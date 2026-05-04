@@ -3,7 +3,9 @@ import { describe, expect, it } from '@jest/globals';
 import {
   Sapling,
   SaplingForm,
+  SaplingGenericReference,
   getSaplingFormLayout,
+  getSaplingGenericReference,
   getSaplingOptions,
 } from './entity.decorator';
 
@@ -18,6 +20,12 @@ describe('entity.decorator', () => {
 
     @SaplingForm({ width: 2 })
     compact!: string;
+
+    @SaplingGenericReference({
+      entityField: ' entity ',
+      handleField: ' reference ',
+    })
+    genericReference!: string;
   }
 
   it('stores normalized form layout metadata without affecting sapling options', () => {
@@ -58,5 +66,18 @@ describe('entity.decorator', () => {
       order: null,
       width: 2,
     });
+  });
+
+  it('stores normalized generic reference metadata', () => {
+    expect(
+      getSaplingGenericReference(ExampleEntity.prototype, 'genericReference'),
+    ).toEqual({
+      entityField: 'entity',
+      handleField: 'reference',
+    });
+
+    expect(
+      getSaplingGenericReference(ExampleEntity.prototype, 'missing'),
+    ).toBeNull();
   });
 });

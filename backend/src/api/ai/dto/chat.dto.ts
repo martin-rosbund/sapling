@@ -141,6 +141,40 @@ export class CreateAiChatMessageDto {
   @IsOptional()
   @IsObject()
   contextPayload?: Record<string, unknown>;
+
+  @ApiPropertyOptional({
+    description: 'Current client date/time at request time as an ISO timestamp',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  clientCurrentDateTime?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'IANA timezone reported by the client, for example Europe/Berlin or America/New_York',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  clientTimeZone?: string;
+
+  @ApiPropertyOptional({
+    description: 'Locale reported by the client, for example de-DE or en-US',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  clientLocale?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Client offset from UTC in minutes at request time, for example 120 for UTC+02:00',
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  clientUtcOffsetMinutes?: number;
 }
 
 export class ListAiChatMessagesQueryDto {

@@ -63,6 +63,11 @@ export interface EntityTemplateReferenceDependency {
   clearOnParentChange?: boolean
 }
 
+export interface EntityTemplateGenericReference {
+  entityField: string
+  handleField: string
+}
+
 export type DialogState = 'create' | 'edit' | 'readonly'
 
 export type DialogSaveAction = 'save' | 'saveAndClose'
@@ -128,6 +133,8 @@ export interface EntityTemplate {
   formWidth?: EntityTemplateFormWidth | null
   /** Declarative parent-child dependency metadata for reference fields */
   referenceDependency?: EntityTemplateReferenceDependency | null
+  /** Declarative metadata for generic record references backed by entity + handle fields */
+  genericReference?: EntityTemplateGenericReference | null
 }
 
 export type AccumulatedPermission = {

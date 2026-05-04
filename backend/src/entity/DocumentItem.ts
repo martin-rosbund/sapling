@@ -2,7 +2,11 @@ import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EntityItem } from './EntityItem';
 import { DocumentTypeItem } from './DocumentTypeItem';
-import { Sapling, SaplingForm } from './global/entity.decorator';
+import {
+  Sapling,
+  SaplingForm,
+  SaplingGenericReference,
+} from './global/entity.decorator';
 import { PersonItem } from './PersonItem';
 import { type Rel } from '@mikro-orm/core';
 
@@ -41,6 +45,7 @@ export class DocumentItem {
    */
   @ApiProperty()
   @Sapling(['isSystem'])
+  @SaplingGenericReference({ entityField: 'entity', handleField: 'reference' })
   @Property({ length: 64 })
   reference!: string;
 

@@ -64,6 +64,76 @@ describe('EventController', () => {
     expect(result.method).toBe(ScriptResultServerMethods.none);
   });
 
+  it('defaults empty participants to assignee and creator before create', async () => {
+    const controller = new EventController(
+      { handle: 'event' } as never,
+      { handle: 1 } as never,
+      {} as never,
+      {} as never,
+      {} as never,
+    );
+    const items = [
+      {
+        assigneePerson: 10,
+        creatorPerson: { handle: 11 },
+        participants: [],
+      },
+    ] as unknown as EventItem[];
+
+    const result = await controller.beforeInsert(items);
+
+    expect(result.items).toBe(items);
+    expect(result.method).toBe(ScriptResultServerMethods.overwrite);
+    expect(
+      (items[0] as unknown as { participants: number[] }).participants,
+    ).toEqual([10, 11]);
+  });
+
+  it('does not duplicate participants when assignee and creator are the same person', async () => {
+    const controller = new EventController(
+      { handle: 'event' } as never,
+      { handle: 1 } as never,
+      {} as never,
+      {} as never,
+      {} as never,
+    );
+    const items = [
+      {
+        assigneePerson: { handle: 10 },
+        creatorPerson: 10,
+      },
+    ] as unknown as EventItem[];
+
+    await controller.beforeInsert(items);
+
+    expect(
+      (items[0] as unknown as { participants: number[] }).participants,
+    ).toEqual([10]);
+  });
+
+  it('keeps explicit participants before create', async () => {
+    const controller = new EventController(
+      { handle: 'event' } as never,
+      { handle: 1 } as never,
+      {} as never,
+      {} as never,
+      {} as never,
+    );
+    const items = [
+      {
+        assigneePerson: 10,
+        creatorPerson: 11,
+        participants: [12],
+      },
+    ] as unknown as EventItem[];
+
+    await controller.beforeInsert(items);
+
+    expect(
+      (items[0] as unknown as { participants: number[] }).participants,
+    ).toEqual([12]);
+  });
+
   it('queues updated events for google users with a session', async () => {
     const azureQueueEvent = jest.fn(() => Promise.resolve(undefined));
     const googleQueueEvent = jest.fn(() => Promise.resolve(undefined));

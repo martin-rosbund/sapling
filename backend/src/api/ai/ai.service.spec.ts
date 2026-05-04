@@ -65,19 +65,54 @@ describe('AiService', () => {
       service as never as {
         buildSystemInstruction: (options?: {
           includeToolGuidance?: boolean;
+          user?: unknown;
+          clientTimeContext?: unknown;
         }) => string;
       }
     ).buildSystemInstruction({ includeToolGuidance: true });
 
     expect(instruction).toContain(
-      'Current server date and time: 2026-04-20T08:15:30.000Z.',
+      'Current UTC date and time: 2026-04-20T08:15:30.000Z.',
     );
     expect(instruction).toContain('Server local date: 2026-04-20.');
     expect(instruction).toContain(
-      'Interpret relative date expressions such as "today", "yesterday", "this week", and "this month" using the server local date',
+      'Interpret relative date expressions such as "today", "yesterday", "this week", and "this month" using the',
     );
     expect(instruction).toContain(
       'Use available tools automatically when they are needed to answer with current Sapling data.',
+    );
+  });
+
+  it('uses the client timezone context for local date and time instructions', () => {
+    const service = createService();
+
+    const instruction = (
+      service as never as {
+        buildSystemInstruction: (options?: {
+          includeToolGuidance?: boolean;
+          user?: unknown;
+          clientTimeContext?: unknown;
+        }) => string;
+      }
+    ).buildSystemInstruction({
+      clientTimeContext: {
+        currentDate: new Date('2026-04-20T08:15:30.000Z'),
+        timeZone: 'Europe/Berlin',
+        locale: 'de-DE',
+        utcOffsetMinutes: 120,
+      },
+    });
+
+    expect(instruction).toContain(
+      'Client reported current date and time: 2026-04-20T08:15:30.000Z.',
+    );
+    expect(instruction).toContain(
+      'Client reported timezone offset at request time: UTC+02:00.',
+    );
+    expect(instruction).toContain('UTC+02:00 (Europe/Berlin).');
+    expect(instruction).toContain('using the Europe/Berlin user locale date');
+    expect(instruction).toContain(
+      'use 20:00 Europe/Berlin rather than 20:00 UTC unless UTC is explicitly requested',
     );
   });
 

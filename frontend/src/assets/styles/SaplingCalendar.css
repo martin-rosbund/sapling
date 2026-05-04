@@ -297,6 +297,16 @@
   max-height: min(520px, 42dvh);
 }
 
+.sapling-event-context-dialog__surface {
+  width: min(720px, calc(100vw - (var(--sapling-gap-md) * 2)));
+  max-width: 100%;
+}
+
+.sapling-event-context-dialog__panel {
+  min-height: min(720px, calc(100dvh - (var(--sapling-gap-md) * 4)));
+  max-height: min(720px, calc(100dvh - (var(--sapling-gap-md) * 4)));
+}
+
 .sapling-event-panel {
   display: flex;
   flex-direction: column;

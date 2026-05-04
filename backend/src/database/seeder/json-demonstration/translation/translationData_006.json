@@ -1,0 +1,68 @@
+[
+  {
+    "entity": "document",
+    "property": "selectDocuments",
+    "de": "Dokumente auswählen",
+    "en": "Select documents"
+  },
+  {
+    "entity": "document",
+    "property": "dropDocuments",
+    "de": "Dateien hierher ziehen oder per Klick auswählen",
+    "en": "Drag files here or click to select them"
+  },
+  {
+    "entity": "document",
+    "property": "maxFileSizeLabel",
+    "de": "Max. Dateigröße",
+    "en": "Max file size"
+  },
+  {
+    "entity": "document",
+    "property": "selectedFilesLabel",
+    "de": "Ausgewählte Dateien",
+    "en": "Selected files"
+  },
+  {
+    "entity": "document",
+    "property": "filesSelected",
+    "de": "{count} Dateien ausgewählt",
+    "en": "{count} files selected"
+  },
+  {
+    "entity": "document",
+    "property": "maxFileSizeHint",
+    "de": "Maximale Dateigröße pro Datei: {size} MB",
+    "en": "Maximum file size per file: {size} MB"
+  },
+  {
+    "entity": "document",
+    "property": "maxFileSizeExceeded",
+    "de": "Mindestens eine Datei überschreitet die maximale Größe von {size} MB.",
+    "en": "At least one file exceeds the maximum size of {size} MB."
+  },
+  {
+    "entity": "document",
+    "property": "descriptionHint",
+    "de": "Optionale Beschreibung, die für alle ausgewählten Dateien übernommen wird.",
+    "en": "Optional description applied to all selected files."
+  },
+  {
+    "entity": "document",
+    "property": "uploadCompleted",
+    "de": "Upload abgeschlossen",
+    "en": "Upload completed"
+  },
+  {
+    "entity": "document",
+    "property": "uploadCompletedDescription",
+    "de": "{count} Dateien wurden erfolgreich hochgeladen.",
+    "en": "{count} files were uploaded successfully."
+  },
+  {
+    "entity": "document",
+    "property": "uploadPartialDescription",
+    "de": "{successCount} Dateien wurden hochgeladen, {failedCount} Dateien müssen erneut versucht werden.",
+    "en": "{successCount} files were uploaded, {failedCount} files still need to be retried."
+  }
+]

@@ -13,9 +13,16 @@ import type {
 import type { FilterQuery } from '@/services/api.generic.service'
 import { formatValue } from './saplingFormatUtil'
 
+export function isGenericReferenceTemplate(template?: Partial<EntityTemplate>): boolean {
+  return Boolean(
+    template?.genericReference?.entityField?.trim() &&
+    template?.genericReference?.handleField?.trim(),
+  )
+}
+
 function isVisibleTableTemplate(template: EntityTemplate): boolean {
   return (
-    !template.options?.includes('isSystem') &&
+    (!template.options?.includes('isSystem') || isGenericReferenceTemplate(template)) &&
     !template.isAutoIncrement &&
     !template.options?.includes('isSecurity') &&
     !((template.length ?? 0) > 256) &&
@@ -56,7 +63,7 @@ export function getEditDialogHeaders(
 ) {
   return entityTemplates.filter(
     (x) =>
-      !x.options?.includes('isSystem') &&
+      (!x.options?.includes('isSystem') || isGenericReferenceTemplate(x)) &&
       !x.isAutoIncrement &&
       !['1:m', 'm:n', 'n:m', '1:1'].includes(x.kind || '') &&
       (x.name !== 'handle' || mode === 'create') &&
@@ -612,4 +619,52 @@ export function getEntityValueLabel(
   }
 
   return ''
+}
+
+export function getGenericReferenceEntityHandle(
+  item?: SaplingGenericItem | null,
+  template?: Partial<EntityTemplate>,
+): string {
+  const entityField = template?.genericReference?.entityField?.trim()
+  if (!item || !entityField) {
+    return ''
+  }
+
+  const rawValue = item[entityField]
+  if (typeof rawValue === 'string') {
+    return rawValue.trim()
+  }
+
+  if (
+    rawValue &&
+    typeof rawValue === 'object' &&
+    'handle' in rawValue &&
+    typeof rawValue.handle === 'string'
+  ) {
+    return rawValue.handle.trim()
+  }
+
+  return ''
+}
+
+export function getGenericReferenceHandle(
+  item?: SaplingGenericItem | null,
+  template?: Partial<EntityTemplate>,
+): string | number | null {
+  const handleField = template?.genericReference?.handleField?.trim()
+  if (!item || !handleField) {
+    return null
+  }
+
+  const rawValue = item[handleField]
+  if (typeof rawValue === 'number') {
+    return rawValue
+  }
+
+  if (typeof rawValue === 'string') {
+    const trimmedValue = rawValue.trim()
+    return trimmedValue.length > 0 ? trimmedValue : null
+  }
+
+  return null
 }

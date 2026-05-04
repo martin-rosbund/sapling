@@ -64,6 +64,8 @@ import { defineAsyncComponent, ref, computed, watch } from 'vue'
 import SaplingFilePDF from './SaplingFilePDF.vue'
 import SaplingFilePNG from './SaplingFilePNG.vue'
 import SaplingFileJPEG from './SaplingFileJPEG.vue'
+import SaplingFileAudio from './SaplingFileAudio.vue'
+import SaplingFileVideo from './SaplingFileVideo.vue'
 import SaplingFileNoPreview from './SaplingFileNoPreview.vue'
 import SaplingFileDetail from './SaplingFileDetail.vue'
 import SaplingFileJSON from './SaplingFileJSON.vue'
@@ -149,6 +151,8 @@ const previewComponent = computed(() => {
   if (previewType.value === 'pdf') return SaplingFilePDF
   if (previewType.value === 'png') return SaplingFilePNG
   if (previewType.value === 'jpeg') return SaplingFileJPEG
+  if (previewType.value === 'audio') return SaplingFileAudio
+  if (previewType.value === 'video') return SaplingFileVideo
   if (previewType.value === 'json') return SaplingFileJSON
   if (previewType.value === 'eml') return SaplingFileMail
   return SaplingFileNoPreview
@@ -169,6 +173,20 @@ const previewProps = computed(() => {
   const url = `${BACKEND_URL}document/download/${selectedHandle.value}`
   if (previewType.value === 'png') return { pngUrl: url }
   if (previewType.value === 'jpeg') return { jpegUrl: url }
+  if (previewType.value === 'audio') {
+    return {
+      audioUrl: url,
+      mimeType: selectedMimeType.value,
+      fileName: selectedFilename.value,
+    }
+  }
+  if (previewType.value === 'video') {
+    return {
+      videoUrl: url,
+      mimeType: selectedMimeType.value,
+      fileName: selectedFilename.value,
+    }
+  }
   if (previewType.value === 'eml') {
     return {
       mailUrl: url,
@@ -186,6 +204,8 @@ function getPreviewType(mimetype: string, filename: string) {
   if (normalizedMimeType === 'application/pdf') return 'pdf'
   if (normalizedMimeType === 'image/png') return 'png'
   if (normalizedMimeType === 'image/jpeg' || normalizedMimeType === 'image/jpg') return 'jpeg'
+  if (isAudioFile(normalizedMimeType, normalizedFilename)) return 'audio'
+  if (isVideoFile(normalizedMimeType, normalizedFilename)) return 'video'
   if (normalizedMimeType === 'application/json') return 'json'
   if (isEmlFile(normalizedMimeType, normalizedFilename)) return 'eml'
   return 'none'
@@ -193,5 +213,17 @@ function getPreviewType(mimetype: string, filename: string) {
 
 function isEmlFile(mimetype: string, filename: string) {
   return mimetype === 'message/rfc822' || filename.endsWith('.eml')
+}
+
+function isAudioFile(mimetype: string, filename: string) {
+  return mimetype === 'audio/mpeg' || mimetype === 'audio/mp3' || filename.endsWith('.mp3')
+}
+
+function isVideoFile(mimetype: string, filename: string) {
+  return mimetype === 'video/mp4' || mimetype === 'video/webm' || hasVideoExtension(filename)
+}
+
+function hasVideoExtension(filename: string) {
+  return filename.endsWith('.mp4') || filename.endsWith('.webm')
 }
 </script>

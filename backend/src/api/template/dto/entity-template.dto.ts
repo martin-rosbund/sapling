@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   SaplingOption,
   type SaplingFormWidthSpan,
+  type SaplingGenericReferenceMetadata,
   type SaplingReferenceDependency,
 } from '../../../entity/global/entity.decorator';
 
@@ -33,6 +34,7 @@ import {
  * @property        formOrder           Optional form order index for generated edit dialogs
  * @property        formWidth           Optional form width span (1-4) for generated edit dialogs
  * @property        referenceDependency Declarative parent-child dependency metadata for reference fields
+ * @property        genericReference    Declarative metadata for generic entity+handle record references
  */
 export class EntityTemplateDto {
   @ApiProperty({
@@ -173,4 +175,13 @@ export class EntityTemplateDto {
     type: Object,
   })
   referenceDependency?: SaplingReferenceDependency | null;
+
+  @ApiProperty({
+    description:
+      'Declarative metadata for generic record references backed by a target entity field and a handle field.',
+    nullable: true,
+    required: false,
+    type: Object,
+  })
+  genericReference?: SaplingGenericReferenceMetadata | null;
 }

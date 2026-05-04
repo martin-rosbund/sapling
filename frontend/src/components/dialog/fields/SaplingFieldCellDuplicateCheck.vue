@@ -22,7 +22,7 @@
     </template>
     <div class="sapling-menu-surface sapling-menu-surface--field-table">
       <sapling-table
-      class="glass-panel"
+        class="glass-panel"
         :entity-handle="entityHandle"
         :items="items"
         :search="inputValue"

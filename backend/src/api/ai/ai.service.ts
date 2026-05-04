@@ -82,6 +82,13 @@ type AiChatMessagePage = {
   };
 };
 
+type AiClientTimeContext = {
+  currentDate?: Date;
+  timeZone?: string;
+  locale?: string;
+  utcOffsetMinutes?: number;
+};
+
 type AiEmbeddingTarget = {
   provider: AiProviderTypeItem;
   model: AiProviderModelItem;
@@ -541,6 +548,7 @@ export class AiService {
       dto.modelHandle ?? this.extractModelHandle(session.model),
     );
     const availableTools = await this.mcpService.listActiveTools(user);
+    const clientTimeContext = this.extractClientTimeContext(dto);
 
     const userMessage = this.em.create(AiChatMessageItem, {
       session,
@@ -559,6 +567,11 @@ export class AiService {
         routeName: dto.routeName ?? null,
         url: dto.url ?? null,
         pageTitle: dto.pageTitle ?? null,
+        clientCurrentDateTime:
+          clientTimeContext?.currentDate?.toISOString() ?? null,
+        clientTimeZone: clientTimeContext?.timeZone ?? null,
+        clientLocale: clientTimeContext?.locale ?? null,
+        clientUtcOffsetMinutes: clientTimeContext?.utcOffsetMinutes ?? null,
         contextPayload: dto.contextPayload ?? null,
       },
     });
@@ -658,6 +671,7 @@ export class AiService {
           availableTools,
           user,
           maxToolCallIterations,
+          clientTimeContext,
           async (delta) => {
             if (!delta) {
               return;
@@ -679,6 +693,7 @@ export class AiService {
           availableTools,
           user,
           maxToolCallIterations,
+          clientTimeContext,
           async (delta) => {
             if (!delta) {
               return;
@@ -864,6 +879,7 @@ export class AiService {
       dto.providerHandle ?? this.extractProviderHandle(session.provider),
       dto.modelHandle ?? this.extractModelHandle(session.model),
     );
+    const clientTimeContext = this.extractClientTimeContext(dto);
 
     const latestMessage = await this.em.find(
       AiChatMessageItem,
@@ -888,6 +904,11 @@ export class AiService {
         routeName: dto.routeName ?? null,
         url: dto.url ?? null,
         pageTitle: dto.pageTitle ?? null,
+        clientCurrentDateTime:
+          clientTimeContext?.currentDate?.toISOString() ?? null,
+        clientTimeZone: clientTimeContext?.timeZone ?? null,
+        clientLocale: clientTimeContext?.locale ?? null,
+        clientUtcOffsetMinutes: clientTimeContext?.utcOffsetMinutes ?? null,
         contextPayload: dto.contextPayload ?? null,
       },
     });
@@ -1740,10 +1761,11 @@ export class AiService {
     availableTools: McpToolDescriptor[],
     user: PersonItem,
     maxToolCallIterations: number,
+    clientTimeContext: AiClientTimeContext | undefined,
     onDelta: (delta: string) => Promise<void>,
   ): Promise<AiStreamResult> {
     const toolRegistry = this.buildToolRegistry(availableTools);
-    const messages = this.buildOpenAiMessages(history);
+    const messages = this.buildOpenAiMessages(history, user, clientTimeContext);
     const executedToolCalls: AiExecutedToolCall[] = [];
 
     for (let iteration = 0; iteration < maxToolCallIterations; iteration += 1) {
@@ -1819,6 +1841,7 @@ export class AiService {
     availableTools: McpToolDescriptor[],
     user: PersonItem,
     maxToolCallIterations: number,
+    clientTimeContext: AiClientTimeContext | undefined,
     onDelta: (delta: string) => Promise<void>,
   ): Promise<AiStreamResult> {
     const toolRegistry = this.buildToolRegistry(availableTools);
@@ -1842,6 +1865,7 @@ export class AiService {
         functionDeclarations,
         user,
         maxToolCallIterations,
+        clientTimeContext,
         onDelta,
       );
     } catch (error) {
@@ -1856,6 +1880,8 @@ export class AiService {
         modelName,
         conversation,
         currentTurn.parts,
+        user,
+        clientTimeContext,
         onDelta,
       );
     }
@@ -1870,6 +1896,7 @@ export class AiService {
     functionDeclarations: FunctionDeclaration[],
     user: PersonItem,
     maxToolCallIterations: number,
+    clientTimeContext: AiClientTimeContext | undefined,
     onDelta: (delta: string) => Promise<void>,
   ): Promise<AiStreamResult> {
     const generativeModel = this.createGeminiClient(
@@ -1887,6 +1914,8 @@ export class AiService {
         : {}),
       systemInstruction: this.buildSystemInstruction({
         includeToolGuidance: true,
+        user,
+        clientTimeContext,
       }),
     });
 
@@ -1980,13 +2009,18 @@ export class AiService {
     modelName: string,
     conversation: Content[],
     currentTurnParts: Part[],
+    user: PersonItem,
+    clientTimeContext: AiClientTimeContext | undefined,
     onDelta: (delta: string) => Promise<void>,
   ): Promise<AiStreamResult> {
     const generativeModel = this.createGeminiClient(
       provider,
     ).getGenerativeModel({
       model: modelName,
-      systemInstruction: this.buildSystemInstruction(),
+      systemInstruction: this.buildSystemInstruction({
+        user,
+        clientTimeContext,
+      }),
     });
 
     const chat = generativeModel.startChat({ history: conversation });
@@ -2375,11 +2409,21 @@ export class AiService {
     return `${errorLine} ${hintLine}`.trim();
   }
 
-  private buildOpenAiMessages(history: AiChatMessageItem[]) {
+  private buildOpenAiMessages(
+    history: AiChatMessageItem[],
+    user?: PersonItem,
+    clientTimeContext?: AiClientTimeContext,
+  ) {
     const messages: Array<Record<string, unknown>> = [
       {
         role: 'system',
-        content: this.buildSystemInstruction({ includeToolGuidance: true }),
+        content: this.buildSystemInstruction({
+          includeToolGuidance: true,
+          user,
+          clientTimeContext:
+            clientTimeContext ??
+            this.extractClientTimeContextFromHistory(history),
+        }),
       },
     ];
 
@@ -2402,6 +2446,8 @@ export class AiService {
 
   private buildSystemInstruction(options?: {
     includeToolGuidance?: boolean;
+    user?: PersonItem;
+    clientTimeContext?: AiClientTimeContext;
   }): string {
     const baseInstruction =
       'You are Songbird, the Sapling assistant. Songbird is your name, and if the user asks for your name you should say that your name is Songbird. Address the user informally when speaking German and consistently use du, dir, dich, dein, and deine; avoid the formal forms Sie and Ihre. Use the persisted page context from the latest user message when it is relevant and answer concisely.';
@@ -2409,15 +2455,125 @@ export class AiService {
       ? ' Use available tools automatically when they are needed to answer with current Sapling data. For questions about the current user identity, profile, company, department, language, or roles, use the current_person tool. If you only know a partial entity name or a field such as email or assigneePerson, use entity_search before entity_schema. For descriptive ticket, incident, Sage error, or known-solution questions across long text fields, use semantic_search with entityHandle ticket first. Semantic search is especially useful for natural-language symptoms, problem descriptions, and workaround requests because it searches vectorized ticket sections such as overview, problem, and solution. Use ticket_search for exact ticket numbers, external numbers, or strict keyword matching. Prefer ticket_search with searchMode solution when the user explicitly asks for an existing fix, workaround, Loesung, or ticket solution and the wording is already keyword-oriented. Do not invent or infer URLs, deep links, record detail links, or absolute Sapling addresses in the prose answer. Only mention a Sapling link when an exact path is provided by tool results; otherwise rely on the UI navigation action instead of fabricating a URL. For questions about where something is located in the app, navigation, or menu, first inspect the entity_catalog to identify likely candidates, then use entity_schema and generic queries on entity, entityGroup, and entityRoute. Treat entity as the page or feature name, entity.group as the navigation group where it is found, entityGroup.parent as an optional parent group for nested navigation, and entityRoute.route as the final route to open. When you identify the sought destination, prefer the matching entityRoute, return the final route at the end of the answer, and use that route for the navigation link instead of only returning a table view. When you already know the exact record handle, prefer generic_get over generic_list. For history, date span, or record activity questions about one known record, use generic_timeline. Before querying or mutating an unfamiliar Sapling entity, inspect its schema first and only use fields and relation names returned by the schema tool.'
       : '';
 
-    return `${baseInstruction}${toolInstruction} ${this.buildCurrentDateInstruction()}`.trim();
+    return `${baseInstruction}${toolInstruction} ${this.buildCurrentDateInstruction(
+      new Date(),
+      options?.user,
+      options?.clientTimeContext,
+    )}`.trim();
   }
 
   private buildCurrentDateInstruction(
     referenceDate: Date = new Date(),
+    user?: PersonItem,
+    clientTimeContext?: AiClientTimeContext,
   ): string {
     const offsetMinutes = -referenceDate.getTimezoneOffset();
-    const offsetSign = offsetMinutes >= 0 ? '+' : '-';
-    const absoluteOffsetMinutes = Math.abs(offsetMinutes);
+
+    const localeTimeZone = this.resolveUserTimeZone(user, clientTimeContext);
+    const localeName = this.resolveUserLocale(user, clientTimeContext);
+    const clientReferenceDate = clientTimeContext?.currentDate ?? referenceDate;
+    const clientReportedLine = clientTimeContext?.currentDate
+      ? `Client reported current date and time: ${clientTimeContext.currentDate.toISOString()}.`
+      : null;
+    const clientOffsetLine = Number.isFinite(
+      clientTimeContext?.utcOffsetMinutes,
+    )
+      ? `Client reported timezone offset at request time: UTC${this.formatUtcOffset(clientTimeContext?.utcOffsetMinutes ?? 0)}.`
+      : null;
+
+    return [
+      `Current UTC date and time: ${referenceDate.toISOString()}.`,
+      `Server local date: ${this.formatLocalDate(referenceDate)}.`,
+      `Server timezone offset: UTC${this.formatUtcOffset(offsetMinutes)}.`,
+      clientReportedLine,
+      clientOffsetLine,
+      `User locale date and time: ${this.formatZonedDateTime(clientReferenceDate, localeTimeZone, localeName)} (${localeTimeZone}).`,
+      `Interpret relative date expressions such as "today", "yesterday", "this week", and "this month" using the ${localeTimeZone} user locale date unless the user explicitly specifies a different date or timezone.`,
+      `When the user gives a time without timezone in German or local phrasing, interpret it as ${localeTimeZone} local time and include the correct offset in tool payloads, for example use 20:00 ${localeTimeZone} rather than 20:00 UTC unless UTC is explicitly requested.`,
+    ]
+      .filter((line): line is string => !!line)
+      .join(' ');
+  }
+
+  private resolveUserLocale(
+    user?: PersonItem,
+    clientTimeContext?: AiClientTimeContext,
+  ): string {
+    if (clientTimeContext?.locale?.trim()) {
+      return clientTimeContext.locale.trim();
+    }
+
+    const languageHandle =
+      user?.language && typeof user.language !== 'string'
+        ? user.language.handle
+        : undefined;
+
+    return languageHandle === 'de' || !languageHandle
+      ? 'de-DE'
+      : languageHandle;
+  }
+
+  private resolveUserTimeZone(
+    user?: PersonItem,
+    clientTimeContext?: AiClientTimeContext,
+  ): string {
+    if (this.isValidTimeZone(clientTimeContext?.timeZone)) {
+      return clientTimeContext.timeZone?.trim() ?? 'UTC';
+    }
+
+    void user;
+    const serverTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return this.isValidTimeZone(serverTimeZone) ? serverTimeZone : 'UTC';
+  }
+
+  private isValidTimeZone(value: unknown): value is string {
+    if (typeof value !== 'string' || !value.trim()) {
+      return false;
+    }
+
+    try {
+      new Intl.DateTimeFormat('en-US', { timeZone: value.trim() });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  private formatZonedDateTime(
+    value: Date,
+    timeZone: string,
+    locale: string,
+  ): string {
+    const offset = this.formatTimeZoneOffset(value, timeZone);
+    const dateTime = new Intl.DateTimeFormat(locale, {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    }).format(value);
+
+    return `${dateTime} UTC${offset}`;
+  }
+
+  private formatTimeZoneOffset(value: Date, timeZone: string): string {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      timeZoneName: 'longOffset',
+    }).formatToParts(value);
+    const offset = parts.find((part) => part.type === 'timeZoneName')?.value;
+    const match = offset?.match(/GMT([+-]\d{2}:\d{2})/);
+
+    return match?.[1] ?? '+00:00';
+  }
+
+  private formatUtcOffset(offsetMinutes: number): string {
+    const normalizedOffsetMinutes = Math.trunc(offsetMinutes);
+    const offsetSign = normalizedOffsetMinutes >= 0 ? '+' : '-';
+    const absoluteOffsetMinutes = Math.abs(normalizedOffsetMinutes);
     const offsetHours = String(Math.floor(absoluteOffsetMinutes / 60)).padStart(
       2,
       '0',
@@ -2427,12 +2583,96 @@ export class AiService {
       '0',
     );
 
-    return [
-      `Current server date and time: ${referenceDate.toISOString()}.`,
-      `Server local date: ${this.formatLocalDate(referenceDate)}.`,
-      `Server timezone offset: UTC${offsetSign}${offsetHours}:${offsetRemainderMinutes}.`,
-      'Interpret relative date expressions such as "today", "yesterday", "this week", and "this month" using the server local date unless the user explicitly specifies a different date or timezone.',
-    ].join(' ');
+    return `${offsetSign}${offsetHours}:${offsetRemainderMinutes}`;
+  }
+
+  private extractClientTimeContext(
+    dto: CreateAiChatMessageDto,
+  ): AiClientTimeContext | undefined {
+    const currentDate = this.parseClientCurrentDate(dto.clientCurrentDateTime);
+    const timeZone = this.isValidTimeZone(dto.clientTimeZone)
+      ? dto.clientTimeZone.trim()
+      : undefined;
+    const locale =
+      typeof dto.clientLocale === 'string' && dto.clientLocale.trim()
+        ? dto.clientLocale.trim()
+        : undefined;
+    const utcOffsetMinutes = Number.isFinite(dto.clientUtcOffsetMinutes)
+      ? Math.trunc(dto.clientUtcOffsetMinutes ?? 0)
+      : undefined;
+
+    if (
+      !currentDate &&
+      !timeZone &&
+      !locale &&
+      typeof utcOffsetMinutes === 'undefined'
+    ) {
+      return undefined;
+    }
+
+    return {
+      currentDate,
+      timeZone,
+      locale,
+      utcOffsetMinutes,
+    };
+  }
+
+  private extractClientTimeContextFromHistory(
+    history: AiChatMessageItem[],
+  ): AiClientTimeContext | undefined {
+    for (const message of [...history].reverse()) {
+      if (message.role !== 'user') {
+        continue;
+      }
+
+      const payload = this.asRecord(message.requestPayload);
+
+      if (!payload) {
+        continue;
+      }
+
+      const currentDate = this.parseClientCurrentDate(
+        payload.clientCurrentDateTime,
+      );
+      const timeZone = this.isValidTimeZone(payload.clientTimeZone)
+        ? payload.clientTimeZone.trim()
+        : undefined;
+      const locale =
+        typeof payload.clientLocale === 'string' && payload.clientLocale.trim()
+          ? payload.clientLocale.trim()
+          : undefined;
+      const utcOffsetMinutes =
+        typeof payload.clientUtcOffsetMinutes === 'number' &&
+        Number.isFinite(payload.clientUtcOffsetMinutes)
+          ? Math.trunc(payload.clientUtcOffsetMinutes)
+          : undefined;
+
+      if (
+        currentDate ||
+        timeZone ||
+        locale ||
+        typeof utcOffsetMinutes !== 'undefined'
+      ) {
+        return {
+          currentDate,
+          timeZone,
+          locale,
+          utcOffsetMinutes,
+        };
+      }
+    }
+
+    return undefined;
+  }
+
+  private parseClientCurrentDate(value: unknown): Date | undefined {
+    if (typeof value !== 'string' || !value.trim()) {
+      return undefined;
+    }
+
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? undefined : date;
   }
 
   private formatLocalDate(value: Date): string {

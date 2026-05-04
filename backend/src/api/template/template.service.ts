@@ -4,6 +4,7 @@ import { ENTITY_MAP } from '../../entity/global/entity.registry';
 import { EntityTemplateDto } from './dto/entity-template.dto';
 import {
   getSaplingFormLayout,
+  getSaplingGenericReference,
   getSaplingReferenceDependency,
   getSaplingOptions,
   hasSaplingOption,
@@ -98,6 +99,10 @@ export class TemplateService {
         formOrder: formLayout.order,
         formWidth: formLayout.width,
         referenceDependency: getSaplingReferenceDependency(
+          entityClass.prototype as object,
+          prop.name,
+        ),
+        genericReference: getSaplingGenericReference(
           entityClass.prototype as object,
           prop.name,
         ),

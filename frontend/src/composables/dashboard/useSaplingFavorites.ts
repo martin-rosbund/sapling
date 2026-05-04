@@ -7,6 +7,7 @@ import { i18n } from '@/i18n'
 import type { FavoriteItem, EntityItem } from '../../entity/entity'
 import { useGenericStore } from '@/stores/genericStore'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
+import { buildFavoritePath } from '@/utils/saplingFavoriteNavigation'
 
 interface FavoriteEntityOption extends EntityItem {
   title: string
@@ -138,6 +139,7 @@ export function useSaplingFavorites() {
         (
           await ApiGenericService.find<EntityItem>('entity', {
             filter: { canShow: true },
+            relations: ['routes'],
           })
         ).data || []
     } finally {
@@ -270,20 +272,9 @@ export function useSaplingFavorites() {
       return
     }
 
-    const entityHandle =
-      favorite.entity && typeof favorite.entity === 'object'
-        ? favorite.entity.handle
-        : favorite.entity
-
-    if (!entityHandle) {
+    const path = buildFavoritePath(favorite, entities.value)
+    if (!path) {
       return
-    }
-
-    let path = `table/${entityHandle}`
-    if (favorite.filter) {
-      const serializedFilter =
-        typeof favorite.filter === 'string' ? favorite.filter : JSON.stringify(favorite.filter)
-      path += `?filter=${encodeURIComponent(serializedFilter)}`
     }
 
     router.push(path)
