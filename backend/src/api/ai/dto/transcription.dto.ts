@@ -93,7 +93,8 @@ export class CreateAiChatTranscriptionDto {
   clientUtcOffsetMinutes?: number;
 
   @ApiPropertyOptional({
-    description: 'Optional measured duration from the client recorder in seconds',
+    description:
+      'Optional measured duration from the client recorder in seconds',
   })
   @IsOptional()
   @Type(() => Number)

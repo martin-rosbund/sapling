@@ -18,6 +18,7 @@ import {
   ApiBody,
   ApiConsumes,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiResponse,
   ApiTags,
@@ -135,11 +136,17 @@ export class AiController {
   async listTranscriptionModels(
     @Query('providerHandle') providerHandle?: string,
   ): Promise<AiProviderModelItem[]> {
-    return this.aiService.listActiveModels(providerHandle, 'transcription', true);
+    return this.aiService.listActiveModels(
+      providerHandle,
+      'transcription',
+      true,
+    );
   }
 
   @Post('chat/transcriptions')
-  @ApiOperation({ summary: 'Upload audio and create a persisted transcription draft' })
+  @ApiOperation({
+    summary: 'Upload audio and create a persisted transcription draft',
+  })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -319,6 +326,19 @@ export class AiController {
     @Body() body: CreateAiChatMessageDto,
   ): Promise<{ session: AiChatSessionItem; message: AiChatMessageItem }> {
     return this.aiService.createChatMessage(body, req.user);
+  }
+
+  @Post('chat/messages/:handle/speech')
+  @ApiOperation({
+    summary: 'Create or reuse persisted speech audio for an assistant message',
+  })
+  @ApiParam({ name: 'handle', type: 'number', description: 'Message handle' })
+  @ApiResponse({ status: 201, type: AiChatMessageItem })
+  async ensureAssistantMessageSpeech(
+    @Req() req: Request & { user: PersonItem },
+    @Param('handle') handle: number,
+  ): Promise<AiChatMessageItem> {
+    return this.aiService.ensureAssistantMessageSpeech(handle, req.user);
   }
 
   @Post('chat/stream')

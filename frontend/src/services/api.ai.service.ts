@@ -280,6 +280,45 @@ class ApiAiService {
     }
   }
 
+  static async ensureMessageSpeech(
+    handle: number,
+    options?: {
+      suppressErrorMessage?: boolean
+    },
+  ): Promise<AiChatMessageItem> {
+    try {
+      const response = await axios.post<AiChatMessageItem>(
+        `${BACKEND_URL}ai/chat/messages/${handle}/speech`,
+      )
+      return response.data
+    } catch (error: unknown) {
+      if (!options?.suppressErrorMessage) {
+        this.handleError(error, 'ai.speech.createFailed')
+      }
+      throw error
+    }
+  }
+
+  static async downloadMessageSpeechAudio(
+    documentHandle: number,
+    options?: {
+      suppressErrorMessage?: boolean
+    },
+  ): Promise<Blob> {
+    try {
+      const response = await axios.get<Blob>(`${BACKEND_URL}document/download/${documentHandle}`, {
+        responseType: 'blob',
+        withCredentials: true,
+      })
+      return response.data
+    } catch (error: unknown) {
+      if (!options?.suppressErrorMessage) {
+        this.handleError(error, 'ai.speech.playbackFailed')
+      }
+      throw error
+    }
+  }
+
   static async createTranscription(
     file: File | Blob,
     payload: CreateAiChatTranscriptionPayload = {},

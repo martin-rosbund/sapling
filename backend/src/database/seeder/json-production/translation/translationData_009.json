@@ -1,0 +1,12 @@
+[
+  { "entity": "ai", "property": "speechProviderNotConfigured", "de": "Sprachausgabeanbieter nicht konfiguriert", "en": "Speech provider not configured" },
+  { "entity": "ai", "property": "speechGenerationFailed", "de": "Audio konnte nicht erzeugt werden", "en": "Failed to generate speech audio" },
+  { "entity": "ai", "property": "speechOnlySupportedForAssistantMessages", "de": "Sprachausgabe ist nur fuer Assistant-Nachrichten verfuegbar", "en": "Speech output is only available for assistant messages" },
+  { "entity": "ai", "property": "speechInputEmpty", "de": "Es ist kein Text fuer die Sprachausgabe vorhanden", "en": "There is no text available for speech output" },
+  { "entity": "ai", "property": "speech.createFailed", "de": "Sprachausgabe konnte nicht erstellt werden", "en": "Unable to create speech output" },
+  { "entity": "ai", "property": "speech.playbackFailed", "de": "Sprachausgabe konnte nicht abgespielt werden", "en": "Unable to play speech output" },
+
+  { "entity": "aiChat", "property": "playVoiceOutput", "de": "Vorlesen", "en": "Read aloud" },
+  { "entity": "aiChat", "property": "pauseVoiceOutput", "de": "Vorlesen stoppen", "en": "Stop reading aloud" },
+  { "entity": "aiChat", "property": "loadingVoiceOutput", "de": "Sprachausgabe wird erzeugt", "en": "Generating speech output" }
+]

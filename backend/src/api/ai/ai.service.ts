@@ -25,6 +25,7 @@ import { AiChatMessageItem } from '../../entity/AiChatMessageItem';
 import { AiChatTranscriptionItem } from '../../entity/AiChatTranscriptionItem';
 import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
 import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
+import { DocumentItem } from '../../entity/DocumentItem';
 import {
   AiChatMessageListResponseDto,
   AiChatMessageListMetaDto,
@@ -95,6 +96,26 @@ type AiClientTimeContext = {
   utcOffsetMinutes?: number;
 };
 
+type AiChatMessageSpeechPayload = {
+  status: 'completed' | 'failed';
+  providerHandle: string | null;
+  model: string | null;
+  voice: string | null;
+  documentHandle: number | null;
+  mimeType: string | null;
+  filename: string | null;
+  sourceTextLength: number | null;
+  wasTruncated: boolean;
+  generatedAt: string;
+  error?: string | null;
+};
+
+type AiPreparedSpeechText = {
+  text: string;
+  sourceTextLength: number;
+  wasTruncated: boolean;
+};
+
 type AiEmbeddingTarget = {
   provider: AiProviderTypeItem;
   model: AiProviderModelItem;
@@ -156,6 +177,14 @@ export class AiService {
   private readonly vectorSearchCandidateMultiplier = 6;
   private readonly maxVectorSearchCandidateLimit = 60;
   private readonly maxVectorSearchResults = 10;
+  private readonly assistantSpeechProviderHandle = 'openai';
+  private readonly assistantSpeechModel = 'gpt-4o-mini-tts';
+  private readonly assistantSpeechVoice = 'shimmer';
+  private readonly assistantSpeechMimeType = 'audio/mpeg';
+  private readonly assistantSpeechFileExtension: 'mp3' = 'mp3';
+  private readonly assistantSpeechMaxInputLength = 4000;
+  private readonly assistantSpeechInstructions =
+    'Sprich als Songbird mit warmer, klarer weiblicher Stimme. Sprich natuerlich in der Sprache der Nachricht und lies Markdown nicht als Syntax vor.';
 
   /**
    * Service for accessing configuration values.
@@ -950,6 +979,96 @@ export class AiService {
     };
   }
 
+  async ensureAssistantMessageSpeech(
+    handle: number,
+    user: PersonItem,
+  ): Promise<AiChatMessageItem> {
+    const person = await this.requireManagedUser(user);
+    const message = await this.findOwnedMessage(handle, user);
+
+    if (message.role !== 'assistant') {
+      throw new BadRequestException(
+        'ai.speechOnlySupportedForAssistantMessages',
+      );
+    }
+
+    const preparedSpeechText = this.prepareAssistantSpeechText(message.content);
+
+    if (!preparedSpeechText.text) {
+      throw new BadRequestException('ai.speechInputEmpty');
+    }
+
+    const existingSpeechPayload = this.extractMessageSpeechPayload(
+      message.responsePayload,
+    );
+    const existingDocumentHandle =
+      existingSpeechPayload?.documentHandle ?? null;
+
+    if (existingDocumentHandle != null) {
+      const existingDocument = await this.em.findOne(DocumentItem, {
+        handle: existingDocumentHandle,
+      });
+
+      if (existingDocument) {
+        message.responsePayload = this.withMessageSpeechPayload(
+          message.responsePayload,
+          this.buildAssistantSpeechPayload(
+            preparedSpeechText,
+            existingDocument,
+            existingSpeechPayload?.providerHandle ?? null,
+          ),
+        );
+        await this.em.flush();
+        return this.sanitizeChatMessage(message);
+      }
+    }
+
+    try {
+      const provider = await this.requireAssistantSpeechProvider();
+      const response = await this.createOpenAiClient(
+        provider,
+      ).audio.speech.create({
+        model: this.assistantSpeechModel,
+        voice: this.assistantSpeechVoice,
+        input: preparedSpeechText.text,
+        response_format: this.assistantSpeechFileExtension,
+        instructions: this.assistantSpeechInstructions,
+      });
+      const audioBuffer = Buffer.from(await response.arrayBuffer());
+      const document = await this.documentService.uploadDocument(
+        {
+          buffer: audioBuffer,
+          originalname: this.buildAssistantSpeechFilename(message),
+          mimetype: this.assistantSpeechMimeType,
+          size: audioBuffer.length,
+        } as Express.Multer.File,
+        'aiChatMessage',
+        String(message.handle ?? ''),
+        'aiChatAudio',
+        person,
+        this.buildAssistantSpeechDescription(message),
+      );
+
+      message.responsePayload = this.withMessageSpeechPayload(
+        message.responsePayload,
+        this.buildAssistantSpeechPayload(
+          preparedSpeechText,
+          document,
+          provider.handle,
+        ),
+      );
+      await this.em.flush();
+      return this.sanitizeChatMessage(message);
+    } catch (error) {
+      message.responsePayload = this.withMessageSpeechPayload(
+        message.responsePayload,
+        this.buildAssistantSpeechFailurePayload(preparedSpeechText, error),
+      );
+      await this.em.flush();
+      throw error;
+    }
+  }
+
   private async findOwnedSession(
     handle: number,
     user: PersonItem,
@@ -970,6 +1089,27 @@ export class AiService {
     }
 
     return session;
+  }
+
+  private async findOwnedMessage(
+    handle: number,
+    user: PersonItem,
+  ): Promise<AiChatMessageItem> {
+    const userHandle = this.requireUserHandle(user);
+    const message = await this.em.findOne(
+      AiChatMessageItem,
+      {
+        handle,
+        person: { handle: userHandle },
+      },
+      { populate: ['session'] },
+    );
+
+    if (!message) {
+      throw new NotFoundException('global.notFound');
+    }
+
+    return message;
   }
 
   private buildSessionTitle(content: string): string {
@@ -1501,7 +1641,8 @@ export class AiService {
     } catch (error) {
       transcription.status = 'failed';
       transcription.failurePayload = {
-        error: error instanceof Error ? error.message : 'ai.transcriptionFailed',
+        error:
+          error instanceof Error ? error.message : 'ai.transcriptionFailed',
       };
       await this.em.flush();
       throw error;
@@ -2725,14 +2866,12 @@ export class AiService {
     return `${offsetSign}${offsetHours}:${offsetRemainderMinutes}`;
   }
 
-  private extractClientTimeContext(
-    dto: {
-      clientCurrentDateTime?: string;
-      clientTimeZone?: string;
-      clientLocale?: string;
-      clientUtcOffsetMinutes?: number;
-    },
-  ): AiClientTimeContext | undefined {
+  private extractClientTimeContext(dto: {
+    clientCurrentDateTime?: string;
+    clientTimeZone?: string;
+    clientLocale?: string;
+    clientUtcOffsetMinutes?: number;
+  }): AiClientTimeContext | undefined {
     const currentDate = this.parseClientCurrentDate(dto.clientCurrentDateTime);
     const timeZone = this.isValidTimeZone(dto.clientTimeZone)
       ? dto.clientTimeZone.trim()
@@ -3284,6 +3423,200 @@ export class AiService {
 
     const value = credentials[key];
     return typeof value === 'string' && value.trim() ? value.trim() : null;
+  }
+
+  private async requireAssistantSpeechProvider(): Promise<AiProviderTypeItem> {
+    const provider = await this.em.findOne(AiProviderTypeItem, {
+      handle: this.assistantSpeechProviderHandle,
+      isActive: true,
+    });
+
+    if (!provider || !this.hasUsableProviderCredentials(provider)) {
+      throw new Error('ai.speechProviderNotConfigured');
+    }
+
+    return provider;
+  }
+
+  private prepareAssistantSpeechText(content: string): AiPreparedSpeechText {
+    const withoutCodeBlocks = content.replace(
+      /```[\s\S]*?```/g,
+      ' Codebeispiel ausgelassen. ',
+    );
+    const withoutImages = withoutCodeBlocks.replace(
+      /!\[[^\]]*]\([^)]*\)/g,
+      ' ',
+    );
+    const withoutLinks = withoutImages.replace(/\[([^\]]+)]\(([^)]+)\)/g, '$1');
+    const withoutRawUrls = withoutLinks.replace(/https?:\/\/\S+/g, ' ');
+    const withoutInlineCode = withoutRawUrls.replace(/`([^`]+)`/g, '$1');
+    const withoutHeadings = withoutInlineCode.replace(
+      /^\s{0,3}#{1,6}\s*/gm,
+      '',
+    );
+    const withoutBullets = withoutHeadings.replace(
+      /^\s*([-*+]|\d+\.)\s+/gm,
+      '',
+    );
+    const normalized = withoutBullets
+      .replace(/[>*_~|]/g, ' ')
+      .replace(/\r\n/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    if (!normalized) {
+      return {
+        text: '',
+        sourceTextLength: 0,
+        wasTruncated: false,
+      };
+    }
+
+    if (normalized.length <= this.assistantSpeechMaxInputLength) {
+      return {
+        text: normalized,
+        sourceTextLength: normalized.length,
+        wasTruncated: false,
+      };
+    }
+
+    const truncationSuffix = ' Antwort gekuerzt.';
+    const truncatedText = `${normalized
+      .slice(0, this.assistantSpeechMaxInputLength - truncationSuffix.length)
+      .trimEnd()}${truncationSuffix}`;
+
+    return {
+      text: truncatedText,
+      sourceTextLength: normalized.length,
+      wasTruncated: true,
+    };
+  }
+
+  private buildAssistantSpeechFilename(message: AiChatMessageItem): string {
+    return `songbird-message-${message.handle ?? 'reply'}.${this.assistantSpeechFileExtension}`;
+  }
+
+  private buildAssistantSpeechDescription(
+    message: AiChatMessageItem,
+  ): string | undefined {
+    const pageTitle = message.pageTitle?.trim();
+
+    if (pageTitle) {
+      return `Songbird audio reply for ${pageTitle}`;
+    }
+
+    return 'Songbird audio reply';
+  }
+
+  private buildAssistantSpeechPayload(
+    preparedSpeechText: AiPreparedSpeechText,
+    document: DocumentItem,
+    providerHandle: string | null,
+  ): AiChatMessageSpeechPayload {
+    return {
+      status: 'completed',
+      providerHandle,
+      model: this.assistantSpeechModel,
+      voice: this.assistantSpeechVoice,
+      documentHandle: document.handle,
+      mimeType: document.mimetype,
+      filename: document.filename,
+      sourceTextLength: preparedSpeechText.sourceTextLength,
+      wasTruncated: preparedSpeechText.wasTruncated,
+      generatedAt: new Date().toISOString(),
+      error: null,
+    };
+  }
+
+  private buildAssistantSpeechFailurePayload(
+    preparedSpeechText: AiPreparedSpeechText,
+    error: unknown,
+  ): AiChatMessageSpeechPayload {
+    return {
+      status: 'failed',
+      providerHandle: this.assistantSpeechProviderHandle,
+      model: this.assistantSpeechModel,
+      voice: this.assistantSpeechVoice,
+      documentHandle: null,
+      mimeType: null,
+      filename: null,
+      sourceTextLength: preparedSpeechText.sourceTextLength,
+      wasTruncated: preparedSpeechText.wasTruncated,
+      generatedAt: new Date().toISOString(),
+      error:
+        error instanceof Error && error.message.trim()
+          ? error.message
+          : 'ai.speechGenerationFailed',
+    };
+  }
+
+  private withMessageSpeechPayload(
+    responsePayload: object | null | undefined,
+    speechPayload: AiChatMessageSpeechPayload,
+  ): Record<string, unknown> {
+    const normalizedResponsePayload = this.normalizeRecord(responsePayload);
+
+    return {
+      ...normalizedResponsePayload,
+      speech: speechPayload,
+    };
+  }
+
+  private extractMessageSpeechPayload(
+    responsePayload: object | null | undefined,
+  ): AiChatMessageSpeechPayload | null {
+    const normalizedResponsePayload = this.normalizeRecord(responsePayload);
+    const speechPayload = this.normalizeRecord(
+      normalizedResponsePayload?.speech,
+    );
+
+    if (!speechPayload) {
+      return null;
+    }
+
+    return {
+      status: speechPayload.status === 'failed' ? 'failed' : 'completed',
+      providerHandle:
+        typeof speechPayload.providerHandle === 'string'
+          ? speechPayload.providerHandle
+          : null,
+      model:
+        typeof speechPayload.model === 'string' ? speechPayload.model : null,
+      voice:
+        typeof speechPayload.voice === 'string' ? speechPayload.voice : null,
+      documentHandle:
+        typeof speechPayload.documentHandle === 'number'
+          ? speechPayload.documentHandle
+          : null,
+      mimeType:
+        typeof speechPayload.mimeType === 'string'
+          ? speechPayload.mimeType
+          : null,
+      filename:
+        typeof speechPayload.filename === 'string'
+          ? speechPayload.filename
+          : null,
+      sourceTextLength:
+        typeof speechPayload.sourceTextLength === 'number'
+          ? speechPayload.sourceTextLength
+          : null,
+      wasTruncated: speechPayload.wasTruncated === true,
+      generatedAt:
+        typeof speechPayload.generatedAt === 'string'
+          ? speechPayload.generatedAt
+          : new Date().toISOString(),
+      error:
+        typeof speechPayload.error === 'string' ? speechPayload.error : null,
+    };
+  }
+
+  private normalizeRecord(value: unknown): Record<string, unknown> | null {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return null;
+    }
+
+    return value as Record<string, unknown>;
   }
 
   private hasUsableProviderCredentials(

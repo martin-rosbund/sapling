@@ -2,22 +2,16 @@ import { computed, defineComponent, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type {
-  AccumulatedPermission,
-  DialogState,
-  EntityTemplate,
-} from '@/entity/structure'
+import type { AccumulatedPermission, DialogState, EntityTemplate } from '@/entity/structure'
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity'
 
-const {
-  fetchCurrentPersonMock,
-  fetchCurrentPermissionMock,
-  buildSavePayloadMock,
-} = vi.hoisted(() => ({
-  fetchCurrentPersonMock: vi.fn(),
-  fetchCurrentPermissionMock: vi.fn(),
-  buildSavePayloadMock: vi.fn(),
-}))
+const { fetchCurrentPersonMock, fetchCurrentPermissionMock, buildSavePayloadMock } = vi.hoisted(
+  () => ({
+    fetchCurrentPersonMock: vi.fn(),
+    fetchCurrentPermissionMock: vi.fn(),
+    buildSavePayloadMock: vi.fn(),
+  }),
+)
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
@@ -42,9 +36,7 @@ vi.mock('@/utils/saplingTableUtil', () => ({
 
 vi.mock('@/utils/saplingDialogLayoutUtil', () => ({
   getDialogTemplateColumns: () => ({ cols: 12 }),
-  groupDialogTemplates: (templates: EntityTemplate[]) => [
-    { id: 'main', label: '', templates },
-  ],
+  groupDialogTemplates: (templates: EntityTemplate[]) => [{ id: 'main', label: '', templates }],
   sortDialogTemplates: (templates: EntityTemplate[]) => templates,
 }))
 

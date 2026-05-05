@@ -106,10 +106,17 @@
         <div class="sapling-ai-chat__message-content">
           <SaplingMarkdownContent :source="getMessageDisplayContent(message)" />
         </div>
-        <div
-          v-if="message.role === 'assistant' && getMessageNavigationLinks(message).length > 0"
-          class="sapling-ai-chat__message-links"
-        >
+        <div v-if="shouldShowMessageActions(message)" class="sapling-ai-chat__message-links">
+          <v-btn
+            v-if="canPlayMessageSpeech(message)"
+            size="small"
+            variant="tonal"
+            :loading="getMessageSpeechState(message) === 'loading'"
+            :prepend-icon="getMessageSpeechButtonIcon(message)"
+            @click="emit('toggle-message-speech', message)"
+          >
+            {{ getMessageSpeechButtonLabel(message) }}
+          </v-btn>
           <v-btn
             v-for="link in getMessageNavigationLinks(message)"
             :key="`${message.handle ?? message.sequence}-${link.path}`"
@@ -146,9 +153,7 @@
             :model-value="selectedTranscriptionProviderHandle"
             class="sapling-ai-chat__provider-select flex-1-1"
             density="compact"
-            :disabled="
-              isSending || isLoadingTranscriptionProviders || isLoadingTranscriptionModels
-            "
+            :disabled="isSending || isLoadingTranscriptionProviders || isLoadingTranscriptionModels"
             hide-details
             item-title="label"
             item-value="value"
@@ -163,9 +168,7 @@
             class="sapling-ai-chat__model-select flex-1-1"
             density="compact"
             :disabled="
-              isSending ||
-              isLoadingTranscriptionModels ||
-              !selectedTranscriptionProviderHandle
+              isSending || isLoadingTranscriptionModels || !selectedTranscriptionProviderHandle
             "
             hide-details
             item-title="label"
@@ -249,8 +252,10 @@ const props = withDefaults(
     hasMoreMessages: boolean
     isLoadingOlderMessages: boolean
     isVoiceInputAvailable: boolean
+    isVoiceOutputAvailable: boolean
     isRecordingVoiceInput: boolean
     isTranscribingVoiceInput: boolean
+    speechStateByHandle: Record<number, string>
     titlePreviewLimit?: number
   }>(),
   {
@@ -267,6 +272,7 @@ const emit = defineEmits<{
   (event: 'send'): void
   (event: 'close'): void
   (event: 'load-older-messages'): void
+  (event: 'toggle-message-speech', message: AiChatMessageItem): void
   (event: 'toggle-voice-input'): void
 }>()
 
@@ -298,6 +304,46 @@ function getVoiceInputButtonLabel() {
   }
 
   return t('aiChat.startVoiceInput')
+}
+
+function shouldShowMessageActions(message: AiChatMessageItem) {
+  return canPlayMessageSpeech(message) || getMessageNavigationLinks(message).length > 0
+}
+
+function canPlayMessageSpeech(message: AiChatMessageItem) {
+  return (
+    props.isVoiceOutputAvailable &&
+    message.role === 'assistant' &&
+    message.status === 'completed' &&
+    message.handle != null &&
+    !!message.content?.trim()
+  )
+}
+
+function getMessageSpeechState(message: AiChatMessageItem) {
+  if (message.handle == null) {
+    return 'idle'
+  }
+
+  return props.speechStateByHandle[message.handle] ?? 'idle'
+}
+
+function getMessageSpeechButtonIcon(message: AiChatMessageItem) {
+  return getMessageSpeechState(message) === 'playing' ? 'mdi-pause' : 'mdi-volume-high'
+}
+
+function getMessageSpeechButtonLabel(message: AiChatMessageItem) {
+  const speechState = getMessageSpeechState(message)
+
+  if (speechState === 'loading') {
+    return t('aiChat.loadingVoiceOutput')
+  }
+
+  if (speechState === 'playing') {
+    return t('aiChat.pauseVoiceOutput')
+  }
+
+  return t('aiChat.playVoiceOutput')
 }
 
 watch(

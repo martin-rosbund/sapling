@@ -97,8 +97,10 @@
               :has-more-messages="hasMoreMessages"
               :is-loading-older-messages="isLoadingOlderMessages"
               :is-voice-input-available="isVoiceInputAvailable"
+              :is-voice-output-available="isVoiceOutputAvailable"
               :is-recording-voice-input="isRecordingVoiceInput"
               :is-transcribing-voice-input="isTranscribingVoiceInput"
+              :speech-state-by-handle="speechStateByHandle"
               :title-preview-limit="TITLE_PREVIEW_LIMIT"
               @update:selected-provider="updateSelectedProvider"
               @update:selected-model="updateSelectedModel"
@@ -107,6 +109,7 @@
               @update:draft-message="updateDraftMessage"
               @close="closePanel"
               @load-older-messages="loadOlderMessages"
+              @toggle-message-speech="toggleMessageSpeech"
               @toggle-voice-input="toggleVoiceInput"
               @send="sendMessage"
             />
@@ -186,16 +189,23 @@ const hasInitialized = ref(false)
 const activeTranscriptionHandle = ref<number | null>(null)
 const activeVoiceRecorder = ref<MediaRecorder | null>(null)
 const activeVoiceStream = ref<MediaStream | null>(null)
+const activeSpeechAudio = ref<HTMLAudioElement | null>(null)
+const activeSpeechMessageHandle = ref<number | null>(null)
 const activeSendAttempt = ref<{
   content: string
   receivedServerEvents: boolean
 } | null>(null)
+const speechLoadingByHandle = ref<Record<number, boolean>>({})
+const speechFailedByHandle = ref<Record<number, boolean>>({})
 let initializationPromise: Promise<void> | null = null
 let streamingClockTimer: number | null = null
 let nextLocalMessageHandle = -1
 let voiceRecordingStartedAt: number | null = null
 let pendingVoiceChunks: Blob[] = []
 let discardPendingVoiceRecording = false
+const pendingSpeechRequestByHandle = new Map<number, Promise<AiChatMessageItem>>()
+const speechObjectUrlByDocumentHandle = new Map<number, string>()
+const autoRequestedSpeechHandles = new Set<number>()
 
 const isBusy = computed(
   () =>
@@ -239,8 +249,7 @@ const transcriptionProviderOptions = computed(() =>
 )
 
 const hasConfiguredTranscriptionProviders = computed(
-  () =>
-    transcriptionProviderOptions.value.length > 0 && transcriptionModelConfigs.value.length > 0,
+  () => transcriptionProviderOptions.value.length > 0 && transcriptionModelConfigs.value.length > 0,
 )
 
 const filteredModelConfigs = computed(() =>
@@ -282,6 +291,8 @@ const isVoiceInputAvailable = computed(
     hasConfiguredTranscriptionProviders.value,
 )
 
+const isVoiceOutputAvailable = computed(() => typeof Audio !== 'undefined')
+
 const streamingDurationByHandle = computed<Record<number, number>>(() => {
   const entries = messages.value
     .filter((message) => message.handle != null)
@@ -293,6 +304,47 @@ const streamingDurationByHandle = computed<Record<number, number>>(() => {
 const activeConversationTitle = computed(
   () => activeSession.value?.title || t('aiChat.draftConversation'),
 )
+
+const speechStateByHandle = computed<Record<number, string>>(() => {
+  const nextState: Record<number, string> = {}
+
+  for (const message of messages.value) {
+    if (
+      message.handle == null ||
+      message.role !== 'assistant' ||
+      message.status !== 'completed' ||
+      !message.content?.trim()
+    ) {
+      continue
+    }
+
+    if (activeSpeechMessageHandle.value === message.handle) {
+      nextState[message.handle] = 'playing'
+      continue
+    }
+
+    if (speechLoadingByHandle.value[message.handle]) {
+      nextState[message.handle] = 'loading'
+      continue
+    }
+
+    const speech = getMessageSpeechMetadata(message)
+
+    if (speech?.status === 'completed' && speech.documentHandle != null) {
+      nextState[message.handle] = 'ready'
+      continue
+    }
+
+    if (speech?.status === 'failed' || speechFailedByHandle.value[message.handle]) {
+      nextState[message.handle] = 'failed'
+      continue
+    }
+
+    nextState[message.handle] = 'idle'
+  }
+
+  return nextState
+})
 
 watch(
   isMobileLayout,
@@ -359,6 +411,8 @@ onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
   streamAbortController.value?.abort()
   cancelVoiceInput()
+  stopSpeechPlayback()
+  revokeSpeechObjectUrls()
   if (streamingClockTimer != null) {
     window.clearInterval(streamingClockTimer)
   }
@@ -372,6 +426,7 @@ function handleKeydown(event: KeyboardEvent) {
 
 function closePanel() {
   cancelVoiceInput()
+  stopSpeechPlayback()
   closeSaplingAiChat()
 }
 
@@ -557,6 +612,7 @@ async function loadOlderMessages() {
 
 async function selectSession(session: AiChatSessionItem) {
   cancelVoiceInput()
+  stopSpeechPlayback()
   activeSession.value = session
   activeTranscriptionHandle.value = null
   editingSessionHandle.value = null
@@ -570,6 +626,7 @@ async function selectSession(session: AiChatSessionItem) {
 
 function startNewChat() {
   cancelVoiceInput()
+  stopSpeechPlayback()
   activeSession.value = null
   messages.value = []
   resetMessageWindow()
@@ -986,6 +1043,9 @@ function handleStreamEvent(event: AiChatStreamEvent) {
       markActiveSendAttemptAsStarted()
       if (event.message) {
         upsertMessage(event.message)
+        if (event.type === 'message.completed' && event.message.role === 'assistant') {
+          void autoPlayAssistantSpeech(event.message)
+        }
       }
       if (event.session) {
         replaceSession(event.session)
@@ -1321,5 +1381,247 @@ function appendLocalFailedExchange(content: string, errorMessage: string) {
     createdAt: timestamp,
     updatedAt: timestamp,
   } as AiChatMessageItem)
+}
+
+interface AssistantSpeechMetadata {
+  status: string
+  providerHandle: string | null
+  model: string | null
+  voice: string | null
+  documentHandle: number | null
+  mimeType: string | null
+  filename: string | null
+  sourceTextLength: number | null
+  wasTruncated: boolean
+  generatedAt: string | null
+  error: string | null
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  return value as Record<string, unknown>
+}
+
+function getMessageSpeechMetadata(
+  message?: AiChatMessageItem | null,
+): AssistantSpeechMetadata | null {
+  const responsePayload = asRecord(message?.responsePayload)
+  const speechPayload = asRecord(responsePayload?.speech)
+
+  if (!speechPayload) {
+    return null
+  }
+
+  return {
+    status: typeof speechPayload.status === 'string' ? speechPayload.status : 'completed',
+    providerHandle:
+      typeof speechPayload.providerHandle === 'string' ? speechPayload.providerHandle : null,
+    model: typeof speechPayload.model === 'string' ? speechPayload.model : null,
+    voice: typeof speechPayload.voice === 'string' ? speechPayload.voice : null,
+    documentHandle:
+      typeof speechPayload.documentHandle === 'number' ? speechPayload.documentHandle : null,
+    mimeType: typeof speechPayload.mimeType === 'string' ? speechPayload.mimeType : null,
+    filename: typeof speechPayload.filename === 'string' ? speechPayload.filename : null,
+    sourceTextLength:
+      typeof speechPayload.sourceTextLength === 'number' ? speechPayload.sourceTextLength : null,
+    wasTruncated: speechPayload.wasTruncated === true,
+    generatedAt: typeof speechPayload.generatedAt === 'string' ? speechPayload.generatedAt : null,
+    error: typeof speechPayload.error === 'string' ? speechPayload.error : null,
+  }
+}
+
+async function autoPlayAssistantSpeech(message: AiChatMessageItem) {
+  const sessionHandle =
+    typeof message.session === 'number' ? message.session : (message.session?.handle ?? null)
+
+  if (
+    !isOpen.value ||
+    !isVoiceOutputAvailable.value ||
+    message.handle == null ||
+    !message.content?.trim() ||
+    (sessionHandle != null && activeSession.value?.handle !== sessionHandle)
+  ) {
+    return
+  }
+
+  if (autoRequestedSpeechHandles.has(message.handle)) {
+    return
+  }
+
+  autoRequestedSpeechHandles.add(message.handle)
+
+  try {
+    const updatedMessage = (await ensureMessageSpeech(message, { reportErrors: false })) ?? message
+
+    if (!isOpen.value || (sessionHandle != null && activeSession.value?.handle !== sessionHandle)) {
+      return
+    }
+
+    await playMessageSpeech(updatedMessage, { reportErrors: false })
+  } catch {
+    // Autoplay stays silent; manual playback can retry later.
+  }
+}
+
+async function toggleMessageSpeech(message: AiChatMessageItem) {
+  if (message.handle == null) {
+    return
+  }
+
+  if (activeSpeechMessageHandle.value === message.handle) {
+    stopSpeechPlayback()
+    return
+  }
+
+  const updatedMessage = (await ensureMessageSpeech(message, { reportErrors: true })) ?? message
+  await playMessageSpeech(updatedMessage, { reportErrors: true })
+}
+
+async function ensureMessageSpeech(
+  message: AiChatMessageItem,
+  options?: {
+    reportErrors?: boolean
+  },
+) {
+  if (
+    message.handle == null ||
+    message.role !== 'assistant' ||
+    message.status !== 'completed' ||
+    !message.content?.trim()
+  ) {
+    return null
+  }
+
+  const existingSpeech = getMessageSpeechMetadata(message)
+
+  if (existingSpeech?.status === 'completed' && existingSpeech.documentHandle != null) {
+    return message
+  }
+
+  const pendingRequest = pendingSpeechRequestByHandle.get(message.handle)
+
+  if (pendingRequest) {
+    return pendingRequest
+  }
+
+  speechLoadingByHandle.value = {
+    ...speechLoadingByHandle.value,
+    [message.handle]: true,
+  }
+  speechFailedByHandle.value = {
+    ...speechFailedByHandle.value,
+    [message.handle]: false,
+  }
+
+  const request = ApiAiService.ensureMessageSpeech(message.handle, {
+    suppressErrorMessage: !options?.reportErrors,
+  })
+    .then((updatedMessage) => {
+      upsertMessage(updatedMessage)
+      return updatedMessage
+    })
+    .catch((error) => {
+      speechFailedByHandle.value = {
+        ...speechFailedByHandle.value,
+        [message.handle as number]: true,
+      }
+      throw error
+    })
+    .finally(() => {
+      pendingSpeechRequestByHandle.delete(message.handle as number)
+      speechLoadingByHandle.value = {
+        ...speechLoadingByHandle.value,
+        [message.handle as number]: false,
+      }
+    })
+
+  pendingSpeechRequestByHandle.set(message.handle, request)
+  return request
+}
+
+async function playMessageSpeech(
+  message: AiChatMessageItem,
+  options?: {
+    reportErrors?: boolean
+  },
+) {
+  const speech = getMessageSpeechMetadata(message)
+
+  if (message.handle == null || speech?.documentHandle == null) {
+    return
+  }
+
+  stopSpeechPlayback()
+
+  let objectUrl = speechObjectUrlByDocumentHandle.get(speech.documentHandle)
+
+  if (!objectUrl) {
+    const blob = await ApiAiService.downloadMessageSpeechAudio(speech.documentHandle, {
+      suppressErrorMessage: !options?.reportErrors,
+    })
+    objectUrl = URL.createObjectURL(blob)
+    speechObjectUrlByDocumentHandle.set(speech.documentHandle, objectUrl)
+  }
+
+  const audio = new Audio(objectUrl)
+  activeSpeechAudio.value = audio
+  activeSpeechMessageHandle.value = message.handle
+
+  audio.addEventListener('ended', () => {
+    if (activeSpeechAudio.value !== audio) {
+      return
+    }
+
+    activeSpeechAudio.value = null
+    activeSpeechMessageHandle.value = null
+  })
+
+  audio.addEventListener('error', () => {
+    if (activeSpeechAudio.value === audio) {
+      activeSpeechAudio.value = null
+      activeSpeechMessageHandle.value = null
+    }
+  })
+
+  try {
+    await audio.play()
+  } catch (error) {
+    if (activeSpeechAudio.value === audio) {
+      activeSpeechAudio.value = null
+      activeSpeechMessageHandle.value = null
+    }
+
+    if (options?.reportErrors) {
+      messageCenter.pushMessage('error', 'ai.speech.playbackFailed', '', 'aiChat')
+    }
+
+    throw error
+  }
+}
+
+function stopSpeechPlayback() {
+  const audio = activeSpeechAudio.value
+
+  activeSpeechAudio.value = null
+  activeSpeechMessageHandle.value = null
+
+  if (!audio) {
+    return
+  }
+
+  audio.pause()
+  audio.currentTime = 0
+  audio.src = ''
+}
+
+function revokeSpeechObjectUrls() {
+  for (const objectUrl of speechObjectUrlByDocumentHandle.values()) {
+    URL.revokeObjectURL(objectUrl)
+  }
+
+  speechObjectUrlByDocumentHandle.clear()
 }
 </script>
