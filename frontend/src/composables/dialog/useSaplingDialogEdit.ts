@@ -655,8 +655,6 @@ export function useSaplingDialogEdit(
       return
     }
 
-    emit('update:modelValue', false)
-    await waitForUiPaint()
     emitSave(output, 'saveAndClose')
   }
   // #endregion

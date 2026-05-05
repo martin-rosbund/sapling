@@ -927,7 +927,8 @@ function appendLocalFailedExchange(content: string, errorMessage: string) {
     return
   }
 
-  const nextSequence = (messages.value.at(-1)?.sequence ?? 0) + 1
+  const lastMessage = messages.value.length > 0 ? messages.value[messages.value.length - 1] : null
+  const nextSequence = (lastMessage?.sequence ?? 0) + 1
   const personHandle = currentPersonStore.person?.handle ?? 0
   const sessionHandle = activeSession.value?.handle ?? 0
   const timestamp = new Date()

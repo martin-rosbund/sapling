@@ -141,12 +141,11 @@ export function buildRecurrenceRule(input: RecurrenceRuleInput): string | null {
 
   if (input.endMode === 'count') {
     const count =
-      typeof input.count === 'number' && Number.isFinite(input.count) && input.count > 0
-        ? Math.trunc(input.count)
-        : null
-    if (count) {
-      parts.push(`COUNT=${count}`)
-    }
+      typeof input.count === 'number' && Number.isFinite(input.count)
+        ? Math.max(1, Math.trunc(input.count))
+        : 1
+
+    parts.push(`COUNT=${count}`)
   }
 
   if (input.endMode === 'until') {

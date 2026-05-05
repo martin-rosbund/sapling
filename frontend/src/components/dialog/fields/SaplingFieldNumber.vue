@@ -6,6 +6,10 @@
     :required="required"
     :placeholder="placeholder"
     :rules="rules"
+    :min="min"
+    :max="max"
+    :step="step"
+    :precision="precision"
     autocomplete="off"
     @update:model-value="(val) => emit('update:modelValue', val)"
   />
@@ -19,6 +23,10 @@ defineProps<{
   required?: boolean
   placeholder?: string
   rules?: Array<(value: number | null) => boolean | string>
+  min?: number
+  max?: number
+  step?: number
+  precision?: number | null
 }>()
 
 const emit = defineEmits(['update:modelValue'])

@@ -67,6 +67,8 @@
                         <SaplingNumberField
                           :label="t('event.recurrenceEvery')"
                           :model-value="draftInterval"
+                          :min="0"
+                          :step="1"
                           @update:model-value="onIntervalChange"
                         />
                       </div>
@@ -123,6 +125,8 @@
                         <SaplingNumberField
                           :label="t('event.recurrenceCount')"
                           :model-value="draftCount"
+                          :min="1"
+                          :step="1"
                           @update:model-value="onCountChange"
                         />
                       </div>
@@ -195,7 +199,7 @@ interface RecurrenceDraftState {
   interval: number
   weekdays: RecurrenceWeekdayCode[]
   endMode: RecurrenceEndMode
-  count: number | null
+  count: number
   untilDate: string
   untilTime: string
 }
@@ -220,7 +224,7 @@ const draftFrequency = ref<'NONE' | RecurrenceFrequency>('NONE')
 const draftInterval = ref(1)
 const draftWeekdays = ref<RecurrenceWeekdayCode[]>([])
 const draftEndMode = ref<RecurrenceEndMode>('never')
-const draftCount = ref<number | null>(null)
+const draftCount = ref(0)
 const draftUntilDate = ref('')
 const draftUntilTime = ref('')
 
@@ -338,7 +342,7 @@ function createStateFromRule(value?: string | null): RecurrenceDraftState {
       interval: 1,
       weekdays: resolveDefaultWeekdays(),
       endMode: 'never',
-      count: null,
+      count: 0,
       untilDate: '',
       untilTime: '',
     }
@@ -350,7 +354,7 @@ function createStateFromRule(value?: string | null): RecurrenceDraftState {
     weekdays:
       parsedRule.byDay.length > 0 ? parsedRule.byDay : resolveDefaultWeekdays(parsedRule.frequency),
     endMode: parsedRule.count ? 'count' : parsedRule.until ? 'until' : 'never',
-    count: parsedRule.count ?? null,
+    count: parsedRule.count ?? 0,
     untilDate: parsedRule.until ? formatLocalDate(parsedRule.until) : '',
     untilTime: parsedRule.until ? formatLocalTime(parsedRule.until) : '',
   }
@@ -402,7 +406,7 @@ function selectFrequency(value: 'NONE' | RecurrenceFrequency) {
   if (value === 'NONE') {
     draftInterval.value = 1
     draftEndMode.value = 'never'
-    draftCount.value = null
+    draftCount.value = 0
     draftUntilDate.value = ''
     draftUntilTime.value = ''
   }
@@ -412,7 +416,7 @@ function selectEndMode(value: RecurrenceEndMode) {
   draftEndMode.value = value
 
   if (value !== 'count') {
-    draftCount.value = null
+    draftCount.value = 0
   }
 
   if (value !== 'until') {
@@ -442,7 +446,7 @@ function onIntervalChange(value: unknown) {
 
 function onCountChange(value: unknown) {
   const nextValue = toPositiveInteger(value)
-  draftCount.value = Number.isFinite(nextValue) && nextValue > 0 ? nextValue : null
+  draftCount.value = Number.isFinite(nextValue) && nextValue >= 0 ? nextValue : 0
 }
 
 function resolveDefaultWeekdays(

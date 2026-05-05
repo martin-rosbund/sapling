@@ -131,7 +131,10 @@ export function useSaplingKpiSparkline(kpi: MaybeRefOrGetter<KPIItem | null | un
     )
   })
   const latestDrilldownLabel = computed(
-    () => visibleDrilldownItems.value.at(-1)?.label ?? lastLabel.value,
+    () =>
+      (visibleDrilldownItems.value.length > 0
+        ? visibleDrilldownItems.value[visibleDrilldownItems.value.length - 1]?.label
+        : null) ?? lastLabel.value,
   )
   const drilldownItems = computed(() => {
     const items = Array.isArray(drilldown.value?.items)

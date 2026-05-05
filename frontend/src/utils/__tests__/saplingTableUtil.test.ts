@@ -264,6 +264,32 @@ describe('saplingTableUtil', () => {
     ).toBe('priority')
   })
 
+  it('ignores relation objects in isValue labels and falls back gracefully', () => {
+    expect(
+      getEntityValueLabel(
+        {
+          handle: '2026#00015',
+          title: 'DATEV Zahlungsverkehrsexport',
+          customer: { handle: 'customer-1', title: 'Musterkunde' },
+        },
+        [
+          createTemplate({ name: 'customer', options: ['isValue'] }),
+          createTemplate({ name: 'title', options: ['isValue'] }),
+        ],
+      ),
+    ).toBe('DATEV Zahlungsverkehrsexport')
+
+    expect(
+      getEntityValueLabel(
+        {
+          handle: '2026#00015',
+          customer: { handle: 'customer-1', title: 'Musterkunde' },
+        },
+        [createTemplate({ name: 'customer', options: ['isValue'] })],
+      ),
+    ).toBe('2026#00015')
+  })
+
   it('extracts entity and handle data for generic references', () => {
     const template = createTemplate({
       name: 'reference',

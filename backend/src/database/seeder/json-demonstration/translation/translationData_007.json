@@ -1,0 +1,20 @@
+[
+  {
+    "entity": "document",
+    "property": "selectFileForPreview",
+    "de": "Datei zur Vorschau auswählen",
+    "en": "Select a file for preview"
+  },
+  {
+    "entity": "document",
+    "property": "selectFileForPreviewDescription",
+    "de": "Wähle links einen Eintrag aus, um die Vorschau zu öffnen.",
+    "en": "Choose an entry from the list to open the preview."
+  },
+  {
+    "entity": "document",
+    "property": "downloadToInspect",
+    "de": "Nutze den Download, um diese Datei lokal zu prüfen.",
+    "en": "Use download to inspect this file locally."
+  }
+]

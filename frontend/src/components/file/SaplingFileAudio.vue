@@ -3,7 +3,7 @@
     class="sapling-file-preview sapling-file-audio sapling-file-viewer sapling-file-preview-fullheight"
   >
     <div class="sapling-file-media-surface sapling-file-media-surface--stacked">
-      <div class="sapling-file-media-card">
+      <div class="sapling-file-media-card sapling-file-media-card--minimal">
         <div class="sapling-file-media-card__header">
           <div class="sapling-file-media-card__icon">
             <v-icon icon="mdi-music-circle-outline" size="44" />
@@ -11,11 +11,9 @@
 
           <div class="sapling-file-media-card__copy">
             <div class="sapling-file-media-card__eyebrow-row">
-              <span class="sapling-file-media-card__eyebrow">{{ $t('document.preview') }}</span>
               <span class="sapling-file-media-card__pill">{{ formatLabel }}</span>
+              <span class="sapling-file-media-card__meta">{{ mimeType || 'audio/mpeg' }}</span>
             </div>
-            <h3 class="sapling-file-media-card__title">{{ fileName || $t('document.file') }}</h3>
-            <p class="sapling-file-media-card__meta">{{ mimeType || 'audio/mpeg' }}</p>
           </div>
         </div>
 

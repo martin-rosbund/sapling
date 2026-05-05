@@ -597,7 +597,12 @@ export function getEntityValueLabel(
       ?.filter((template) => template.options?.includes('isValue'))
       .map((template) => {
         const value = item[template.name]
-        if (value === null || typeof value === 'undefined' || String(value).trim().length === 0) {
+        if (
+          value === null ||
+          typeof value === 'undefined' ||
+          typeof value === 'object' ||
+          String(value).trim().length === 0
+        ) {
           return ''
         }
 

@@ -1,62 +1,84 @@
 <template>
-  <v-container class="pa-0 sapling-file-fullheight" density="compact" fluid>
+  <v-container
+    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--fill sapling-page-shell--uniform-inset sapling-file-page sapling-fill-shell"
+    density="compact"
+    fluid
+  >
     <section class="sapling-file-workspace">
-      <aside class="sapling-file-workspace__sidebar glass-panel">
-        <div class="sapling-file-workspace__table-shell">
-          <div class="sapling-document-table-scroll">
-            <SaplingTable
-              :items="items"
-              :search="search ?? ''"
-              :page="page"
-              :items-per-page="itemsPerPage"
-              :total-items="totalItems"
-              :is-loading="isLoading"
-              :sort-by="sortBy"
-              :column-filters="columnFilters"
-              :active-filter="activeFilter"
-              :entity-handle="entity?.handle || ''"
-              :entity="entity"
-              :entity-permission="entityPermission"
-              :entity-templates="entityTemplates || []"
-              :show-actions="false"
-              :multi-select="false"
-              :show-favorite="false"
-              :parent-filter="parentFilter"
-              :table-key="entityHandleRef + '-table'"
-              @update:selected="onSelectedDocument"
-              @update:search="onSearchUpdate"
-              @update:page="onPageUpdate"
-              @update:items-per-page="onItemsPerPageUpdate"
-              @update:sort-by="onSortByUpdate"
-              @update:column-filters="onColumnFiltersUpdate"
-            />
+      <template v-if="isTranslationLoading">
+        <aside class="sapling-file-workspace__sidebar glass-panel sapling-file-loading-panel">
+          <v-skeleton-loader type="heading, table-heading, table-tbody" />
+        </aside>
+
+        <section class="sapling-file-workspace__detail">
+          <header class="sapling-document-header glass-panel sapling-file-loading-panel">
+            <v-skeleton-loader class="sapling-document-header__skeleton" type="heading, text" />
+          </header>
+
+          <section class="sapling-file-stage glass-panel sapling-file-loading-panel">
+            <v-skeleton-loader class="sapling-file-stage__skeleton" type="image, article" />
+          </section>
+        </section>
+      </template>
+
+      <template v-else>
+        <aside class="sapling-file-workspace__sidebar glass-panel">
+          <div class="sapling-file-workspace__table-shell">
+            <div class="sapling-document-table-scroll">
+              <SaplingTable
+                :items="items"
+                :search="search ?? ''"
+                :page="page"
+                :items-per-page="itemsPerPage"
+                :total-items="totalItems"
+                :is-loading="isLoading"
+                :sort-by="sortBy"
+                :column-filters="columnFilters"
+                :active-filter="activeFilter"
+                :entity-handle="entity?.handle || ''"
+                :entity="entity"
+                :entity-permission="entityPermission"
+                :entity-templates="entityTemplates || []"
+                :show-actions="false"
+                :multi-select="false"
+                :show-favorite="false"
+                :parent-filter="parentFilter"
+                :table-key="entityHandleRef + '-table'"
+                @update:selected="onSelectedDocument"
+                @update:search="onSearchUpdate"
+                @update:page="onPageUpdate"
+                @update:items-per-page="onItemsPerPageUpdate"
+                @update:sort-by="onSortByUpdate"
+                @update:column-filters="onColumnFiltersUpdate"
+              />
+            </div>
           </div>
-        </div>
-      </aside>
+        </aside>
 
-      <section class="sapling-file-workspace__detail">
-        <SaplingFileHeader
-          :selected-handle="selectedHandle"
-          :selected-filename="selectedFilename"
-          :preview-type="previewType"
-          :has-selection="hasSelection"
-          :is-loading="isLoading && !isInitialized"
-          :on-download-document="onDownloadDocument"
-        />
+        <section class="sapling-file-workspace__detail">
+          <SaplingFileHeader
+            :selected-handle="selectedHandle"
+            :selected-filename="selectedFilename"
+            :preview-type="previewType"
+            :has-selection="hasSelection"
+            :is-loading="isPreviewLoading"
+            :on-download-document="onDownloadDocument"
+          />
 
-        <SaplingFileDetail
-          :selected-handle="selectedHandle"
-          :has-selection="hasSelection"
-          :is-loading="isLoading && !isInitialized"
-          :preview-component="previewComponent"
-          :preview-props="previewProps"
-        />
-      </section>
+          <SaplingFileDetail
+            :has-selection="hasSelection"
+            :is-loading="isPreviewLoading"
+            :preview-component="previewComponent"
+            :preview-props="previewProps"
+          />
+        </section>
+      </template>
     </section>
   </v-container>
 </template>
 
 <script lang="ts" setup>
+import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import { BACKEND_URL, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants'
 import { useSaplingTable } from '@/composables/table/useSaplingTable'
 import type { SaplingGenericItem } from '@/entity/entity'
@@ -75,6 +97,7 @@ import SaplingFileMail from './SaplingFileMail.vue'
 const SaplingTable = defineAsyncComponent(() => import('@/components/table/SaplingTable.vue'))
 const props = defineProps<{ entityHandle: string }>()
 const entityHandleRef = ref(props.entityHandle)
+const { isLoading: isTranslationLoading } = useTranslationLoader('document', 'global')
 
 const {
   items,
@@ -113,6 +136,7 @@ watch(
 )
 
 const hasSelection = computed(() => selectedHandle.value.length > 0)
+const isPreviewLoading = computed(() => isLoading.value && !isInitialized.value)
 
 function getSelectedDocumentHandle(item?: SaplingGenericItem) {
   const handle = item?.handle
