@@ -130,7 +130,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
@@ -1094,6 +1094,8 @@ async function uploadVoiceRecording(blob: Blob, mimeType: string, durationSecond
       ? `${draftMessage.value.trim()}\n\n${transcript}`
       : transcript
     activeTranscriptionHandle.value = response.transcriptionHandle
+    await nextTick()
+    void sendMessage()
   } catch {
     activeTranscriptionHandle.value = null
   } finally {
