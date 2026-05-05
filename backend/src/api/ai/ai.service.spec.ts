@@ -22,12 +22,16 @@ jest.mock('../../entity/AiChatSessionItem', () => ({
 jest.mock('../../entity/AiChatMessageItem', () => ({
   AiChatMessageItem: class {},
 }));
+jest.mock('../../entity/AiChatTranscriptionItem', () => ({
+  AiChatTranscriptionItem: class {},
+}));
 jest.mock('../../entity/AiProviderTypeItem', () => ({
   AiProviderTypeItem: class {},
 }));
 jest.mock('../../entity/AiProviderModelItem', () => ({
   AiProviderModelItem: class {},
 }));
+jest.mock('../../entity/DocumentItem', () => ({ DocumentItem: class {} }));
 jest.mock('./dto/chat.dto', () => ({
   AiChatMessageListMetaDto: class {},
   AiChatMessageListResponseDto: class {},
@@ -36,7 +40,18 @@ jest.mock('./dto/chat.dto', () => ({
   ListAiChatMessagesQueryDto: class {},
   UpdateAiChatSessionDto: class {},
 }));
+jest.mock('./dto/vectorization.dto', () => ({
+  VectorizeEntityDto: class {},
+  VectorizeEntityResponseDto: class {},
+}));
+jest.mock('./dto/transcription.dto', () => ({
+  AiChatTranscriptionResponseDto: class {},
+  CreateAiChatTranscriptionDto: class {},
+}));
 jest.mock('./mcp.service', () => ({ McpService: class {} }));
+jest.mock('../document/document.service', () => ({
+  DocumentService: class {},
+}));
 jest.mock('../generic/generic.service', () => ({ GenericService: class {} }));
 
 import { AiService } from './ai.service';
@@ -317,6 +332,25 @@ describe('AiService', () => {
     expect(instruction).toContain('Use ticket_search for exact ticket numbers');
     expect(instruction).toContain(
       'Prefer ticket_search with searchMode solution',
+    );
+  });
+
+  it('instructs Songbird not to expose internal handles in user-facing prose', () => {
+    const service = createService();
+
+    const instruction = (
+      service as never as {
+        buildSystemInstruction: (options?: {
+          includeToolGuidance?: boolean;
+        }) => string;
+      }
+    ).buildSystemInstruction({ includeToolGuidance: true });
+
+    expect(instruction).toContain(
+      'Do not expose internal technical identifiers such as raw record handles',
+    );
+    expect(instruction).toContain(
+      'You may still mention explicit user-facing business identifiers such as a ticket number or external number',
     );
   });
 
