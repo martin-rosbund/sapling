@@ -16,6 +16,7 @@ import { McpServerConfigItem } from '../../entity/McpServerConfigItem';
 import { AiVectorDocumentItem } from '../../entity/AiVectorDocumentItem';
 import { McpService } from './mcp.service';
 import { SaplingMcpService } from './sapling-mcp.service';
+import { SaplingMcpPermissionService } from './sapling-mcp-permission.service';
 
 /**
  * @class
@@ -43,7 +44,12 @@ import { SaplingMcpService } from './sapling-mcp.service';
       McpServerConfigItem,
     ]),
   ],
-  providers: [AiService, McpService, SaplingMcpService],
+  providers: [
+    AiService,
+    McpService,
+    SaplingMcpService,
+    SaplingMcpPermissionService,
+  ],
   controllers: [AiController],
   exports: [AiService, McpService, SaplingMcpService],
 })

@@ -54,7 +54,12 @@ const loginLimiter = rateLimit({
     GenericPermissionGuard,
     CurrentService,
   ],
-  exports: [AuthService, SessionOrBearerAuthGuard, AdminPermissionGuard],
+  exports: [
+    AuthService,
+    SessionOrBearerAuthGuard,
+    AdminPermissionGuard,
+    GenericPermissionGuard,
+  ],
 })
 export class AuthModule implements NestModule {
   /**

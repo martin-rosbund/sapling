@@ -33,6 +33,13 @@ type GenericPermissionResolverFn = (
 
 const PUBLIC_GENERIC_READ_ENTITIES = ['translation', 'entity', 'entityGroup'];
 
+export type GenericPermissionGuardRequest = Pick<
+  Request,
+  'method' | 'params' | 'body'
+> & {
+  user?: PersonItem;
+};
+
 /**
  * @class
  * @version         1.0
@@ -61,30 +68,56 @@ export class GenericPermissionGuard implements CanActivate {
    */
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<Request>();
-    const user = req.user as PersonItem;
+    await this.assertPermissionForRequest(
+      req as GenericPermissionGuardRequest,
+      {
+        entityHandle: this.reflector.getAllAndOverride<string>(
+          GENERIC_PERMISSION_ENTITY_KEY,
+          [context.getHandler(), context.getClass()],
+        ),
+        permission: this.reflector.getAllAndOverride<GenericPermissionAction>(
+          GENERIC_PERMISSION_KEY,
+          [context.getHandler(), context.getClass()],
+        ),
+        resolver: this.reflector.getAllAndOverride(
+          GENERIC_PERMISSION_RESOLVE_KEY,
+          [context.getHandler(), context.getClass()],
+        ),
+      },
+    );
+    return true;
+  }
+
+  async assertPermissionForRequest(
+    req: GenericPermissionGuardRequest,
+    options?: {
+      entityHandle?: string;
+      permission?: GenericPermissionAction;
+      resolver?: GenericPermissionResolverFn;
+    },
+  ): Promise<void> {
+    const user = req.user;
     const method = req.method;
-    const resolvedPermission = await this.resolvePermission(req, context);
+    const resolvedPermission = await this.resolvePermission(
+      req,
+      options?.resolver,
+    );
     const entityHandle =
       resolvedPermission?.entityHandle ??
-      this.reflector.getAllAndOverride<string>(GENERIC_PERMISSION_ENTITY_KEY, [
-        context.getHandler(),
-        context.getClass(),
-      ]) ??
-      req.params.entityHandle;
+      options?.entityHandle ??
+      req.params?.entityHandle;
 
-    // Allow GET for translation, entity and entityGroup without authentication.
     if (
       method === 'GET' &&
       PUBLIC_GENERIC_READ_ENTITIES.includes(entityHandle ?? '')
     ) {
-      return true;
+      return;
     }
 
     if (!user || !entityHandle) {
       throw new ForbiddenException(`global.permissionDenied`);
     }
 
-    // Mapping HTTP method to permission
     const permissionMap: Record<string, keyof PermissionItem> = {
       GET: 'allowRead',
       POST: 'allowInsert',
@@ -93,10 +126,7 @@ export class GenericPermissionGuard implements CanActivate {
     };
 
     const permissionKey =
-      this.reflector.getAllAndOverride<GenericPermissionAction>(
-        GENERIC_PERMISSION_KEY,
-        [context.getHandler(), context.getClass()],
-      ) ??
+      options?.permission ??
       resolvedPermission?.permission ??
       permissionMap[method];
 
@@ -104,13 +134,13 @@ export class GenericPermissionGuard implements CanActivate {
       throw new ForbiddenException(`global.permissionDenied`);
     }
 
-    for (const role of user?.roles ?? []) {
+    for (const role of user.roles ?? []) {
       for (const permission of role.permissions ?? []) {
         if (
           permission.entity.handle === entityHandle &&
           permission[permissionKey] === true
         ) {
-          return true;
+          return;
         }
       }
     }
@@ -119,20 +149,14 @@ export class GenericPermissionGuard implements CanActivate {
   }
 
   private async resolvePermission(
-    req: Request,
-    context: ExecutionContext,
+    req: GenericPermissionGuardRequest,
+    resolver?: GenericPermissionResolverFn,
   ): Promise<ResolvedGenericPermission | undefined> {
-    const resolver: GenericPermissionResolverFn | undefined =
-      this.reflector.getAllAndOverride(GENERIC_PERMISSION_RESOLVE_KEY, [
-        context.getHandler(),
-        context.getClass(),
-      ]);
-
     if (!resolver) {
       return undefined;
     }
 
-    const resolved = await resolver(req, this.em);
+    const resolved = await resolver(req as Request, this.em);
     return this.normalizeResolvedPermission(resolved);
   }
 

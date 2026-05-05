@@ -186,6 +186,24 @@ export class CreateAiChatMessageDto {
   clientUtcOffsetMinutes?: number;
 }
 
+export class CreateAiChatMessageSpeechDto {
+  @ApiPropertyOptional({
+    description: 'Optional preferred AI provider handle for speech output',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  providerHandle?: string;
+
+  @ApiPropertyOptional({
+    description: 'Optional preferred AI model handle for speech output',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(128)
+  modelHandle?: string;
+}
+
 export class ListAiChatMessagesQueryDto {
   @ApiPropertyOptional({
     description: 'Maximum number of messages to return in a single page',

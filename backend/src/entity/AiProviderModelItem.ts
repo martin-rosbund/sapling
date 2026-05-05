@@ -101,6 +101,126 @@ export class AiProviderModelItem {
 
   @ApiProperty()
   @SaplingForm({
+    order: 525,
+    group: 'aiProviderModel.groupIntegration',
+    groupOrder: 400,
+    width: 1,
+  })
+  @Property({ nullable: false, default: 32 })
+  embeddingBatchSize = 32;
+
+  @ApiProperty()
+  @SaplingForm({
+    order: 530,
+    group: 'aiProviderModel.groupIntegration',
+    groupOrder: 400,
+    width: 1,
+  })
+  @Property({ nullable: false, default: 1200 })
+  vectorChunkLength = 1200;
+
+  @ApiProperty()
+  @SaplingForm({
+    order: 535,
+    group: 'aiProviderModel.groupIntegration',
+    groupOrder: 400,
+    width: 1,
+  })
+  @Property({ nullable: false, default: 200 })
+  vectorChunkOverlap = 200;
+
+  @ApiProperty()
+  @SaplingForm({
+    order: 540,
+    group: 'aiProviderModel.groupIntegration',
+    groupOrder: 400,
+    width: 1,
+  })
+  @Property({ nullable: false, default: 6 })
+  vectorSearchCandidateMultiplier = 6;
+
+  @ApiProperty()
+  @SaplingForm({
+    order: 545,
+    group: 'aiProviderModel.groupIntegration',
+    groupOrder: 400,
+    width: 1,
+  })
+  @Property({ nullable: false, default: 60 })
+  vectorSearchMaxCandidateLimit = 60;
+
+  @ApiProperty()
+  @SaplingForm({
+    order: 548,
+    group: 'aiProviderModel.groupIntegration',
+    groupOrder: 400,
+    width: 1,
+  })
+  @Property({ nullable: false, default: 10 })
+  vectorSearchMaxResults = 10;
+
+  @ApiProperty()
+  @SaplingForm({
+    order: 550,
+    group: 'aiProviderModel.groupIntegration',
+    groupOrder: 400,
+    width: 2,
+  })
+  @Property({ nullable: false, default: false })
+  supportsSpeech = false;
+
+  @ApiProperty()
+  @SaplingForm({
+    order: 650,
+    group: 'aiProviderModel.groupIntegration',
+    groupOrder: 400,
+    width: 2,
+  })
+  @Property({ length: 64, nullable: false, default: 'nova' })
+  speechVoice = 'nova';
+
+  @ApiProperty()
+  @SaplingForm({
+    order: 750,
+    group: 'aiProviderModel.groupIntegration',
+    groupOrder: 400,
+    width: 1,
+  })
+  @Property({ nullable: false, default: 1, type: 'float' })
+  speechSpeed = 1;
+
+  @ApiProperty()
+  @SaplingForm({
+    order: 850,
+    group: 'aiProviderModel.groupIntegration',
+    groupOrder: 400,
+    width: 2,
+  })
+  @Property({ length: 128, nullable: false, default: 'audio/mpeg' })
+  speechMimeType = 'audio/mpeg';
+
+  @ApiProperty()
+  @SaplingForm({
+    order: 950,
+    group: 'aiProviderModel.groupIntegration',
+    groupOrder: 400,
+    width: 1,
+  })
+  @Property({ length: 16, nullable: false, default: 'mp3' })
+  speechFileExtension = 'mp3';
+
+  @ApiProperty()
+  @SaplingForm({
+    order: 1050,
+    group: 'aiProviderModel.groupIntegration',
+    groupOrder: 400,
+    width: 1,
+  })
+  @Property({ nullable: false, default: 4000 })
+  speechMaxInputLength = 4000;
+
+  @ApiProperty()
+  @SaplingForm({
     order: 200,
     group: 'aiProviderModel.groupBasics',
     groupOrder: 100,

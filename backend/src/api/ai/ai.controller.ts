@@ -37,6 +37,7 @@ import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
 import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import {
   AiChatMessageListResponseDto,
+  CreateAiChatMessageSpeechDto,
   CreateAiChatMessageDto,
   CreateAiChatSessionDto,
   ListAiChatMessagesQueryDto,
@@ -141,6 +142,23 @@ export class AiController {
       'transcription',
       true,
     );
+  }
+
+  @Get('speech/providers')
+  @ApiOperation({ summary: 'List active AI providers for speech synthesis' })
+  @ApiResponse({ status: 200, type: AiProviderTypeItem, isArray: true })
+  async listSpeechProviders(): Promise<AiProviderTypeItem[]> {
+    return this.aiService.listActiveProviders('speech', true);
+  }
+
+  @Get('speech/models')
+  @ApiOperation({ summary: 'List active AI speech models' })
+  @ApiQuery({ name: 'providerHandle', required: false, type: String })
+  @ApiResponse({ status: 200, type: AiProviderModelItem, isArray: true })
+  async listSpeechModels(
+    @Query('providerHandle') providerHandle?: string,
+  ): Promise<AiProviderModelItem[]> {
+    return this.aiService.listActiveModels(providerHandle, 'speech', true);
   }
 
   @Post('chat/transcriptions')
@@ -332,13 +350,15 @@ export class AiController {
   @ApiOperation({
     summary: 'Create or reuse persisted speech audio for an assistant message',
   })
+  @ApiBody({ type: CreateAiChatMessageSpeechDto })
   @ApiParam({ name: 'handle', type: 'number', description: 'Message handle' })
   @ApiResponse({ status: 201, type: AiChatMessageItem })
   async ensureAssistantMessageSpeech(
     @Req() req: Request & { user: PersonItem },
     @Param('handle') handle: number,
+    @Body() body: CreateAiChatMessageSpeechDto,
   ): Promise<AiChatMessageItem> {
-    return this.aiService.ensureAssistantMessageSpeech(handle, req.user);
+    return this.aiService.ensureAssistantMessageSpeech(handle, req.user, body);
   }
 
   @Post('chat/stream')

@@ -394,6 +394,33 @@ export const LOG_APPENDERS: string[] = process.env.LOG_APPENDERS
 export const PORT: number = parseInt(process.env.PORT || '3000', 10);
 
 /**
+ * @constant {number} AI_CHAT_MESSAGE_PAGE_SIZE
+ * Default number of chat messages returned per page.
+ */
+export const AI_CHAT_MESSAGE_PAGE_SIZE: number = parseInt(
+  process.env.AI_CHAT_MESSAGE_PAGE_SIZE || '100',
+  10,
+);
+
+/**
+ * @constant {number} AI_MAX_CHAT_MESSAGE_PAGE_SIZE
+ * Maximum number of chat messages that can be requested per page.
+ */
+export const AI_MAX_CHAT_MESSAGE_PAGE_SIZE: number = parseInt(
+  process.env.AI_MAX_CHAT_MESSAGE_PAGE_SIZE || '100',
+  10,
+);
+
+/**
+ * @constant {number} AI_STREAM_HISTORY_MESSAGE_LIMIT
+ * Number of prior chat messages included in provider runtime history.
+ */
+export const AI_STREAM_HISTORY_MESSAGE_LIMIT: number = parseInt(
+  process.env.AI_STREAM_HISTORY_MESSAGE_LIMIT || '24',
+  10,
+);
+
+/**
  * @constant {string} GITHUB_REPO
  * GitHub repository name. Defaults to empty string.
  */
