@@ -394,6 +394,139 @@ export const LOG_APPENDERS: string[] = process.env.LOG_APPENDERS
 export const PORT: number = parseInt(process.env.PORT || '3000', 10);
 
 /**
+ * @constant {number} AI_CHAT_MESSAGE_PAGE_SIZE
+ * Default number of chat messages returned per page.
+ */
+export const AI_CHAT_MESSAGE_PAGE_SIZE: number = parseInt(
+  process.env.AI_CHAT_MESSAGE_PAGE_SIZE || '100',
+  10,
+);
+
+/**
+ * @constant {number} AI_MAX_CHAT_MESSAGE_PAGE_SIZE
+ * Maximum number of chat messages that can be requested per page.
+ */
+export const AI_MAX_CHAT_MESSAGE_PAGE_SIZE: number = parseInt(
+  process.env.AI_MAX_CHAT_MESSAGE_PAGE_SIZE || '100',
+  10,
+);
+
+/**
+ * @constant {number} AI_STREAM_HISTORY_MESSAGE_LIMIT
+ * Number of prior chat messages included in provider runtime history.
+ */
+export const AI_STREAM_HISTORY_MESSAGE_LIMIT: number = parseInt(
+  process.env.AI_STREAM_HISTORY_MESSAGE_LIMIT || '24',
+  10,
+);
+
+/**
+ * @constant {number} AI_EMBEDDING_BATCH_SIZE
+ * Maximum number of texts embedded in one provider batch request.
+ */
+export const AI_EMBEDDING_BATCH_SIZE: number = parseInt(
+  process.env.AI_EMBEDDING_BATCH_SIZE || '32',
+  10,
+);
+
+/**
+ * @constant {number} AI_VECTOR_CHUNK_LENGTH
+ * Target chunk length for vector document generation.
+ */
+export const AI_VECTOR_CHUNK_LENGTH: number = parseInt(
+  process.env.AI_VECTOR_CHUNK_LENGTH || '1200',
+  10,
+);
+
+/**
+ * @constant {number} AI_VECTOR_CHUNK_OVERLAP
+ * Chunk overlap for vector document generation.
+ */
+export const AI_VECTOR_CHUNK_OVERLAP: number = parseInt(
+  process.env.AI_VECTOR_CHUNK_OVERLAP || '200',
+  10,
+);
+
+/**
+ * @constant {number} AI_VECTOR_SEARCH_CANDIDATE_MULTIPLIER
+ * Multiplier used to overfetch semantic-search vector candidates before permission filtering.
+ */
+export const AI_VECTOR_SEARCH_CANDIDATE_MULTIPLIER: number = parseInt(
+  process.env.AI_VECTOR_SEARCH_CANDIDATE_MULTIPLIER || '6',
+  10,
+);
+
+/**
+ * @constant {number} AI_VECTOR_SEARCH_MAX_CANDIDATE_LIMIT
+ * Maximum vector candidate count fetched from pgvector per semantic query.
+ */
+export const AI_VECTOR_SEARCH_MAX_CANDIDATE_LIMIT: number = parseInt(
+  process.env.AI_VECTOR_SEARCH_MAX_CANDIDATE_LIMIT || '60',
+  10,
+);
+
+/**
+ * @constant {number} AI_VECTOR_SEARCH_MAX_RESULTS
+ * Maximum semantic search results returned to clients.
+ */
+export const AI_VECTOR_SEARCH_MAX_RESULTS: number = parseInt(
+  process.env.AI_VECTOR_SEARCH_MAX_RESULTS || '10',
+  10,
+);
+
+/**
+ * @constant {string} AI_ASSISTANT_SPEECH_PROVIDER_HANDLE
+ * Provider handle used for assistant speech generation.
+ */
+export const AI_ASSISTANT_SPEECH_PROVIDER_HANDLE: string =
+  process.env.AI_ASSISTANT_SPEECH_PROVIDER_HANDLE || 'openai';
+
+/**
+ * @constant {string} AI_ASSISTANT_SPEECH_MODEL
+ * Provider model identifier used for assistant speech generation.
+ */
+export const AI_ASSISTANT_SPEECH_MODEL: string =
+  process.env.AI_ASSISTANT_SPEECH_MODEL || 'gpt-4o-mini-tts';
+
+/**
+ * @constant {string} AI_ASSISTANT_SPEECH_VOICE
+ * Voice identifier used for assistant speech generation.
+ */
+export const AI_ASSISTANT_SPEECH_VOICE: string =
+  process.env.AI_ASSISTANT_SPEECH_VOICE || 'nova';
+
+/**
+ * @constant {number} AI_ASSISTANT_SPEECH_SPEED
+ * Playback speed requested for assistant speech synthesis.
+ */
+export const AI_ASSISTANT_SPEECH_SPEED: number = Number.parseFloat(
+  process.env.AI_ASSISTANT_SPEECH_SPEED || '1',
+);
+
+/**
+ * @constant {string} AI_ASSISTANT_SPEECH_MIME_TYPE
+ * MIME type persisted for synthesized assistant speech.
+ */
+export const AI_ASSISTANT_SPEECH_MIME_TYPE: string =
+  process.env.AI_ASSISTANT_SPEECH_MIME_TYPE || 'audio/mpeg';
+
+/**
+ * @constant {string} AI_ASSISTANT_SPEECH_FILE_EXTENSION
+ * File extension persisted for synthesized assistant speech.
+ */
+export const AI_ASSISTANT_SPEECH_FILE_EXTENSION: string =
+  process.env.AI_ASSISTANT_SPEECH_FILE_EXTENSION || 'mp3';
+
+/**
+ * @constant {number} AI_ASSISTANT_SPEECH_MAX_INPUT_LENGTH
+ * Maximum normalized assistant message length passed to speech synthesis.
+ */
+export const AI_ASSISTANT_SPEECH_MAX_INPUT_LENGTH: number = parseInt(
+  process.env.AI_ASSISTANT_SPEECH_MAX_INPUT_LENGTH || '4000',
+  10,
+);
+
+/**
  * @constant {string} GITHUB_REPO
  * GitHub repository name. Defaults to empty string.
  */

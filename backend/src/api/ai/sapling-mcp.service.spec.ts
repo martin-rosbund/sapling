@@ -22,6 +22,7 @@ jest.mock('../current/current.service', () => ({ CurrentService: class {} }));
 jest.mock('../template/template.service', () => ({
   TemplateService: class {},
 }));
+jest.mock('./ai.service', () => ({ AiService: class {} }));
 jest.mock('../../entity/PersonItem', () => ({ PersonItem: class {} }));
 jest.mock('../../entity/global/entity.registry', () => ({
   ENTITY_HANDLES: ['person', 'project', 'ticket'],
@@ -63,17 +64,20 @@ const createService = ({
   currentService = { getPerson: jest.fn() },
   templateService = { getEntityTemplate: jest.fn().mockReturnValue([]) },
   aiService = { searchVectorDocuments: jest.fn() },
+  permissionService = { assertEntityPermission: jest.fn() },
 }: {
   genericService?: Record<string, jest.Mock>;
   currentService?: Record<string, jest.Mock>;
   templateService?: { getEntityTemplate: jest.Mock };
   aiService?: { searchVectorDocuments: jest.Mock };
+  permissionService?: { assertEntityPermission: jest.Mock };
 } = {}) =>
   new SaplingMcpService(
     genericService as never,
     currentService as never,
     templateService as never,
     aiService as never,
+    permissionService as never,
   );
 
 describe('SaplingMcpService', () => {

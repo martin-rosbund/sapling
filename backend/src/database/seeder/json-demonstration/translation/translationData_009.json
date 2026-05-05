@@ -8,5 +8,7 @@
 
   { "entity": "aiChat", "property": "playVoiceOutput", "de": "Vorlesen", "en": "Read aloud" },
   { "entity": "aiChat", "property": "pauseVoiceOutput", "de": "Vorlesen stoppen", "en": "Stop reading aloud" },
-  { "entity": "aiChat", "property": "loadingVoiceOutput", "de": "Sprachausgabe wird erzeugt", "en": "Generating speech output" }
+  { "entity": "aiChat", "property": "loadingVoiceOutput", "de": "Sprachausgabe wird erzeugt", "en": "Generating speech output" },
+
+  { "entity": "navigationGroup", "property": "teams", "de": "Teams", "en": "Teams" }
 ]

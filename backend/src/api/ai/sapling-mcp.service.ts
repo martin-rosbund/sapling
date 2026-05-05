@@ -8,7 +8,6 @@ import {
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
-import * as z from 'zod/v4';
 import type { Request, Response } from 'express';
 import { GenericService } from '../generic/generic.service';
 import { CurrentService } from '../current/current.service';
@@ -17,6 +16,9 @@ import { PersonItem } from '../../entity/PersonItem';
 import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 import { AiService } from './ai.service';
+import { SAPLING_MCP_TOOL_DEFINITIONS } from './sapling-mcp-tool-definitions';
+import { SAPLING_MCP_USAGE_HINTS } from './prompts/sapling-mcp.prompts';
+import { SaplingMcpPermissionService } from './sapling-mcp-permission.service';
 
 type SaplingMcpSession = {
   transport: StreamableHTTPServerTransport;
@@ -27,281 +29,6 @@ type SaplingMcpSession = {
 export class SaplingMcpService {
   private readonly transports = new Map<string, SaplingMcpSession>();
   private readonly internalServerName = 'sapling';
-  private readonly toolDefinitions = [
-    {
-      toolName: 'current_person',
-      description:
-        'Return safe profile context for the current authenticated Sapling user, including name, login, company, language, department, and roles. Use this for questions such as "Wer bin ich?", "Welche Rollen habe ich?", or "Zu welcher Firma gehore ich?".',
-      inputSchema: {
-        type: 'object',
-        properties: {},
-        additionalProperties: false,
-      },
-    },
-    {
-      toolName: 'entity_catalog',
-      description:
-        'List the registered Sapling entity handles that can be used with the generic CRUD tools. Use this when you are unsure which entity name to query. For questions about where something is located in the app, navigation, or menu, inspect this catalog first to identify likely candidates such as entity, entityGroup, and entityRoute before querying details.',
-      inputSchema: {
-        type: 'object',
-        properties: {},
-        additionalProperties: false,
-      },
-    },
-    {
-      toolName: 'entity_schema',
-      description:
-        'Return structured metadata for one Sapling entity, including fields, relation names, referenced entities, required flags, and Sapling options. Use this before building filters, relations, or create/update payloads for an unfamiliar entity. For navigation questions, use this to verify that entity is the page name, entity.group is the group where it appears, entityGroup.parent is an optional parent group, and entityRoute.route is the final route to open.',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          entityHandle: {
-            type: 'string',
-            description: 'Registered Sapling entity handle to inspect.',
-          },
-        },
-        required: ['entityHandle'],
-        additionalProperties: false,
-      },
-    },
-    {
-      toolName: 'entity_search',
-      description:
-        'Search the Sapling entity catalog by entity handle, field name, or relation target. Use this when you only know a rough term, a field such as email or assigneePerson, or a partial entity name and need to discover likely entity handles before calling entity_schema or generic tools.',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          query: {
-            type: 'string',
-            description:
-              'Search term matched against entity handles and schema fields.',
-          },
-          limit: {
-            type: 'integer',
-            description: 'Maximum number of matches to return, default 10.',
-          },
-        },
-        required: ['query'],
-        additionalProperties: false,
-      },
-    },
-    {
-      toolName: 'generic_list',
-      description:
-        'List Sapling generic records with the same read permissions and filters as the current user. Before using complex filters or relations, first inspect the entity with entity_schema and only use fields and relation names returned there. Use MikroORM-style operators such as $eq, $in, $ilike, $and, and $or; common aliases like eq and like are normalized automatically.',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          entityHandle: {
-            type: 'string',
-            description: 'Registered Sapling entity handle.',
-          },
-          filter: {
-            type: 'object',
-            description: 'Optional MikroORM filter object.',
-            additionalProperties: true,
-          },
-          orderBy: {
-            type: 'object',
-            description: 'Optional orderBy object.',
-            additionalProperties: true,
-          },
-          relations: {
-            type: 'array',
-            description: 'Optional relations to populate.',
-            items: { type: 'string' },
-          },
-          page: {
-            type: 'integer',
-            description: 'Page number, default 1.',
-          },
-          limit: {
-            type: 'integer',
-            description: 'Maximum result size, default 50.',
-          },
-        },
-        required: ['entityHandle'],
-        additionalProperties: false,
-      },
-    },
-    {
-      toolName: 'generic_get',
-      description:
-        'Load one Sapling generic record by handle with the same read permissions as the current user. Use this when you already know the record handle and need the current sanitized record instead of a list.',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          entityHandle: {
-            type: 'string',
-            description: 'Registered Sapling entity handle.',
-          },
-          handle: {
-            anyOf: [{ type: 'string' }, { type: 'integer' }],
-            description: 'Record handle to load.',
-          },
-          relations: {
-            type: 'array',
-            description: 'Optional relations to populate.',
-            items: { type: 'string' },
-          },
-        },
-        required: ['entityHandle', 'handle'],
-        additionalProperties: false,
-      },
-    },
-    {
-      toolName: 'generic_timeline',
-      description:
-        'Load the record-centric timeline for one Sapling record. Use this for history, date span, or recent activity questions about a known record handle.',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          entityHandle: {
-            type: 'string',
-            description: 'Registered Sapling entity handle.',
-          },
-          handle: {
-            anyOf: [{ type: 'string' }, { type: 'integer' }],
-            description: 'Record handle to inspect.',
-          },
-          before: {
-            type: 'string',
-            description: 'Optional month cursor in YYYY-MM format.',
-          },
-          months: {
-            type: 'integer',
-            description: 'Number of non-empty months to load, default 6.',
-          },
-        },
-        required: ['entityHandle', 'handle'],
-        additionalProperties: false,
-      },
-    },
-    {
-      toolName: 'ticket_search',
-      description:
-        'Search tickets in TicketItem by number, external number, title, problem description, and optionally solution description. Use this for ticket questions, Sage error reports, and known-fix lookups. Prefer searchMode solution when the user explicitly asks for an existing ticket solution or workaround.',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          query: {
-            type: 'string',
-            description: 'Search text matched against TicketItem text fields.',
-          },
-          searchMode: {
-            type: 'string',
-            enum: ['all', 'problem', 'solution'],
-            description:
-              'Search scope. Use solution for known fixes, problem for incident descriptions, default all.',
-          },
-          limit: {
-            type: 'integer',
-            description: 'Maximum number of matches to return, default 10.',
-          },
-        },
-        required: ['query'],
-        additionalProperties: false,
-      },
-    },
-    {
-      toolName: 'semantic_search',
-      description:
-        'Search vectorized Sapling content semantically. Use this for descriptive ticket problems, incident symptoms, and workaround requests when the wording is natural language or the relevant wording in the stored record may differ from the question. For now, the ticket entity is the primary indexed entity.',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          entityHandle: {
-            type: 'string',
-            description:
-              'Registered Sapling entity handle with an active vector index, for example ticket.',
-          },
-          query: {
-            type: 'string',
-            description:
-              'Natural-language query that should be matched semantically against vectorized content.',
-          },
-          limit: {
-            type: 'integer',
-            description:
-              'Maximum number of semantic results to return, default 5.',
-          },
-        },
-        required: ['entityHandle', 'query'],
-        additionalProperties: false,
-      },
-    },
-    {
-      toolName: 'generic_create',
-      description:
-        'Create a Sapling generic record with the same insert permissions as the current user. Inspect required fields and reference fields with entity_schema before creating an unfamiliar entity.',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          entityHandle: {
-            type: 'string',
-            description: 'Registered Sapling entity handle.',
-          },
-          data: {
-            type: 'object',
-            description: 'Payload for the new record.',
-            additionalProperties: true,
-          },
-        },
-        required: ['entityHandle', 'data'],
-        additionalProperties: false,
-      },
-    },
-    {
-      toolName: 'generic_update',
-      description:
-        'Update a Sapling generic record with the same update permissions as the current user. Inspect valid fields and relations with entity_schema before updating an unfamiliar entity.',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          entityHandle: {
-            type: 'string',
-            description: 'Registered Sapling entity handle.',
-          },
-          handle: {
-            anyOf: [{ type: 'string' }, { type: 'integer' }],
-            description: 'Record handle to update.',
-          },
-          data: {
-            type: 'object',
-            description: 'Partial update payload.',
-            additionalProperties: true,
-          },
-          relations: {
-            type: 'array',
-            description: 'Optional relations to populate in the response.',
-            items: { type: 'string' },
-          },
-        },
-        required: ['entityHandle', 'handle', 'data'],
-        additionalProperties: false,
-      },
-    },
-    {
-      toolName: 'generic_delete',
-      description:
-        'Delete a Sapling generic record with the same delete permissions as the current user.',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          entityHandle: {
-            type: 'string',
-            description: 'Registered Sapling entity handle.',
-          },
-          handle: {
-            anyOf: [{ type: 'string' }, { type: 'integer' }],
-            description: 'Record handle to delete.',
-          },
-        },
-        required: ['entityHandle', 'handle'],
-        additionalProperties: false,
-      },
-    },
-  ] as const;
 
   constructor(
     private readonly genericService: GenericService,
@@ -309,6 +36,7 @@ export class SaplingMcpService {
     private readonly templateService: TemplateService,
     @Inject(forwardRef(() => AiService))
     private readonly aiService: AiService,
+    private readonly permissionService: SaplingMcpPermissionService,
   ) {}
 
   listTools(): Promise<
@@ -319,10 +47,10 @@ export class SaplingMcpService {
     }>
   > {
     return Promise.resolve(
-      this.toolDefinitions.map((tool) => ({
+      SAPLING_MCP_TOOL_DEFINITIONS.map((tool) => ({
         toolName: tool.toolName,
         description: tool.description,
-        inputSchema: { ...tool.inputSchema },
+        inputSchema: { ...tool.jsonSchema },
       })),
     );
   }
@@ -476,350 +204,19 @@ export class SaplingMcpService {
       version: '1.0.0',
     });
 
-    server.registerTool(
-      'current_person',
-      {
-        description:
-          'Return safe profile context for the current authenticated Sapling user, including name, login, company, language, department, and roles. Use this for questions such as "Wer bin ich?", "Welche Rollen habe ich?", or "Zu welcher Firma gehore ich?".',
-        inputSchema: {},
-      },
-      async () => this.createJsonContent(await this.executeCurrentPerson(user)),
-    );
-
-    server.registerTool(
-      'entity_catalog',
-      {
-        description:
-          'List the registered Sapling entity handles that can be used with the generic CRUD tools. Use this when you are unsure which entity name to query. For questions about where something is located in the app, navigation, or menu, inspect this catalog first to identify likely candidates such as entity, entityGroup, and entityRoute before querying details.',
-        inputSchema: {},
-      },
-      () =>
-        Promise.resolve(this.createJsonContent(this.executeEntityCatalog())),
-    );
-
-    server.registerTool(
-      'entity_schema',
-      {
-        description:
-          'Return structured metadata for one Sapling entity, including fields, relation names, referenced entities, required flags, and Sapling options. Use this before building filters, relations, or create/update payloads for an unfamiliar entity. For navigation questions, use this to verify that entity is the page name, entity.group is the group where it appears, entityGroup.parent is an optional parent group, and entityRoute.route is the final route to open.',
-        inputSchema: {
-          entityHandle: z
-            .string()
-            .describe('Registered Sapling entity handle to inspect.'),
+    for (const tool of SAPLING_MCP_TOOL_DEFINITIONS) {
+      server.registerTool(
+        tool.toolName,
+        {
+          description: tool.description,
+          inputSchema: tool.serverInputSchema,
         },
-      },
-      ({ entityHandle }) => {
-        const result = this.executeEntitySchema({ entityHandle });
-        return Promise.resolve(this.createJsonContent(result));
-      },
-    );
-
-    server.registerTool(
-      'entity_search',
-      {
-        description:
-          'Search the Sapling entity catalog by entity handle, field name, or relation target. Use this when you only know a rough term, a field such as email or assigneePerson, or a partial entity name and need to discover likely entity handles before calling entity_schema or generic tools.',
-        inputSchema: {
-          query: z
-            .string()
-            .describe(
-              'Search term matched against entity handles and schema fields.',
-            ),
-          limit: z
-            .number()
-            .int()
-            .positive()
-            .max(50)
-            .optional()
-            .describe('Maximum number of matches to return, default 10.'),
+        async (args: Record<string, unknown> = {}) => {
+          const result = await this.executeTool(tool.toolName, args, user);
+          return this.createJsonContent(result.rawResult);
         },
-      },
-      ({ query, limit }) => {
-        const result = this.executeEntitySearch({ query, limit });
-        return Promise.resolve(this.createJsonContent(result));
-      },
-    );
-
-    server.registerTool(
-      'generic_list',
-      {
-        description:
-          'List Sapling generic records with the same read permissions and filters as the current user. Before using complex filters or relations, first inspect the entity with entity_schema and only use fields and relation names returned there. Use MikroORM-style operators such as $eq, $in, $ilike, $and, and $or; common aliases like eq and like are normalized automatically.',
-        inputSchema: {
-          entityHandle: z
-            .string()
-            .describe('Registered Sapling entity handle.'),
-          filter: z
-            .record(z.string(), z.unknown())
-            .optional()
-            .describe('Optional MikroORM filter object.'),
-          orderBy: z
-            .record(z.string(), z.unknown())
-            .optional()
-            .describe('Optional orderBy object.'),
-          relations: z
-            .array(z.string())
-            .optional()
-            .describe('Optional relations to populate.'),
-          page: z
-            .number()
-            .int()
-            .positive()
-            .optional()
-            .describe('Page number, default 1.'),
-          limit: z
-            .number()
-            .int()
-            .positive()
-            .max(200)
-            .optional()
-            .describe('Maximum result size, default 50.'),
-        },
-      },
-      async ({ entityHandle, filter, orderBy, relations, page, limit }) => {
-        const result = await this.executeGenericList(
-          {
-            entityHandle,
-            filter,
-            orderBy,
-            relations,
-            page,
-            limit,
-          },
-          user,
-        );
-        return this.createJsonContent(result);
-      },
-    );
-
-    server.registerTool(
-      'generic_get',
-      {
-        description:
-          'Load one Sapling generic record by handle with the same read permissions as the current user. Use this when you already know the record handle and need the current sanitized record instead of a list.',
-        inputSchema: {
-          entityHandle: z
-            .string()
-            .describe('Registered Sapling entity handle.'),
-          handle: z
-            .union([z.string(), z.number()])
-            .describe('Record handle to load.'),
-          relations: z
-            .array(z.string())
-            .optional()
-            .describe('Optional relations to populate.'),
-        },
-      },
-      async ({ entityHandle, handle, relations }) => {
-        const result = await this.executeGenericGet(
-          {
-            entityHandle,
-            handle,
-            relations,
-          },
-          user,
-        );
-        return this.createJsonContent(result);
-      },
-    );
-
-    server.registerTool(
-      'generic_timeline',
-      {
-        description:
-          'Load the record-centric timeline for one Sapling record. Use this for history, date span, or recent activity questions about a known record handle.',
-        inputSchema: {
-          entityHandle: z
-            .string()
-            .describe('Registered Sapling entity handle.'),
-          handle: z
-            .union([z.string(), z.number()])
-            .describe('Record handle to inspect.'),
-          before: z
-            .string()
-            .optional()
-            .describe('Optional month cursor in YYYY-MM format.'),
-          months: z
-            .number()
-            .int()
-            .positive()
-            .max(12)
-            .optional()
-            .describe('Number of non-empty months to load, default 6.'),
-        },
-      },
-      async ({ entityHandle, handle, before, months }) => {
-        const result = await this.executeGenericTimeline(
-          {
-            entityHandle,
-            handle,
-            before,
-            months,
-          },
-          user,
-        );
-        return this.createJsonContent(result);
-      },
-    );
-
-    server.registerTool(
-      'ticket_search',
-      {
-        description:
-          'Search tickets in TicketItem by number, external number, title, problem description, and optionally solution description. Use this for ticket questions, Sage error reports, and known-fix lookups. Prefer searchMode solution when the user explicitly asks for an existing ticket solution or workaround.',
-        inputSchema: {
-          query: z
-            .string()
-            .describe('Search text matched against TicketItem text fields.'),
-          searchMode: z
-            .enum(['all', 'problem', 'solution'])
-            .optional()
-            .describe(
-              'Search scope. Use solution for known fixes, problem for incident descriptions, default all.',
-            ),
-          limit: z
-            .number()
-            .int()
-            .positive()
-            .max(50)
-            .optional()
-            .describe('Maximum number of matches to return, default 10.'),
-        },
-      },
-      async ({ query, searchMode, limit }) => {
-        const result = await this.executeTicketSearch(
-          {
-            query,
-            searchMode,
-            limit,
-          },
-          user,
-        );
-        return this.createJsonContent(result);
-      },
-    );
-
-    server.registerTool(
-      'semantic_search',
-      {
-        description:
-          'Search vectorized Sapling content semantically. Use this for descriptive ticket problems, incident symptoms, and workaround requests when the wording is natural language or the relevant wording in the stored record may differ from the question. For now, the ticket entity is the primary indexed entity.',
-        inputSchema: {
-          entityHandle: z
-            .string()
-            .describe(
-              'Registered Sapling entity handle with an active vector index, for example ticket.',
-            ),
-          query: z
-            .string()
-            .describe(
-              'Natural-language query that should be matched semantically against vectorized content.',
-            ),
-          limit: z
-            .number()
-            .int()
-            .positive()
-            .max(20)
-            .optional()
-            .describe(
-              'Maximum number of semantic results to return, default 5.',
-            ),
-        },
-      },
-      async ({ entityHandle, query, limit }) => {
-        const result = await this.executeSemanticSearch(
-          {
-            entityHandle,
-            query,
-            limit,
-          },
-          user,
-        );
-        return this.createJsonContent(result);
-      },
-    );
-
-    server.registerTool(
-      'generic_create',
-      {
-        description:
-          'Create a Sapling generic record with the same insert permissions as the current user. Inspect required fields and reference fields with entity_schema before creating an unfamiliar entity. Treat autogenerated handles or primary keys in the result as internal metadata and do not expose them in normal user-facing prose unless the user explicitly asks for them.',
-        inputSchema: {
-          entityHandle: z
-            .string()
-            .describe('Registered Sapling entity handle.'),
-          data: z
-            .record(z.string(), z.unknown())
-            .describe('Payload for the new record.'),
-        },
-      },
-      async ({ entityHandle, data }) => {
-        const result = await this.executeGenericCreate(
-          { entityHandle, data },
-          user,
-        );
-        return this.createJsonContent(result);
-      },
-    );
-
-    server.registerTool(
-      'generic_update',
-      {
-        description:
-          'Update a Sapling generic record with the same update permissions as the current user. Inspect valid fields and relations with entity_schema before updating an unfamiliar entity. Treat autogenerated handles or primary keys in the result as internal metadata and do not expose them in normal user-facing prose unless the user explicitly asks for them.',
-        inputSchema: {
-          entityHandle: z
-            .string()
-            .describe('Registered Sapling entity handle.'),
-          handle: z
-            .union([z.string(), z.number()])
-            .describe('Record handle to update.'),
-          data: z
-            .record(z.string(), z.unknown())
-            .describe('Partial update payload.'),
-          relations: z
-            .array(z.string())
-            .optional()
-            .describe('Optional relations to populate in the response.'),
-        },
-      },
-      async ({ entityHandle, handle, data, relations }) => {
-        const result = await this.executeGenericUpdate(
-          {
-            entityHandle,
-            handle,
-            data,
-            relations,
-          },
-          user,
-        );
-        return this.createJsonContent(result);
-      },
-    );
-
-    server.registerTool(
-      'generic_delete',
-      {
-        description:
-          'Delete a Sapling generic record with the same delete permissions as the current user.',
-        inputSchema: {
-          entityHandle: z
-            .string()
-            .describe('Registered Sapling entity handle.'),
-          handle: z
-            .union([z.string(), z.number()])
-            .describe('Record handle to delete.'),
-        },
-      },
-      async ({ entityHandle, handle }) => {
-        const result = await this.executeGenericDelete(
-          { entityHandle, handle },
-          user,
-        );
-
-        return this.createJsonContent(result);
-      },
-    );
+      );
+    }
 
     return server;
   }
@@ -842,6 +239,11 @@ export class SaplingMcpService {
     const entityHandle = this.requireStringArg(
       args.entityHandle,
       'entityHandle',
+    );
+    await this.permissionService.assertEntityPermission(
+      user,
+      entityHandle,
+      'allowRead',
     );
     const filter = this.normalizeEntityCriteria(
       entityHandle,
@@ -942,10 +344,7 @@ export class SaplingMcpService {
           : null,
         roles,
       },
-      usageHints: [
-        'Use this tool when the user asks about their own identity, profile, company, department, language, or roles.',
-        'This payload is intentionally sanitized and does not include passwords, session tokens, or refresh tokens.',
-      ],
+      usageHints: [...SAPLING_MCP_USAGE_HINTS.currentPerson],
     };
   }
 
@@ -1024,16 +423,7 @@ export class SaplingMcpService {
         '$or',
         '$and',
       ],
-      usageHints: [
-        'Inspect this schema before composing filters or relation names.',
-        'Use only field names listed here.',
-        'Security-sensitive fields are intentionally omitted from MCP schema responses and mutation payloads.',
-        'Do not send auto-increment or generated primary keys in create payloads.',
-        'Treat autogenerated handles and raw primary keys as internal metadata unless the user explicitly asks for them.',
-        'For app location, navigation, or menu questions, treat entity as the page name, entity.group as the group where it is shown, entityGroup.parent as an optional parent group, and entityRoute.route as the final route to open.',
-        'For person/company references, prefer nested filters on relation fields such as assigneePerson.handle or assigneePerson.email.',
-        'Use MikroORM operators with a leading $, for example $eq or $ilike.',
-      ],
+      usageHints: [...SAPLING_MCP_USAGE_HINTS.entitySchema],
     };
   }
 
@@ -1132,10 +522,7 @@ export class SaplingMcpService {
     return {
       query,
       matches,
-      usageHints: [
-        'Use entity_schema on one of the returned entity handles before composing filters or mutation payloads.',
-        'This search matches entity handles, field names, and relation target handles; it does not query record data.',
-      ],
+      usageHints: [...SAPLING_MCP_USAGE_HINTS.entitySearch],
     };
   }
 
@@ -1146,13 +533,7 @@ export class SaplingMcpService {
       ok: false,
       toolName,
       error: message,
-      hints: [
-        'If you only know a partial handle or field name, start with entity_search.',
-        'Inspect the target entity with entity_schema before retrying.',
-        'For location, navigation, or menu questions, start with entity_catalog and then inspect entity, entityGroup, and entityRoute.',
-        'Use only valid field and relation names from the schema response.',
-        'Use MikroORM operators with a leading $, for example $eq, $in, or $ilike.',
-      ],
+      hints: [...SAPLING_MCP_USAGE_HINTS.toolError],
     };
   }
 
@@ -1238,6 +619,11 @@ export class SaplingMcpService {
       args.entityHandle,
       'entityHandle',
     );
+    await this.permissionService.assertEntityPermission(
+      user,
+      entityHandle,
+      'allowRead',
+    );
     const handle = this.requireHandleArg(args.handle, 'handle');
     const relations = this.normalizeEntityRelations(
       entityHandle,
@@ -1265,9 +651,7 @@ export class SaplingMcpService {
       ...(resolvedHandle !== null ? { handle: resolvedHandle } : {}),
       found: record != null,
       record,
-      usageHints: [
-        'Use this tool when you already know the exact record handle and need the current sanitized record.',
-      ],
+      usageHints: [...SAPLING_MCP_USAGE_HINTS.genericGet],
     };
   }
 
@@ -1278,6 +662,11 @@ export class SaplingMcpService {
     const entityHandle = this.requireStringArg(
       args.entityHandle,
       'entityHandle',
+    );
+    await this.permissionService.assertEntityPermission(
+      user,
+      entityHandle,
+      'allowRead',
     );
     const handle = this.requireHandleArg(args.handle, 'handle');
     const before =
@@ -1299,6 +688,11 @@ export class SaplingMcpService {
     args: Record<string, unknown>,
     user: PersonItem,
   ): Promise<unknown> {
+    await this.permissionService.assertEntityPermission(
+      user,
+      'ticket',
+      'allowRead',
+    );
     const query = this.requireStringArg(args.query, 'query');
     const searchMode = this.asTicketSearchMode(args.searchMode);
     const limit = Math.min(this.asPositiveNumber(args.limit) ?? 10, 50);
@@ -1326,10 +720,7 @@ export class SaplingMcpService {
       searchFields,
       appliedFilter: filter,
       ...result,
-      usageHints: [
-        'TicketItem is exposed via the generic entity handle ticket.',
-        'Use searchMode solution when the user asks for an existing fix, workaround, or ticket solution.',
-      ],
+      usageHints: [...SAPLING_MCP_USAGE_HINTS.ticketSearch],
     };
   }
 
@@ -1341,15 +732,24 @@ export class SaplingMcpService {
       args.entityHandle,
       'entityHandle',
     );
+    await this.permissionService.assertEntityPermission(
+      user,
+      entityHandle,
+      'allowRead',
+    );
     const query = this.requireStringArg(args.query, 'query');
     const limit = Math.min(this.asPositiveNumber(args.limit) ?? 5, 20);
-
-    return this.aiService.searchVectorDocuments(
+    const result = await this.aiService.searchVectorDocuments(
       entityHandle,
       query,
       user,
       limit,
     );
+
+    return {
+      ...(result as Record<string, unknown>),
+      usageHints: [...SAPLING_MCP_USAGE_HINTS.semanticSearch],
+    };
   }
 
   private asTicketSearchMode(value: unknown): 'all' | 'problem' | 'solution' {
@@ -1696,6 +1096,11 @@ export class SaplingMcpService {
       args.entityHandle,
       'entityHandle',
     );
+    await this.permissionService.assertEntityPermission(
+      user,
+      entityHandle,
+      'allowInsert',
+    );
     const data = this.stripSecurityFields(
       entityHandle,
       this.asRecord(args.data),
@@ -1710,6 +1115,11 @@ export class SaplingMcpService {
     const entityHandle = this.requireStringArg(
       args.entityHandle,
       'entityHandle',
+    );
+    await this.permissionService.assertEntityPermission(
+      user,
+      entityHandle,
+      'allowUpdate',
     );
     const handle = this.requireHandleArg(args.handle, 'handle');
     const data = this.stripSecurityFields(
@@ -1734,6 +1144,11 @@ export class SaplingMcpService {
     const entityHandle = this.requireStringArg(
       args.entityHandle,
       'entityHandle',
+    );
+    await this.permissionService.assertEntityPermission(
+      user,
+      entityHandle,
+      'allowDelete',
     );
     const handle = this.requireHandleArg(args.handle, 'handle');
 

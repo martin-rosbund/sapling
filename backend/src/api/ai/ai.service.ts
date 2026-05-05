@@ -7,11 +7,8 @@ import {
   NotFoundException,
   forwardRef,
 } from '@nestjs/common';
-import { OpenAI, toFile } from 'openai';
 import {
-  GoogleGenerativeAI,
   SchemaType,
-  TaskType,
   type Content,
   type FunctionCall,
   type FunctionDeclaration,
@@ -45,40 +42,70 @@ import {
   CreateAiChatTranscriptionDto,
 } from './dto/transcription.dto';
 import { GenericService } from '../generic/generic.service';
-
-type AiExecutedToolCall = {
-  serverHandle: number;
-  serverName: string;
-  toolName: string;
-  arguments: Record<string, unknown>;
-  rawResult: unknown;
-};
-
-type AiToolErrorPayload = {
-  ok: false;
-  toolName?: string;
-  error?: string;
-  hints?: string[];
-};
-
-type AiChatNavigationLink = {
-  path: string;
-  entityHandle: string;
-  kind: 'list' | 'record' | 'route';
-};
-
-type AiStreamResult = {
-  toolCalls: AiExecutedToolCall[];
-};
-
-type AiToolRegistryEntry = {
-  encodedName: string;
-  descriptor: McpToolDescriptor;
-};
-
-type AiProviderCapability = 'chat' | 'embedding' | 'transcription';
-
-type AiEmbeddingPurpose = 'document' | 'query';
+import {
+  AI_ASSISTANT_SPEECH_FILE_EXTENSION,
+  AI_ASSISTANT_SPEECH_MAX_INPUT_LENGTH,
+  AI_ASSISTANT_SPEECH_MIME_TYPE,
+  AI_ASSISTANT_SPEECH_MODEL,
+  AI_ASSISTANT_SPEECH_PROVIDER_HANDLE,
+  AI_ASSISTANT_SPEECH_SPEED,
+  AI_ASSISTANT_SPEECH_VOICE,
+  AI_CHAT_MESSAGE_PAGE_SIZE,
+  AI_EMBEDDING_BATCH_SIZE,
+  AI_MAX_CHAT_MESSAGE_PAGE_SIZE,
+  AI_STREAM_HISTORY_MESSAGE_LIMIT,
+  AI_VECTOR_CHUNK_LENGTH,
+  AI_VECTOR_CHUNK_OVERLAP,
+  AI_VECTOR_SEARCH_CANDIDATE_MULTIPLIER,
+  AI_VECTOR_SEARCH_MAX_CANDIDATE_LIMIT,
+  AI_VECTOR_SEARCH_MAX_RESULTS,
+} from '../../constants/project.constants';
+import {
+  buildAssistantSpeechDescription,
+  buildAssistantSpeechFailurePayload,
+  buildAssistantSpeechFilename,
+  buildAssistantSpeechPayload,
+  prepareAssistantSpeechText,
+} from './ai-speech.utils';
+import {
+  hasUsableProviderCredentials,
+  resolveProviderKind,
+} from './ai-provider.utils';
+import { createGeminiClient, embedGeminiTexts } from './gemini-ai.runtime';
+import {
+  createOpenAiClient,
+  embedOpenAiTexts,
+  synthesizeOpenAiSpeech,
+  transcribeOpenAiAudio,
+} from './openai-ai.runtime';
+import {
+  AiChatMessageSpeechPayload,
+  AiChatNavigationLink,
+  AiClientTimeContext,
+  AiEmbeddingPurpose,
+  AiEmbeddingTarget,
+  AiExecutedToolCall,
+  AiProviderCapability,
+  AiPreparedSpeechText,
+  AiStreamResult,
+  AiToolErrorPayload,
+  AiToolRegistryEntry,
+  AiVectorDocumentDraft,
+  AiVectorDocumentRow,
+  AiVectorIndexRow,
+} from './ai.types';
+import {
+  AI_ASSISTANT_SPEECH_INSTRUCTIONS,
+  AI_GEMINI_REPEATED_TOOL_CALL_ABORT_MESSAGE,
+  AI_GEMINI_TOOL_CALL_LIMIT_MESSAGE,
+  buildCurrentDateInstruction,
+  buildGeminiJsonStringDescription,
+  buildGeminiToolPayloadDescription,
+  buildSystemInstruction,
+  buildToolSummary,
+  buildToolFailureAssistantMessage,
+  normalizeJsonSchema,
+} from './prompts/ai.prompts';
 
 type AiChatMessagePage = {
   messages: AiChatMessageItem[];
@@ -87,70 +114,6 @@ type AiChatMessagePage = {
     hasMore: boolean;
     nextBeforeSequence: number | null;
   };
-};
-
-type AiClientTimeContext = {
-  currentDate?: Date;
-  timeZone?: string;
-  locale?: string;
-  utcOffsetMinutes?: number;
-};
-
-type AiChatMessageSpeechPayload = {
-  status: 'completed' | 'failed';
-  providerHandle: string | null;
-  model: string | null;
-  voice: string | null;
-  speed: number | null;
-  documentHandle: number | null;
-  mimeType: string | null;
-  filename: string | null;
-  sourceTextLength: number | null;
-  wasTruncated: boolean;
-  generatedAt: string;
-  error?: string | null;
-};
-
-type AiPreparedSpeechText = {
-  text: string;
-  sourceTextLength: number;
-  wasTruncated: boolean;
-};
-
-type AiEmbeddingTarget = {
-  provider: AiProviderTypeItem;
-  model: AiProviderModelItem;
-  providerKind: 'openai' | 'gemini';
-};
-
-type AiVectorDocumentDraft = {
-  sourceRecordHandle: string;
-  sourceSection: string;
-  chunkIndex: number;
-  title: string | null;
-  content: string;
-  contentHash: string;
-  metadata: Record<string, unknown> | null;
-};
-
-type AiVectorDocumentRow = {
-  handle: number;
-  source_record_handle: string;
-  source_section: string;
-  chunk_index: number;
-  title: string | null;
-  content: string;
-  content_hash: string;
-  metadata: Record<string, unknown> | null;
-  provider_handle: string;
-  model_handle: string;
-  embedding_dimensions: number;
-};
-
-type AiVectorIndexRow = {
-  provider_handle: string;
-  model_handle: string;
-  document_count: number | string;
 };
 
 /**
@@ -169,25 +132,6 @@ type AiVectorIndexRow = {
  */
 @Injectable()
 export class AiService {
-  private readonly chatMessagePageSize = 100;
-  private readonly maxChatMessagePageSize = 100;
-  private readonly streamHistoryMessageLimit = 24;
-  private readonly embeddingBatchSize = 32;
-  private readonly vectorChunkLength = 1200;
-  private readonly vectorChunkOverlap = 200;
-  private readonly vectorSearchCandidateMultiplier = 6;
-  private readonly maxVectorSearchCandidateLimit = 60;
-  private readonly maxVectorSearchResults = 10;
-  private readonly assistantSpeechProviderHandle = 'openai';
-  private readonly assistantSpeechModel = 'gpt-4o-mini-tts';
-  private readonly assistantSpeechVoice = 'shimmer';
-  private readonly assistantSpeechSpeed = 1.0;
-  private readonly assistantSpeechMimeType = 'audio/mpeg';
-  private readonly assistantSpeechFileExtension = 'mp3';
-  private readonly assistantSpeechMaxInputLength = 4000;
-  private readonly assistantSpeechInstructions =
-    'Speak as Songbird in a warm, lovely, clear female voice. Speak naturally in the language of the message and do not read Markdown as syntax.';
-
   /**
    * Service for accessing configuration values.
    * @type {ConfigService}
@@ -432,8 +376,8 @@ export class AiService {
       'query',
     );
     const candidateLimit = Math.min(
-      Math.max(limit, 1) * this.vectorSearchCandidateMultiplier,
-      this.maxVectorSearchCandidateLimit,
+      Math.max(limit, 1) * AI_VECTOR_SEARCH_CANDIDATE_MULTIPLIER,
+      AI_VECTOR_SEARCH_MAX_CANDIDATE_LIMIT,
     );
     const vectorLiteral = this.toVectorLiteral(queryEmbedding ?? []);
     const rows = (await this.em.getConnection().execute(
@@ -541,7 +485,7 @@ export class AiService {
         } => result != null,
       )
       .sort((left, right) => Number(right.score ?? 0) - Number(left.score ?? 0))
-      .slice(0, Math.min(Math.max(limit, 1), this.maxVectorSearchResults));
+      .slice(0, Math.min(Math.max(limit, 1), AI_VECTOR_SEARCH_MAX_RESULTS));
 
     return {
       entityHandle: normalizedEntityHandle,
@@ -1027,22 +971,25 @@ export class AiService {
 
     try {
       const provider = await this.requireAssistantSpeechProvider();
-      const response = await this.createOpenAiClient(
+      const audioBuffer = await synthesizeOpenAiSpeech({
         provider,
-      ).audio.speech.create({
-        model: this.assistantSpeechModel,
-        voice: this.assistantSpeechVoice,
+        model: AI_ASSISTANT_SPEECH_MODEL,
+        voice: AI_ASSISTANT_SPEECH_VOICE,
         input: preparedSpeechText.text,
-        response_format: this.assistantSpeechFileExtension,
-        instructions: this.assistantSpeechInstructions,
-        speed: this.assistantSpeechSpeed,
+        responseFormat: AI_ASSISTANT_SPEECH_FILE_EXTENSION as
+          | 'mp3'
+          | 'wav'
+          | 'flac'
+          | 'opus'
+          | 'pcm',
+        instructions: AI_ASSISTANT_SPEECH_INSTRUCTIONS,
+        speed: AI_ASSISTANT_SPEECH_SPEED,
       });
-      const audioBuffer = Buffer.from(await response.arrayBuffer());
       const document = await this.documentService.uploadDocument(
         {
           buffer: audioBuffer,
           originalname: this.buildAssistantSpeechFilename(message),
-          mimetype: this.assistantSpeechMimeType,
+          mimetype: AI_ASSISTANT_SPEECH_MIME_TYPE,
           size: audioBuffer.length,
         } as Express.Multer.File,
         'aiChatMessage',
@@ -1150,7 +1097,7 @@ export class AiService {
   private resolveProvider(
     preferredProvider?: string | null,
   ): 'openai' | 'gemini' {
-    return preferredProvider === 'gemini' ? 'gemini' : 'openai';
+    return resolveProviderKind(preferredProvider);
   }
 
   private async resolveRuntimeTarget(
@@ -1617,15 +1564,13 @@ export class AiService {
 
       transcription.document = document;
 
-      const response = await this.createOpenAiClient(
-        target.provider,
-      ).audio.transcriptions.create({
-        file: await toFile(file.buffer, file.originalname, {
-          type: file.mimetype,
-        }),
+      const response = await transcribeOpenAiAudio({
+        provider: target.provider,
         model: target.model.providerModel,
+        fileBuffer: file.buffer,
+        originalname: file.originalname,
+        mimetype: file.mimetype,
         language: dto.language?.trim() || undefined,
-        response_format: 'verbose_json',
       });
 
       transcription.status = 'completed';
@@ -1685,7 +1630,7 @@ export class AiService {
       return [];
     }
 
-    if (normalized.length <= this.vectorChunkLength) {
+    if (normalized.length <= AI_VECTOR_CHUNK_LENGTH) {
       return [normalized];
     }
 
@@ -1693,7 +1638,7 @@ export class AiService {
     let start = 0;
 
     while (start < normalized.length) {
-      let end = Math.min(start + this.vectorChunkLength, normalized.length);
+      let end = Math.min(start + AI_VECTOR_CHUNK_LENGTH, normalized.length);
 
       if (end < normalized.length) {
         const slice = normalized.slice(start, end);
@@ -1702,7 +1647,7 @@ export class AiService {
           slice.lastIndexOf('\n'),
           slice.lastIndexOf('. '),
           slice.lastIndexOf(' '),
-        ].filter((value) => value >= Math.floor(this.vectorChunkLength * 0.6));
+        ].filter((value) => value >= Math.floor(AI_VECTOR_CHUNK_LENGTH * 0.6));
 
         if (preferredBreakpoints.length > 0) {
           end = start + Math.max(...preferredBreakpoints) + 1;
@@ -1719,7 +1664,7 @@ export class AiService {
         break;
       }
 
-      start = Math.max(end - this.vectorChunkOverlap, start + 1);
+      start = Math.max(end - AI_VECTOR_CHUNK_OVERLAP, start + 1);
 
       while (start < normalized.length && /\s/.test(normalized[start] ?? '')) {
         start += 1;
@@ -1747,9 +1692,9 @@ export class AiService {
     for (
       let index = 0;
       index < texts.length;
-      index += this.embeddingBatchSize
+      index += AI_EMBEDDING_BATCH_SIZE
     ) {
-      const batch = texts.slice(index, index + this.embeddingBatchSize);
+      const batch = texts.slice(index, index + AI_EMBEDDING_BATCH_SIZE);
       const batchEmbeddings =
         target.providerKind === 'gemini'
           ? await this.embedGeminiTexts(batch, target, purpose)
@@ -1765,16 +1710,7 @@ export class AiService {
     texts: string[],
     target: AiEmbeddingTarget,
   ): Promise<number[][]> {
-    const client = this.createOpenAiClient(target.provider);
-    const response = await client.embeddings.create({
-      model: target.model.providerModel,
-      input: texts,
-      encoding_format: 'float',
-    });
-
-    return response.data
-      .sort((left, right) => left.index - right.index)
-      .map((item) => item.embedding);
+    return embedOpenAiTexts(target.provider, target.model.providerModel, texts);
   }
 
   private async embedGeminiTexts(
@@ -1782,42 +1718,12 @@ export class AiService {
     target: AiEmbeddingTarget,
     purpose: AiEmbeddingPurpose,
   ): Promise<number[][]> {
-    const client = this.createGeminiClient(target.provider);
-    const model = client.getGenerativeModel({
+    return embedGeminiTexts({
+      provider: target.provider,
       model: target.model.providerModel,
+      texts,
+      purpose,
     });
-
-    if (texts.length === 1) {
-      const response = await model.embedContent(
-        this.buildGeminiEmbeddingRequest(texts[0], purpose),
-      );
-
-      return [response.embedding.values];
-    }
-
-    const response = await model.batchEmbedContents({
-      requests: texts.map((text) =>
-        this.buildGeminiEmbeddingRequest(text, purpose),
-      ),
-    });
-
-    return response.embeddings.map((item) => item.values);
-  }
-
-  private buildGeminiEmbeddingRequest(
-    text: string,
-    purpose: AiEmbeddingPurpose,
-  ) {
-    return {
-      content: {
-        role: 'user',
-        parts: [{ text }],
-      },
-      taskType:
-        purpose === 'query'
-          ? TaskType.RETRIEVAL_QUERY
-          : TaskType.RETRIEVAL_DOCUMENT,
-    };
   }
 
   private buildVectorDocumentKey(
@@ -1969,7 +1875,7 @@ export class AiService {
     userHandle: number,
   ): Promise<AiChatMessageItem[]> {
     const page = await this.fetchChatMessagePage(sessionHandle, userHandle, {
-      limit: this.streamHistoryMessageLimit,
+      limit: AI_STREAM_HISTORY_MESSAGE_LIMIT,
     });
 
     return page.messages;
@@ -2019,12 +1925,12 @@ export class AiService {
 
   private normalizeChatMessageLimit(limit?: number): number {
     if (!Number.isFinite(limit)) {
-      return this.chatMessagePageSize;
+      return AI_CHAT_MESSAGE_PAGE_SIZE;
     }
 
     return Math.min(
-      this.maxChatMessagePageSize,
-      Math.max(1, Math.trunc(limit ?? this.chatMessagePageSize)),
+      AI_MAX_CHAT_MESSAGE_PAGE_SIZE,
+      Math.max(1, Math.trunc(limit ?? AI_CHAT_MESSAGE_PAGE_SIZE)),
     );
   }
 
@@ -2232,9 +2138,10 @@ export class AiService {
         repeatedCallCounts.set(toolCallSignature, repeatedCallCount);
 
         if (repeatedCallCount > 2) {
-          await onDelta(
+          await onDelta(AI_GEMINI_REPEATED_TOOL_CALL_ABORT_MESSAGE);
+          /*
             'Ich breche die automatische Werkzeugschleife ab, weil derselbe Tool-Aufruf wiederholt fehlgeschlagen ist. Bitte formuliere die Frage konkreter oder prüfe zuerst das Entity-Schema.',
-          );
+          */
           return { toolCalls: executedToolCalls };
         }
 
@@ -2281,9 +2188,10 @@ export class AiService {
       result = await chat.sendMessage(functionResponses);
     }
 
-    await onDelta(
+    await onDelta(AI_GEMINI_TOOL_CALL_LIMIT_MESSAGE);
+    /*
       'Ich habe die automatische Werkzeugausführung beendet, weil zu viele aufeinanderfolgende Tool-Aufrufe nötig waren. Bitte formuliere die Anfrage konkreter oder nenne die gewünschte Entity direkt.',
-    );
+    */
     return { toolCalls: executedToolCalls };
   }
 
@@ -2681,15 +2589,14 @@ export class AiService {
   private buildToolFailureAssistantMessage(
     toolErrors: AiToolErrorPayload[],
   ): string {
-    const firstError = toolErrors[0];
-    const errorLine = firstError?.error
-      ? `Das Datenwerkzeug hat wiederholt mit folgendem Fehler geantwortet: ${firstError.error}.`
+    return buildToolFailureAssistantMessage(toolErrors);
+    /*
       : 'Das Datenwerkzeug hat wiederholt ungültige Aufrufe erhalten.';
     const hintLine = firstError?.hints?.[0]
       ? `Hinweis: ${firstError.hints[0]}`
       : 'Hinweis: Prüfe zuerst das Entity-Schema und verwende nur dort aufgeführte Felder und Operatoren.';
 
-    return `${errorLine} ${hintLine}`.trim();
+    */
   }
 
   private buildOpenAiMessages(
@@ -2732,6 +2639,13 @@ export class AiService {
     user?: PersonItem;
     clientTimeContext?: AiClientTimeContext;
   }): string {
+    return buildSystemInstruction({
+      includeToolGuidance: options?.includeToolGuidance,
+      user: options?.user,
+      clientTimeContext: options?.clientTimeContext,
+      referenceDate: new Date(),
+    });
+    /*
     const baseInstruction =
       'You are Songbird, the Sapling assistant. Songbird is your name, and if the user asks for your name you should say that your name is Songbird. Address the user informally when speaking German and consistently use du, dir, dich, dein, and deine; avoid the formal forms Sie and Ihre. Use the persisted page context from the latest user message when it is relevant and answer concisely. Do not expose internal technical identifiers such as raw record handles, autogenerated primary keys, or generic internal IDs in normal user-facing prose. If a tool returns such internal identifiers, treat them as internal metadata unless the user explicitly asks for that exact identifier. Prefer natural confirmations such as saying that a record was created, updated, or deleted successfully. You may still mention explicit user-facing business identifiers such as a ticket number or external number when they are clearly intended for end users.';
     const toolInstruction = options?.includeToolGuidance
@@ -2743,6 +2657,7 @@ export class AiService {
       options?.user,
       options?.clientTimeContext,
     )}`.trim();
+    */
   }
 
   private buildCurrentDateInstruction(
@@ -2750,6 +2665,8 @@ export class AiService {
     user?: PersonItem,
     clientTimeContext?: AiClientTimeContext,
   ): string {
+    return buildCurrentDateInstruction(referenceDate, user, clientTimeContext);
+    /*
     const offsetMinutes = -referenceDate.getTimezoneOffset();
 
     const localeTimeZone = this.resolveUserTimeZone(user, clientTimeContext);
@@ -2776,6 +2693,7 @@ export class AiService {
     ]
       .filter((line): line is string => !!line)
       .join(' ');
+    */
   }
 
   private resolveUserLocale(
@@ -2997,15 +2915,7 @@ export class AiService {
   }
 
   private buildToolSummary(availableTools: McpToolDescriptor[]): string {
-    if (availableTools.length === 0) {
-      return '';
-    }
-
-    return `\n\nAvailable MCP tools: ${availableTools
-      .map((tool) => `${tool.serverName}.${tool.toolName}`)
-      .join(
-        ', ',
-      )}. Use them automatically when they are needed. Direct execution is also available with messages like /tool server.tool {"key":"value"}.`;
+    return buildToolSummary(availableTools);
   }
 
   private buildToolRegistry(
@@ -3077,26 +2987,7 @@ export class AiService {
   private normalizeJsonSchema(
     schema?: Record<string, unknown> | null,
   ): Record<string, unknown> | null {
-    if (!schema || typeof schema !== 'object') {
-      return null;
-    }
-
-    const anyOf = Array.isArray(schema.anyOf) ? schema.anyOf : null;
-
-    if (anyOf) {
-      const firstObjectSchema = anyOf.find(
-        (item): item is Record<string, unknown> =>
-          item != null &&
-          typeof item === 'object' &&
-          (item as Record<string, unknown>).type === 'object',
-      );
-
-      if (firstObjectSchema) {
-        return this.normalizeJsonSchema(firstObjectSchema);
-      }
-    }
-
-    return schema;
+    return normalizeJsonSchema(schema);
   }
 
   private convertJsonSchemaToGemini(
@@ -3370,67 +3261,26 @@ export class AiService {
   }
 
   private buildGeminiJsonStringDescription(description: unknown): string {
-    const prefix =
-      typeof description === 'string' && description.trim()
-        ? `${description.trim()} `
-        : '';
-
-    return `${prefix}Provide this value as a JSON string.`.trim();
+    return buildGeminiJsonStringDescription(description);
   }
 
   private buildGeminiToolPayloadDescription(
     entry: AiToolRegistryEntry,
   ): string {
-    const schema = this.normalizeJsonSchema(entry.descriptor.inputSchema);
-    const properties =
-      schema?.properties && typeof schema.properties === 'object'
-        ? Object.keys(schema.properties)
-        : [];
-    const propertyHint =
-      properties.length > 0
-        ? `Include a JSON object with keys like: ${properties.join(', ')}.`
-        : "Include a JSON object with this tool's arguments.";
-
-    return `${propertyHint} Provide the full object as a JSON string.`;
+    return buildGeminiToolPayloadDescription(entry);
   }
 
-  private createOpenAiClient(provider: AiProviderTypeItem): OpenAI {
-    const apiKey = this.getProviderCredential(provider, 'openAiApiKey');
-
-    if (!apiKey) {
-      throw new Error('ai.providerNotConfigured');
-    }
-
-    return new OpenAI({ apiKey });
+  private createOpenAiClient(provider: AiProviderTypeItem) {
+    return createOpenAiClient(provider);
   }
 
-  private createGeminiClient(provider: AiProviderTypeItem): GoogleGenerativeAI {
-    const apiKey = this.getProviderCredential(provider, 'geminiApiKey');
-
-    if (!apiKey) {
-      throw new Error('ai.providerNotConfigured');
-    }
-
-    return new GoogleGenerativeAI(apiKey);
-  }
-
-  private getProviderCredential(
-    provider: AiProviderTypeItem,
-    key: string,
-  ): string | null {
-    const credentials = provider.credentials;
-
-    if (!credentials || typeof credentials !== 'object') {
-      return null;
-    }
-
-    const value = credentials[key];
-    return typeof value === 'string' && value.trim() ? value.trim() : null;
+  private createGeminiClient(provider: AiProviderTypeItem) {
+    return createGeminiClient(provider);
   }
 
   private async requireAssistantSpeechProvider(): Promise<AiProviderTypeItem> {
     const provider = await this.em.findOne(AiProviderTypeItem, {
-      handle: this.assistantSpeechProviderHandle,
+      handle: AI_ASSISTANT_SPEECH_PROVIDER_HANDLE,
       isActive: true,
     });
 
@@ -3442,74 +3292,17 @@ export class AiService {
   }
 
   private prepareAssistantSpeechText(content: string): AiPreparedSpeechText {
-    const withoutCodeBlocks = content.replace(
-      /```[\s\S]*?```/g,
-      ' Codebeispiel ausgelassen. ',
-    );
-    const withoutImages = withoutCodeBlocks.replace(
-      /!\[[^\]]*]\([^)]*\)/g,
-      ' ',
-    );
-    const withoutLinks = withoutImages.replace(/\[([^\]]+)]\(([^)]+)\)/g, '$1');
-    const withoutRawUrls = withoutLinks.replace(/https?:\/\/\S+/g, ' ');
-    const withoutInlineCode = withoutRawUrls.replace(/`([^`]+)`/g, '$1');
-    const withoutHeadings = withoutInlineCode.replace(
-      /^\s{0,3}#{1,6}\s*/gm,
-      '',
-    );
-    const withoutBullets = withoutHeadings.replace(
-      /^\s*([-*+]|\d+\.)\s+/gm,
-      '',
-    );
-    const normalized = withoutBullets
-      .replace(/[>*_~|]/g, ' ')
-      .replace(/\r\n/g, '\n')
-      .replace(/\n{3,}/g, '\n\n')
-      .replace(/\s+/g, ' ')
-      .trim();
-
-    if (!normalized) {
-      return {
-        text: '',
-        sourceTextLength: 0,
-        wasTruncated: false,
-      };
-    }
-
-    if (normalized.length <= this.assistantSpeechMaxInputLength) {
-      return {
-        text: normalized,
-        sourceTextLength: normalized.length,
-        wasTruncated: false,
-      };
-    }
-
-    const truncationSuffix = ' Antwort gekuerzt.';
-    const truncatedText = `${normalized
-      .slice(0, this.assistantSpeechMaxInputLength - truncationSuffix.length)
-      .trimEnd()}${truncationSuffix}`;
-
-    return {
-      text: truncatedText,
-      sourceTextLength: normalized.length,
-      wasTruncated: true,
-    };
+    return prepareAssistantSpeechText(content);
   }
 
   private buildAssistantSpeechFilename(message: AiChatMessageItem): string {
-    return `songbird-message-${message.handle ?? 'reply'}.${this.assistantSpeechFileExtension}`;
+    return buildAssistantSpeechFilename(message);
   }
 
   private buildAssistantSpeechDescription(
     message: AiChatMessageItem,
   ): string | undefined {
-    const pageTitle = message.pageTitle?.trim();
-
-    if (pageTitle) {
-      return `Songbird audio reply for ${pageTitle}`;
-    }
-
-    return 'Songbird audio reply';
+    return buildAssistantSpeechDescription(message);
   }
 
   private buildAssistantSpeechPayload(
@@ -3517,43 +3310,18 @@ export class AiService {
     document: DocumentItem,
     providerHandle: string | null,
   ): AiChatMessageSpeechPayload {
-    return {
-      status: 'completed',
+    return buildAssistantSpeechPayload(
+      preparedSpeechText,
+      document,
       providerHandle,
-      model: this.assistantSpeechModel,
-      voice: this.assistantSpeechVoice,
-      speed: this.assistantSpeechSpeed,
-      documentHandle: document.handle,
-      mimeType: document.mimetype,
-      filename: document.filename,
-      sourceTextLength: preparedSpeechText.sourceTextLength,
-      wasTruncated: preparedSpeechText.wasTruncated,
-      generatedAt: new Date().toISOString(),
-      error: null,
-    };
+    );
   }
 
   private buildAssistantSpeechFailurePayload(
     preparedSpeechText: AiPreparedSpeechText,
     error: unknown,
   ): AiChatMessageSpeechPayload {
-    return {
-      status: 'failed',
-      providerHandle: this.assistantSpeechProviderHandle,
-      model: this.assistantSpeechModel,
-      voice: this.assistantSpeechVoice,
-      speed: this.assistantSpeechSpeed,
-      documentHandle: null,
-      mimeType: null,
-      filename: null,
-      sourceTextLength: preparedSpeechText.sourceTextLength,
-      wasTruncated: preparedSpeechText.wasTruncated,
-      generatedAt: new Date().toISOString(),
-      error:
-        error instanceof Error && error.message.trim()
-          ? error.message
-          : 'ai.speechGenerationFailed',
-    };
+    return buildAssistantSpeechFailurePayload(preparedSpeechText, error);
   }
 
   private withMessageSpeechPayload(
@@ -3629,15 +3397,7 @@ export class AiService {
   private hasUsableProviderCredentials(
     provider?: AiProviderTypeItem | null,
   ): boolean {
-    if (!provider) {
-      return false;
-    }
-
-    if (provider.handle === 'gemini') {
-      return this.getProviderCredential(provider, 'geminiApiKey') != null;
-    }
-
-    return this.getProviderCredential(provider, 'openAiApiKey') != null;
+    return hasUsableProviderCredentials(provider);
   }
 
   private extractPersonReference(

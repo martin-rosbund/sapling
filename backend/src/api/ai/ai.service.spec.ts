@@ -60,8 +60,15 @@ const asMock = (value: unknown): jest.Mock => value as jest.Mock;
 const createService = (
   em: unknown = {},
   mcpService: unknown = {},
+  documentService: unknown = {},
   genericService: unknown = {},
-) => new AiService(em as never, mcpService as never, genericService as never);
+) =>
+  new AiService(
+    em as never,
+    mcpService as never,
+    documentService as never,
+    genericService as never,
+  );
 
 describe('AiService', () => {
   beforeEach(() => {
