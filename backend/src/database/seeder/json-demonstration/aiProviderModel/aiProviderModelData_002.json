@@ -1,0 +1,17 @@
+[
+    {
+    "handle": "openai-whisper-1",
+    "title": "Whisper 1",
+    "description": "OpenAI speech-to-text model for chat voice input.",
+    "provider": "openai",
+    "providerModel": "whisper-1",
+    "supportsStreaming": false,
+    "supportsTools": false,
+    "supportsEmbeddings": false,
+    "supportsTranscription": true,
+    "isDefault": true,
+    "isActive": true,
+    "sortOrder": 55,
+    "maxToolCallIterations": 20
+  }
+]

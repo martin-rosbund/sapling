@@ -7,7 +7,7 @@ import {
   NotFoundException,
   forwardRef,
 } from '@nestjs/common';
-import { OpenAI } from 'openai';
+import { OpenAI, toFile } from 'openai';
 import {
   GoogleGenerativeAI,
   SchemaType,
@@ -22,6 +22,7 @@ import { PersonItem } from '../../entity/PersonItem';
 import { TicketItem } from '../../entity/TicketItem';
 import { AiChatSessionItem } from '../../entity/AiChatSessionItem';
 import { AiChatMessageItem } from '../../entity/AiChatMessageItem';
+import { AiChatTranscriptionItem } from '../../entity/AiChatTranscriptionItem';
 import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
 import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import {
@@ -33,10 +34,15 @@ import {
   UpdateAiChatSessionDto,
 } from './dto/chat.dto';
 import { McpService, type McpToolDescriptor } from './mcp.service';
+import { DocumentService } from '../document/document.service';
 import {
   VectorizeEntityDto,
   VectorizeEntityResponseDto,
 } from './dto/vectorization.dto';
+import {
+  AiChatTranscriptionResponseDto,
+  CreateAiChatTranscriptionDto,
+} from './dto/transcription.dto';
 import { GenericService } from '../generic/generic.service';
 
 type AiExecutedToolCall = {
@@ -69,7 +75,7 @@ type AiToolRegistryEntry = {
   descriptor: McpToolDescriptor;
 };
 
-type AiProviderCapability = 'chat' | 'embedding';
+type AiProviderCapability = 'chat' | 'embedding' | 'transcription';
 
 type AiEmbeddingPurpose = 'document' | 'query';
 
@@ -159,6 +165,7 @@ export class AiService {
     private readonly em: EntityManager,
     @Inject(forwardRef(() => McpService))
     private readonly mcpService: McpService,
+    private readonly documentService: DocumentService,
     private readonly genericService: GenericService,
   ) {}
 
@@ -567,6 +574,7 @@ export class AiService {
         routeName: dto.routeName ?? null,
         url: dto.url ?? null,
         pageTitle: dto.pageTitle ?? null,
+        transcriptionHandle: dto.transcriptionHandle ?? null,
         clientCurrentDateTime:
           clientTimeContext?.currentDate?.toISOString() ?? null,
         clientTimeZone: clientTimeContext?.timeZone ?? null,
@@ -596,6 +604,12 @@ export class AiService {
     session.lastMessageAt = new Date();
     this.em.persist([userMessage, assistantMessage]);
     await this.em.flush();
+    await this.linkTranscriptionToMessage(
+      dto.transcriptionHandle,
+      session,
+      userMessage,
+      user,
+    );
     await this.populateChatSession(session);
 
     await onEvent({
@@ -904,6 +918,7 @@ export class AiService {
         routeName: dto.routeName ?? null,
         url: dto.url ?? null,
         pageTitle: dto.pageTitle ?? null,
+        transcriptionHandle: dto.transcriptionHandle ?? null,
         clientCurrentDateTime:
           clientTimeContext?.currentDate?.toISOString() ?? null,
         clientTimeZone: clientTimeContext?.timeZone ?? null,
@@ -922,6 +937,12 @@ export class AiService {
 
     this.em.persist(message);
     await this.em.flush();
+    await this.linkTranscriptionToMessage(
+      dto.transcriptionHandle,
+      session,
+      message,
+      user,
+    );
     await this.populateChatSession(session);
     return {
       session: this.sanitizeChatSession(session),
@@ -1011,6 +1032,17 @@ export class AiService {
     );
   }
 
+  private async resolveTranscriptionTarget(
+    preferredProviderHandle?: string | null,
+    preferredModelHandle?: string | null,
+  ): Promise<AiEmbeddingTarget> {
+    return this.resolveAiTarget(
+      preferredProviderHandle,
+      preferredModelHandle,
+      'transcription',
+    );
+  }
+
   private async resolveAiTarget(
     preferredProviderHandle: string | null | undefined,
     preferredModelHandle: string | null | undefined,
@@ -1029,7 +1061,9 @@ export class AiService {
       throw new NotFoundException(
         capability === 'embedding'
           ? 'ai.embeddingModelNotFound'
-          : 'ai.modelNotFound',
+          : capability === 'transcription'
+            ? 'ai.transcriptionModelNotFound'
+            : 'ai.modelNotFound',
       );
     }
 
@@ -1040,7 +1074,9 @@ export class AiService {
       throw new Error(
         capability === 'embedding'
           ? 'ai.embeddingProviderNotConfigured'
-          : 'ai.providerNotConfigured',
+          : capability === 'transcription'
+            ? 'ai.transcriptionProviderNotConfigured'
+            : 'ai.providerNotConfigured',
       );
     }
 
@@ -1064,9 +1100,15 @@ export class AiService {
   private buildModelCapabilityFilter(
     capability: AiProviderCapability,
   ): Record<string, boolean> {
-    return capability === 'embedding'
-      ? { supportsEmbeddings: true }
-      : { supportsStreaming: true };
+    switch (capability) {
+      case 'embedding':
+        return { supportsEmbeddings: true };
+      case 'transcription':
+        return { supportsTranscription: true };
+      case 'chat':
+      default:
+        return { supportsStreaming: true };
+    }
   }
 
   private async getDefaultModelConfig(
@@ -1367,6 +1409,103 @@ export class AiService {
             )
           : null,
     };
+  }
+
+  async createChatTranscription(
+    dto: CreateAiChatTranscriptionDto,
+    file: Express.Multer.File | undefined,
+    user: PersonItem,
+  ): Promise<AiChatTranscriptionResponseDto> {
+    if (!file?.buffer?.length) {
+      throw new BadRequestException('ai.transcriptionFileRequired');
+    }
+
+    const person = await this.requireManagedUser(user);
+    const session = dto.sessionHandle
+      ? await this.findOwnedSession(dto.sessionHandle, user)
+      : null;
+    const target = await this.resolveTranscriptionTarget(
+      dto.providerHandle ?? null,
+      dto.modelHandle ?? null,
+    );
+    const clientTimeContext = this.extractClientTimeContext(dto);
+
+    const transcription = this.em.create(AiChatTranscriptionItem, {
+      session,
+      person,
+      provider: target.provider,
+      model: target.model,
+      status: 'processing',
+      mimeType: file.mimetype,
+      byteLength: file.size,
+      durationSeconds: dto.durationSeconds ?? null,
+      transcript: null,
+      detectedLanguage: null,
+      requestPayload: {
+        routeName: dto.routeName ?? null,
+        url: dto.url ?? null,
+        pageTitle: dto.pageTitle ?? null,
+        language: dto.language ?? null,
+        clientCurrentDateTime:
+          clientTimeContext?.currentDate?.toISOString() ?? null,
+        clientTimeZone: clientTimeContext?.timeZone ?? null,
+        clientLocale: clientTimeContext?.locale ?? null,
+        clientUtcOffsetMinutes: clientTimeContext?.utcOffsetMinutes ?? null,
+        file: {
+          originalname: file.originalname,
+          mimetype: file.mimetype,
+          size: file.size,
+        },
+      },
+    });
+
+    this.em.persist(transcription);
+    await this.em.flush();
+
+    try {
+      const document = await this.documentService.uploadDocument(
+        file,
+        'aiChatTranscription',
+        String(transcription.handle ?? ''),
+        'aiChatAudio',
+        person,
+        dto.pageTitle?.trim() || undefined,
+      );
+
+      transcription.document = document;
+
+      const response = await this.createOpenAiClient(
+        target.provider,
+      ).audio.transcriptions.create({
+        file: await toFile(file.buffer, file.originalname, {
+          type: file.mimetype,
+        }),
+        model: target.model.providerModel,
+        language: dto.language?.trim() || undefined,
+        response_format: 'verbose_json',
+      });
+
+      transcription.status = 'completed';
+      transcription.transcript = response.text?.trim() || null;
+      transcription.detectedLanguage = response.language?.trim() || null;
+      transcription.durationSeconds =
+        response.duration ?? transcription.durationSeconds ?? null;
+      transcription.responsePayload = {
+        providerHandle: target.provider.handle,
+        modelHandle: target.model.handle,
+        usage: response.usage ?? null,
+      };
+      await this.em.flush();
+
+      return this.buildTranscriptionResponse(transcription);
+    } catch (error) {
+      transcription.status = 'failed';
+      transcription.failurePayload = {
+        error: error instanceof Error ? error.message : 'ai.transcriptionFailed',
+      };
+      await this.em.flush();
+      throw error;
+    }
   }
 
   private buildPersonLabel(
@@ -2587,7 +2726,12 @@ export class AiService {
   }
 
   private extractClientTimeContext(
-    dto: CreateAiChatMessageDto,
+    dto: {
+      clientCurrentDateTime?: string;
+      clientTimeZone?: string;
+      clientLocale?: string;
+      clientUtcOffsetMinutes?: number;
+    },
   ): AiClientTimeContext | undefined {
     const currentDate = this.parseClientCurrentDate(dto.clientCurrentDateTime);
     const timeZone = this.isValidTimeZone(dto.clientTimeZone)
@@ -3197,6 +3341,7 @@ export class AiService {
       supportsStreaming: model.supportsStreaming,
       supportsTools: model.supportsTools,
       supportsEmbeddings: model.supportsEmbeddings,
+      supportsTranscription: model.supportsTranscription,
       maxToolCallIterations: model.maxToolCallIterations,
       isDefault: model.isDefault,
       isActive: model.isActive,
@@ -3226,6 +3371,24 @@ export class AiService {
     } as AiChatSessionItem;
   }
 
+  private buildTranscriptionResponse(
+    transcription: AiChatTranscriptionItem,
+  ): AiChatTranscriptionResponseDto {
+    return {
+      transcriptionHandle: transcription.handle ?? 0,
+      transcript: transcription.transcript ?? null,
+      detectedLanguage: transcription.detectedLanguage ?? null,
+      durationSeconds: transcription.durationSeconds ?? null,
+      status: transcription.status,
+      providerHandle: this.extractProviderHandle(transcription.provider),
+      modelHandle: this.extractModelHandle(transcription.model),
+      documentHandle:
+        transcription.document && typeof transcription.document === 'object'
+          ? (transcription.document.handle ?? null)
+          : null,
+    };
+  }
+
   private sanitizeChatMessage(message: AiChatMessageItem): AiChatMessageItem {
     return {
       handle: message.handle,
@@ -3250,5 +3413,48 @@ export class AiService {
       createdAt: message.createdAt,
       updatedAt: message.updatedAt,
     } as unknown as AiChatMessageItem;
+  }
+
+  private async findOwnedTranscription(
+    handle: number,
+    user: PersonItem,
+  ): Promise<AiChatTranscriptionItem> {
+    const userHandle = this.requireUserHandle(user);
+    const transcription = await this.em.findOne(
+      AiChatTranscriptionItem,
+      {
+        handle,
+        person: { handle: userHandle },
+      },
+      {
+        populate: ['document', 'provider', 'model', 'session', 'message'],
+      },
+    );
+
+    if (!transcription) {
+      throw new NotFoundException('ai.transcriptionNotFound');
+    }
+
+    return transcription;
+  }
+
+  private async linkTranscriptionToMessage(
+    transcriptionHandle: number | undefined,
+    session: AiChatSessionItem,
+    message: AiChatMessageItem,
+    user: PersonItem,
+  ): Promise<void> {
+    if (!transcriptionHandle) {
+      return;
+    }
+
+    const transcription = await this.findOwnedTranscription(
+      transcriptionHandle,
+      user,
+    );
+
+    transcription.session = session;
+    transcription.message = message;
+    await this.em.flush();
   }
 }

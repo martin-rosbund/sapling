@@ -134,6 +134,15 @@ export class CreateAiChatMessageDto {
   modelHandle?: string;
 
   @ApiPropertyOptional({
+    description: 'Optional transcription handle linked to this message',
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  transcriptionHandle?: number;
+
+  @ApiPropertyOptional({
     description: 'Optional structured context payload from the frontend',
     type: 'object',
     additionalProperties: true,

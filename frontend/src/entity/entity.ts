@@ -1304,6 +1304,8 @@ export interface AiProviderModelItem extends SaplingGenericItem {
   supportsTools: boolean
   /** Supports embedding generation */
   supportsEmbeddings: boolean
+  /** Supports speech transcription */
+  supportsTranscription: boolean
   /** Default frontend selection */
   isDefault: boolean
   /** Whether the model is active */

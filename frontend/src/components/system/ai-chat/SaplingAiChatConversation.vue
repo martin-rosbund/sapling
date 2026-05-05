@@ -140,25 +140,65 @@
       />
 
       <div class="sapling-ai-chat__composer-actions">
-        <div class="sapling-ai-chat__composer-context">
-          <v-chip
-            class="sapling-ai-chat__composer-badge"
-            color="primary"
-            prepend-icon="mdi-check-circle-outline"
-            size="small"
-            variant="tonal"
-          >
-            {{ t('aiChat.connectedBadge') }}
-          </v-chip>
+        <div class="sapling-ai-chat__composer-context d-flex ga-2 flex-wrap flex-grow-1">
+          <v-select
+            v-if="transcriptionProviderOptions.length > 0"
+            :model-value="selectedTranscriptionProviderHandle"
+            class="sapling-ai-chat__provider-select flex-1-1"
+            density="compact"
+            :disabled="
+              isSending || isLoadingTranscriptionProviders || isLoadingTranscriptionModels
+            "
+            hide-details
+            item-title="label"
+            item-value="value"
+            :items="transcriptionProviderOptions"
+            :label="t('aiChat.voiceProvider')"
+            variant="outlined"
+            @update:model-value="emit('update:selectedTranscriptionProvider', $event)"
+          />
+          <v-select
+            v-if="transcriptionModelOptions.length > 0"
+            :model-value="selectedTranscriptionModelHandle"
+            class="sapling-ai-chat__model-select flex-1-1"
+            density="compact"
+            :disabled="
+              isSending ||
+              isLoadingTranscriptionModels ||
+              !selectedTranscriptionProviderHandle
+            "
+            hide-details
+            item-title="label"
+            item-value="value"
+            :items="transcriptionModelOptions"
+            :label="t('aiChat.voiceModel')"
+            variant="outlined"
+            @update:model-value="emit('update:selectedTranscriptionModel', $event)"
+          />
         </div>
-        <v-btn
-          variant="tonal"
-          :disabled="!canSendMessage || !draftMessage.trim()"
-          :loading="isSending"
-          @click="emit('send')"
-        >
-          {{ t('aiChat.send') }}
-        </v-btn>
+        <div class="d-flex ga-2">
+          <v-btn
+            variant="text"
+            :disabled="
+              !hasConfiguredProviders ||
+              !hasConfiguredTranscriptionProviders ||
+              isSending ||
+              isTranscribingVoiceInput
+            "
+            :icon="isRecordingVoiceInput ? 'mdi-stop' : 'mdi-microphone-outline'"
+            :loading="isTranscribingVoiceInput"
+            :title="getVoiceInputButtonLabel()"
+            @click="emit('toggle-voice-input')"
+          />
+          <v-btn
+            variant="tonal"
+            icon="mdi-send"
+            :disabled="!canSendMessage || !draftMessage.trim()"
+            :loading="isSending"
+            :title="t('aiChat.send')"
+            @click="emit('send')"
+          />
+        </div>
       </div>
     </div>
   </section>
@@ -187,13 +227,20 @@ const props = withDefaults(
     activeConversationTitle: string
     providerOptions: SelectOption[]
     modelOptions: SelectOption[]
+    transcriptionProviderOptions: SelectOption[]
+    transcriptionModelOptions: SelectOption[]
     selectedProviderHandle: string | null
     selectedModelHandle: string | null
+    selectedTranscriptionProviderHandle: string | null
+    selectedTranscriptionModelHandle: string | null
     hasConfiguredProviders: boolean
+    hasConfiguredTranscriptionProviders: boolean
     canSendMessage: boolean
     isSending: boolean
     isLoadingProviders: boolean
     isLoadingModels: boolean
+    isLoadingTranscriptionProviders: boolean
+    isLoadingTranscriptionModels: boolean
     messages: AiChatMessageItem[]
     draftMessage: string
     assistantName: string
@@ -201,6 +248,9 @@ const props = withDefaults(
     streamingDurationByHandle: Record<number, number>
     hasMoreMessages: boolean
     isLoadingOlderMessages: boolean
+    isVoiceInputAvailable: boolean
+    isRecordingVoiceInput: boolean
+    isTranscribingVoiceInput: boolean
     titlePreviewLimit?: number
   }>(),
   {
@@ -211,10 +261,13 @@ const props = withDefaults(
 const emit = defineEmits<{
   (event: 'update:selectedProvider', value: unknown): void
   (event: 'update:selectedModel', value: unknown): void
+  (event: 'update:selectedTranscriptionProvider', value: unknown): void
+  (event: 'update:selectedTranscriptionModel', value: unknown): void
   (event: 'update:draftMessage', value: string): void
   (event: 'send'): void
   (event: 'close'): void
   (event: 'load-older-messages'): void
+  (event: 'toggle-voice-input'): void
 }>()
 
 const { t, te } = useI18n()
@@ -229,6 +282,22 @@ const draftMessageModel = computed({
 
 function getLastItem<T>(items: readonly T[]): T | undefined {
   return items.length > 0 ? items[items.length - 1] : undefined
+}
+
+function getVoiceInputButtonLabel() {
+  if (!props.isVoiceInputAvailable) {
+    return t('aiChat.voiceInputUnavailable')
+  }
+
+  if (props.isTranscribingVoiceInput) {
+    return t('aiChat.transcribingAudio')
+  }
+
+  if (props.isRecordingVoiceInput) {
+    return t('aiChat.stopVoiceInput')
+  }
+
+  return t('aiChat.startVoiceInput')
 }
 
 watch(

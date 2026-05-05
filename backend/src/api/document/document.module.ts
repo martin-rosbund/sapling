@@ -23,5 +23,6 @@ import { AuthModule } from '../../auth/auth.module';
   ],
   controllers: [DocumentController],
   providers: [DocumentService],
+  exports: [DocumentService],
 })
 export class DocumentModule {}

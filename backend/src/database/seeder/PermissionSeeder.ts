@@ -74,6 +74,7 @@ export class PermissionSeeder extends Seeder {
       'dashboardTemplate',
       'aiChatSession',
       'aiChatMessage',
+      'aiChatTranscription',
     ],
     insert: [
       'company',
@@ -188,6 +189,7 @@ export class PermissionSeeder extends Seeder {
       'information',
       'aiChatSession',
       'aiChatMessage',
+      'aiChatTranscription',
     ],
   });
 

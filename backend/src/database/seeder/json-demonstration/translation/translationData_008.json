@@ -1,0 +1,43 @@
+[
+  { "entity": "ai", "property": "transcriptionFileRequired", "de": "Audiodatei fehlt", "en": "Audio file is required" },
+  { "entity": "ai", "property": "transcriptionProviderNotConfigured", "de": "Transkriptionsanbieter nicht konfiguriert", "en": "Transcription provider not configured" },
+  { "entity": "ai", "property": "transcriptionModelNotFound", "de": "Transkriptionsmodell nicht gefunden", "en": "Transcription model not found" },
+  { "entity": "ai", "property": "transcriptionFailed", "de": "Audio konnte nicht transkribiert werden", "en": "Failed to transcribe audio" },
+
+  { "entity": "aiChat", "property": "startVoiceInput", "de": "Spracheingabe starten", "en": "Start voice input" },
+  { "entity": "aiChat", "property": "stopVoiceInput", "de": "Spracheingabe stoppen", "en": "Stop voice input" },
+  { "entity": "aiChat", "property": "transcribingAudio", "de": "Audio wird transkribiert", "en": "Transcribing audio" },
+  { "entity": "aiChat", "property": "voiceInputUnavailable", "de": "Spracheingabe ist in diesem Browser nicht verfügbar.", "en": "Voice input is not available in this browser." },
+  { "entity": "aiChat", "property": "microphoneAccessFailed", "de": "Auf das Mikrofon konnte nicht zugegriffen werden.", "en": "Unable to access the microphone." },
+  { "entity": "aiChat", "property": "noSpeechDetected", "de": "In der Aufnahme konnte keine Sprache erkannt werden.", "en": "No speech could be transcribed from the recording." },
+  { "entity": "aiChat", "property": "voiceProvider", "de": "Sprachanbieter", "en": "Voice provider" },
+  { "entity": "aiChat", "property": "voiceModel", "de": "Sprachmodell", "en": "Voice model" },
+  
+  { "entity": "aiProviderModel", "property": "supportsTranscription", "de": "Unterstützt Transkription", "en": "Supports transcription" },
+
+  { "entity": "aiChatTranscription", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "aiChatTranscription", "property": "session", "de": "Chat", "en": "Chat" },
+  { "entity": "aiChatTranscription", "property": "message", "de": "Nachricht", "en": "Message" },
+  { "entity": "aiChatTranscription", "property": "document", "de": "Dokument", "en": "Document" },
+  { "entity": "aiChatTranscription", "property": "person", "de": "Person", "en": "Person" },
+  { "entity": "aiChatTranscription", "property": "provider", "de": "Provider", "en": "Provider" },
+  { "entity": "aiChatTranscription", "property": "model", "de": "Modell", "en": "Model" },
+  { "entity": "aiChatTranscription", "property": "status", "de": "Status", "en": "Status" },
+  { "entity": "aiChatTranscription", "property": "transcript", "de": "Transkript", "en": "Transcript" },
+  { "entity": "aiChatTranscription", "property": "detectedLanguage", "de": "Erkannte Sprache", "en": "Detected language" },
+  { "entity": "aiChatTranscription", "property": "mimeType", "de": "MIME-Typ", "en": "MIME type" },
+  { "entity": "aiChatTranscription", "property": "byteLength", "de": "Dateigröße", "en": "File size" },
+  { "entity": "aiChatTranscription", "property": "durationSeconds", "de": "Dauer in Sekunden", "en": "Duration in seconds" },
+  { "entity": "aiChatTranscription", "property": "requestPayload", "de": "Request-Daten", "en": "Request payload" },
+  { "entity": "aiChatTranscription", "property": "responsePayload", "de": "Response-Daten", "en": "Response payload" },
+  { "entity": "aiChatTranscription", "property": "failurePayload", "de": "Fehlerdaten", "en": "Failure payload" },
+  { "entity": "aiChatTranscription", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "aiChatTranscription", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
+  { "entity": "navigation", "property": "aiChatTranscription", "de": "AI-Transkription", "en": "AI Transcription" },
+
+  { "entity": "aiChatTranscription", "property": "groupReference", "de": "Referenz", "en": "Reference" },
+  { "entity": "aiChatTranscription", "property": "groupBasics", "de": "Grundlagen", "en": "Basics" },
+  { "entity": "aiChatTranscription", "property": "groupIntegration", "de": "Integration", "en": "Integration" },
+  { "entity": "aiChatTranscription", "property": "groupContent", "de": "Inhalt", "en": "Content" }
+]

@@ -9,16 +9,20 @@ import {
   Query,
   Req,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiConsumes,
   ApiOperation,
   ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request, Response } from 'express';
 import { AiService } from './ai.service';
 import { SaplingMcpService } from './sapling-mcp.service';
@@ -41,6 +45,10 @@ import {
   VectorizeEntityDto,
   VectorizeEntityResponseDto,
 } from './dto/vectorization.dto';
+import {
+  AiChatTranscriptionResponseDto,
+  CreateAiChatTranscriptionDto,
+} from './dto/transcription.dto';
 
 /**
  * @class
@@ -111,6 +119,96 @@ export class AiController {
     @Query('providerHandle') providerHandle?: string,
   ): Promise<AiProviderModelItem[]> {
     return this.aiService.listActiveModels(providerHandle, 'chat', true);
+  }
+
+  @Get('transcription/providers')
+  @ApiOperation({ summary: 'List active AI providers for transcription' })
+  @ApiResponse({ status: 200, type: AiProviderTypeItem, isArray: true })
+  async listTranscriptionProviders(): Promise<AiProviderTypeItem[]> {
+    return this.aiService.listActiveProviders('transcription', true);
+  }
+
+  @Get('transcription/models')
+  @ApiOperation({ summary: 'List active AI transcription models' })
+  @ApiQuery({ name: 'providerHandle', required: false, type: String })
+  @ApiResponse({ status: 200, type: AiProviderModelItem, isArray: true })
+  async listTranscriptionModels(
+    @Query('providerHandle') providerHandle?: string,
+  ): Promise<AiProviderModelItem[]> {
+    return this.aiService.listActiveModels(providerHandle, 'transcription', true);
+  }
+
+  @Post('chat/transcriptions')
+  @ApiOperation({ summary: 'Upload audio and create a persisted transcription draft' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+        sessionHandle: {
+          type: 'number',
+          nullable: true,
+        },
+        providerHandle: {
+          type: 'string',
+          nullable: true,
+        },
+        modelHandle: {
+          type: 'string',
+          nullable: true,
+        },
+        language: {
+          type: 'string',
+          nullable: true,
+        },
+        routeName: {
+          type: 'string',
+          nullable: true,
+        },
+        url: {
+          type: 'string',
+          nullable: true,
+        },
+        pageTitle: {
+          type: 'string',
+          nullable: true,
+        },
+        clientCurrentDateTime: {
+          type: 'string',
+          nullable: true,
+        },
+        clientTimeZone: {
+          type: 'string',
+          nullable: true,
+        },
+        clientLocale: {
+          type: 'string',
+          nullable: true,
+        },
+        clientUtcOffsetMinutes: {
+          type: 'number',
+          nullable: true,
+        },
+        durationSeconds: {
+          type: 'number',
+          nullable: true,
+        },
+      },
+      required: ['file'],
+    },
+  })
+  @ApiResponse({ status: 201, type: AiChatTranscriptionResponseDto })
+  @UseInterceptors(FileInterceptor('file'))
+  async createTranscription(
+    @Req() req: Request & { user: PersonItem },
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: CreateAiChatTranscriptionDto,
+  ): Promise<AiChatTranscriptionResponseDto> {
+    return this.aiService.createChatTranscription(body, file, req.user);
   }
 
   @Get('vectorization/providers')

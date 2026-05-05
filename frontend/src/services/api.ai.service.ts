@@ -30,11 +30,38 @@ export interface CreateAiChatMessagePayload {
   pageTitle?: string
   providerHandle?: string
   modelHandle?: string
+  transcriptionHandle?: number
   contextPayload?: Record<string, unknown>
   clientCurrentDateTime?: string
   clientTimeZone?: string
   clientLocale?: string
   clientUtcOffsetMinutes?: number
+}
+
+export interface CreateAiChatTranscriptionPayload {
+  sessionHandle?: number
+  providerHandle?: string
+  modelHandle?: string
+  language?: string
+  routeName?: string
+  url?: string
+  pageTitle?: string
+  clientCurrentDateTime?: string
+  clientTimeZone?: string
+  clientLocale?: string
+  clientUtcOffsetMinutes?: number
+  durationSeconds?: number
+}
+
+export interface AiChatTranscriptionResponse {
+  transcriptionHandle: number
+  transcript: string | null
+  detectedLanguage: string | null
+  durationSeconds: number | null
+  status: string
+  providerHandle: string | null
+  modelHandle: string | null
+  documentHandle: number | null
 }
 
 export interface VectorizeEntityPayload {
@@ -96,6 +123,36 @@ class ApiAiService {
       return response.data
     } catch (error: unknown) {
       this.handleError(error, 'ai.chat.modelListFailed')
+      throw error
+    }
+  }
+
+  static async listTranscriptionProviders(): Promise<AiProviderTypeItem[]> {
+    try {
+      const response = await axios.get<AiProviderTypeItem[]>(
+        `${BACKEND_URL}ai/transcription/providers`,
+      )
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'ai.transcription.providerListFailed')
+      throw error
+    }
+  }
+
+  static async listTranscriptionModels(providerHandle?: string): Promise<AiProviderModelItem[]> {
+    try {
+      const response = await axios.get<AiProviderModelItem[]>(
+        `${BACKEND_URL}ai/transcription/models`,
+        {
+          params: {
+            providerHandle: providerHandle ?? undefined,
+          },
+        },
+      )
+
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'ai.transcription.modelListFailed')
       throw error
     }
   }
@@ -223,6 +280,36 @@ class ApiAiService {
     }
   }
 
+  static async createTranscription(
+    file: File | Blob,
+    payload: CreateAiChatTranscriptionPayload = {},
+    filename = 'sapling-chat-audio.webm',
+  ): Promise<AiChatTranscriptionResponse> {
+    try {
+      const formData = new FormData()
+      formData.append('file', file, filename)
+
+      const enrichedPayload = this.withClientTimeContext(payload)
+
+      for (const [key, value] of Object.entries(enrichedPayload)) {
+        if (value == null) {
+          continue
+        }
+
+        formData.append(key, String(value))
+      }
+
+      const response = await axios.post<AiChatTranscriptionResponse>(
+        `${BACKEND_URL}ai/chat/transcriptions`,
+        formData,
+      )
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'ai.transcription.createFailed')
+      throw error
+    }
+  }
+
   static async streamMessage(
     payload: CreateAiChatMessagePayload,
     onEvent: (event: AiChatStreamEvent) => void,
@@ -279,7 +366,14 @@ class ApiAiService {
     pushApiErrorMessage(error, fallbackMessage, context)
   }
 
-  private static withClientTimeContext<T extends CreateAiChatMessagePayload>(payload: T): T {
+  private static withClientTimeContext<
+    T extends {
+      clientCurrentDateTime?: string
+      clientTimeZone?: string
+      clientLocale?: string
+      clientUtcOffsetMinutes?: number
+    },
+  >(payload: T): T {
     const now = new Date()
     const resolvedOptions = Intl.DateTimeFormat().resolvedOptions()
     const timeZone = resolvedOptions.timeZone?.trim()

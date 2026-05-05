@@ -75,13 +75,20 @@
               :active-conversation-title="activeConversationTitle"
               :provider-options="providerOptions"
               :model-options="modelOptions"
+              :transcription-provider-options="transcriptionProviderOptions"
+              :transcription-model-options="transcriptionModelOptions"
               :selected-provider-handle="selectedProviderHandle"
               :selected-model-handle="selectedModelHandle"
+              :selected-transcription-provider-handle="selectedTranscriptionProviderHandle"
+              :selected-transcription-model-handle="selectedTranscriptionModelHandle"
               :has-configured-providers="hasConfiguredProviders"
+              :has-configured-transcription-providers="hasConfiguredTranscriptionProviders"
               :can-send-message="canSendMessage"
               :is-sending="isSending"
               :is-loading-providers="isLoadingProviders"
               :is-loading-models="isLoadingModels"
+              :is-loading-transcription-providers="isLoadingTranscriptionProviders"
+              :is-loading-transcription-models="isLoadingTranscriptionModels"
               :messages="messages"
               :draft-message="draftMessage"
               :assistant-name="assistantName"
@@ -89,12 +96,18 @@
               :streaming-duration-by-handle="streamingDurationByHandle"
               :has-more-messages="hasMoreMessages"
               :is-loading-older-messages="isLoadingOlderMessages"
+              :is-voice-input-available="isVoiceInputAvailable"
+              :is-recording-voice-input="isRecordingVoiceInput"
+              :is-transcribing-voice-input="isTranscribingVoiceInput"
               :title-preview-limit="TITLE_PREVIEW_LIMIT"
               @update:selected-provider="updateSelectedProvider"
               @update:selected-model="updateSelectedModel"
+              @update:selected-transcription-provider="updateSelectedTranscriptionProvider"
+              @update:selected-transcription-model="updateSelectedTranscriptionModel"
               @update:draft-message="updateDraftMessage"
               @close="closePanel"
               @load-older-messages="loadOlderMessages"
+              @toggle-voice-input="toggleVoiceInput"
               @send="sendMessage"
             />
           </div>
@@ -141,16 +154,22 @@ const { isOpen, hasSaplingAiChatAccess, ensureSaplingAiChatAccess, closeSaplingA
 const includeArchived = ref(false)
 const isLoadingProviders = ref(false)
 const isLoadingModels = ref(false)
+const isLoadingTranscriptionProviders = ref(false)
+const isLoadingTranscriptionModels = ref(false)
 const isLoadingSessions = ref(false)
 const isLoadingMessages = ref(false)
 const isSending = ref(false)
 const providerConfigs = ref<AiProviderTypeItem[]>([])
 const modelConfigs = ref<AiProviderModelItem[]>([])
+const transcriptionProviderConfigs = ref<AiProviderTypeItem[]>([])
+const transcriptionModelConfigs = ref<AiProviderModelItem[]>([])
 const sessions = ref<AiChatSessionItem[]>([])
 const messages = ref<AiChatMessageItem[]>([])
 const activeSession = ref<AiChatSessionItem | null>(null)
 const selectedProviderHandle = ref<string | null>(null)
 const selectedModelHandle = ref<string | null>(null)
+const selectedTranscriptionProviderHandle = ref<string | null>(null)
+const selectedTranscriptionModelHandle = ref<string | null>(null)
 const draftMessage = ref('')
 const editingSessionHandle = ref<number | null>(null)
 const editingSessionTitle = ref('')
@@ -158,10 +177,15 @@ const isSessionRailCollapsed = ref(false)
 const hasMoreMessages = ref(false)
 const nextMessageBeforeSequence = ref<number | null>(null)
 const isLoadingOlderMessages = ref(false)
+const isRecordingVoiceInput = ref(false)
+const isTranscribingVoiceInput = ref(false)
 const streamAbortController = ref<AbortController | null>(null)
 const streamingClock = ref(Date.now())
 const streamingMessageStartedAt = new Map<number, number>()
 const hasInitialized = ref(false)
+const activeTranscriptionHandle = ref<number | null>(null)
+const activeVoiceRecorder = ref<MediaRecorder | null>(null)
+const activeVoiceStream = ref<MediaStream | null>(null)
 const activeSendAttempt = ref<{
   content: string
   receivedServerEvents: boolean
@@ -169,6 +193,9 @@ const activeSendAttempt = ref<{
 let initializationPromise: Promise<void> | null = null
 let streamingClockTimer: number | null = null
 let nextLocalMessageHandle = -1
+let voiceRecordingStartedAt: number | null = null
+let pendingVoiceChunks: Blob[] = []
+let discardPendingVoiceRecording = false
 
 const isBusy = computed(
   () =>
@@ -204,6 +231,18 @@ const hasConfiguredProviders = computed(
   () => providerOptions.value.length > 0 && modelConfigs.value.length > 0,
 )
 
+const transcriptionProviderOptions = computed(() =>
+  transcriptionProviderConfigs.value.map((item) => ({
+    label: item.title,
+    value: item.handle ?? '',
+  })),
+)
+
+const hasConfiguredTranscriptionProviders = computed(
+  () =>
+    transcriptionProviderOptions.value.length > 0 && transcriptionModelConfigs.value.length > 0,
+)
+
 const filteredModelConfigs = computed(() =>
   modelConfigs.value.filter(
     (item) => getModelProviderHandle(item) === selectedProviderHandle.value,
@@ -217,9 +256,30 @@ const modelOptions = computed(() =>
   })),
 )
 
+const filteredTranscriptionModelConfigs = computed(() =>
+  transcriptionModelConfigs.value.filter(
+    (item) => getModelProviderHandle(item) === selectedTranscriptionProviderHandle.value,
+  ),
+)
+
+const transcriptionModelOptions = computed(() =>
+  filteredTranscriptionModelConfigs.value.map((item) => ({
+    label: `${item.title} (${item.providerModel})`,
+    value: item.handle ?? '',
+  })),
+)
+
 const canSendMessage = computed(
   () =>
     hasConfiguredProviders.value && !!selectedProviderHandle.value && !!selectedModelHandle.value,
+)
+
+const isVoiceInputAvailable = computed(
+  () =>
+    typeof window !== 'undefined' &&
+    typeof MediaRecorder !== 'undefined' &&
+    !!navigator.mediaDevices?.getUserMedia &&
+    hasConfiguredTranscriptionProviders.value,
 )
 
 const streamingDurationByHandle = computed<Record<number, number>>(() => {
@@ -298,6 +358,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
   streamAbortController.value?.abort()
+  cancelVoiceInput()
   if (streamingClockTimer != null) {
     window.clearInterval(streamingClockTimer)
   }
@@ -310,6 +371,7 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 function closePanel() {
+  cancelVoiceInput()
   closeSaplingAiChat()
 }
 
@@ -329,6 +391,8 @@ async function ensureChatInitialized() {
       loadTranslations(),
       loadProviders(),
       loadModels(),
+      loadTranscriptionProviders(),
+      loadTranscriptionModels(),
     ])
 
     if (currentPersonStore.person?.handle) {
@@ -364,6 +428,28 @@ async function loadModels() {
     syncSelectedRuntimeTarget()
   } finally {
     isLoadingModels.value = false
+  }
+}
+
+async function loadTranscriptionProviders() {
+  isLoadingTranscriptionProviders.value = true
+
+  try {
+    transcriptionProviderConfigs.value = await ApiAiService.listTranscriptionProviders()
+    syncSelectedTranscriptionTarget()
+  } finally {
+    isLoadingTranscriptionProviders.value = false
+  }
+}
+
+async function loadTranscriptionModels() {
+  isLoadingTranscriptionModels.value = true
+
+  try {
+    transcriptionModelConfigs.value = await ApiAiService.listTranscriptionModels()
+    syncSelectedTranscriptionTarget()
+  } finally {
+    isLoadingTranscriptionModels.value = false
   }
 }
 
@@ -470,7 +556,9 @@ async function loadOlderMessages() {
 }
 
 async function selectSession(session: AiChatSessionItem) {
+  cancelVoiceInput()
   activeSession.value = session
+  activeTranscriptionHandle.value = null
   editingSessionHandle.value = null
   isOpen.value = true
   await loadMessages(session.handle)
@@ -481,10 +569,12 @@ async function selectSession(session: AiChatSessionItem) {
 }
 
 function startNewChat() {
+  cancelVoiceInput()
   activeSession.value = null
   messages.value = []
   resetMessageWindow()
   draftMessage.value = ''
+  activeTranscriptionHandle.value = null
   editingSessionHandle.value = null
   isOpen.value = true
   syncSelectedRuntimeTarget()
@@ -513,6 +603,10 @@ function updateEditingSessionTitle(value: string) {
 
 function updateDraftMessage(value: string) {
   draftMessage.value = value
+
+  if (!value.trim()) {
+    activeTranscriptionHandle.value = null
+  }
 }
 
 function beginRename(session: AiChatSessionItem) {
@@ -597,6 +691,7 @@ async function sendMessage() {
         pageTitle: document.title || undefined,
         providerHandle: selectedProviderHandle.value ?? undefined,
         modelHandle: selectedModelHandle.value ?? undefined,
+        transcriptionHandle: activeTranscriptionHandle.value ?? undefined,
         contextPayload: {
           params: route.params,
           query: route.query,
@@ -617,7 +712,185 @@ async function sendMessage() {
   } finally {
     isSending.value = false
     activeSendAttempt.value = null
+    activeTranscriptionHandle.value = null
   }
+}
+
+async function toggleVoiceInput() {
+  if (isTranscribingVoiceInput.value) {
+    return
+  }
+
+  if (isRecordingVoiceInput.value) {
+    stopVoiceInput()
+    return
+  }
+
+  if (!isVoiceInputAvailable.value) {
+    messageCenter.pushMessage('info', 'aiChat.voiceInputUnavailable', '', 'aiChat')
+    return
+  }
+
+  if (!hasConfiguredProviders.value) {
+    messageCenter.pushMessage(
+      'info',
+      'aiChat.noConfiguredProviders',
+      'aiChat.contactAdministrator',
+      'aiChat',
+    )
+    return
+  }
+
+  if (!hasConfiguredTranscriptionProviders.value) {
+    messageCenter.pushMessage(
+      'info',
+      'ai.transcriptionProviderNotConfigured',
+      'aiChat.contactAdministrator',
+      'aiChat',
+    )
+    return
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    const recorder = new MediaRecorder(stream)
+
+    pendingVoiceChunks = []
+    discardPendingVoiceRecording = false
+    voiceRecordingStartedAt = Date.now()
+    activeVoiceStream.value = stream
+    activeVoiceRecorder.value = recorder
+    isRecordingVoiceInput.value = true
+
+    recorder.addEventListener('dataavailable', (event) => {
+      if (event.data.size > 0) {
+        pendingVoiceChunks.push(event.data)
+      }
+    })
+
+    recorder.addEventListener('stop', () => {
+      const mimeType = recorder.mimeType || 'audio/webm'
+      const durationSeconds =
+        voiceRecordingStartedAt != null
+          ? Math.max(0, (Date.now() - voiceRecordingStartedAt) / 1000)
+          : undefined
+
+      isRecordingVoiceInput.value = false
+      voiceRecordingStartedAt = null
+      stopVoiceStreamTracks()
+      activeVoiceRecorder.value = null
+
+      const chunks = pendingVoiceChunks
+      pendingVoiceChunks = []
+
+      if (discardPendingVoiceRecording || chunks.length === 0) {
+        discardPendingVoiceRecording = false
+        return
+      }
+
+      void uploadVoiceRecording(new Blob(chunks, { type: mimeType }), mimeType, durationSeconds)
+    })
+
+    recorder.start()
+  } catch (error) {
+    messageCenter.pushMessage(
+      'error',
+      error instanceof Error && error.message.trim()
+        ? error.message
+        : 'aiChat.microphoneAccessFailed',
+      '',
+      'aiChat',
+    )
+    cancelVoiceInput()
+  }
+}
+
+function stopVoiceInput() {
+  if (!activeVoiceRecorder.value) {
+    return
+  }
+
+  activeVoiceRecorder.value.stop()
+}
+
+function cancelVoiceInput() {
+  discardPendingVoiceRecording = true
+
+  if (activeVoiceRecorder.value && activeVoiceRecorder.value.state !== 'inactive') {
+    activeVoiceRecorder.value.stop()
+  }
+
+  pendingVoiceChunks = []
+  isRecordingVoiceInput.value = false
+  isTranscribingVoiceInput.value = false
+  voiceRecordingStartedAt = null
+  activeVoiceRecorder.value = null
+  stopVoiceStreamTracks()
+}
+
+function stopVoiceStreamTracks() {
+  if (!activeVoiceStream.value) {
+    return
+  }
+
+  for (const track of activeVoiceStream.value.getTracks()) {
+    track.stop()
+  }
+
+  activeVoiceStream.value = null
+}
+
+async function uploadVoiceRecording(blob: Blob, mimeType: string, durationSeconds?: number) {
+  isTranscribingVoiceInput.value = true
+
+  try {
+    const response = await ApiAiService.createTranscription(
+      blob,
+      {
+        sessionHandle: activeSession.value?.handle ?? undefined,
+        providerHandle: selectedTranscriptionProviderHandle.value ?? undefined,
+        modelHandle: selectedTranscriptionModelHandle.value ?? undefined,
+        routeName: route.name != null ? String(route.name) : undefined,
+        url: window.location.href,
+        pageTitle: document.title || undefined,
+        durationSeconds,
+      },
+      buildVoiceRecordingFilename(mimeType),
+    )
+
+    const transcript = response.transcript?.trim() ?? ''
+
+    if (!transcript) {
+      messageCenter.pushMessage('info', 'aiChat.noSpeechDetected', '', 'aiChat')
+      activeTranscriptionHandle.value = null
+      return
+    }
+
+    draftMessage.value = draftMessage.value.trim()
+      ? `${draftMessage.value.trim()}\n\n${transcript}`
+      : transcript
+    activeTranscriptionHandle.value = response.transcriptionHandle
+  } catch {
+    activeTranscriptionHandle.value = null
+  } finally {
+    isTranscribingVoiceInput.value = false
+  }
+}
+
+function buildVoiceRecordingFilename(mimeType: string) {
+  if (mimeType.includes('ogg')) {
+    return 'sapling-chat-audio.ogg'
+  }
+
+  if (mimeType.includes('wav')) {
+    return 'sapling-chat-audio.wav'
+  }
+
+  if (mimeType.includes('mp4') || mimeType.includes('m4a')) {
+    return 'sapling-chat-audio.m4a'
+  }
+
+  return 'sapling-chat-audio.webm'
 }
 
 async function updateSelectedProvider(value: unknown) {
@@ -640,6 +913,26 @@ async function updateSelectedProvider(value: unknown) {
     selectedModelHandle.value = previousModelHandle
     throw error
   }
+}
+
+function updateSelectedTranscriptionProvider(value: unknown) {
+  const nextProviderHandle = normalizeHandle(value)
+
+  selectedTranscriptionProviderHandle.value = nextProviderHandle
+  selectedTranscriptionModelHandle.value =
+    getDefaultTranscriptionModelForProvider(
+      nextProviderHandle,
+      selectedTranscriptionModelHandle.value,
+    )?.handle ?? null
+}
+
+function updateSelectedTranscriptionModel(value: unknown) {
+  const nextHandle = normalizeHandle(value)
+  const nextModel =
+    transcriptionModelConfigs.value.find((item) => item.handle === nextHandle) ?? null
+
+  selectedTranscriptionProviderHandle.value = getModelProviderHandle(nextModel)
+  selectedTranscriptionModelHandle.value = nextModel?.handle ?? null
 }
 
 async function updateSelectedModel(value: unknown) {
@@ -815,8 +1108,54 @@ function syncSelectedRuntimeTarget() {
   selectedModelHandle.value = defaultModel?.handle ?? null
 }
 
+function syncSelectedTranscriptionTarget() {
+  const availableProviderHandles = new Set(
+    transcriptionProviderConfigs.value.map((item) => item.handle ?? ''),
+  )
+  const availableModelHandles = new Set(
+    transcriptionModelConfigs.value.map((item) => item.handle ?? ''),
+  )
+
+  if (
+    selectedTranscriptionModelHandle.value &&
+    availableModelHandles.has(selectedTranscriptionModelHandle.value)
+  ) {
+    const selectedModel =
+      transcriptionModelConfigs.value.find(
+        (item) => item.handle === selectedTranscriptionModelHandle.value,
+      ) ?? null
+    selectedTranscriptionProviderHandle.value =
+      getModelProviderHandle(selectedModel) ?? selectedTranscriptionProviderHandle.value
+    return
+  }
+
+  if (
+    selectedTranscriptionProviderHandle.value &&
+    availableProviderHandles.has(selectedTranscriptionProviderHandle.value)
+  ) {
+    selectedTranscriptionModelHandle.value =
+      getDefaultTranscriptionModelForProvider(
+        selectedTranscriptionProviderHandle.value,
+        selectedTranscriptionModelHandle.value,
+      )?.handle ?? null
+    return
+  }
+
+  const defaultModel = getGlobalDefaultTranscriptionModel()
+  selectedTranscriptionProviderHandle.value = getModelProviderHandle(defaultModel)
+  selectedTranscriptionModelHandle.value = defaultModel?.handle ?? null
+}
+
 function getGlobalDefaultModel() {
   return modelConfigs.value.find((item) => item.isDefault) ?? modelConfigs.value[0] ?? null
+}
+
+function getGlobalDefaultTranscriptionModel() {
+  return (
+    transcriptionModelConfigs.value.find((item) => item.isDefault) ??
+    transcriptionModelConfigs.value[0] ??
+    null
+  )
 }
 
 function getDefaultModelForProvider(
@@ -828,6 +1167,29 @@ function getDefaultModelForProvider(
   }
 
   const filteredModels = modelConfigs.value.filter(
+    (item) => getModelProviderHandle(item) === providerHandle,
+  )
+
+  if (preferredModelHandle) {
+    const preferredModel =
+      filteredModels.find((item) => item.handle === preferredModelHandle) ?? null
+    if (preferredModel) {
+      return preferredModel
+    }
+  }
+
+  return filteredModels.find((item) => item.isDefault) ?? filteredModels[0] ?? null
+}
+
+function getDefaultTranscriptionModelForProvider(
+  providerHandle?: string | null,
+  preferredModelHandle?: string | null,
+) {
+  if (!providerHandle) {
+    return null
+  }
+
+  const filteredModels = transcriptionModelConfigs.value.filter(
     (item) => getModelProviderHandle(item) === providerHandle,
   )
 

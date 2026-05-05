@@ -239,7 +239,7 @@
 
 .sapling-ai-chat__selectors {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  grid-template-columns: minmax(0, 7fr) minmax(0, 13fr);
   gap: var(--sapling-gap-sm-plus);
   width: 100%;
   min-width: 0;
@@ -348,6 +348,20 @@
 .sapling-ai-chat__composer-context {
   min-width: 0;
   flex: 1 1 auto;
+}
+
+.sapling-ai-chat__composer-context .sapling-ai-chat__provider-select,
+.sapling-ai-chat__composer-context .sapling-ai-chat__model-select {
+  width: auto;
+  min-width: 0;
+}
+
+.sapling-ai-chat__composer-context .sapling-ai-chat__provider-select {
+  flex: 7 1 0;
+}
+
+.sapling-ai-chat__composer-context .sapling-ai-chat__model-select {
+  flex: 13 1 0;
 }
 
 .sapling-ai-chat__composer-badge {

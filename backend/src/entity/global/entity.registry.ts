@@ -79,6 +79,7 @@ import { SlaPolicyItem } from '../SlaPolicyItem';
 import { PersonApiTokenItem } from '../PersonApiTokenItem';
 import { AiChatSessionItem } from '../AiChatSessionItem';
 import { AiChatMessageItem } from '../AiChatMessageItem';
+import { AiChatTranscriptionItem } from '../AiChatTranscriptionItem';
 import { AiProviderTypeItem } from '../AiProviderTypeItem';
 import { AiProviderModelItem } from '../AiProviderModelItem';
 import { McpServerConfigItem } from '../McpServerConfigItem';
@@ -170,6 +171,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'teamsDeliveryStatus', class: TeamsDeliveryStatusItem },
   { name: 'aiChatSession', class: AiChatSessionItem },
   { name: 'aiChatMessage', class: AiChatMessageItem },
+  { name: 'aiChatTranscription', class: AiChatTranscriptionItem },
   { name: 'aiProviderType', class: AiProviderTypeItem },
   { name: 'aiProviderModel', class: AiProviderModelItem },
   { name: 'mcpServerConfig', class: McpServerConfigItem },

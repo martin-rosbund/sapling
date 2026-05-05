@@ -157,6 +157,7 @@ export class AiChatMessageItem {
   routeName?: string | null;
 
   @ApiPropertyOptional()
+  @Sapling(['isValue'])
   @SaplingForm({
     order: 600,
     group: 'aiChatMessage.groupBasics',

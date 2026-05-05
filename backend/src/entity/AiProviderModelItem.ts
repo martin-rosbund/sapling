@@ -91,6 +91,16 @@ export class AiProviderModelItem {
 
   @ApiProperty()
   @SaplingForm({
+    order: 500,
+    group: 'aiProviderModel.groupIntegration',
+    groupOrder: 400,
+    width: 2,
+  })
+  @Property({ nullable: false, default: false })
+  supportsTranscription = false;
+
+  @ApiProperty()
+  @SaplingForm({
     order: 200,
     group: 'aiProviderModel.groupBasics',
     groupOrder: 100,

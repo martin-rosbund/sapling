@@ -62,6 +62,7 @@ import { SocialMediaTypeItem } from '../../entity/SocialMediaTypeItem';
 import { EmailTemplateItem } from '../../entity/EmailTemplateItem';
 import { EMailListItem } from '../../entity/EMailListItem';
 import { ScriptButtonItem } from '../../entity/ScriptButtonItem';
+import { AiChatTranscriptionItem } from '../../entity/AiChatTranscriptionItem';
 import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
 import { McpServerConfigItem } from '../../entity/McpServerConfigItem';
@@ -173,6 +174,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(TeamsDeliveryStatusItem),
       GenericSeeder.for(TeamsSubscriptionItem),
       GenericSeeder.for(TeamsDeliveryItem),
+      GenericSeeder.for(AiChatTranscriptionItem),
       GenericSeeder.for(AiProviderTypeItem),
       GenericSeeder.for(AiProviderModelItem),
       GenericSeeder.for(McpServerConfigItem),
