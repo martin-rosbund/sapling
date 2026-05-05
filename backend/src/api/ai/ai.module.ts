@@ -6,6 +6,9 @@ import { GenericModule } from '../generic/generic.module';
 import { CurrentModule } from '../current/current.module';
 import { TemplateModule } from '../template/template.module';
 import { AiService } from './ai.service';
+import { AiChatRuntimeService } from './ai-chat-runtime.service';
+import { AiProviderRegistryService } from './ai-provider-registry.service';
+import { AiVectorService } from './ai-vector.service';
 import { AiController } from './ai.controller';
 import { AiChatSessionItem } from '../../entity/AiChatSessionItem';
 import { AiChatMessageItem } from '../../entity/AiChatMessageItem';
@@ -46,6 +49,9 @@ import { SaplingMcpPermissionService } from './sapling-mcp-permission.service';
   ],
   providers: [
     AiService,
+    AiChatRuntimeService,
+    AiProviderRegistryService,
+    AiVectorService,
     McpService,
     SaplingMcpService,
     SaplingMcpPermissionService,

@@ -53,8 +53,13 @@ jest.mock('../document/document.service', () => ({
   DocumentService: class {},
 }));
 jest.mock('../generic/generic.service', () => ({ GenericService: class {} }));
+jest.mock('./ai-provider-registry.service', () => ({
+  AiProviderRegistryService: class {},
+}));
+jest.mock('./ai-vector.service', () => ({ AiVectorService: class {} }));
 
 import { AiService } from './ai.service';
+import { AiChatRuntimeService } from './ai-chat-runtime.service';
 import {
   alignAssistantContentWithNavigationLinks,
   buildNavigationLink,
@@ -80,13 +85,17 @@ const createService = (
   em: unknown = {},
   mcpService: unknown = {},
   documentService: unknown = {},
-  genericService: unknown = {},
+  providerRegistry: unknown = {},
+  vectorService: unknown = {},
+  chatRuntime: unknown = new AiChatRuntimeService(mcpService as never),
 ) =>
   new AiService(
     em as never,
     mcpService as never,
     documentService as never,
-    genericService as never,
+    providerRegistry as never,
+    vectorService as never,
+    chatRuntime as never,
   );
 
 describe('AiService', () => {
