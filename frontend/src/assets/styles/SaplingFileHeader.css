@@ -4,7 +4,10 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--sapling-gap-xl);
-  padding: var(--sapling-gap-md) var(--sapling-gap-xl);
+  padding: var(--sapling-space-panel-md);
+  border: 1px solid var(--sapling-surface-border);
+  border-radius: var(--sapling-radius-sm);
+  box-shadow: var(--sapling-shadow-lift);
 }
 
 .sapling-document-title {
@@ -12,6 +15,7 @@
   font-size: 1.1rem;
   font-weight: 600;
   line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
 .sapling-document-download-btn {
@@ -70,7 +74,9 @@
 .sapling-document-header__actions {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: var(--sapling-gap-xs);
+  justify-content: flex-end;
 }
 
 .sapling-document-header__badge {
@@ -85,7 +91,11 @@
 
   .sapling-document-header__actions {
     width: 100%;
-    justify-content: space-between;
+    justify-content: stretch;
+  }
+
+  .sapling-document-header__actions .v-btn {
+    flex: 1 1 auto;
   }
 
   .sapling-document-header__subtitle {

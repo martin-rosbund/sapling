@@ -7,7 +7,7 @@
         <v-icon icon="mdi-eye-off-outline" size="34" />
       </div>
       <h3 class="sapling-file-stage__empty-title">{{ $t('document.noPreviewAvailable') }}</h3>
-      <p class="sapling-file-stage__empty-copy">{{ $t('global.download') }}</p>
+      <p class="sapling-file-stage__empty-copy">{{ $t('document.downloadToInspect') }}</p>
     </div>
   </div>
 </template>

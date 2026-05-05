@@ -70,16 +70,24 @@ const headerIcon = computed(() => {
     return 'mdi-file-search-outline'
   }
 
+  if (props.previewType === 'eml') {
+    return 'mdi-email-outline'
+  }
+
+  if (props.previewType === 'json') {
+    return 'mdi-code-json'
+  }
+
   if (props.previewType === 'none') {
     return 'mdi-file-alert-outline'
   }
 
-  return 'mdi-eye'
+  return 'mdi-file-eye-outline'
 })
 
 const headerTitle = computed(() => {
   if (!props.hasSelection) {
-    return i18n.global.t('document.preview')
+    return i18n.global.t('document.selectFileForPreview')
   }
 
   return props.selectedFilename || props.selectedHandle

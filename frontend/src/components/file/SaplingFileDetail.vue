@@ -11,8 +11,10 @@
         <div class="sapling-file-stage__empty-icon">
           <v-icon icon="mdi-file-search-outline" size="34" />
         </div>
-        <h3 class="sapling-file-stage__empty-title">{{ $t('document.preview') }}</h3>
-        <p class="sapling-file-stage__empty-copy">{{ $t('global.noData') }}</p>
+        <h3 class="sapling-file-stage__empty-title">{{ $t('document.selectFileForPreview') }}</h3>
+        <p class="sapling-file-stage__empty-copy">
+          {{ $t('document.selectFileForPreviewDescription') }}
+        </p>
       </div>
     </div>
 
@@ -24,7 +26,6 @@
 
 <script lang="ts" setup>
 defineProps<{
-  selectedHandle: string
   hasSelection: boolean
   isLoading: boolean
   previewComponent: unknown
