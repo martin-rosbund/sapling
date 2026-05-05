@@ -60,6 +60,12 @@ import {
   hasUsableProviderCredentials,
   resolveProviderKind,
 } from './ai-provider.utils';
+import {
+  alignAssistantContentWithNavigationLinks,
+  asRecord,
+  buildNavigationLinks,
+  extractRecordHandle,
+} from './ai-navigation.utils';
 import { createGeminiClient, embedGeminiTexts } from './gemini-ai.runtime';
 import {
   createOpenAiClient,
@@ -70,7 +76,6 @@ import {
 import {
   AiChatMessageSpeechDescriptor,
   AiChatMessageSpeechPayload,
-  AiChatNavigationLink,
   AiClientTimeContext,
   AiEmbeddingPurpose,
   AiEmbeddingTarget,
@@ -90,7 +95,6 @@ import {
   AI_ASSISTANT_SPEECH_INSTRUCTIONS,
   AI_GEMINI_REPEATED_TOOL_CALL_ABORT_MESSAGE,
   AI_GEMINI_TOOL_CALL_LIMIT_MESSAGE,
-  buildCurrentDateInstruction,
   buildGeminiJsonStringDescription,
   buildGeminiToolPayloadDescription,
   buildSystemInstruction,
@@ -200,7 +204,7 @@ export class AiService {
       ? models.filter(
           (model) =>
             typeof model.provider !== 'string' &&
-            this.hasUsableProviderCredentials(model.provider),
+            hasUsableProviderCredentials(model.provider),
         )
       : models;
 
@@ -441,7 +445,7 @@ export class AiService {
     );
     const results = accessibleRecords
       .map((record) => {
-        const recordHandle = this.extractRecordHandle(record);
+        const recordHandle = extractRecordHandle(record);
 
         if (recordHandle == null) {
           return null;
@@ -607,7 +611,7 @@ export class AiService {
       await this.mcpService.tryExecuteInlineToolCommand(dto.content, user);
 
     if (inlineToolExecution) {
-      const navigationLinks = this.buildNavigationLinks([
+      const navigationLinks = buildNavigationLinks([
         {
           serverHandle: inlineToolExecution.serverHandle,
           serverName: inlineToolExecution.serverName,
@@ -708,8 +712,8 @@ export class AiService {
       }));
 
       assistantMessage.status = 'completed';
-      const navigationLinks = this.buildNavigationLinks(streamResult.toolCalls);
-      assistantMessage.content = this.alignAssistantContentWithNavigationLinks(
+      const navigationLinks = buildNavigationLinks(streamResult.toolCalls);
+      assistantMessage.content = alignAssistantContentWithNavigationLinks(
         assistantMessage.content,
         navigationLinks,
         dto.url ?? null,
@@ -973,9 +977,7 @@ export class AiService {
       }
     }
 
-    const normalizedSpeechText = this.normalizeAssistantSpeechText(
-      message.content,
-    );
+    const normalizedSpeechText = normalizeAssistantSpeechText(message.content);
     let preparedSpeechText: AiPreparedSpeechText = {
       text: normalizedSpeechText,
       sourceTextLength: normalizedSpeechText.length,
@@ -987,7 +989,7 @@ export class AiService {
       const speechTarget =
         requestedSpeechTarget ?? (await this.resolveSpeechTarget());
       speechDescriptor = this.buildAssistantSpeechDescriptor(speechTarget);
-      preparedSpeechText = this.prepareAssistantSpeechText(
+      preparedSpeechText = prepareAssistantSpeechText(
         message.content,
         speechTarget.maxInputLength,
       );
@@ -1009,7 +1011,7 @@ export class AiService {
       const document = await this.documentService.uploadDocument(
         {
           buffer: audioBuffer,
-          originalname: this.buildAssistantSpeechFilename(
+          originalname: buildAssistantSpeechFilename(
             message,
             speechTarget.fileExtension,
           ),
@@ -1020,12 +1022,12 @@ export class AiService {
         String(message.handle ?? ''),
         'aiChatAudio',
         person,
-        this.buildAssistantSpeechDescription(message),
+        buildAssistantSpeechDescription(message),
       );
 
       message.responsePayload = this.withMessageSpeechPayload(
         message.responsePayload,
-        this.buildAssistantSpeechPayload(
+        buildAssistantSpeechPayload(
           preparedSpeechText,
           document,
           speechDescriptor,
@@ -1036,7 +1038,7 @@ export class AiService {
     } catch (error) {
       message.responsePayload = this.withMessageSpeechPayload(
         message.responsePayload,
-        this.buildAssistantSpeechFailurePayload(
+        buildAssistantSpeechFailurePayload(
           preparedSpeechText,
           error,
           speechDescriptor,
@@ -1224,7 +1226,7 @@ export class AiService {
     await this.em.populate(model, ['provider']);
     const provider = model.provider;
 
-    if (!this.hasUsableProviderCredentials(provider)) {
+    if (!hasUsableProviderCredentials(provider)) {
       throw new Error(
         capability === 'embedding'
           ? 'ai.embeddingProviderNotConfigured'
@@ -1306,7 +1308,7 @@ export class AiService {
 
     return (
       models.find((model) =>
-        this.hasUsableProviderCredentials(model.provider as AiProviderTypeItem),
+        hasUsableProviderCredentials(model.provider as AiProviderTypeItem),
       ) ?? null
     );
   }
@@ -2118,7 +2120,7 @@ export class AiService {
     const executedToolCalls: AiExecutedToolCall[] = [];
 
     for (let iteration = 0; iteration < maxToolCallIterations; iteration += 1) {
-      const response = await this.createOpenAiClient(
+      const response = await createOpenAiClient(
         provider,
       ).chat.completions.create({
         model,
@@ -2248,9 +2250,7 @@ export class AiService {
     clientTimeContext: AiClientTimeContext | undefined,
     onDelta: (delta: string) => Promise<void>,
   ): Promise<AiStreamResult> {
-    const generativeModel = this.createGeminiClient(
-      provider,
-    ).getGenerativeModel({
+    const generativeModel = createGeminiClient(provider).getGenerativeModel({
       model: modelName,
       ...(functionDeclarations.length > 0
         ? {
@@ -2299,9 +2299,6 @@ export class AiService {
 
         if (repeatedCallCount > 2) {
           await onDelta(AI_GEMINI_REPEATED_TOOL_CALL_ABORT_MESSAGE);
-          /*
-            'Ich breche die automatische Werkzeugschleife ab, weil derselbe Tool-Aufruf wiederholt fehlgeschlagen ist. Bitte formuliere die Frage konkreter oder prüfe zuerst das Entity-Schema.',
-          */
           return { toolCalls: executedToolCalls };
         }
 
@@ -2341,7 +2338,7 @@ export class AiService {
       }
 
       if (consecutiveToolErrorIterations >= 2) {
-        await onDelta(this.buildToolFailureAssistantMessage(toolErrors));
+        await onDelta(buildToolFailureAssistantMessage(toolErrors));
         return { toolCalls: executedToolCalls };
       }
 
@@ -2349,9 +2346,6 @@ export class AiService {
     }
 
     await onDelta(AI_GEMINI_TOOL_CALL_LIMIT_MESSAGE);
-    /*
-      'Ich habe die automatische Werkzeugausführung beendet, weil zu viele aufeinanderfolgende Tool-Aufrufe nötig waren. Bitte formuliere die Anfrage konkreter oder nenne die gewünschte Entity direkt.',
-    */
     return { toolCalls: executedToolCalls };
   }
 
@@ -2364,9 +2358,7 @@ export class AiService {
     clientTimeContext: AiClientTimeContext | undefined,
     onDelta: (delta: string) => Promise<void>,
   ): Promise<AiStreamResult> {
-    const generativeModel = this.createGeminiClient(
-      provider,
-    ).getGenerativeModel({
+    const generativeModel = createGeminiClient(provider).getGenerativeModel({
       model: modelName,
       systemInstruction: this.buildSystemInstruction({
         user,
@@ -2448,317 +2440,6 @@ export class AiService {
     return JSON.stringify(value);
   }
 
-  private buildNavigationLinks(
-    toolCalls: AiExecutedToolCall[],
-  ): AiChatNavigationLink[] {
-    const deduplicatedLinks = new Map<string, AiChatNavigationLink>();
-
-    for (const toolCall of toolCalls) {
-      const link = this.buildNavigationLink(toolCall);
-
-      if (!link) {
-        continue;
-      }
-
-      deduplicatedLinks.set(link.path, link);
-    }
-
-    return [...deduplicatedLinks.values()];
-  }
-
-  private alignAssistantContentWithNavigationLinks(
-    content: string,
-    navigationLinks: AiChatNavigationLink[],
-    pageUrl?: string | null,
-  ): string {
-    if (!content.trim() || navigationLinks.length !== 1) {
-      return content;
-    }
-
-    const navigationUrl = this.buildAbsoluteNavigationUrl(
-      navigationLinks[0].path,
-      pageUrl,
-    );
-
-    if (!navigationUrl) {
-      return content;
-    }
-
-    let normalizedContent = content.replace(
-      /\]\(((?:https?:\/\/|\/)[^)]+)\)/g,
-      (match, rawUrl: string) =>
-        this.isLikelySaplingNavigationReference(rawUrl, pageUrl)
-          ? `](${navigationUrl})`
-          : match,
-    );
-
-    normalizedContent = normalizedContent.replace(
-      /https?:\/\/[^\s)]+/g,
-      (rawUrl) =>
-        this.isLikelySaplingNavigationReference(rawUrl, pageUrl)
-          ? navigationUrl
-          : rawUrl,
-    );
-
-    return normalizedContent;
-  }
-
-  private buildNavigationLink(
-    toolCall: AiExecutedToolCall,
-  ): AiChatNavigationLink | null {
-    const entityHandle = this.asNonEmptyString(toolCall.arguments.entityHandle);
-    const rawResult = this.asRecord(toolCall.rawResult);
-
-    if (toolCall.toolName === 'ticket_search') {
-      return {
-        path: this.buildEntityTablePath(
-          'ticket',
-          this.asRecord(rawResult?.appliedFilter),
-        ),
-        entityHandle: 'ticket',
-        kind: 'list',
-      };
-    }
-
-    if (toolCall.toolName === 'semantic_search') {
-      const semanticEntityHandle =
-        this.asNonEmptyString(toolCall.arguments.entityHandle) ??
-        this.asNonEmptyString(rawResult?.entityHandle) ??
-        'ticket';
-      const resultHandles = Array.isArray(rawResult?.results)
-        ? rawResult.results
-            .map((item) => this.asRecord(item)?.handle)
-            .filter(
-              (value): value is string | number =>
-                typeof value === 'string' || typeof value === 'number',
-            )
-        : [];
-
-      if (resultHandles.length === 0) {
-        return null;
-      }
-
-      return {
-        path: this.buildEntityTablePath(semanticEntityHandle, {
-          handle: {
-            $in: resultHandles,
-          },
-        }),
-        entityHandle: semanticEntityHandle,
-        kind: 'list',
-      };
-    }
-
-    if (!entityHandle) {
-      return null;
-    }
-
-    if (rawResult?.found === false) {
-      return null;
-    }
-
-    if (entityHandle === 'entityRoute') {
-      const directRoutePath = this.extractEntityRoutePath(
-        toolCall.rawResult,
-        toolCall.arguments,
-      );
-
-      if (directRoutePath) {
-        return {
-          path: directRoutePath,
-          entityHandle,
-          kind: 'route',
-        };
-      }
-    }
-
-    if (toolCall.toolName === 'generic_list') {
-      return {
-        path: this.buildEntityTablePath(
-          entityHandle,
-          this.asRecord(toolCall.arguments.filter),
-        ),
-        entityHandle,
-        kind: 'list',
-      };
-    }
-
-    if (
-      toolCall.toolName === 'generic_get' ||
-      toolCall.toolName === 'generic_timeline' ||
-      toolCall.toolName === 'generic_create' ||
-      toolCall.toolName === 'generic_update'
-    ) {
-      const recordHandle = this.extractRecordHandle(
-        toolCall.rawResult,
-        toolCall.arguments.handle,
-      );
-
-      if (recordHandle == null) {
-        return null;
-      }
-
-      return {
-        path: this.buildEntityTablePath(entityHandle, { handle: recordHandle }),
-        entityHandle,
-        kind: 'record',
-      };
-    }
-
-    return null;
-  }
-
-  private buildEntityTablePath(
-    entityHandle: string,
-    filter?: Record<string, unknown>,
-  ): string {
-    const hasFilter = !!filter && Object.keys(filter).length > 0;
-    const query = hasFilter
-      ? `?filter=${encodeURIComponent(JSON.stringify(filter))}`
-      : '';
-
-    return `/table/${entityHandle}${query}`;
-  }
-
-  private buildAbsoluteNavigationUrl(
-    path: string,
-    pageUrl?: string | null,
-  ): string | null {
-    if (!path.trim()) {
-      return null;
-    }
-
-    if (!pageUrl?.trim()) {
-      return path;
-    }
-
-    try {
-      return new URL(path, pageUrl).toString();
-    } catch {
-      return path;
-    }
-  }
-
-  private isLikelySaplingNavigationReference(
-    rawUrl: string,
-    pageUrl?: string | null,
-  ): boolean {
-    try {
-      const currentUrl = pageUrl?.trim() ? new URL(pageUrl) : null;
-      const url = rawUrl.startsWith('/')
-        ? new URL(rawUrl, currentUrl ?? 'http://localhost')
-        : new URL(rawUrl);
-      const sameOrigin = currentUrl ? url.origin === currentUrl.origin : false;
-      const knownSaplingHost = [
-        'localhost',
-        '127.0.0.1',
-        'sapling.ai',
-      ].includes(url.hostname.toLowerCase());
-      const pathLooksInternal =
-        url.pathname.startsWith('/table/') ||
-        url.pathname.startsWith('/partner/') ||
-        url.pathname.startsWith('/dashboard/') ||
-        url.pathname.startsWith('/system/') ||
-        /\/ticket(\/|$)/.test(url.pathname);
-
-      return pathLooksInternal && (sameOrigin || knownSaplingHost);
-    } catch {
-      return false;
-    }
-  }
-
-  private extractEntityRoutePath(
-    rawResult: unknown,
-    args: Record<string, unknown>,
-  ): string | null {
-    const resultRecord = this.asRecord(rawResult);
-    const directRoute = this.normalizeRoutePath(resultRecord?.route);
-
-    if (directRoute) {
-      return directRoute;
-    }
-
-    const recordRoute = this.normalizeRoutePath(
-      this.asRecord(resultRecord?.record)?.route,
-    );
-
-    if (recordRoute) {
-      return recordRoute;
-    }
-
-    const resultData = Array.isArray(resultRecord?.data)
-      ? resultRecord.data
-      : [];
-
-    for (const item of resultData) {
-      const routePath = this.normalizeRoutePath(this.asRecord(item)?.route);
-
-      if (routePath) {
-        return routePath;
-      }
-    }
-
-    const routeFilter = this.asRecord(args.filter);
-    return this.normalizeRoutePath(routeFilter?.route);
-  }
-
-  private normalizeRoutePath(value: unknown): string | null {
-    if (typeof value !== 'string' || !value.trim()) {
-      return null;
-    }
-
-    const trimmedValue = value.trim();
-    return trimmedValue.startsWith('/') ? trimmedValue : `/${trimmedValue}`;
-  }
-
-  private extractRecordHandle(
-    rawResult: unknown,
-    fallbackHandle?: unknown,
-  ): string | number | null {
-    const resultHandle = this.asHandleValue(
-      rawResult && typeof rawResult === 'object'
-        ? (rawResult as Record<string, unknown>).handle
-        : null,
-    );
-
-    return resultHandle ?? this.asHandleValue(fallbackHandle);
-  }
-
-  private asHandleValue(value: unknown): string | number | null {
-    if (typeof value === 'number' && Number.isFinite(value)) {
-      return value;
-    }
-
-    if (typeof value === 'string' && value.trim()) {
-      return value.trim();
-    }
-
-    return null;
-  }
-
-  private asRecord(value: unknown): Record<string, unknown> | undefined {
-    return value && typeof value === 'object' && !Array.isArray(value)
-      ? (value as Record<string, unknown>)
-      : undefined;
-  }
-
-  private asNonEmptyString(value: unknown): string | null {
-    return typeof value === 'string' && value.trim() ? value.trim() : null;
-  }
-
-  private buildToolFailureAssistantMessage(
-    toolErrors: AiToolErrorPayload[],
-  ): string {
-    return buildToolFailureAssistantMessage(toolErrors);
-    /*
-      : 'Das Datenwerkzeug hat wiederholt ungültige Aufrufe erhalten.';
-    const hintLine = firstError?.hints?.[0]
-      ? `Hinweis: ${firstError.hints[0]}`
-      : 'Hinweis: Prüfe zuerst das Entity-Schema und verwende nur dort aufgeführte Felder und Operatoren.';
-
-    */
-  }
-
   private buildOpenAiMessages(
     history: AiChatMessageItem[],
     user?: PersonItem,
@@ -2805,55 +2486,6 @@ export class AiService {
       clientTimeContext: options?.clientTimeContext,
       referenceDate: new Date(),
     });
-    /*
-    const baseInstruction =
-      'You are Songbird, the Sapling assistant. Songbird is your name, and if the user asks for your name you should say that your name is Songbird. Address the user informally when speaking German and consistently use du, dir, dich, dein, and deine; avoid the formal forms Sie and Ihre. Use the persisted page context from the latest user message when it is relevant and answer concisely. Do not expose internal technical identifiers such as raw record handles, autogenerated primary keys, or generic internal IDs in normal user-facing prose. If a tool returns such internal identifiers, treat them as internal metadata unless the user explicitly asks for that exact identifier. Prefer natural confirmations such as saying that a record was created, updated, or deleted successfully. You may still mention explicit user-facing business identifiers such as a ticket number or external number when they are clearly intended for end users.';
-    const toolInstruction = options?.includeToolGuidance
-      ? ' Use available tools automatically when they are needed to answer with current Sapling data. For questions about the current user identity, profile, company, department, language, or roles, use the current_person tool. If you only know a partial entity name or a field such as email or assigneePerson, use entity_search before entity_schema. For descriptive ticket, incident, Sage error, or known-solution questions across long text fields, use semantic_search with entityHandle ticket first. Semantic search is especially useful for natural-language symptoms, problem descriptions, and workaround requests because it searches vectorized ticket sections such as overview, problem, and solution. Use ticket_search for exact ticket numbers, external numbers, or strict keyword matching. Prefer ticket_search with searchMode solution when the user explicitly asks for an existing fix, workaround, Loesung, or ticket solution and the wording is already keyword-oriented. Do not invent or infer URLs, deep links, record detail links, or absolute Sapling addresses in the prose answer. Only mention a Sapling link when an exact path is provided by tool results; otherwise rely on the UI navigation action instead of fabricating a URL. For questions about where something is located in the app, navigation, or menu, first inspect the entity_catalog to identify likely candidates, then use entity_schema and generic queries on entity, entityGroup, and entityRoute. Treat entity as the page or feature name, entity.group as the navigation group where it is found, entityGroup.parent as an optional parent group for nested navigation, and entityRoute.route as the final route to open. When you identify the sought destination, prefer the matching entityRoute, return the final route at the end of the answer, and use that route for the navigation link instead of only returning a table view. When you already know the exact record handle, prefer generic_get over generic_list. For history, date span, or record activity questions about one known record, use generic_timeline. Before querying or mutating an unfamiliar Sapling entity, inspect its schema first and only use fields and relation names returned by the schema tool.'
-      : '';
-
-    return `${baseInstruction}${toolInstruction} ${this.buildCurrentDateInstruction(
-      new Date(),
-      options?.user,
-      options?.clientTimeContext,
-    )}`.trim();
-    */
-  }
-
-  private buildCurrentDateInstruction(
-    referenceDate: Date = new Date(),
-    user?: PersonItem,
-    clientTimeContext?: AiClientTimeContext,
-  ): string {
-    return buildCurrentDateInstruction(referenceDate, user, clientTimeContext);
-    /*
-    const offsetMinutes = -referenceDate.getTimezoneOffset();
-
-    const localeTimeZone = this.resolveUserTimeZone(user, clientTimeContext);
-    const localeName = this.resolveUserLocale(user, clientTimeContext);
-    const clientReferenceDate = clientTimeContext?.currentDate ?? referenceDate;
-    const clientReportedLine = clientTimeContext?.currentDate
-      ? `Client reported current date and time: ${clientTimeContext.currentDate.toISOString()}.`
-      : null;
-    const clientOffsetLine = Number.isFinite(
-      clientTimeContext?.utcOffsetMinutes,
-    )
-      ? `Client reported timezone offset at request time: UTC${this.formatUtcOffset(clientTimeContext?.utcOffsetMinutes ?? 0)}.`
-      : null;
-
-    return [
-      `Current UTC date and time: ${referenceDate.toISOString()}.`,
-      `Server local date: ${this.formatLocalDate(referenceDate)}.`,
-      `Server timezone offset: UTC${this.formatUtcOffset(offsetMinutes)}.`,
-      clientReportedLine,
-      clientOffsetLine,
-      `User locale date and time: ${this.formatZonedDateTime(clientReferenceDate, localeTimeZone, localeName)} (${localeTimeZone}).`,
-      `Interpret relative date expressions such as "today", "yesterday", "this week", and "this month" using the ${localeTimeZone} user locale date unless the user explicitly specifies a different date or timezone.`,
-      `When the user gives a time without timezone in German or local phrasing, interpret it as ${localeTimeZone} local time and include the correct offset in tool payloads, for example use 20:00 ${localeTimeZone} rather than 20:00 UTC unless UTC is explicitly requested.`,
-    ]
-      .filter((line): line is string => !!line)
-      .join(' ');
-    */
   }
 
   private resolveUserLocale(
@@ -2990,7 +2622,7 @@ export class AiService {
         continue;
       }
 
-      const payload = this.asRecord(message.requestPayload);
+      const payload = asRecord(message.requestPayload);
 
       if (!payload) {
         continue;
@@ -3114,7 +2746,7 @@ export class AiService {
       function: {
         name: entry.encodedName,
         description: entry.descriptor.description,
-        parameters: this.normalizeJsonSchema(entry.descriptor.inputSchema) ?? {
+        parameters: normalizeJsonSchema(entry.descriptor.inputSchema) ?? {
           type: 'object',
           properties: {},
           additionalProperties: true,
@@ -3133,7 +2765,7 @@ export class AiService {
         properties: {
           payload: {
             type: SchemaType.STRING,
-            description: this.buildGeminiToolPayloadDescription(entry),
+            description: buildGeminiToolPayloadDescription(entry),
           },
         },
         required: ['payload'],
@@ -3142,12 +2774,6 @@ export class AiService {
         ? { description: entry.descriptor.description }
         : {}),
     }));
-  }
-
-  private normalizeJsonSchema(
-    schema?: Record<string, unknown> | null,
-  ): Record<string, unknown> | null {
-    return normalizeJsonSchema(schema);
   }
 
   private convertJsonSchemaToGemini(
@@ -3267,9 +2893,7 @@ export class AiService {
         if (!hasExplicitProperties) {
           return {
             type: SchemaType.STRING,
-            description: this.buildGeminiJsonStringDescription(
-              schema.description,
-            ),
+            description: buildGeminiJsonStringDescription(schema.description),
           };
         }
 
@@ -3420,72 +3044,6 @@ export class AiService {
     }
   }
 
-  private buildGeminiJsonStringDescription(description: unknown): string {
-    return buildGeminiJsonStringDescription(description);
-  }
-
-  private buildGeminiToolPayloadDescription(
-    entry: AiToolRegistryEntry,
-  ): string {
-    return buildGeminiToolPayloadDescription(entry);
-  }
-
-  private createOpenAiClient(provider: AiProviderTypeItem) {
-    return createOpenAiClient(provider);
-  }
-
-  private createGeminiClient(provider: AiProviderTypeItem) {
-    return createGeminiClient(provider);
-  }
-
-  private normalizeAssistantSpeechText(content: string): string {
-    return normalizeAssistantSpeechText(content);
-  }
-
-  private prepareAssistantSpeechText(
-    content: string,
-    maxInputLength: number,
-  ): AiPreparedSpeechText {
-    return prepareAssistantSpeechText(content, maxInputLength);
-  }
-
-  private buildAssistantSpeechFilename(
-    message: AiChatMessageItem,
-    fileExtension: string,
-  ): string {
-    return buildAssistantSpeechFilename(message, fileExtension);
-  }
-
-  private buildAssistantSpeechDescription(
-    message: AiChatMessageItem,
-  ): string | undefined {
-    return buildAssistantSpeechDescription(message);
-  }
-
-  private buildAssistantSpeechPayload(
-    preparedSpeechText: AiPreparedSpeechText,
-    document: DocumentItem,
-    speechDescriptor: AiChatMessageSpeechDescriptor,
-  ): AiChatMessageSpeechPayload {
-    return buildAssistantSpeechPayload(
-      preparedSpeechText,
-      document,
-      speechDescriptor,
-    );
-  }
-
-  private buildAssistantSpeechFailurePayload(
-    preparedSpeechText: AiPreparedSpeechText,
-    error: unknown,
-    speechDescriptor: AiChatMessageSpeechDescriptor,
-  ): AiChatMessageSpeechPayload {
-    return buildAssistantSpeechFailurePayload(
-      preparedSpeechText,
-      error,
-      speechDescriptor,
-    );
-  }
-
   private buildAssistantSpeechDescriptor(
     target: AiSpeechTarget | null,
   ): AiChatMessageSpeechDescriptor {
@@ -3587,12 +3145,6 @@ export class AiService {
     }
 
     return value as Record<string, unknown>;
-  }
-
-  private hasUsableProviderCredentials(
-    provider?: AiProviderTypeItem | null,
-  ): boolean {
-    return hasUsableProviderCredentials(provider);
   }
 
   private extractPersonReference(

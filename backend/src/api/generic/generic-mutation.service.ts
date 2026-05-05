@@ -62,7 +62,15 @@ export class GenericMutationService {
     );
 
     if (script.method === ScriptResultServerMethods.overwrite) {
-      return script.items[0] as T;
+      const overwritten = script.items[0] as T;
+
+      if (overwritten === data) {
+        return (
+          Array.isArray(overwritten) ? [...overwritten] : { ...overwritten }
+        ) as T;
+      }
+
+      return overwritten;
     }
 
     return data;

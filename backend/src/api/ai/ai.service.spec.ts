@@ -55,6 +55,25 @@ jest.mock('../document/document.service', () => ({
 jest.mock('../generic/generic.service', () => ({ GenericService: class {} }));
 
 import { AiService } from './ai.service';
+import {
+  alignAssistantContentWithNavigationLinks,
+  buildNavigationLink,
+} from './ai-navigation.utils';
+
+type ExecuteToolResult = {
+  serverHandle: number;
+  serverName: string;
+  toolName: string;
+  content: string;
+  rawResult: Record<string, unknown>;
+};
+
+type ExecuteToolMock = (
+  serverName: string,
+  toolName: string,
+  args: Record<string, unknown>,
+  user: unknown,
+) => Promise<ExecuteToolResult>;
 
 const asMock = (value: unknown): jest.Mock => value as jest.Mock;
 const createService = (
@@ -236,13 +255,9 @@ describe('AiService', () => {
   });
 
   it('builds record navigation links for generic_get results', () => {
-    const service = createService();
-
-    const link = (
-      service as never as {
-        buildNavigationLink: (toolCall: Record<string, unknown>) => unknown;
-      }
-    ).buildNavigationLink({
+    const link = buildNavigationLink({
+      serverHandle: 0,
+      serverName: 'sapling',
       toolName: 'generic_get',
       arguments: {
         entityHandle: 'project',
@@ -264,13 +279,9 @@ describe('AiService', () => {
   });
 
   it('prefers direct entityRoute paths from generic_get results', () => {
-    const service = createService();
-
-    const link = (
-      service as never as {
-        buildNavigationLink: (toolCall: Record<string, unknown>) => unknown;
-      }
-    ).buildNavigationLink({
+    const link = buildNavigationLink({
+      serverHandle: 0,
+      serverName: 'sapling',
       toolName: 'generic_get',
       arguments: {
         entityHandle: 'entityRoute',
@@ -293,13 +304,9 @@ describe('AiService', () => {
   });
 
   it('builds list navigation links for ticket_search results', () => {
-    const service = createService();
-
-    const link = (
-      service as never as {
-        buildNavigationLink: (toolCall: Record<string, unknown>) => unknown;
-      }
-    ).buildNavigationLink({
+    const link = buildNavigationLink({
+      serverHandle: 0,
+      serverName: 'sapling',
       toolName: 'ticket_search',
       arguments: {
         query: 'Sage 100',
@@ -363,7 +370,7 @@ describe('AiService', () => {
 
   it('resolves Gemini tool calls by raw tool name when the server prefix is omitted', async () => {
     const mcpService = {
-      executeTool: jest.fn().mockResolvedValue({
+      executeTool: jest.fn<ExecuteToolMock>().mockResolvedValue({
         serverHandle: 0,
         serverName: 'sapling',
         toolName: 'current_person',
@@ -413,7 +420,7 @@ describe('AiService', () => {
 
   it('resolves Gemini tool calls when consecutive underscores are collapsed', async () => {
     const mcpService = {
-      executeTool: jest.fn().mockResolvedValue({
+      executeTool: jest.fn<ExecuteToolMock>().mockResolvedValue({
         serverHandle: 0,
         serverName: 'sapling',
         toolName: 'semantic_search',
@@ -462,21 +469,7 @@ describe('AiService', () => {
   });
 
   it('replaces hallucinated Sapling URLs with the canonical navigation link', () => {
-    const service = createService();
-
-    const normalizedContent = (
-      service as never as {
-        alignAssistantContentWithNavigationLinks: (
-          content: string,
-          navigationLinks: Array<{
-            path: string;
-            entityHandle: string;
-            kind: 'list' | 'record' | 'route';
-          }>,
-          pageUrl?: string | null,
-        ) => string;
-      }
-    ).alignAssistantContentWithNavigationLinks(
+    const normalizedContent = alignAssistantContentWithNavigationLinks(
       'Du kannst das Ticket hier einsehen: https://sapling.ai/partner/ticket/12',
       [
         {

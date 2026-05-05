@@ -117,6 +117,42 @@ describe('GenericMutationService', () => {
     });
   });
 
+  it('returns a distinct payload reference when after scripts overwrite in place', async () => {
+    const item = {
+      handle: 7,
+      number: null as string | null,
+      createdAt: new Date('2026-04-29T09:00:00.000Z'),
+    };
+    const scriptService = {
+      runServer: jest.fn(() => {
+        item.number = '2026#00007';
+
+        return Promise.resolve(
+          new ScriptResultServer([item], ScriptResultServerMethods.overwrite),
+        );
+      }),
+    };
+    const service = new GenericMutationService(
+      {} as never,
+      scriptService as never,
+      new GenericFilterService(),
+    );
+
+    const overwritten = await service.applyAfterScript(
+      ScriptMethods.afterInsert,
+      item,
+      { handle: 'ticket' } as never,
+      { handle: 1 } as never,
+    );
+
+    expect(overwritten).toEqual({
+      handle: 7,
+      number: '2026#00007',
+      createdAt: new Date('2026-04-29T09:00:00.000Z'),
+    });
+    expect(overwritten).not.toBe(item);
+  });
+
   it('maps persistence errors to bad requests', async () => {
     const em = {
       nativeDelete: jest.fn(() =>
