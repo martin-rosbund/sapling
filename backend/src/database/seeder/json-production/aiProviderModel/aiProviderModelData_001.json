@@ -10,7 +10,8 @@
     "supportsEmbeddings": false,
     "isDefault": true,
     "isActive": true,
-    "sortOrder": 10
+    "sortOrder": 10,
+    "maxToolCallIterations": 20
   },
   {
     "handle": "openai-gpt-4_1",
@@ -23,7 +24,8 @@
     "supportsEmbeddings": false,
     "isDefault": false,
     "isActive": true,
-    "sortOrder": 20
+    "sortOrder": 20,
+    "maxToolCallIterations": 20
   },
   {
     "handle": "openai-gpt-4o-mini",
@@ -36,7 +38,8 @@
     "supportsEmbeddings": false,
     "isDefault": false,
     "isActive": true,
-    "sortOrder": 30
+    "sortOrder": 30,
+    "maxToolCallIterations": 20
   },
   {
     "handle": "openai-gpt-4o",
@@ -49,7 +52,8 @@
     "supportsEmbeddings": false,
     "isDefault": false,
     "isActive": true,
-    "sortOrder": 40
+    "sortOrder": 40,
+    "maxToolCallIterations": 20
   },
   {
     "handle": "gemini-2_5-flash",
@@ -62,7 +66,8 @@
     "supportsEmbeddings": false,
     "isDefault": true,
     "isActive": true,
-    "sortOrder": 10
+    "sortOrder": 10,
+    "maxToolCallIterations": 20
   },
   {
     "handle": "gemini-2_5-flash-lite",
@@ -75,7 +80,8 @@
     "supportsEmbeddings": false,
     "isDefault": false,
     "isActive": true,
-    "sortOrder": 20
+    "sortOrder": 20,
+    "maxToolCallIterations": 20
   },
   {
     "handle": "gemini-2_0-flash",
@@ -88,7 +94,8 @@
     "supportsEmbeddings": false,
     "isDefault": false,
     "isActive": true,
-    "sortOrder": 30
+    "sortOrder": 30,
+    "maxToolCallIterations": 20
   },
   {
     "handle": "gemini-2_5-pro",
@@ -101,7 +108,8 @@
     "supportsEmbeddings": false,
     "isDefault": false,
     "isActive": true,
-    "sortOrder": 40
+    "sortOrder": 40,
+    "maxToolCallIterations": 20
   },
   {
     "handle": "openai-text-embedding-3-small",
@@ -114,7 +122,8 @@
     "supportsEmbeddings": true,
     "isDefault": true,
     "isActive": true,
-    "sortOrder": 50
+    "sortOrder": 50,
+    "maxToolCallIterations": 20
   },
   {
     "handle": "openai-text-embedding-3-large",
@@ -127,7 +136,8 @@
     "supportsEmbeddings": true,
     "isDefault": false,
     "isActive": true,
-    "sortOrder": 60
+    "sortOrder": 60,
+    "maxToolCallIterations": 20
   },
   {
     "handle": "gemini-embedding-001",
@@ -140,6 +150,7 @@
     "supportsEmbeddings": true,
     "isDefault": true,
     "isActive": true,
-    "sortOrder": 50
+    "sortOrder": 50,
+    "maxToolCallIterations": 20
   }
 ]
