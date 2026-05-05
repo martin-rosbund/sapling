@@ -58,6 +58,29 @@
   white-space: pre;
 }
 
+.sapling-text-truncate {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sapling-button-truncate {
+  max-width: 100%;
+}
+
+.sapling-button-truncate .v-btn__content {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.sapling-button-truncate__label {
+  flex: 1 1 auto;
+}
+
 .sapling-cell-meter {
   display: flex;
   align-items: center;

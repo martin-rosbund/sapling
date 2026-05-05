@@ -100,10 +100,13 @@
                 @click.stop="openDialogForCol(col.key || '')"
                 :rounded="false"
                 :max-height="32"
-                class="glass-panel"
+                class="glass-panel sapling-button-truncate"
               >
                 <v-icon class="pr-3" left>mdi-eye</v-icon>
-                <span v-if="getCompactPanelTitle(col.key || '')" class="sapling-inline-pre">
+                <span
+                  v-if="getCompactPanelTitle(col.key || '')"
+                  class="sapling-inline-pre sapling-text-truncate sapling-button-truncate__label"
+                >
                   {{ getCompactPanelTitle(col.key || '') }}
                 </span>
               </v-btn>

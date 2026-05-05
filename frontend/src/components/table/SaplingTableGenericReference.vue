@@ -4,12 +4,15 @@
       size="small"
       :rounded="false"
       :max-height="32"
-      class="glass-panel"
+      class="glass-panel sapling-button-truncate"
       :loading="isLoading"
       @click.stop="openTargetDialog"
     >
       <v-icon class="pr-3" left>mdi-eye</v-icon>
-      <span v-if="displayLabel" class="sapling-inline-pre">
+      <span
+        v-if="displayLabel"
+        class="sapling-inline-pre sapling-text-truncate sapling-button-truncate__label"
+      >
         {{ displayLabel }}
       </span>
     </v-btn>

@@ -7,9 +7,7 @@ import type {
   EntityTemplate,
   SaplingTableHeaderItem,
 } from '@/entity/structure'
-import { i18n } from '@/i18n'
-import { getTableHeaders } from '@/utils/saplingTableUtil'
-import { formatValue } from '@/utils/saplingFormatUtil'
+import { getEntityValueLabel } from '@/utils/saplingTableUtil'
 import {
   getSaplingContextMenuTableItems,
   type SaplingContextMenuTableMenuItem,
@@ -94,26 +92,6 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
       scriptButtons: scriptButtons.value,
     }),
   )
-  const referenceCompactHeaders = computed<Record<string, SaplingTableHeaderItem[]>>(() => {
-    const referenceNames = Array.from(
-      new Set(
-        props.columns
-          .map((column) => column.referenceName)
-          .filter((referenceName): referenceName is string => Boolean(referenceName)),
-      ),
-    )
-
-    return Object.fromEntries(
-      referenceNames.map((referenceName) => [
-        referenceName,
-        getTableHeaders(
-          getReferenceTemplates(referenceName),
-          getReferenceEntity(referenceName),
-          i18n.global.t,
-        ).filter((header) => header.options?.includes('isValue')),
-      ]),
-    )
-  })
   const compactPanelTitles = computed<Record<string, string>>(() => {
     const titles: Record<string, string> = {}
 
@@ -129,11 +107,10 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
         continue
       }
 
-      const valueMap = referenceValue as Record<string, unknown>
-      titles[columnKey] = (referenceCompactHeaders.value[column.referenceName] ?? [])
-        .map((header) => formatValue(String(valueMap[String(header.key ?? '')] ?? ''), header.type))
-        .filter((value) => value && value !== '-')
-        .join(' | ')
+      titles[columnKey] = getEntityValueLabel(
+        referenceValue as SaplingGenericItem,
+        getReferenceTemplates(column.referenceName),
+      )
     }
 
     return titles
