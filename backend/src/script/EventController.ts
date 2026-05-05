@@ -38,7 +38,7 @@ export class EventController extends ScriptClass {
    * @param {EventItem[]} items - The new Event records to be inserted.
    * @returns {Promise<ScriptResultServer>} The result of the before insert event.
    */
-  async beforeInsert(items: EventItem[]): Promise<ScriptResultServer> {
+  beforeInsert(items: EventItem[]): Promise<ScriptResultServer> {
     this.logDebug('beforeInsert', 'Handling event create defaults', {
       itemCount: items.length,
     });
@@ -47,7 +47,9 @@ export class EventController extends ScriptClass {
       this.ensureDefaultParticipants(event);
     }
 
-    return new ScriptResultServer(items, ScriptResultServerMethods.overwrite);
+    return Promise.resolve(
+      new ScriptResultServer(items, ScriptResultServerMethods.overwrite),
+    );
   }
 
   /**

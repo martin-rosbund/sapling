@@ -29,7 +29,7 @@ import {
   highlightActiveLineGutter,
   highlightSpecialChars,
   keymap,
-  lineNumbers,
+  lineNumbers as codeMirrorLineNumbers,
 } from '@codemirror/view'
 import { computed, markRaw, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 
@@ -169,7 +169,7 @@ function getThemeExtension(): Extension {
 
 function getBaseExtensions(): Extension[] {
   return [
-    lineNumbers(),
+    codeMirrorLineNumbers(),
     highlightActiveLineGutter(),
     highlightSpecialChars(),
     history(),

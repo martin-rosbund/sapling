@@ -227,10 +227,14 @@ const draftMessageModel = computed({
   set: (value: string) => emit('update:draftMessage', value),
 })
 
+function getLastItem<T>(items: readonly T[]): T | undefined {
+  return items.length > 0 ? items[items.length - 1] : undefined
+}
+
 watch(
   () =>
     (() => {
-      const lastMessage = props.messages.at(-1)
+      const lastMessage = getLastItem(props.messages)
       return lastMessage
         ? `${lastMessage.handle ?? 'pending'}:${lastMessage.content?.length ?? 0}:${lastMessage.status ?? ''}`
         : 'empty'
@@ -245,8 +249,8 @@ watch(
 
 watch(
   () => {
-    const lastMessage = props.messages.at(-1)
-    const link = lastMessage ? (getMessageNavigationLinks(lastMessage).at(-1) ?? null) : null
+    const lastMessage = getLastItem(props.messages)
+    const link = lastMessage ? (getLastItem(getMessageNavigationLinks(lastMessage)) ?? null) : null
 
     return {
       handle: lastMessage?.handle ?? null,
@@ -361,7 +365,7 @@ function getMessageNavigationLinks(message: AiChatMessageItem): ChatNavigationLi
   }
 
   const validNavigationLinks = navigationLinks.filter(isChatNavigationLink)
-  const lastNavigationLink = validNavigationLinks.at(-1)
+  const lastNavigationLink = getLastItem(validNavigationLinks)
 
   return lastNavigationLink ? [lastNavigationLink] : []
 }
