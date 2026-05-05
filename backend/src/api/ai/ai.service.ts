@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto';
 import { EntityManager } from '@mikro-orm/core';
 import {
   BadRequestException,
@@ -8,11 +7,8 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import {
-  SchemaType,
   type Content,
-  type FunctionCall,
   type FunctionDeclaration,
-  type FunctionDeclarationSchema,
   type Part,
 } from '@google/generative-ai';
 import { PersonItem } from '../../entity/PersonItem';
@@ -62,7 +58,6 @@ import {
 } from './ai-provider.utils';
 import {
   alignAssistantContentWithNavigationLinks,
-  asRecord,
   buildNavigationLinks,
   extractRecordHandle,
 } from './ai-navigation.utils';
@@ -74,8 +69,6 @@ import {
   transcribeOpenAiAudio,
 } from './openai-ai.runtime';
 import {
-  AiChatMessageSpeechDescriptor,
-  AiChatMessageSpeechPayload,
   AiClientTimeContext,
   AiEmbeddingPurpose,
   AiEmbeddingTarget,
@@ -95,13 +88,52 @@ import {
   AI_ASSISTANT_SPEECH_INSTRUCTIONS,
   AI_GEMINI_REPEATED_TOOL_CALL_ABORT_MESSAGE,
   AI_GEMINI_TOOL_CALL_LIMIT_MESSAGE,
-  buildGeminiJsonStringDescription,
-  buildGeminiToolPayloadDescription,
   buildSystemInstruction,
-  buildToolSummary,
   buildToolFailureAssistantMessage,
-  normalizeJsonSchema,
 } from './prompts/ai.prompts';
+import {
+  extractClientTimeContext,
+  extractClientTimeContextFromHistory,
+} from './ai-client-time.utils';
+import {
+  buildGeminiFunctionDeclarations,
+  buildOpenAiTools,
+  buildToolCallSignature,
+  buildToolRegistry,
+  isToolErrorPayload,
+  normalizeFunctionCallArgs,
+  parseToolArguments,
+  resolveMaxToolCallIterations,
+  resolveToolRegistryEntry,
+} from './ai-tool-call.utils';
+import {
+  assertVectorizableEntity,
+  asSimilarityScore,
+  buildTicketSectionContent,
+  buildTicketVectorMetadata,
+  buildVectorDocumentKey,
+  buildVectorExcerpt,
+  coerceVectorRecordHandle,
+  createTicketVectorSectionDocuments,
+  resolveEmbeddingBatchSize,
+  resolveVectorSearchCandidateMultiplier,
+  resolveVectorSearchMaxCandidateLimit,
+  resolveVectorSearchMaxResults,
+  toVectorLiteral,
+} from './ai-vector.utils';
+import {
+  buildAssistantSpeechDescriptor,
+  buildTranscriptionResponse,
+  extractMessageSpeechPayload,
+  extractModelHandle,
+  extractProviderHandle,
+  sanitizeChatMessage,
+  sanitizeChatSession,
+  sanitizeModel,
+  sanitizeProvider,
+  shouldReuseAssistantSpeech,
+  withMessageSpeechPayload,
+} from './ai-response.utils';
 
 type AiChatMessagePage = {
   messages: AiChatMessageItem[];
@@ -151,7 +183,7 @@ export class AiService {
     );
     const providerHandles = new Set(
       activeModels
-        .map((model) => this.extractProviderHandle(model.provider))
+        .map((model) => extractProviderHandle(model.provider))
         .filter((handle): handle is string => !!handle),
     );
 
@@ -172,7 +204,7 @@ export class AiService {
       },
     );
 
-    return providers.map((provider) => this.sanitizeProvider(provider));
+    return providers.map((provider) => sanitizeProvider(provider));
   }
 
   async listActiveModels(
@@ -208,7 +240,7 @@ export class AiService {
         )
       : models;
 
-    return visibleModels.map((model) => this.sanitizeModel(model));
+    return visibleModels.map((model) => sanitizeModel(model));
   }
 
   async vectorizeEntity(
@@ -232,18 +264,16 @@ export class AiService {
     )) as AiVectorDocumentRow[];
 
     const existingByKey = new Map(
-      existingRows.map((row) => [this.buildVectorDocumentKey(row), row]),
+      existingRows.map((row) => [buildVectorDocumentKey(row), row]),
     );
     const nextKeys = new Set(
-      documents.map((document) => this.buildVectorDocumentKey(document)),
+      documents.map((document) => buildVectorDocumentKey(document)),
     );
     const documentsToDelete = existingRows.filter(
-      (row) => !nextKeys.has(this.buildVectorDocumentKey(row)),
+      (row) => !nextKeys.has(buildVectorDocumentKey(row)),
     );
     const documentsToEmbed = documents.filter((document) => {
-      const existingRow = existingByKey.get(
-        this.buildVectorDocumentKey(document),
-      );
+      const existingRow = existingByKey.get(buildVectorDocumentKey(document));
 
       if (!existingRow) {
         return true;
@@ -272,11 +302,9 @@ export class AiService {
       }
 
       for (const [index, document] of documentsToEmbed.entries()) {
-        const existingRow = existingByKey.get(
-          this.buildVectorDocumentKey(document),
-        );
+        const existingRow = existingByKey.get(buildVectorDocumentKey(document));
         const embedding = embeddings[index] ?? [];
-        const vectorLiteral = this.toVectorLiteral(embedding);
+        const vectorLiteral = toVectorLiteral(embedding);
         const metadata = document.metadata
           ? JSON.stringify(document.metadata)
           : null;
@@ -350,7 +378,7 @@ export class AiService {
       throw new BadRequestException('ai.vectorSearchQueryMissing');
     }
 
-    this.assertVectorizableEntity(normalizedEntityHandle);
+    assertVectorizableEntity(normalizedEntityHandle);
     const index = await this.getVectorIndex(normalizedEntityHandle);
 
     if (!index) {
@@ -376,10 +404,10 @@ export class AiService {
     );
     const candidateLimit = Math.min(
       Math.max(limit, 1) *
-        this.resolveVectorSearchCandidateMultiplier(embeddingTarget.model),
-      this.resolveVectorSearchMaxCandidateLimit(embeddingTarget.model),
+        resolveVectorSearchCandidateMultiplier(embeddingTarget.model),
+      resolveVectorSearchMaxCandidateLimit(embeddingTarget.model),
     );
-    const vectorLiteral = this.toVectorLiteral(queryEmbedding ?? []);
+    const vectorLiteral = toVectorLiteral(queryEmbedding ?? []);
     const rows = (await this.em.getConnection().execute(
       `select "source_record_handle", "source_section", "chunk_index", "title", "content", "metadata",
               1 - ("embedding" <=> ?::vector) as "similarity"
@@ -415,13 +443,13 @@ export class AiService {
 
     for (const row of rows) {
       const key = row.source_record_handle;
-      const similarity = this.asSimilarityScore(row.similarity);
+      const similarity = asSimilarityScore(row.similarity);
       const match = {
         score: similarity,
         section: row.source_section,
         chunkIndex: row.chunk_index,
         title: row.title,
-        excerpt: this.buildVectorExcerpt(row.content),
+        excerpt: buildVectorExcerpt(row.content),
         metadata: row.metadata ?? null,
       };
       const existingGroup = groupedRows.get(key);
@@ -459,7 +487,7 @@ export class AiService {
         }
 
         return {
-          handle: this.coerceVectorRecordHandle(recordHandleKey),
+          handle: coerceVectorRecordHandle(recordHandleKey),
           score: groupedResult.score,
           record,
           matches: groupedResult.matches
@@ -489,7 +517,7 @@ export class AiService {
         0,
         Math.min(
           Math.max(limit, 1),
-          this.resolveVectorSearchMaxResults(embeddingTarget.model),
+          resolveVectorSearchMaxResults(embeddingTarget.model),
         ),
       );
 
@@ -532,11 +560,11 @@ export class AiService {
 
     const nextSequence = await this.getNextSequence(session.handle ?? 0);
     const runtimeTarget = await this.resolveRuntimeTarget(
-      dto.providerHandle ?? this.extractProviderHandle(session.provider),
-      dto.modelHandle ?? this.extractModelHandle(session.model),
+      dto.providerHandle ?? extractProviderHandle(session.provider),
+      dto.modelHandle ?? extractModelHandle(session.model),
     );
     const availableTools = await this.mcpService.listActiveTools(user);
-    const clientTimeContext = this.extractClientTimeContext(dto);
+    const clientTimeContext = extractClientTimeContext(dto);
 
     const userMessage = this.em.create(AiChatMessageItem, {
       session,
@@ -595,15 +623,15 @@ export class AiService {
 
     await onEvent({
       type: 'session.upsert',
-      session: this.sanitizeChatSession(session),
+      session: sanitizeChatSession(session),
     });
     await onEvent({
       type: 'message.user',
-      message: this.sanitizeChatMessage(userMessage),
+      message: sanitizeChatMessage(userMessage),
     });
     await onEvent({
       type: 'message.assistant',
-      message: this.sanitizeChatMessage(assistantMessage),
+      message: sanitizeChatMessage(assistantMessage),
     });
     await onEvent({ type: 'mcp.tools', tools: availableTools });
 
@@ -641,8 +669,8 @@ export class AiService {
       await this.em.flush();
       await onEvent({
         type: 'message.completed',
-        message: this.sanitizeChatMessage(assistantMessage),
-        session: this.sanitizeChatSession(session),
+        message: sanitizeChatMessage(assistantMessage),
+        session: sanitizeChatSession(session),
       });
       return { session, userMessage, assistantMessage };
     }
@@ -654,7 +682,7 @@ export class AiService {
       );
 
       let streamResult: AiStreamResult;
-      const maxToolCallIterations = this.resolveMaxToolCallIterations(
+      const maxToolCallIterations = resolveMaxToolCallIterations(
         runtimeTarget.model,
       );
 
@@ -735,8 +763,8 @@ export class AiService {
 
       await onEvent({
         type: 'message.completed',
-        message: this.sanitizeChatMessage(assistantMessage),
-        session: this.sanitizeChatSession(session),
+        message: sanitizeChatMessage(assistantMessage),
+        session: sanitizeChatSession(session),
       });
       return { session, userMessage, assistantMessage };
     } catch (error) {
@@ -769,7 +797,7 @@ export class AiService {
       },
     );
 
-    return sessions.map((session) => this.sanitizeChatSession(session));
+    return sessions.map((session) => sanitizeChatSession(session));
   }
 
   async createChatSession(
@@ -777,7 +805,7 @@ export class AiService {
     user: PersonItem,
   ): Promise<AiChatSessionItem> {
     const session = await this.createManagedChatSession(dto, user);
-    return this.sanitizeChatSession(session);
+    return sanitizeChatSession(session);
   }
 
   private async createManagedChatSession(
@@ -822,8 +850,8 @@ export class AiService {
 
     if (dto.providerHandle !== undefined || dto.modelHandle !== undefined) {
       const runtimeTarget = await this.resolveRuntimeTarget(
-        dto.providerHandle ?? this.extractProviderHandle(session.provider),
-        dto.modelHandle ?? this.extractModelHandle(session.model),
+        dto.providerHandle ?? extractProviderHandle(session.provider),
+        dto.modelHandle ?? extractModelHandle(session.model),
       );
       session.provider = runtimeTarget.provider;
       session.model = runtimeTarget.model;
@@ -831,7 +859,7 @@ export class AiService {
 
     await this.em.flush();
     await this.populateChatSession(session);
-    return this.sanitizeChatSession(session);
+    return sanitizeChatSession(session);
   }
 
   async listChatMessages(
@@ -848,7 +876,7 @@ export class AiService {
 
     const response = new AiChatMessageListResponseDto();
     response.data = page.messages.map((message) =>
-      this.sanitizeChatMessage(message),
+      sanitizeChatMessage(message),
     );
     response.meta = Object.assign(new AiChatMessageListMetaDto(), page.meta);
     return response;
@@ -871,10 +899,10 @@ export class AiService {
         );
 
     const runtimeTarget = await this.resolveRuntimeTarget(
-      dto.providerHandle ?? this.extractProviderHandle(session.provider),
-      dto.modelHandle ?? this.extractModelHandle(session.model),
+      dto.providerHandle ?? extractProviderHandle(session.provider),
+      dto.modelHandle ?? extractModelHandle(session.model),
     );
-    const clientTimeContext = this.extractClientTimeContext(dto);
+    const clientTimeContext = extractClientTimeContext(dto);
 
     const latestMessage = await this.em.find(
       AiChatMessageItem,
@@ -926,8 +954,8 @@ export class AiService {
     );
     await this.populateChatSession(session);
     return {
-      session: this.sanitizeChatSession(session),
-      message: this.sanitizeChatMessage(message),
+      session: sanitizeChatSession(session),
+      message: sanitizeChatMessage(message),
     };
   }
 
@@ -945,7 +973,7 @@ export class AiService {
       );
     }
 
-    const existingSpeechPayload = this.extractMessageSpeechPayload(
+    const existingSpeechPayload = extractMessageSpeechPayload(
       message.responsePayload,
     );
     const existingDocumentHandle =
@@ -957,7 +985,7 @@ export class AiService {
             dto.modelHandle ?? null,
           )
         : null;
-    const requestedSpeechDescriptor = this.buildAssistantSpeechDescriptor(
+    const requestedSpeechDescriptor = buildAssistantSpeechDescriptor(
       requestedSpeechTarget,
     );
 
@@ -968,12 +996,12 @@ export class AiService {
 
       if (
         existingDocument &&
-        this.shouldReuseAssistantSpeech(
+        shouldReuseAssistantSpeech(
           existingSpeechPayload,
           requestedSpeechTarget ? requestedSpeechDescriptor : null,
         )
       ) {
-        return this.sanitizeChatMessage(message);
+        return sanitizeChatMessage(message);
       }
     }
 
@@ -983,12 +1011,12 @@ export class AiService {
       sourceTextLength: normalizedSpeechText.length,
       wasTruncated: false,
     };
-    let speechDescriptor = this.buildAssistantSpeechDescriptor(null);
+    let speechDescriptor = buildAssistantSpeechDescriptor(null);
 
     try {
       const speechTarget =
         requestedSpeechTarget ?? (await this.resolveSpeechTarget());
-      speechDescriptor = this.buildAssistantSpeechDescriptor(speechTarget);
+      speechDescriptor = buildAssistantSpeechDescriptor(speechTarget);
       preparedSpeechText = prepareAssistantSpeechText(
         message.content,
         speechTarget.maxInputLength,
@@ -1025,7 +1053,7 @@ export class AiService {
         buildAssistantSpeechDescription(message),
       );
 
-      message.responsePayload = this.withMessageSpeechPayload(
+      message.responsePayload = withMessageSpeechPayload(
         message.responsePayload,
         buildAssistantSpeechPayload(
           preparedSpeechText,
@@ -1034,9 +1062,9 @@ export class AiService {
         ),
       );
       await this.em.flush();
-      return this.sanitizeChatMessage(message);
+      return sanitizeChatMessage(message);
     } catch (error) {
-      message.responsePayload = this.withMessageSpeechPayload(
+      message.responsePayload = withMessageSpeechPayload(
         message.responsePayload,
         buildAssistantSpeechFailurePayload(
           preparedSpeechText,
@@ -1245,16 +1273,6 @@ export class AiService {
     };
   }
 
-  private resolveModel(
-    provider: 'openai' | 'gemini',
-    preferredModel?: string | null,
-  ): string {
-    return (
-      preferredModel?.trim() ||
-      (provider === 'gemini' ? 'gemini-1.5-flash' : 'gpt-4.1-mini')
-    );
-  }
-
   private buildModelCapabilityFilter(
     capability: AiProviderCapability,
   ): Record<string, boolean> {
@@ -1353,19 +1371,11 @@ export class AiService {
     );
   }
 
-  private assertVectorizableEntity(entityHandle: string): void {
-    if (entityHandle === 'ticket') {
-      return;
-    }
-
-    throw new BadRequestException('ai.vectorizationUnsupportedEntity');
-  }
-
   private async buildVectorDocuments(
     entityHandle: string,
     embeddingModel: AiProviderModelItem,
   ): Promise<AiVectorDocumentDraft[]> {
-    this.assertVectorizableEntity(entityHandle);
+    assertVectorizableEntity(entityHandle);
 
     switch (entityHandle) {
       case 'ticket':
@@ -1402,33 +1412,33 @@ export class AiService {
 
       const sourceRecordHandle = String(ticket.handle);
       const title = ticket.title?.trim() || ticket.number?.trim() || null;
-      const metadata = this.buildTicketVectorMetadata(ticket);
+      const metadata = buildTicketVectorMetadata(ticket);
 
       documents.push(
-        ...this.createTicketVectorSectionDocuments(
+        ...createTicketVectorSectionDocuments(
           sourceRecordHandle,
           'overview',
-          this.buildTicketSectionContent(ticket, 'overview'),
+          buildTicketSectionContent(ticket, 'overview'),
           title,
           metadata,
           embeddingModel,
         ),
       );
       documents.push(
-        ...this.createTicketVectorSectionDocuments(
+        ...createTicketVectorSectionDocuments(
           sourceRecordHandle,
           'problem',
-          this.buildTicketSectionContent(ticket, 'problem'),
+          buildTicketSectionContent(ticket, 'problem'),
           title,
           metadata,
           embeddingModel,
         ),
       );
       documents.push(
-        ...this.createTicketVectorSectionDocuments(
+        ...createTicketVectorSectionDocuments(
           sourceRecordHandle,
           'solution',
-          this.buildTicketSectionContent(ticket, 'solution'),
+          buildTicketSectionContent(ticket, 'solution'),
           title,
           metadata,
           embeddingModel,
@@ -1437,160 +1447,6 @@ export class AiService {
     }
 
     return documents;
-  }
-
-  private createTicketVectorSectionDocuments(
-    sourceRecordHandle: string,
-    sourceSection: string,
-    content: string,
-    title: string | null,
-    metadata: Record<string, unknown>,
-    embeddingModel: AiProviderModelItem,
-  ): AiVectorDocumentDraft[] {
-    const chunks = this.chunkVectorContent(content, embeddingModel);
-
-    return chunks.map((chunk, index) => ({
-      sourceRecordHandle,
-      sourceSection,
-      chunkIndex: index,
-      title,
-      content: chunk,
-      contentHash: this.hashVectorContent(chunk),
-      metadata: {
-        ...metadata,
-        section: sourceSection,
-        chunkIndex: index,
-      },
-    }));
-  }
-
-  private buildTicketSectionContent(
-    ticket: TicketItem,
-    section: 'overview' | 'problem' | 'solution',
-  ): string {
-    const lines = [
-      `Ticket: ${ticket.number?.trim() || ticket.handle || ''}`.trim(),
-      ticket.externalNumber?.trim()
-        ? `External ticket number: ${ticket.externalNumber.trim()}`
-        : null,
-      ticket.title?.trim() ? `Title: ${ticket.title.trim()}` : null,
-      ticket.status && typeof ticket.status !== 'string'
-        ? `Status: ${ticket.status.description}`
-        : null,
-      ticket.priority && typeof ticket.priority !== 'string'
-        ? `Priority: ${ticket.priority.description}`
-        : null,
-      ticket.creatorCompany &&
-      typeof ticket.creatorCompany !== 'string' &&
-      'name' in ticket.creatorCompany
-        ? `Creator company: ${String(ticket.creatorCompany.name ?? '').trim()}`
-        : null,
-      ticket.creatorPerson &&
-      typeof ticket.creatorPerson !== 'string' &&
-      'firstName' in ticket.creatorPerson
-        ? `Creator person: ${this.buildPersonLabel(
-            ticket.creatorPerson.firstName,
-            ticket.creatorPerson.lastName,
-            ticket.creatorPerson.email,
-          )}`
-        : null,
-      ticket.assigneeCompany &&
-      typeof ticket.assigneeCompany !== 'string' &&
-      'name' in ticket.assigneeCompany
-        ? `Assignee company: ${String(ticket.assigneeCompany.name ?? '').trim()}`
-        : null,
-      ticket.assigneePerson &&
-      typeof ticket.assigneePerson !== 'string' &&
-      'firstName' in ticket.assigneePerson
-        ? `Assignee person: ${this.buildPersonLabel(
-            ticket.assigneePerson.firstName,
-            ticket.assigneePerson.lastName,
-            ticket.assigneePerson.email,
-          )}`
-        : null,
-      null,
-    ].filter((line): line is string => !!line && line.trim().length > 0);
-
-    if (section === 'overview') {
-      lines.push('Section: Overview');
-      const summaryLines = [
-        ticket.problemDescription?.trim()
-          ? `Problem summary: ${this.summarizeVectorText(ticket.problemDescription)}`
-          : null,
-        ticket.solutionDescription?.trim()
-          ? `Solution summary: ${this.summarizeVectorText(ticket.solutionDescription)}`
-          : null,
-      ].filter((line): line is string => !!line && line.trim().length > 0);
-
-      lines.push(...summaryLines);
-      return lines.join('\n');
-    }
-
-    const sectionLabel =
-      section === 'problem' ? 'Problem description' : 'Solution description';
-    const sectionBody =
-      section === 'problem'
-        ? (ticket.problemDescription?.trim() ?? '')
-        : (ticket.solutionDescription?.trim() ?? '');
-
-    if (!sectionBody) {
-      return '';
-    }
-
-    lines.push(`Section: ${sectionLabel}`);
-    lines.push(sectionBody);
-    return lines.join('\n');
-  }
-
-  private buildTicketVectorMetadata(
-    ticket: TicketItem,
-  ): Record<string, unknown> {
-    return {
-      ticketHandle: ticket.handle ?? null,
-      ticketNumber: ticket.number?.trim() || null,
-      externalNumber: ticket.externalNumber?.trim() || null,
-      title: ticket.title?.trim() || null,
-      status:
-        ticket.status && typeof ticket.status !== 'string'
-          ? ticket.status.description
-          : null,
-      priority:
-        ticket.priority && typeof ticket.priority !== 'string'
-          ? ticket.priority.description
-          : null,
-      creatorCompany:
-        ticket.creatorCompany &&
-        typeof ticket.creatorCompany !== 'string' &&
-        'name' in ticket.creatorCompany
-          ? ticket.creatorCompany.name
-          : null,
-      creatorPerson:
-        ticket.creatorPerson &&
-        typeof ticket.creatorPerson !== 'string' &&
-        'firstName' in ticket.creatorPerson
-          ? this.buildPersonLabel(
-              ticket.creatorPerson.firstName,
-              ticket.creatorPerson.lastName,
-              ticket.creatorPerson.email,
-            )
-          : null,
-      assigneeCompany:
-        ticket.assigneeCompany &&
-        typeof ticket.assigneeCompany !== 'string' &&
-        'name' in ticket.assigneeCompany
-          ? ticket.assigneeCompany.name
-          : null,
-      assigneePerson:
-        ticket.assigneePerson &&
-        typeof ticket.assigneePerson !== 'string' &&
-        'firstName' in ticket.assigneePerson
-          ? this.buildPersonLabel(
-              ticket.assigneePerson.firstName,
-              ticket.assigneePerson.lastName,
-              ticket.assigneePerson.email,
-            )
-          : null,
-    };
   }
 
   async createChatTranscription(
@@ -1610,7 +1466,7 @@ export class AiService {
       dto.providerHandle ?? null,
       dto.modelHandle ?? null,
     );
-    const clientTimeContext = this.extractClientTimeContext(dto);
+    const clientTimeContext = extractClientTimeContext(dto);
 
     const transcription = this.em.create(AiChatTranscriptionItem, {
       session,
@@ -1677,7 +1533,7 @@ export class AiService {
       };
       await this.em.flush();
 
-      return this.buildTranscriptionResponse(transcription);
+      return buildTranscriptionResponse(transcription);
     } catch (error) {
       transcription.status = 'failed';
       transcription.failurePayload = {
@@ -1687,156 +1543,6 @@ export class AiService {
       await this.em.flush();
       throw error;
     }
-  }
-
-  private buildPersonLabel(
-    firstName?: string | null,
-    lastName?: string | null,
-    email?: string | null,
-  ): string {
-    const fullName = [firstName, lastName]
-      .filter(
-        (part): part is string =>
-          typeof part === 'string' && part.trim().length > 0,
-      )
-      .join(' ')
-      .trim();
-
-    return fullName || email?.trim() || '';
-  }
-
-  private summarizeVectorText(value?: string | null, maxLength = 240): string {
-    const normalized = value?.replace(/\s+/g, ' ').trim() ?? '';
-
-    if (normalized.length <= maxLength) {
-      return normalized;
-    }
-
-    return `${normalized.slice(0, maxLength - 3).trimEnd()}...`;
-  }
-
-  private resolveEmbeddingBatchSize(
-    model?: AiProviderModelItem | null,
-  ): number {
-    const value = model?.embeddingBatchSize;
-
-    return Number.isFinite(value) && value != null && value > 0
-      ? Math.max(1, Math.floor(value))
-      : 32;
-  }
-
-  private resolveVectorChunkLength(model?: AiProviderModelItem | null): number {
-    const value = model?.vectorChunkLength;
-
-    return Number.isFinite(value) && value != null && value > 0
-      ? Math.max(200, Math.floor(value))
-      : 1200;
-  }
-
-  private resolveVectorChunkOverlap(
-    model?: AiProviderModelItem | null,
-    chunkLength = this.resolveVectorChunkLength(model),
-  ): number {
-    const value = model?.vectorChunkOverlap;
-    const normalizedValue =
-      Number.isFinite(value) && value != null && value >= 0
-        ? Math.floor(value)
-        : 200;
-
-    return Math.max(0, Math.min(normalizedValue, Math.max(chunkLength - 1, 0)));
-  }
-
-  private resolveVectorSearchCandidateMultiplier(
-    model?: AiProviderModelItem | null,
-  ): number {
-    const value = model?.vectorSearchCandidateMultiplier;
-
-    return Number.isFinite(value) && value != null && value > 0
-      ? Math.max(1, Math.floor(value))
-      : 6;
-  }
-
-  private resolveVectorSearchMaxCandidateLimit(
-    model?: AiProviderModelItem | null,
-  ): number {
-    const value = model?.vectorSearchMaxCandidateLimit;
-
-    return Number.isFinite(value) && value != null && value > 0
-      ? Math.max(1, Math.floor(value))
-      : 60;
-  }
-
-  private resolveVectorSearchMaxResults(
-    model?: AiProviderModelItem | null,
-  ): number {
-    const value = model?.vectorSearchMaxResults;
-
-    return Number.isFinite(value) && value != null && value > 0
-      ? Math.max(1, Math.floor(value))
-      : 10;
-  }
-
-  private chunkVectorContent(
-    content: string,
-    embeddingModel: AiProviderModelItem,
-  ): string[] {
-    const normalized = content.replace(/\r\n/g, '\n').trim();
-    const chunkLength = this.resolveVectorChunkLength(embeddingModel);
-    const chunkOverlap = this.resolveVectorChunkOverlap(
-      embeddingModel,
-      chunkLength,
-    );
-
-    if (!normalized) {
-      return [];
-    }
-
-    if (normalized.length <= chunkLength) {
-      return [normalized];
-    }
-
-    const chunks: string[] = [];
-    let start = 0;
-
-    while (start < normalized.length) {
-      let end = Math.min(start + chunkLength, normalized.length);
-
-      if (end < normalized.length) {
-        const slice = normalized.slice(start, end);
-        const preferredBreakpoints = [
-          slice.lastIndexOf('\n\n'),
-          slice.lastIndexOf('\n'),
-          slice.lastIndexOf('. '),
-          slice.lastIndexOf(' '),
-        ].filter((value) => value >= Math.floor(chunkLength * 0.6));
-
-        if (preferredBreakpoints.length > 0) {
-          end = start + Math.max(...preferredBreakpoints) + 1;
-        }
-      }
-
-      const chunk = normalized.slice(start, end).trim();
-
-      if (chunk) {
-        chunks.push(chunk);
-      }
-
-      if (end >= normalized.length) {
-        break;
-      }
-
-      start = Math.max(end - chunkOverlap, start + 1);
-
-      while (start < normalized.length && /\s/.test(normalized[start] ?? '')) {
-        start += 1;
-      }
-    }
-
-    return [...new Set(chunks)];
-  }
-
-  private hashVectorContent(content: string): string {
-    return createHash('sha256').update(content).digest('hex');
   }
 
   private async embedTexts(
@@ -1853,9 +1559,9 @@ export class AiService {
     for (
       let index = 0;
       index < texts.length;
-      index += this.resolveEmbeddingBatchSize(target.model)
+      index += resolveEmbeddingBatchSize(target.model)
     ) {
-      const batchSize = this.resolveEmbeddingBatchSize(target.model);
+      const batchSize = resolveEmbeddingBatchSize(target.model);
       const batch = texts.slice(index, index + batchSize);
       const batchEmbeddings =
         target.providerKind === 'gemini'
@@ -1888,32 +1594,6 @@ export class AiService {
     });
   }
 
-  private buildVectorDocumentKey(
-    row:
-      | Pick<
-          AiVectorDocumentRow,
-          'source_record_handle' | 'source_section' | 'chunk_index'
-        >
-      | Pick<
-          AiVectorDocumentDraft,
-          'sourceRecordHandle' | 'sourceSection' | 'chunkIndex'
-        >,
-  ): string {
-    if ('source_record_handle' in row) {
-      return `${row.source_record_handle}:${row.source_section}:${row.chunk_index}`;
-    }
-
-    return `${row.sourceRecordHandle}:${row.sourceSection}:${row.chunkIndex}`;
-  }
-
-  private toVectorLiteral(embedding: number[]): string {
-    if (embedding.length === 0) {
-      throw new Error('ai.vectorEmbeddingFailed');
-    }
-
-    return `[${embedding.map((value) => Number(value).toString()).join(',')}]`;
-  }
-
   private async getVectorIndex(
     entityHandle: string,
   ): Promise<AiVectorIndexRow | null> {
@@ -1943,9 +1623,7 @@ export class AiService {
       entityHandle,
       {
         handle: {
-          $in: recordHandles.map((handle) =>
-            this.coerceVectorRecordHandle(handle),
-          ),
+          $in: recordHandles.map((handle) => coerceVectorRecordHandle(handle)),
         },
       },
       1,
@@ -1963,59 +1641,6 @@ export class AiService {
     );
 
     return result.data;
-  }
-
-  private coerceVectorRecordHandle(value: string): string | number {
-    return /^\d+$/.test(value) ? Number(value) : value;
-  }
-
-  private buildVectorExcerpt(content: string, maxLength = 280): string {
-    const normalized = content.replace(/\s+/g, ' ').trim();
-
-    if (normalized.length <= maxLength) {
-      return normalized;
-    }
-
-    return `${normalized.slice(0, maxLength - 3).trimEnd()}...`;
-  }
-
-  private asSimilarityScore(value: number | string): number {
-    const numericValue =
-      typeof value === 'number' ? value : Number.parseFloat(value);
-
-    if (!Number.isFinite(numericValue)) {
-      return 0;
-    }
-
-    return Math.max(0, Math.min(1, numericValue));
-  }
-
-  private extractProviderHandle(
-    provider?: AiProviderTypeItem | string | null,
-  ): string | null {
-    if (!provider) {
-      return null;
-    }
-
-    if (typeof provider === 'string') {
-      return provider;
-    }
-
-    return provider.handle ?? null;
-  }
-
-  private extractModelHandle(
-    model?: AiProviderModelItem | string | null,
-  ): string | null {
-    if (!model) {
-      return null;
-    }
-
-    if (typeof model === 'string') {
-      return model;
-    }
-
-    return model.handle ?? null;
   }
 
   private async populateChatSession(session: AiChatSessionItem): Promise<void> {
@@ -2115,7 +1740,7 @@ export class AiService {
     clientTimeContext: AiClientTimeContext | undefined,
     onDelta: (delta: string) => Promise<void>,
   ): Promise<AiStreamResult> {
-    const toolRegistry = this.buildToolRegistry(availableTools);
+    const toolRegistry = buildToolRegistry(availableTools);
     const messages = this.buildOpenAiMessages(history, user, clientTimeContext);
     const executedToolCalls: AiExecutedToolCall[] = [];
 
@@ -2127,7 +1752,7 @@ export class AiService {
         messages: messages as never,
         ...(toolRegistry.length > 0
           ? {
-              tools: this.buildOpenAiTools(toolRegistry),
+              tools: buildOpenAiTools(toolRegistry),
               tool_choice: 'auto' as const,
             }
           : {}),
@@ -2158,7 +1783,7 @@ export class AiService {
           continue;
         }
 
-        const args = this.parseToolArguments(toolCall.function.arguments);
+        const args = parseToolArguments(toolCall.function.arguments);
         const toolExecution = await this.executeAutomaticToolCall(
           toolRegistry,
           toolCall.function.name,
@@ -2195,7 +1820,7 @@ export class AiService {
     clientTimeContext: AiClientTimeContext | undefined,
     onDelta: (delta: string) => Promise<void>,
   ): Promise<AiStreamResult> {
-    const toolRegistry = this.buildToolRegistry(availableTools);
+    const toolRegistry = buildToolRegistry(availableTools);
     const conversation = this.buildGeminiConversation(history);
     const currentTurn = conversation.pop();
 
@@ -2205,7 +1830,7 @@ export class AiService {
 
     try {
       const functionDeclarations =
-        this.buildGeminiFunctionDeclarations(toolRegistry);
+        buildGeminiFunctionDeclarations(toolRegistry);
 
       return await this.streamGeminiWithTools(
         provider,
@@ -2287,8 +1912,8 @@ export class AiService {
       const toolErrors: AiToolErrorPayload[] = [];
 
       for (const functionCall of functionCalls) {
-        const args = this.normalizeFunctionCallArgs(functionCall);
-        const toolCallSignature = this.buildToolCallSignature(
+        const args = normalizeFunctionCallArgs(functionCall);
+        const toolCallSignature = buildToolCallSignature(
           functionCall.name,
           args,
         );
@@ -2317,7 +1942,7 @@ export class AiService {
           rawResult: toolExecution.rawResult,
         });
 
-        if (this.isToolErrorPayload(toolExecution.rawResult)) {
+        if (isToolErrorPayload(toolExecution.rawResult)) {
           toolErrors.push(toolExecution.rawResult);
         }
 
@@ -2396,50 +2021,6 @@ export class AiService {
     );
   }
 
-  private resolveMaxToolCallIterations(model: AiProviderModelItem): number {
-    const value = model.maxToolCallIterations;
-
-    if (typeof value !== 'number' || !Number.isFinite(value)) {
-      return 8;
-    }
-
-    return Math.max(1, Math.floor(value));
-  }
-
-  private isToolErrorPayload(value: unknown): value is AiToolErrorPayload {
-    return (
-      !!value &&
-      typeof value === 'object' &&
-      (value as { ok?: unknown }).ok === false
-    );
-  }
-
-  private buildToolCallSignature(
-    functionName: string,
-    args: Record<string, unknown>,
-  ): string {
-    return `${functionName}:${this.stableStringify(args)}`;
-  }
-
-  private stableStringify(value: unknown): string {
-    if (Array.isArray(value)) {
-      return `[${value.map((item) => this.stableStringify(item)).join(',')}]`;
-    }
-
-    if (value && typeof value === 'object') {
-      const record = value as Record<string, unknown>;
-      return `{${Object.keys(record)
-        .sort((left, right) => left.localeCompare(right))
-        .map(
-          (key) =>
-            `${JSON.stringify(key)}:${this.stableStringify(record[key])}`,
-        )
-        .join(',')}}`;
-    }
-
-    return JSON.stringify(value);
-  }
-
   private buildOpenAiMessages(
     history: AiChatMessageItem[],
     user?: PersonItem,
@@ -2452,8 +2033,7 @@ export class AiService {
           includeToolGuidance: true,
           user,
           clientTimeContext:
-            clientTimeContext ??
-            this.extractClientTimeContextFromHistory(history),
+            clientTimeContext ?? extractClientTimeContextFromHistory(history),
         }),
       },
     ];
@@ -2488,197 +2068,6 @@ export class AiService {
     });
   }
 
-  private resolveUserLocale(
-    user?: PersonItem,
-    clientTimeContext?: AiClientTimeContext,
-  ): string {
-    if (clientTimeContext?.locale?.trim()) {
-      return clientTimeContext.locale.trim();
-    }
-
-    const languageHandle =
-      user?.language && typeof user.language !== 'string'
-        ? user.language.handle
-        : undefined;
-
-    return languageHandle === 'de' || !languageHandle
-      ? 'de-DE'
-      : languageHandle;
-  }
-
-  private resolveUserTimeZone(
-    user?: PersonItem,
-    clientTimeContext?: AiClientTimeContext,
-  ): string {
-    if (this.isValidTimeZone(clientTimeContext?.timeZone)) {
-      return clientTimeContext.timeZone?.trim() ?? 'UTC';
-    }
-
-    void user;
-    const serverTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    return this.isValidTimeZone(serverTimeZone) ? serverTimeZone : 'UTC';
-  }
-
-  private isValidTimeZone(value: unknown): value is string {
-    if (typeof value !== 'string' || !value.trim()) {
-      return false;
-    }
-
-    try {
-      new Intl.DateTimeFormat('en-US', { timeZone: value.trim() });
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  private formatZonedDateTime(
-    value: Date,
-    timeZone: string,
-    locale: string,
-  ): string {
-    const offset = this.formatTimeZoneOffset(value, timeZone);
-    const dateTime = new Intl.DateTimeFormat(locale, {
-      timeZone,
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-    }).format(value);
-
-    return `${dateTime} UTC${offset}`;
-  }
-
-  private formatTimeZoneOffset(value: Date, timeZone: string): string {
-    const parts = new Intl.DateTimeFormat('en-US', {
-      timeZone,
-      timeZoneName: 'longOffset',
-    }).formatToParts(value);
-    const offset = parts.find((part) => part.type === 'timeZoneName')?.value;
-    const match = offset?.match(/GMT([+-]\d{2}:\d{2})/);
-
-    return match?.[1] ?? '+00:00';
-  }
-
-  private formatUtcOffset(offsetMinutes: number): string {
-    const normalizedOffsetMinutes = Math.trunc(offsetMinutes);
-    const offsetSign = normalizedOffsetMinutes >= 0 ? '+' : '-';
-    const absoluteOffsetMinutes = Math.abs(normalizedOffsetMinutes);
-    const offsetHours = String(Math.floor(absoluteOffsetMinutes / 60)).padStart(
-      2,
-      '0',
-    );
-    const offsetRemainderMinutes = String(absoluteOffsetMinutes % 60).padStart(
-      2,
-      '0',
-    );
-
-    return `${offsetSign}${offsetHours}:${offsetRemainderMinutes}`;
-  }
-
-  private extractClientTimeContext(dto: {
-    clientCurrentDateTime?: string;
-    clientTimeZone?: string;
-    clientLocale?: string;
-    clientUtcOffsetMinutes?: number;
-  }): AiClientTimeContext | undefined {
-    const currentDate = this.parseClientCurrentDate(dto.clientCurrentDateTime);
-    const timeZone = this.isValidTimeZone(dto.clientTimeZone)
-      ? dto.clientTimeZone.trim()
-      : undefined;
-    const locale =
-      typeof dto.clientLocale === 'string' && dto.clientLocale.trim()
-        ? dto.clientLocale.trim()
-        : undefined;
-    const utcOffsetMinutes = Number.isFinite(dto.clientUtcOffsetMinutes)
-      ? Math.trunc(dto.clientUtcOffsetMinutes ?? 0)
-      : undefined;
-
-    if (
-      !currentDate &&
-      !timeZone &&
-      !locale &&
-      typeof utcOffsetMinutes === 'undefined'
-    ) {
-      return undefined;
-    }
-
-    return {
-      currentDate,
-      timeZone,
-      locale,
-      utcOffsetMinutes,
-    };
-  }
-
-  private extractClientTimeContextFromHistory(
-    history: AiChatMessageItem[],
-  ): AiClientTimeContext | undefined {
-    for (const message of [...history].reverse()) {
-      if (message.role !== 'user') {
-        continue;
-      }
-
-      const payload = asRecord(message.requestPayload);
-
-      if (!payload) {
-        continue;
-      }
-
-      const currentDate = this.parseClientCurrentDate(
-        payload.clientCurrentDateTime,
-      );
-      const timeZone = this.isValidTimeZone(payload.clientTimeZone)
-        ? payload.clientTimeZone.trim()
-        : undefined;
-      const locale =
-        typeof payload.clientLocale === 'string' && payload.clientLocale.trim()
-          ? payload.clientLocale.trim()
-          : undefined;
-      const utcOffsetMinutes =
-        typeof payload.clientUtcOffsetMinutes === 'number' &&
-        Number.isFinite(payload.clientUtcOffsetMinutes)
-          ? Math.trunc(payload.clientUtcOffsetMinutes)
-          : undefined;
-
-      if (
-        currentDate ||
-        timeZone ||
-        locale ||
-        typeof utcOffsetMinutes !== 'undefined'
-      ) {
-        return {
-          currentDate,
-          timeZone,
-          locale,
-          utcOffsetMinutes,
-        };
-      }
-    }
-
-    return undefined;
-  }
-
-  private parseClientCurrentDate(value: unknown): Date | undefined {
-    if (typeof value !== 'string' || !value.trim()) {
-      return undefined;
-    }
-
-    const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? undefined : date;
-  }
-
-  private formatLocalDate(value: Date): string {
-    const year = value.getFullYear();
-    const month = String(value.getMonth() + 1).padStart(2, '0');
-    const day = String(value.getDate()).padStart(2, '0');
-
-    return `${year}-${month}-${day}`;
-  }
-
   private normalizeHistory(history: AiChatMessageItem[]): AiChatMessageItem[] {
     return history.filter((message) => {
       if (message.role !== 'user' && message.role !== 'assistant') {
@@ -2706,217 +2095,13 @@ export class AiService {
     return `${message.content}${contextPrefix}`;
   }
 
-  private buildToolSummary(availableTools: McpToolDescriptor[]): string {
-    return buildToolSummary(availableTools);
-  }
-
-  private buildToolRegistry(
-    availableTools: McpToolDescriptor[],
-  ): AiToolRegistryEntry[] {
-    const usedNames = new Set<string>();
-
-    return availableTools.map((descriptor) => {
-      const baseName = this.sanitizeToolFunctionName(
-        `${descriptor.serverName}__${descriptor.toolName}`,
-      );
-      let encodedName = baseName;
-      let suffix = 2;
-
-      while (usedNames.has(encodedName)) {
-        encodedName = this.sanitizeToolFunctionName(`${baseName}_${suffix}`);
-        suffix += 1;
-      }
-
-      usedNames.add(encodedName);
-      return { encodedName, descriptor };
-    });
-  }
-
-  private sanitizeToolFunctionName(name: string): string {
-    const sanitized = name.replace(/[^a-zA-Z0-9_]/g, '_');
-    const prefixed = /^[a-zA-Z_]/.test(sanitized)
-      ? sanitized
-      : `tool_${sanitized}`;
-    return prefixed.slice(0, 64);
-  }
-
-  private buildOpenAiTools(toolRegistry: AiToolRegistryEntry[]) {
-    return toolRegistry.map((entry) => ({
-      type: 'function' as const,
-      function: {
-        name: entry.encodedName,
-        description: entry.descriptor.description,
-        parameters: normalizeJsonSchema(entry.descriptor.inputSchema) ?? {
-          type: 'object',
-          properties: {},
-          additionalProperties: true,
-        },
-      },
-    }));
-  }
-
-  private buildGeminiFunctionDeclarations(
-    toolRegistry: AiToolRegistryEntry[],
-  ): FunctionDeclaration[] {
-    return toolRegistry.map((entry) => ({
-      name: entry.encodedName,
-      parameters: {
-        type: SchemaType.OBJECT,
-        properties: {
-          payload: {
-            type: SchemaType.STRING,
-            description: buildGeminiToolPayloadDescription(entry),
-          },
-        },
-        required: ['payload'],
-      },
-      ...(entry.descriptor.description
-        ? { description: entry.descriptor.description }
-        : {}),
-    }));
-  }
-
-  private convertJsonSchemaToGemini(
-    schema?: Record<string, unknown> | null,
-  ): FunctionDeclaration['parameters'] | undefined {
-    if (!schema || schema.type !== 'object') {
-      return undefined;
-    }
-
-    const propertiesRecord =
-      schema.properties && typeof schema.properties === 'object'
-        ? (schema.properties as Record<string, Record<string, unknown>>)
-        : {};
-
-    const properties = Object.fromEntries(
-      Object.entries(propertiesRecord)
-        .map(([key, value]) => [
-          key,
-          this.convertJsonSchemaPropertyToGemini(value),
-        ])
-        .filter(
-          (
-            entry,
-          ): entry is [
-            string,
-            NonNullable<
-              ReturnType<typeof this.convertJsonSchemaPropertyToGemini>
-            >,
-          ] => entry[1] != null,
-        ),
-    );
-
-    return {
-      type: SchemaType.OBJECT,
-      properties:
-        properties as unknown as FunctionDeclarationSchema['properties'],
-      ...(typeof schema.description === 'string'
-        ? { description: schema.description }
-        : {}),
-      ...(Array.isArray(schema.required)
-        ? {
-            required: schema.required.filter(
-              (item): item is string => typeof item === 'string',
-            ),
-          }
-        : {}),
-    };
-  }
-
-  private convertJsonSchemaPropertyToGemini(
-    schema?: Record<string, unknown> | null,
-  ): Record<string, unknown> | null {
-    if (!schema || typeof schema !== 'object') {
-      return null;
-    }
-
-    if (Array.isArray(schema.anyOf)) {
-      const anyOf = schema.anyOf as Array<Record<string, unknown>>;
-      const preferred =
-        anyOf.find((item) => item.type === 'object') ??
-        anyOf.find((item) => item.type === 'string') ??
-        anyOf[0];
-      return this.convertJsonSchemaPropertyToGemini(preferred);
-    }
-
-    switch (schema.type) {
-      case 'string':
-        return {
-          type: SchemaType.STRING,
-          ...(typeof schema.description === 'string'
-            ? { description: schema.description }
-            : {}),
-        };
-      case 'number':
-        return {
-          type: SchemaType.NUMBER,
-          ...(typeof schema.description === 'string'
-            ? { description: schema.description }
-            : {}),
-        };
-      case 'integer':
-        return {
-          type: SchemaType.INTEGER,
-          ...(typeof schema.description === 'string'
-            ? { description: schema.description }
-            : {}),
-        };
-      case 'boolean':
-        return {
-          type: SchemaType.BOOLEAN,
-          ...(typeof schema.description === 'string'
-            ? { description: schema.description }
-            : {}),
-        };
-      case 'array': {
-        const itemSchema =
-          schema.items && typeof schema.items === 'object'
-            ? this.convertJsonSchemaPropertyToGemini(
-                schema.items as Record<string, unknown>,
-              )
-            : null;
-
-        return {
-          type: SchemaType.ARRAY,
-          ...(typeof schema.description === 'string'
-            ? { description: schema.description }
-            : {}),
-          ...(itemSchema ? { items: itemSchema } : {}),
-        };
-      }
-      case 'object': {
-        const hasExplicitProperties =
-          schema.properties &&
-          typeof schema.properties === 'object' &&
-          Object.keys(schema.properties).length > 0;
-
-        if (!hasExplicitProperties) {
-          return {
-            type: SchemaType.STRING,
-            description: buildGeminiJsonStringDescription(schema.description),
-          };
-        }
-
-        const parameters = this.convertJsonSchemaToGemini(schema);
-        return parameters ? { ...parameters } : null;
-      }
-      default:
-        return {
-          type: SchemaType.STRING,
-          ...(typeof schema.description === 'string'
-            ? { description: schema.description }
-            : {}),
-        };
-    }
-  }
-
   private async executeAutomaticToolCall(
     toolRegistry: AiToolRegistryEntry[],
     encodedName: string,
     args: Record<string, unknown>,
     user: PersonItem,
   ) {
-    const entry = this.resolveToolRegistryEntry(toolRegistry, encodedName);
+    const entry = resolveToolRegistryEntry(toolRegistry, encodedName);
 
     if (!entry) {
       throw new Error(`ai.toolNotFound:${encodedName}`);
@@ -2928,350 +2113,6 @@ export class AiService {
       args,
       user,
     );
-  }
-
-  private resolveToolRegistryEntry(
-    toolRegistry: AiToolRegistryEntry[],
-    requestedName: string,
-  ): AiToolRegistryEntry | null {
-    const normalizedRequestedName =
-      this.sanitizeToolFunctionName(requestedName);
-    const exactMatch =
-      toolRegistry.find(
-        (item) =>
-          item.encodedName === requestedName ||
-          item.encodedName === normalizedRequestedName,
-      ) ?? null;
-
-    if (exactMatch) {
-      return exactMatch;
-    }
-
-    const aliasMatches = toolRegistry.filter((item) => {
-      const qualifiedAlias = this.sanitizeToolFunctionName(
-        `${item.descriptor.serverName}__${item.descriptor.toolName}`,
-      );
-      const collapsedQualifiedAlias = this.sanitizeToolFunctionName(
-        `${item.descriptor.serverName}_${item.descriptor.toolName}`,
-      );
-      const rawAlias = this.sanitizeToolFunctionName(item.descriptor.toolName);
-
-      return [qualifiedAlias, collapsedQualifiedAlias, rawAlias].includes(
-        normalizedRequestedName,
-      );
-    });
-
-    if (aliasMatches.length === 1) {
-      return aliasMatches[0];
-    }
-
-    const saplingMatch =
-      aliasMatches.find((item) => item.descriptor.serverName === 'sapling') ??
-      null;
-
-    if (saplingMatch) {
-      return saplingMatch;
-    }
-
-    return null;
-  }
-
-  private parseToolArguments(argumentsJson: string): Record<string, unknown> {
-    if (!argumentsJson.trim()) {
-      return {};
-    }
-
-    return this.coerceJsonLikeValues(
-      JSON.parse(argumentsJson) as Record<string, unknown>,
-    );
-  }
-
-  private normalizeFunctionCallArgs(
-    functionCall: FunctionCall,
-  ): Record<string, unknown> {
-    if (!functionCall.args || typeof functionCall.args !== 'object') {
-      return {};
-    }
-
-    const functionArgs = functionCall.args as Record<string, unknown>;
-
-    if (typeof functionArgs.payload === 'string') {
-      const parsedPayload = this.parseJsonLikeValue(functionArgs.payload);
-
-      if (
-        parsedPayload &&
-        typeof parsedPayload === 'object' &&
-        !Array.isArray(parsedPayload)
-      ) {
-        return this.coerceJsonLikeValues(
-          parsedPayload as Record<string, unknown>,
-        );
-      }
-    }
-
-    return this.coerceJsonLikeValues(functionArgs);
-  }
-
-  private coerceJsonLikeValues(
-    args: Record<string, unknown>,
-  ): Record<string, unknown> {
-    return Object.fromEntries(
-      Object.entries(args).map(([key, value]) => [
-        key,
-        this.parseJsonLikeValue(value),
-      ]),
-    );
-  }
-
-  private parseJsonLikeValue(value: unknown): unknown {
-    if (typeof value !== 'string') {
-      return value;
-    }
-
-    const trimmedValue = value.trim();
-
-    if (
-      !(trimmedValue.startsWith('{') && trimmedValue.endsWith('}')) &&
-      !(trimmedValue.startsWith('[') && trimmedValue.endsWith(']'))
-    ) {
-      return value;
-    }
-
-    try {
-      return JSON.parse(trimmedValue) as unknown;
-    } catch {
-      return value;
-    }
-  }
-
-  private buildAssistantSpeechDescriptor(
-    target: AiSpeechTarget | null,
-  ): AiChatMessageSpeechDescriptor {
-    return {
-      providerHandle: target?.provider.handle ?? null,
-      model: target?.model.providerModel ?? null,
-      voice: target?.voice ?? null,
-      speed: target?.speed ?? null,
-    };
-  }
-
-  private shouldReuseAssistantSpeech(
-    payload: AiChatMessageSpeechPayload | null,
-    descriptor: AiChatMessageSpeechDescriptor | null,
-  ): boolean {
-    if (!payload) {
-      return false;
-    }
-
-    if (!descriptor) {
-      return payload.status === 'completed' && payload.documentHandle != null;
-    }
-
-    return (
-      payload.status === 'completed' &&
-      payload.documentHandle != null &&
-      payload.providerHandle === descriptor.providerHandle &&
-      payload.model === descriptor.model &&
-      payload.voice === descriptor.voice &&
-      payload.speed === descriptor.speed
-    );
-  }
-
-  private withMessageSpeechPayload(
-    responsePayload: object | null | undefined,
-    speechPayload: AiChatMessageSpeechPayload,
-  ): Record<string, unknown> {
-    const normalizedResponsePayload = this.normalizeRecord(responsePayload);
-
-    return {
-      ...normalizedResponsePayload,
-      speech: speechPayload,
-    };
-  }
-
-  private extractMessageSpeechPayload(
-    responsePayload: object | null | undefined,
-  ): AiChatMessageSpeechPayload | null {
-    const normalizedResponsePayload = this.normalizeRecord(responsePayload);
-    const speechPayload = this.normalizeRecord(
-      normalizedResponsePayload?.speech,
-    );
-
-    if (!speechPayload) {
-      return null;
-    }
-
-    return {
-      status: speechPayload.status === 'failed' ? 'failed' : 'completed',
-      providerHandle:
-        typeof speechPayload.providerHandle === 'string'
-          ? speechPayload.providerHandle
-          : null,
-      model:
-        typeof speechPayload.model === 'string' ? speechPayload.model : null,
-      voice:
-        typeof speechPayload.voice === 'string' ? speechPayload.voice : null,
-      speed:
-        typeof speechPayload.speed === 'number' ? speechPayload.speed : null,
-      documentHandle:
-        typeof speechPayload.documentHandle === 'number'
-          ? speechPayload.documentHandle
-          : null,
-      mimeType:
-        typeof speechPayload.mimeType === 'string'
-          ? speechPayload.mimeType
-          : null,
-      filename:
-        typeof speechPayload.filename === 'string'
-          ? speechPayload.filename
-          : null,
-      sourceTextLength:
-        typeof speechPayload.sourceTextLength === 'number'
-          ? speechPayload.sourceTextLength
-          : null,
-      wasTruncated: speechPayload.wasTruncated === true,
-      generatedAt:
-        typeof speechPayload.generatedAt === 'string'
-          ? speechPayload.generatedAt
-          : new Date().toISOString(),
-      error:
-        typeof speechPayload.error === 'string' ? speechPayload.error : null,
-    };
-  }
-
-  private normalizeRecord(value: unknown): Record<string, unknown> | null {
-    if (!value || typeof value !== 'object' || Array.isArray(value)) {
-      return null;
-    }
-
-    return value as Record<string, unknown>;
-  }
-
-  private extractPersonReference(
-    person?: PersonItem | number | null,
-  ): PersonItem | number {
-    if (typeof person === 'number') {
-      return person;
-    }
-
-    if (person?.handle != null) {
-      return person.handle;
-    }
-
-    return 0;
-  }
-
-  private sanitizeProvider(provider: AiProviderTypeItem): AiProviderTypeItem {
-    return {
-      handle: provider.handle,
-      title: provider.title,
-      icon: provider.icon,
-      color: provider.color,
-      credentialTypes: provider.credentialTypes,
-      isActive: provider.isActive,
-      createdAt: provider.createdAt,
-      updatedAt: provider.updatedAt,
-      credentials: undefined,
-    } as AiProviderTypeItem;
-  }
-
-  private sanitizeModel(model: AiProviderModelItem): AiProviderModelItem {
-    return {
-      handle: model.handle,
-      title: model.title,
-      description: model.description,
-      provider:
-        model.provider && typeof model.provider !== 'string'
-          ? this.sanitizeProvider(model.provider)
-          : model.provider,
-      providerModel: model.providerModel,
-      supportsStreaming: model.supportsStreaming,
-      supportsTools: model.supportsTools,
-      supportsEmbeddings: model.supportsEmbeddings,
-      supportsTranscription: model.supportsTranscription,
-      embeddingBatchSize: model.embeddingBatchSize,
-      vectorChunkLength: model.vectorChunkLength,
-      vectorChunkOverlap: model.vectorChunkOverlap,
-      vectorSearchCandidateMultiplier: model.vectorSearchCandidateMultiplier,
-      vectorSearchMaxCandidateLimit: model.vectorSearchMaxCandidateLimit,
-      vectorSearchMaxResults: model.vectorSearchMaxResults,
-      supportsSpeech: model.supportsSpeech,
-      speechVoice: model.speechVoice,
-      speechSpeed: model.speechSpeed,
-      speechMimeType: model.speechMimeType,
-      speechFileExtension: model.speechFileExtension,
-      speechMaxInputLength: model.speechMaxInputLength,
-      maxToolCallIterations: model.maxToolCallIterations,
-      isDefault: model.isDefault,
-      isActive: model.isActive,
-      sortOrder: model.sortOrder,
-      createdAt: model.createdAt,
-      updatedAt: model.updatedAt,
-    } as AiProviderModelItem;
-  }
-
-  private sanitizeChatSession(session: AiChatSessionItem): AiChatSessionItem {
-    return {
-      handle: session.handle,
-      title: session.title,
-      isArchived: session.isArchived,
-      provider:
-        session.provider && typeof session.provider !== 'string'
-          ? this.sanitizeProvider(session.provider)
-          : session.provider,
-      model:
-        session.model && typeof session.model !== 'string'
-          ? this.sanitizeModel(session.model)
-          : session.model,
-      lastMessageAt: session.lastMessageAt,
-      person: this.extractPersonReference(session.person),
-      createdAt: session.createdAt,
-      updatedAt: session.updatedAt,
-    } as AiChatSessionItem;
-  }
-
-  private buildTranscriptionResponse(
-    transcription: AiChatTranscriptionItem,
-  ): AiChatTranscriptionResponseDto {
-    return {
-      transcriptionHandle: transcription.handle ?? 0,
-      transcript: transcription.transcript ?? null,
-      detectedLanguage: transcription.detectedLanguage ?? null,
-      durationSeconds: transcription.durationSeconds ?? null,
-      status: transcription.status,
-      providerHandle: this.extractProviderHandle(transcription.provider),
-      modelHandle: this.extractModelHandle(transcription.model),
-      documentHandle:
-        transcription.document && typeof transcription.document === 'object'
-          ? (transcription.document.handle ?? null)
-          : null,
-    };
-  }
-
-  private sanitizeChatMessage(message: AiChatMessageItem): AiChatMessageItem {
-    return {
-      handle: message.handle,
-      session:
-        message.session && typeof message.session !== 'number'
-          ? (message.session.handle ?? 0)
-          : message.session,
-      person: this.extractPersonReference(message.person),
-      role: message.role,
-      status: message.status,
-      sequence: message.sequence,
-      content: message.content,
-      contextPayload: message.contextPayload ?? null,
-      toolCalls: message.toolCalls ?? null,
-      requestPayload: message.requestPayload ?? null,
-      responsePayload: message.responsePayload ?? null,
-      provider: message.provider ?? null,
-      model: message.model ?? null,
-      url: message.url ?? null,
-      routeName: message.routeName ?? null,
-      pageTitle: message.pageTitle ?? null,
-      createdAt: message.createdAt,
-      updatedAt: message.updatedAt,
-    } as unknown as AiChatMessageItem;
   }
 
   private async findOwnedTranscription(
