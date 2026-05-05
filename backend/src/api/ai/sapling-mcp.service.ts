@@ -747,7 +747,7 @@ export class SaplingMcpService {
     );
 
     return {
-      ...(result as Record<string, unknown>),
+      ...result,
       usageHints: [...SAPLING_MCP_USAGE_HINTS.semanticSearch],
     };
   }

@@ -996,13 +996,14 @@ export class AiService {
         throw new BadRequestException('ai.speechInputEmpty');
       }
 
+      const speechInstructions = String(AI_ASSISTANT_SPEECH_INSTRUCTIONS);
       const audioBuffer = await synthesizeOpenAiSpeech({
         provider: speechTarget.provider,
         model: speechTarget.model.providerModel,
         voice: speechTarget.voice,
         input: preparedSpeechText.text,
         responseFormat: speechTarget.fileExtension,
-        instructions: AI_ASSISTANT_SPEECH_INSTRUCTIONS,
+        instructions: speechInstructions,
         speed: speechTarget.speed,
       });
       const document = await this.documentService.uploadDocument(
