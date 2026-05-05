@@ -18,7 +18,13 @@
         </div>
 
         <div class="sapling-file-audio-player-shell">
-          <audio class="sapling-file-audio-player" controls preload="metadata">
+          <audio
+            ref="audioElement"
+            :key="audioUrl"
+            class="sapling-file-audio-player"
+            controls
+            preload="metadata"
+          >
             <source :src="audioUrl" :type="mimeType || 'audio/mpeg'" />
           </audio>
         </div>
@@ -28,13 +34,37 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 const props = defineProps<{
   audioUrl: string
   mimeType?: string
   fileName?: string
 }>()
+
+const audioElement = ref<HTMLAudioElement | null>(null)
+
+function resetAudioPlayback() {
+  const element = audioElement.value
+  if (element == null) return
+
+  element.pause()
+  element.currentTime = 0
+  element.load()
+}
+
+watch(
+  () => props.audioUrl,
+  async (nextUrl, previousUrl) => {
+    if (!nextUrl || nextUrl === previousUrl) return
+    await nextTick()
+    resetAudioPlayback()
+  },
+)
+
+onBeforeUnmount(() => {
+  resetAudioPlayback()
+})
 
 const formatLabel = computed(() => {
   const normalizedFileName = (props.fileName || '').trim().toLowerCase()
