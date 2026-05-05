@@ -1,5 +1,6 @@
 import { OpenAI, toFile } from 'openai';
 import type { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
+import type { AiSpeechResponseFormat } from './ai.types';
 
 const OPENAI_API_KEY_CREDENTIAL = 'openAiApiKey';
 
@@ -60,7 +61,7 @@ export async function synthesizeOpenAiSpeech(options: {
   model: string;
   voice: string;
   input: string;
-  responseFormat: 'mp3' | 'wav' | 'flac' | 'opus' | 'pcm';
+  responseFormat: AiSpeechResponseFormat;
   instructions?: string;
   speed?: number;
 }): Promise<Buffer> {

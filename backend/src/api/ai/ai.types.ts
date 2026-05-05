@@ -32,7 +32,13 @@ export type AiToolRegistryEntry = {
   descriptor: McpToolDescriptor;
 };
 
-export type AiProviderCapability = 'chat' | 'embedding' | 'transcription';
+export type AiProviderCapability =
+  | 'chat'
+  | 'embedding'
+  | 'transcription'
+  | 'speech';
+
+export type AiSpeechResponseFormat = 'mp3' | 'wav' | 'flac' | 'opus' | 'pcm';
 
 export type AiEmbeddingPurpose = 'document' | 'query';
 
@@ -43,12 +49,15 @@ export type AiClientTimeContext = {
   utcOffsetMinutes?: number;
 };
 
-export type AiChatMessageSpeechPayload = {
-  status: 'completed' | 'failed';
+export type AiChatMessageSpeechDescriptor = {
   providerHandle: string | null;
   model: string | null;
   voice: string | null;
   speed: number | null;
+};
+
+export type AiChatMessageSpeechPayload = AiChatMessageSpeechDescriptor & {
+  status: 'completed' | 'failed';
   documentHandle: number | null;
   mimeType: string | null;
   filename: string | null;
@@ -68,6 +77,14 @@ export type AiEmbeddingTarget = {
   provider: AiProviderTypeItem;
   model: AiProviderModelItem;
   providerKind: 'openai' | 'gemini';
+};
+
+export type AiSpeechTarget = AiEmbeddingTarget & {
+  voice: string;
+  speed: number;
+  mimeType: string;
+  fileExtension: AiSpeechResponseFormat;
+  maxInputLength: number;
 };
 
 export type AiVectorDocumentDraft = {

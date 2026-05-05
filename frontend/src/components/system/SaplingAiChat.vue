@@ -77,18 +77,25 @@
               :model-options="modelOptions"
               :transcription-provider-options="transcriptionProviderOptions"
               :transcription-model-options="transcriptionModelOptions"
+              :speech-provider-options="speechProviderOptions"
+              :speech-model-options="speechModelOptions"
               :selected-provider-handle="selectedProviderHandle"
               :selected-model-handle="selectedModelHandle"
               :selected-transcription-provider-handle="selectedTranscriptionProviderHandle"
               :selected-transcription-model-handle="selectedTranscriptionModelHandle"
+              :selected-speech-provider-handle="selectedSpeechProviderHandle"
+              :selected-speech-model-handle="selectedSpeechModelHandle"
               :has-configured-providers="hasConfiguredProviders"
               :has-configured-transcription-providers="hasConfiguredTranscriptionProviders"
+              :has-configured-speech-providers="hasConfiguredSpeechProviders"
               :can-send-message="canSendMessage"
               :is-sending="isSending"
               :is-loading-providers="isLoadingProviders"
               :is-loading-models="isLoadingModels"
               :is-loading-transcription-providers="isLoadingTranscriptionProviders"
               :is-loading-transcription-models="isLoadingTranscriptionModels"
+              :is-loading-speech-providers="isLoadingSpeechProviders"
+              :is-loading-speech-models="isLoadingSpeechModels"
               :messages="messages"
               :draft-message="draftMessage"
               :assistant-name="assistantName"
@@ -106,6 +113,8 @@
               @update:selected-model="updateSelectedModel"
               @update:selected-transcription-provider="updateSelectedTranscriptionProvider"
               @update:selected-transcription-model="updateSelectedTranscriptionModel"
+              @update:selected-speech-provider="updateSelectedSpeechProvider"
+              @update:selected-speech-model="updateSelectedSpeechModel"
               @update:draft-message="updateDraftMessage"
               @close="closePanel"
               @load-older-messages="loadOlderMessages"
@@ -163,6 +172,8 @@ const isLoadingProviders = ref(false)
 const isLoadingModels = ref(false)
 const isLoadingTranscriptionProviders = ref(false)
 const isLoadingTranscriptionModels = ref(false)
+const isLoadingSpeechProviders = ref(false)
+const isLoadingSpeechModels = ref(false)
 const isLoadingSessions = ref(false)
 const isLoadingMessages = ref(false)
 const isSending = ref(false)
@@ -170,6 +181,8 @@ const providerConfigs = ref<AiProviderTypeItem[]>([])
 const modelConfigs = ref<AiProviderModelItem[]>([])
 const transcriptionProviderConfigs = ref<AiProviderTypeItem[]>([])
 const transcriptionModelConfigs = ref<AiProviderModelItem[]>([])
+const speechProviderConfigs = ref<AiProviderTypeItem[]>([])
+const speechModelConfigs = ref<AiProviderModelItem[]>([])
 const sessions = ref<AiChatSessionItem[]>([])
 const messages = ref<AiChatMessageItem[]>([])
 const activeSession = ref<AiChatSessionItem | null>(null)
@@ -177,6 +190,8 @@ const selectedProviderHandle = ref<string | null>(null)
 const selectedModelHandle = ref<string | null>(null)
 const selectedTranscriptionProviderHandle = ref<string | null>(null)
 const selectedTranscriptionModelHandle = ref<string | null>(null)
+const selectedSpeechProviderHandle = ref<string | null>(null)
+const selectedSpeechModelHandle = ref<string | null>(null)
 const draftMessage = ref('')
 const editingSessionHandle = ref<number | null>(null)
 const editingSessionTitle = ref('')
@@ -258,8 +273,19 @@ const transcriptionProviderOptions = computed(() =>
   })),
 )
 
+const speechProviderOptions = computed(() =>
+  speechProviderConfigs.value.map((item) => ({
+    label: item.title,
+    value: item.handle ?? '',
+  })),
+)
+
 const hasConfiguredTranscriptionProviders = computed(
   () => transcriptionProviderOptions.value.length > 0 && transcriptionModelConfigs.value.length > 0,
+)
+
+const hasConfiguredSpeechProviders = computed(
+  () => speechProviderOptions.value.length > 0 && speechModelConfigs.value.length > 0,
 )
 
 const filteredModelConfigs = computed(() =>
@@ -288,6 +314,19 @@ const transcriptionModelOptions = computed(() =>
   })),
 )
 
+const filteredSpeechModelConfigs = computed(() =>
+  speechModelConfigs.value.filter(
+    (item) => getModelProviderHandle(item) === selectedSpeechProviderHandle.value,
+  ),
+)
+
+const speechModelOptions = computed(() =>
+  filteredSpeechModelConfigs.value.map((item) => ({
+    label: `${item.title} (${item.providerModel})`,
+    value: item.handle ?? '',
+  })),
+)
+
 const canSendMessage = computed(
   () =>
     hasConfiguredProviders.value && !!selectedProviderHandle.value && !!selectedModelHandle.value,
@@ -301,7 +340,9 @@ const isVoiceInputAvailable = computed(
     hasConfiguredTranscriptionProviders.value,
 )
 
-const isVoiceOutputAvailable = computed(() => typeof Audio !== 'undefined')
+const isVoiceOutputAvailable = computed(
+  () => typeof Audio !== 'undefined' && hasConfiguredSpeechProviders.value,
+)
 
 const streamingDurationByHandle = computed<Record<number, number>>(() => {
   const entries = messages.value
@@ -458,6 +499,8 @@ async function ensureChatInitialized() {
       loadModels(),
       loadTranscriptionProviders(),
       loadTranscriptionModels(),
+      loadSpeechProviders(),
+      loadSpeechModels(),
     ])
 
     if (currentPersonStore.person?.handle) {
@@ -515,6 +558,28 @@ async function loadTranscriptionModels() {
     syncSelectedTranscriptionTarget()
   } finally {
     isLoadingTranscriptionModels.value = false
+  }
+}
+
+async function loadSpeechProviders() {
+  isLoadingSpeechProviders.value = true
+
+  try {
+    speechProviderConfigs.value = await ApiAiService.listSpeechProviders()
+    syncSelectedSpeechTarget()
+  } finally {
+    isLoadingSpeechProviders.value = false
+  }
+}
+
+async function loadSpeechModels() {
+  isLoadingSpeechModels.value = true
+
+  try {
+    speechModelConfigs.value = await ApiAiService.listSpeechModels()
+    syncSelectedSpeechTarget()
+  } finally {
+    isLoadingSpeechModels.value = false
   }
 }
 
@@ -1094,6 +1159,23 @@ function updateSelectedTranscriptionModel(value: unknown) {
   selectedTranscriptionModelHandle.value = nextModel?.handle ?? null
 }
 
+function updateSelectedSpeechProvider(value: unknown) {
+  const nextProviderHandle = normalizeHandle(value)
+
+  selectedSpeechProviderHandle.value = nextProviderHandle
+  selectedSpeechModelHandle.value =
+    getDefaultSpeechModelForProvider(nextProviderHandle, selectedSpeechModelHandle.value)?.handle ??
+    null
+}
+
+function updateSelectedSpeechModel(value: unknown) {
+  const nextHandle = normalizeHandle(value)
+  const nextModel = speechModelConfigs.value.find((item) => item.handle === nextHandle) ?? null
+
+  selectedSpeechProviderHandle.value = getModelProviderHandle(nextModel)
+  selectedSpeechModelHandle.value = nextModel?.handle ?? null
+}
+
 async function updateSelectedModel(value: unknown) {
   const nextHandle = normalizeHandle(value)
   const nextModel = modelConfigs.value.find((item) => item.handle === nextHandle) ?? null
@@ -1317,6 +1399,41 @@ function syncSelectedTranscriptionTarget() {
   selectedTranscriptionModelHandle.value = defaultModel?.handle ?? null
 }
 
+function syncSelectedSpeechTarget() {
+  const availableProviderHandles = new Set(
+    speechProviderConfigs.value.map((item) => item.handle ?? ''),
+  )
+  const availableModelHandles = new Set(speechModelConfigs.value.map((item) => item.handle ?? ''))
+
+  if (
+    selectedSpeechModelHandle.value &&
+    availableModelHandles.has(selectedSpeechModelHandle.value)
+  ) {
+    const selectedModel =
+      speechModelConfigs.value.find((item) => item.handle === selectedSpeechModelHandle.value) ??
+      null
+    selectedSpeechProviderHandle.value =
+      getModelProviderHandle(selectedModel) ?? selectedSpeechProviderHandle.value
+    return
+  }
+
+  if (
+    selectedSpeechProviderHandle.value &&
+    availableProviderHandles.has(selectedSpeechProviderHandle.value)
+  ) {
+    selectedSpeechModelHandle.value =
+      getDefaultSpeechModelForProvider(
+        selectedSpeechProviderHandle.value,
+        selectedSpeechModelHandle.value,
+      )?.handle ?? null
+    return
+  }
+
+  const defaultModel = getGlobalDefaultSpeechModel()
+  selectedSpeechProviderHandle.value = getModelProviderHandle(defaultModel)
+  selectedSpeechModelHandle.value = defaultModel?.handle ?? null
+}
+
 function getGlobalDefaultModel() {
   return modelConfigs.value.find((item) => item.isDefault) ?? modelConfigs.value[0] ?? null
 }
@@ -1326,6 +1443,12 @@ function getGlobalDefaultTranscriptionModel() {
     transcriptionModelConfigs.value.find((item) => item.isDefault) ??
     transcriptionModelConfigs.value[0] ??
     null
+  )
+}
+
+function getGlobalDefaultSpeechModel() {
+  return (
+    speechModelConfigs.value.find((item) => item.isDefault) ?? speechModelConfigs.value[0] ?? null
   )
 }
 
@@ -1361,6 +1484,29 @@ function getDefaultTranscriptionModelForProvider(
   }
 
   const filteredModels = transcriptionModelConfigs.value.filter(
+    (item) => getModelProviderHandle(item) === providerHandle,
+  )
+
+  if (preferredModelHandle) {
+    const preferredModel =
+      filteredModels.find((item) => item.handle === preferredModelHandle) ?? null
+    if (preferredModel) {
+      return preferredModel
+    }
+  }
+
+  return filteredModels.find((item) => item.isDefault) ?? filteredModels[0] ?? null
+}
+
+function getDefaultSpeechModelForProvider(
+  providerHandle?: string | null,
+  preferredModelHandle?: string | null,
+) {
+  if (!providerHandle) {
+    return null
+  }
+
+  const filteredModels = speechModelConfigs.value.filter(
     (item) => getModelProviderHandle(item) === providerHandle,
   )
 
@@ -1499,6 +1645,7 @@ interface AssistantSpeechMetadata {
   providerHandle: string | null
   model: string | null
   voice: string | null
+  speed: number | null
   documentHandle: number | null
   mimeType: string | null
   filename: string | null
@@ -1532,6 +1679,7 @@ function getMessageSpeechMetadata(
       typeof speechPayload.providerHandle === 'string' ? speechPayload.providerHandle : null,
     model: typeof speechPayload.model === 'string' ? speechPayload.model : null,
     voice: typeof speechPayload.voice === 'string' ? speechPayload.voice : null,
+    speed: typeof speechPayload.speed === 'number' ? speechPayload.speed : null,
     documentHandle:
       typeof speechPayload.documentHandle === 'number' ? speechPayload.documentHandle : null,
     mimeType: typeof speechPayload.mimeType === 'string' ? speechPayload.mimeType : null,
@@ -1542,6 +1690,33 @@ function getMessageSpeechMetadata(
     generatedAt: typeof speechPayload.generatedAt === 'string' ? speechPayload.generatedAt : null,
     error: typeof speechPayload.error === 'string' ? speechPayload.error : null,
   }
+}
+
+function getSelectedSpeechModelConfig() {
+  return (
+    speechModelConfigs.value.find((item) => item.handle === selectedSpeechModelHandle.value) ?? null
+  )
+}
+
+function doesSpeechMetadataMatchSelection(metadata: AssistantSpeechMetadata | null) {
+  const selectedModel = getSelectedSpeechModelConfig()
+  const selectedProviderHandle =
+    getModelProviderHandle(selectedModel) ?? selectedSpeechProviderHandle.value
+
+  if (!metadata || metadata.status !== 'completed' || metadata.documentHandle == null) {
+    return false
+  }
+
+  if (!selectedModel) {
+    return true
+  }
+
+  return (
+    metadata.providerHandle === selectedProviderHandle &&
+    metadata.model === selectedModel.providerModel &&
+    metadata.voice === selectedModel.speechVoice &&
+    metadata.speed === selectedModel.speechSpeed
+  )
 }
 
 async function autoPlayAssistantSpeech(message: AiChatMessageItem) {
@@ -1608,7 +1783,7 @@ async function ensureMessageSpeech(
 
   const existingSpeech = getMessageSpeechMetadata(message)
 
-  if (existingSpeech?.status === 'completed' && existingSpeech.documentHandle != null) {
+  if (doesSpeechMetadataMatchSelection(existingSpeech)) {
     return message
   }
 
@@ -1627,9 +1802,16 @@ async function ensureMessageSpeech(
     [message.handle]: false,
   }
 
-  const request = ApiAiService.ensureMessageSpeech(message.handle, {
-    suppressErrorMessage: !options?.reportErrors,
-  })
+  const request = ApiAiService.ensureMessageSpeech(
+    message.handle,
+    {
+      providerHandle: selectedSpeechProviderHandle.value ?? undefined,
+      modelHandle: selectedSpeechModelHandle.value ?? undefined,
+    },
+    {
+      suppressErrorMessage: !options?.reportErrors,
+    },
+  )
     .then((updatedMessage) => {
       upsertMessage(updatedMessage)
       return updatedMessage

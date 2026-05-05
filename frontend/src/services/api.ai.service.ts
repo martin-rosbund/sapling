@@ -53,6 +53,11 @@ export interface CreateAiChatTranscriptionPayload {
   durationSeconds?: number
 }
 
+export interface CreateAiChatMessageSpeechPayload {
+  providerHandle?: string
+  modelHandle?: string
+}
+
 export interface AiChatTranscriptionResponse {
   transcriptionHandle: number
   transcript: string | null
@@ -153,6 +158,31 @@ class ApiAiService {
       return response.data
     } catch (error: unknown) {
       this.handleError(error, 'ai.transcription.modelListFailed')
+      throw error
+    }
+  }
+
+  static async listSpeechProviders(): Promise<AiProviderTypeItem[]> {
+    try {
+      const response = await axios.get<AiProviderTypeItem[]>(`${BACKEND_URL}ai/speech/providers`)
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'ai.speech.providerListFailed')
+      throw error
+    }
+  }
+
+  static async listSpeechModels(providerHandle?: string): Promise<AiProviderModelItem[]> {
+    try {
+      const response = await axios.get<AiProviderModelItem[]>(`${BACKEND_URL}ai/speech/models`, {
+        params: {
+          providerHandle: providerHandle ?? undefined,
+        },
+      })
+
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'ai.speech.modelListFailed')
       throw error
     }
   }
@@ -282,6 +312,7 @@ class ApiAiService {
 
   static async ensureMessageSpeech(
     handle: number,
+    payload?: CreateAiChatMessageSpeechPayload,
     options?: {
       suppressErrorMessage?: boolean
     },
@@ -289,6 +320,7 @@ class ApiAiService {
     try {
       const response = await axios.post<AiChatMessageItem>(
         `${BACKEND_URL}ai/chat/messages/${handle}/speech`,
+        payload ?? {},
       )
       return response.data
     } catch (error: unknown) {

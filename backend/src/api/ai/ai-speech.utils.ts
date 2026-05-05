@@ -1,21 +1,12 @@
 import type { DocumentItem } from '../../entity/DocumentItem';
 import type { AiChatMessageItem } from '../../entity/AiChatMessageItem';
-import {
-  AI_ASSISTANT_SPEECH_FILE_EXTENSION,
-  AI_ASSISTANT_SPEECH_MAX_INPUT_LENGTH,
-  AI_ASSISTANT_SPEECH_MODEL,
-  AI_ASSISTANT_SPEECH_PROVIDER_HANDLE,
-  AI_ASSISTANT_SPEECH_SPEED,
-  AI_ASSISTANT_SPEECH_VOICE,
-} from '../../constants/project.constants';
 import type {
+  AiChatMessageSpeechDescriptor,
   AiChatMessageSpeechPayload,
   AiPreparedSpeechText,
 } from './ai.types';
 
-export function prepareAssistantSpeechText(
-  content: string,
-): AiPreparedSpeechText {
+export function normalizeAssistantSpeechText(content: string): string {
   const withoutCodeBlocks = content.replace(
     /```[\s\S]*?```/g,
     ' Codebeispiel ausgelassen. ',
@@ -33,6 +24,15 @@ export function prepareAssistantSpeechText(
     .replace(/\s+/g, ' ')
     .trim();
 
+  return normalized;
+}
+
+export function prepareAssistantSpeechText(
+  content: string,
+  maxInputLength: number,
+): AiPreparedSpeechText {
+  const normalized = normalizeAssistantSpeechText(content);
+
   if (!normalized) {
     return {
       text: '',
@@ -41,7 +41,7 @@ export function prepareAssistantSpeechText(
     };
   }
 
-  if (normalized.length <= AI_ASSISTANT_SPEECH_MAX_INPUT_LENGTH) {
+  if (normalized.length <= maxInputLength) {
     return {
       text: normalized,
       sourceTextLength: normalized.length,
@@ -51,7 +51,7 @@ export function prepareAssistantSpeechText(
 
   const truncationSuffix = ' Antwort gekuerzt.';
   const truncatedText = `${normalized
-    .slice(0, AI_ASSISTANT_SPEECH_MAX_INPUT_LENGTH - truncationSuffix.length)
+    .slice(0, maxInputLength - truncationSuffix.length)
     .trimEnd()}${truncationSuffix}`;
 
   return {
@@ -63,8 +63,9 @@ export function prepareAssistantSpeechText(
 
 export function buildAssistantSpeechFilename(
   message: AiChatMessageItem,
+  fileExtension: string,
 ): string {
-  return `songbird-message-${message.handle ?? 'reply'}.${AI_ASSISTANT_SPEECH_FILE_EXTENSION}`;
+  return `songbird-message-${message.handle ?? 'reply'}.${fileExtension}`;
 }
 
 export function buildAssistantSpeechDescription(
@@ -79,14 +80,14 @@ export function buildAssistantSpeechDescription(
 export function buildAssistantSpeechPayload(
   preparedSpeechText: AiPreparedSpeechText,
   document: DocumentItem,
-  providerHandle: string | null,
+  speechDescriptor: AiChatMessageSpeechDescriptor,
 ): AiChatMessageSpeechPayload {
   return {
     status: 'completed',
-    providerHandle,
-    model: AI_ASSISTANT_SPEECH_MODEL,
-    voice: AI_ASSISTANT_SPEECH_VOICE,
-    speed: AI_ASSISTANT_SPEECH_SPEED,
+    providerHandle: speechDescriptor.providerHandle,
+    model: speechDescriptor.model,
+    voice: speechDescriptor.voice,
+    speed: speechDescriptor.speed,
     documentHandle: document.handle,
     mimeType: document.mimetype,
     filename: document.filename,
@@ -100,13 +101,14 @@ export function buildAssistantSpeechPayload(
 export function buildAssistantSpeechFailurePayload(
   preparedSpeechText: AiPreparedSpeechText,
   error: unknown,
+  speechDescriptor: AiChatMessageSpeechDescriptor,
 ): AiChatMessageSpeechPayload {
   return {
     status: 'failed',
-    providerHandle: AI_ASSISTANT_SPEECH_PROVIDER_HANDLE,
-    model: AI_ASSISTANT_SPEECH_MODEL,
-    voice: AI_ASSISTANT_SPEECH_VOICE,
-    speed: AI_ASSISTANT_SPEECH_SPEED,
+    providerHandle: speechDescriptor.providerHandle,
+    model: speechDescriptor.model,
+    voice: speechDescriptor.voice,
+    speed: speechDescriptor.speed,
     documentHandle: null,
     mimeType: null,
     filename: null,

@@ -26,6 +26,7 @@ import { DocumentItem } from '../../entity/DocumentItem';
 import {
   AiChatMessageListResponseDto,
   AiChatMessageListMetaDto,
+  CreateAiChatMessageSpeechDto,
   CreateAiChatMessageDto,
   CreateAiChatSessionDto,
   ListAiChatMessagesQueryDto,
@@ -43,28 +44,16 @@ import {
 } from './dto/transcription.dto';
 import { GenericService } from '../generic/generic.service';
 import {
-  AI_ASSISTANT_SPEECH_FILE_EXTENSION,
-  AI_ASSISTANT_SPEECH_MAX_INPUT_LENGTH,
-  AI_ASSISTANT_SPEECH_MIME_TYPE,
-  AI_ASSISTANT_SPEECH_MODEL,
-  AI_ASSISTANT_SPEECH_PROVIDER_HANDLE,
-  AI_ASSISTANT_SPEECH_SPEED,
-  AI_ASSISTANT_SPEECH_VOICE,
   AI_CHAT_MESSAGE_PAGE_SIZE,
-  AI_EMBEDDING_BATCH_SIZE,
   AI_MAX_CHAT_MESSAGE_PAGE_SIZE,
   AI_STREAM_HISTORY_MESSAGE_LIMIT,
-  AI_VECTOR_CHUNK_LENGTH,
-  AI_VECTOR_CHUNK_OVERLAP,
-  AI_VECTOR_SEARCH_CANDIDATE_MULTIPLIER,
-  AI_VECTOR_SEARCH_MAX_CANDIDATE_LIMIT,
-  AI_VECTOR_SEARCH_MAX_RESULTS,
 } from '../../constants/project.constants';
 import {
   buildAssistantSpeechDescription,
   buildAssistantSpeechFailurePayload,
   buildAssistantSpeechFilename,
   buildAssistantSpeechPayload,
+  normalizeAssistantSpeechText,
   prepareAssistantSpeechText,
 } from './ai-speech.utils';
 import {
@@ -79,11 +68,14 @@ import {
   transcribeOpenAiAudio,
 } from './openai-ai.runtime';
 import {
+  AiChatMessageSpeechDescriptor,
   AiChatMessageSpeechPayload,
   AiChatNavigationLink,
   AiClientTimeContext,
   AiEmbeddingPurpose,
   AiEmbeddingTarget,
+  AiSpeechResponseFormat,
+  AiSpeechTarget,
   AiExecutedToolCall,
   AiProviderCapability,
   AiPreparedSpeechText,
@@ -223,7 +215,10 @@ export class AiService {
       dto.providerHandle,
       dto.modelHandle,
     );
-    const documents = await this.buildVectorDocuments(entityHandle);
+    const documents = await this.buildVectorDocuments(
+      entityHandle,
+      embeddingTarget.model,
+    );
     const connection = this.em.getConnection();
     const existingRows = (await connection.execute(
       `select "handle", "source_record_handle", "source_section", "chunk_index", "title", "content", "content_hash", "metadata", "provider_handle", "model_handle", "embedding_dimensions"
@@ -376,8 +371,9 @@ export class AiService {
       'query',
     );
     const candidateLimit = Math.min(
-      Math.max(limit, 1) * AI_VECTOR_SEARCH_CANDIDATE_MULTIPLIER,
-      AI_VECTOR_SEARCH_MAX_CANDIDATE_LIMIT,
+      Math.max(limit, 1) *
+        this.resolveVectorSearchCandidateMultiplier(embeddingTarget.model),
+      this.resolveVectorSearchMaxCandidateLimit(embeddingTarget.model),
     );
     const vectorLiteral = this.toVectorLiteral(queryEmbedding ?? []);
     const rows = (await this.em.getConnection().execute(
@@ -485,7 +481,13 @@ export class AiService {
         } => result != null,
       )
       .sort((left, right) => Number(right.score ?? 0) - Number(left.score ?? 0))
-      .slice(0, Math.min(Math.max(limit, 1), AI_VECTOR_SEARCH_MAX_RESULTS));
+      .slice(
+        0,
+        Math.min(
+          Math.max(limit, 1),
+          this.resolveVectorSearchMaxResults(embeddingTarget.model),
+        ),
+      );
 
     return {
       entityHandle: normalizedEntityHandle,
@@ -928,6 +930,7 @@ export class AiService {
   async ensureAssistantMessageSpeech(
     handle: number,
     user: PersonItem,
+    dto: CreateAiChatMessageSpeechDto = {},
   ): Promise<AiChatMessageItem> {
     const person = await this.requireManagedUser(user);
     const message = await this.findOwnedMessage(handle, user);
@@ -938,58 +941,78 @@ export class AiService {
       );
     }
 
-    const preparedSpeechText = this.prepareAssistantSpeechText(message.content);
-
-    if (!preparedSpeechText.text) {
-      throw new BadRequestException('ai.speechInputEmpty');
-    }
-
     const existingSpeechPayload = this.extractMessageSpeechPayload(
       message.responsePayload,
     );
     const existingDocumentHandle =
       existingSpeechPayload?.documentHandle ?? null;
+    const requestedSpeechTarget =
+      dto.providerHandle?.trim() || dto.modelHandle?.trim()
+        ? await this.resolveSpeechTarget(
+            dto.providerHandle ?? null,
+            dto.modelHandle ?? null,
+          )
+        : null;
+    const requestedSpeechDescriptor = this.buildAssistantSpeechDescriptor(
+      requestedSpeechTarget,
+    );
 
     if (existingDocumentHandle != null) {
       const existingDocument = await this.em.findOne(DocumentItem, {
         handle: existingDocumentHandle,
       });
 
-      if (existingDocument) {
-        message.responsePayload = this.withMessageSpeechPayload(
-          message.responsePayload,
-          this.buildAssistantSpeechPayload(
-            preparedSpeechText,
-            existingDocument,
-            existingSpeechPayload?.providerHandle ?? null,
-          ),
-        );
-        await this.em.flush();
+      if (
+        existingDocument &&
+        this.shouldReuseAssistantSpeech(
+          existingSpeechPayload,
+          requestedSpeechTarget ? requestedSpeechDescriptor : null,
+        )
+      ) {
         return this.sanitizeChatMessage(message);
       }
     }
 
+    const normalizedSpeechText = this.normalizeAssistantSpeechText(
+      message.content,
+    );
+    let preparedSpeechText: AiPreparedSpeechText = {
+      text: normalizedSpeechText,
+      sourceTextLength: normalizedSpeechText.length,
+      wasTruncated: false,
+    };
+    let speechDescriptor = this.buildAssistantSpeechDescriptor(null);
+
     try {
-      const provider = await this.requireAssistantSpeechProvider();
+      const speechTarget =
+        requestedSpeechTarget ?? (await this.resolveSpeechTarget());
+      speechDescriptor = this.buildAssistantSpeechDescriptor(speechTarget);
+      preparedSpeechText = this.prepareAssistantSpeechText(
+        message.content,
+        speechTarget.maxInputLength,
+      );
+
+      if (!preparedSpeechText.text) {
+        throw new BadRequestException('ai.speechInputEmpty');
+      }
+
       const audioBuffer = await synthesizeOpenAiSpeech({
-        provider,
-        model: AI_ASSISTANT_SPEECH_MODEL,
-        voice: AI_ASSISTANT_SPEECH_VOICE,
+        provider: speechTarget.provider,
+        model: speechTarget.model.providerModel,
+        voice: speechTarget.voice,
         input: preparedSpeechText.text,
-        responseFormat: AI_ASSISTANT_SPEECH_FILE_EXTENSION as
-          | 'mp3'
-          | 'wav'
-          | 'flac'
-          | 'opus'
-          | 'pcm',
+        responseFormat: speechTarget.fileExtension,
         instructions: AI_ASSISTANT_SPEECH_INSTRUCTIONS,
-        speed: AI_ASSISTANT_SPEECH_SPEED,
+        speed: speechTarget.speed,
       });
       const document = await this.documentService.uploadDocument(
         {
           buffer: audioBuffer,
-          originalname: this.buildAssistantSpeechFilename(message),
-          mimetype: AI_ASSISTANT_SPEECH_MIME_TYPE,
+          originalname: this.buildAssistantSpeechFilename(
+            message,
+            speechTarget.fileExtension,
+          ),
+          mimetype: speechTarget.mimeType,
           size: audioBuffer.length,
         } as Express.Multer.File,
         'aiChatMessage',
@@ -1004,7 +1027,7 @@ export class AiService {
         this.buildAssistantSpeechPayload(
           preparedSpeechText,
           document,
-          provider.handle,
+          speechDescriptor,
         ),
       );
       await this.em.flush();
@@ -1012,7 +1035,11 @@ export class AiService {
     } catch (error) {
       message.responsePayload = this.withMessageSpeechPayload(
         message.responsePayload,
-        this.buildAssistantSpeechFailurePayload(preparedSpeechText, error),
+        this.buildAssistantSpeechFailurePayload(
+          preparedSpeechText,
+          error,
+          speechDescriptor,
+        ),
       );
       await this.em.flush();
       throw error;
@@ -1133,6 +1160,40 @@ export class AiService {
     );
   }
 
+  private async resolveSpeechTarget(
+    preferredProviderHandle?: string | null,
+    preferredModelHandle?: string | null,
+  ): Promise<AiSpeechTarget> {
+    const target = await this.resolveAiTarget(
+      preferredProviderHandle,
+      preferredModelHandle,
+      'speech',
+    );
+
+    if (target.providerKind !== 'openai') {
+      throw new Error('ai.speechProviderUnsupported');
+    }
+
+    return {
+      ...target,
+      voice: target.model.speechVoice?.trim() || 'nova',
+      speed:
+        Number.isFinite(target.model.speechSpeed) &&
+        target.model.speechSpeed > 0
+          ? target.model.speechSpeed
+          : 1,
+      mimeType: target.model.speechMimeType?.trim() || 'audio/mpeg',
+      fileExtension: this.resolveSpeechResponseFormat(
+        target.model.speechFileExtension,
+      ),
+      maxInputLength:
+        Number.isFinite(target.model.speechMaxInputLength) &&
+        target.model.speechMaxInputLength > 0
+          ? Math.floor(target.model.speechMaxInputLength)
+          : 4000,
+    };
+  }
+
   private async resolveAiTarget(
     preferredProviderHandle: string | null | undefined,
     preferredModelHandle: string | null | undefined,
@@ -1153,7 +1214,9 @@ export class AiService {
           ? 'ai.embeddingModelNotFound'
           : capability === 'transcription'
             ? 'ai.transcriptionModelNotFound'
-            : 'ai.modelNotFound',
+            : capability === 'speech'
+              ? 'ai.speechModelNotFound'
+              : 'ai.modelNotFound',
       );
     }
 
@@ -1166,7 +1229,9 @@ export class AiService {
           ? 'ai.embeddingProviderNotConfigured'
           : capability === 'transcription'
             ? 'ai.transcriptionProviderNotConfigured'
-            : 'ai.providerNotConfigured',
+            : capability === 'speech'
+              ? 'ai.speechProviderNotConfigured'
+              : 'ai.providerNotConfigured',
       );
     }
 
@@ -1195,9 +1260,26 @@ export class AiService {
         return { supportsEmbeddings: true };
       case 'transcription':
         return { supportsTranscription: true };
+      case 'speech':
+        return { supportsSpeech: true };
       case 'chat':
       default:
         return { supportsStreaming: true };
+    }
+  }
+
+  private resolveSpeechResponseFormat(
+    fileExtension?: string | null,
+  ): AiSpeechResponseFormat {
+    switch (fileExtension?.trim().toLowerCase()) {
+      case 'wav':
+      case 'flac':
+      case 'opus':
+      case 'pcm':
+        return fileExtension.trim().toLowerCase() as AiSpeechResponseFormat;
+      case 'mp3':
+      default:
+        return 'mp3';
     }
   }
 
@@ -1278,18 +1360,21 @@ export class AiService {
 
   private async buildVectorDocuments(
     entityHandle: string,
+    embeddingModel: AiProviderModelItem,
   ): Promise<AiVectorDocumentDraft[]> {
     this.assertVectorizableEntity(entityHandle);
 
     switch (entityHandle) {
       case 'ticket':
-        return this.buildTicketVectorDocuments();
+        return this.buildTicketVectorDocuments(embeddingModel);
       default:
         throw new BadRequestException('ai.vectorizationUnsupportedEntity');
     }
   }
 
-  private async buildTicketVectorDocuments(): Promise<AiVectorDocumentDraft[]> {
+  private async buildTicketVectorDocuments(
+    embeddingModel: AiProviderModelItem,
+  ): Promise<AiVectorDocumentDraft[]> {
     const tickets = await this.em.find(
       TicketItem,
       {},
@@ -1323,6 +1408,7 @@ export class AiService {
           this.buildTicketSectionContent(ticket, 'overview'),
           title,
           metadata,
+          embeddingModel,
         ),
       );
       documents.push(
@@ -1332,6 +1418,7 @@ export class AiService {
           this.buildTicketSectionContent(ticket, 'problem'),
           title,
           metadata,
+          embeddingModel,
         ),
       );
       documents.push(
@@ -1341,6 +1428,7 @@ export class AiService {
           this.buildTicketSectionContent(ticket, 'solution'),
           title,
           metadata,
+          embeddingModel,
         ),
       );
     }
@@ -1354,8 +1442,9 @@ export class AiService {
     content: string,
     title: string | null,
     metadata: Record<string, unknown>,
+    embeddingModel: AiProviderModelItem,
   ): AiVectorDocumentDraft[] {
-    const chunks = this.chunkVectorContent(content);
+    const chunks = this.chunkVectorContent(content, embeddingModel);
 
     return chunks.map((chunk, index) => ({
       sourceRecordHandle,
@@ -1623,14 +1712,83 @@ export class AiService {
     return `${normalized.slice(0, maxLength - 3).trimEnd()}...`;
   }
 
-  private chunkVectorContent(content: string): string[] {
+  private resolveEmbeddingBatchSize(
+    model?: AiProviderModelItem | null,
+  ): number {
+    const value = model?.embeddingBatchSize;
+
+    return Number.isFinite(value) && value != null && value > 0
+      ? Math.max(1, Math.floor(value))
+      : 32;
+  }
+
+  private resolveVectorChunkLength(model?: AiProviderModelItem | null): number {
+    const value = model?.vectorChunkLength;
+
+    return Number.isFinite(value) && value != null && value > 0
+      ? Math.max(200, Math.floor(value))
+      : 1200;
+  }
+
+  private resolveVectorChunkOverlap(
+    model?: AiProviderModelItem | null,
+    chunkLength = this.resolveVectorChunkLength(model),
+  ): number {
+    const value = model?.vectorChunkOverlap;
+    const normalizedValue =
+      Number.isFinite(value) && value != null && value >= 0
+        ? Math.floor(value)
+        : 200;
+
+    return Math.max(0, Math.min(normalizedValue, Math.max(chunkLength - 1, 0)));
+  }
+
+  private resolveVectorSearchCandidateMultiplier(
+    model?: AiProviderModelItem | null,
+  ): number {
+    const value = model?.vectorSearchCandidateMultiplier;
+
+    return Number.isFinite(value) && value != null && value > 0
+      ? Math.max(1, Math.floor(value))
+      : 6;
+  }
+
+  private resolveVectorSearchMaxCandidateLimit(
+    model?: AiProviderModelItem | null,
+  ): number {
+    const value = model?.vectorSearchMaxCandidateLimit;
+
+    return Number.isFinite(value) && value != null && value > 0
+      ? Math.max(1, Math.floor(value))
+      : 60;
+  }
+
+  private resolveVectorSearchMaxResults(
+    model?: AiProviderModelItem | null,
+  ): number {
+    const value = model?.vectorSearchMaxResults;
+
+    return Number.isFinite(value) && value != null && value > 0
+      ? Math.max(1, Math.floor(value))
+      : 10;
+  }
+
+  private chunkVectorContent(
+    content: string,
+    embeddingModel: AiProviderModelItem,
+  ): string[] {
     const normalized = content.replace(/\r\n/g, '\n').trim();
+    const chunkLength = this.resolveVectorChunkLength(embeddingModel);
+    const chunkOverlap = this.resolveVectorChunkOverlap(
+      embeddingModel,
+      chunkLength,
+    );
 
     if (!normalized) {
       return [];
     }
 
-    if (normalized.length <= AI_VECTOR_CHUNK_LENGTH) {
+    if (normalized.length <= chunkLength) {
       return [normalized];
     }
 
@@ -1638,7 +1796,7 @@ export class AiService {
     let start = 0;
 
     while (start < normalized.length) {
-      let end = Math.min(start + AI_VECTOR_CHUNK_LENGTH, normalized.length);
+      let end = Math.min(start + chunkLength, normalized.length);
 
       if (end < normalized.length) {
         const slice = normalized.slice(start, end);
@@ -1647,7 +1805,7 @@ export class AiService {
           slice.lastIndexOf('\n'),
           slice.lastIndexOf('. '),
           slice.lastIndexOf(' '),
-        ].filter((value) => value >= Math.floor(AI_VECTOR_CHUNK_LENGTH * 0.6));
+        ].filter((value) => value >= Math.floor(chunkLength * 0.6));
 
         if (preferredBreakpoints.length > 0) {
           end = start + Math.max(...preferredBreakpoints) + 1;
@@ -1664,7 +1822,7 @@ export class AiService {
         break;
       }
 
-      start = Math.max(end - AI_VECTOR_CHUNK_OVERLAP, start + 1);
+      start = Math.max(end - chunkOverlap, start + 1);
 
       while (start < normalized.length && /\s/.test(normalized[start] ?? '')) {
         start += 1;
@@ -1692,9 +1850,10 @@ export class AiService {
     for (
       let index = 0;
       index < texts.length;
-      index += AI_EMBEDDING_BATCH_SIZE
+      index += this.resolveEmbeddingBatchSize(target.model)
     ) {
-      const batch = texts.slice(index, index + AI_EMBEDDING_BATCH_SIZE);
+      const batchSize = this.resolveEmbeddingBatchSize(target.model);
+      const batch = texts.slice(index, index + batchSize);
       const batchEmbeddings =
         target.providerKind === 'gemini'
           ? await this.embedGeminiTexts(batch, target, purpose)
@@ -3278,25 +3437,22 @@ export class AiService {
     return createGeminiClient(provider);
   }
 
-  private async requireAssistantSpeechProvider(): Promise<AiProviderTypeItem> {
-    const provider = await this.em.findOne(AiProviderTypeItem, {
-      handle: AI_ASSISTANT_SPEECH_PROVIDER_HANDLE,
-      isActive: true,
-    });
-
-    if (!provider || !this.hasUsableProviderCredentials(provider)) {
-      throw new Error('ai.speechProviderNotConfigured');
-    }
-
-    return provider;
+  private normalizeAssistantSpeechText(content: string): string {
+    return normalizeAssistantSpeechText(content);
   }
 
-  private prepareAssistantSpeechText(content: string): AiPreparedSpeechText {
-    return prepareAssistantSpeechText(content);
+  private prepareAssistantSpeechText(
+    content: string,
+    maxInputLength: number,
+  ): AiPreparedSpeechText {
+    return prepareAssistantSpeechText(content, maxInputLength);
   }
 
-  private buildAssistantSpeechFilename(message: AiChatMessageItem): string {
-    return buildAssistantSpeechFilename(message);
+  private buildAssistantSpeechFilename(
+    message: AiChatMessageItem,
+    fileExtension: string,
+  ): string {
+    return buildAssistantSpeechFilename(message, fileExtension);
   }
 
   private buildAssistantSpeechDescription(
@@ -3308,20 +3464,58 @@ export class AiService {
   private buildAssistantSpeechPayload(
     preparedSpeechText: AiPreparedSpeechText,
     document: DocumentItem,
-    providerHandle: string | null,
+    speechDescriptor: AiChatMessageSpeechDescriptor,
   ): AiChatMessageSpeechPayload {
     return buildAssistantSpeechPayload(
       preparedSpeechText,
       document,
-      providerHandle,
+      speechDescriptor,
     );
   }
 
   private buildAssistantSpeechFailurePayload(
     preparedSpeechText: AiPreparedSpeechText,
     error: unknown,
+    speechDescriptor: AiChatMessageSpeechDescriptor,
   ): AiChatMessageSpeechPayload {
-    return buildAssistantSpeechFailurePayload(preparedSpeechText, error);
+    return buildAssistantSpeechFailurePayload(
+      preparedSpeechText,
+      error,
+      speechDescriptor,
+    );
+  }
+
+  private buildAssistantSpeechDescriptor(
+    target: AiSpeechTarget | null,
+  ): AiChatMessageSpeechDescriptor {
+    return {
+      providerHandle: target?.provider.handle ?? null,
+      model: target?.model.providerModel ?? null,
+      voice: target?.voice ?? null,
+      speed: target?.speed ?? null,
+    };
+  }
+
+  private shouldReuseAssistantSpeech(
+    payload: AiChatMessageSpeechPayload | null,
+    descriptor: AiChatMessageSpeechDescriptor | null,
+  ): boolean {
+    if (!payload) {
+      return false;
+    }
+
+    if (!descriptor) {
+      return payload.status === 'completed' && payload.documentHandle != null;
+    }
+
+    return (
+      payload.status === 'completed' &&
+      payload.documentHandle != null &&
+      payload.providerHandle === descriptor.providerHandle &&
+      payload.model === descriptor.model &&
+      payload.voice === descriptor.voice &&
+      payload.speed === descriptor.speed
+    );
   }
 
   private withMessageSpeechPayload(
@@ -3442,6 +3636,18 @@ export class AiService {
       supportsTools: model.supportsTools,
       supportsEmbeddings: model.supportsEmbeddings,
       supportsTranscription: model.supportsTranscription,
+      embeddingBatchSize: model.embeddingBatchSize,
+      vectorChunkLength: model.vectorChunkLength,
+      vectorChunkOverlap: model.vectorChunkOverlap,
+      vectorSearchCandidateMultiplier: model.vectorSearchCandidateMultiplier,
+      vectorSearchMaxCandidateLimit: model.vectorSearchMaxCandidateLimit,
+      vectorSearchMaxResults: model.vectorSearchMaxResults,
+      supportsSpeech: model.supportsSpeech,
+      speechVoice: model.speechVoice,
+      speechSpeed: model.speechSpeed,
+      speechMimeType: model.speechMimeType,
+      speechFileExtension: model.speechFileExtension,
+      speechMaxInputLength: model.speechMaxInputLength,
       maxToolCallIterations: model.maxToolCallIterations,
       isDefault: model.isDefault,
       isActive: model.isActive,

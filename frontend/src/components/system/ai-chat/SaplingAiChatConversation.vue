@@ -147,37 +147,80 @@
       />
 
       <div class="sapling-ai-chat__composer-actions">
-        <div class="sapling-ai-chat__composer-context d-flex ga-2 flex-wrap flex-grow-1">
-          <v-select
-            v-if="transcriptionProviderOptions.length > 0"
-            :model-value="selectedTranscriptionProviderHandle"
-            class="sapling-ai-chat__provider-select flex-1-1"
-            density="compact"
-            :disabled="isSending || isLoadingTranscriptionProviders || isLoadingTranscriptionModels"
-            hide-details
-            item-title="label"
-            item-value="value"
-            :items="transcriptionProviderOptions"
-            :label="t('aiChat.voiceProvider')"
-            variant="outlined"
-            @update:model-value="emit('update:selectedTranscriptionProvider', $event)"
-          />
-          <v-select
-            v-if="transcriptionModelOptions.length > 0"
-            :model-value="selectedTranscriptionModelHandle"
-            class="sapling-ai-chat__model-select flex-1-1"
-            density="compact"
-            :disabled="
-              isSending || isLoadingTranscriptionModels || !selectedTranscriptionProviderHandle
-            "
-            hide-details
-            item-title="label"
-            item-value="value"
-            :items="transcriptionModelOptions"
-            :label="t('aiChat.voiceModel')"
-            variant="outlined"
-            @update:model-value="emit('update:selectedTranscriptionModel', $event)"
-          />
+        <div class="sapling-ai-chat__composer-context flex-grow-1">
+          <div class="sapling-ai-chat__voice-select-stack">
+            <div class="sapling-ai-chat__voice-select-row">
+              <v-select
+                v-if="transcriptionProviderOptions.length > 0"
+                :model-value="selectedTranscriptionProviderHandle"
+                class="sapling-ai-chat__provider-select"
+                density="compact"
+                :disabled="
+                  isSending || isLoadingTranscriptionProviders || isLoadingTranscriptionModels
+                "
+                hide-details
+                item-title="label"
+                item-value="value"
+                :items="transcriptionProviderOptions"
+                :label="t('aiChat.voiceProvider')"
+                variant="outlined"
+                @update:model-value="emit('update:selectedTranscriptionProvider', $event)"
+              />
+              <v-select
+                v-if="transcriptionModelOptions.length > 0"
+                :model-value="selectedTranscriptionModelHandle"
+                class="sapling-ai-chat__model-select"
+                density="compact"
+                :disabled="
+                  isSending || isLoadingTranscriptionModels || !selectedTranscriptionProviderHandle
+                "
+                hide-details
+                item-title="label"
+                item-value="value"
+                :items="transcriptionModelOptions"
+                :label="t('aiChat.voiceModel')"
+                variant="outlined"
+                @update:model-value="emit('update:selectedTranscriptionModel', $event)"
+              />
+            </div>
+            <div
+              v-if="
+                hasConfiguredSpeechProviders ||
+                speechProviderOptions.length > 0 ||
+                speechModelOptions.length > 0
+              "
+              class="sapling-ai-chat__voice-select-row"
+            >
+              <v-select
+                v-if="speechProviderOptions.length > 0"
+                :model-value="selectedSpeechProviderHandle"
+                class="sapling-ai-chat__provider-select"
+                density="compact"
+                :disabled="isSending || isLoadingSpeechProviders || isLoadingSpeechModels"
+                hide-details
+                item-title="label"
+                item-value="value"
+                :items="speechProviderOptions"
+                :label="t('aiChat.voiceOutputProvider')"
+                variant="outlined"
+                @update:model-value="emit('update:selectedSpeechProvider', $event)"
+              />
+              <v-select
+                v-if="speechModelOptions.length > 0"
+                :model-value="selectedSpeechModelHandle"
+                class="sapling-ai-chat__model-select"
+                density="compact"
+                :disabled="isSending || isLoadingSpeechModels || !selectedSpeechProviderHandle"
+                hide-details
+                item-title="label"
+                item-value="value"
+                :items="speechModelOptions"
+                :label="t('aiChat.voiceOutputModel')"
+                variant="outlined"
+                @update:model-value="emit('update:selectedSpeechModel', $event)"
+              />
+            </div>
+          </div>
         </div>
         <div class="d-flex ga-2">
           <v-btn
@@ -232,18 +275,25 @@ const props = withDefaults(
     modelOptions: SelectOption[]
     transcriptionProviderOptions: SelectOption[]
     transcriptionModelOptions: SelectOption[]
+    speechProviderOptions: SelectOption[]
+    speechModelOptions: SelectOption[]
     selectedProviderHandle: string | null
     selectedModelHandle: string | null
     selectedTranscriptionProviderHandle: string | null
     selectedTranscriptionModelHandle: string | null
+    selectedSpeechProviderHandle: string | null
+    selectedSpeechModelHandle: string | null
     hasConfiguredProviders: boolean
     hasConfiguredTranscriptionProviders: boolean
+    hasConfiguredSpeechProviders: boolean
     canSendMessage: boolean
     isSending: boolean
     isLoadingProviders: boolean
     isLoadingModels: boolean
     isLoadingTranscriptionProviders: boolean
     isLoadingTranscriptionModels: boolean
+    isLoadingSpeechProviders: boolean
+    isLoadingSpeechModels: boolean
     messages: AiChatMessageItem[]
     draftMessage: string
     assistantName: string
@@ -268,6 +318,8 @@ const emit = defineEmits<{
   (event: 'update:selectedModel', value: unknown): void
   (event: 'update:selectedTranscriptionProvider', value: unknown): void
   (event: 'update:selectedTranscriptionModel', value: unknown): void
+  (event: 'update:selectedSpeechProvider', value: unknown): void
+  (event: 'update:selectedSpeechModel', value: unknown): void
   (event: 'update:draftMessage', value: string): void
   (event: 'send'): void
   (event: 'close'): void

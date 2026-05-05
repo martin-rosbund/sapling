@@ -1306,6 +1306,30 @@ export interface AiProviderModelItem extends SaplingGenericItem {
   supportsEmbeddings: boolean
   /** Supports speech transcription */
   supportsTranscription: boolean
+  /** Maximum texts per embedding request */
+  embeddingBatchSize: number
+  /** Target chunk length for vectorization */
+  vectorChunkLength: number
+  /** Overlap between vector chunks */
+  vectorChunkOverlap: number
+  /** Overfetch multiplier for vector search candidates */
+  vectorSearchCandidateMultiplier: number
+  /** Upper candidate limit for vector search */
+  vectorSearchMaxCandidateLimit: number
+  /** Maximum vector search results returned */
+  vectorSearchMaxResults: number
+  /** Supports speech synthesis */
+  supportsSpeech: boolean
+  /** Default speech voice identifier */
+  speechVoice: string
+  /** Default speech speed */
+  speechSpeed: number
+  /** Persisted speech MIME type */
+  speechMimeType: string
+  /** Persisted speech file extension */
+  speechFileExtension: string
+  /** Maximum speech input length */
+  speechMaxInputLength: number
   /** Default frontend selection */
   isDefault: boolean
   /** Whether the model is active */
