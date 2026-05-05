@@ -16,6 +16,29 @@ describe('eventRecurrence', () => {
     ).toBe('FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,WE;COUNT=8')
   })
 
+  it('normalizes zero or empty count values to COUNT=1', () => {
+    expect(
+      buildRecurrenceRule({
+        frequency: 'WEEKLY',
+        interval: 1,
+        weekdays: ['MO'],
+        endMode: 'count',
+        count: 0,
+        startDate: '2026-05-04',
+      }),
+    ).toBe('FREQ=WEEKLY;INTERVAL=1;BYDAY=MO;COUNT=1')
+
+    expect(
+      buildRecurrenceRule({
+        frequency: 'MONTHLY',
+        interval: 1,
+        endMode: 'count',
+        count: null,
+        startDate: '2026-05-04',
+      }),
+    ).toBe('FREQ=MONTHLY;INTERVAL=1;COUNT=1')
+  })
+
   it('parses stored RRULE strings', () => {
     expect(parseRecurrenceRule('RRULE:FREQ=MONTHLY;INTERVAL=1;COUNT=6')).toEqual({
       raw: 'FREQ=MONTHLY;INTERVAL=1;COUNT=6',
