@@ -267,13 +267,13 @@
     "name": "Aktive Unternehmen",
     "entity": "company",
     "filter": { "isActive": true },
-    "isRecommended": true
+    "isRecommended": false
   },
   {
     "name": "Unternehmen mit Website",
     "entity": "company",
     "filter": { "website": { "$ne": null } },
-    "isRecommended": true
+    "isRecommended": false
   },
   {
     "name": "Unternehmen mit Telefonnummer",
