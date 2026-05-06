@@ -1,9 +1,14 @@
 import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { PersonItem } from './PersonItem';
 import { EntityItem } from './EntityItem';
-import { Sapling, SaplingForm } from './global/entity.decorator';
+import {
+  Sapling,
+  SaplingDependsOn,
+  SaplingForm,
+} from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { type Rel } from '@mikro-orm/core';
+import { EntityRouteItem } from './EntityRouteItem';
 
 /**
  * @class
@@ -90,6 +95,26 @@ export class FavoriteItem {
   @ManyToOne(() => EntityItem, { nullable: false })
   @Sapling(['isEntity'])
   entity!: Rel<EntityItem>;
+
+  /**
+   * Optional route configuration used when opening the favorite.
+   * @type {EntityRouteItem}
+   */
+  @ApiPropertyOptional({ type: () => EntityRouteItem })
+  @SaplingDependsOn({
+    parentField: 'entity',
+    targetField: 'entity',
+    requireParent: true,
+    clearOnParentChange: true,
+  })
+  @SaplingForm({
+    order: 300,
+    group: 'favorite.groupReference',
+    groupOrder: 300,
+    width: 2,
+  })
+  @ManyToOne(() => EntityRouteItem, { nullable: true })
+  entityRoute?: Rel<EntityRouteItem>;
   // #endregion
 
   // #region Properties: System

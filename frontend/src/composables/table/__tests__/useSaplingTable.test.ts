@@ -55,10 +55,25 @@ function createTestHost(entityHandle: Ref<string>) {
   })
 }
 
+function createQueryEnabledTestHost(entityHandle: Ref<string>) {
+  return defineComponent({
+    setup() {
+      return useSaplingTable(entityHandle, 25, true, true)
+    },
+    template: '<div />',
+  })
+}
+
 const mountedWrappers: Array<ReturnType<typeof mount>> = []
 
 function mountTestHost(entityHandle: Ref<string>) {
   const wrapper = mount(createTestHost(entityHandle))
+  mountedWrappers.push(wrapper)
+  return wrapper
+}
+
+function mountQueryEnabledTestHost(entityHandle: Ref<string>) {
+  const wrapper = mount(createQueryEnabledTestHost(entityHandle))
   mountedWrappers.push(wrapper)
   return wrapper
 }
@@ -212,6 +227,32 @@ describe('useSaplingTable', () => {
         },
       }),
     )
+  })
+
+  it('applies decoded route query filters when query parameters are enabled', async () => {
+    loadGenericMock.mockResolvedValue(undefined)
+    routeState.query = {
+      filter: '{"status":{"handle":"open"},"assigneePerson":{"handle":"{{currentUser.handle}}"}}',
+    }
+    apiFindMock.mockResolvedValue({
+      data: [{ handle: 1, title: 'Open ticket' }],
+      meta: { total: 1 },
+    })
+
+    const wrapper = mountQueryEnabledTestHost(ref('partner'))
+    await flushPromises()
+
+    expect(apiFindMock).toHaveBeenCalledWith(
+      'partner',
+      expect.objectContaining({
+        filter: {
+          status: { handle: 'open' },
+          assigneePerson: { handle: '{{currentUser.handle}}' },
+        },
+      }),
+    )
+    expect(wrapper.vm.items).toEqual([{ handle: 1, title: 'Open ticket' }])
+    expect(wrapper.vm.totalItems).toBe(1)
   })
 })
 

@@ -18,7 +18,7 @@ export function useSaplingChangePassword(options: UseSaplingChangePasswordOption
   //#region State
   const newPassword = ref('')
   const confirmPassword = ref('')
-  const { t, te } = useI18n()
+  const { t } = useI18n()
   const { isLoading: isTranslationLoading } = useTranslationLoader('global', 'login')
   const isSubmitting = ref(false)
   const isLoading = computed(() => isTranslationLoading.value || isSubmitting.value)
@@ -49,13 +49,8 @@ export function useSaplingChangePassword(options: UseSaplingChangePasswordOption
       resetForm()
       pushMessage(
         'success',
-        translateOrFallback(t, te, 'login.passwordChanged', 'Passwort aktualisiert'),
-        translateOrFallback(
-          t,
-          te,
-          'login.passwordChangedDescription',
-          'Das Passwort wurde erfolgreich aktualisiert.',
-        ),
+        t('login.passwordChanged'),
+        t('login.passwordChangedDescription'),
         'login',
       )
       options.onSuccess?.()
@@ -109,13 +104,4 @@ export function useSaplingChangePassword(options: UseSaplingChangePasswordOption
     closeDialog,
   }
   //#endregion
-}
-
-function translateOrFallback(
-  t: ReturnType<typeof useI18n>['t'],
-  te: ReturnType<typeof useI18n>['te'],
-  key: string,
-  fallback: string,
-) {
-  return te(key) ? t(key) : fallback
 }

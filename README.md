@@ -31,7 +31,7 @@ Das Repository ist als JavaScript/TypeScript-Monorepo aufgebaut und kombiniert e
 
 - Generisches Entity-Modell für CRM-, Service- und Betriebsdaten
 - Tabellen-, Datei-, Partner- und Timeline-Ansichten für unterschiedliche Nutzungskontexte
-- KPI-Dashboard mit Trends, Sparklines, Drilldowns und Favoriten
+- KPI-Dashboard mit Trends, Sparklines, Drilldowns und Arbeitslisten
 - Ticket-, Notiz-, Termin- und Dokumentenverwaltung in einer gemeinsamen Oberfläche
 - Lokale Anmeldung sowie Microsoft- und Google-OAuth
 - Rollen- und Berechtigungssystem pro Entität

@@ -30,6 +30,7 @@ import { RoleStageItem } from '../RoleStageItem';
 import { DashboardItem } from '../DashboardItem';
 import { DashboardTemplateItem } from '../DashboardTemplateItem';
 import { FavoriteItem } from '../FavoriteItem';
+import { FavoriteTemplateItem } from '../FavoriteTemplateItem';
 import { KpiAggregationItem } from '../KpiAggregationItem';
 import { KpiTimeframeItem } from '../KpiTimeframeItem';
 import { KpiTypeItem } from '../KpiTypeItem';
@@ -140,6 +141,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'entity', class: EntityItem },
   { name: 'entityRoute', class: EntityRouteItem },
   { name: 'favorite', class: FavoriteItem },
+  { name: 'favoriteTemplate', class: FavoriteTemplateItem },
   { name: 'kpi', class: KpiItem },
   { name: 'scriptButton', class: ScriptButtonItem },
   { name: 'document', class: DocumentItem },

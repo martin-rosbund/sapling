@@ -1,4 +1,14 @@
 [
+  { "entity": "ai", "property": "speechModelNotFound", "de": "Sprachausgabemodell nicht gefunden", "en": "Speech model not found" },
+  { "entity": "ai", "property": "speechProviderUnsupported", "de": "Der konfigurierte Sprachausgabeanbieter wird nicht unterstützt", "en": "The configured speech provider is not supported" },
+  { "entity": "ai", "property": "speech.providerListFailed", "de": "Sprachausgabeanbieter konnten nicht geladen werden", "en": "Unable to load speech providers" },
+  { "entity": "ai", "property": "speech.modelListFailed", "de": "Sprachausgabemodelle konnten nicht geladen werden", "en": "Unable to load speech models" },
+  { "entity": "ai", "property": "speechProviderNotConfigured", "de": "Sprachausgabeanbieter nicht konfiguriert", "en": "Speech provider not configured" },
+  { "entity": "ai", "property": "speechGenerationFailed", "de": "Audio konnte nicht erzeugt werden", "en": "Failed to generate speech audio" },
+  { "entity": "ai", "property": "speechOnlySupportedForAssistantMessages", "de": "Sprachausgabe ist nur fuer Assistant-Nachrichten verfuegbar", "en": "Speech output is only available for assistant messages" },
+  { "entity": "ai", "property": "speechInputEmpty", "de": "Es ist kein Text fuer die Sprachausgabe vorhanden", "en": "There is no text available for speech output" },
+  { "entity": "ai", "property": "speech.createFailed", "de": "Sprachausgabe konnte nicht erstellt werden", "en": "Unable to create speech output" },
+  { "entity": "ai", "property": "speech.playbackFailed", "de": "Sprachausgabe konnte nicht abgespielt werden", "en": "Unable to play speech output" },
   { "entity": "ai", "property": "transcriptionFileRequired", "de": "Audiodatei fehlt", "en": "Audio file is required" },
   { "entity": "ai", "property": "transcriptionProviderNotConfigured", "de": "Transkriptionsanbieter nicht konfiguriert", "en": "Transcription provider not configured" },
   { "entity": "ai", "property": "transcriptionModelNotFound", "de": "Transkriptionsmodell nicht gefunden", "en": "Transcription model not found" },
@@ -12,8 +22,25 @@
   { "entity": "aiChat", "property": "noSpeechDetected", "de": "In der Aufnahme konnte keine Sprache erkannt werden.", "en": "No speech could be transcribed from the recording." },
   { "entity": "aiChat", "property": "voiceProvider", "de": "Sprachanbieter", "en": "Voice provider" },
   { "entity": "aiChat", "property": "voiceModel", "de": "Sprachmodell", "en": "Voice model" },
-  
+  { "entity": "aiChat", "property": "voiceOutputProvider", "de": "Sprachausgabeanbieter", "en": "Speech output provider" },
+  { "entity": "aiChat", "property": "voiceOutputModel", "de": "Sprachausgabemodell", "en": "Speech output model" },
+  { "entity": "aiChat", "property": "playVoiceOutput", "de": "Vorlesen", "en": "Read aloud" },
+  { "entity": "aiChat", "property": "pauseVoiceOutput", "de": "Vorlesen stoppen", "en": "Stop reading aloud" },
+  { "entity": "aiChat", "property": "loadingVoiceOutput", "de": "Sprachausgabe wird erzeugt", "en": "Generating speech output" },
+
   { "entity": "aiProviderModel", "property": "supportsTranscription", "de": "Unterstützt Transkription", "en": "Supports transcription" },
+  { "entity": "aiProviderModel", "property": "supportsSpeech", "de": "Unterstützt Sprachausgabe", "en": "Supports speech output" },
+  { "entity": "aiProviderModel", "property": "speechVoice", "de": "Stimme", "en": "Voice" },
+  { "entity": "aiProviderModel", "property": "speechSpeed", "de": "Sprechgeschwindigkeit", "en": "Speech speed" },
+  { "entity": "aiProviderModel", "property": "speechMimeType", "de": "Speech MIME-Typ", "en": "Speech MIME type" },
+  { "entity": "aiProviderModel", "property": "speechFileExtension", "de": "Speech-Dateiendung", "en": "Speech file extension" },
+  { "entity": "aiProviderModel", "property": "speechMaxInputLength", "de": "Maximale Speech-Eingabelaenge", "en": "Maximum speech input length" },
+  { "entity": "aiProviderModel", "property": "embeddingBatchSize", "de": "Embedding-Batchgroesse", "en": "Embedding batch size" },
+  { "entity": "aiProviderModel", "property": "vectorChunkLength", "de": "Vector-Chunklaenge", "en": "Vector chunk length" },
+  { "entity": "aiProviderModel", "property": "vectorChunkOverlap", "de": "Vector-Chunkueberlappung", "en": "Vector chunk overlap" },
+  { "entity": "aiProviderModel", "property": "vectorSearchCandidateMultiplier", "de": "Vector-Kandidaten-Multiplikator", "en": "Vector search candidate multiplier" },
+  { "entity": "aiProviderModel", "property": "vectorSearchMaxCandidateLimit", "de": "Maximales Vector-Kandidatenlimit", "en": "Maximum vector candidate limit" },
+  { "entity": "aiProviderModel", "property": "vectorSearchMaxResults", "de": "Maximale Vector-Ergebnisse", "en": "Maximum vector results" },
 
   { "entity": "aiChatTranscription", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "aiChatTranscription", "property": "session", "de": "Chat", "en": "Chat" },
@@ -34,10 +61,36 @@
   { "entity": "aiChatTranscription", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "aiChatTranscription", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
-  { "entity": "navigation", "property": "aiChatTranscription", "de": "AI-Transkription", "en": "AI Transcription" },
+  { "entity": "favoriteTemplate", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "favoriteTemplate", "property": "name", "de": "Name", "en": "Name" },
+  { "entity": "favoriteTemplate", "property": "entity", "de": "Seite", "en": "Page" },
+  { "entity": "favoriteTemplate", "property": "filter", "de": "Filter", "en": "Filter" },
+  { "entity": "favoriteTemplate", "property": "isRecommended", "de": "Empfohlen", "en": "Recommended" },
+  { "entity": "favoriteTemplate", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "favoriteTemplate", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+  { "entity": "favoriteTemplate", "property": "groupBasics", "de": "Grundlagen", "en": "Basics" },
+  { "entity": "favoriteTemplate", "property": "groupContent", "de": "Inhalt", "en": "Content" },
+  { "entity": "favoriteTemplate", "property": "entityRoute", "de": "Seitennavigation", "en": "Page navigation" },
+
+  { "entity": "favorite", "property": "loadTemplate", "de": "Vorlage laden", "en": "Load template" },
+  { "entity": "favorite", "property": "templatePickerTitle", "de": "Arbeitslisten-Vorlage wählen", "en": "Choose worklist template" },
+  { "entity": "favorite", "property": "templatePickerText", "de": "Lade eine bestehende Vorlage als persönliche Arbeitsliste.", "en": "Load an existing template as a personal worklist." },
+  { "entity": "favorite", "property": "templateEmptyTitle", "de": "Noch keine Vorlagen verfügbar", "en": "No templates available yet" },
+  { "entity": "favorite", "property": "templateEmptyText", "de": "Lege Arbeitslisten-Vorlagen in der Administration an, um sie hier bereitzustellen.", "en": "Create worklist templates in the administration area to make them available here." },
+  { "entity": "favorite", "property": "templateLoadAction", "de": "Als Arbeitsliste verwenden", "en": "Use as worklist" },
+  { "entity": "favorite", "property": "templateRecommended", "de": "Empfohlen", "en": "Recommended" },
+  { "entity": "favorite", "property": "entityRoute", "de": "Seitennavigation", "en": "Page navigation" },
 
   { "entity": "aiChatTranscription", "property": "groupReference", "de": "Referenz", "en": "Reference" },
   { "entity": "aiChatTranscription", "property": "groupBasics", "de": "Grundlagen", "en": "Basics" },
   { "entity": "aiChatTranscription", "property": "groupIntegration", "de": "Integration", "en": "Integration" },
-  { "entity": "aiChatTranscription", "property": "groupContent", "de": "Inhalt", "en": "Content" }
+  { "entity": "aiChatTranscription", "property": "groupContent", "de": "Inhalt", "en": "Content" },
+
+  { "entity": "entityRoute", "property": "favoriteTemplates", "de": "Arbeitsliste-Vorlagen", "en": "Worklist Templates" },
+  { "entity": "entityRoute", "property": "favorites", "de": "Arbeitslisten", "en": "Worklists" },
+
+  { "entity": "navigation", "property": "aiChatTranscription", "de": "AI-Transkription", "en": "AI Transcription" },
+  { "entity": "navigation", "property": "favoriteTemplate", "de": "Arbeitslisten-Vorlagen", "en": "Worklist Templates" },
+
+  { "entity": "navigationGroup", "property": "teams", "de": "Teams", "en": "Teams" }
 ]

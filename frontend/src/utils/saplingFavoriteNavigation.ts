@@ -1,7 +1,28 @@
-import type { EntityItem, FavoriteItem } from '@/entity/entity'
+import type {
+  EntityItem,
+  EntityRouteItem,
+  FavoriteItem,
+  FavoriteTemplateItem,
+} from '@/entity/entity'
+
+type FavoriteNavigationTarget = {
+  entity: FavoriteItem['entity'] | FavoriteTemplateItem['entity']
+  entityRoute?: FavoriteItem['entityRoute'] | FavoriteTemplateItem['entityRoute']
+  filter?: FavoriteItem['filter'] | FavoriteTemplateItem['filter']
+}
 
 function isEntityItem(value: FavoriteItem['entity']): value is EntityItem {
   return value !== null && typeof value === 'object' && typeof value.handle === 'string'
+}
+
+function isEntityRouteItem(
+  value: FavoriteNavigationTarget['entityRoute'],
+): value is EntityRouteItem {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    (value.handle == null || typeof value.handle === 'number')
+  )
 }
 
 export function getFavoriteEntityHandle(entity: FavoriteItem['entity']): string | null {
@@ -17,27 +38,24 @@ export function getFavoriteEntityHandle(entity: FavoriteItem['entity']): string 
 }
 
 function getConfiguredFavoriteRoute(
-  favorite: FavoriteItem,
+  favorite: FavoriteNavigationTarget,
   entities: EntityItem[] = [],
 ): string | null {
+  const configuredRoute = resolveConfiguredEntityRoute(favorite.entityRoute, entities)
+  if (configuredRoute) {
+    return configuredRoute
+  }
+
   const entityHandle = getFavoriteEntityHandle(favorite.entity)
   if (!entityHandle) {
     return null
   }
 
-  const entityDefinition = isEntityItem(favorite.entity)
-    ? favorite.entity
-    : entities.find((entry) => entry.handle === entityHandle)
-
-  const configuredRoute = entityDefinition?.routes?.find((entry) => {
-    return typeof entry.route === 'string' && entry.route.length > 0
-  })?.route
-
-  return configuredRoute || `table/${entityHandle}`
+  return `table/${entityHandle}`
 }
 
 export function buildFavoritePath(
-  favorite: FavoriteItem,
+  favorite: FavoriteNavigationTarget,
   entities: EntityItem[] = [],
 ): string | null {
   const route = getConfiguredFavoriteRoute(favorite, entities)
@@ -51,8 +69,49 @@ export function buildFavoritePath(
     return normalizedPath
   }
 
-  const serializedFilter =
-    typeof favorite.filter === 'string' ? favorite.filter : JSON.stringify(favorite.filter)
+  const serializedFilter = serializeFavoriteFilter(favorite.filter)
 
   return `${normalizedPath}?filter=${encodeURIComponent(serializedFilter)}`
+}
+
+function serializeFavoriteFilter(filter: FavoriteNavigationTarget['filter']): string {
+  if (typeof filter === 'string') {
+    return filter
+  }
+
+  return JSON.stringify(filter)
+}
+
+function resolveConfiguredEntityRoute(
+  entityRoute: FavoriteNavigationTarget['entityRoute'],
+  entities: EntityItem[],
+) {
+  if (
+    isEntityRouteItem(entityRoute) &&
+    typeof entityRoute.route === 'string' &&
+    entityRoute.route
+  ) {
+    return entityRoute.route
+  }
+
+  if (isEntityRouteItem(entityRoute) && typeof entityRoute.handle === 'number') {
+    return resolveRouteByHandle(entityRoute.handle, entities)
+  }
+
+  if (typeof entityRoute !== 'number') {
+    return null
+  }
+
+  return resolveRouteByHandle(entityRoute, entities)
+}
+
+function resolveRouteByHandle(handle: number, entities: EntityItem[]) {
+  for (const entity of entities) {
+    const matchingRoute = entity.routes?.find((entry) => entry.handle === handle)
+    if (matchingRoute?.route) {
+      return matchingRoute.route
+    }
+  }
+
+  return null
 }

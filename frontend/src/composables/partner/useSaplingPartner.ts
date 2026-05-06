@@ -34,7 +34,7 @@ export function useSaplingPartner(entityHandle: Ref<string>) {
     onItemsPerPageUpdate,
     onColumnFiltersUpdate,
     onSortByUpdate,
-  } = useSaplingTable(entityHandle)
+  } = useSaplingTable(entityHandle, undefined, true)
 
   const tableKey = computed(() => `${entityHandle.value}-table`)
   const filterDrawerKey = computed(() => `${entityHandle.value}-filter`)

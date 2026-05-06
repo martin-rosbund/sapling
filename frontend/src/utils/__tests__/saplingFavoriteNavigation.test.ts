@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { EntityItem, FavoriteItem } from '@/entity/entity'
+import type { EntityItem, EntityRouteItem, FavoriteItem } from '@/entity/entity'
 
 import { buildFavoritePath, getFavoriteEntityHandle } from '../saplingFavoriteNavigation'
 
@@ -20,6 +20,17 @@ function createFavorite(overrides: Partial<FavoriteItem> = {}): FavoriteItem {
     title: 'Company overview',
     person: 1,
     entity: 'company',
+    entityRoute: null,
+    createdAt: null,
+    ...overrides,
+  }
+}
+
+function createEntityRoute(overrides: Partial<EntityRouteItem> = {}): EntityRouteItem {
+  return {
+    handle: 1,
+    route: 'table/company',
+    navigation: null,
     createdAt: null,
     ...overrides,
   }
@@ -34,10 +45,7 @@ describe('saplingFavoriteNavigation', () => {
 
   it('builds a root-relative path from the configured entity route', () => {
     const favorite = createFavorite({
-      entity: createEntity({
-        handle: 'company',
-        routes: [{ route: 'table/company', navigation: null, createdAt: null }],
-      }),
+      entityRoute: createEntityRoute(),
       filter: { status: 'active' },
     })
 
@@ -52,20 +60,72 @@ describe('saplingFavoriteNavigation', () => {
     expect(buildFavoritePath(favorite)).toBe('/table/company')
   })
 
-  it('uses loaded entity definitions when the favorite only stores the entity handle', () => {
+  it('uses loaded entity definitions when only an entityRoute handle is available', () => {
     const favorite = createFavorite({
       entity: 'favorite',
+      entityRoute: 42,
       filter: '{"mine":true}',
     })
     const entities = [
       createEntity({
         handle: 'favorite',
-        routes: [{ route: 'partner/favorite', navigation: null, createdAt: null }],
+        routes: [createEntityRoute({ handle: 42, route: 'table/favorite' })],
       }),
     ]
 
     expect(buildFavoritePath(favorite, entities)).toBe(
-      '/partner/favorite?filter=%7B%22mine%22%3Atrue%7D',
+      '/table/favorite?filter=%7B%22mine%22%3Atrue%7D',
+    )
+  })
+
+  it('falls back to the standard table route when no configured entity route exists', () => {
+    const favorite = createFavorite({
+      entity: createEntity({
+        handle: 'ticket',
+        routes: [],
+      }),
+    })
+
+    expect(buildFavoritePath(favorite)).toBe('/table/ticket')
+  })
+
+  it('prefers the explicit entityRoute over inline entity route metadata', () => {
+    const favorite = createFavorite({
+      entityRoute: createEntityRoute({ route: 'table/event', handle: 18 }),
+      entity: createEntity({
+        handle: 'event',
+        routes: [
+          createEntityRoute({ route: 'event', navigation: 'calendar', handle: 19 }),
+          createEntityRoute({ route: 'partner/event', navigation: null, handle: 20 }),
+        ],
+      }),
+    })
+
+    expect(buildFavoritePath(favorite)).toBe('/table/event')
+  })
+
+  it('passes object filter placeholders through unchanged', () => {
+    const favorite = createFavorite({
+      entityRoute: createEntityRoute({ route: 'table/ticket' }),
+      filter: {
+        status: { handle: 'open' },
+        assigneePerson: { handle: '{{currentUser.handle}}' },
+      },
+    })
+
+    expect(buildFavoritePath(favorite)).toBe(
+      '/table/ticket?filter=%7B%22status%22%3A%7B%22handle%22%3A%22open%22%7D%2C%22assigneePerson%22%3A%7B%22handle%22%3A%22%7B%7BcurrentUser.handle%7D%7D%22%7D%7D',
+    )
+  })
+
+  it('passes JSON string filter placeholders through unchanged', () => {
+    const favorite = createFavorite({
+      entityRoute: createEntityRoute({ route: 'table/ticket' }),
+      filter: '{"status":{"handle":"open"},"assigneePerson":{"handle":"{{currentUser.handle}}"}}',
+    })
+
+    expect(buildFavoritePath(favorite)).toBe(
+      '/table/ticket?filter=%7B%22status%22%3A%7B%22handle%22%3A%22open%22%7D%2C%22assigneePerson%22%3A%7B%22handle%22%3A%22%7B%7BcurrentUser.handle%7D%7D%22%7D%7D',
     )
   })
 })

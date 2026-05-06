@@ -30,6 +30,7 @@ import { EventDeliveryStatusItem } from '../../entity/EventDeliveryStatusItem';
 import { ProductItem } from '../../entity/ProductItem';
 import { NoteItem } from '../../entity/NoteItem';
 import { FavoriteItem } from '../../entity/FavoriteItem';
+import { FavoriteTemplateItem } from '../../entity/FavoriteTemplateItem';
 import { KpiAggregationItem } from '../../entity/KpiAggregationItem';
 import { KpiTimeframeItem } from '../../entity/KpiTimeframeItem';
 import { KpiTypeItem } from '../../entity/KpiTypeItem';
@@ -157,6 +158,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(ProductItem),
       GenericSeeder.for(NoteItem),
       GenericSeeder.for(FavoriteItem),
+      GenericSeeder.for(FavoriteTemplateItem),
       GenericSeeder.for(WebhookAuthenticationTypeItem),
       GenericSeeder.for(WebhookSubscriptionTypeItem),
       GenericSeeder.for(WebhookSubscriptionPayloadType),

@@ -25,8 +25,8 @@
   { "handle": "eventAzure", "icon": "mdi-calendar-export", "canShow": true, "group": "event", "order": 50, "canRead": false},
   { "handle": "eventGoogle", "icon": "mdi-calendar-export", "canShow": true, "group": "event", "order": 60, "canRead": false},
   { "handle": "eventDeliveryStatus", "icon": "mdi-calendar-export", "canShow": true, "group": "event", "order": 70, "canUpdate": true},
-  { "handle": "holidayGroup", "icon": "mdi-calendar-multiple-check", "canShow": true, "group": "event", "order": 12, "canInsert": true, "canUpdate": true, "canDelete": true},
-  { "handle": "holiday", "icon": "mdi-calendar-alert", "canShow": true, "group": "event", "order": 15, "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "holiday", "icon": "mdi-calendar-alert", "canShow": true, "group": "event", "order": 12, "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "holidayGroup", "icon": "mdi-calendar-multiple-check", "canShow": true, "group": "event", "order": 15, "canInsert": true, "canUpdate": true, "canDelete": true},
 
   { "handle": "ticket", "canShow": true, "icon": "mdi-ticket", "group": "ticket", "order": 10, "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "ticketTimeTracking", "canShow": true, "icon": "mdi-timer", "group": "ticket", "order": 20, "canInsert": true, "canUpdate": true, "canDelete": true},
@@ -72,6 +72,7 @@
   { "handle": "dashboard", "icon": "mdi-view-dashboard", "canShow": true, "group": "administration", "order": 60, "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "dashboardTemplate", "icon": "mdi-view-dashboard-edit-outline", "canShow": true, "group": "administration", "order": 70, "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "favorite", "icon": "mdi-star", "canShow": true, "group": "administration", "order": 80, "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "favoriteTemplate", "icon": "mdi-view-list-outline", "canShow": true, "group": "administration", "order": 90, "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
 
   { "handle": "webhookSubscription", "canShow": true, "icon": "mdi-webhook", "group": "webhook", "order": 10, "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "webhookSubscriptionType", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "order": 20, "canUpdate": true},
@@ -112,6 +113,7 @@
 
   { "handle": "aiChatSession", "canShow": true, "icon": "mdi-forum", "group": "chat", "order": 10, "canRead": true, "canInsert": false, "canUpdate": false, "canDelete": true},
   { "handle": "aiChatMessage", "canShow": true, "icon": "mdi-forum", "group": "chat", "order": 20, "canRead": true, "canInsert": false, "canUpdate": false, "canDelete": true},
-  
+  { "handle": "aiChatTranscription", "canShow": true, "icon": "mdi-microphone-message", "group": "chat", "order": 30, "canRead": true, "canInsert": false, "canUpdate": false, "canDelete": true},
+
   { "handle": "mcpServerConfig", "canShow": true, "icon": "mdi-wrench-cog", "group": "mcp", "order": 10, "canRead": true, "canInsert": true, "canUpdate": true, "canDelete": true}
 ]

@@ -2,6 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import { describe, expect, it } from '@jest/globals';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 import { GenericFilterService } from './generic-filter.service';
+import { PersonItem } from '../../entity/PersonItem';
 
 const createTemplateField = (
   overrides: Partial<EntityTemplateDto>,
@@ -25,6 +26,20 @@ const createTemplateField = (
   ...overrides,
 });
 
+function createCurrentUser(overrides: Partial<PersonItem> = {}): PersonItem {
+  return {
+    handle: 7,
+    firstName: 'Ada',
+    lastName: 'Lovelace',
+    company: {
+      handle: 42,
+      name: 'Analytical Engines Ltd.',
+    },
+    createdAt: null,
+    ...overrides,
+  } as PersonItem;
+}
+
 describe('GenericFilterService', () => {
   it('normalizes string operators and date filter values for read criteria', () => {
     const service = new GenericFilterService();
@@ -47,6 +62,25 @@ describe('GenericFilterService', () => {
     expect(result.title).toEqual({ $ilike: '%Ada%' });
     expect(result.createdAt.$gte).toBeInstanceOf(Date);
     expect(result.createdAt.$gte).toEqual(new Date('2026-04-01'));
+  });
+
+  it('resolves supported current-user placeholders before read criteria normalization', () => {
+    const service = new GenericFilterService();
+
+    const result = service.prepareReadCriteria(
+      {
+        assigneePerson: { handle: '{{currentUser.handle}}' },
+        company: { handle: '{{currentUser.company.handle}}' },
+      },
+      [],
+      createCurrentUser(),
+    ) as unknown as {
+      assigneePerson: { handle: number };
+      company: { handle: number };
+    };
+
+    expect(result.assigneePerson.handle).toBe(7);
+    expect(result.company.handle).toBe(42);
   });
 
   it('rejects ilike filters on non-string fields', () => {

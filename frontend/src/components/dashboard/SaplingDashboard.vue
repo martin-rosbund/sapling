@@ -34,6 +34,8 @@
       </template>
     </SaplingPageHero>
 
+    <SaplingDashboardRecommendedFavorites v-if="!isLoading" />
+
     <template v-if="isLoading || !currentPersonStore.loaded">
       <section class="sapling-dashboard__surface">
         <div class="sapling-dashboard__tabs-shell glass-panel">
@@ -116,6 +118,7 @@
 import { useSaplingDashboard } from '@/composables/dashboard/useSaplingDashboard'
 import SaplingDashboardEmptyState from '@/components/dashboard/SaplingDashboardEmptyState.vue'
 import SaplingDashboardHeroActions from '@/components/dashboard/SaplingDashboardHeroActions.vue'
+import SaplingDashboardRecommendedFavorites from '@/components/dashboard/SaplingDashboardRecommendedFavorites.vue'
 import SaplingDashboardTemplateLoadDialog from '@/components/dashboard/SaplingDashboardTemplateLoadDialog.vue'
 import SaplingDashboardTabs from '@/components/dashboard/SaplingDashboardTabs.vue'
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'

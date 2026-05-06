@@ -1,8 +1,15 @@
-import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
+import { Collection, type Rel } from '@mikro-orm/core';
+import {
+  Entity,
+  ManyToOne,
+  OneToMany,
+  Property,
+} from '@mikro-orm/decorators/legacy';
 import { EntityItem } from './EntityItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling, SaplingForm } from './global/entity.decorator';
-import { type Rel } from '@mikro-orm/core';
+import { FavoriteItem } from './FavoriteItem';
+import { FavoriteTemplateItem } from './FavoriteTemplateItem';
 
 /**
  * @class
@@ -73,6 +80,18 @@ export class EntityRouteItem {
   })
   @ManyToOne(() => EntityItem, { nullable: true })
   entity!: Rel<EntityItem>;
+
+  @ApiPropertyOptional({ type: () => FavoriteItem, isArray: true })
+  @OneToMany(() => FavoriteItem, (favorite) => favorite.entityRoute)
+  favorites: Collection<FavoriteItem> = new Collection<FavoriteItem>(this);
+
+  @ApiPropertyOptional({ type: () => FavoriteTemplateItem, isArray: true })
+  @OneToMany(
+    () => FavoriteTemplateItem,
+    (favoriteTemplate) => favoriteTemplate.entityRoute,
+  )
+  favoriteTemplates: Collection<FavoriteTemplateItem> =
+    new Collection<FavoriteTemplateItem>(this);
   // #endregion
 
   // #region Properties: System
