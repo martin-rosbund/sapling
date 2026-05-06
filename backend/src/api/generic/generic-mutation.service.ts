@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { EntityManager, RequiredEntityData } from '@mikro-orm/core';
 import { EntityItem } from '../../entity/EntityItem';
+import { EntityRouteItem } from '../../entity/EntityRouteItem';
 import { PersonItem } from '../../entity/PersonItem';
 import type { ScriptServerContext } from '../../script/core/script.interface';
 import { ScriptResultServerMethods } from '../../script/core/script.result.server';
@@ -84,7 +85,7 @@ export class GenericMutationService {
   ): Promise<object> {
     return this.runPersistence(entityHandle, async () => {
       const normalizedData = this.genericFilterService.normalizeDatePayload(
-        data,
+        await this.applyDefaultFavoriteRoute(entityHandle, data),
         template,
       );
       const created = this.em.create(
@@ -104,7 +105,7 @@ export class GenericMutationService {
   ): Promise<object> {
     return this.runPersistence(entityHandle, async () => {
       const normalizedData = this.genericFilterService.normalizeDatePayload(
-        data,
+        await this.applyDefaultFavoriteRoute(entityHandle, data),
         template,
       );
       const updated = this.em.assign(item, normalizedData as never);
@@ -141,5 +142,53 @@ export class GenericMutationService {
 
       throw error;
     }
+  }
+
+  private async applyDefaultFavoriteRoute<T extends Record<string, any>>(
+    entityHandle: string,
+    data: T,
+  ): Promise<T> {
+    if (
+      (entityHandle !== 'favorite' && entityHandle !== 'favoriteTemplate') ||
+      data.entityRoute != null
+    ) {
+      return data;
+    }
+
+    const relatedEntityHandle = this.extractFavoriteEntityHandle(data.entity);
+
+    if (!relatedEntityHandle) {
+      return data;
+    }
+
+    const entityRoute = await this.em.findOne(EntityRouteItem, {
+      entity: { handle: relatedEntityHandle },
+      route: `table/${relatedEntityHandle}`,
+    });
+
+    if (!entityRoute?.handle) {
+      return data;
+    }
+
+    return {
+      ...data,
+      entityRoute: entityRoute.handle,
+    };
+  }
+
+  private extractFavoriteEntityHandle(entity: unknown): string | null {
+    if (typeof entity === 'string' && entity.trim().length > 0) {
+      return entity.trim();
+    }
+
+    if (
+      entity &&
+      typeof entity === 'object' &&
+      typeof (entity as { handle?: unknown }).handle === 'string'
+    ) {
+      return (entity as { handle: string }).handle.trim();
+    }
+
+    return null;
   }
 }

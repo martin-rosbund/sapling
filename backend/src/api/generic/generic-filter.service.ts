@@ -1,15 +1,27 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
+import { PersonItem } from '../../entity/PersonItem';
 
 @Injectable()
 export class GenericFilterService {
-  prepareReadCriteria<T>(obj: T, template: EntityTemplateDto[] = []): T {
+  prepareReadCriteria<T>(
+    obj: T,
+    template: EntityTemplateDto[] = [],
+    currentUser?: PersonItem | null,
+  ): T {
+    const resolvedCriteria = this.resolveDynamicFilterPlaceholders(
+      obj,
+      currentUser,
+    );
     const stringFields = template
       .filter((field) => field.type === 'string')
       .map((field) => field.name)
       .filter((name): name is string => typeof name === 'string');
 
-    const filteredCriteria = this.filterNonStringLike(obj, stringFields);
+    const filteredCriteria = this.filterNonStringLike(
+      resolvedCriteria,
+      stringFields,
+    );
     return this.convertDateStrings(filteredCriteria, template);
   }
 
@@ -93,6 +105,119 @@ export class GenericFilterService {
     }
 
     return obj;
+  }
+
+  private resolveDynamicFilterPlaceholders<T>(
+    value: T,
+    currentUser?: PersonItem | null,
+  ): T {
+    if (Array.isArray(value)) {
+      return (value as unknown[]).map((entry: unknown) => {
+        return this.resolveDynamicFilterPlaceholders(entry, currentUser);
+      }) as T;
+    }
+
+    if (typeof value === 'string') {
+      return this.resolveDynamicFilterToken(value, currentUser) as T;
+    }
+
+    if (!this.isPlainRecord(value)) {
+      return value;
+    }
+
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [
+        key,
+        this.resolveDynamicFilterPlaceholders(entry, currentUser),
+      ]),
+    ) as T;
+  }
+
+  private resolveDynamicFilterToken(
+    value: string,
+    currentUser?: PersonItem | null,
+  ): unknown {
+    const tokenMatch = value.match(/^\{\{\s*([^}]+?)\s*\}\}$/);
+    if (!tokenMatch) {
+      return value;
+    }
+
+    const tokenPath = tokenMatch[1]?.trim();
+    if (!tokenPath) {
+      return value;
+    }
+
+    const resolvedValue = this.resolveSupportedFilterToken(
+      tokenPath,
+      currentUser,
+    );
+    return typeof resolvedValue === 'undefined' ? value : resolvedValue;
+  }
+
+  private resolveSupportedFilterToken(
+    tokenPath: string,
+    currentUser?: PersonItem | null,
+  ): unknown {
+    switch (tokenPath) {
+      case 'currentUser.handle':
+        return currentUser?.handle;
+      case 'currentUser.company.handle':
+        return this.resolveCurrentUserCompanyHandle(currentUser);
+      case 'today.start':
+        return GenericFilterService.toIsoAtStartOfDay(new Date());
+      case 'tomorrow.start':
+        return GenericFilterService.toIsoAtStartOfDay(
+          GenericFilterService.addDays(new Date(), 1),
+        );
+      case 'dayAfterTomorrow.start':
+        return GenericFilterService.toIsoAtStartOfDay(
+          GenericFilterService.addDays(new Date(), 2),
+        );
+      case 'week.start':
+        return GenericFilterService.toIsoAtStartOfDay(
+          GenericFilterService.startOfWeek(new Date()),
+        );
+      case 'week.end':
+        return GenericFilterService.toIsoAtStartOfDay(
+          GenericFilterService.addDays(
+            GenericFilterService.startOfWeek(new Date()),
+            7,
+          ),
+        );
+      case 'month.start':
+        return GenericFilterService.toIsoAtStartOfDay(
+          GenericFilterService.startOfMonth(new Date()),
+        );
+      case 'month.end':
+        return GenericFilterService.toIsoAtStartOfDay(
+          GenericFilterService.startOfNextMonth(new Date()),
+        );
+      case 'now':
+        return new Date().toISOString();
+      default:
+        return undefined;
+    }
+  }
+
+  private resolveCurrentUserCompanyHandle(
+    currentUser?: PersonItem | null,
+  ): number | string | undefined {
+    const company = currentUser?.company;
+
+    if (typeof company === 'number' || typeof company === 'string') {
+      return company;
+    }
+
+    if (
+      company &&
+      typeof company === 'object' &&
+      'handle' in company &&
+      (typeof company.handle === 'number' || typeof company.handle === 'string')
+    ) {
+      return company.handle;
+    }
+
+    return undefined;
   }
 
   private normalizeLikeOperators(obj: unknown): void {
@@ -232,5 +357,33 @@ export class GenericFilterService {
     }
 
     return undefined;
+  }
+
+  private static addDays(date: Date, days: number): Date {
+    const nextDate = new Date(date);
+    nextDate.setDate(nextDate.getDate() + days);
+    return nextDate;
+  }
+
+  private static startOfWeek(date: Date): Date {
+    const nextDate = new Date(date);
+    const dayOfWeek = nextDate.getDay();
+    const normalizedOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    nextDate.setDate(nextDate.getDate() + normalizedOffset);
+    return nextDate;
+  }
+
+  private static startOfMonth(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), 1);
+  }
+
+  private static startOfNextMonth(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth() + 1, 1);
+  }
+
+  private static toIsoAtStartOfDay(date: Date): string {
+    const nextDate = new Date(date);
+    nextDate.setHours(0, 0, 0, 0);
+    return nextDate.toISOString();
   }
 }

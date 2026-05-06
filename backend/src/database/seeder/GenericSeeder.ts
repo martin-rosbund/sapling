@@ -2,6 +2,7 @@
 import { EntityManager } from '@mikro-orm/core';
 import type { EntityName } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
+import { EntityRouteItem } from '../../entity/EntityRouteItem';
 import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
 import { SeedScriptItem } from '../../entity/SeedScriptItem';
 import { DB_DATA_SEEDER } from '../../constants/project.constants';
@@ -87,7 +88,10 @@ export class GenericSeeder extends Seeder {
       );
       try {
         for (const item of data) {
-          em.create(entityClass, item);
+          em.create(
+            entityClass,
+            await this.prepareSeedItem(entityHandle, item, em),
+          );
         }
         await em.flush();
         const statusItem = new SeedScriptItem();
@@ -111,6 +115,48 @@ export class GenericSeeder extends Seeder {
         );
       }
     }
+  }
+
+  private async prepareSeedItem(
+    entityHandle: string,
+    item: object,
+    em: EntityManager,
+  ): Promise<object> {
+    if (entityHandle !== 'favorite' && entityHandle !== 'favoriteTemplate') {
+      return item;
+    }
+
+    const seedItem = item as {
+      entity?: string | { handle?: string };
+      entityRoute?: number | null;
+    };
+
+    if (seedItem.entityRoute != null) {
+      return item;
+    }
+
+    const relatedEntityHandle =
+      typeof seedItem.entity === 'string'
+        ? seedItem.entity
+        : seedItem.entity?.handle;
+
+    if (!relatedEntityHandle) {
+      return item;
+    }
+
+    const entityRoute = await em.findOne(EntityRouteItem, {
+      entity: { handle: relatedEntityHandle },
+      route: `table/${relatedEntityHandle}`,
+    });
+
+    if (!entityRoute?.handle) {
+      return item;
+    }
+
+    return {
+      ...seedItem,
+      entityRoute: entityRoute.handle,
+    };
   }
 
   /**

@@ -7123,6 +7123,22 @@
           "enumItems": [],
           "mappedType": "string"
         },
+        "entity_route_handle": {
+          "name": "entity_route_handle",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
         "filter": {
           "name": "filter",
           "type": "jsonb",
@@ -7229,6 +7245,18 @@
           ],
           "referencedTableName": "public.entity_item"
         },
+        "favorite_item_entity_route_handle_foreign": {
+          "columnNames": [
+            "entity_route_handle"
+          ],
+          "constraintName": "favorite_item_entity_route_handle_foreign",
+          "localTableName": "public.favorite_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "public.entity_route_item",
+          "deleteRule": "set null"
+        },
         "favorite_item_person_handle_foreign": {
           "columnNames": [
             "person_handle"
@@ -7278,6 +7306,22 @@
           "comment": null,
           "enumItems": [],
           "mappedType": "string"
+        },
+        "entity_route_handle": {
+          "name": "entity_route_handle",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
         },
         "filter": {
           "name": "filter",
@@ -7384,6 +7428,18 @@
             "handle"
           ],
           "referencedTableName": "public.entity_item"
+        },
+        "favorite_template_item_entity_route_handle_foreign": {
+          "columnNames": [
+            "entity_route_handle"
+          ],
+          "constraintName": "favorite_template_item_entity_route_handle_foreign",
+          "localTableName": "public.favorite_template_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "public.entity_route_item",
+          "deleteRule": "set null"
         }
       },
       "comment": null

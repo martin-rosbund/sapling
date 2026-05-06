@@ -3,7 +3,7 @@
     "name": "Meine offenen Tickets",
     "entity": "ticket",
     "filter": {
-      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "assigneePerson": { "handle": "{{currentUser.handle}}" },
       "status": { "handle": "open" }
     },
     "isRecommended": true
@@ -12,7 +12,7 @@
     "name": "Meine Tickets in Bearbeitung",
     "entity": "ticket",
     "filter": {
-      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "assigneePerson": { "handle": "{{currentUser.handle}}" },
       "status": { "handle": { "$in": ["in_progress", "in_development"] } }
     },
     "isRecommended": true
@@ -21,7 +21,7 @@
     "name": "Meine wartenden Tickets",
     "entity": "ticket",
     "filter": {
-      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "assigneePerson": { "handle": "{{currentUser.handle}}" },
       "status": { "handle": "waiting" }
     },
     "isRecommended": true
@@ -30,7 +30,7 @@
     "name": "Meine Tickets mit hoher Prioritaet",
     "entity": "ticket",
     "filter": {
-      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "assigneePerson": { "handle": "{{currentUser.handle}}" },
       "priority": { "handle": "high" },
       "status": { "handle": { "$nin": ["closed"] } }
     },
@@ -40,7 +40,7 @@
     "name": "Meine ueberfaelligen Tickets",
     "entity": "ticket",
     "filter": {
-      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "assigneePerson": { "handle": "{{currentUser.handle}}" },
       "deadlineDate": { "$lt": "{{today.start}}" },
       "status": { "handle": { "$nin": ["closed"] } }
     },
@@ -50,7 +50,7 @@
     "name": "Meine heute faelligen Tickets",
     "entity": "ticket",
     "filter": {
-      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "assigneePerson": { "handle": "{{currentUser.handle}}" },
       "deadlineDate": {
         "$gte": "{{today.start}}",
         "$lt": "{{tomorrow.start}}"
@@ -63,7 +63,7 @@
     "name": "Eigene erstellte offene Tickets",
     "entity": "ticket",
     "filter": {
-      "creatorPerson": { "handle": "{{currentPerson.handle}}" },
+      "creatorPerson": { "handle": "{{currentUser.handle}}" },
       "status": { "handle": { "$nin": ["closed"] } }
     },
     "isRecommended": false
@@ -126,7 +126,7 @@
     "name": "Meine offenen Verkaufschancen",
     "entity": "salesOpportunity",
     "filter": {
-      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "assigneePerson": { "handle": "{{currentUser.handle}}" },
       "isActive": true
     },
     "isRecommended": true
@@ -135,7 +135,7 @@
     "name": "Meine neuen Verkaufschancen",
     "entity": "salesOpportunity",
     "filter": {
-      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "assigneePerson": { "handle": "{{currentUser.handle}}" },
       "isActive": true,
       "type": { "handle": "new" }
     },
@@ -145,7 +145,7 @@
     "name": "Meine qualifizierten Verkaufschancen",
     "entity": "salesOpportunity",
     "filter": {
-      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "assigneePerson": { "handle": "{{currentUser.handle}}" },
       "isActive": true,
       "type": { "handle": "qualified" }
     },
@@ -155,7 +155,7 @@
     "name": "Meine Angebote",
     "entity": "salesOpportunity",
     "filter": {
-      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "assigneePerson": { "handle": "{{currentUser.handle}}" },
       "isActive": true,
       "type": { "handle": "proposal" }
     },
@@ -165,7 +165,7 @@
     "name": "Meine Verhandlungen",
     "entity": "salesOpportunity",
     "filter": {
-      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "assigneePerson": { "handle": "{{currentUser.handle}}" },
       "isActive": true,
       "type": { "handle": "negotiation" }
     },
@@ -175,7 +175,7 @@
     "name": "Verkaufschancen meines Unternehmens",
     "entity": "salesOpportunity",
     "filter": {
-      "assigneeCompany": { "handle": "{{currentCompany.handle}}" },
+      "assigneeCompany": { "handle": "{{currentUser.company.handle}}" },
       "isActive": true
     },
     "isRecommended": false
@@ -184,7 +184,7 @@
     "name": "Meine heutigen Termine",
     "entity": "event",
     "filter": {
-      "participants": { "handle": "{{currentPerson.handle}}" },
+      "participants": { "handle": "{{currentUser.handle}}" },
       "startDate": {
         "$gte": "{{today.start}}",
         "$lt": "{{tomorrow.start}}"
@@ -197,7 +197,7 @@
     "name": "Meine bestaetigten Termine heute",
     "entity": "event",
     "filter": {
-      "participants": { "handle": "{{currentPerson.handle}}" },
+      "participants": { "handle": "{{currentUser.handle}}" },
       "startDate": {
         "$gte": "{{today.start}}",
         "$lt": "{{tomorrow.start}}"
@@ -210,7 +210,7 @@
     "name": "Meine morgigen Termine",
     "entity": "event",
     "filter": {
-      "participants": { "handle": "{{currentPerson.handle}}" },
+      "participants": { "handle": "{{currentUser.handle}}" },
       "startDate": {
         "$gte": "{{tomorrow.start}}",
         "$lt": "{{dayAfterTomorrow.start}}"
@@ -223,7 +223,7 @@
     "name": "Meine Termine diese Woche",
     "entity": "event",
     "filter": {
-      "participants": { "handle": "{{currentPerson.handle}}" },
+      "participants": { "handle": "{{currentUser.handle}}" },
       "startDate": {
         "$gte": "{{week.start}}",
         "$lt": "{{week.end}}"
@@ -236,7 +236,7 @@
     "name": "Meine geplanten Termine",
     "entity": "event",
     "filter": {
-      "participants": { "handle": "{{currentPerson.handle}}" },
+      "participants": { "handle": "{{currentUser.handle}}" },
       "status": { "handle": "scheduled" }
     },
     "isRecommended": false
@@ -245,7 +245,7 @@
     "name": "Meine Termine diesen Monat",
     "entity": "event",
     "filter": {
-      "participants": { "handle": "{{currentPerson.handle}}" },
+      "participants": { "handle": "{{currentUser.handle}}" },
       "startDate": {
         "$gte": "{{month.start}}",
         "$lt": "{{month.end}}"
@@ -258,7 +258,7 @@
     "name": "Meine erstellten Termine",
     "entity": "event",
     "filter": {
-      "creatorPerson": { "handle": "{{currentPerson.handle}}" },
+      "creatorPerson": { "handle": "{{currentUser.handle}}" },
       "status": { "handle": { "$nin": ["canceled"] } }
     },
     "isRecommended": false
@@ -306,7 +306,7 @@
     "name": "Kontakte meines Unternehmens",
     "entity": "person",
     "filter": {
-      "company": { "handle": "{{currentCompany.handle}}" },
+      "company": { "handle": "{{currentUser.company.handle}}" },
       "isActive": true
     },
     "isRecommended": false
@@ -321,7 +321,7 @@
     "name": "Aktive Vertraege meines Unternehmens",
     "entity": "contract",
     "filter": {
-      "company": { "handle": "{{currentCompany.handle}}" },
+      "company": { "handle": "{{currentUser.company.handle}}" },
       "isActive": true
     },
     "isRecommended": false
@@ -330,7 +330,7 @@
     "name": "Vertraege mit naechstem Service diese Woche",
     "entity": "contract",
     "filter": {
-      "company": { "handle": "{{currentCompany.handle}}" },
+      "company": { "handle": "{{currentUser.company.handle}}" },
       "nextServiceDate": {
         "$gte": "{{week.start}}",
         "$lt": "{{week.end}}"
@@ -342,7 +342,7 @@
     "name": "Vertraege meines Unternehmens mit Updateservice",
     "entity": "contract",
     "filter": {
-      "company": { "handle": "{{currentCompany.handle}}" },
+      "company": { "handle": "{{currentUser.company.handle}}" },
       "hasUpdateservice": true
     },
     "isRecommended": false
@@ -351,7 +351,7 @@
     "name": "Vertraege meines Unternehmens mit Enddatum diesen Monat",
     "entity": "contract",
     "filter": {
-      "company": { "handle": "{{currentCompany.handle}}" },
+      "company": { "handle": "{{currentUser.company.handle}}" },
       "endDate": {
         "$gte": "{{month.start}}",
         "$lt": "{{month.end}}"
@@ -363,7 +363,7 @@
     "name": "Systeme meines Unternehmens mit Remote Access",
     "entity": "serverLandscape",
     "filter": {
-      "company": { "handle": "{{currentCompany.handle}}" },
+      "company": { "handle": "{{currentUser.company.handle}}" },
       "allowRemoteAccess": true
     },
     "isRecommended": false
@@ -372,7 +372,7 @@
     "name": "Systeme meines Unternehmens ohne Internetzugang",
     "entity": "serverLandscape",
     "filter": {
-      "company": { "handle": "{{currentCompany.handle}}" },
+      "company": { "handle": "{{currentUser.company.handle}}" },
       "hasInternetAccess": false
     },
     "isRecommended": false
@@ -381,7 +381,7 @@
     "name": "Systeme meines Unternehmens mit Internetzugang",
     "entity": "serverLandscape",
     "filter": {
-      "company": { "handle": "{{currentCompany.handle}}" },
+      "company": { "handle": "{{currentUser.company.handle}}" },
       "hasInternetAccess": true
     },
     "isRecommended": false

@@ -27,12 +27,6 @@ vi.mock('@/stores/genericStore', () => ({
   }),
 }))
 
-vi.mock('@/stores/currentPersonStore', () => ({
-  useCurrentPersonStore: () => ({
-    person: null,
-  }),
-}))
-
 import { useSaplingTable } from '../useSaplingTable'
 
 const entityStates = reactive<Record<string, ReturnType<typeof createEntityState>>>({
@@ -238,7 +232,7 @@ describe('useSaplingTable', () => {
   it('applies decoded route query filters when query parameters are enabled', async () => {
     loadGenericMock.mockResolvedValue(undefined)
     routeState.query = {
-      filter: '{"status":{"handle":"open"},"assigneePerson":{"handle":1}}',
+      filter: '{"status":{"handle":"open"},"assigneePerson":{"handle":"{{currentUser.handle}}"}}',
     }
     apiFindMock.mockResolvedValue({
       data: [{ handle: 1, title: 'Open ticket' }],
@@ -253,7 +247,7 @@ describe('useSaplingTable', () => {
       expect.objectContaining({
         filter: {
           status: { handle: 'open' },
-          assigneePerson: { handle: 1 },
+          assigneePerson: { handle: '{{currentUser.handle}}' },
         },
       }),
     )

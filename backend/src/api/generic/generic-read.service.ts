@@ -54,6 +54,7 @@ export class GenericReadService {
         entityHandle,
       ),
       template,
+      currentUser,
     );
 
     return { entity, where: nextWhere };

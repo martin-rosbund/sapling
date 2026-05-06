@@ -111,7 +111,7 @@ function updateFavoriteTemplateDialog(value: boolean) {
 }
 
 function openFavorite(favorite: FavoriteItem) {
-  goToFavorite(favorite)
+  void goToFavorite(favorite)
   emit('navigate')
 }
 // #endregion

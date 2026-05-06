@@ -84,7 +84,7 @@ export function useSaplingTableActions({
   selectedRows,
   clearSelection,
 }: UseSaplingTableActionsOptions) {
-  const { t, te, locale } = useI18n()
+  const { t } = useI18n()
   const router = useRouter()
   const currentPersonStore = useCurrentPersonStore()
   const currentPermissionStore = useCurrentPermissionStore()
@@ -185,14 +185,8 @@ export function useSaplingTableActions({
       downloadJSONFile(json, `${props.entityHandle}.json`)
       pushMessage(
         'success',
-        translateOrFallback(locale.value, te, t, 'global.jsonExported', {
-          de: 'JSON exportiert',
-          en: 'JSON exported',
-        }),
-        translateOrFallback(locale.value, te, t, 'global.jsonExportedDescription', {
-          de: `${json.length} Datensaetze wurden als JSON heruntergeladen.`,
-          en: `${json.length} records were downloaded as JSON.`,
-        }),
+        t('global.jsonExported'),
+        t('global.jsonExportedDescription', { count: json.length }),
         props.entityHandle,
       )
     } catch {
@@ -214,14 +208,8 @@ export function useSaplingTableActions({
     downloadJSONFile(selectedItems.value, `${props.entityHandle}-selected.json`)
     pushMessage(
       'success',
-      translateOrFallback(locale.value, te, t, 'global.selectionExported', {
-        de: 'Auswahl exportiert',
-        en: 'Selection exported',
-      }),
-      translateOrFallback(locale.value, te, t, 'global.selectionExportedDescription', {
-        de: `${selectedItems.value.length} Datensaetze aus der Auswahl wurden als JSON heruntergeladen.`,
-        en: `${selectedItems.value.length} selected records were downloaded as JSON.`,
-      }),
+      t('global.selectionExported'),
+      t('global.selectionExportedDescription', { count: selectedItems.value.length }),
       props.entityHandle,
     )
   }
@@ -430,14 +418,8 @@ export function useSaplingTableActions({
       emit('reload')
       pushMessage(
         'success',
-        translateOrFallback(locale.value, te, t, 'global.recordSaved', {
-          de: 'Datensatz gespeichert',
-          en: 'Record saved',
-        }),
-        translateOrFallback(locale.value, te, t, 'global.recordSavedDescription', {
-          de: 'Der Datensatz wurde erfolgreich gespeichert.',
-          en: 'The record was saved successfully.',
-        }),
+        t('global.recordSaved'),
+        t('global.recordSavedDescription'),
         props.entityHandle,
       )
 
@@ -478,14 +460,8 @@ export function useSaplingTableActions({
       emit('reload')
       pushMessage(
         'success',
-        translateOrFallback(locale.value, te, t, 'global.recordDeleted', {
-          de: 'Datensatz geloescht',
-          en: 'Record deleted',
-        }),
-        translateOrFallback(locale.value, te, t, 'global.recordDeletedDescription', {
-          de: 'Der Datensatz wurde erfolgreich geloescht.',
-          en: 'The record was deleted successfully.',
-        }),
+        t('global.recordDeleted'),
+        t('global.recordDeletedDescription'),
         props.entityHandle,
       )
     } catch {
@@ -530,14 +506,8 @@ export function useSaplingTableActions({
       emit('reload')
       pushMessage(
         'success',
-        translateOrFallback(locale.value, te, t, 'global.recordsDeleted', {
-          de: 'Datensaetze geloescht',
-          en: 'Records deleted',
-        }),
-        translateOrFallback(locale.value, te, t, 'global.recordsDeletedDescription', {
-          de: `${handles.length} Datensaetze wurden erfolgreich geloescht.`,
-          en: `${handles.length} records were deleted successfully.`,
-        }),
+        t('global.recordsDeleted'),
+        t('global.recordsDeletedDescription', { count: handles.length }),
         props.entityHandle,
       )
     } catch {
@@ -610,6 +580,7 @@ export function useSaplingTableActions({
       await ApiGenericService.create<FavoriteItem>('favorite', {
         title: trimmedTitle,
         entity: props.entityHandle,
+        entityRoute: getCurrentFavoriteEntityRouteHandle(),
         person: personHandle,
         filter: getCurrentFavoriteFilter(),
       })
@@ -617,14 +588,8 @@ export function useSaplingTableActions({
       closeFavoriteDialog()
       pushMessage(
         'success',
-        translateOrFallback(locale.value, te, t, 'global.favoriteSaved', {
-          de: 'Favorit gespeichert',
-          en: 'Favorite saved',
-        }),
-        translateOrFallback(locale.value, te, t, 'global.favoriteSavedDescription', {
-          de: 'Die aktuelle Auswahl wurde als Favorit gespeichert.',
-          en: 'The current selection was saved as a favorite.',
-        }),
+        t('global.favoriteSaved'),
+        t('global.favoriteSavedDescription'),
         props.entityHandle,
       )
     } catch {
@@ -651,6 +616,14 @@ export function useSaplingTableActions({
     }
 
     return JSON.parse(serializedFilter) as FilterQuery
+  }
+
+  function getCurrentFavoriteEntityRouteHandle() {
+    const tableRoute = props.entity?.routes?.find((entry) => {
+      return entry.route === `table/${props.entityHandle}` && entry.handle != null
+    })
+
+    return tableRoute?.handle
   }
 
   return {
@@ -709,18 +682,4 @@ function getItemHandle(item?: SaplingGenericItem | null) {
 
   const { handle } = item
   return typeof handle === 'string' || typeof handle === 'number' ? handle : null
-}
-
-function translateOrFallback(
-  currentLocale: string,
-  te: ReturnType<typeof useI18n>['te'],
-  t: ReturnType<typeof useI18n>['t'],
-  key: string,
-  fallback: { de: string; en: string },
-) {
-  if (te(key)) {
-    return t(key)
-  }
-
-  return currentLocale === 'en' ? fallback.en : fallback.de
 }

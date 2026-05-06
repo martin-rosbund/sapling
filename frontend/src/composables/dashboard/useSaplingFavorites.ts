@@ -3,7 +3,12 @@ import { useRouter } from 'vue-router'
 import ApiGenericService from '@/services/api.generic.service'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
-import type { FavoriteItem, FavoriteTemplateItem, EntityItem } from '../../entity/entity'
+import type {
+  FavoriteItem,
+  FavoriteTemplateItem,
+  EntityItem,
+  EntityRouteItem,
+} from '../../entity/entity'
 import { useGenericStore } from '@/stores/genericStore'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import { buildFavoritePath } from '@/utils/saplingFavoriteNavigation'
@@ -133,6 +138,7 @@ export function useSaplingFavorites() {
 
       const favoriteRes = await ApiGenericService.find<FavoriteItem>('favorite', {
         filter: { person: { handle: currentPersonStore.person.handle } },
+        relations: ['entity', 'entityRoute'],
       })
       favorites.value = favoriteRes.data || []
     } finally {
@@ -144,7 +150,9 @@ export function useSaplingFavorites() {
    * Loads all entities that can be targeted by a favorite.
    */
   async function loadEntities() {
-    if (!(await ensureFavoritesAccess())) {
+    const hasAnyAccess = (await ensureFavoritesAccess()) || (await ensureFavoriteTemplateAccess())
+
+    if (!hasAnyAccess) {
       entities.value = []
       isEntitiesLoading.value = false
       return
@@ -182,7 +190,7 @@ export function useSaplingFavorites() {
         FAVORITE_TEMPLATE_ENTITY_HANDLE,
         {
           orderBy: { isRecommended: 'DESC', name: 'ASC' },
-          relations: ['entity'],
+          relations: ['entity', 'entityRoute'],
         },
       )
 
@@ -223,6 +231,9 @@ export function useSaplingFavorites() {
       const createdFavorite = await ApiGenericService.create<FavoriteItem>(FAVORITE_ENTITY_HANDLE, {
         title: template.name,
         entity: getEntityHandle(template.entity),
+        entityRoute:
+          getEntityRouteHandle(template.entityRoute) ??
+          resolveDefaultTableRouteHandle(template.entity, entities.value),
         person: currentPersonStore.person.handle,
         filter: normalizeFilter(template.filter),
       })
@@ -230,6 +241,10 @@ export function useSaplingFavorites() {
       favorites.value.push({
         ...createdFavorite,
         entity: createdFavorite.entity ?? resolveTemplateEntity(template),
+        entityRoute:
+          createdFavorite.entityRoute ??
+          resolveTemplateEntityRoute(template, entities.value) ??
+          null,
       })
 
       favoriteTemplateLoadDialog.value = false
@@ -268,14 +283,24 @@ export function useSaplingFavorites() {
   /**
    * Navigates to the table route behind a stored favorite, including an optional serialized filter.
    */
-  function goToFavorite(favorite: FavoriteItem) {
+  async function goToFavorite(favorite: FavoriteItem) {
     if (!hasFavoritesAccess.value) {
       return
     }
 
-    const path = buildFavoritePath(favorite, entities.value, {
-      currentPerson: currentPersonStore.person,
-    })
+    const path = buildFavoritePath(favorite, entities.value)
+    if (!path) {
+      return
+    }
+
+    router.push(path)
+  }
+
+  /**
+   * Navigates directly to a saved template without creating a personal favorite first.
+   */
+  async function goToFavoriteTemplate(template: FavoriteTemplateItem) {
+    const path = buildFavoritePath(template, entities.value)
     if (!path) {
       return
     }
@@ -286,16 +311,23 @@ export function useSaplingFavorites() {
 
   // #region Lifecycle
   onMounted(async () => {
-    if (!(await ensureFavoritesAccess())) {
+    const favoritesAccess = await ensureFavoritesAccess()
+    const favoriteTemplateAccess = await ensureFavoriteTemplateAccess()
+
+    if (!favoritesAccess && !favoriteTemplateAccess) {
       isFavoritesLoading.value = false
       isEntitiesLoading.value = false
       isFavoriteTemplatesLoading.value = false
       favorites.value = []
+      favoriteTemplates.value = []
       entities.value = []
       return
     }
 
-    genericStore.loadGeneric(FAVORITE_ENTITY_HANDLE, 'global')
+    if (favoritesAccess) {
+      genericStore.loadGeneric(FAVORITE_ENTITY_HANDLE, 'global')
+    }
+
     await Promise.all([loadFavorites(), loadEntities(), loadFavoriteTemplates()])
   })
   // #endregion
@@ -312,6 +344,7 @@ export function useSaplingFavorites() {
     loadingFavoriteTemplateHandle,
     openFavoriteTemplateLoadDialog,
     loadFavoriteFromTemplate,
+    goToFavoriteTemplate,
     removeFavorite,
     goToFavorite,
   }
@@ -336,4 +369,55 @@ function normalizeFilter(filter: FavoriteTemplateItem['filter']) {
 
 function resolveTemplateEntity(template: FavoriteTemplateItem) {
   return template.entity ?? null
+}
+
+function getEntityRouteHandle(entityRoute: FavoriteTemplateItem['entityRoute']) {
+  if (typeof entityRoute === 'number') {
+    return entityRoute
+  }
+
+  return entityRoute?.handle ?? undefined
+}
+
+function resolveDefaultTableRouteHandle(
+  entity: FavoriteTemplateItem['entity'],
+  entities: EntityItem[],
+) {
+  return resolveDefaultTableRoute(entity, entities)?.handle ?? undefined
+}
+
+function resolveTemplateEntityRoute(template: FavoriteTemplateItem, entities: EntityItem[]) {
+  if (typeof template.entityRoute === 'number') {
+    return resolveEntityRouteByHandle(template.entityRoute, entities)
+  }
+
+  return template.entityRoute ?? resolveDefaultTableRoute(template.entity, entities) ?? null
+}
+
+function resolveDefaultTableRoute(entity: FavoriteTemplateItem['entity'], entities: EntityItem[]) {
+  const entityHandle = getEntityHandle(entity)
+  if (!entityHandle) {
+    return null
+  }
+
+  const entityDefinition =
+    (typeof entity === 'object' && entity?.handle ? entity : null) ??
+    entities.find((entry) => entry.handle === entityHandle) ??
+    null
+
+  return entityDefinition?.routes?.find((entry) => entry.route === `table/${entityHandle}`) ?? null
+}
+
+function resolveEntityRouteByHandle(
+  handle: number,
+  entities: EntityItem[],
+): EntityRouteItem | null {
+  for (const entity of entities) {
+    const entityRoute = entity.routes?.find((entry) => entry.handle === handle)
+    if (entityRoute) {
+      return entityRoute
+    }
+  }
+
+  return null
 }

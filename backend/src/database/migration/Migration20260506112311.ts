@@ -1,9 +1,9 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260506102356 extends Migration {
+export class Migration20260506112311 extends Migration {
   override up(): void | Promise<void> {
     this.addSql(
-      `create table "favorite_template_item" ("handle" serial primary key, "name" varchar(128) not null, "entity_handle" varchar(64) not null, "filter" jsonb null, "is_recommended" boolean not null default false, "created_at" timestamptz not null, "updated_at" timestamptz not null);`,
+      `create table "favorite_template_item" ("handle" serial primary key, "name" varchar(128) not null, "entity_handle" varchar(64) not null, "entity_route_handle" int null, "filter" jsonb null, "is_recommended" boolean not null default false, "created_at" timestamptz not null, "updated_at" timestamptz not null);`,
     );
 
     this.addSql(
@@ -56,6 +56,9 @@ export class Migration20260506102356 extends Migration {
 
     this.addSql(
       `alter table "favorite_template_item" add constraint "favorite_template_item_entity_handle_foreign" foreign key ("entity_handle") references "entity_item" ("handle");`,
+    );
+    this.addSql(
+      `alter table "favorite_template_item" add constraint "favorite_template_item_entity_route_handle_foreign" foreign key ("entity_route_handle") references "entity_route_item" ("handle") on delete set null;`,
     );
 
     this.addSql(
@@ -158,6 +161,13 @@ export class Migration20260506102356 extends Migration {
     );
 
     this.addSql(
+      `alter table "favorite_item" add "entity_route_handle" int null;`,
+    );
+    this.addSql(
+      `alter table "favorite_item" add constraint "favorite_item_entity_route_handle_foreign" foreign key ("entity_route_handle") references "entity_route_item" ("handle") on delete set null;`,
+    );
+
+    this.addSql(
       `alter table "event_item" add "recurrence_rule" varchar(512) null;`,
     );
   }
@@ -211,6 +221,10 @@ export class Migration20260506102356 extends Migration {
     this.addSql(`drop table if exists "ai_chat_transcription_item" cascade;`);
 
     this.addSql(
+      `alter table "favorite_item" drop constraint "favorite_item_entity_route_handle_foreign";`,
+    );
+
+    this.addSql(
       `alter table "ai_provider_model_item" drop column "supports_transcription", drop column "embedding_batch_size", drop column "vector_chunk_length", drop column "vector_chunk_overlap", drop column "vector_search_candidate_multiplier", drop column "vector_search_max_candidate_limit", drop column "vector_search_max_results", drop column "supports_speech", drop column "speech_voice", drop column "speech_speed", drop column "speech_mime_type", drop column "speech_file_extension", drop column "speech_max_input_length";`,
     );
 
@@ -219,6 +233,10 @@ export class Migration20260506102356 extends Migration {
     );
 
     this.addSql(`alter table "event_item" drop column "recurrence_rule";`);
+
+    this.addSql(
+      `alter table "favorite_item" drop column "entity_route_handle";`,
+    );
 
     this.addSql(
       `alter table "person_item" drop column "holiday_group_handle";`,

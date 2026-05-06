@@ -2,7 +2,12 @@ import { type Rel } from '@mikro-orm/core';
 import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EntityItem } from './EntityItem';
-import { Sapling, SaplingForm } from './global/entity.decorator';
+import {
+  Sapling,
+  SaplingDependsOn,
+  SaplingForm,
+} from './global/entity.decorator';
+import { EntityRouteItem } from './EntityRouteItem';
 
 /**
  * Persisted template that can be loaded as a personal worklist favorite.
@@ -34,6 +39,22 @@ export class FavoriteTemplateItem {
   })
   @ManyToOne(() => EntityItem, { nullable: false })
   entity!: Rel<EntityItem>;
+
+  @ApiPropertyOptional({ type: () => EntityRouteItem })
+  @SaplingDependsOn({
+    parentField: 'entity',
+    targetField: 'entity',
+    requireParent: true,
+    clearOnParentChange: true,
+  })
+  @SaplingForm({
+    order: 250,
+    group: 'favoriteTemplate.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
+  @ManyToOne(() => EntityRouteItem, { nullable: true })
+  entityRoute?: Rel<EntityRouteItem>;
 
   @ApiPropertyOptional()
   @SaplingForm({

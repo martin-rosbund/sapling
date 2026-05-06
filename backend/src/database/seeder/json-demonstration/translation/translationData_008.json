@@ -70,6 +70,7 @@
   { "entity": "favoriteTemplate", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
   { "entity": "favoriteTemplate", "property": "groupBasics", "de": "Grundlagen", "en": "Basics" },
   { "entity": "favoriteTemplate", "property": "groupContent", "de": "Inhalt", "en": "Content" },
+  { "entity": "favoriteTemplate", "property": "entityRoute", "de": "Seitennavigation", "en": "Page navigation" },
 
   { "entity": "favorite", "property": "loadTemplate", "de": "Vorlage laden", "en": "Load template" },
   { "entity": "favorite", "property": "templatePickerTitle", "de": "Arbeitslisten-Vorlage wählen", "en": "Choose worklist template" },
@@ -78,11 +79,15 @@
   { "entity": "favorite", "property": "templateEmptyText", "de": "Lege Arbeitslisten-Vorlagen in der Administration an, um sie hier bereitzustellen.", "en": "Create worklist templates in the administration area to make them available here." },
   { "entity": "favorite", "property": "templateLoadAction", "de": "Als Arbeitsliste verwenden", "en": "Use as worklist" },
   { "entity": "favorite", "property": "templateRecommended", "de": "Empfohlen", "en": "Recommended" },
+  { "entity": "favorite", "property": "entityRoute", "de": "Seitennavigation", "en": "Page navigation" },
 
   { "entity": "aiChatTranscription", "property": "groupReference", "de": "Referenz", "en": "Reference" },
   { "entity": "aiChatTranscription", "property": "groupBasics", "de": "Grundlagen", "en": "Basics" },
   { "entity": "aiChatTranscription", "property": "groupIntegration", "de": "Integration", "en": "Integration" },
   { "entity": "aiChatTranscription", "property": "groupContent", "de": "Inhalt", "en": "Content" },
+
+  { "entity": "entityRoute", "property": "favoriteTemplates", "de": "Arbeitsliste-Vorlagen", "en": "Worklist Templates" },
+  { "entity": "entityRoute", "property": "favorites", "de": "Arbeitslisten", "en": "Worklists" },
 
   { "entity": "navigation", "property": "aiChatTranscription", "de": "AI-Transkription", "en": "AI Transcription" },
   { "entity": "navigation", "property": "favoriteTemplate", "de": "Arbeitslisten-Vorlagen", "en": "Worklist Templates" },

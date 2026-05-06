@@ -493,17 +493,6 @@
       @cancel="handleDeleteCancel"
     />
 
-    <SaplingDialogFavorite
-      :add-favorite-dialog="favoriteDialogModel"
-      :new-favorite-title="favoriteTitle"
-      :selected-favorite-entity="selectedFavoriteEntity"
-      :entity-options="favoriteEntityOptions"
-      @update:add-favorite-dialog="favoriteDialogModel = $event"
-      @update:new-favorite-title="favoriteTitle = $event"
-      @update:selected-favorite-entity="selectedFavoriteEntity = $event"
-      @addFavorite="handleFavoriteAdd"
-    />
-
     <SaplingDialogKpi
       :add-kpi-dialog="kpiDialogModel"
       :selected-kpi="selectedKpi"
@@ -543,7 +532,6 @@ import SaplingActionSave from '@/components/actions/SaplingActionSave.vue'
 import SaplingActionUpload from '@/components/actions/SaplingActionUpload.vue'
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
-import SaplingDialogFavorite from '@/components/dialog/SaplingDialogFavorite.vue'
 import SaplingDialogKpi from '@/components/dialog/SaplingDialogKpi.vue'
 import SaplingBooleanField from '@/components/dialog/fields/SaplingFieldBoolean.vue'
 import SaplingColorField from '@/components/dialog/fields/SaplingFieldColor.vue'
@@ -570,7 +558,7 @@ import { useSaplingPhoneDialog } from '@/composables/dialog/useSaplingPhoneDialo
 import { type Message, useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useSaplingTable } from '@/composables/table/useSaplingTable'
 import { TILT_SOFT_OPTIONS } from '@/constants/tilt.constants'
-import type { EntityItem, KPIItem, SaplingGenericItem } from '@/entity/entity'
+import type { KPIItem, SaplingGenericItem } from '@/entity/entity'
 import type { DialogSaveAction, DialogSaveContext, DialogState } from '@/entity/structure'
 
 const SaplingSelectAddField = defineAsyncComponent(
@@ -679,52 +667,12 @@ const deleteDialogItem = ref<SaplingGenericItem | null>({
   name: 'Playground Record',
 })
 
-const favoriteDialogModel = ref(false)
-const favoriteTitle = ref('Pipeline Board')
-const selectedFavoriteEntity = ref<EntityItem | null>(null)
-
 const kpiDialogModel = ref(false)
 const selectedKpi = ref<KPIItem | null>(null)
 
 const editDialogModel = ref(false)
 const editDialogMode = ref<DialogState>('create')
 const editDialogItem = ref<SaplingGenericItem | null>(null)
-
-const fallbackFavoriteEntities: EntityItem[] = [
-  {
-    handle: 'company',
-    icon: 'mdi-domain',
-    canRead: true,
-    canInsert: true,
-    canUpdate: true,
-    canDelete: true,
-    canShow: true,
-    createdAt: null,
-  },
-  {
-    handle: 'person',
-    icon: 'mdi-account',
-    canRead: true,
-    canInsert: true,
-    canUpdate: true,
-    canDelete: true,
-    canShow: true,
-    createdAt: null,
-  },
-]
-
-const favoriteEntityOptions = computed(() => {
-  const loadedEntity = entity.value
-
-  if (!loadedEntity) {
-    return fallbackFavoriteEntities
-  }
-
-  return [
-    loadedEntity,
-    ...fallbackFavoriteEntities.filter((option) => option.handle !== loadedEntity.handle),
-  ]
-})
 
 const availableKpiOptions = computed(() => {
   return [kpiItem.value, kpiList.value, kpiTrend.value, kpiSparkline.value].filter(
@@ -779,20 +727,6 @@ function handleDeleteConfirm() {
 function handleDeleteCancel() {
   deleteDialogModel.value = false
   pushDemoFeedback('Delete-Dialog geschlossen.', 'info')
-}
-
-function openFavoriteShowcaseDialog() {
-  if (!selectedFavoriteEntity.value) {
-    selectedFavoriteEntity.value = favoriteEntityOptions.value[0] ?? null
-  }
-
-  favoriteDialogModel.value = true
-}
-
-function handleFavoriteAdd() {
-  const title = favoriteTitle.value.trim() || selectedFavoriteEntity.value?.handle || 'Arbeitsliste'
-  favoriteDialogModel.value = false
-  pushDemoFeedback(`Arbeitsliste gespeichert: ${title}`, 'success')
 }
 
 function openKpiShowcaseDialog() {
@@ -964,14 +898,6 @@ const dialogLaunchers = computed<ShowcaseDialogLauncher[]>(() => [
     icon: 'mdi-delete-outline',
     color: 'error',
     open: openDeleteShowcaseDialog,
-  },
-  {
-    key: 'favorite',
-    title: 'Favorite Dialog',
-    description: 'Speichert eine Arbeitsliste mit Titel und Entity-Auswahl.',
-    icon: 'mdi-star-outline',
-    color: 'primary',
-    open: openFavoriteShowcaseDialog,
   },
   {
     key: 'kpi',

@@ -448,6 +448,8 @@ export interface FavoriteItem extends SaplingGenericItem {
   person: PersonItem | number | null
   /** Reference to the entity */
   entity: EntityItem | string | null
+  /** Optional configured route for opening the favorite */
+  entityRoute?: EntityRouteItem | number | null
   /** Optional filter */
   filter?: Record<string, unknown> | string | null
   /** Date and time when the favorite was created */
@@ -466,6 +468,8 @@ export interface FavoriteTemplateItem extends SaplingGenericItem {
   name: string
   /** Target page/entity */
   entity: EntityItem | string | null
+  /** Optional configured route for opening the template */
+  entityRoute?: EntityRouteItem | number | null
   /** Optional persisted filter */
   filter?: Record<string, unknown> | string | null
   /** Whether the template should be highlighted */
