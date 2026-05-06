@@ -1,5 +1,8 @@
 <template>
-  <article class="sapling-inbox-section glass-panel" :class="`sapling-inbox-section--${section.tone}`">
+  <article
+    class="sapling-inbox-section glass-panel"
+    :class="`sapling-inbox-section--${section.tone}`"
+  >
     <div class="sapling-inbox-section__header">
       <div class="sapling-inbox-section__title-wrap">
         <div class="sapling-inbox-section__title-row">

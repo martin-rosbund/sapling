@@ -747,6 +747,8 @@
   { "entity": "favorite", "property": "title", "de": "Titel", "en": "Title" },
   { "entity": "favorite", "property": "person", "de": "Person", "en": "Person" },
   { "entity": "favorite", "property": "entity", "de": "Entität", "en": "Entity" },
+  { "entity": "favorite", "property": "search", "de": "Suche", "en": "Search" },
+  { "entity": "favorite", "property": "sortBy", "de": "Sortierung", "en": "Sorting" },
   { "entity": "favorite", "property": "filter", "de": "Filter", "en": "Filter" },
   { "entity": "favorite", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "favorite", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },

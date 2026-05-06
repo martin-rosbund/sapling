@@ -99,6 +99,48 @@ describe('GenericPayloadService', () => {
     });
   });
 
+  it('normalizes empty strings to null for nullable numeric fields', () => {
+    const referenceService = {
+      reduceReferenceFields: jest.fn(
+        (_template: EntityTemplateDto[], data: object) => data,
+      ),
+    };
+    const service = new GenericPayloadService(
+      referenceService as unknown as GenericReferenceService,
+    );
+
+    const result = service.prepareCreatePayload(
+      [
+        createTemplateField({
+          name: 'expectedRevenue',
+          type: 'float',
+          nullable: true,
+        }),
+        createTemplateField({
+          name: 'probability',
+          type: 'number',
+          nullable: true,
+        }),
+        createTemplateField({
+          name: 'title',
+          type: 'string',
+          nullable: true,
+        }),
+      ],
+      {
+        expectedRevenue: '',
+        probability: '   ',
+        title: '',
+      },
+    );
+
+    expect(result).toEqual({
+      expectedRevenue: null,
+      probability: null,
+      title: '',
+    });
+  });
+
   it('builds merged dependency payloads for reference validation', () => {
     const referenceService = {
       reduceReferenceFields: jest.fn(),

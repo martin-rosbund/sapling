@@ -450,6 +450,10 @@ export interface FavoriteItem extends SaplingGenericItem {
   entity: EntityItem | string | null
   /** Optional configured route for opening the favorite */
   entityRoute?: EntityRouteItem | number | null
+  /** Optional persisted free-text search */
+  search?: string | null
+  /** Optional persisted sorting configuration */
+  sortBy?: Array<{ key: string; order?: 'asc' | 'desc' }> | null
   /** Optional filter */
   filter?: Record<string, unknown> | string | null
   /** Date and time when the favorite was created */

@@ -4,6 +4,18 @@ import { GenericReferenceService } from './generic-reference.service';
 
 @Injectable()
 export class GenericPayloadService {
+  private static readonly NULLABLE_NUMBER_TYPES = new Set([
+    'number',
+    'float',
+    'double',
+    'decimal',
+    'real',
+    'int',
+    'integer',
+    'smallint',
+    'bigint',
+  ]);
+
   constructor(
     private readonly genericReferenceService: GenericReferenceService,
   ) {}
@@ -57,9 +69,30 @@ export class GenericPayloadService {
 
       if (shouldRemove && typeof field.name !== 'undefined') {
         delete nextData[field.name];
+        continue;
+      }
+
+      if (
+        typeof field.name !== 'undefined' &&
+        this.shouldNormalizeEmptyStringToNull(field, nextData[field.name])
+      ) {
+        nextData[field.name] = null;
       }
     }
 
     return nextData;
+  }
+
+  private shouldNormalizeEmptyStringToNull(
+    field: EntityTemplateDto,
+    value: unknown,
+  ): boolean {
+    return (
+      typeof value === 'string' &&
+      value.trim().length === 0 &&
+      field.nullable === true &&
+      field.isReference !== true &&
+      GenericPayloadService.NULLABLE_NUMBER_TYPES.has(field.type)
+    );
   }
 }

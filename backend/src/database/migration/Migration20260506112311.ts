@@ -170,6 +170,10 @@ export class Migration20260506112311 extends Migration {
     this.addSql(
       `alter table "event_item" add "recurrence_rule" varchar(512) null;`,
     );
+
+    this.addSql(
+      `alter table "favorite_item" add "search" varchar(256) null, add "sort_by" jsonb null;`,
+    );
   }
 
   override down(): void | Promise<void> {
@@ -240,6 +244,10 @@ export class Migration20260506112311 extends Migration {
 
     this.addSql(
       `alter table "person_item" drop column "holiday_group_handle";`,
+    );
+
+    this.addSql(
+      `alter table "favorite_item" drop column "search", drop column "sort_by";`,
     );
   }
 }

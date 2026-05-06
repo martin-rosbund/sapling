@@ -31,12 +31,7 @@ export interface InboxEntry {
 
 export interface InboxSection {
   key: InboxSectionKey
-  titleKey:
-    | 'inbox.overdue'
-    | 'inbox.today'
-    | 'inbox.upcoming'
-    | 'inbox.later'
-    | 'inbox.unplanned'
+  titleKey: 'inbox.overdue' | 'inbox.today' | 'inbox.upcoming' | 'inbox.later' | 'inbox.unplanned'
   subtitleKey:
     | 'inbox.overdueSummary'
     | 'inbox.todaySummary'
@@ -66,11 +61,7 @@ export interface InboxSummaryCard {
 
 export function useSaplingInbox(emit: CloseEmitter) {
   //#region State
-  const { isLoading: isTranslationLoading } = useTranslationLoader(
-    'global',
-    'inbox',
-    'navigation',
-  )
+  const { isLoading: isTranslationLoading } = useTranslationLoader('global', 'inbox', 'navigation')
   const dialog = ref(true)
   const isDataLoading = ref(false)
   const tickets = ref<TicketItem[]>([])

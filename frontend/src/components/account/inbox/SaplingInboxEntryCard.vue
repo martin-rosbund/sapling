@@ -44,12 +44,7 @@
         >
           {{ entry.statusLabel }}
         </v-chip>
-        <v-chip
-          v-for="label in entry.supportLabels"
-          :key="label"
-          size="x-small"
-          variant="text"
-        >
+        <v-chip v-for="label in entry.supportLabels" :key="label" size="x-small" variant="text">
           {{ label }}
         </v-chip>
       </div>

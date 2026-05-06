@@ -5,11 +5,7 @@
       v-tilt="TILT_DEFAULT_OPTIONS"
       elevation="12"
     >
-      <SaplingDialogShell
-        fill-shell
-        body-class="sapling-inbox-dialog__body"
-        :show-divider="false"
-      >
+      <SaplingDialogShell fill-shell body-class="sapling-inbox-dialog__body" :show-divider="false">
         <template #hero>
           <SaplingDialogHero
             v-if="isLoading"

@@ -51,12 +51,40 @@ export class FavoriteItem {
   title!: string;
 
   /**
+   * Optional persisted free-text search.
+   * @type {string}
+   */
+  @ApiPropertyOptional()
+  @SaplingForm({
+    order: 150,
+    group: 'favorite.groupContent',
+    groupOrder: 200,
+    width: 2,
+  })
+  @Property({ length: 256, nullable: true })
+  search?: string;
+
+  /**
+   * Optional persisted sorting configuration.
+   * @type {object}
+   */
+  @ApiPropertyOptional()
+  @SaplingForm({
+    order: 175,
+    group: 'favorite.groupContent',
+    groupOrder: 200,
+    width: 2,
+  })
+  @Property({ type: 'json', nullable: true })
+  sortBy?: object;
+
+  /**
    * Optional query parameter (nullable).
    * @type {object}
    */
   @ApiPropertyOptional()
   @SaplingForm({
-    order: 100,
+    order: 200,
     group: 'favorite.groupContent',
     groupOrder: 200,
     width: 4,

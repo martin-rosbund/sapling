@@ -340,9 +340,9 @@ describe('CurrentController', () => {
     await expect(
       controller.getOpenSalesOpportunities(req as never),
     ).resolves.toBe(salesOpportunities);
-    expect(asMock(currentService.getOpenSalesOpportunities)).toHaveBeenCalledWith(
-      req.user,
-    );
+    expect(
+      asMock(currentService.getOpenSalesOpportunities),
+    ).toHaveBeenCalledWith(req.user);
   });
 
   it('counts open tasks for the current user', async () => {

@@ -8,6 +8,8 @@ import type {
 type FavoriteNavigationTarget = {
   entity: FavoriteItem['entity'] | FavoriteTemplateItem['entity']
   entityRoute?: FavoriteItem['entityRoute'] | FavoriteTemplateItem['entityRoute']
+  search?: FavoriteItem['search']
+  sortBy?: FavoriteItem['sortBy']
   filter?: FavoriteItem['filter'] | FavoriteTemplateItem['filter']
 }
 
@@ -64,14 +66,26 @@ export function buildFavoritePath(
   }
 
   const normalizedPath = route.startsWith('/') ? route : `/${route}`
+  const queryParts: string[] = []
 
-  if (!favorite.filter) {
+  if (typeof favorite.search === 'string' && favorite.search.trim().length > 0) {
+    queryParts.push(`search=${encodeURIComponent(favorite.search)}`)
+  }
+
+  if (Array.isArray(favorite.sortBy) && favorite.sortBy.length > 0) {
+    queryParts.push(`sortBy=${encodeURIComponent(JSON.stringify(favorite.sortBy))}`)
+  }
+
+  if (favorite.filter) {
+    const serializedFilter = serializeFavoriteFilter(favorite.filter)
+    queryParts.push(`filter=${encodeURIComponent(serializedFilter)}`)
+  }
+
+  if (queryParts.length === 0) {
     return normalizedPath
   }
 
-  const serializedFilter = serializeFavoriteFilter(favorite.filter)
-
-  return `${normalizedPath}?filter=${encodeURIComponent(serializedFilter)}`
+  return `${normalizedPath}?${queryParts.join('&')}`
 }
 
 function serializeFavoriteFilter(filter: FavoriteNavigationTarget['filter']): string {

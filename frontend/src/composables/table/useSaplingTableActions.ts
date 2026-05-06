@@ -1,5 +1,5 @@
 import { computed, ref, watch, type Ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import type {
   AccumulatedPermission,
@@ -85,6 +85,7 @@ export function useSaplingTableActions({
   clearSelection,
 }: UseSaplingTableActionsOptions) {
   const { t } = useI18n()
+  const route = useRoute()
   const router = useRouter()
   const currentPersonStore = useCurrentPersonStore()
   const currentPermissionStore = useCurrentPermissionStore()
@@ -582,6 +583,8 @@ export function useSaplingTableActions({
         entity: props.entityHandle,
         entityRoute: getCurrentFavoriteEntityRouteHandle(),
         person: personHandle,
+        search: getCurrentFavoriteSearch(),
+        sortBy: getCurrentFavoriteSortBy(),
         filter: getCurrentFavoriteFilter(),
       })
 
@@ -606,16 +609,49 @@ export function useSaplingTableActions({
   }
 
   function getCurrentFavoriteFilter() {
-    if (!props.activeFilter) {
-      return undefined
+    const routeFilterParam = Array.isArray(route.query.filter)
+      ? route.query.filter[0]
+      : route.query.filter
+
+    let urlFilter: unknown
+    if (typeof routeFilterParam === 'string' && routeFilterParam.length > 0) {
+      try {
+        urlFilter = JSON.parse(routeFilterParam)
+      } catch {
+        urlFilter = routeFilterParam
+      }
     }
 
-    const serializedFilter = JSON.stringify(props.activeFilter)
+    const filter = buildTableFilter({
+      search: '',
+      columnFilters: localColumnFilters.value,
+      entityTemplates: props.entityTemplates,
+      parentFilter: props.parentFilter,
+      urlFilter,
+    })
+
+    const serializedFilter = JSON.stringify(filter)
     if (serializedFilter === '{}' || serializedFilter === 'null') {
       return undefined
     }
 
     return JSON.parse(serializedFilter) as FilterQuery
+  }
+
+  function getCurrentFavoriteSearch() {
+    const trimmedSearch = props.search.trim()
+    return trimmedSearch.length > 0 ? trimmedSearch : undefined
+  }
+
+  function getCurrentFavoriteSortBy() {
+    if (props.sortBy.length === 0) {
+      return undefined
+    }
+
+    return props.sortBy.map((sort) => ({
+      key: sort.key,
+      order: sort.order,
+    }))
   }
 
   function getCurrentFavoriteEntityRouteHandle() {

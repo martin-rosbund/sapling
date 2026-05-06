@@ -130,9 +130,13 @@ export class CurrentService {
    * @returns Array of open events
    */
   async getOpenEvents(user: PersonItem): Promise<EventItem[]> {
-    const items = await this.em.find(EventItem, this.buildOpenEventWhere(user), {
-      populate: ['status', 'type'],
-    });
+    const items = await this.em.find(
+      EventItem,
+      this.buildOpenEventWhere(user),
+      {
+        populate: ['status', 'type'],
+      },
+    );
     return items || [];
   }
 

@@ -95,6 +95,43 @@ export function useSaplingTable(
     return typeof searchParam === 'string' ? searchParam : ''
   }
 
+  function getUrlSortByParam(): SortItem[] {
+    if (!isUseQueryParameter) {
+      return []
+    }
+
+    const sortByParam = Array.isArray(route.query.sortBy)
+      ? route.query.sortBy[0]
+      : route.query.sortBy
+
+    if (typeof sortByParam !== 'string' || sortByParam.length === 0) {
+      return []
+    }
+
+    try {
+      const parsedSortBy = JSON.parse(sortByParam)
+      if (!Array.isArray(parsedSortBy)) {
+        return []
+      }
+
+      return parsedSortBy
+        .filter(
+          (item): item is SortItem =>
+            item != null &&
+            typeof item === 'object' &&
+            'key' in item &&
+            typeof item.key === 'string' &&
+            item.key.length > 0,
+        )
+        .map((item) => ({
+          key: item.key,
+          order: item.order === 'desc' ? 'desc' : 'asc',
+        }))
+    } catch {
+      return []
+    }
+  }
+
   const activeFilter = computed(() =>
     buildTableFilter({
       search: search.value,
@@ -114,6 +151,12 @@ export function useSaplingTable(
    * Applies the first template-defined default ordering to the server query.
    */
   function initialSort(nextEntityTemplates = entityTemplates.value) {
+    const urlSortBy = getUrlSortByParam()
+    if (urlSortBy.length > 0) {
+      sortBy.value = urlSortBy
+      return
+    }
+
     const orderColumn = nextEntityTemplates.find(
       (template) =>
         Array.isArray(template.options) &&

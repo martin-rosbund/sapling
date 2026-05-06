@@ -263,8 +263,11 @@
   padding: var(--sapling-gap-lg);
   border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
   border-radius: 20px;
-  background:
-    linear-gradient(180deg, rgba(var(--v-theme-surface), 0.94), rgba(var(--v-theme-surface), 0.88));
+  background: linear-gradient(
+    180deg,
+    rgba(var(--v-theme-surface), 0.94),
+    rgba(var(--v-theme-surface), 0.88)
+  );
   cursor: pointer;
   transition:
     transform 0.2s ease,
