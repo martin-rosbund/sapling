@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { EntityItem, FavoriteItem } from '@/entity/entity'
+import type { EntityItem, FavoriteItem, PersonItem } from '@/entity/entity'
 
 import { buildFavoritePath, getFavoriteEntityHandle } from '../saplingFavoriteNavigation'
 
@@ -23,6 +23,16 @@ function createFavorite(overrides: Partial<FavoriteItem> = {}): FavoriteItem {
     createdAt: null,
     ...overrides,
   }
+}
+
+function createPerson(overrides: Partial<PersonItem> = {}): PersonItem {
+  return {
+    handle: 7,
+    firstName: 'Ada',
+    lastName: 'Lovelace',
+    createdAt: null,
+    ...overrides,
+  } as PersonItem
 }
 
 describe('saplingFavoriteNavigation', () => {
@@ -98,5 +108,37 @@ describe('saplingFavoriteNavigation', () => {
     })
 
     expect(buildFavoritePath(favorite)).toBe('/partner/event')
+  })
+
+  it('replaces current person placeholders in object filters', () => {
+    const favorite = createFavorite({
+      entity: createEntity({
+        handle: 'ticket',
+        routes: [{ route: 'partner/ticket', navigation: null, createdAt: null }],
+      }),
+      filter: {
+        status: { handle: 'open' },
+        assigneePerson: { handle: '{{currentPerson.handle}}' },
+      },
+    })
+
+    expect(buildFavoritePath(favorite, [], { currentPerson: createPerson() })).toBe(
+      '/partner/ticket?filter=%7B%22status%22%3A%7B%22handle%22%3A%22open%22%7D%2C%22assigneePerson%22%3A%7B%22handle%22%3A7%7D%7D',
+    )
+  })
+
+  it('replaces current person placeholders in JSON string filters', () => {
+    const favorite = createFavorite({
+      entity: createEntity({
+        handle: 'ticket',
+        routes: [{ route: 'partner/ticket', navigation: null, createdAt: null }],
+      }),
+      filter:
+        '{"status":{"handle":"open"},"assigneePerson":{"handle":"{{currentPerson.handle}}"}}',
+    })
+
+    expect(buildFavoritePath(favorite, [], { currentPerson: createPerson() })).toBe(
+      '/partner/ticket?filter=%7B%22status%22%3A%7B%22handle%22%3A%22open%22%7D%2C%22assigneePerson%22%3A%7B%22handle%22%3A7%7D%7D',
+    )
   })
 })

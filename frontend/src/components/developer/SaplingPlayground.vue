@@ -790,9 +790,9 @@ function openFavoriteShowcaseDialog() {
 }
 
 function handleFavoriteAdd() {
-  const title = favoriteTitle.value.trim() || selectedFavoriteEntity.value?.handle || 'Favorit'
+  const title = favoriteTitle.value.trim() || selectedFavoriteEntity.value?.handle || 'Arbeitsliste'
   favoriteDialogModel.value = false
-  pushDemoFeedback(`Favorit gespeichert: ${title}`, 'success')
+  pushDemoFeedback(`Arbeitsliste gespeichert: ${title}`, 'success')
 }
 
 function openKpiShowcaseDialog() {

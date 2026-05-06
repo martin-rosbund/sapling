@@ -273,7 +273,9 @@ export function useSaplingFavorites() {
       return
     }
 
-    const path = buildFavoritePath(favorite, entities.value)
+    const path = buildFavoritePath(favorite, entities.value, {
+      currentPerson: currentPersonStore.person,
+    })
     if (!path) {
       return
     }
