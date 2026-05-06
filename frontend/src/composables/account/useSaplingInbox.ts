@@ -1,83 +1,92 @@
 import { computed, onMounted, ref } from 'vue'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
-import type { TicketItem, EventItem } from '@/entity/entity'
+import type { EventItem, SalesOpportunityItem, TicketItem } from '@/entity/entity'
 import ApiService from '@/services/api.service'
 import { formatDate, formatDateFromTo } from '@/utils/saplingFormatUtil'
 import { useRouter, type RouteLocationRaw } from 'vue-router'
 
 type CloseEmitter = (event: 'close') => void
-type InboxEntryKind = 'ticket' | 'event'
+export type InboxEntryKind = 'ticket' | 'event' | 'salesOpportunity'
+export type InboxSectionKey = 'overdue' | 'today' | 'upcoming' | 'later' | 'unplanned'
 
-/**
- * Handles inbox translations, data loading and navigation for ticket and event reminders.
- */
-interface InboxEntry {
+const UPCOMING_DAY_RANGE = 7
+
+export interface InboxEntry {
   id: string
   kind: InboxEntryKind
+  kindLabelKey: 'navigation.ticket' | 'navigation.event' | 'navigation.salesOpportunity'
   title: string
   description: string
   dateText: string
+  dateValue: Date | null
   icon: string
   accentColor?: string | null
   contextLabel?: string
   contextColor?: string | null
   statusLabel?: string
   statusColor?: string | null
-  raw: TicketItem | EventItem
+  supportLabels: string[]
+  route: RouteLocationRaw
 }
 
-interface InboxGroup {
-  key: InboxEntryKind
-  labelKey: 'navigation.ticket' | 'navigation.event'
+export interface InboxSection {
+  key: InboxSectionKey
+  titleKey:
+    | 'inbox.overdue'
+    | 'inbox.today'
+    | 'inbox.upcoming'
+    | 'inbox.later'
+    | 'inbox.unplanned'
+  subtitleKey:
+    | 'inbox.overdueSummary'
+    | 'inbox.todaySummary'
+    | 'inbox.upcomingSummary'
+    | 'inbox.laterSummary'
+    | 'inbox.unplannedSummary'
+  emptyKey:
+    | 'inbox.overdueEmpty'
+    | 'inbox.todayEmpty'
+    | 'inbox.upcomingEmpty'
+    | 'inbox.laterEmpty'
+    | 'inbox.unplannedEmpty'
   icon: string
+  tone: 'primary' | 'info' | 'warning' | 'success' | 'secondary'
   count: number
   items: InboxEntry[]
-}
-
-interface InboxSection {
-  key: 'today' | 'expired'
-  titleKey: 'inbox.today' | 'inbox.expired'
-  subtitleKey: 'inbox.todaySummary' | 'inbox.expiredSummary'
-  emptyKey: 'inbox.todayEmpty' | 'inbox.expiredEmpty'
-  icon: string
-  count: number
-  groups: InboxGroup[]
   empty: boolean
 }
 
-interface InboxSummaryCard {
-  key: 'total' | 'today' | 'expired'
-  labelKey: 'navigation.inbox' | 'inbox.today' | 'inbox.expired'
+export interface InboxSummaryCard {
+  key: 'total' | 'overdue' | 'today' | 'upcoming'
+  labelKey: 'navigation.inbox' | 'inbox.overdue' | 'inbox.today' | 'inbox.upcoming'
   icon: string
   count: number
-  tone: 'primary' | 'info' | 'warning'
+  tone: 'primary' | 'warning' | 'info' | 'success'
 }
 
 export function useSaplingInbox(emit: CloseEmitter) {
   //#region State
-  const { isLoading: isTranslationLoading } = useTranslationLoader('global', 'inbox', 'navigation')
+  const { isLoading: isTranslationLoading } = useTranslationLoader(
+    'global',
+    'inbox',
+    'navigation',
+  )
   const dialog = ref(true)
   const isDataLoading = ref(false)
   const tickets = ref<TicketItem[]>([])
   const tasks = ref<EventItem[]>([])
-  const todayTickets = ref<TicketItem[]>([])
-  const expiredTickets = ref<TicketItem[]>([])
-  const todayTasks = ref<EventItem[]>([])
-  const expiredTasks = ref<EventItem[]>([])
+  const salesOpportunities = ref<SalesOpportunityItem[]>([])
   const router = useRouter()
   const isLoading = computed(() => isTranslationLoading.value || isDataLoading.value)
   //#endregion
 
   //#region Lifecycle
   onMounted(async () => {
-    await loadTicketsAndTasks()
+    await loadInboxItems()
   })
   //#endregion
 
   //#region Utility Functions
-  /**
-   * Normalizes a nullable date input into a Date instance.
-   */
   function toDate(date: Date | string | null | undefined): Date | null {
     if (!date) {
       return null
@@ -87,97 +96,77 @@ export function useSaplingInbox(emit: CloseEmitter) {
     return Number.isNaN(normalizedDate.getTime()) ? null : normalizedDate
   }
 
-  /**
-   * Checks whether a date belongs to the current day.
-   */
-  function isToday(date: Date | string | null | undefined) {
-    const d = toDate(date)
-    if (!d) return false
+  function startOfDay(date: Date) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate())
+  }
+
+  function addDays(date: Date, days: number) {
+    const nextDate = new Date(date)
+    nextDate.setDate(nextDate.getDate() + days)
+    return nextDate
+  }
+
+  function getSectionKey(date: Date | null): InboxSectionKey {
+    if (!date) {
+      return 'unplanned'
+    }
+
     const now = new Date()
-    return (
-      d.getDate() === now.getDate() &&
-      d.getMonth() === now.getMonth() &&
-      d.getFullYear() === now.getFullYear()
-    )
-  }
+    const todayStart = startOfDay(now)
+    const tomorrowStart = addDays(todayStart, 1)
+    const upcomingEnd = addDays(tomorrowStart, UPCOMING_DAY_RANGE)
 
-  /**
-   * Checks whether a date is in the past while not belonging to the current day.
-   */
-  function isExpired(date: Date | string | null | undefined) {
-    const d = toDate(date)
-    if (!d) return false
-    const now = new Date()
-    return d < now && !isToday(d)
-  }
-
-  /**
-   * Sorts date-like values ascending while pushing missing dates to the end.
-   */
-  function sortByDateAsc(
-    left: Date | string | null | undefined,
-    right: Date | string | null | undefined,
-  ) {
-    const leftTime = toDate(left)?.getTime() ?? Number.MAX_SAFE_INTEGER
-    const rightTime = toDate(right)?.getTime() ?? Number.MAX_SAFE_INTEGER
-    return leftTime - rightTime
-  }
-
-  /**
-   * Builds a unified inbox entry for ticket reminders.
-   */
-  function createTicketEntry(ticket: TicketItem): InboxEntry {
-    return {
-      id: `ticket-${ticket.handle ?? ticket.title}`,
-      kind: 'ticket',
-      title: ticket.title,
-      description: ticket.problemDescription ?? '',
-      dateText: formatDate(ticket.deadlineDate),
-      icon: 'mdi-ticket-confirmation-outline',
-      accentColor: ticket.priority?.color ?? ticket.status.color,
-      contextLabel: ticket.priority?.description,
-      contextColor: ticket.priority?.color,
-      statusLabel: ticket.status.description,
-      statusColor: ticket.status.color,
-      raw: ticket,
-    }
-  }
-
-  /**
-   * Builds a unified inbox entry for event reminders.
-   */
-  function createTaskEntry(task: EventItem): InboxEntry {
-    return {
-      id: `event-${task.handle ?? task.title}`,
-      kind: 'event',
-      title: task.title,
-      description: task.description ?? '',
-      dateText: formatDateFromTo(task.startDate, task.endDate),
-      icon: task.type?.icon || 'mdi-calendar-clock-outline',
-      accentColor: task.type?.color ?? task.status.color,
-      contextLabel: task.type?.title,
-      contextColor: task.type?.color,
-      statusLabel: task.status.description,
-      statusColor: task.status.color,
-      raw: task,
-    }
-  }
-
-  /**
-   * Opens an inbox entry by its underlying entity type.
-   */
-  async function openEntry(entry: InboxEntry) {
-    if (entry.kind === 'ticket') {
-      await openTicket(entry.raw as TicketItem)
-      return
+    if (date < todayStart) {
+      return 'overdue'
     }
 
-    await openTask(entry.raw as EventItem)
+    if (date < tomorrowStart) {
+      return 'today'
+    }
+
+    if (date < upcomingEnd) {
+      return 'upcoming'
+    }
+
+    return 'later'
   }
 
-  /**
-   * Creates the route location for a ticket reminder entry.
-   */
+  function compareEntriesByDate(left: InboxEntry, right: InboxEntry) {
+    const leftTime = left.dateValue?.getTime() ?? Number.MAX_SAFE_INTEGER
+    const rightTime = right.dateValue?.getTime() ?? Number.MAX_SAFE_INTEGER
+
+    if (leftTime !== rightTime) {
+      return leftTime - rightTime
+    }
+
+    return left.title.localeCompare(right.title)
+  }
+
+  function formatCurrency(value?: number | null) {
+    if (typeof value !== 'number' || !Number.isFinite(value)) {
+      return ''
+    }
+
+    return new Intl.NumberFormat(undefined, {
+      style: 'currency',
+      currency: 'EUR',
+      maximumFractionDigits: 0,
+    }).format(value)
+  }
+
+  function formatProbability(value?: number | null) {
+    if (typeof value !== 'number' || !Number.isFinite(value)) {
+      return ''
+    }
+
+    return `${Math.round(value)}%`
+  }
+
+  function openEntry(entry: InboxEntry) {
+    closeDialog()
+    void router.push(entry.route)
+  }
+
   function getTicketRoute(ticket: TicketItem): RouteLocationRaw {
     return {
       path: '/table/ticket',
@@ -187,9 +176,6 @@ export function useSaplingInbox(emit: CloseEmitter) {
     }
   }
 
-  /**
-   * Creates the route location for an event reminder entry.
-   */
   function getTaskRoute(task: EventItem): RouteLocationRaw {
     return {
       path: '/table/event',
@@ -199,50 +185,101 @@ export function useSaplingInbox(emit: CloseEmitter) {
     }
   }
 
-  /**
-   * Closes the inbox and opens the selected ticket.
-   */
-  async function openTicket(ticket: TicketItem) {
-    closeDialog()
-    await router.push(getTicketRoute(ticket))
+  function getSalesOpportunityRoute(opportunity: SalesOpportunityItem): RouteLocationRaw {
+    return {
+      path: '/table/salesOpportunity',
+      query: {
+        filter: JSON.stringify({ handle: opportunity.handle }),
+      },
+    }
   }
 
-  /**
-   * Closes the inbox and opens the selected event.
-   */
-  async function openTask(task: EventItem) {
-    closeDialog()
-    await router.push(getTaskRoute(task))
+  function createTicketEntry(ticket: TicketItem): InboxEntry {
+    const dateValue = toDate(ticket.deadlineDate)
+
+    return {
+      id: `ticket-${ticket.handle ?? ticket.title}`,
+      kind: 'ticket',
+      kindLabelKey: 'navigation.ticket',
+      title: ticket.title,
+      description: ticket.problemDescription ?? '',
+      dateText: formatDate(ticket.deadlineDate),
+      dateValue,
+      icon: 'mdi-ticket-confirmation-outline',
+      accentColor: ticket.priority?.color ?? ticket.status?.color,
+      contextLabel: ticket.priority?.description,
+      contextColor: ticket.priority?.color,
+      statusLabel: ticket.status?.description,
+      statusColor: ticket.status?.color,
+      supportLabels: [],
+      route: getTicketRoute(ticket),
+    }
+  }
+
+  function createTaskEntry(task: EventItem): InboxEntry {
+    const dateValue = toDate(task.startDate)
+
+    return {
+      id: `event-${task.handle ?? task.title}`,
+      kind: 'event',
+      kindLabelKey: 'navigation.event',
+      title: task.title,
+      description: task.description ?? '',
+      dateText: formatDateFromTo(task.startDate, task.endDate),
+      dateValue,
+      icon: task.type?.icon || 'mdi-calendar-clock-outline',
+      accentColor: task.type?.color ?? task.status?.color,
+      contextLabel: task.type?.title,
+      contextColor: task.type?.color,
+      statusLabel: task.status?.description,
+      statusColor: task.status?.color,
+      supportLabels: [],
+      route: getTaskRoute(task),
+    }
+  }
+
+  function createSalesOpportunityEntry(opportunity: SalesOpportunityItem): InboxEntry {
+    const dateValue = toDate(opportunity.closeDate)
+    const supportLabels = [
+      formatCurrency(opportunity.expectedRevenue),
+      formatProbability(opportunity.probability),
+      opportunity.creatorCompany?.name ?? '',
+    ].filter((label) => label.length > 0)
+
+    return {
+      id: `sales-opportunity-${opportunity.handle ?? opportunity.title}`,
+      kind: 'salesOpportunity',
+      kindLabelKey: 'navigation.salesOpportunity',
+      title: opportunity.title,
+      description: opportunity.nextStep ?? opportunity.description ?? opportunity.painPoints ?? '',
+      dateText: formatDate(opportunity.closeDate),
+      dateValue,
+      icon: opportunity.type?.icon || 'mdi-chart-timeline-variant',
+      accentColor: opportunity.type?.color ?? opportunity.forecast?.color,
+      contextLabel: opportunity.forecast?.title,
+      contextColor: opportunity.forecast?.color,
+      statusLabel: opportunity.type?.title,
+      statusColor: opportunity.type?.color,
+      supportLabels,
+      route: getSalesOpportunityRoute(opportunity),
+    }
   }
   //#endregion
 
   //#region Data Loading
-  /**
-   * Fetches all open inbox items and derives the date-based buckets used in the view.
-   */
-  async function loadTicketsAndTasks() {
+  async function loadInboxItems() {
     isDataLoading.value = true
 
     try {
-      const [loadedTickets, loadedTasks] = await Promise.all([
+      const [loadedTickets, loadedTasks, loadedSalesOpportunities] = await Promise.all([
         ApiService.findAll<TicketItem[]>('current/openTickets'),
         ApiService.findAll<EventItem[]>('current/openEvents'),
+        ApiService.findAll<SalesOpportunityItem[]>('current/openSalesOpportunities'),
       ])
 
       tickets.value = loadedTickets
       tasks.value = loadedTasks
-      todayTickets.value = tickets.value
-        .filter((t) => isToday(t.deadlineDate))
-        .sort((left, right) => sortByDateAsc(left.deadlineDate, right.deadlineDate))
-      expiredTickets.value = tickets.value
-        .filter((t) => isExpired(t.deadlineDate))
-        .sort((left, right) => sortByDateAsc(left.deadlineDate, right.deadlineDate))
-      todayTasks.value = tasks.value
-        .filter((t) => isToday(t.startDate))
-        .sort((left, right) => sortByDateAsc(left.startDate, right.startDate))
-      expiredTasks.value = tasks.value
-        .filter((t) => isExpired(t.startDate))
-        .sort((left, right) => sortByDateAsc(left.startDate, right.startDate))
+      salesOpportunities.value = loadedSalesOpportunities
     } finally {
       isDataLoading.value = false
     }
@@ -252,91 +289,119 @@ export function useSaplingInbox(emit: CloseEmitter) {
   //#region Derived State
   const ticketEntries = computed(() => tickets.value.map(createTicketEntry))
   const taskEntries = computed(() => tasks.value.map(createTaskEntry))
-  const todayTicketEntries = computed(() => todayTickets.value.map(createTicketEntry))
-  const expiredTicketEntries = computed(() => expiredTickets.value.map(createTicketEntry))
-  const todayTaskEntries = computed(() => todayTasks.value.map(createTaskEntry))
-  const expiredTaskEntries = computed(() => expiredTasks.value.map(createTaskEntry))
-  const totalEntries = computed(() => ticketEntries.value.length + taskEntries.value.length)
+  const salesOpportunityEntries = computed(() =>
+    salesOpportunities.value.map(createSalesOpportunityEntry),
+  )
+  const allEntries = computed(() =>
+    [...ticketEntries.value, ...taskEntries.value, ...salesOpportunityEntries.value].sort(
+      compareEntriesByDate,
+    ),
+  )
+
+  function getSectionItems(sectionKey: InboxSectionKey) {
+    return allEntries.value.filter((entry) => getSectionKey(entry.dateValue) === sectionKey)
+  }
+
+  const overdueEntries = computed(() => getSectionItems('overdue'))
+  const todayEntries = computed(() => getSectionItems('today'))
+  const upcomingEntries = computed(() => getSectionItems('upcoming'))
+  const laterEntries = computed(() => getSectionItems('later'))
+  const unplannedEntries = computed(() => getSectionItems('unplanned'))
+
+  const totalEntries = computed(() => allEntries.value.length)
   const hasInboxItems = computed(() => totalEntries.value > 0)
+
   const summaryCards = computed<InboxSummaryCard[]>(() => [
     {
       key: 'total',
       labelKey: 'navigation.inbox',
-      icon: 'mdi-inbox-multiple-outline',
+      icon: 'mdi-briefcase-clock-outline',
       count: totalEntries.value,
       tone: 'primary',
+    },
+    {
+      key: 'overdue',
+      labelKey: 'inbox.overdue',
+      icon: 'mdi-alert-circle-outline',
+      count: overdueEntries.value.length,
+      tone: 'warning',
     },
     {
       key: 'today',
       labelKey: 'inbox.today',
       icon: 'mdi-calendar-today',
-      count: todayTicketEntries.value.length + todayTaskEntries.value.length,
+      count: todayEntries.value.length,
       tone: 'info',
     },
     {
-      key: 'expired',
-      labelKey: 'inbox.expired',
-      icon: 'mdi-alert-circle-outline',
-      count: expiredTicketEntries.value.length + expiredTaskEntries.value.length,
-      tone: 'warning',
+      key: 'upcoming',
+      labelKey: 'inbox.upcoming',
+      icon: 'mdi-calendar-clock-outline',
+      count: upcomingEntries.value.length,
+      tone: 'success',
     },
   ])
+
   const sections = computed<InboxSection[]>(() => [
+    {
+      key: 'overdue',
+      titleKey: 'inbox.overdue',
+      subtitleKey: 'inbox.overdueSummary',
+      emptyKey: 'inbox.overdueEmpty',
+      icon: 'mdi-alert-circle-outline',
+      tone: 'warning',
+      count: overdueEntries.value.length,
+      items: overdueEntries.value,
+      empty: overdueEntries.value.length === 0,
+    },
     {
       key: 'today',
       titleKey: 'inbox.today',
       subtitleKey: 'inbox.todaySummary',
       emptyKey: 'inbox.todayEmpty',
       icon: 'mdi-calendar-today',
-      count: todayTicketEntries.value.length + todayTaskEntries.value.length,
-      empty: todayTicketEntries.value.length + todayTaskEntries.value.length === 0,
-      groups: [
-        {
-          key: 'ticket',
-          labelKey: 'navigation.ticket',
-          icon: 'mdi-ticket-confirmation-outline',
-          count: todayTicketEntries.value.length,
-          items: todayTicketEntries.value,
-        },
-        {
-          key: 'event',
-          labelKey: 'navigation.event',
-          icon: 'mdi-calendar-clock-outline',
-          count: todayTaskEntries.value.length,
-          items: todayTaskEntries.value,
-        },
-      ],
+      tone: 'info',
+      count: todayEntries.value.length,
+      items: todayEntries.value,
+      empty: todayEntries.value.length === 0,
     },
     {
-      key: 'expired',
-      titleKey: 'inbox.expired',
-      subtitleKey: 'inbox.expiredSummary',
-      emptyKey: 'inbox.expiredEmpty',
-      icon: 'mdi-alert-circle-outline',
-      count: expiredTicketEntries.value.length + expiredTaskEntries.value.length,
-      empty: expiredTicketEntries.value.length + expiredTaskEntries.value.length === 0,
-      groups: [
-        {
-          key: 'ticket',
-          labelKey: 'navigation.ticket',
-          icon: 'mdi-ticket-confirmation-outline',
-          count: expiredTicketEntries.value.length,
-          items: expiredTicketEntries.value,
-        },
-        {
-          key: 'event',
-          labelKey: 'navigation.event',
-          icon: 'mdi-calendar-clock-outline',
-          count: expiredTaskEntries.value.length,
-          items: expiredTaskEntries.value,
-        },
-      ],
+      key: 'upcoming',
+      titleKey: 'inbox.upcoming',
+      subtitleKey: 'inbox.upcomingSummary',
+      emptyKey: 'inbox.upcomingEmpty',
+      icon: 'mdi-calendar-range-outline',
+      tone: 'success',
+      count: upcomingEntries.value.length,
+      items: upcomingEntries.value,
+      empty: upcomingEntries.value.length === 0,
+    },
+    {
+      key: 'later',
+      titleKey: 'inbox.later',
+      subtitleKey: 'inbox.laterSummary',
+      emptyKey: 'inbox.laterEmpty',
+      icon: 'mdi-timeline-clock-outline',
+      tone: 'primary',
+      count: laterEntries.value.length,
+      items: laterEntries.value,
+      empty: laterEntries.value.length === 0,
+    },
+    {
+      key: 'unplanned',
+      titleKey: 'inbox.unplanned',
+      subtitleKey: 'inbox.unplannedSummary',
+      emptyKey: 'inbox.unplannedEmpty',
+      icon: 'mdi-calendar-question-outline',
+      tone: 'secondary',
+      count: unplannedEntries.value.length,
+      items: unplannedEntries.value,
+      empty: unplannedEntries.value.length === 0,
     },
   ])
   //#endregion
 
   //#region Dialog Management
-  // Close the inbox dialog and emit a close event
   function closeDialog() {
     dialog.value = false
     emit('close')
@@ -344,32 +409,18 @@ export function useSaplingInbox(emit: CloseEmitter) {
   //#endregion
 
   //#region Return
-  // Return all reactive properties and methods for use in components
   return {
     isLoading,
     dialog,
-    tickets,
-    tasks,
-    todayTickets,
-    expiredTickets,
-    todayTasks,
     ticketEntries,
     taskEntries,
+    salesOpportunityEntries,
     totalEntries,
     hasInboxItems,
     summaryCards,
     sections,
-    expiredTasks,
-    isToday,
-    isExpired,
-    formatDate,
-    formatDateFromTo,
-    getTicketRoute,
-    getTaskRoute,
     openEntry,
-    openTicket,
-    openTask,
-    loadTicketsAndTasks,
+    loadInboxItems,
     closeDialog,
   }
   //#endregion

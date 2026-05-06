@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/require-await, @typescript-eslint/unbound-method */
 import { describe, expect, it, jest } from '@jest/globals';
 import { BadRequestException } from '@nestjs/common';
-import type { Response } from 'express';
+import { Response } from 'express';
 
 jest.mock('./current/current.service', () => ({ CurrentService: class {} }));
 jest.mock('./generic/generic.service', () => ({ GenericService: class {} }));
@@ -31,6 +31,9 @@ jest.mock('./system/services/version.service', () => ({
 jest.mock('../entity/PersonItem', () => ({ PersonItem: class {} }));
 jest.mock('../entity/TicketItem', () => ({ TicketItem: class {} }));
 jest.mock('../entity/EventItem', () => ({ EventItem: class {} }));
+jest.mock('../entity/SalesOpportunityItem', () => ({
+  SalesOpportunityItem: class {},
+}));
 jest.mock('../entity/WorkHourWeekItem', () => ({ WorkHourWeekItem: class {} }));
 jest.mock('../entity/global/entity.registry', () => ({
   ENTITY_HANDLES: ['ticket'],
@@ -46,7 +49,7 @@ import { GithubController } from './github/github.controller';
 import { KpiController } from './kpi/kpi.controller';
 import { SystemController } from './system/system.controller';
 import { TemplateController } from './template/template.controller';
-import type { PersonItem } from '../entity/PersonItem';
+import { PersonItem } from '../entity/PersonItem';
 
 const createMockUser = (): PersonItem =>
   ({
@@ -324,6 +327,22 @@ describe('CurrentController', () => {
 
     await expect(controller.getOpenEvents(req as never)).resolves.toBe(events);
     expect(asMock(currentService.getOpenEvents)).toHaveBeenCalledWith(req.user);
+  });
+
+  it('returns open sales opportunities for the current user', async () => {
+    const salesOpportunities = [{ handle: 1 }];
+    const currentService = {
+      getOpenSalesOpportunities: jest.fn(async () => salesOpportunities),
+    };
+    const controller = new CurrentController(currentService as never);
+    const req = { user: createMockUser() };
+
+    await expect(
+      controller.getOpenSalesOpportunities(req as never),
+    ).resolves.toBe(salesOpportunities);
+    expect(asMock(currentService.getOpenSalesOpportunities)).toHaveBeenCalledWith(
+      req.user,
+    );
   });
 
   it('counts open tasks for the current user', async () => {

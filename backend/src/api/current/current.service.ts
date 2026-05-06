@@ -3,6 +3,7 @@ import { EntityManager } from '@mikro-orm/core';
 import { PersonItem } from '../../entity/PersonItem';
 import { TicketItem } from '../../entity/TicketItem';
 import { EventItem } from '../../entity/EventItem';
+import { SalesOpportunityItem } from '../../entity/SalesOpportunityItem';
 import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
 import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
 import {
@@ -24,6 +25,8 @@ import {
  *                  Returns all open tickets assigned to the user.
  * @method          getOpenEvents(user: PersonItem): Promise<EventItem[]>
  *                  Returns all open events assigned to the user.
+ * @method          getOpenSalesOpportunities(user: PersonItem): Promise<SalesOpportunityItem[]>
+ *                  Returns all open sales opportunities assigned to the user.
  * @method          countOpenTasks(user: PersonItem): Promise<{ count: number }>
  *                  Returns the count of open tasks for the user.
  * @method          getEntityPermissions(person: PersonItem, entityHandle: string): AccumulatedPermissionDto
@@ -114,6 +117,9 @@ export class CurrentService {
     const items = await this.em.find(
       TicketItem,
       this.buildOpenTicketWhere(user),
+      {
+        populate: ['status', 'priority'],
+      },
     );
     return items || [];
   }
@@ -124,7 +130,27 @@ export class CurrentService {
    * @returns Array of open events
    */
   async getOpenEvents(user: PersonItem): Promise<EventItem[]> {
-    const items = await this.em.find(EventItem, this.buildOpenEventWhere(user));
+    const items = await this.em.find(EventItem, this.buildOpenEventWhere(user), {
+      populate: ['status', 'type'],
+    });
+    return items || [];
+  }
+
+  /**
+   * Returns all open sales opportunities assigned to the user.
+   * @param user The user whose sales opportunities are to be retrieved
+   * @returns Array of open sales opportunities
+   */
+  async getOpenSalesOpportunities(
+    user: PersonItem,
+  ): Promise<SalesOpportunityItem[]> {
+    const items = await this.em.find(
+      SalesOpportunityItem,
+      this.buildOpenSalesOpportunityWhere(user),
+      {
+        populate: ['type', 'forecast', 'assigneeCompany', 'creatorCompany'],
+      },
+    );
     return items || [];
   }
 
@@ -134,33 +160,39 @@ export class CurrentService {
    * @returns Object containing the count of open tasks
    */
   async countOpenTasks(user: PersonItem): Promise<{ count: number }> {
-    const [openEventCount, openTicketCount] = await Promise.all([
-      this.em.count(EventItem, this.buildOpenEventWhere(user)),
-      this.em.count(TicketItem, this.buildOpenTicketWhere(user)),
-    ]);
+    const [openEventCount, openTicketCount, openSalesOpportunityCount] =
+      await Promise.all([
+        this.em.count(EventItem, this.buildOpenEventWhere(user)),
+        this.em.count(TicketItem, this.buildOpenTicketWhere(user)),
+        this.em.count(
+          SalesOpportunityItem,
+          this.buildOpenSalesOpportunityWhere(user),
+        ),
+      ]);
 
-    return { count: openEventCount + openTicketCount };
+    return {
+      count: openEventCount + openTicketCount + openSalesOpportunityCount,
+    };
   }
 
   private buildOpenTicketWhere(user: PersonItem): object {
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999);
-
     return {
       assigneePerson: { handle: user?.handle },
       status: { handle: { $nin: ['closed'] } },
-      deadlineDate: { $lte: todayEnd },
     };
   }
 
   private buildOpenEventWhere(user: PersonItem): object {
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999);
-
     return {
       participants: { handle: user?.handle },
       status: { handle: { $nin: ['canceled', 'completed'] } },
-      startDate: { $lte: todayEnd },
+    };
+  }
+
+  private buildOpenSalesOpportunityWhere(user: PersonItem): object {
+    return {
+      assigneePerson: { handle: user?.handle },
+      isActive: true,
     };
   }
 

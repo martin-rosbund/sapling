@@ -23,6 +23,7 @@ import {
 } from '@nestjs/swagger';
 import { TicketItem } from '../../entity/TicketItem';
 import { EventItem } from '../../entity/EventItem';
+import { SalesOpportunityItem } from '../../entity/SalesOpportunityItem';
 import { AccumulatedPermissionDto } from './dto/accumulated-permission.dto';
 import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
 import { UseGuards } from '@nestjs/common';
@@ -44,6 +45,8 @@ import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth
  *                  Get all open tickets assigned to the current user.
  * @method          getOpenEvents(req: Request): Promise<EventItem[]>
  *                  Get all open events assigned to the current user.
+ * @method          getOpenSalesOpportunities(req: Request): Promise<SalesOpportunityItem[]>
+ *                  Get all open sales opportunities assigned to the current user.
  * @method          countOpenTasks(req: Request): Promise<{ count: number }>
  *                  Get the count of open tasks for the current user.
  * @method          getAllEntityPermissions(req: Request): AccumulatedPermissionDto[]
@@ -176,6 +179,29 @@ export class CurrentController {
   async getOpenEvents(@Req() req: Request): Promise<EventItem[]> {
     const user = req.user as PersonItem;
     return this.currentService.getOpenEvents(user);
+  }
+
+  /**
+   * Get all open sales opportunities assigned to the current user.
+   * @param req Express request object
+   * @returns Array of open sales opportunities
+   */
+  @Get('openSalesOpportunities')
+  @ApiOperation({
+    summary: 'Get open sales opportunities',
+    description:
+      'Returns all open sales opportunities assigned to the current user.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of open sales opportunities',
+    type: [SalesOpportunityItem],
+  })
+  async getOpenSalesOpportunities(
+    @Req() req: Request,
+  ): Promise<SalesOpportunityItem[]> {
+    const user = req.user as PersonItem;
+    return this.currentService.getOpenSalesOpportunities(user);
   }
 
   /**

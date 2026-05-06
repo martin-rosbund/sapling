@@ -107,6 +107,16 @@
   padding-right: var(--sapling-gap-xs);
 }
 
+.sapling-message-center-dialog__body {
+  display: flex;
+  flex-direction: column;
+}
+
+.sapling-message-center-dialog__body > .sapling-message-center-empty-state {
+  flex: 1 1 auto;
+  min-height: 100%;
+}
+
 .sapling-dialog-small {
   max-width: var(--sapling-dialog-width-sm);
   width: 100%;

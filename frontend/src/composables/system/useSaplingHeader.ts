@@ -43,12 +43,8 @@ export function useSaplingHeader() {
    * Fetches the current number of open inbox items.
    */
   async function countInboxItems() {
-    const [tickets, events] = await Promise.all([
-      ApiService.findAll<unknown[]>('current/openTickets'),
-      ApiService.findAll<unknown[]>('current/openEvents'),
-    ])
-
-    inboxCount.value = tickets.length + events.length
+    const result = await ApiService.findOne<{ count: number }>('current/countOpenTasks')
+    inboxCount.value = result.count
   }
 
   /**

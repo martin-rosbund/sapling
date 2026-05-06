@@ -6,6 +6,9 @@ jest.mock('@mikro-orm/core', () => ({
 jest.mock('../../entity/PersonItem', () => ({ PersonItem: class {} }));
 jest.mock('../../entity/TicketItem', () => ({ TicketItem: class {} }));
 jest.mock('../../entity/EventItem', () => ({ EventItem: class {} }));
+jest.mock('../../entity/SalesOpportunityItem', () => ({
+  SalesOpportunityItem: class {},
+}));
 jest.mock('../../entity/global/entity.registry', () => ({
   ENTITY_HANDLES: [],
 }));
@@ -18,24 +21,23 @@ import { CurrentService } from './current.service';
 describe('CurrentService', () => {
   it('counts open tasks via database count queries instead of loading full lists', async () => {
     const count = jest
-      .fn<
-        (entity: unknown, where: Record<string, unknown>) => Promise<number>
-      >()
+      .fn()
       .mockResolvedValueOnce(3)
-      .mockResolvedValueOnce(5);
+      .mockResolvedValueOnce(5)
+      .mockResolvedValueOnce(2);
     const find = jest.fn();
     const em = {
       count,
       find,
     };
-    const service = new CurrentService(em as never);
+    const service = new CurrentService(em);
 
     const result = await service.countOpenTasks({
       handle: 7,
-    } as unknown as never);
+    });
 
-    expect(result).toEqual({ count: 8 });
-    expect(count).toHaveBeenCalledTimes(2);
+    expect(result).toEqual({ count: 10 });
+    expect(count).toHaveBeenCalledTimes(3);
     expect(find).not.toHaveBeenCalled();
     expect(count.mock.calls[0]?.[1]).toEqual(
       expect.objectContaining({
@@ -47,6 +49,12 @@ describe('CurrentService', () => {
       expect.objectContaining({
         assigneePerson: { handle: 7 },
         status: { handle: { $nin: ['closed'] } },
+      }),
+    );
+    expect(count.mock.calls[2]?.[1]).toEqual(
+      expect.objectContaining({
+        assigneePerson: { handle: 7 },
+        isActive: true,
       }),
     );
   });
