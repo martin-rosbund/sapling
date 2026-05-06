@@ -20,6 +20,10 @@ const FAVORITE_TEMPLATE_ENTITY_HANDLE = 'favoriteTemplate'
 export function useSaplingFavoritesAccess() {
   const currentPermissionStore = useCurrentPermissionStore()
 
+  async function ensurePermissionsLoaded() {
+    await currentPermissionStore.fetchCurrentPermission()
+  }
+
   const hasFavoritesAccess = computed(() => {
     return hasEntityReadPermission(FAVORITE_ENTITY_HANDLE)
   })
@@ -28,13 +32,13 @@ export function useSaplingFavoritesAccess() {
   })
 
   async function ensureFavoritesAccess() {
-    await currentPermissionStore.fetchCurrentPermission()
+    await ensurePermissionsLoaded()
 
     return hasFavoritesAccess.value
   }
 
   async function ensureFavoriteTemplateAccess() {
-    await currentPermissionStore.fetchCurrentPermission()
+    await ensurePermissionsLoaded()
 
     return hasFavoriteTemplateAccess.value
   }
@@ -50,9 +54,6 @@ export function useSaplingFavoritesAccess() {
       (permission) => permission.entityHandle === entityHandle && permission.allowRead,
     )
   }
-
-  void ensureFavoritesAccess()
-  void ensureFavoriteTemplateAccess()
 
   return {
     hasFavoritesAccess,
@@ -98,10 +99,10 @@ export function useSaplingFavorites() {
       isFavoritesLoading.value ||
       isEntitiesLoading.value ||
       isFavoriteTemplatesLoading.value ||
-      genericStore.getState('favorite').isLoading
+      genericStore.getState(FAVORITE_ENTITY_HANDLE).isLoading
     )
   })
-  const entity = computed(() => genericStore.getState('favorite').entity)
+  const entity = computed(() => genericStore.getState(FAVORITE_ENTITY_HANDLE).entity)
   // #endregion
 
   // #region Methods
@@ -136,7 +137,7 @@ export function useSaplingFavorites() {
         return
       }
 
-      const favoriteRes = await ApiGenericService.find<FavoriteItem>('favorite', {
+      const favoriteRes = await ApiGenericService.find<FavoriteItem>(FAVORITE_ENTITY_HANDLE, {
         filter: { person: { handle: currentPersonStore.person.handle } },
         relations: ['entity', 'entityRoute'],
       })
@@ -274,21 +275,14 @@ export function useSaplingFavorites() {
     }
 
     if (favorite.handle != null) {
-      await ApiGenericService.delete('favorite', favorite.handle)
+      await ApiGenericService.delete(FAVORITE_ENTITY_HANDLE, favorite.handle)
     }
 
     favorites.value.splice(favoriteIndex, 1)
   }
 
-  /**
-   * Navigates to the table route behind a stored favorite, including an optional serialized filter.
-   */
-  async function goToFavorite(favorite: FavoriteItem) {
-    if (!hasFavoritesAccess.value) {
-      return
-    }
-
-    const path = buildFavoritePath(favorite, entities.value)
+  function navigateToFavoriteTarget(target: FavoriteItem | FavoriteTemplateItem) {
+    const path = buildFavoritePath(target, entities.value)
     if (!path) {
       return
     }
@@ -297,15 +291,25 @@ export function useSaplingFavorites() {
   }
 
   /**
-   * Navigates directly to a saved template without creating a personal favorite first.
+   * Navigates to the table route behind a stored favorite, including an optional serialized filter.
    */
-  async function goToFavoriteTemplate(template: FavoriteTemplateItem) {
-    const path = buildFavoritePath(template, entities.value)
-    if (!path) {
+  function goToFavorite(favorite: FavoriteItem) {
+    if (!hasFavoritesAccess.value) {
       return
     }
 
-    router.push(path)
+    navigateToFavoriteTarget(favorite)
+  }
+
+  /**
+   * Navigates directly to a saved template without creating a personal favorite first.
+   */
+  function goToFavoriteTemplate(template: FavoriteTemplateItem) {
+    if (!hasFavoriteTemplateAccess.value) {
+      return
+    }
+
+    navigateToFavoriteTarget(template)
   }
   // #endregion
 
@@ -325,7 +329,7 @@ export function useSaplingFavorites() {
     }
 
     if (favoritesAccess) {
-      genericStore.loadGeneric(FAVORITE_ENTITY_HANDLE, 'global')
+      void genericStore.loadGeneric(FAVORITE_ENTITY_HANDLE, 'global')
     }
 
     await Promise.all([loadFavorites(), loadEntities(), loadFavoriteTemplates()])

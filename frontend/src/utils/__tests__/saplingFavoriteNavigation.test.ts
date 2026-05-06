@@ -109,23 +109,23 @@ describe('saplingFavoriteNavigation', () => {
       entityRoute: createEntityRoute({ route: 'table/ticket' }),
       filter: {
         status: { handle: 'open' },
-        assigneePerson: { handle: '{{currentPerson.handle}}' },
+        assigneePerson: { handle: '{{currentUser.handle}}' },
       },
     })
 
     expect(buildFavoritePath(favorite)).toBe(
-      '/table/ticket?filter=%7B%22status%22%3A%7B%22handle%22%3A%22open%22%7D%2C%22assigneePerson%22%3A%7B%22handle%22%3A%22%7B%7BcurrentPerson.handle%7D%7D%22%7D%7D',
+      '/table/ticket?filter=%7B%22status%22%3A%7B%22handle%22%3A%22open%22%7D%2C%22assigneePerson%22%3A%7B%22handle%22%3A%22%7B%7BcurrentUser.handle%7D%7D%22%7D%7D',
     )
   })
 
   it('passes JSON string filter placeholders through unchanged', () => {
     const favorite = createFavorite({
       entityRoute: createEntityRoute({ route: 'table/ticket' }),
-      filter: '{"status":{"handle":"open"},"assigneePerson":{"handle":"{{currentPerson.handle}}"}}',
+      filter: '{"status":{"handle":"open"},"assigneePerson":{"handle":"{{currentUser.handle}}"}}',
     })
 
     expect(buildFavoritePath(favorite)).toBe(
-      '/table/ticket?filter=%7B%22status%22%3A%7B%22handle%22%3A%22open%22%7D%2C%22assigneePerson%22%3A%7B%22handle%22%3A%22%7B%7BcurrentPerson.handle%7D%7D%22%7D%7D',
+      '/table/ticket?filter=%7B%22status%22%3A%7B%22handle%22%3A%22open%22%7D%2C%22assigneePerson%22%3A%7B%22handle%22%3A%22%7B%7BcurrentUser.handle%7D%7D%22%7D%7D',
     )
   })
 })
