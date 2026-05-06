@@ -21,6 +21,7 @@ import ApiGenericService, { type FilterQuery } from '@/services/api.generic.serv
 import ApiScriptService from '@/services/api.script.service'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
+import { buildFavoritePath } from '@/utils/saplingFavoriteNavigation'
 import { buildTableFilter, buildTableOrderBy } from '@/utils/saplingTableUtil'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import type { SaplingContextMenuTableActionPayload } from '@/composables/context/useSaplingContextMenuTable'
@@ -107,8 +108,11 @@ export function useSaplingTableActions({
     y: 0,
   })
   const favoriteDialog = ref<FavoriteDialogState>({ visible: false, title: '' })
+  const currentEntityFavorites = ref<FavoriteItem[]>([])
+  const isCurrentEntityFavoritesLoading = ref(false)
 
   let scriptButtonsRequestId = 0
+  let favoritesRequestId = 0
 
   const scriptButtons = computed(() => props.scriptButtons ?? loadedScriptButtons.value)
   const multiSelectScriptButtons = computed(() =>
@@ -131,6 +135,14 @@ export function useSaplingTableActions({
     () => [props.entityHandle, props.scriptButtons] as const,
     () => {
       void loadScriptButtons()
+    },
+    { immediate: true },
+  )
+
+  watch(
+    () => props.entityHandle,
+    () => {
+      void loadCurrentEntityFavorites()
     },
     { immediate: true },
   )
@@ -159,6 +171,47 @@ export function useSaplingTableActions({
     }
 
     loadedScriptButtons.value = result.data
+  }
+
+  async function loadCurrentEntityFavorites() {
+    if (!props.entityHandle) {
+      currentEntityFavorites.value = []
+      isCurrentEntityFavoritesLoading.value = false
+      return
+    }
+
+    const currentRequestId = ++favoritesRequestId
+    isCurrentEntityFavoritesLoading.value = true
+
+    try {
+      await currentPersonStore.fetchCurrentPerson()
+      const personHandle = currentPersonStore.person?.handle
+
+      if (personHandle == null) {
+        currentEntityFavorites.value = []
+        return
+      }
+
+      const result = await ApiGenericService.find<FavoriteItem>('favorite', {
+        filter: {
+          person: { handle: personHandle },
+          entity: { handle: props.entityHandle },
+        },
+        orderBy: buildTableOrderBy([{ key: 'title', order: 'asc' }]),
+        relations: ['entity', 'entityRoute'],
+        limit: DEFAULT_ENTITY_ITEMS_COUNT,
+      })
+
+      if (currentRequestId !== favoritesRequestId) {
+        return
+      }
+
+      currentEntityFavorites.value = result.data ?? []
+    } finally {
+      if (currentRequestId === favoritesRequestId) {
+        isCurrentEntityFavoritesLoading.value = false
+      }
+    }
   }
 
   async function downloadJSON() {
@@ -589,6 +642,7 @@ export function useSaplingTableActions({
       })
 
       closeFavoriteDialog()
+      await loadCurrentEntityFavorites()
       pushMessage(
         'success',
         t('global.favoriteSaved'),
@@ -662,6 +716,26 @@ export function useSaplingTableActions({
     return tableRoute?.handle
   }
 
+  const activeFavoriteHandle = computed(() => {
+    const currentPath = route.fullPath
+
+    const matchingFavorite = currentEntityFavorites.value.find((favorite) => {
+      const favoritePath = buildFavoritePath(favorite)
+      return favoritePath === currentPath
+    })
+
+    return matchingFavorite?.handle ?? null
+  })
+
+  async function selectFavorite(favorite: FavoriteItem) {
+    const targetPath = buildFavoritePath(favorite)
+    if (!targetPath) {
+      return
+    }
+
+    await router.push(targetPath)
+  }
+
   return {
     scriptButtons,
     multiSelectScriptButtons,
@@ -677,6 +751,9 @@ export function useSaplingTableActions({
     informationDialogItem,
     contextMenu,
     favoriteDialog,
+    currentEntityFavorites,
+    isCurrentEntityFavoritesLoading,
+    activeFavoriteHandle,
     isDownloadingJSON,
     downloadJSON,
     refreshTable,
@@ -694,6 +771,7 @@ export function useSaplingTableActions({
     openFavoriteDialog,
     closeFavoriteDialog,
     saveFavorite,
+    selectFavorite,
     openCreateDialog,
     openEditDialog,
     openShowDialog,

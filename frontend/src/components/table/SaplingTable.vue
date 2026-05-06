@@ -58,9 +58,13 @@
               :refresh-button-label="refreshButtonLabel"
               :show-favorite="showFavoriteButton"
               :show-add="showAddButton"
+              :favorite-items="currentEntityFavorites"
+              :is-favorites-loading="isCurrentEntityFavoritesLoading"
+              :active-favorite-handle="activeFavoriteHandle"
               @download="downloadJSON"
               @refresh="refreshTable"
               @favorite="openFavoriteDialog"
+              @select-favorite="selectFavorite"
               @add="openCreateDialog"
             >
               <template v-if="showSidePanelToggleButton" #leading>
@@ -309,6 +313,9 @@ const {
   informationDialogItem,
   contextMenu,
   favoriteDialog,
+  currentEntityFavorites,
+  isCurrentEntityFavoritesLoading,
+  activeFavoriteHandle,
   isDownloadingJSON,
   multiSelectScriptButtons,
   rowScriptButtons,
@@ -347,6 +354,7 @@ const {
   openFavoriteDialog,
   closeFavoriteDialog,
   saveFavorite,
+  selectFavorite,
   openCreateDialog,
   openEditDialog,
   openShowDialog,

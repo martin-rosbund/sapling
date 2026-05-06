@@ -128,4 +128,20 @@ describe('saplingFavoriteNavigation', () => {
       '/table/ticket?filter=%7B%22status%22%3A%7B%22handle%22%3A%22open%22%7D%2C%22assigneePerson%22%3A%7B%22handle%22%3A%22%7B%7BcurrentUser.handle%7D%7D%22%7D%7D',
     )
   })
+
+  it('includes persisted search and sorting context in the favorite path', () => {
+    const favorite = createFavorite({
+      entityRoute: createEntityRoute({ route: 'table/ticket' }),
+      search: 'Ada',
+      sortBy: [
+        { key: 'deadlineDate', order: 'asc' },
+        { key: 'priority', order: 'desc' },
+      ],
+      filter: { status: { handle: 'open' } },
+    })
+
+    expect(buildFavoritePath(favorite)).toBe(
+      '/table/ticket?search=Ada&sortBy=%5B%7B%22key%22%3A%22deadlineDate%22%2C%22order%22%3A%22asc%22%7D%2C%7B%22key%22%3A%22priority%22%2C%22order%22%3A%22desc%22%7D%5D&filter=%7B%22status%22%3A%7B%22handle%22%3A%22open%22%7D%7D',
+    )
+  })
 })

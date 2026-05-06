@@ -36,6 +36,17 @@ const entityStates = reactive<Record<string, ReturnType<typeof createEntityState
       type: 'string',
       options: ['isOrderASC'],
     }),
+    createTemplate({
+      name: 'status',
+      type: 'string',
+      kind: 'm:1',
+      referenceName: 'ticketStatus',
+      referencedPks: ['handle'],
+    }),
+    createTemplate({
+      name: 'amount',
+      type: 'number',
+    }),
   ]),
   contract: createEntityState([
     createTemplate({
@@ -246,13 +257,60 @@ describe('useSaplingTable', () => {
       'partner',
       expect.objectContaining({
         filter: {
-          status: { handle: 'open' },
-          assigneePerson: { handle: '{{currentUser.handle}}' },
+          $and: [
+            {
+              status: { $in: ['open'] },
+            },
+            {
+              assigneePerson: { handle: '{{currentUser.handle}}' },
+            },
+          ],
         },
       }),
     )
+    expect(wrapper.vm.columnFilters).toEqual({
+      status: {
+        operator: 'eq',
+        value: '',
+        relationItems: [{ handle: 'open' }],
+      },
+    })
     expect(wrapper.vm.items).toEqual([{ handle: 1, title: 'Open ticket' }])
     expect(wrapper.vm.totalItems).toBe(1)
+  })
+
+  it('restores supported route query filters into the table header state before loading', async () => {
+    loadGenericMock.mockResolvedValue(undefined)
+    routeState.query = {
+      filter:
+        '{"$and":[{"name":{"$ilike":"%Ada%"}},{"status":{"$in":["open","pending"]}},{"amount":{"$gte":5,"$lte":10}}]}',
+    }
+    apiFindMock.mockResolvedValue({
+      data: [],
+      meta: { total: 0 },
+    })
+
+    const wrapper = mountQueryEnabledTestHost(ref('partner'))
+    await flushPromises()
+
+    expect(wrapper.vm.columnFilters).toEqual({
+      name: {
+        operator: 'like',
+        value: 'Ada',
+      },
+      status: {
+        operator: 'eq',
+        value: '',
+        relationItems: [{ handle: 'open' }, { handle: 'pending' }],
+      },
+      amount: {
+        operator: 'eq',
+        value: '',
+        rangeStart: '5',
+        rangeEnd: '10',
+      },
+    })
+    expect(apiFindMock).toHaveBeenCalledTimes(1)
   })
 })
 
@@ -284,9 +342,9 @@ function createTemplate(
     options: overrides.options ?? [],
     isAutoIncrement: false,
     isPersistent: true,
-    isReference: false,
-    referencedPks: [],
-    referenceName: undefined,
+    isReference: overrides.isReference ?? false,
+    referencedPks: overrides.referencedPks ?? [],
+    referenceName: overrides.referenceName,
     length: undefined,
   } as EntityTemplate
 }
