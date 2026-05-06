@@ -10,5 +10,11 @@
     "title": "E-Mail",
     "icon": "mdi-email",
     "color": "#2196F3"
+  },
+  {
+    "handle": "aiChatAudio",
+    "title": "Chat-Audio",
+    "icon": "mdi-microphone",
+    "color": "#FF7043"
   }
 ]

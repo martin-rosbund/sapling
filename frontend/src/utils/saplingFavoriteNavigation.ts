@@ -25,13 +25,18 @@ function getConfiguredFavoriteRoute(
     return null
   }
 
-  const entityDefinition = isEntityItem(favorite.entity)
-    ? favorite.entity
-    : entities.find((entry) => entry.handle === entityHandle)
+  const inlineEntityDefinition = isEntityItem(favorite.entity) ? favorite.entity : null
+  const entityDefinition = inlineEntityDefinition?.routes?.length
+    ? inlineEntityDefinition
+    : (entities.find((entry) => entry.handle === entityHandle) ?? inlineEntityDefinition)
 
-  const configuredRoute = entityDefinition?.routes?.find((entry) => {
-    return typeof entry.route === 'string' && entry.route.length > 0
-  })?.route
+  const configuredRoutes =
+    entityDefinition?.routes?.filter((entry) => {
+      return typeof entry.route === 'string' && entry.route.length > 0
+    }) ?? []
+
+  const configuredRoute =
+    configuredRoutes.find((entry) => entry.navigation == null)?.route ?? configuredRoutes[0]?.route
 
   return configuredRoute || `table/${entityHandle}`
 }

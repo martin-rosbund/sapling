@@ -12,6 +12,8 @@ import type {
 import type { SaplingGenericItem } from '@/entity/entity'
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants'
 import { useGenericStore } from '@/stores/genericStore'
+import { useCurrentPersonStore } from '@/stores/currentPersonStore'
+import { resolveDynamicFilter } from '@/utils/saplingDynamicFilter'
 import {
   buildTableFilter,
   buildTableOrderBy,
@@ -47,6 +49,7 @@ export function useSaplingTable(
 
   const route = useRoute()
   const genericStore = useGenericStore()
+  const currentPersonStore = useCurrentPersonStore()
   let activeLoadController: AbortController | null = null
   let scheduledLoadTimeout: ReturnType<typeof setTimeout> | null = null
   let latestLoadRequestId = 0
@@ -77,7 +80,9 @@ export function useSaplingTable(
     }
 
     try {
-      return JSON.parse(filterParam)
+      return resolveDynamicFilter(JSON.parse(filterParam), {
+        currentPerson: currentPersonStore.person,
+      })
     } catch {
       return filterParam
     }
@@ -296,7 +301,15 @@ export function useSaplingTable(
   })
 
   watch(
-    [search, page, itemsPerPage, sortBy, parentFilter, columnFilters],
+    [
+      search,
+      page,
+      itemsPerPage,
+      sortBy,
+      parentFilter,
+      columnFilters,
+      () => currentPersonStore.person?.handle,
+    ],
     () => {
       if (isResettingEntityState.value || !isInitialized.value) {
         return

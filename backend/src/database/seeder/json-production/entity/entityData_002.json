@@ -1,3 +1,0 @@
-[ 
-  { "handle": "aiChatTranscription", "canShow": true, "icon": "mdi-microphone-message", "group": "chat", "order": 30, "canRead": true, "canInsert": false, "canUpdate": false, "canDelete": true}
-]

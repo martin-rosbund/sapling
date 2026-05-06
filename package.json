@@ -21,6 +21,7 @@
 		"orm:migrate": "npm run orm:migrate --prefix backend",
 		"orm:seed": "npm run orm:seed --prefix backend",
 		"orm:deploy": "npm run orm:deploy --prefix backend",
+		"orm:create-migration": "npm run orm:create-migration --prefix backend",
 		"format:backend": "npm run format --prefix backend",
 		"format:frontend": "npm run format --prefix frontend",
 		"format": "npm run format:backend && npm run format:frontend"

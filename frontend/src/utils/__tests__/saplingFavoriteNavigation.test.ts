@@ -68,4 +68,35 @@ describe('saplingFavoriteNavigation', () => {
       '/partner/favorite?filter=%7B%22mine%22%3Atrue%7D',
     )
   })
+
+  it('falls back to loaded entity definitions when an inline entity misses route metadata', () => {
+    const favorite = createFavorite({
+      entity: createEntity({
+        handle: 'ticket',
+        routes: [],
+      }),
+    })
+    const entities = [
+      createEntity({
+        handle: 'ticket',
+        routes: [{ route: 'partner/ticket', navigation: null, createdAt: null }],
+      }),
+    ]
+
+    expect(buildFavoritePath(favorite, entities)).toBe('/partner/ticket')
+  })
+
+  it('prefers worklist-friendly routes over navigation-specific routes', () => {
+    const favorite = createFavorite({
+      entity: createEntity({
+        handle: 'event',
+        routes: [
+          { route: 'event', navigation: 'calendar', createdAt: null },
+          { route: 'partner/event', navigation: null, createdAt: null },
+        ],
+      }),
+    })
+
+    expect(buildFavoritePath(favorite)).toBe('/partner/event')
+  })
 })

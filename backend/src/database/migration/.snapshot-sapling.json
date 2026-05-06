@@ -987,7 +987,7 @@
         },
         "duration_seconds": {
           "name": "duration_seconds",
-          "type": "double precision",
+          "type": "real",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -999,7 +999,7 @@
           "default": null,
           "comment": null,
           "enumItems": [],
-          "mappedType": "double"
+          "mappedType": "float"
         },
         "failure_payload": {
           "name": "failure_payload",
@@ -1233,7 +1233,8 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "referencedTableName": "public.document_item"
+          "referencedTableName": "public.document_item",
+          "deleteRule": "set null"
         },
         "ai_chat_transcription_item_message_handle_foreign": {
           "columnNames": [
@@ -7243,6 +7244,151 @@
       "comment": null
     },
     {
+      "name": "favorite_template_item",
+      "schema": "public",
+      "columns": {
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "entity_handle": {
+          "name": "entity_handle",
+          "type": "varchar(64)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 64,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "filter": {
+          "name": "filter",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "json"
+        },
+        "handle": {
+          "name": "handle",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "is_recommended": {
+          "name": "is_recommended",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "false",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(128)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 128,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "favorite_template_item_pkey",
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "favorite_template_item_entity_handle_foreign": {
+          "columnNames": [
+            "entity_handle"
+          ],
+          "constraintName": "favorite_template_item_entity_handle_foreign",
+          "localTableName": "public.favorite_template_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "public.entity_item"
+        }
+      },
+      "comment": null
+    },
+    {
       "name": "holiday_group_item",
       "schema": "public",
       "columns": {
@@ -12800,11 +12946,11 @@
           "updateRule": "cascade",
           "deleteRule": "cascade"
         },
-        "shared_mailbox_group_item_persons_shared_mailbox_group_item_han": {
+        "shared_mailbox_group_item_persons_shared_mailbox_c547c_foreign": {
           "columnNames": [
             "shared_mailbox_group_item_handle"
           ],
-          "constraintName": "shared_mailbox_group_item_persons_shared_mailbox_group_item_han",
+          "constraintName": "shared_mailbox_group_item_persons_shared_mailbox_c547c_foreign",
           "localTableName": "public.shared_mailbox_group_item_persons",
           "referencedColumnNames": [
             "handle"

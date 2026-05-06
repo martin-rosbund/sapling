@@ -1,0 +1,389 @@
+[
+  {
+    "name": "Meine offenen Tickets",
+    "entity": "ticket",
+    "filter": {
+      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "status": { "handle": "open" }
+    },
+    "isRecommended": true
+  },
+  {
+    "name": "Meine Tickets in Bearbeitung",
+    "entity": "ticket",
+    "filter": {
+      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "status": { "handle": { "$in": ["in_progress", "in_development"] } }
+    },
+    "isRecommended": true
+  },
+  {
+    "name": "Meine wartenden Tickets",
+    "entity": "ticket",
+    "filter": {
+      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "status": { "handle": "waiting" }
+    },
+    "isRecommended": true
+  },
+  {
+    "name": "Meine Tickets mit hoher Prioritaet",
+    "entity": "ticket",
+    "filter": {
+      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "priority": { "handle": "high" },
+      "status": { "handle": { "$nin": ["closed"] } }
+    },
+    "isRecommended": true
+  },
+  {
+    "name": "Meine ueberfaelligen Tickets",
+    "entity": "ticket",
+    "filter": {
+      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "deadlineDate": { "$lt": "{{today.start}}" },
+      "status": { "handle": { "$nin": ["closed"] } }
+    },
+    "isRecommended": true
+  },
+  {
+    "name": "Meine heute faelligen Tickets",
+    "entity": "ticket",
+    "filter": {
+      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "deadlineDate": {
+        "$gte": "{{today.start}}",
+        "$lt": "{{tomorrow.start}}"
+      },
+      "status": { "handle": { "$nin": ["closed"] } }
+    },
+    "isRecommended": true
+  },
+  {
+    "name": "Eigene erstellte offene Tickets",
+    "entity": "ticket",
+    "filter": {
+      "creatorPerson": { "handle": "{{currentPerson.handle}}" },
+      "status": { "handle": { "$nin": ["closed"] } }
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Offene Tickets Service Desk",
+    "entity": "ticket",
+    "filter": {
+      "supportTeam": { "handle": "service_desk" },
+      "status": { "handle": "open" }
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Offene Tickets Platform Operations",
+    "entity": "ticket",
+    "filter": {
+      "supportTeam": { "handle": "platform" },
+      "status": { "handle": "open" }
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Tickets in Queue General Support",
+    "entity": "ticket",
+    "filter": {
+      "supportQueue": { "handle": "general_support" },
+      "status": { "handle": { "$nin": ["closed"] } }
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Tickets in Queue Application Incidents",
+    "entity": "ticket",
+    "filter": {
+      "supportQueue": { "handle": "application_incidents" },
+      "status": { "handle": { "$nin": ["closed"] } }
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Tickets in Queue Consulting Requests",
+    "entity": "ticket",
+    "filter": {
+      "supportQueue": { "handle": "consulting_requests" },
+      "status": { "handle": { "$nin": ["closed"] } }
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Tickets in Queue Platform Operations",
+    "entity": "ticket",
+    "filter": {
+      "supportQueue": { "handle": "platform_ops" },
+      "status": { "handle": { "$nin": ["closed"] } }
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Meine offenen Verkaufschancen",
+    "entity": "salesOpportunity",
+    "filter": {
+      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "isActive": true
+    },
+    "isRecommended": true
+  },
+  {
+    "name": "Meine neuen Verkaufschancen",
+    "entity": "salesOpportunity",
+    "filter": {
+      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "isActive": true,
+      "type": { "handle": "new" }
+    },
+    "isRecommended": true
+  },
+  {
+    "name": "Meine qualifizierten Verkaufschancen",
+    "entity": "salesOpportunity",
+    "filter": {
+      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "isActive": true,
+      "type": { "handle": "qualified" }
+    },
+    "isRecommended": true
+  },
+  {
+    "name": "Meine Angebote",
+    "entity": "salesOpportunity",
+    "filter": {
+      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "isActive": true,
+      "type": { "handle": "proposal" }
+    },
+    "isRecommended": true
+  },
+  {
+    "name": "Meine Verhandlungen",
+    "entity": "salesOpportunity",
+    "filter": {
+      "assigneePerson": { "handle": "{{currentPerson.handle}}" },
+      "isActive": true,
+      "type": { "handle": "negotiation" }
+    },
+    "isRecommended": true
+  },
+  {
+    "name": "Verkaufschancen meines Unternehmens",
+    "entity": "salesOpportunity",
+    "filter": {
+      "assigneeCompany": { "handle": "{{currentCompany.handle}}" },
+      "isActive": true
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Meine heutigen Termine",
+    "entity": "event",
+    "filter": {
+      "participants": { "handle": "{{currentPerson.handle}}" },
+      "startDate": {
+        "$gte": "{{today.start}}",
+        "$lt": "{{tomorrow.start}}"
+      },
+      "status": { "handle": { "$nin": ["canceled", "completed"] } }
+    },
+    "isRecommended": true
+  },
+  {
+    "name": "Meine bestaetigten Termine heute",
+    "entity": "event",
+    "filter": {
+      "participants": { "handle": "{{currentPerson.handle}}" },
+      "startDate": {
+        "$gte": "{{today.start}}",
+        "$lt": "{{tomorrow.start}}"
+      },
+      "status": { "handle": "confirmed" }
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Meine morgigen Termine",
+    "entity": "event",
+    "filter": {
+      "participants": { "handle": "{{currentPerson.handle}}" },
+      "startDate": {
+        "$gte": "{{tomorrow.start}}",
+        "$lt": "{{dayAfterTomorrow.start}}"
+      },
+      "status": { "handle": { "$nin": ["canceled", "completed"] } }
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Meine Termine diese Woche",
+    "entity": "event",
+    "filter": {
+      "participants": { "handle": "{{currentPerson.handle}}" },
+      "startDate": {
+        "$gte": "{{week.start}}",
+        "$lt": "{{week.end}}"
+      },
+      "status": { "handle": { "$nin": ["canceled", "completed"] } }
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Meine geplanten Termine",
+    "entity": "event",
+    "filter": {
+      "participants": { "handle": "{{currentPerson.handle}}" },
+      "status": { "handle": "scheduled" }
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Meine Termine diesen Monat",
+    "entity": "event",
+    "filter": {
+      "participants": { "handle": "{{currentPerson.handle}}" },
+      "startDate": {
+        "$gte": "{{month.start}}",
+        "$lt": "{{month.end}}"
+      },
+      "status": { "handle": { "$nin": ["canceled", "completed"] } }
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Meine erstellten Termine",
+    "entity": "event",
+    "filter": {
+      "creatorPerson": { "handle": "{{currentPerson.handle}}" },
+      "status": { "handle": { "$nin": ["canceled"] } }
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Aktive Unternehmen",
+    "entity": "company",
+    "filter": { "isActive": true },
+    "isRecommended": true
+  },
+  {
+    "name": "Unternehmen mit Website",
+    "entity": "company",
+    "filter": { "website": { "$ne": null } },
+    "isRecommended": true
+  },
+  {
+    "name": "Unternehmen mit Telefonnummer",
+    "entity": "company",
+    "filter": { "phone": { "$ne": null } },
+    "isRecommended": false
+  },
+  {
+    "name": "Unternehmen ohne Website",
+    "entity": "company",
+    "filter": { "website": null },
+    "isRecommended": false
+  },
+  {
+    "name": "Newsletter-faehige Unternehmen",
+    "entity": "company",
+    "filter": {
+      "isActive": true,
+      "allowNewsletter": true
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Aktive Kontakte",
+    "entity": "person",
+    "filter": { "isActive": true },
+    "isRecommended": false
+  },
+  {
+    "name": "Kontakte meines Unternehmens",
+    "entity": "person",
+    "filter": {
+      "company": { "handle": "{{currentCompany.handle}}" },
+      "isActive": true
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Kontakte mit Mobilnummer",
+    "entity": "person",
+    "filter": { "mobile": { "$ne": null } },
+    "isRecommended": false
+  },
+  {
+    "name": "Aktive Vertraege meines Unternehmens",
+    "entity": "contract",
+    "filter": {
+      "company": { "handle": "{{currentCompany.handle}}" },
+      "isActive": true
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Vertraege mit naechstem Service diese Woche",
+    "entity": "contract",
+    "filter": {
+      "company": { "handle": "{{currentCompany.handle}}" },
+      "nextServiceDate": {
+        "$gte": "{{week.start}}",
+        "$lt": "{{week.end}}"
+      }
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Vertraege meines Unternehmens mit Updateservice",
+    "entity": "contract",
+    "filter": {
+      "company": { "handle": "{{currentCompany.handle}}" },
+      "hasUpdateservice": true
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Vertraege meines Unternehmens mit Enddatum diesen Monat",
+    "entity": "contract",
+    "filter": {
+      "company": { "handle": "{{currentCompany.handle}}" },
+      "endDate": {
+        "$gte": "{{month.start}}",
+        "$lt": "{{month.end}}"
+      }
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Systeme meines Unternehmens mit Remote Access",
+    "entity": "serverLandscape",
+    "filter": {
+      "company": { "handle": "{{currentCompany.handle}}" },
+      "allowRemoteAccess": true
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Systeme meines Unternehmens ohne Internetzugang",
+    "entity": "serverLandscape",
+    "filter": {
+      "company": { "handle": "{{currentCompany.handle}}" },
+      "hasInternetAccess": false
+    },
+    "isRecommended": false
+  },
+  {
+    "name": "Systeme meines Unternehmens mit Internetzugang",
+    "entity": "serverLandscape",
+    "filter": {
+      "company": { "handle": "{{currentCompany.handle}}" },
+      "hasInternetAccess": true
+    },
+    "isRecommended": false
+  }
+]

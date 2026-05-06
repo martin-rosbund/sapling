@@ -54,26 +54,25 @@
 
       <div class="sapling-favorites-panel__footer">
         <v-btn
+          v-if="hasFavoriteTemplateAccess"
           block
           color="primary"
           variant="text"
-          prepend-icon="mdi-plus-circle"
+          prepend-icon="mdi-view-list-outline"
           class="d-flex align-center justify-center"
-          @click="openAddFavoriteDialog"
+          @click="openFavoriteTemplateLoadDialog"
         >
-          <span>{{ $t('global.add') }}</span>
+          <span>{{ $t('favorite.loadTemplate') }}</span>
         </v-btn>
       </div>
 
-      <SaplingDialogFavorite
-        :addFavoriteDialog="addFavoriteDialog"
-        @update:addFavoriteDialog="updateAddFavoriteDialog"
-        :entityOptions="entityOptions"
-        :newFavoriteTitle="newFavoriteTitle"
-        @update:newFavoriteTitle="updateNewFavoriteTitle"
-        :selectedFavoriteEntity="selectedFavoriteEntity"
-        @update:selectedFavoriteEntity="updateSelectedFavoriteEntity"
-        @addFavorite="addFavorite"
+      <SaplingFavoriteTemplateLoadDialog
+        :model-value="favoriteTemplateLoadDialog"
+        :templates="favoriteTemplates"
+        :busy-template-handle="loadingFavoriteTemplateHandle"
+        :busy="loadingFavoriteTemplateHandle !== null"
+        @update:model-value="updateFavoriteTemplateDialog"
+        @select="loadFavoriteFromTemplate"
       />
     </template>
   </section>
@@ -82,7 +81,7 @@
 <script setup lang="ts">
 // #region Imports
 import { useSaplingFavorites } from '@/composables/dashboard/useSaplingFavorites'
-import SaplingDialogFavorite from '@/components/dialog/SaplingDialogFavorite.vue'
+import SaplingFavoriteTemplateLoadDialog from '@/components/dashboard/SaplingFavoriteTemplateLoadDialog.vue'
 import type { FavoriteItem } from '@/entity/entity'
 // #endregion
 
@@ -96,19 +95,20 @@ const emit = defineEmits<{
 const {
   entity,
   isLoading,
+  hasFavoriteTemplateAccess,
   favorites,
-  addFavoriteDialog,
-  newFavoriteTitle,
-  selectedFavoriteEntity,
-  entityOptions,
-  openAddFavoriteDialog,
-  updateAddFavoriteDialog,
-  updateNewFavoriteTitle,
-  updateSelectedFavoriteEntity,
+  favoriteTemplates,
+  favoriteTemplateLoadDialog,
+  loadingFavoriteTemplateHandle,
+  openFavoriteTemplateLoadDialog,
+  loadFavoriteFromTemplate,
   removeFavorite,
   goToFavorite,
-  addFavorite,
 } = useSaplingFavorites()
+
+function updateFavoriteTemplateDialog(value: boolean) {
+  favoriteTemplateLoadDialog.value = value
+}
 
 function openFavorite(favorite: FavoriteItem) {
   goToFavorite(favorite)

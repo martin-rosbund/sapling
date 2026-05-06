@@ -52,6 +52,7 @@
   { "entity": "dashboard", "route": "partner/dashboard" },
   { "entity": "dashboardTemplate", "route": "table/dashboardTemplate" },
   { "entity": "favorite", "route": "partner/favorite" },
+  { "entity": "favoriteTemplate", "route": "table/favoriteTemplate" },
 
   { "entity": "webhookSubscription", "route": "table/webhookSubscription" },
   { "entity": "webhookSubscriptionType", "route": "table/webhookSubscriptionType" },
@@ -102,5 +103,6 @@
   { "entity": "aiChatMessage", "route": "table/aiChatMessage" },
   { "entity": "aiProviderType", "route": "table/aiProviderType" },
   { "entity": "aiProviderModel", "route": "table/aiProviderModel" },
+  { "entity": "aiChatTranscription", "route": "table/aiChatTranscription" },
   { "entity": "mcpServerConfig", "route": "table/mcpServerConfig" }
 ]

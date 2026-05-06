@@ -456,6 +456,26 @@ export interface FavoriteItem extends SaplingGenericItem {
   updatedAt?: Date | null
 }
 
+/**
+ * Represents a reusable worklist template for favorites.
+ */
+export interface FavoriteTemplateItem extends SaplingGenericItem {
+  /** Unique identifier for the template */
+  handle: number | null
+  /** Visible template name */
+  name: string
+  /** Target page/entity */
+  entity: EntityItem | string | null
+  /** Optional persisted filter */
+  filter?: Record<string, unknown> | string | null
+  /** Whether the template should be highlighted */
+  isRecommended: boolean
+  /** Creation date */
+  createdAt: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
 export interface KPIAggregationItem extends SaplingGenericItem {
   /** Unique identifier for the aggregation type */
   handle: string

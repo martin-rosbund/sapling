@@ -968,7 +968,7 @@ const dialogLaunchers = computed<ShowcaseDialogLauncher[]>(() => [
   {
     key: 'favorite',
     title: 'Favorite Dialog',
-    description: 'Speichert einen Favoriten mit Titel und Entity-Auswahl.',
+    description: 'Speichert eine Arbeitsliste mit Titel und Entity-Auswahl.',
     icon: 'mdi-star-outline',
     color: 'primary',
     open: openFavoriteShowcaseDialog,
