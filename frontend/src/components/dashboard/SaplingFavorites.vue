@@ -1,11 +1,8 @@
 <template>
   <section class="sapling-favorites-panel">
     <template v-if="isLoading">
-      <div class="sapling-favorites-panel__header">
-        <v-skeleton-loader type="text" width="180" />
-      </div>
-
       <div class="sapling-favorites-panel__content">
+        <v-skeleton-loader class="mb-3" type="text" width="100%" />
         <v-skeleton-loader
           v-for="item in 4"
           :key="item"
@@ -20,13 +17,6 @@
     </template>
 
     <template v-else>
-      <div class="sapling-favorites-panel__header">
-        <div class="sapling-favorites-panel__headline">
-          <v-icon>{{ entity?.icon || 'mdi-bookmark-multiple-outline' }}</v-icon>
-          <span>{{ $t('navigation.favorite') }}</span>
-        </div>
-      </div>
-
       <v-text-field
         v-model="favoriteSearch"
         class="sapling-favorites-panel__search"
@@ -118,7 +108,6 @@ const favoriteSearch = ref('')
 
 // #region Composable
 const {
-  entity,
   isLoading,
   hasFavoriteTemplateAccess,
   favorites,

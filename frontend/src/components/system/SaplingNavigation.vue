@@ -50,8 +50,13 @@
               <span>{{ navigationSummary.subgroupCount }} {{ $t('global.groups') }}</span>
               <span>{{ navigationSummary.entityCount }} {{ $t('global.entities') }}</span>
             </template>
+            <template v-else-if="isFavoritesSummaryLoading">
+              <v-skeleton-loader type="text" width="96" />
+              <v-skeleton-loader type="text" width="88" />
+            </template>
             <template v-else>
-              <span>{{ $t('navigation.favorite') }}</span>
+              <span>{{ favoriteSummary.favoriteCount }} {{ $t('global.items') }}</span>
+              <span>{{ favoriteSummary.entityCount }} {{ $t('global.entities') }}</span>
             </template>
           </div>
         </template>
@@ -233,10 +238,14 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import SaplingFavorites from '@/components/dashboard/SaplingFavorites.vue'
 import { useSaplingNavigation } from '@/composables/system/useSaplingNavigation'
-import { useSaplingFavoritesAccess } from '@/composables/dashboard/useSaplingFavorites'
+import {
+  useSaplingFavorites,
+  useSaplingFavoritesAccess,
+} from '@/composables/dashboard/useSaplingFavorites'
+import { getFavoriteEntityHandle } from '@/utils/saplingFavoriteNavigation'
 // #endregion
 
 // #region Props & Emits
@@ -266,7 +275,20 @@ const {
 } = useSaplingNavigation(props, emit)
 
 const { hasFavoritesAccess } = useSaplingFavoritesAccess()
+const { favorites, isLoading: isFavoritesSummaryLoading } = useSaplingFavorites()
 const activePanel = ref<'navigation' | 'favorites'>('navigation')
+const favoriteSummary = computed(() => {
+  const entityHandles = new Set(
+    favorites.value
+      .map((favorite) => getFavoriteEntityHandle(favorite.entity))
+      .filter((handle): handle is string => Boolean(handle)),
+  )
+
+  return {
+    favoriteCount: favorites.value.length,
+    entityCount: entityHandles.size,
+  }
+})
 
 function toggleActivePanel() {
   activePanel.value = activePanel.value === 'navigation' ? 'favorites' : 'navigation'
