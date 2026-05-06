@@ -7,7 +7,6 @@ import { AddressTypeItem } from '../../entity/AddressTypeItem';
 import { CompanyItem } from '../../entity/CompanyItem';
 import { CompanyRelationshipItem } from '../../entity/CompanyRelationshipItem';
 import { CompanyRelationshipTypeItem } from '../../entity/CompanyRelationshipTypeItem';
-import { DashboardItem } from '../../entity/DashboardItem';
 import { DashboardTemplateItem } from '../../entity/DashboardTemplateItem';
 import { PermissionSeeder } from './PermissionSeeder';
 import { readFileSync } from 'fs';
@@ -29,7 +28,6 @@ import { EventItem } from '../../entity/EventItem';
 import { EventDeliveryStatusItem } from '../../entity/EventDeliveryStatusItem';
 import { ProductItem } from '../../entity/ProductItem';
 import { NoteItem } from '../../entity/NoteItem';
-import { FavoriteItem } from '../../entity/FavoriteItem';
 import { FavoriteTemplateItem } from '../../entity/FavoriteTemplateItem';
 import { KpiAggregationItem } from '../../entity/KpiAggregationItem';
 import { KpiTimeframeItem } from '../../entity/KpiTimeframeItem';
@@ -80,6 +78,7 @@ import { TeamsDeliveryItem } from '../../entity/TeamsDeliveryItem';
 import { TeamsDeliveryStatusItem } from '../../entity/TeamsDeliveryStatusItem';
 import { HolidayItem } from '../../entity/HolidayItem';
 import { HolidayGroupItem } from '../../entity/HolidayGroupItem';
+import { RoleStarterSeeder } from './RoleStarterSeeder';
 
 // entfernt
 
@@ -150,15 +149,14 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(ContractItem),
       GenericSeeder.for(TicketItem),
       GenericSeeder.for(EventItem),
-      GenericSeeder.for(DashboardItem),
       GenericSeeder.for(DashboardTemplateItem),
+      GenericSeeder.for(FavoriteTemplateItem),
+      RoleStarterSeeder,
       GenericSeeder.for(ServerLandscapeTypeItem),
       GenericSeeder.for(ServerLandscapeTypeUsageItem),
       GenericSeeder.for(ServerLandscapeItem),
       GenericSeeder.for(ProductItem),
       GenericSeeder.for(NoteItem),
-      GenericSeeder.for(FavoriteItem),
-      GenericSeeder.for(FavoriteTemplateItem),
       GenericSeeder.for(WebhookAuthenticationTypeItem),
       GenericSeeder.for(WebhookSubscriptionTypeItem),
       GenericSeeder.for(WebhookSubscriptionPayloadType),

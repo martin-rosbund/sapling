@@ -1,0 +1,44 @@
+[
+  {
+    "role": "Administrator",
+    "templates": [
+      "Support Operations",
+      "Sales Pipeline",
+      "Event Coordination",
+      "Contracts & Products",
+      "Master Data Quality",
+      "System Operations"
+    ]
+  },
+  {
+    "role": "Support",
+    "templates": [
+      "Support Operations",
+      "Event Coordination",
+      "System Operations"
+    ]
+  },
+  {
+    "role": "Vertrieb",
+    "templates": [
+      "Sales Pipeline",
+      "Event Coordination",
+      "Contracts & Products"
+    ]
+  },
+  {
+    "role": "Kunde",
+    "templates": [
+      "Event Coordination",
+      "Contracts & Products"
+    ]
+  },
+  {
+    "role": "Dienstleister",
+    "templates": [
+      "Support Operations",
+      "Event Coordination",
+      "Contracts & Products"
+    ]
+  }
+]

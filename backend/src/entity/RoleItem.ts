@@ -9,6 +9,8 @@ import {
 import { PersonItem } from './PersonItem';
 import { PermissionItem } from './PermissionItem';
 import { RoleStageItem } from './RoleStageItem';
+import { DashboardTemplateItem } from './DashboardTemplateItem';
+import { FavoriteTemplateItem } from './FavoriteTemplateItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling, SaplingForm } from './global/entity.decorator';
 
@@ -82,6 +84,34 @@ export class RoleItem {
   permissions: Collection<PermissionItem> = new Collection<PermissionItem>(
     this,
   );
+
+  /**
+   * Starter dashboard templates that are provisioned for users of this role.
+   */
+  @ApiPropertyOptional({ type: () => DashboardTemplateItem, isArray: true })
+  @SaplingForm({
+    order: 100,
+    group: 'role.groupStarter',
+    groupOrder: 250,
+    width: 4,
+  })
+  @ManyToMany(() => DashboardTemplateItem, undefined, { owner: true })
+  starterDashboardTemplates: Collection<DashboardTemplateItem> =
+    new Collection<DashboardTemplateItem>(this);
+
+  /**
+   * Starter favorite templates that are provisioned for users of this role.
+   */
+  @ApiPropertyOptional({ type: () => FavoriteTemplateItem, isArray: true })
+  @SaplingForm({
+    order: 200,
+    group: 'role.groupStarter',
+    groupOrder: 250,
+    width: 4,
+  })
+  @ManyToMany(() => FavoriteTemplateItem, undefined, { owner: true })
+  starterFavoriteTemplates: Collection<FavoriteTemplateItem> =
+    new Collection<FavoriteTemplateItem>(this);
 
   /**
    * The stage this role belongs to.

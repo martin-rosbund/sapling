@@ -11078,6 +11078,168 @@
       "comment": null
     },
     {
+      "name": "role_item_starter_dashboard_templates",
+      "schema": "public",
+      "columns": {
+        "dashboard_template_item_handle": {
+          "name": "dashboard_template_item_handle",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "role_item_handle": {
+          "name": "role_item_handle",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "role_item_handle",
+            "dashboard_template_item_handle"
+          ],
+          "composite": true,
+          "constraint": true,
+          "keyName": "role_item_starter_dashboard_templates_pkey",
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "role_item_starter_dashboard_templates_dashboard__7942f_foreign": {
+          "columnNames": [
+            "dashboard_template_item_handle"
+          ],
+          "constraintName": "role_item_starter_dashboard_templates_dashboard__7942f_foreign",
+          "localTableName": "public.role_item_starter_dashboard_templates",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "public.dashboard_template_item",
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        },
+        "role_item_starter_dashboard_templates_role_item_handle_foreign": {
+          "columnNames": [
+            "role_item_handle"
+          ],
+          "constraintName": "role_item_starter_dashboard_templates_role_item_handle_foreign",
+          "localTableName": "public.role_item_starter_dashboard_templates",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "public.role_item",
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        }
+      },
+      "comment": null
+    },
+    {
+      "name": "role_item_starter_favorite_templates",
+      "schema": "public",
+      "columns": {
+        "favorite_template_item_handle": {
+          "name": "favorite_template_item_handle",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "role_item_handle": {
+          "name": "role_item_handle",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "role_item_handle",
+            "favorite_template_item_handle"
+          ],
+          "composite": true,
+          "constraint": true,
+          "keyName": "role_item_starter_favorite_templates_pkey",
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "role_item_starter_favorite_templates_favorite_te_3edaa_foreign": {
+          "columnNames": [
+            "favorite_template_item_handle"
+          ],
+          "constraintName": "role_item_starter_favorite_templates_favorite_te_3edaa_foreign",
+          "localTableName": "public.role_item_starter_favorite_templates",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "public.favorite_template_item",
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        },
+        "role_item_starter_favorite_templates_role_item_handle_foreign": {
+          "columnNames": [
+            "role_item_handle"
+          ],
+          "constraintName": "role_item_starter_favorite_templates_role_item_handle_foreign",
+          "localTableName": "public.role_item_starter_favorite_templates",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "public.role_item",
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        }
+      },
+      "comment": null
+    },
+    {
       "name": "role_stage_item",
       "schema": "public",
       "columns": {

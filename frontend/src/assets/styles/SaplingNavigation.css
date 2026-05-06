@@ -416,6 +416,15 @@
   color: var(--sapling-surface-text-muted);
 }
 
+.sapling-navigation-shell__search-panel {
+  flex: 0 0 auto;
+  padding: var(--sapling-space-panel-md);
+  border: 1px solid var(--sapling-surface-border);
+  border-radius: var(--sapling-radius-sm);
+  background: var(--sapling-surface-fill);
+  box-shadow: var(--sapling-inset-highlight);
+}
+
 .sapling-navigation-shell__search {
   flex: 0 0 auto;
 }

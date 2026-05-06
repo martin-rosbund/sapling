@@ -529,6 +529,9 @@
   { "entity": "role", "property": "noContactData", "de": "Keine Kontaktdaten", "en": "No contact data" },
   { "entity": "role", "property": "noMembersAssigned", "de": "Dieser Rolle sind noch keine Mitglieder zugewiesen.", "en": "No members are assigned to this role yet." },
   { "entity": "role", "property": "stage", "de": "Stufe", "en": "Stage" },
+  { "entity": "role", "property": "starterDashboardTemplates", "de": "Starter-Dashboardvorlagen", "en": "Starter dashboard templates" },
+  { "entity": "role", "property": "starterFavoriteTemplates", "de": "Starter-Arbeitslistenvorlagen", "en": "Starter worklist templates" },
+  { "entity": "role", "property": "groupStarter", "de": "Starter-Setup", "en": "Starter setup" },
   { "entity": "role", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "role", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 

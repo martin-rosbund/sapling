@@ -348,11 +348,7 @@ function restoreColumnFilterFromClause(
   for (const operator of ['eq', 'gt', 'gte', 'lt', 'lte'] as const) {
     const operatorKey = `$${operator}`
     const value = operatorValue[operatorKey]
-    if (
-      typeof value === 'string' ||
-      typeof value === 'number' ||
-      typeof value === 'boolean'
-    ) {
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
       return {
         operator,
         value: String(value),
@@ -488,7 +484,10 @@ function parseLikeOperatorFilter(value: string): Partial<ColumnFilterItem> {
   }
 }
 
-function createRelationFilterItem(template: EntityTemplate, rawValue: unknown): SaplingGenericItem | null {
+function createRelationFilterItem(
+  template: EntityTemplate,
+  rawValue: unknown,
+): SaplingGenericItem | null {
   if (rawValue && typeof rawValue === 'object' && !Array.isArray(rawValue)) {
     return { ...(rawValue as Record<string, unknown>) }
   }

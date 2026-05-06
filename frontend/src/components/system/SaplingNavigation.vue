@@ -62,17 +62,18 @@
         </template>
       </div>
 
-      <v-text-field
-        v-if="activePanel === 'navigation'"
-        v-model="navigationSearch"
-        class="sapling-navigation-shell__search"
-        clearable
-        density="comfortable"
-        hide-details
-        prepend-inner-icon="mdi-magnify"
-        :disabled="isLoading"
-        :placeholder="isLoading ? '' : $t('global.search')"
-      />
+      <div v-if="activePanel === 'navigation'" class="sapling-navigation-shell__search-panel">
+        <v-text-field
+          v-model="navigationSearch"
+          class="sapling-navigation-shell__search"
+          clearable
+          density="comfortable"
+          hide-details
+          prepend-inner-icon="mdi-magnify"
+          :disabled="isLoading"
+          :placeholder="isLoading ? '' : $t('global.search')"
+        />
+      </div>
 
       <SaplingFavorites
         v-if="activePanel === 'favorites'"

@@ -6,6 +6,12 @@ import { EventItem } from '../../entity/EventItem';
 import { SalesOpportunityItem } from '../../entity/SalesOpportunityItem';
 import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
 import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
+import { DashboardItem } from '../../entity/DashboardItem';
+import { DashboardTemplateItem } from '../../entity/DashboardTemplateItem';
+import { FavoriteItem } from '../../entity/FavoriteItem';
+import { FavoriteTemplateItem } from '../../entity/FavoriteTemplateItem';
+import { RoleItem } from '../../entity/RoleItem';
+import { KpiItem } from '../../entity/KpiItem';
 import {
   AccumulatedPermissionDto,
   AccumulatedPermissionBufferDto,
@@ -65,6 +71,7 @@ export class CurrentService {
     }
 
     const em = this.forkEntityManager();
+    await this.ensureStarterWorkspace(em, user.handle);
 
     const person = await em.findOne(
       PersonItem,
@@ -87,6 +94,79 @@ export class CurrentService {
 
     delete person?.loginPassword; // Remove password before returning
     return person || null;
+  }
+
+  private async ensureStarterWorkspace(
+    em: EntityManager,
+    personHandle: number,
+  ): Promise<void> {
+    const person = await em.findOne(
+      PersonItem,
+      { handle: personHandle },
+      {
+        populate: [
+          'roles',
+          'roles.starterDashboardTemplates',
+          'roles.starterDashboardTemplates.kpis',
+          'roles.starterFavoriteTemplates',
+          'roles.starterFavoriteTemplates.entity',
+          'roles.starterFavoriteTemplates.entityRoute',
+        ],
+      },
+    );
+
+    if (!person) {
+      return;
+    }
+
+    const starterDashboardTemplates =
+      this.collectStarterDashboardTemplates(person);
+    const starterFavoriteTemplates =
+      this.collectStarterFavoriteTemplates(person);
+
+    if (
+      starterDashboardTemplates.length === 0 &&
+      starterFavoriteTemplates.length === 0
+    ) {
+      return;
+    }
+
+    const [dashboardCount, favoriteCount] = await Promise.all([
+      starterDashboardTemplates.length > 0
+        ? em.count(DashboardItem, { person: { handle: personHandle } })
+        : Promise.resolve(0),
+      starterFavoriteTemplates.length > 0
+        ? em.count(FavoriteItem, { person: { handle: personHandle } })
+        : Promise.resolve(0),
+    ]);
+
+    const starterDashboards =
+      dashboardCount === 0
+        ? starterDashboardTemplates.map((template) =>
+            this.createDashboardFromTemplate(person, template),
+          )
+        : [];
+
+    const starterFavorites =
+      favoriteCount === 0
+        ? starterFavoriteTemplates.map((template) =>
+            this.createFavoriteFromTemplate(person, template),
+          )
+        : [];
+
+    if (starterDashboards.length === 0 && starterFavorites.length === 0) {
+      return;
+    }
+
+    for (const dashboard of starterDashboards) {
+      em.persist(dashboard);
+    }
+
+    for (const favorite of starterFavorites) {
+      em.persist(favorite);
+    }
+
+    await em.flush();
   }
 
   /**
@@ -355,5 +435,108 @@ export class CurrentService {
       );
     }
     return null;
+  }
+
+  private collectStarterDashboardTemplates(
+    person: PersonItem,
+  ): DashboardTemplateItem[] {
+    return this.getUniqueTemplates(
+      this.getCollectionItems<RoleItem>(person.roles).flatMap((role) =>
+        this.getCollectionItems(role.starterDashboardTemplates),
+      ),
+    );
+  }
+
+  private collectStarterFavoriteTemplates(
+    person: PersonItem,
+  ): FavoriteTemplateItem[] {
+    return this.getUniqueTemplates(
+      this.getCollectionItems<RoleItem>(person.roles).flatMap((role) =>
+        this.getCollectionItems(role.starterFavoriteTemplates),
+      ),
+    );
+  }
+
+  private createDashboardFromTemplate(
+    person: PersonItem,
+    template: DashboardTemplateItem,
+  ): DashboardItem {
+    const dashboard = new DashboardItem();
+    dashboard.name = template.name;
+    dashboard.person = person;
+
+    const starterKpis = this.getCollectionItems<KpiItem>(template.kpis);
+    if (starterKpis.length > 0) {
+      for (const starterKpi of starterKpis) {
+        dashboard.kpis.add(starterKpi);
+      }
+    }
+
+    return dashboard;
+  }
+
+  private createFavoriteFromTemplate(
+    person: PersonItem,
+    template: FavoriteTemplateItem,
+  ): FavoriteItem {
+    const favorite = new FavoriteItem();
+    favorite.title = template.name;
+    favorite.person = person;
+    favorite.entity = template.entity;
+    favorite.entityRoute = template.entityRoute;
+    favorite.filter = this.cloneJsonValue(template.filter);
+
+    return favorite;
+  }
+
+  private getCollectionItems<T>(value: unknown): T[] {
+    if (!value) {
+      return [];
+    }
+
+    if (Array.isArray(value)) {
+      return value as T[];
+    }
+
+    if (typeof value === 'object' && 'getItems' in value) {
+      const getItems = (value as { getItems?: () => T[] }).getItems;
+      if (typeof getItems === 'function') {
+        return getItems.call(value);
+      }
+    }
+
+    if (typeof (value as Iterable<T>)[Symbol.iterator] === 'function') {
+      return Array.from(value as Iterable<T>);
+    }
+
+    return [];
+  }
+
+  private getUniqueTemplates<T extends { handle?: number; name?: string }>(
+    templates: T[],
+  ): T[] {
+    const seenKeys = new Set<string>();
+
+    return templates.filter((template) => {
+      const templateKey =
+        template.handle != null
+          ? `handle:${template.handle}`
+          : `name:${template.name ?? ''}`;
+
+      if (seenKeys.has(templateKey)) {
+        return false;
+      }
+
+      seenKeys.add(templateKey);
+      return true;
+    });
+  }
+
+  private cloneJsonValue<T>(value: T): T {
+    if (value == null) {
+      return value;
+    }
+
+    return JSON.parse(JSON.stringify(value)) as T;
   }
 }
