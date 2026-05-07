@@ -55,6 +55,26 @@ const entityStates = reactive<Record<string, ReturnType<typeof createEntityState
       options: ['isOrderASC'],
     }),
   ]),
+  ticket: createEntityState([
+    createTemplate({
+      name: 'status',
+      type: 'string',
+      kind: 'm:1',
+      referenceName: 'ticketStatus',
+      referencedPks: ['handle'],
+    }),
+    createTemplate({
+      name: 'deadlineDate',
+      type: 'date',
+    }),
+    createTemplate({
+      name: 'assigneePerson',
+      type: 'string',
+      kind: 'm:1',
+      referenceName: 'person',
+      referencedPks: ['handle'],
+    }),
+  ]),
 })
 
 function createTestHost(entityHandle: Ref<string>) {
@@ -250,21 +270,14 @@ describe('useSaplingTable', () => {
       meta: { total: 1 },
     })
 
-    const wrapper = mountQueryEnabledTestHost(ref('partner'))
+    const wrapper = mountQueryEnabledTestHost(ref('ticket'))
     await flushPromises()
 
     expect(apiFindMock).toHaveBeenCalledWith(
-      'partner',
+      'ticket',
       expect.objectContaining({
         filter: {
-          $and: [
-            {
-              status: { $in: ['open'] },
-            },
-            {
-              assigneePerson: { handle: '{{currentUser.handle}}' },
-            },
-          ],
+          $and: [{ status: { handle: 'open' } }, { assigneePerson: { handle: '{{currentUser.handle}}' } }],
         },
       }),
     )
@@ -273,6 +286,11 @@ describe('useSaplingTable', () => {
         operator: 'eq',
         value: '',
         relationItems: [{ handle: 'open' }],
+      },
+      assigneePerson: {
+        operator: 'eq',
+        value: '',
+        relationItems: [{ handle: '{{currentUser.handle}}' }],
       },
     })
     expect(wrapper.vm.items).toEqual([{ handle: 1, title: 'Open ticket' }])
@@ -304,13 +322,81 @@ describe('useSaplingTable', () => {
         relationItems: [{ handle: 'open' }, { handle: 'pending' }],
       },
       amount: {
-        operator: 'eq',
+        operator: 'between',
         value: '',
         rangeStart: '5',
         rangeEnd: '10',
+        rangeStartOperator: 'gte',
+        rangeEndOperator: 'lte',
       },
     })
     expect(apiFindMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('rehydrates the full url filter into table header filters without a leftover query filter', async () => {
+    loadGenericMock.mockResolvedValue(undefined)
+    routeState.query = {
+      filter:
+        '{"status":{"handle":{"$nin":["closed"]}},"deadlineDate":{"$lt":"{{tomorrow.start}}","$gte":"{{today.start}}"},"assigneePerson":{"handle":"{{currentUser.handle}}"}}',
+    }
+    apiFindMock.mockResolvedValue({
+      data: [{ handle: 17, title: 'Today ticket' }],
+      meta: { total: 1 },
+    })
+
+    const wrapper = mountQueryEnabledTestHost(ref('ticket'))
+    await flushPromises()
+
+    expect(wrapper.vm.columnFilters).toEqual({
+      status: {
+        operator: 'nin',
+        value: '',
+        relationItems: [{ handle: 'closed' }],
+      },
+      deadlineDate: {
+        operator: 'between',
+        value: '',
+        rangeStart: '{{today.start}}',
+        rangeEnd: '{{tomorrow.start}}',
+        rangeStartOperator: 'gte',
+        rangeEndOperator: 'lt',
+      },
+      assigneePerson: {
+        operator: 'eq',
+        value: '',
+        relationItems: [{ handle: '{{currentUser.handle}}' }],
+      },
+    })
+
+    expect(apiFindMock).toHaveBeenCalledWith(
+      'ticket',
+      expect.objectContaining({
+        filter: {
+          $and: [
+            {
+              status: { handle: { $nin: ['closed'] } },
+            },
+            {
+              $and: [
+                {
+                  deadlineDate: {
+                    $gte: '{{today.start}}',
+                  },
+                },
+                {
+                  deadlineDate: {
+                    $lt: '{{tomorrow.start}}',
+                  },
+                },
+              ],
+            },
+            {
+              assigneePerson: { handle: '{{currentUser.handle}}' },
+            },
+          ],
+        },
+      }),
+    )
   })
 })
 

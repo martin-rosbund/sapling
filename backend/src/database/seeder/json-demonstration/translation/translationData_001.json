@@ -1345,6 +1345,10 @@
   { "entity": "filter", "property": "maximum", "de": "Maximum", "en": "Maximum" },
   { "entity": "filter", "property": "start", "de": "Start", "en": "Start" },
   { "entity": "filter", "property": "end", "de": "Ende", "en": "End" },
+  { "entity": "filter", "property": "isBetween", "de": "Zwischen", "en": "Is between" },
+  { "entity": "filter", "property": "isNotIn", "de": "Ist nicht in", "en": "Is not in" },
+  { "entity": "filter", "property": "hasValue", "de": "Hat Wert", "en": "Has value" },
+  { "entity": "filter", "property": "isEmpty", "de": "Ist leer", "en": "Is empty" },
   { "entity": "filter", "property": "selectedCount", "de": "{count} ausgewählt", "en": "{count} selected" },
 
   { "entity": "exception", "property": "unknownError", "de": "Unbekannter Fehler", "en": "Unknown error" },

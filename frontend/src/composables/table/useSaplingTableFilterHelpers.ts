@@ -37,6 +37,8 @@ export function cloneColumnFilters(filters?: Record<string, ColumnFilterItem>) {
       key,
       {
         ...value,
+        rangeStartOperator: value.rangeStartOperator,
+        rangeEndOperator: value.rangeEndOperator,
         relationItems: value.relationItems?.map((item) => ({ ...item })),
       },
     ]),
@@ -53,11 +55,17 @@ export function normalizeColumnFilterItem(
     value: filter.value.trim(),
     rangeStart: filter.rangeStart?.trim() || undefined,
     rangeEnd: filter.rangeEnd?.trim() || undefined,
+    rangeStartOperator: filter.rangeStartOperator,
+    rangeEndOperator: filter.rangeEndOperator,
     relationItems: filter.relationItems?.map((item) => ({ ...item })),
   }
 }
 
 export function isEmptyColumnFilterItem(filter: ColumnFilterItem) {
+  if (filter.operator === 'isSet' || filter.operator === 'isEmpty') {
+    return false
+  }
+
   return (
     filter.value.length === 0 &&
     (filter.rangeStart?.length ?? 0) === 0 &&
@@ -318,6 +326,12 @@ function restoreColumnFilterFromClause(
   }
 
   if (typeof rawValue !== 'object' || rawValue === null || Array.isArray(rawValue)) {
+    if (rawValue === null) {
+      return {
+        operator: 'isEmpty',
+      }
+    }
+
     if (
       typeof rawValue === 'string' ||
       typeof rawValue === 'number' ||
@@ -338,6 +352,18 @@ function restoreColumnFilterFromClause(
     return parseLikeOperatorFilter(operatorValue.$ilike)
   }
 
+  if ('$ne' in operatorValue && operatorValue.$ne === null) {
+    return {
+      operator: 'isSet',
+    }
+  }
+
+  if ('$eq' in operatorValue && operatorValue.$eq === null) {
+    return {
+      operator: 'isEmpty',
+    }
+  }
+
   if (isRangeTemplate(template)) {
     const restoredRangeFilter = restoreRangeFilter(template, operatorValue)
     if (restoredRangeFilter) {
@@ -345,14 +371,26 @@ function restoreColumnFilterFromClause(
     }
   }
 
-  for (const operator of ['eq', 'gt', 'gte', 'lt', 'lte'] as const) {
-    const operatorKey = `$${operator}`
-    const value = operatorValue[operatorKey]
-    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-      return {
-        operator,
-        value: String(value),
-      }
+  if (Object.keys(operatorValue).length > 1) {
+    return null
+  }
+
+  const restoredOperators = (['eq', 'gt', 'gte', 'lt', 'lte'] as const)
+    .map((operator) => ({
+      operator,
+      value: operatorValue[`$${operator}`],
+    }))
+    .filter(
+      (entry): entry is { operator: 'eq' | 'gt' | 'gte' | 'lt' | 'lte'; value: string | number | boolean } =>
+        typeof entry.value === 'string' ||
+        typeof entry.value === 'number' ||
+        typeof entry.value === 'boolean',
+    )
+
+  if (restoredOperators.length === 1) {
+    return {
+      operator: restoredOperators[0].operator,
+      value: String(restoredOperators[0].value),
     }
   }
 
@@ -391,6 +429,19 @@ function restoreRelationFilter(template: EntityTemplate, rawValue: unknown) {
     return null
   }
 
+  const nestedIdentifierOperator = restoreRelationIdentifierOperatorFilter(template, operatorValue)
+  if (nestedIdentifierOperator) {
+    return nestedIdentifierOperator
+  }
+
+  if (Object.keys(operatorValue).some((key) => key.startsWith('$'))) {
+    return null
+  }
+
+  if (!isRoundTrippableRelationIdentifier(template, operatorValue)) {
+    return null
+  }
+
   const relationItem = createRelationFilterItem(template, rawValue)
   return relationItem
     ? {
@@ -408,25 +459,7 @@ function restoreRangeFilter(template: EntityTemplate, operatorValue: Record<stri
     }
   }
 
-  const rangeStart =
-    typeof operatorValue.$gte === 'string' || typeof operatorValue.$gte === 'number'
-      ? String(operatorValue.$gte)
-      : undefined
-
-  const rangeEndValue =
-    typeof operatorValue.$lte === 'string' || typeof operatorValue.$lte === 'number'
-      ? String(operatorValue.$lte)
-      : undefined
-
-  if (rangeStart || rangeEndValue) {
-    return {
-      operator: 'eq',
-      rangeStart,
-      rangeEnd: rangeEndValue,
-    }
-  }
-
-  return null
+  return restoreBetweenFilter(operatorValue)
 }
 
 function restoreDateEqualityFilter(operatorValue: Record<string, unknown>) {
@@ -488,7 +521,7 @@ function createRelationFilterItem(
   template: EntityTemplate,
   rawValue: unknown,
 ): SaplingGenericItem | null {
-  if (rawValue && typeof rawValue === 'object' && !Array.isArray(rawValue)) {
+  if (isRoundTrippableRelationIdentifier(template, rawValue)) {
     return { ...(rawValue as Record<string, unknown>) }
   }
 
@@ -504,6 +537,120 @@ function createRelationFilterItem(
   return {
     [identifierKey]: rawValue,
   }
+}
+
+function restoreRelationIdentifierOperatorFilter(
+  template: EntityTemplate,
+  operatorValue: Record<string, unknown>,
+): Partial<ColumnFilterItem> | null {
+  const identifierKeys = template.referencedPks?.length ? template.referencedPks : ['handle', 'id']
+  if (identifierKeys.length !== 1) {
+    return null
+  }
+
+  const identifierKey = identifierKeys[0]
+  const nestedValue = operatorValue[identifierKey]
+
+  if (
+    typeof nestedValue === 'string' ||
+    typeof nestedValue === 'number' ||
+    typeof nestedValue === 'boolean'
+  ) {
+    return {
+      operator: 'eq',
+      relationItems: [{ [identifierKey]: nestedValue }],
+    }
+  }
+
+  if (typeof nestedValue !== 'object' || nestedValue === null || Array.isArray(nestedValue)) {
+    return null
+  }
+
+  const nestedOperatorValue = nestedValue as Record<string, unknown>
+
+  if (Array.isArray(nestedOperatorValue.$in)) {
+    return {
+      operator: 'eq',
+      relationItems: nestedOperatorValue.$in
+        .filter(isScalarFilterValue)
+        .map((value) => ({ [identifierKey]: value })),
+    }
+  }
+
+  if (Array.isArray(nestedOperatorValue.$nin)) {
+    return {
+      operator: 'nin',
+      relationItems: nestedOperatorValue.$nin
+        .filter(isScalarFilterValue)
+        .map((value) => ({ [identifierKey]: value })),
+    }
+  }
+
+  return null
+}
+
+function restoreBetweenFilter(operatorValue: Record<string, unknown>): Partial<ColumnFilterItem> | null {
+  const rangeStart = parseComparableRangeValue(operatorValue.$gt ?? operatorValue.$gte)
+  const rangeEnd = parseComparableRangeValue(operatorValue.$lt ?? operatorValue.$lte)
+  const rangeStartOperator = typeof operatorValue.$gt !== 'undefined' ? 'gt' : typeof operatorValue.$gte !== 'undefined' ? 'gte' : undefined
+  const rangeEndOperator = typeof operatorValue.$lt !== 'undefined' ? 'lt' : typeof operatorValue.$lte !== 'undefined' ? 'lte' : undefined
+
+  if (!rangeStartOperator && !rangeEndOperator) {
+    return null
+  }
+
+  if (rangeStartOperator && rangeEndOperator) {
+    return {
+      operator: 'between',
+      rangeStart,
+      rangeEnd,
+      rangeStartOperator,
+      rangeEndOperator,
+    }
+  }
+
+  if (rangeStart && rangeStartOperator) {
+    return {
+      operator: rangeStartOperator,
+      value: rangeStart,
+    }
+  }
+
+  if (rangeEnd && rangeEndOperator) {
+    return {
+      operator: rangeEndOperator,
+      value: rangeEnd,
+    }
+  }
+
+  return null
+}
+
+function isRoundTrippableRelationIdentifier(template: EntityTemplate, rawValue: unknown) {
+  if (typeof rawValue !== 'object' || rawValue === null || Array.isArray(rawValue)) {
+    return false
+  }
+
+  const identifier = rawValue as Record<string, unknown>
+  if (Object.keys(identifier).some((key) => key.startsWith('$'))) {
+    return false
+  }
+
+  const identifierKeys = template.referencedPks?.length
+    ? template.referencedPks
+    : ['handle', 'id'].filter((key) => key in identifier)
+
+  if (identifierKeys.length === 0) {
+    return false
+  }
+
+  return identifierKeys.every((key) => isScalarFilterValue(identifier[key]))
+}
+
+function isScalarFilterValue(value: unknown): value is string | number | boolean {
+  return (
+    typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
+  )
 }
 
 function mergeRestoredFilter(
@@ -560,6 +707,8 @@ function normalizeRestoredColumnFilter(
   } else if (filter.rangeStart || filter.rangeEnd) {
     normalizedFilter.rangeStart = filter.rangeStart?.trim() || undefined
     normalizedFilter.rangeEnd = filter.rangeEnd?.trim() || undefined
+    normalizedFilter.rangeStartOperator = filter.rangeStartOperator
+    normalizedFilter.rangeEndOperator = filter.rangeEndOperator
     normalizedFilter.value = ''
   } else if (typeof filter.value === 'string') {
     normalizedFilter.value = filter.value.trim()
@@ -574,4 +723,16 @@ function normalizeRestoredColumnFilter(
 
 function isDateOnlyValue(value: string) {
   return /^\d{4}-\d{2}-\d{2}$/.test(value)
+}
+
+function parseComparableRangeValue(value: unknown) {
+  if (
+    typeof value !== 'string' &&
+    typeof value !== 'number' &&
+    typeof value !== 'boolean'
+  ) {
+    return undefined
+  }
+
+  return String(value).trim() || undefined
 }

@@ -663,25 +663,11 @@ export function useSaplingTableActions({
   }
 
   function getCurrentFavoriteFilter() {
-    const routeFilterParam = Array.isArray(route.query.filter)
-      ? route.query.filter[0]
-      : route.query.filter
-
-    let urlFilter: unknown
-    if (typeof routeFilterParam === 'string' && routeFilterParam.length > 0) {
-      try {
-        urlFilter = JSON.parse(routeFilterParam)
-      } catch {
-        urlFilter = routeFilterParam
-      }
-    }
-
     const filter = buildTableFilter({
       search: '',
       columnFilters: localColumnFilters.value,
       entityTemplates: props.entityTemplates,
       parentFilter: props.parentFilter,
-      urlFilter,
     })
 
     const serializedFilter = JSON.stringify(filter)

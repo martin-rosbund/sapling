@@ -105,7 +105,7 @@
           />
 
           <SaplingTableFilterSingleValue
-            v-else
+            v-else-if="!['isSet', 'isEmpty'].includes(String(currentOperator))"
             :model-value="singleValue"
             :input-type="inputType"
             :label="singleValueLabel"

@@ -163,8 +163,11 @@ export function getDefaultColumnFilterOperatorForTemplate(
 export function getAllowedColumnFilterOperators(
   template?: Partial<EntityTemplate>,
 ): ColumnFilterOperator[] {
+  if (isManyToOneTemplate(template)) {
+    return ['eq', 'nin', 'isSet', 'isEmpty']
+  }
+
   if (
-    isManyToOneTemplate(template) ||
     isBooleanTemplate(template) ||
     hasTemplateOption(template, 'isColor') ||
     hasTemplateOption(template, 'isIcon')
@@ -173,10 +176,10 @@ export function getAllowedColumnFilterOperators(
   }
 
   if (isDateTemplate(template) || isTimeTemplate(template) || isNumericTemplate(template)) {
-    return ['eq', 'gt', 'gte', 'lt', 'lte']
+    return ['eq', 'between', 'gt', 'gte', 'lt', 'lte', 'isSet', 'isEmpty']
   }
 
-  return ['like', 'startsWith', 'endsWith', 'eq']
+  return ['like', 'startsWith', 'endsWith', 'eq', 'isSet', 'isEmpty']
 }
 
 export function buildTableFilter({
@@ -184,13 +187,11 @@ export function buildTableFilter({
   columnFilters = {},
   entityTemplates,
   parentFilter,
-  urlFilter,
 }: {
   search?: string
   columnFilters?: Record<string, string | ColumnFilterItem>
   entityTemplates: EntityTemplate[]
   parentFilter?: Record<string, unknown>
-  urlFilter?: unknown
 }): FilterQuery {
   const clauses: FilterQuery[] = []
   const filterableTemplates = entityTemplates.filter(isFilterableTableColumn)
@@ -223,14 +224,6 @@ export function buildTableFilter({
 
   if (parentFilter && Object.keys(parentFilter).length > 0) {
     clauses.push(parentFilter)
-  }
-
-  if (
-    urlFilter &&
-    typeof urlFilter === 'object' &&
-    Object.keys(urlFilter as Record<string, unknown>).length > 0
-  ) {
-    clauses.push(urlFilter as FilterQuery)
   }
 
   if (clauses.length === 0) {
@@ -274,17 +267,37 @@ function normalizeColumnFilter(
     value: value.value.trim(),
     rangeStart: value.rangeStart?.trim(),
     rangeEnd: value.rangeEnd?.trim(),
+    rangeStartOperator: value.rangeStartOperator,
+    rangeEndOperator: value.rangeEndOperator,
     relationItems: value.relationItems?.map((item) => ({ ...item })),
   }
 }
 
 function buildColumnFilterClause(template: EntityTemplate, filter: ColumnFilterItem): FilterQuery {
-  if (isManyToOneTemplate(template) && (filter.relationItems?.length ?? 0) > 0) {
-    return buildManyToOneColumnFilterClause(template, filter.relationItems ?? [])
+  if (filter.operator === 'isSet') {
+    return {
+      [template.name]: { $ne: null },
+    }
   }
 
-  if (isRangeTemplate(template) && (filter.rangeStart || filter.rangeEnd)) {
-    return buildRangeColumnFilterClause(template, filter.rangeStart, filter.rangeEnd)
+  if (filter.operator === 'isEmpty') {
+    return {
+      [template.name]: null,
+    }
+  }
+
+  if (isManyToOneTemplate(template) && (filter.relationItems?.length ?? 0) > 0) {
+    return buildManyToOneColumnFilterClause(template, filter.relationItems ?? [], filter.operator)
+  }
+
+  if (isRangeTemplate(template) && filter.operator === 'between') {
+    return buildRangeColumnFilterClause(
+      template,
+      filter.rangeStart,
+      filter.rangeEnd,
+      filter.rangeStartOperator,
+      filter.rangeEndOperator,
+    )
   }
 
   const operator = getNormalizedColumnFilterOperator(template, filter.operator)
@@ -314,7 +327,7 @@ function buildColumnFilterClause(template: EntityTemplate, filter: ColumnFilterI
   }
 
   const operatorMap: Record<
-    Exclude<ColumnFilterOperator, 'like' | 'startsWith' | 'endsWith'>,
+    Exclude<ColumnFilterOperator, 'like' | 'startsWith' | 'endsWith' | 'between' | 'nin' | 'isSet' | 'isEmpty'>,
     string
   > = {
     eq: '$eq',
@@ -360,6 +373,10 @@ function getNormalizedColumnFilterOperator(
 }
 
 function isEmptyColumnFilter(filter: ColumnFilterItem): boolean {
+  if (filter.operator === 'isSet' || filter.operator === 'isEmpty') {
+    return false
+  }
+
   return (
     filter.value.length === 0 &&
     (filter.rangeStart?.length ?? 0) === 0 &&
@@ -386,22 +403,24 @@ function buildDateColumnFilterClause(
 ): FilterQuery {
   const normalizedDate = normalizeDateFilterValue(rawValue)
 
+  const operatorMap: Record<'eq' | 'gt' | 'gte' | 'lt' | 'lte', string> = {
+    eq: '$eq',
+    gt: '$gt',
+    gte: '$gte',
+    lt: '$lt',
+    lte: '$lte',
+  }
+  const normalizedOperator = ['gt', 'gte', 'lt', 'lte'].includes(operator) ? operator : 'eq'
+
   if (!normalizedDate) {
     return {
-      [key]: { $eq: rawValue },
+      [key]: {
+        [operatorMap[normalizedOperator as 'eq' | 'gt' | 'gte' | 'lt' | 'lte']]: rawValue,
+      },
     }
   }
 
   if (!normalizedDate.isDateOnly) {
-    const operatorMap: Record<'eq' | 'gt' | 'gte' | 'lt' | 'lte', string> = {
-      eq: '$eq',
-      gt: '$gt',
-      gte: '$gte',
-      lt: '$lt',
-      lte: '$lte',
-    }
-    const normalizedOperator = ['gt', 'gte', 'lt', 'lte'].includes(operator) ? operator : 'eq'
-
     return {
       [key]: {
         [operatorMap[normalizedOperator as 'eq' | 'gt' | 'gte' | 'lt' | 'lte']]:
@@ -434,6 +453,8 @@ function buildRangeColumnFilterClause(
   template: EntityTemplate,
   rangeStart?: string,
   rangeEnd?: string,
+  rangeStartOperator: 'gt' | 'gte' = 'gte',
+  rangeEndOperator: 'lt' | 'lte' = isDateTemplate(template) ? 'lt' : 'lte',
 ): FilterQuery {
   const normalizedStart = rangeStart?.trim() ?? ''
   const normalizedEnd = rangeEnd?.trim() ?? ''
@@ -442,11 +463,11 @@ function buildRangeColumnFilterClause(
     const rangeClauses: FilterQuery[] = []
 
     if (normalizedStart) {
-      rangeClauses.push(buildDateColumnFilterClause(template.name, 'gte', normalizedStart))
+      rangeClauses.push(buildDateColumnFilterClause(template.name, rangeStartOperator, normalizedStart))
     }
 
     if (normalizedEnd) {
-      rangeClauses.push(buildDateColumnFilterClause(template.name, 'lte', normalizedEnd))
+      rangeClauses.push(buildDateColumnFilterClause(template.name, rangeEndOperator, normalizedEnd))
     }
 
     if (rangeClauses.length === 0) {
@@ -463,11 +484,17 @@ function buildRangeColumnFilterClause(
   const conditions: Record<string, string | number | boolean> = {}
 
   if (normalizedStart) {
-    conditions.$gte = normalizeFilterValue(template, normalizedStart)
+    conditions[rangeStartOperator === 'gt' ? '$gt' : '$gte'] = normalizeFilterValue(
+      template,
+      normalizedStart,
+    )
   }
 
   if (normalizedEnd) {
-    conditions.$lte = normalizeFilterValue(template, normalizedEnd)
+    conditions[rangeEndOperator === 'lt' ? '$lt' : '$lte'] = normalizeFilterValue(
+      template,
+      normalizedEnd,
+    )
   }
 
   return {
@@ -478,6 +505,7 @@ function buildRangeColumnFilterClause(
 function buildManyToOneColumnFilterClause(
   template: EntityTemplate,
   relationItems: SaplingGenericItem[],
+  operator: ColumnFilterOperator = 'eq',
 ): FilterQuery {
   const identifierKeys = getRelationIdentifierKeys(template, relationItems)
   if (identifierKeys.length === 0) {
@@ -497,8 +525,26 @@ function buildManyToOneColumnFilterClause(
       return {}
     }
 
+    if (operator === 'nin') {
+      return {
+        [template.name]: {
+          [identifierKey]: { $nin: selectedValues },
+        },
+      }
+    }
+
+    if (selectedValues.length === 1) {
+      return {
+        [template.name]: {
+          [identifierKey]: selectedValues[0],
+        },
+      }
+    }
+
     return {
-      [template.name]: { $in: selectedValues },
+      [template.name]: {
+        [identifierKey]: { $in: selectedValues },
+      },
     }
   }
 
@@ -620,7 +666,36 @@ export function getEntityValueLabel(
     typeof handleValue === 'number' ||
     typeof handleValue === 'boolean'
   ) {
-    return String(handleValue)
+    return formatFilterDisplayValue(handleValue)
+  }
+
+  if (handleValue && typeof handleValue === 'object') {
+    return formatFilterDisplayValue(handleValue)
+  }
+
+  return ''
+}
+
+function formatFilterDisplayValue(value: unknown): string {
+  if (typeof value === 'string') {
+    const tokenMatch = value.trim().match(/^\{\{\s*([^}]+?)\s*\}\}$/)
+    return tokenMatch?.[1]?.trim() ?? value
+  }
+
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value)
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((entry) => formatFilterDisplayValue(entry)).filter(Boolean).join(', ')
+  }
+
+  if (value && typeof value === 'object') {
+    const entries = Object.entries(value as Record<string, unknown>)
+    return entries
+      .map(([key, entry]) => `${key}: ${formatFilterDisplayValue(entry)}`)
+      .filter((entry) => !entry.endsWith(': '))
+      .join(', ')
   }
 
   return ''

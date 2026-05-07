@@ -35,10 +35,14 @@ const FILTER_OPERATOR_OPTIONS: Array<{ label: string; value: ColumnFilterOperato
   { label: 'a*', value: 'startsWith' },
   { label: '*a', value: 'endsWith' },
   { label: '=', value: 'eq' },
+  { label: '..', value: 'between' },
   { label: '>', value: 'gt' },
   { label: '>=', value: 'gte' },
   { label: '<', value: 'lt' },
   { label: '<=', value: 'lte' },
+  { label: '!=', value: 'nin' },
+  { label: 'set', value: 'isSet' },
+  { label: 'empty', value: 'isEmpty' },
 ]
 
 export function useSaplingTableFilters(

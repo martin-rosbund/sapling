@@ -175,16 +175,22 @@ export type ColumnFilterOperator =
   | 'startsWith'
   | 'endsWith'
   | 'eq'
+  | 'between'
   | 'gt'
   | 'gte'
   | 'lt'
   | 'lte'
+  | 'nin'
+  | 'isSet'
+  | 'isEmpty'
 
 export type ColumnFilterItem = {
   operator: ColumnFilterOperator
   value: string
   rangeStart?: string
   rangeEnd?: string
+  rangeStartOperator?: 'gt' | 'gte'
+  rangeEndOperator?: 'lt' | 'lte'
   relationItems?: SaplingGenericItem[]
 }
 

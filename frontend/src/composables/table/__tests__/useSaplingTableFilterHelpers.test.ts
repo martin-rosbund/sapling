@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { ColumnFilterItem, EntityTemplate } from '@/entity/structure'
 import {
   cloneColumnFilters,
+  extractColumnFiltersFromFilterQuery,
   isEmptyColumnFilterItem,
   normalizeColumnFilterItem,
   normalizeTableColumnTemplate,
@@ -75,6 +76,65 @@ describe('useSaplingTableFilterHelpers', () => {
     ).toBe(true)
     expect(isEmptyColumnFilterItem(cloned.company)).toBe(false)
   })
+
+  it('rehydrates favorite-style url filters into full table header filters', () => {
+    const templates = [
+      createTemplate({
+        name: 'status',
+        type: 'string',
+        kind: 'm:1',
+        referenceName: 'ticketStatus',
+        referencedPks: ['handle'],
+      }),
+      createTemplate({
+        name: 'deadlineDate',
+        type: 'date',
+      }),
+      createTemplate({
+        name: 'assigneePerson',
+        type: 'string',
+        kind: 'm:1',
+        referenceName: 'person',
+        referencedPks: ['handle'],
+      }),
+    ]
+
+    const filterQuery = {
+      status: {
+        handle: {
+          $nin: ['closed'],
+        },
+      },
+      deadlineDate: {
+        $lt: '{{tomorrow.start}}',
+        $gte: '{{today.start}}',
+      },
+      assigneePerson: {
+        handle: '{{currentUser.handle}}',
+      },
+    }
+
+    expect(extractColumnFiltersFromFilterQuery(templates, filterQuery)).toEqual({
+      status: {
+        operator: 'nin',
+        value: '',
+        relationItems: [{ handle: 'closed' }],
+      },
+      deadlineDate: {
+        operator: 'between',
+        value: '',
+        rangeStart: '{{today.start}}',
+        rangeEnd: '{{tomorrow.start}}',
+        rangeStartOperator: 'gte',
+        rangeEndOperator: 'lt',
+      },
+      assigneePerson: {
+        operator: 'eq',
+        value: '',
+        relationItems: [{ handle: '{{currentUser.handle}}' }],
+      },
+    })
+  })
 })
 
 function createTemplate(
@@ -89,9 +149,9 @@ function createTemplate(
     options: overrides.options ?? [],
     isAutoIncrement: false,
     isPersistent: true,
-    isReference: false,
-    referencedPks: [],
-    referenceName: undefined,
-    length: undefined,
+    isReference: overrides.isReference ?? false,
+    referencedPks: overrides.referencedPks ?? [],
+    referenceName: overrides.referenceName,
+    length: overrides.length,
   } as EntityTemplate
 }

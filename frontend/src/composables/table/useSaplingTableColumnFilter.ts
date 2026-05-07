@@ -82,6 +82,10 @@ export function useSaplingTableColumnFilter(
   })
 
   const filterVariant = computed<FilterVariant>(() => {
+    if (isValueLessOperator(localFilter.value.operator)) {
+      return 'single'
+    }
+
     if (inputKind.value === 'boolean') {
       return 'boolean'
     }
@@ -94,7 +98,7 @@ export function useSaplingTableColumnFilter(
       return 'relation'
     }
 
-    if (isRangeTemplate(normalizedColumn.value)) {
+    if (isRangeTemplate(normalizedColumn.value) && currentOperator.value === 'between') {
       return 'range'
     }
 
@@ -147,6 +151,10 @@ export function useSaplingTableColumnFilter(
   })
 
   const hasValue = computed(() => {
+    if (isValueLessOperator(currentOperator.value)) {
+      return true
+    }
+
     return (
       singleValue.value.trim().length > 0 ||
       rangeStartValue.value.trim().length > 0 ||
@@ -170,7 +178,9 @@ export function useSaplingTableColumnFilter(
   })
 
   const isOperatorSelectable = computed(
-    () => props.operatorOptions.length > 1 && filterVariant.value === 'single',
+    () =>
+      props.operatorOptions.length > 1 &&
+      !['boolean', 'icon'].includes(filterVariant.value),
   )
 
   const operatorItems = computed(() =>
@@ -182,6 +192,14 @@ export function useSaplingTableColumnFilter(
   )
 
   const inputType = computed(() => {
+    const shouldUseTextInputForDynamicValue =
+      ['date', 'datetime', 'time'].includes(inputKind.value) &&
+      [singleValue.value, rangeStartValue.value, rangeEndValue.value].some(isTokenFilterValue)
+
+    if (shouldUseTextInputForDynamicValue) {
+      return 'text'
+    }
+
     switch (inputKind.value) {
       case 'color':
         return 'color'
@@ -245,17 +263,25 @@ export function useSaplingTableColumnFilter(
       return t('filter.noFilter')
     }
 
+    if (currentOperator.value === 'isSet') {
+      return t('filter.hasValue')
+    }
+
+    if (currentOperator.value === 'isEmpty') {
+      return t('filter.isEmpty')
+    }
+
     if (filterVariant.value === 'range') {
       if (rangeStartValue.value && rangeEndValue.value) {
-        return `${rangeStartValue.value} ${t('filter.to').toLowerCase()} ${rangeEndValue.value}`
+        return `${formatFilterSummaryValue(rangeStartValue.value)} ${t('filter.to').toLowerCase()} ${formatFilterSummaryValue(rangeEndValue.value)}`
       }
 
       if (rangeStartValue.value) {
-        return `${t('filter.from').toLowerCase()} ${rangeStartValue.value}`
+        return `${t('filter.from').toLowerCase()} ${formatFilterSummaryValue(rangeStartValue.value)}`
       }
 
       if (rangeEndValue.value) {
-        return `${t('filter.to').toLowerCase()} ${rangeEndValue.value}`
+        return `${t('filter.to').toLowerCase()} ${formatFilterSummaryValue(rangeEndValue.value)}`
       }
     }
 
@@ -271,11 +297,41 @@ export function useSaplingTableColumnFilter(
       return singleValue.value === 'true' ? t('filter.yes') : t('filter.no')
     }
 
-    return singleValue.value
+    return formatFilterSummaryValue(singleValue.value)
   })
 
   function updateOperator(value: ColumnFilterOperator | null) {
     if (!value) {
+      return
+    }
+
+    if (value === 'between') {
+      emitFilter(
+        {
+          operator: value,
+          value: '',
+          rangeStart: rangeStartValue.value || singleValue.value,
+          rangeEnd: rangeEndValue.value,
+          rangeStartOperator: localFilter.value.rangeStartOperator ?? 'gte',
+          rangeEndOperator: localFilter.value.rangeEndOperator ?? getDefaultRangeEndOperator(inputKind.value),
+        },
+        { debounce: false },
+      )
+      return
+    }
+
+    if (currentOperator.value === 'between') {
+      emitFilter(
+        {
+          operator: value,
+          value: rangeStartValue.value || rangeEndValue.value || singleValue.value,
+          rangeStart: undefined,
+          rangeEnd: undefined,
+          rangeStartOperator: undefined,
+          rangeEndOperator: undefined,
+        },
+        { debounce: false },
+      )
       return
     }
 
@@ -311,20 +367,37 @@ export function useSaplingTableColumnFilter(
       value: singleValue.value,
       rangeStart: rangeStartValue.value,
       rangeEnd: rangeEndValue.value,
+      rangeStartOperator: localFilter.value.rangeStartOperator ?? 'gte',
+      rangeEndOperator:
+        localFilter.value.rangeEndOperator ?? getDefaultRangeEndOperator(inputKind.value),
       relationItems: relationItems.value.map((item) => ({ ...item })),
       ...patch,
     }
 
-    if (filterVariant.value === 'relation') {
+    if (isValueLessOperator(nextFilter.operator)) {
       nextFilter.value = ''
       nextFilter.rangeStart = undefined
       nextFilter.rangeEnd = undefined
-    } else if (filterVariant.value === 'range') {
+      nextFilter.rangeStartOperator = undefined
+      nextFilter.rangeEndOperator = undefined
+      nextFilter.relationItems = undefined
+    } else if (filterVariant.value === 'relation') {
+      nextFilter.value = ''
+      nextFilter.rangeStart = undefined
+      nextFilter.rangeEnd = undefined
+      nextFilter.rangeStartOperator = undefined
+      nextFilter.rangeEndOperator = undefined
+    } else if (filterVariant.value === 'range' || nextFilter.operator === 'between') {
       nextFilter.value = ''
       nextFilter.relationItems = undefined
+      nextFilter.rangeStartOperator = nextFilter.rangeStartOperator ?? 'gte'
+      nextFilter.rangeEndOperator =
+        nextFilter.rangeEndOperator ?? getDefaultRangeEndOperator(inputKind.value)
     } else {
       nextFilter.rangeStart = undefined
       nextFilter.rangeEnd = undefined
+      nextFilter.rangeStartOperator = undefined
+      nextFilter.rangeEndOperator = undefined
       nextFilter.relationItems = undefined
       nextFilter.value = nextFilter.value.trim()
     }
@@ -342,6 +415,7 @@ export function useSaplingTableColumnFilter(
       : undefined
 
     const isEmpty =
+      !isValueLessOperator(nextFilter.operator) &&
       nextFilter.value.length === 0 &&
       (nextFilter.rangeStart?.length ?? 0) === 0 &&
       (nextFilter.rangeEnd?.length ?? 0) === 0 &&
@@ -412,6 +486,8 @@ function createFilterState(
     value: filterItem?.value ?? '',
     rangeStart: filterItem?.rangeStart ?? '',
     rangeEnd: filterItem?.rangeEnd ?? '',
+    rangeStartOperator: filterItem?.rangeStartOperator,
+    rangeEndOperator: filterItem?.rangeEndOperator,
     relationItems: filterItem?.relationItems?.map((item) => ({ ...item })) ?? [],
   }
 }
@@ -422,6 +498,8 @@ function createEmptyFilterState(operator: ColumnFilterOperator): ColumnFilterIte
     value: '',
     rangeStart: '',
     rangeEnd: '',
+    rangeStartOperator: undefined,
+    rangeEndOperator: undefined,
     relationItems: [],
   }
 }
@@ -439,6 +517,8 @@ function getOperatorDescription(
       return t('filter.endsWith')
     case 'eq':
       return t('filter.isEqual')
+    case 'between':
+      return t('filter.isBetween')
     case 'gt':
       return t('filter.isGreaterThan')
     case 'gte':
@@ -447,6 +527,12 @@ function getOperatorDescription(
       return t('filter.isLessThan')
     case 'lte':
       return t('filter.isLessThanOrEqualTo')
+    case 'nin':
+      return t('filter.isNotIn')
+    case 'isSet':
+      return t('filter.hasValue')
+    case 'isEmpty':
+      return t('filter.isEmpty')
     default:
       return operator
   }
@@ -457,4 +543,21 @@ function isAllowedOperator(
   operator: ColumnFilterOperator,
 ) {
   return operatorOptions.some((option) => option.value === operator)
+}
+
+function formatFilterSummaryValue(value: string) {
+  const tokenMatch = value.trim().match(/^\{\{\s*([^}]+?)\s*\}\}$/)
+  return tokenMatch?.[1]?.trim() ?? value
+}
+
+function isTokenFilterValue(value: string) {
+  return /^\{\{\s*[^}]+?\s*\}\}$/.test(value.trim())
+}
+
+function isValueLessOperator(operator: ColumnFilterOperator) {
+  return operator === 'isSet' || operator === 'isEmpty'
+}
+
+function getDefaultRangeEndOperator(inputKind: InputKind): 'lt' | 'lte' {
+  return ['date', 'datetime', 'time'].includes(inputKind) ? 'lt' : 'lte'
 }

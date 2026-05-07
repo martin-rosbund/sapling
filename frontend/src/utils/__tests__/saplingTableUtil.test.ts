@@ -153,10 +153,13 @@ describe('saplingTableUtil', () => {
     )
     expect(getAllowedColumnFilterOperators(createTemplate({ type: 'Decimal' }))).toEqual([
       'eq',
+      'between',
       'gt',
       'gte',
       'lt',
       'lte',
+      'isSet',
+      'isEmpty',
     ])
   })
 
@@ -205,16 +208,18 @@ describe('saplingTableUtil', () => {
         },
         entityTemplates: [companyTemplate],
       }),
-    ).toEqual({ company: { $in: [5] } })
+    ).toEqual({ company: { id: 5 } })
 
     expect(
       buildTableFilter({
         columnFilters: {
           createdAt: {
-            operator: 'eq',
+            operator: 'between',
             value: '',
             rangeStart: '2026-04-01',
             rangeEnd: '2026-04-02',
+            rangeStartOperator: 'gte',
+            rangeEndOperator: 'lt',
           },
         },
         entityTemplates: [createdAtTemplate],

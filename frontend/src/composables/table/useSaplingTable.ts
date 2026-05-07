@@ -14,7 +14,6 @@ import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants'
 import { useGenericStore } from '@/stores/genericStore'
 import {
   extractColumnFiltersFromFilterQuery,
-  removeRestoredColumnFiltersFromFilterQuery,
 } from '@/composables/table/useSaplingTableFilterHelpers'
 import {
   buildTableFilter,
@@ -46,7 +45,6 @@ export function useSaplingTable(
   const sortBy = ref<SortItem[]>([])
   const columnFilters = ref<Record<string, ColumnFilterItem>>({})
   const parentFilter = ref<Record<string, unknown>>({})
-  const remainingUrlFilter = ref<unknown>(null)
   const isResettingEntityState = ref(false)
   const isInitialized = ref(false)
 
@@ -143,7 +141,6 @@ export function useSaplingTable(
       columnFilters: columnFilters.value,
       entityTemplates: entityTemplates.value,
       parentFilter: parentFilter.value,
-      urlFilter: remainingUrlFilter.value,
     }),
   )
 
@@ -271,16 +268,11 @@ export function useSaplingTable(
     search.value = getUrlSearchParam()
     sortBy.value = []
     columnFilters.value = {}
-    remainingUrlFilter.value = getUrlFilterParam()
   }
 
   function restoreQueryFilterState(nextEntityTemplates: EntityTemplate[]) {
     const urlFilter = getUrlFilterParam()
     columnFilters.value = extractColumnFiltersFromFilterQuery(nextEntityTemplates, urlFilter)
-    remainingUrlFilter.value = removeRestoredColumnFiltersFromFilterQuery(
-      nextEntityTemplates,
-      urlFilter,
-    )
   }
 
   async function initializeEntityState() {

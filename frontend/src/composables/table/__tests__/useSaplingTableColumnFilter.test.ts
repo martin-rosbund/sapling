@@ -91,4 +91,56 @@ describe('useSaplingTableColumnFilter', () => {
 
     expect(wrapper.vm.filterSummary).toBe('Geschlossen')
   })
+
+  it('renders dynamic placeholder values in a more readable summary', () => {
+    const wrapper = mount(TestHost, {
+      props: {
+        column: {
+          key: 'assigneePerson',
+          name: 'assigneePerson',
+          kind: 'm:1',
+          referenceName: 'person',
+        },
+        filterItem: {
+          operator: 'eq',
+          value: '',
+          relationItems: [{ handle: '{{currentUser.handle}}' }],
+        } satisfies ColumnFilterItem,
+        title: 'Verantwortlich',
+        operatorOptions: [{ label: '=', value: 'eq' }],
+      },
+    })
+
+    expect(wrapper.vm.filterSummary).toBe('currentUser.handle')
+  })
+
+  it('shows dynamic date windows as a range filter and falls back to text inputs for placeholders', () => {
+    const wrapper = mount(TestHost, {
+      props: {
+        column: {
+          key: 'deadlineDate',
+          name: 'deadlineDate',
+          type: 'date',
+        },
+        filterItem: {
+          operator: 'between',
+          value: '',
+          rangeStart: '{{today.start}}',
+          rangeEnd: '{{tomorrow.start}}',
+          rangeStartOperator: 'gte',
+          rangeEndOperator: 'lt',
+        } satisfies ColumnFilterItem,
+        title: 'Deadline',
+        operatorOptions: [
+          { label: '=', value: 'eq' },
+          { label: '..', value: 'between' },
+          { label: '<', value: 'lt' },
+        ],
+      },
+    })
+
+    expect(wrapper.vm.filterVariant).toBe('range')
+    expect(wrapper.vm.inputType).toBe('text')
+    expect(wrapper.vm.filterSummary).toBe('today.start filter.to tomorrow.start')
+  })
 })
