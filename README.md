@@ -1,89 +1,59 @@
 # Sapling
 
-Sapling ist eine Full-Stack-Plattform für CRM, Service, operative Abläufe und teaminterne Zusammenarbeit. Die Anwendung bündelt Stammdaten, Tickets, Termine, Dateien, Kennzahlen und KI-gestützte Assistenz in einer gemeinsamen Oberfläche, damit Fachprozesse nicht auf mehrere Einzellösungen verteilt werden müssen.
+Sapling ist eine Full-Stack-Plattform fuer CRM, Service, operative Ablaeufe und teaminterne Zusammenarbeit. Die Anwendung buendelt Stammdaten, Tickets, Termine, Dateien, Kennzahlen, Arbeitslisten, Vorlagen, Integrationen und KI-gestuetzte Assistenz in einer gemeinsamen Oberflaeche.
 
-Das Repository ist als JavaScript/TypeScript-Monorepo aufgebaut und kombiniert ein NestJS-Backend mit einem Vue-3-Frontend. Dadurch eignet sich Sapling sowohl für lokale Entwicklung als auch für selbst betriebene Ubuntu-Deployments mit PostgreSQL, optional Redis und einer klassischen Reverse-Proxy-Architektur.
+Das Repository ist als JavaScript/TypeScript-Monorepo aufgebaut und kombiniert ein NestJS-Backend mit einem Vue-3-Frontend. Sapling eignet sich fuer lokale Entwicklung, Docker-gestuetzte Infrastruktur und selbst betriebene Ubuntu-Deployments mit PostgreSQL, optional Redis und Reverse Proxy.
 
-## Overview
+## Highlights
 
-- **CRM und Stammdatenverwaltung:** Sapling verwaltet Unternehmen, Personen, Verträge, Produkte, Rollen und Beziehungen in einem generischen Datenmodell. Die Anwendung ist darauf ausgelegt, operative Kernobjekte konsistent zu erfassen, zu durchsuchen, zu filtern und in Tabellen-, Detail- und Timeline-Ansichten weiterzuverarbeiten.
-- **Service, Tickets und operative Vorgänge:** Support- und Serviceprozesse lassen sich über Tickets, Notizen, Statusmodelle, Prioritäten und zugehörige Aktionen abbilden. So entsteht ein Arbeitsbereich, in dem Anfragebearbeitung, Zuständigkeiten und Nachverfolgung an einem Ort zusammenlaufen.
-- **Kalender und Terminplanung:** Ereignisse, Planungsansichten und Zustell-/Synchronisationslogik für Kalender sind direkt in die Plattform integriert. Neben der Oberfläche für Termine gibt es auch Anbindungen an Microsoft- und Google-Kalender, damit operative Planung und externe Kalender nicht getrennt gepflegt werden müssen.
-- **Dashboards und KPI-Auswertung:** Sapling enthält ein KPI-System mit Aggregationen, Zeiträumen, Trends, Sparklines und Drilldowns. Damit lassen sich operative Kennzahlen nicht nur anzeigen, sondern auch entlang der zugrunde liegenden Entitäten und Filterlogiken nachvollziehen.
-- **Dokumente, Dateien und Kommunikation:** Die Plattform bringt Dateiverwaltung, Dateivorschauen, Mail-Funktionen und Dokumenttypen als eigene Fachbausteine mit. Dadurch können Informationen, Anhänge und Kommunikationsartefakte direkt an Geschäftsobjekten organisiert werden.
-- **Rechte, Rollen und Anmeldung:** Authentifizierung per lokaler Anmeldung sowie Microsoft- und Google-Login ist bereits angelegt. In Kombination mit Rollen, Berechtigungen und Session-/Token-Schutz entsteht eine Anwendung, die unterschiedliche Nutzergruppen und Zugriffsebenen sauber voneinander trennt.
-- **AI Integration:** Mit dem integrierten Assistenten "Songbird" verfügt Sapling über einen modernen AI-Chat mit Sitzungen, Modellwahl, Streaming-Antworten und Seitenkontext. Die KI kann damit nicht nur allgemeine Antworten liefern, sondern innerhalb der Anwendung mit aktuellem Kontext arbeiten und sich an aktiven Datensätzen orientieren.
-- **MCP Server:** Einer der wichtigsten neueren Ausbauschritte ist die MCP-Unterstützung. Sapling bringt einen internen MCP-Server für sichere, berechtigungsabhängige Datenzugriffe mit und kann zusätzlich externe MCP-Server über HTTP oder `stdio` anbinden, um die KI um weitere Werkzeuge zu erweitern.
-- **Integrationen und Automatisierung:** Webhooks, GitHub-Anbindung, Scripts, Systeminformationen und optionale Queue-Verarbeitung mit Redis/BullMQ erweitern die Plattform über klassische CRUD-Funktionen hinaus. Das macht Sapling nicht nur zu einer Datenbankoberfläche, sondern zu einer operativen Integrationsschicht für tägliche Arbeitsabläufe.
+- **Generisches Datenmodell:** Unternehmen, Personen, Tickets, Verkaufschancen, Vertraege, Produkte, Termine, Dokumente, Rollen, Systemlandschaften und weitere Fachobjekte laufen ueber ein einheitliches Entity-, Template- und Berechtigungsmodell.
+- **Arbeitslisten:** Vordefinierte und personalisierbare Arbeitslisten basieren auf gespeicherten Filtern, z. B. offene eigene Tickets, ueberfaellige Tickets, heutige Termine, aktive Verkaufschancen oder relevante Kunden-/Vertragslisten.
+- **Vorlagen fuer Dashboards und Arbeitslisten:** Rollen koennen Starter-Dashboards und Starter-Arbeitslisten erhalten. Neue Benutzer bekommen damit direkt passende KPI-Sichten und operative Listen.
+- **Dashboard- und KPI-System:** KPI-Karten, Trends, Sparklines, Zeitraeume, Aggregationen, Drilldowns und Dashboard-Templates machen operative Kennzahlen nachvollziehbar.
+- **Teams-Integration:** Sapling kann Microsoft-Teams-Nachrichten aus Templates erzeugen, Platzhalter aus Datensaetzen fuellen, 1:1-Chats bzw. Self-Chats anlegen und Zustellungen als Deliveries nachverfolgen.
+- **Mail- und Message-Templates:** E-Mail- und Teams-Vorlagen unterstuetzen Markdown, Platzhalter und fachliche Kontexte aus Entitaeten.
+- **Kalender und Termine:** Terminverwaltung mit Status, Teilnehmenden, Kontextpanels und optionaler Microsoft-/Google-Kalenderanbindung.
+- **Dateien und Dokumente:** Dokumenttypen, Uploads, Dateivorschauen und Zuordnung zu Fachobjekten sind integriert.
+- **Berechtigungen und Rollen:** Authentifizierung per lokaler Anmeldung sowie Microsoft- und Google-OAuth; Rollen steuern Zugriff auf Entitaeten und Funktionen.
+- **AI-Assistent Songbird:** AI-Chat mit Sitzungen, Modellwahl, Streaming, Seitenkontext, Transkription, Vektorisierung und interner Tool-Nutzung.
+- **MCP-Unterstuetzung:** Interner Sapling-MCP-Server fuer berechtigte Datenzugriffe sowie externe MCP-Server per HTTP oder `stdio`.
+- **Integrationen und Automatisierung:** Webhooks, GitHub-Anbindung, Script-Buttons, Systeminformationen, Mail-, Teams- und Kalenderfunktionen sowie optionale Queue-Verarbeitung mit Redis/BullMQ.
 
-## Architecture
+## Architektur
 
-| Layer | Technology | Purpose |
+| Layer | Technologie | Zweck |
 | --- | --- | --- |
-| Frontend | Vue 3, Vite, Vuetify, Pinia, Vue Router | Responsive application UI |
-| Backend | NestJS, TypeScript, Passport.js | API, authentication, business logic |
-| Database | PostgreSQL via MikroORM | Persistent application data |
-| Queue / Events | BullMQ, Redis (optional) | Background jobs and webhook processing |
-| AI Integrations | OpenAI, Gemini | AI-assisted features |
-| Logging | Morgan, Log4js | Request and server logging |
+| Frontend | Vue 3, Vite, Vuetify, Pinia, Vue Router | Responsive Weboberflaeche |
+| Backend | NestJS, TypeScript, Passport.js | API, Authentifizierung, Fachlogik |
+| Datenbank | PostgreSQL ueber MikroORM | Persistente Anwendungsdaten |
+| Queue / Jobs | BullMQ, Redis optional | Hintergrundjobs, Webhooks, Mail und Teams |
+| AI | OpenAI, Gemini, MCP | Chat, Tools, Vektorisierung und Assistenz |
+| Integrationen | Microsoft Graph, Google APIs, GitHub API | Kalender, Mail, Teams, Repository-Kontext |
+| Logging | Morgan, Log4js | Request- und Server-Logging |
 
-## Key Features
-
-- Generisches Entity-Modell für CRM-, Service- und Betriebsdaten
-- Tabellen-, Datei-, Partner- und Timeline-Ansichten für unterschiedliche Nutzungskontexte
-- KPI-Dashboard mit Trends, Sparklines, Drilldowns und Arbeitslisten
-- Ticket-, Notiz-, Termin- und Dokumentenverwaltung in einer gemeinsamen Oberfläche
-- Lokale Anmeldung sowie Microsoft- und Google-OAuth
-- Rollen- und Berechtigungssystem pro Entität
-- Integrierter AI-Chat mit Sitzungen, Modellumschaltung und Streaming
-- Unterstützung für OpenAI- und Gemini-Modelle über konfigurierbare Provider
-- Interner Sapling-MCP-Server für sichere Datenwerkzeuge im Benutzerkontext
-- Externe MCP-Server-Konfiguration über HTTP- oder `stdio`-Transporte
-- Webhooks, Mail-, GitHub-, Script- und Kalender-Integrationen
-- Swagger-Dokumentation für das Backend unter `/api/swagger`
-- Self-hosted Deployment auf Ubuntu mit PostgreSQL, PM2 und Reverse Proxy
-- Optionales Redis/BullMQ für Queue-basierte Hintergrundverarbeitung
-
-## Repository Structure
+## Repository-Struktur
 
 ```text
 sapling/
-|-- backend/          NestJS API, auth, ORM, logging, integrations
-|-- frontend/         Vue 3 application and UI assets
-|-- log/              Runtime log output
-|-- package.json      Root scripts for local orchestration
+|-- backend/          NestJS API, ORM, Auth, Integrationen, Seeder
+|-- frontend/         Vue 3 Client, Views, Komponenten, Stores
+|-- log/              Lokale Laufzeitlogs
+|-- package.json      Root-Skripte fuer Build, Debug, Tests und ORM
 |-- LICENSE
 `-- README.md
 ```
 
-## Getting Started
+## Voraussetzungen
 
-### Prerequisites
-
-Für eine lokale Installation auf Ubuntu sollten die folgenden Bausteine vorhanden sein:
-
-- Ubuntu 22.04 LTS oder neuer
-- Node.js 22.x oder 20.19+
+- Node.js `^20.19.0` oder `>=22.12.0`
 - npm
 - PostgreSQL
-- Redis optional, wenn Queue-/Webhook-Verarbeitung aktiviert werden soll
+- Redis optional, wenn Queues fuer Mail, Webhooks oder Teams genutzt werden sollen
+- Ubuntu 22.04 LTS oder neuer fuer die Deployment-Beispiele
 
-### Installation on Ubuntu
+Fuer lokale Entwicklung kann PostgreSQL klassisch installiert oder per Docker gestartet werden. Wenn AI-Vektorisierung genutzt werden soll, empfiehlt sich ein PostgreSQL-Image mit `pgvector`.
 
-Die folgenden Schritte richten eine saubere lokale Entwicklungsumgebung auf Ubuntu ein:
-
-```bash
-sudo apt update
-sudo apt install -y git curl ca-certificates gnupg build-essential postgresql postgresql-contrib
-
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-sudo apt install -y nodejs
-
-# Optional für BullMQ/Webhooks
-sudo apt install -y redis-server
-```
-
-Danach das Repository klonen und alle Abhängigkeiten installieren:
+## Lokale Installation
 
 ```bash
 git clone <REPOSITORY_URL>
@@ -94,74 +64,109 @@ npm ci --prefix backend
 npm ci --prefix frontend
 ```
 
-### Database Setup
-
-Lege für die lokale Entwicklung eine PostgreSQL-Datenbank und einen passenden Benutzer an:
+### Datenbank anlegen
 
 ```bash
 sudo -u postgres createuser --pwprompt sapling
 sudo -u postgres createdb --owner=sapling sapling
 ```
 
-Wenn du stattdessen den vorhandenen `postgres`-Benutzer verwenden willst, passe einfach die Werte in `backend/.env` entsprechend an.
+Alternativ kann die Infrastruktur mit Docker gestartet werden, siehe [Docker](#docker).
 
-### Environment Setup
-
-Erzeuge zunächst beide lokalen Umgebungsdateien aus den vorhandenen Defaults:
+### Environment-Dateien anlegen
 
 ```bash
 cp backend/.env.default backend/.env
 cp frontend/.env.default frontend/.env
 ```
 
-Danach sollten mindestens die folgenden Werte geprüft und angepasst werden.
+Passe danach mindestens Datenbank, Secret, Frontend-URL und Login-/Integrationswerte an.
 
-#### Backend
+## Environment-Konfiguration
 
-| Variable | Bedeutung |
-| --- | --- |
-| `PORT` | Port des NestJS-Backends, standardmäßig `3000` |
-| `SAPLING_FRONTEND_URL` | Exakte Frontend-URL für CORS und Session-Zugriffe |
-| `SAPLING_SECRET` | Pflichtwert für Session- und Sicherheitslogik |
-| `DB_DRIVER` | Datenbanktreiber, aktuell `postgresql` |
-| `DB_HOST` / `DB_PORT` | PostgreSQL-Host und Port |
-| `DB_USER` / `DB_PASSWORD` | Datenbankzugang |
-| `DB_NAME` | Name der Sapling-Datenbank |
-| `DB_DATA_SEEDER` | Seed-Datensatz, typischerweise `demonstration` oder `production` |
-| `DB_LOGGING` | Aktiviert SQL-Debug-Logging |
-| `SESSION_COOKIE_*` / `SESSION_TRUST_PROXY` | Session-Cookies und Reverse-Proxy-Verhalten |
-| `LOG_*` | Dateinamen, Log-Level, Backup-Anzahl und Zielpfad |
-| `REDIS_ENABLED` und `REDIS_*` | Nur nötig, wenn BullMQ/Queues aktiv sind |
-| `WEBHOOK_*` | Timeouts und Redirect-Verhalten für Webhook-Zustellung |
-| `AZURE_AD_*` | Microsoft-Login und Microsoft-Kalender |
-| `GOOGLE_*` | Google-Login und Google-Kalender |
-| `GITHUB_*` | GitHub-Integration |
+Im Repository gibt es aktuell zwei dokumentierte Runtime-Umgebungen:
 
-#### Frontend
+- `backend/.env` fuer API, Datenbank, Sessions, Integrationen, Logging, AI und Queues
+- `frontend/.env` fuer den Vite-Client, API-Ziel, UI-Grenzwerte und Login-Schalter
+
+### Backend `.env`
 
 | Variable | Bedeutung |
 | --- | --- |
-| `VITE_BACKEND_URL` | Backend-Basis inklusive `/api/`, z. B. `http://localhost:3000/api/` |
-| `VITE_PORT` | Port des Vite-Dev-Servers |
-| `VITE_ALLOWED_HOSTS` | Erlaubte Hosts für lokale Vite-Zugriffe |
-| `VITE_DEBUG_USERNAME` / `VITE_DEBUG_PASSWORD` | Komfortwerte für lokale Entwicklung |
-| `VITE_IS_LOGIN_WITH_AZURE_ENABLED` | Schaltet Microsoft-Login im Frontend ein oder aus |
-| `VITE_IS_LOGIN_WITH_GOOGLE_ENABLED` | Schaltet Google-Login im Frontend ein oder aus |
-| `VITE_NAVIGATION_URL` | Externe Ziel-URL für Navigation/Maps |
-| `VITE_DEFAULT_*` | Standardwerte für Fensterbreiten, Seitengrößen und Listenverhalten |
-| `VITE_DOCUMENT_MAX_FILE_SIZE_MB` | Maximale Dateigröße pro Upload-Datei im Frontend in MB |
+| `PORT` | Port des NestJS-Backends, Standard `3000`. |
+| `SAPLING_WHITELISTED_IPS` | Kommagetrennte Liste erlaubter IPs fuer geschuetzte Systemzugriffe. |
+| `SAPLING_SECRET` | Pflichtwert fuer Session- und Sicherheitslogik; produktiv immer stark und eindeutig setzen. |
+| `SAPLING_FRONTEND_URL` | Exakte Frontend-URL fuer CORS, Redirects und Cookies, z. B. `http://localhost:5173`. |
+| `SAPLING_HASH_INDICATOR` / `SAPLING_HASH_COST` | Passwort-Hashing-Konfiguration. |
+| `DB_DRIVER` | Datenbanktreiber, aktuell `postgresql`. |
+| `DB_HOST` / `DB_PORT` | PostgreSQL Host und Port. |
+| `DB_USER` / `DB_PASSWORD` / `DB_NAME` | Datenbankzugang und Datenbankname. |
+| `DB_DATA_SEEDER` | Seed-Datensatz, typischerweise `demonstration` oder `production`. |
+| `DB_LOGGING` | Aktiviert SQL-Logging fuer Debugging. |
+| `SESSION_COOKIE_NAME` | Name des Session-Cookies. |
+| `SESSION_MAX_AGE` / `SESSION_REMEMBER_ME_MAX_AGE` | Session-Lebensdauer in Millisekunden. |
+| `SESSION_COOKIE_SECURE` | Muss bei HTTPS/Produktion normalerweise `true` sein. |
+| `SESSION_COOKIE_SAME_SITE` | Cookie-SameSite-Policy: `lax`, `strict`, `none` oder `false`. |
+| `SESSION_TRUST_PROXY` | Anzahl vertrauter Reverse Proxies, meist `1` hinter Nginx. |
+| `GENERIC_DOWNLOAD_LIMIT` | Maximale Anzahl Datensaetze fuer generische Exporte. |
+| `LOG_OUTPUT_PATH` | Zielordner fuer Logs, relativ zum Backend-Prozess. |
+| `LOG_BACKUP_FILES` | Anzahl rotierter Logdateien. |
+| `LOG_LEVEL` | Log-Level, z. B. `info` oder `debug`. |
+| `LOG_NAME_REQUESTS` / `LOG_NAME_SERVER` | Dateinamen fuer Request- und Serverlogs. |
+| `LOG_APPENDERS` | Log-Ziele, z. B. `console,file`. |
+| `REDIS_ENABLED` | Aktiviert Redis/BullMQ-Queues. |
+| `REDIS_SERVER` / `REDIS_PORT` | Redis Host und Port. |
+| `REDIS_USERNAME` / `REDIS_PASSWORD` | Redis-Zugang, falls erforderlich. |
+| `REDIS_ATTEMPTS` / `REDIS_BACKOFF_*` | Retry-Verhalten fuer Queue-Jobs. |
+| `REDIS_REMOVE_ON_FAIL` / `REDIS_REMOVE_ON_COMPLETE` | Aufraeumverhalten abgeschlossener oder fehlgeschlagener Jobs. |
+| `WEBHOOK_TIMEOUT` / `WEBHOOK_MAX_REDIRECTS` | HTTP-Verhalten fuer Webhook-Zustellung. |
+| `AZURE_AD_TENNANT_ID` | Microsoft Tenant-ID. Der Name ist im Code aktuell so geschrieben. |
+| `AZURE_AD_CLIENT_ID` / `AZURE_AD_CLIENT_SECRET` | Microsoft OAuth App Credentials. |
+| `AZURE_AD_REDIRECT_URL` | Callback, z. B. `http://localhost:3000/api/auth/azure/callback`. |
+| `AZURE_AD_SCOPE` | Microsoft Graph Scopes fuer Login, Kalender, Mail und Teams. |
+| `AZURE_AD_RESPONSE_TYPE` / `AZURE_AD_RESPONSE_MODE` | Optionales OAuth-Antwortverhalten. |
+| `AZURE_AD_ALLOW_HTTP` | Nur fuer lokale Microsoft-OAuth-Setups ohne HTTPS relevant. |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth App Credentials. |
+| `GOOGLE_CALLBACK_URL` | Callback, z. B. `http://localhost:3000/api/auth/google/callback`. |
+| `GOOGLE_SCOPE` | Google Scopes fuer Login und Kalender. |
+| `AI_CHAT_MESSAGE_PAGE_SIZE` | Standard-Seitengroesse fuer Chat-Historien. |
+| `AI_MAX_CHAT_MESSAGE_PAGE_SIZE` | Maximale Chat-Historien-Seitengroesse. |
+| `AI_STREAM_HISTORY_MESSAGE_LIMIT` | Anzahl vorheriger Nachrichten im Streaming-Kontext. |
+| `GITHUB_REPO` / `GITHUB_API_URL` / `GITHUB_TOKEN` | GitHub-Integration. |
+| `API_TITLE` / `API_VERSION` / `API_DESCRIPTION` | Swagger-Metadaten. |
+| `API_CONTACT_NAME` / `API_CONTACT_URL` / `API_CONTACT_EMAIL` | Swagger-Kontaktdaten. |
 
-#### AI and MCP Setup
+AI-Provider-Credentials werden im laufenden System datengetrieben ueber Provider-Datensaetze gepflegt. Die `.env` steuert vor allem Laufzeitlimits und Infrastruktur; Modelle, Provider und MCP-Konfigurationen liegen in der Datenbank.
 
-Die aktuellen AI-Provider und Modelle werden als Datenobjekte in der Datenbank geführt und durch die Seeder angelegt. Für den produktiven Einsatz sollten nach dem ersten Seed die Provider-Datensätze gepflegt werden, insbesondere die Sicherheitsfelder der `aiProviderType`-Einträge für OpenAI und/oder Gemini.
+### Frontend / Client `.env`
 
-Die `backend/.env.default` enthält weiterhin Platzhalter für AI-Keys, der aktuelle Runtime-Pfad der AI-Services liest die Provider-Credentials jedoch aus den Datenbankeinträgen. Entscheidend sind deshalb im laufenden System die gepflegten `aiProviderType`-Datensätze und nicht nur die Werte in der `.env`.
+| Variable | Bedeutung |
+| --- | --- |
+| `VITE_BACKEND_URL` | Backend-Basis inklusive `/api/`, z. B. `http://localhost:3000/api/`. |
+| `VITE_GIT_URL` | Repository-URL, die im Client fuer Projekt-/GitHub-Verweise genutzt wird. |
+| `VITE_PORT` | Port des Vite-Dev-Servers, Standard `5173`. |
+| `VITE_ALLOWED_HOSTS` | Kommagetrennte erlaubte Hosts fuer lokale Vite-Zugriffe. |
+| `VITE_DEFAULT_SMALL_WINDOW_WIDTH` | Breakpoint fuer kleine Fenster. |
+| `VITE_DEFAULT_MEDIUM_WINDOW_WIDTH` | Breakpoint fuer mittlere Fenster. |
+| `VITE_DEFAULT_LARGE_WINDOW_WIDTH` | Breakpoint fuer grosse Fenster. |
+| `VITE_DEFAULT_PAGE_SIZE_SMALL` | Standard-Seitengroesse fuer kleine Viewports. |
+| `VITE_DEFAULT_PAGE_SIZE_MEDIUM` | Standard-Seitengroesse fuer mittlere Viewports. |
+| `VITE_DEFAULT_PAGE_SIZE_LARGE` | Standard-Seitengroesse fuer grosse Viewports. |
+| `VITE_DEFAULT_PAGE_SIZE_OPTIONS` | Auswahlwerte fuer Tabellen-Pagination, z. B. `10,25,50,100`. |
+| `VITE_DEFAULT_ENTITY_ITEMS_COUNT` | Standardlimit fuer Entity-Abfragen im Client. |
+| `VITE_DOCUMENT_MAX_FILE_SIZE_MB` | Maximale Uploadgroesse pro Datei im Frontend. |
+| `VITE_MOBILE_CARD_FIELD_LIMIT` | Maximale Feldanzahl in mobilen Kartenansichten. |
+| `VITE_DESKTOP_TABLE_COLUMN_LIMIT` | Maximale Spaltenanzahl in Desktop-Tabellenansichten. |
+| `VITE_DEBUG_USERNAME` / `VITE_DEBUG_PASSWORD` | Komfortwerte fuer lokale Login-Entwicklung; nicht produktiv verwenden. |
+| `VITE_IS_LOGIN_WITH_AZURE_ENABLED` | Schaltet Microsoft-Login im Frontend sichtbar. |
+| `VITE_IS_LOGIN_WITH_GOOGLE_ENABLED` | Schaltet Google-Login im Frontend sichtbar. |
+| `VITE_NAVIGATION_URL` | Externe Navigations-/Maps-Basis-URL. |
 
-MCP-Server werden ebenfalls datengetrieben über `mcpServerConfig` verwaltet. Es gibt einen eingebauten Sapling-MCP-Endpunkt unter `/api/ai/mcp`; zusätzliche externe MCP-Server können danach per HTTP- oder `stdio`-Transport in der Anwendung hinterlegt werden.
+Wichtig: Vite liest nur Variablen mit `VITE_`-Praefix in den Client ein. Geheimnisse gehoeren daher ausschliesslich in `backend/.env`, niemals in `frontend/.env`.
 
-### Migrations and Seeders
+## Datenbank, Migrationen und Seeder
 
-Die Datenbankpflege läuft im Backend über drei klar getrennte Commands:
+Die Datenbankpflege laeuft ueber Backend-Kommandos:
 
 ```bash
 npm run orm:migrate --prefix backend
@@ -169,209 +174,209 @@ npm run orm:seed --prefix backend
 npm run orm:deploy --prefix backend
 ```
 
-- `orm:migrate` baut das Backend und führt ausschließlich ausstehende MikroORM-Migrationen aus.
-- `orm:seed` baut das Backend und startet ausschließlich die Seeder.
-- `orm:deploy` kombiniert beide Schritte und ist der sinnvollste Einstieg für eine frische Umgebung oder ein Deployment.
+- `orm:migrate` baut das Backend und fuehrt ausstehende MikroORM-Migrationen aus.
+- `orm:seed` baut das Backend und startet die Seeder.
+- `orm:deploy` kombiniert Migrationen und Seeder und ist der beste Einstieg fuer frische Umgebungen.
+- `orm:create-migration` erstellt eine neue MikroORM-Migration aus dem aktuellen Entity-Modell.
 
-Wichtig für das aktuelle Verhalten:
+Seed-Daten liegen unter `backend/src/database/seeder/json-${DB_DATA_SEEDER}/...`. Erfolgreich gelaufene Seed-Dateien werden in `seed_script_item` protokolliert und spaeter uebersprungen. Neue Seed-Daten sollten deshalb in neuen JSON-Dateien ausgeliefert werden.
 
-- Die Seed-Daten werden aus `backend/src/database/seeder/json-${DB_DATA_SEEDER}/...` geladen.
-- Erfolgreich ausgeführte Seed-Dateien werden in `seed_script_item` protokolliert und bei späteren Läufen übersprungen.
-- Seeding ist damit dateinamenbasiert idempotent: Wenn du neue Seed-Daten ausrollen willst, legst du in der Regel eine neue JSON-Datei an, statt eine bereits erfolgreich gelaufene Datei still zu überschreiben.
-- `TranslationSeeder` importiert Sprachwerte getrennt für Deutsch und Englisch, während `PermissionSeeder` fehlende Rollen-/Entitätsberechtigungen ergänzt.
+## Projekt starten
 
-Für die erste Inbetriebnahme ist daher meist genau dieser Ablauf sinnvoll:
+Vom Repository-Root:
 
 ```bash
-npm run orm:deploy --prefix backend
-```
-
-### Run the Project
-
-From the repository root:
-
-```bash
-# Start backend and frontend in development/debug mode
+# Backend und Frontend im lokalen Debug-/Watch-Modus starten
 npm run debug
 
-# Start backend and frontend with production-style commands
+# Produktionsnahe Startkommandos fuer beide Teile
 npm run release
 ```
 
-Default local endpoints:
+Lokale Standard-Endpunkte:
 
 - Frontend: `http://localhost:5173`
 - Backend API: `http://localhost:3000`
+- Swagger: `http://localhost:3000/api/swagger`
 
-## Available Scripts
+## Root-Skripte
 
-### Root
-
-| Command | Description |
+| Command | Beschreibung |
 | --- | --- |
-| `npm run build:backend` | Baut nur das Backend in `backend/dist` |
-| `npm run build:frontend` | Baut nur das Frontend fuer den produktiven Einsatz |
-| `npm run build` | Baut Backend und Frontend nacheinander |
-| `npm run debug:backend` | Startet nur das Backend im Debug-/Watch-Modus |
-| `npm run debug:frontend` | Startet nur das Frontend im Debug-/Dev-Modus |
-| `npm run debug` | Startet Backend und Frontend parallel fuer die lokale Entwicklung |
-| `npm run test:backend` | Fuehrt nur die Backend-Tests aus |
-| `npm run test:frontend` | Fuehrt nur die Frontend-Tests aus |
-| `npm run test` | Fuehrt Backend- und Frontend-Tests nacheinander aus |
-| `npm run type-check:backend` | Fuehrt den TypeScript-Build-Check fuer das Backend aus |
-| `npm run type-check:frontend` | Fuehrt Vue-/TypeScript-Type-Checks fuer das Frontend aus |
-| `npm run type-check` | Fuehrt alle Type-Checks des Monorepos aus |
-| `npm run verify` | Fuehrt Type-Checks und alle Tests als Gesamtpruefung aus |
-| `npm run release:backend` | Startet nur das Backend ueber das produktionsnahe Startscript |
-| `npm run release:frontend` | Startet nur das Frontend ueber das Release-Entry-Script |
-| `npm run release` | Startet Backend und Frontend parallel ueber die Release-Scripts |
-| `npm run orm:migrate` | Fuehrt nur ausstehende Datenbankmigrationen aus |
-| `npm run orm:seed` | Fuehrt nur die Seeder aus |
-| `npm run orm:deploy` | Fuehrt Build, Migrationen und Seeder fuer das Backend aus |
-| `npm run format:backend` | Formatiert nur den Backend-Code |
-| `npm run format:frontend` | Formatiert nur den Frontend-Code |
-| `npm run format` | Formatiert Backend und Frontend nacheinander |
+| `npm run build:backend` | Baut nur das Backend. |
+| `npm run build:frontend` | Baut nur das Frontend. |
+| `npm run build` | Baut Backend und Frontend nacheinander. |
+| `npm run debug:backend` | Startet das Backend im Debug-/Watch-Modus. |
+| `npm run debug:frontend` | Startet den Vite-Client im Dev-Modus. |
+| `npm run debug` | Startet Backend und Frontend parallel mit `concurrently`. |
+| `npm run test:backend` | Fuehrt Backend-Tests mit Jest aus. |
+| `npm run test:frontend` | Fuehrt Frontend-Unit-Tests mit Vitest aus. |
+| `npm run test` | Fuehrt Backend- und Frontend-Tests nacheinander aus. |
+| `npm run type-check:backend` | Fuehrt den TypeScript-Build-Check fuer das Backend aus. |
+| `npm run type-check:frontend` | Fuehrt Vue-/TypeScript-Type-Checks fuer das Frontend aus. |
+| `npm run type-check` | Fuehrt alle Type-Checks aus. |
+| `npm run verify` | Fuehrt Type-Checks und Tests als Gesamtpruefung aus. |
+| `npm run release:backend` | Startet nur das Backend ueber das produktionsnahe Startscript. |
+| `npm run release:frontend` | Startet nur das Frontend ueber das Release-Entry-Script. |
+| `npm run release` | Startet Backend und Frontend parallel ueber Release-Skripte. |
+| `npm run orm:migrate` | Fuehrt Backend-Migrationen aus. |
+| `npm run orm:seed` | Fuehrt Backend-Seeder aus. |
+| `npm run orm:deploy` | Fuehrt Backend-Build, Migrationen und Seeder aus. |
+| `npm run orm:create-migration` | Erstellt eine neue MikroORM-Migration. |
+| `npm run format:backend` | Formatiert Backend-Code. |
+| `npm run format:frontend` | Formatiert Frontend-Code. |
+| `npm run format` | Formatiert Backend und Frontend. |
 
-## Configuration Notes
+## Feature-Details
 
-### Backend
+### Arbeitslisten
 
-Die Backend-Konfiguration ist stark umgebungsbasiert aufgebaut. Besonders wichtig sind die CORS-/Session-Kombination aus `SAPLING_FRONTEND_URL`, `SESSION_COOKIE_*` und `SESSION_TRUST_PROXY`, weil darüber entschieden wird, ob Login, Cookies und Reverse-Proxy-Setups sauber funktionieren.
+Arbeitslisten werden als `FavoriteTemplateItem` gepflegt. Sie definieren Entity, Route und Filter und koennen Platzhalter wie `{{currentUser.handle}}`, `{{today.start}}`, `{{week.start}}` oder `{{month.end}}` nutzen. Dadurch entstehen dynamische Listen fuer den aktuellen Benutzer, z. B.:
 
-Das Backend stellt zusätzlich Swagger unter `/api/swagger` bereit und schreibt Request- sowie Server-Logs über Morgan und Log4js in das konfigurierte Log-Verzeichnis. Wenn Redis deaktiviert ist, laufen Queue- und BullMQ-bezogene Funktionen nicht mit, das restliche System kann aber weiterhin betrieben werden.
+- eigene offene, wartende, ueberfaellige oder heute faellige Tickets
+- eigene Verkaufschancen nach Pipeline-Phase
+- heutige, morgige oder wochenbezogene Termine
+- aktive Kontakte, Unternehmen, Vertraege und Systemlandschaften
 
-### Frontend
+Rollen koennen Starter-Arbeitslisten referenzieren. Beim ersten Zugriff werden daraus persoenliche Favoriten fuer den Benutzer erzeugt.
 
-Das Frontend erwartet, dass `VITE_BACKEND_URL` bereits auf den API-Pfad zeigt und typischerweise mit `/api/` endet. Für lokale Setups sollten außerdem `VITE_ALLOWED_HOSTS`, die gewünschte Dev-Port-Konfiguration und die Login-Toggles zu den tatsächlich aktivierten Authentifizierungswegen passen.
+### Dashboard-Vorlagen
 
-Die Werte für Standardseitenlängen, Fensterbreiten, Dokument-Upload-Grenzen und Debug-Zugangsdaten sind rein anwendungsbezogene Komfortkonfiguration. Für Produktivumgebungen sollten Debug-Credentials nicht verwendet und externe URLs wie `VITE_NAVIGATION_URL` bewusst gesetzt werden.
+`DashboardTemplateItem` beschreibt wiederverwendbare Dashboard-Zusammenstellungen mit KPI-Sets. Der Produktions-Seed bringt unter anderem Vorlagen fuer Support Operations, Sales Pipeline, Event Coordination, Contracts & Products, Master Data Quality und System Operations mit.
 
-### AI and MCP
+Rollen koennen Starter-Dashboards erhalten. Hat ein Benutzer noch keine persoenlichen Dashboards, werden passende Vorlagen automatisch provisioniert.
 
-Die AI-Funktionalität ist nicht hart im Code auf ein einziges Modell festgelegt, sondern arbeitet mit aktiven Providern und Modellen aus der Datenbank. Dadurch lassen sich verfügbare Modelle, Standards und Tool-Fähigkeiten zentral pflegen, ohne jedes Mal die Anwendung umbauen zu müssen.
+### Teams-Integration
 
-Für MCP gilt dasselbe Prinzip: Sapling bringt einen eingebauten internen MCP-Server mit sicheren Datenwerkzeugen mit und kann darüber hinaus externe Server registrieren. Die Konfiguration dafür liegt in `mcpServerConfig`, inklusive Transport, Headern, Authentifizierung, erlaubten Tools und Sortierung.
+Die Teams-Funktion besteht aus drei Bausteinen:
 
-## Deployment
+- `TeamsTemplateItem`: Markdown-Vorlagen mit Platzhaltern pro Entity.
+- `TeamsSubscriptionItem`: fachliche Ausloeser inklusive Ziel-/Empfaengerfeld.
+- `TeamsDeliveryItem`: protokollierte Zustellung mit Status, Provider-Response und Retry-Moeglichkeit.
 
-Fuer ein Ubuntu-Deployment empfiehlt sich bei Sapling eine klare Trennung:
+Die Zustellung erfolgt ueber Microsoft Graph. Sender und Empfaenger muessen Azure-Benutzer mit gueltiger Session bzw. Login-Information sein. Ist Redis aktiv, laufen Teams-Zustellungen ueber BullMQ; ohne Redis werden sie direkt verarbeitet.
 
-- `frontend/dist` wird statisch ueber Nginx ausgeliefert
-- das NestJS-Backend laeuft separat ueber PM2 auf Port `3000`
-- PostgreSQL wird direkt vom Backend genutzt
-- Redis ist nur noetig, wenn Queue-/Webhook-Funktionen produktiv aktiviert werden sollen
+### AI und MCP
 
-### Kompakte Ubuntu-Installationsanleitung
+Songbird verwendet Provider- und Modelldaten aus der Datenbank. Der interne Sapling-MCP-Server stellt berechtigungsabhaengige Datenwerkzeuge bereit; externe MCP-Server koennen ueber `mcpServerConfig` mit Transport, Headern, Authentifizierung und erlaubten Tools angebunden werden.
 
-Die folgenden Schritte sind auf dieses Repository zugeschnitten und gehen davon aus, dass Sapling unter `/var/www/sapling` betrieben wird.
+## Docker
 
-#### 1. Systempakete und Node.js installieren
+Docker wird in diesem Repository vor allem fuer lokale Infrastruktur empfohlen. Backend und Frontend laufen weiterhin bequem per `npm run debug`; PostgreSQL und Redis koennen isoliert in Containern laufen.
+
+### PostgreSQL mit pgvector
 
 ```bash
-sudo apt update
-sudo apt install -y git curl ca-certificates gnupg build-essential \
-  postgresql postgresql-contrib nginx certbot python3-certbot-nginx
-
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-sudo apt install -y nodejs
-
-# Optional nur fuer BullMQ / Webhooks
-sudo apt install -y redis-server
+docker run \
+  --name sapling-postgres-vector \
+  --restart unless-stopped \
+  -e POSTGRES_DB=sapling \
+  -e POSTGRES_USER=sapling \
+  -e POSTGRES_PASSWORD=sapling \
+  -p 5432:5432 \
+  -d pgvector/pgvector:pg18
 ```
 
-#### 2. Repository bereitstellen und Abhaengigkeiten installieren
+Passende Backend-Werte:
+
+```dotenv
+DB_DRIVER=postgresql
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=sapling
+DB_PASSWORD=sapling
+DB_NAME=sapling
+```
+
+Falls Port `5432` lokal bereits belegt ist, kann links ein anderer Host-Port verwendet werden, z. B. `-p 55432:5432`; dann muss `DB_PORT=55432` gesetzt werden.
+
+### Redis fuer Queues
 
 ```bash
-sudo mkdir -p /var/www
-sudo chown -R $USER:$USER /var/www
-cd /var/www
+docker run \
+  --name sapling-redis-cache \
+  --restart unless-stopped \
+  -p 6379:6379 \
+  -d redis:alpine
+```
 
-git clone https://github.com/martin-rosbund/sapling.git sapling
-cd sapling
+Passende Backend-Werte:
+
+```dotenv
+REDIS_ENABLED=true
+REDIS_SERVER=localhost
+REDIS_PORT=6379
+REDIS_USERNAME=
+REDIS_PASSWORD=
+```
+
+Redis ist optional. Wenn `REDIS_ENABLED=false` ist, kann Sapling ohne Queue-Infrastruktur laufen; bestimmte Jobs werden dann direkt verarbeitet oder Queue-Funktionen bleiben deaktiviert.
+
+### Container verwalten
+
+```bash
+docker ps
+docker logs sapling-postgres-vector
+docker logs sapling-redis-cache
+docker stop sapling-postgres-vector sapling-redis-cache
+docker start sapling-postgres-vector sapling-redis-cache
+```
+
+Nach dem ersten Start:
+
+```bash
+npm run orm:deploy --prefix backend
+npm run debug
+```
+
+## Ubuntu-Deployment
+
+Fuer ein selbst betriebenes Deployment empfiehlt sich:
+
+- PostgreSQL lokal oder als verwalteter Dienst
+- optional Redis fuer Queue-basierte Verarbeitung
+- Backend als PM2-Prozess auf Port `3000`
+- Frontend als Vite-/Node-Prozess oder alternativ statisch aus `frontend/dist`
+- Nginx als Reverse Proxy fuer `/` und `/api/`
+
+### Build und Deployment-Schritte
+
+```bash
+cd /var/www/sapling
+git pull
 
 npm ci
 npm ci --prefix backend
 npm ci --prefix frontend
-```
 
-#### 3. `.env`-Dateien anlegen und fuer HTTPS vorbereiten
-
-```bash
-cp backend/.env.default backend/.env
-cp frontend/.env.default frontend/.env
-```
-
-Fuer ein produktives Setup sollten mindestens diese Werte angepasst werden:
-
-`backend/.env`
-
-```dotenv
-PORT=3000
-SAPLING_FRONTEND_URL=https://sapling.craffel.de
-SESSION_COOKIE_SECURE=true
-SESSION_TRUST_PROXY=1
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=sapling
-DB_PASSWORD=<secure-password>
-DB_NAME=sapling
-REDIS_ENABLED=false
-```
-
-`frontend/.env`
-
-```dotenv
-VITE_BACKEND_URL=https://sapling.craffel.de/api/
-```
-
-Wenn Microsoft- oder Google-Login aktiv genutzt wird, muessen auch die Callback-URLs in `backend/.env` auf die produktive HTTPS-Domain zeigen.
-
-#### 4. Datenbank vorbereiten und Anwendung bauen
-
-```bash
-sudo -u postgres createuser --pwprompt sapling
-sudo -u postgres createdb --owner=sapling sapling
-
-npm run build --prefix backend
-npm run build --prefix frontend
+npm run build
 npm run orm:deploy --prefix backend
 ```
 
-#### 5. PM2 installieren und Frontend + Backend als Dienste einrichten
-
-Im hier dokumentierten Setup liefert Nginx das Frontend nicht direkt aus `frontend/dist` aus, sondern leitet `/` an den Frontend-Prozess auf Port `5173` und `/api/` an das Backend auf Port `3000` weiter. Deshalb sollten beide Prozesse ueber PM2 laufen.
+### PM2
 
 ```bash
 sudo npm install -g pm2
 
-cd /var/www/sapling
 pm2 start npm --name sapling-backend -- run release:backend
 pm2 start npm --name sapling-frontend -- run release:frontend
 pm2 save
 pm2 startup
 ```
 
-Danach den von `pm2 startup` ausgegebenen `sudo`-Befehl einmal ausfuehren und anschliessend mit `pm2 list`, `pm2 logs sapling-backend` und `pm2 logs sapling-frontend` pruefen, ob beide Prozesse sauber laufen.
+Danach den von `pm2 startup` ausgegebenen `sudo`-Befehl ausfuehren.
 
-#### 6. Nginx installieren und konfigurieren
-
-Erstelle zunaechst eine Site-Konfiguration:
-
-```bash
-sudo nano /etc/nginx/sites-available/sapling
-```
-
-Beispielkonfiguration fuer dieses Repository:
+### Nginx-Beispiel
 
 ```nginx
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
 
-    server_name sapling.craffel.de www.sapling.craffel.de;
+    server_name sapling.example.com;
 
-    ssl_certificate /etc/nginx/ssl/craffel.de_ssl_certificate.cer;
-    ssl_certificate_key /etc/nginx/ssl/craffel.de_private_key.key;
+    ssl_certificate /etc/nginx/ssl/sapling_fullchain.pem;
+    ssl_certificate_key /etc/nginx/ssl/sapling_private.key;
 
     client_max_body_size 20M;
 
@@ -398,92 +403,26 @@ server {
 }
 ```
 
-Danach die Site aktivieren und Nginx laden:
+Wichtige Produktionswerte:
 
-```bash
-sudo ln -s /etc/nginx/sites-available/sapling /etc/nginx/sites-enabled/sapling
-sudo rm -f /etc/nginx/sites-enabled/default
-sudo nginx -t
-sudo systemctl reload nginx
+```dotenv
+SAPLING_FRONTEND_URL=https://sapling.example.com
+SESSION_COOKIE_SECURE=true
+SESSION_TRUST_PROXY=1
+VITE_BACKEND_URL=https://sapling.example.com/api/
 ```
 
-#### 6a. SSL-Zertifikat manuell fuer Nginx hinterlegen
-
-Wenn das Zertifikat nicht ueber Certbot verwaltet wird, kann es direkt unter `/etc/nginx/ssl` abgelegt werden.
-
-```bash
-sudo mkdir -p /etc/nginx/ssl
-sudo cp craffel.de_ssl_certificate.cer /etc/nginx/ssl/
-sudo cp craffel.de_private_key.key /etc/nginx/ssl/
-sudo chown root:root /etc/nginx/ssl/craffel.de_ssl_certificate.cer /etc/nginx/ssl/craffel.de_private_key.key
-sudo chmod 644 /etc/nginx/ssl/craffel.de_ssl_certificate.cer
-sudo chmod 600 /etc/nginx/ssl/craffel.de_private_key.key
-```
-
-Danach werden die Pfade in der Nginx-Datei ueber diese beiden Zeilen eingetragen:
-
-```nginx
-ssl_certificate /etc/nginx/ssl/craffel.de_ssl_certificate.cer;
-ssl_certificate_key /etc/nginx/ssl/craffel.de_private_key.key;
-```
-
-Die Zertifikatsdatei ist der oeffentliche Teil fuer die Domain, die Key-Datei ist der private Schluessel. Falls dein Anbieter statt einer `.cer`-Datei ein Bundle oder eine Full-Chain-Datei liefert, sollte genau diese Datei bei `ssl_certificate` verwendet werden.
-
-Nach dem Hinterlegen des Zertifikats sollten diese Werte nochmals geprueft werden:
-
-- `SAPLING_FRONTEND_URL=https://sapling.craffel.de`
-- `SESSION_COOKIE_SECURE=true`
-- `SESSION_TRUST_PROXY=1`
-- `VITE_BACKEND_URL=https://sapling.craffel.de/api/`
-
-#### 6b. Dateigroesse fuer Uploads auf 20 MB setzen
-
-Fuer Sapling ist die wichtigste Reverse-Proxy-Einstellung dafuer:
-
-```nginx
-client_max_body_size 20M;
-```
-
-Sie gehoert in den jeweiligen `server`-Block oder global in den `http`-Block. Nach Aenderungen immer neu laden:
+Nach Nginx-Aenderungen:
 
 ```bash
 sudo nginx -t
 sudo systemctl reload nginx
 ```
-
-Im aktuellen Projekt ist im Backend kein engeres Multer-Dateilimit hinterlegt, daher ist Nginx hier der entscheidende Schalter fuer Uploads.
-
-#### Wartung und Updates
-
-Ein minimales Update fuer ein bestehendes Deployment sieht so aus:
-
-```bash
-cd /var/www/sapling
-git pull
-npm ci
-npm ci --prefix backend
-npm ci --prefix frontend
-npm run build --prefix backend
-npm run build --prefix frontend
-npm run orm:deploy --prefix backend
-pm2 restart sapling-frontend
-pm2 restart sapling-backend
-```
-
-Das Repository enthaelt ausserdem mit `.github/workflows/ionos_deploy.yml` eine vorhandene Basis fuer CI/CD in eine IONOS-Umgebung. Sie eignet sich gut als Startpunkt, sollte aber vor dem produktiven Einsatz mit den aktuell gewuenschten Build- und Server-Schritten abgeglichen werden.
 
 ## Logging
 
-Application logs are written to the root `log/` directory. Log file names, retention, output targets, and log level are controlled through backend environment variables.
+Backend-Logs werden standardmaessig in `log/` geschrieben. Zielpfad, Dateinamen, Retention, Appender und Log-Level werden ueber `LOG_*` in `backend/.env` gesteuert.
 
-## License
+## Lizenz
 
-This project is licensed under the GNU General Public License v3.0. See [LICENSE](./LICENSE) for details.
-
-## Docker
-
-Datenbank:
-docker run --name sapling-postgres-vector -e POSTGRES_PASSWORD=sapling -p 5432:5432 -d pgvector/pgvector:pg18
-
-Redis / BullMQ
-docker run -d --name sapling-redis-cache --restart always -p 6379:6379 redis:alpine
+Sapling steht unter der GNU General Public License v3.0. Details stehen in [LICENSE](./LICENSE).
