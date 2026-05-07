@@ -12,9 +12,7 @@ import type {
 import type { SaplingGenericItem } from '@/entity/entity'
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants'
 import { useGenericStore } from '@/stores/genericStore'
-import {
-  extractColumnFiltersFromFilterQuery,
-} from '@/composables/table/useSaplingTableFilterHelpers'
+import { extractColumnFiltersFromFilterQuery } from '@/composables/table/useSaplingTableFilterHelpers'
 import {
   buildTableFilter,
   buildTableOrderBy,

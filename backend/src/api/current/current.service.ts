@@ -499,9 +499,10 @@ export class CurrentService {
     }
 
     if (typeof value === 'object' && 'getItems' in value) {
-      const getItems = (value as { getItems?: () => T[] }).getItems;
+      const getItems = (value as { getItems?: () => unknown }).getItems;
       if (typeof getItems === 'function') {
-        return getItems.call(value);
+        const items = getItems.call(value) as unknown;
+        return Array.isArray(items) ? (items as T[]) : [];
       }
     }
 

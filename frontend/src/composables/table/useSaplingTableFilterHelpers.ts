@@ -381,7 +381,12 @@ function restoreColumnFilterFromClause(
       value: operatorValue[`$${operator}`],
     }))
     .filter(
-      (entry): entry is { operator: 'eq' | 'gt' | 'gte' | 'lt' | 'lte'; value: string | number | boolean } =>
+      (
+        entry,
+      ): entry is {
+        operator: 'eq' | 'gt' | 'gte' | 'lt' | 'lte'
+        value: string | number | boolean
+      } =>
         typeof entry.value === 'string' ||
         typeof entry.value === 'number' ||
         typeof entry.value === 'boolean',
@@ -397,7 +402,10 @@ function restoreColumnFilterFromClause(
   return null
 }
 
-function restoreRelationFilter(template: EntityTemplate, rawValue: unknown) {
+function restoreRelationFilter(
+  template: EntityTemplate,
+  rawValue: unknown,
+): Partial<ColumnFilterItem> | null {
   if (typeof rawValue !== 'object' || rawValue === null) {
     const relationItem = createRelationFilterItem(template, rawValue)
     return relationItem
@@ -451,7 +459,10 @@ function restoreRelationFilter(template: EntityTemplate, rawValue: unknown) {
     : null
 }
 
-function restoreRangeFilter(template: EntityTemplate, operatorValue: Record<string, unknown>) {
+function restoreRangeFilter(
+  template: EntityTemplate,
+  operatorValue: Record<string, unknown>,
+): Partial<ColumnFilterItem> | null {
   if (isDateTemplate(template)) {
     const restoredDateEquality = restoreDateEqualityFilter(operatorValue)
     if (restoredDateEquality) {
@@ -462,7 +473,9 @@ function restoreRangeFilter(template: EntityTemplate, operatorValue: Record<stri
   return restoreBetweenFilter(operatorValue)
 }
 
-function restoreDateEqualityFilter(operatorValue: Record<string, unknown>) {
+function restoreDateEqualityFilter(
+  operatorValue: Record<string, unknown>,
+): Partial<ColumnFilterItem> | null {
   if (typeof operatorValue.$gte !== 'string' || typeof operatorValue.$lt !== 'string') {
     return null
   }
@@ -589,11 +602,23 @@ function restoreRelationIdentifierOperatorFilter(
   return null
 }
 
-function restoreBetweenFilter(operatorValue: Record<string, unknown>): Partial<ColumnFilterItem> | null {
+function restoreBetweenFilter(
+  operatorValue: Record<string, unknown>,
+): Partial<ColumnFilterItem> | null {
   const rangeStart = parseComparableRangeValue(operatorValue.$gt ?? operatorValue.$gte)
   const rangeEnd = parseComparableRangeValue(operatorValue.$lt ?? operatorValue.$lte)
-  const rangeStartOperator = typeof operatorValue.$gt !== 'undefined' ? 'gt' : typeof operatorValue.$gte !== 'undefined' ? 'gte' : undefined
-  const rangeEndOperator = typeof operatorValue.$lt !== 'undefined' ? 'lt' : typeof operatorValue.$lte !== 'undefined' ? 'lte' : undefined
+  const rangeStartOperator =
+    typeof operatorValue.$gt !== 'undefined'
+      ? 'gt'
+      : typeof operatorValue.$gte !== 'undefined'
+        ? 'gte'
+        : undefined
+  const rangeEndOperator =
+    typeof operatorValue.$lt !== 'undefined'
+      ? 'lt'
+      : typeof operatorValue.$lte !== 'undefined'
+        ? 'lte'
+        : undefined
 
   if (!rangeStartOperator && !rangeEndOperator) {
     return null
@@ -648,9 +673,7 @@ function isRoundTrippableRelationIdentifier(template: EntityTemplate, rawValue: 
 }
 
 function isScalarFilterValue(value: unknown): value is string | number | boolean {
-  return (
-    typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
-  )
+  return typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
 }
 
 function mergeRestoredFilter(
@@ -726,11 +749,7 @@ function isDateOnlyValue(value: string) {
 }
 
 function parseComparableRangeValue(value: unknown) {
-  if (
-    typeof value !== 'string' &&
-    typeof value !== 'number' &&
-    typeof value !== 'boolean'
-  ) {
+  if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean') {
     return undefined
   }
 

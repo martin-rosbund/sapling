@@ -73,7 +73,9 @@
             >
               <template #prepend>
                 <v-icon>{{
-                  favoriteItem.handle === activeFavoriteHandle ? 'mdi-bookmark' : 'mdi-bookmark-outline'
+                  favoriteItem.handle === activeFavoriteHandle
+                    ? 'mdi-bookmark'
+                    : 'mdi-bookmark-outline'
                 }}</v-icon>
               </template>
               <v-list-item-title>{{ favoriteItem.title }}</v-list-item-title>
@@ -143,7 +145,9 @@
             >
               <template #prepend>
                 <v-icon>{{
-                  favoriteItem.handle === activeFavoriteHandle ? 'mdi-bookmark' : 'mdi-bookmark-outline'
+                  favoriteItem.handle === activeFavoriteHandle
+                    ? 'mdi-bookmark'
+                    : 'mdi-bookmark-outline'
                 }}</v-icon>
               </template>
               <v-list-item-title>{{ favoriteItem.title }}</v-list-item-title>

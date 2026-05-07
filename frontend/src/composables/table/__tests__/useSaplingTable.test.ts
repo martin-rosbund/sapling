@@ -277,7 +277,10 @@ describe('useSaplingTable', () => {
       'ticket',
       expect.objectContaining({
         filter: {
-          $and: [{ status: { handle: 'open' } }, { assigneePerson: { handle: '{{currentUser.handle}}' } }],
+          $and: [
+            { status: { handle: 'open' } },
+            { assigneePerson: { handle: '{{currentUser.handle}}' } },
+          ],
         },
       }),
     )

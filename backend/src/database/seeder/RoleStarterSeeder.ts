@@ -90,7 +90,10 @@ export class RoleStarterSeeder extends Seeder {
   }
 
   private loadJsonData(fileBase: string): RoleStarterTemplateSeed[] {
-    const jsonPath = join(__dirname, `./json-${DB_DATA_SEEDER}/${fileBase}.json`);
+    const jsonPath = join(
+      __dirname,
+      `./json-${DB_DATA_SEEDER}/${fileBase}.json`,
+    );
     const fileContent = readFileSync(jsonPath, 'utf-8');
     return JSON.parse(fileContent) as RoleStarterTemplateSeed[];
   }
@@ -102,7 +105,9 @@ export class RoleStarterSeeder extends Seeder {
     const roleItem = roleByTitle.get(roleTitle);
 
     if (!roleItem) {
-      throw new Error(`Role starter seeding failed. Unknown role: ${roleTitle}`);
+      throw new Error(
+        `Role starter seeding failed. Unknown role: ${roleTitle}`,
+      );
     }
 
     return roleItem;

@@ -4,6 +4,9 @@ jest.mock('@mikro-orm/core', () => ({
   EntityManager: class {},
 }));
 jest.mock('../../entity/global/entity.decorator', () => ({
+  Sapling: jest.fn(() => () => undefined),
+  SaplingForm: jest.fn(() => () => undefined),
+  SaplingDependsOn: jest.fn(() => () => undefined),
   hasSaplingOption: jest.fn(() => false),
 }));
 jest.mock('../../entity/global/entity.registry', () => ({

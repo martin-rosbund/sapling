@@ -178,9 +178,7 @@ export function useSaplingTableColumnFilter(
   })
 
   const isOperatorSelectable = computed(
-    () =>
-      props.operatorOptions.length > 1 &&
-      !['boolean', 'icon'].includes(filterVariant.value),
+    () => props.operatorOptions.length > 1 && !['boolean', 'icon'].includes(filterVariant.value),
   )
 
   const operatorItems = computed(() =>
@@ -313,7 +311,8 @@ export function useSaplingTableColumnFilter(
           rangeStart: rangeStartValue.value || singleValue.value,
           rangeEnd: rangeEndValue.value,
           rangeStartOperator: localFilter.value.rangeStartOperator ?? 'gte',
-          rangeEndOperator: localFilter.value.rangeEndOperator ?? getDefaultRangeEndOperator(inputKind.value),
+          rangeEndOperator:
+            localFilter.value.rangeEndOperator ?? getDefaultRangeEndOperator(inputKind.value),
         },
         { debounce: false },
       )

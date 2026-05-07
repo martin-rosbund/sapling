@@ -865,6 +865,120 @@ export interface RoleStageItem extends SaplingGenericItem {
 }
 
 /**
+ * Represents a sales opportunity entity.
+ */
+export interface SalesOpportunityItem extends SaplingGenericItem {
+  /** Unique identifier for the sales opportunity */
+  handle?: number | null
+  /** Title of the sales opportunity */
+  title: string
+  /** Optional description */
+  description?: string | null
+  /** Expected revenue for the opportunity */
+  expectedRevenue?: number | null
+  /** Probability of winning the opportunity */
+  probability?: number | null
+  /** Expected close date */
+  closeDate?: Date | null
+  /** Next planned action */
+  nextStep?: string | null
+  /** Customer pain points */
+  painPoints?: string | null
+  /** Whether the opportunity is active */
+  isActive?: boolean | null
+  /** Current stage */
+  type?: SalesOpportunityStageItem | null
+  /** Forecast classification */
+  forecast?: SalesOpportunityForecastItem | null
+  /** Lead source */
+  source?: SalesOpportunitySourceItem | null
+  /** Assigned company */
+  assigneeCompany?: CompanyItem | null
+  /** Assigned person */
+  assigneePerson?: PersonItem | null
+  /** Creating company */
+  creatorCompany?: CompanyItem | null
+  /** Creating person */
+  creatorPerson?: PersonItem | null
+  /** Related tickets */
+  tickets?: TicketItem[]
+  /** Related events */
+  events?: EventItem[]
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a sales opportunity stage.
+ */
+export interface SalesOpportunityStageItem extends SaplingGenericItem {
+  /** Unique identifier for the stage */
+  handle: string
+  /** Display title */
+  title: string
+  /** Optional business description */
+  description?: string | null
+  /** Icon used in the UI */
+  icon?: string | null
+  /** Accent color */
+  color: string
+  /** Pipeline ordering */
+  sortOrder?: number | null
+  /** Suggested probability for this stage */
+  defaultProbability?: number | null
+  /** Whether the stage closes the opportunity */
+  isClosed?: boolean | null
+  /** Whether the stage counts as a success */
+  isSuccess?: boolean | null
+  /** Opportunities in this stage */
+  salesOpportunities?: SalesOpportunityItem[]
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a sales opportunity forecast category.
+ */
+export interface SalesOpportunityForecastItem extends SaplingGenericItem {
+  /** Unique identifier for the forecast */
+  handle: string
+  /** Display title */
+  title: string
+  /** Optional icon */
+  icon?: string | null
+  /** Accent color */
+  color: string
+  /** Opportunities in this forecast */
+  salesOpportunities?: SalesOpportunityItem[]
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a sales opportunity source.
+ */
+export interface SalesOpportunitySourceItem extends SaplingGenericItem {
+  /** Unique identifier for the source */
+  handle?: number | null
+  /** Display title */
+  title: string
+  /** Technical/source name */
+  name: string
+  /** Opportunities tied to this source */
+  salesOpportunities?: SalesOpportunityItem[]
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
  * Represents a ticket entity.
  */
 export interface TicketItem extends SaplingGenericItem {

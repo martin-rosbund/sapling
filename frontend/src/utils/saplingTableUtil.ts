@@ -326,19 +326,31 @@ function buildColumnFilterClause(template: EntityTemplate, filter: ColumnFilterI
     }
   }
 
-  const operatorMap: Record<
-    Exclude<ColumnFilterOperator, 'like' | 'startsWith' | 'endsWith' | 'between' | 'nin' | 'isSet' | 'isEmpty'>,
-    string
-  > = {
-    eq: '$eq',
-    gt: '$gt',
-    gte: '$gte',
-    lt: '$lt',
-    lte: '$lte',
-  }
-
-  return {
-    [template.name]: { [operatorMap[operator]]: normalizedValue },
+  switch (operator) {
+    case 'eq':
+      return {
+        [template.name]: { $eq: normalizedValue },
+      }
+    case 'gt':
+      return {
+        [template.name]: { $gt: normalizedValue },
+      }
+    case 'gte':
+      return {
+        [template.name]: { $gte: normalizedValue },
+      }
+    case 'lt':
+      return {
+        [template.name]: { $lt: normalizedValue },
+      }
+    case 'lte':
+      return {
+        [template.name]: { $lte: normalizedValue },
+      }
+    default:
+      return {
+        [template.name]: { $eq: normalizedValue },
+      }
   }
 }
 
@@ -463,7 +475,9 @@ function buildRangeColumnFilterClause(
     const rangeClauses: FilterQuery[] = []
 
     if (normalizedStart) {
-      rangeClauses.push(buildDateColumnFilterClause(template.name, rangeStartOperator, normalizedStart))
+      rangeClauses.push(
+        buildDateColumnFilterClause(template.name, rangeStartOperator, normalizedStart),
+      )
     }
 
     if (normalizedEnd) {
@@ -687,7 +701,10 @@ function formatFilterDisplayValue(value: unknown): string {
   }
 
   if (Array.isArray(value)) {
-    return value.map((entry) => formatFilterDisplayValue(entry)).filter(Boolean).join(', ')
+    return value
+      .map((entry) => formatFilterDisplayValue(entry))
+      .filter(Boolean)
+      .join(', ')
   }
 
   if (value && typeof value === 'object') {

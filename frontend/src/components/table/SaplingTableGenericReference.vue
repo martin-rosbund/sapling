@@ -9,10 +9,7 @@
       @click.stop="openTargetDialog"
     >
       <v-icon class="sapling-table-generic-reference__icon">mdi-eye</v-icon>
-      <span
-        v-if="displayLabel"
-        class="sapling-text-truncate sapling-button-truncate__label"
-      >
+      <span v-if="displayLabel" class="sapling-text-truncate sapling-button-truncate__label">
         {{ displayLabel }}
       </span>
     </v-btn>

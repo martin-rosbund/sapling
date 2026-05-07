@@ -98,13 +98,20 @@ describe('CurrentService', () => {
       person: { handle: 7 },
     });
     expect(persist).toHaveBeenCalledTimes(2);
+    const persistedDashboard = persist.mock.calls[0]?.[0] as
+      | {
+          kpis: {
+            items: Array<{ handle: number }>;
+          };
+        }
+      | undefined;
     expect(persist.mock.calls[0]?.[0]).toEqual(
       expect.objectContaining({
         name: 'Support Cockpit',
         person: hydratedPerson,
       }),
     );
-    expect(persist.mock.calls[0]?.[0]?.kpis.items).toEqual([
+    expect(persistedDashboard?.kpis.items).toEqual([
       { handle: 101 },
       { handle: 102 },
     ]);

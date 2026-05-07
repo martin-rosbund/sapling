@@ -22,7 +22,7 @@ import {
   ListAiChatMessagesQueryDto,
   UpdateAiChatSessionDto,
 } from './dto/chat.dto';
-import { McpService, type McpToolDescriptor } from './mcp.service';
+import { McpService } from './mcp.service';
 import { DocumentService } from '../document/document.service';
 import {
   VectorizeEntityDto,
@@ -60,10 +60,7 @@ import {
   AiStreamResult,
   AiToolRegistryEntry,
 } from './ai.types';
-import {
-  AI_ASSISTANT_SPEECH_INSTRUCTIONS,
-  buildSystemInstruction,
-} from './prompts/ai.prompts';
+import { AI_ASSISTANT_SPEECH_INSTRUCTIONS } from './prompts/ai.prompts';
 import { extractClientTimeContext } from './ai-client-time.utils';
 import { resolveMaxToolCallIterations } from './ai-tool-call.utils';
 import {
@@ -74,8 +71,6 @@ import {
   extractProviderHandle,
   sanitizeChatMessage,
   sanitizeChatSession,
-  sanitizeModel,
-  sanitizeProvider,
   shouldReuseAssistantSpeech,
   withMessageSpeechPayload,
 } from './ai-response.utils';
