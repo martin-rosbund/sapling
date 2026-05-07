@@ -27,6 +27,7 @@ export interface UseSaplingTableProps {
   parent?: SaplingGenericItem | null
   parentEntity?: EntityItem | null
   search: string
+  showSearch?: boolean
   page: number
   itemsPerPage: number
   totalItems: number

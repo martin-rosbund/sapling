@@ -46,7 +46,7 @@
                   icon="mdi-delete"
                   size="x-small"
                   class="glass-panel"
-                  @click.stop="removeFavorite(favorite)"
+                  @click.stop="requestFavoriteDelete(favorite)"
                 />
               </div>
             </v-list-item>
@@ -75,6 +75,13 @@
         </v-btn>
       </div>
 
+      <SaplingDialogDelete
+        v-model:modelValue="favoriteDeleteDialog"
+        :item="favoriteToDelete"
+        @confirm="confirmFavoriteDelete"
+        @cancel="cancelFavoriteDelete"
+      />
+
       <SaplingFavoriteTemplateLoadDialog
         :model-value="favoriteTemplateLoadDialog"
         :templates="favoriteTemplates"
@@ -93,6 +100,7 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSaplingFavorites } from '@/composables/dashboard/useSaplingFavorites'
 import SaplingFavoriteTemplateLoadDialog from '@/components/dashboard/SaplingFavoriteTemplateLoadDialog.vue'
+import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
 import type { FavoriteItem } from '@/entity/entity'
 import { getFavoriteEntityHandle } from '@/utils/saplingFavoriteNavigation'
 // #endregion
@@ -105,6 +113,8 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const favoriteSearch = ref('')
+const favoriteDeleteDialog = ref(false)
+const favoriteToDelete = ref<FavoriteItem | null>(null)
 
 // #region Composable
 const {
@@ -175,6 +185,25 @@ const filteredFavoriteGroups = computed(() => {
 
 function updateFavoriteTemplateDialog(value: boolean) {
   favoriteTemplateLoadDialog.value = value
+}
+
+function requestFavoriteDelete(favorite: FavoriteItem) {
+  favoriteToDelete.value = favorite
+  favoriteDeleteDialog.value = true
+}
+
+function cancelFavoriteDelete() {
+  favoriteDeleteDialog.value = false
+  favoriteToDelete.value = null
+}
+
+async function confirmFavoriteDelete() {
+  if (!favoriteToDelete.value) {
+    return
+  }
+
+  await removeFavorite(favoriteToDelete.value)
+  cancelFavoriteDelete()
 }
 
 function openFavorite(favorite: FavoriteItem) {

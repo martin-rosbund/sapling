@@ -1,12 +1,28 @@
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent, ref } from 'vue'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ColumnFilterItem } from '@/entity/structure'
+
+const { findMock } = vi.hoisted(() => ({
+  findMock: vi.fn(),
+}))
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string, values?: Record<string, unknown>) =>
-      key === 'filter.selectedCount' ? `selected:${values?.count ?? 0}` : key,
+    t: (key: string, values?: Record<string, unknown>) => {
+      const translations: Record<string, string> = {
+        'filter.selectedCount': `selected:${values?.count ?? 0}`,
+        'filter.to': 'bis',
+        'filter.currentUser': 'Aktueller Benutzer',
+        'filter.currentCompany': 'Aktuelles Unternehmen',
+        'filter.todayStart': 'Heute',
+        'filter.tomorrowStart': 'Morgen',
+        'person.handle': 'Kennung',
+        'company.name': 'Name',
+      }
+
+      return translations[key] ?? key
+    },
   }),
 }))
 
@@ -25,6 +41,12 @@ vi.mock('@/stores/genericStore', () => ({
           : [],
     }),
   }),
+}))
+
+vi.mock('@/services/api.generic.service', () => ({
+  default: {
+    find: findMock,
+  },
 }))
 
 import {
@@ -70,7 +92,15 @@ const TestHost = defineComponent({
 })
 
 describe('useSaplingTableColumnFilter', () => {
-  it('uses the configured isValue relation field in the filter summary', () => {
+  beforeEach(() => {
+    findMock.mockReset()
+  })
+
+  it('resolves translated relation labels for automatically rehydrated relation filters', async () => {
+    findMock.mockResolvedValueOnce({
+      data: [{ handle: 'closed', description: 'Geschlossen' }],
+    })
+
     const wrapper = mount(TestHost, {
       props: {
         column: {
@@ -82,13 +112,19 @@ describe('useSaplingTableColumnFilter', () => {
         filterItem: {
           operator: 'eq',
           value: '',
-          relationItems: [{ handle: 'closed', description: 'Geschlossen' }],
+          relationItems: [{ handle: 'closed' }],
         } satisfies ColumnFilterItem,
         title: 'Status',
         operatorOptions: [{ label: '=', value: 'eq' }],
       },
     })
 
+    await flushPromises()
+
+    expect(findMock).toHaveBeenCalledWith('ticketStatus', {
+      filter: { handle: 'closed' },
+      limit: 1,
+    })
     expect(wrapper.vm.filterSummary).toBe('Geschlossen')
   })
 
@@ -111,7 +147,29 @@ describe('useSaplingTableColumnFilter', () => {
       },
     })
 
-    expect(wrapper.vm.filterSummary).toBe('currentUser.handle')
+    expect(wrapper.vm.filterSummary).toBe('Aktueller Benutzer: Kennung')
+  })
+
+  it('renders current company placeholders with server translations', () => {
+    const wrapper = mount(TestHost, {
+      props: {
+        column: {
+          key: 'customerCompany',
+          name: 'customerCompany',
+          kind: 'm:1',
+          referenceName: 'company',
+        },
+        filterItem: {
+          operator: 'eq',
+          value: '',
+          relationItems: [{ handle: '{{currentCompany.name}}' }],
+        } satisfies ColumnFilterItem,
+        title: 'Unternehmen',
+        operatorOptions: [{ label: '=', value: 'eq' }],
+      },
+    })
+
+    expect(wrapper.vm.filterSummary).toBe('Aktuelles Unternehmen: Name')
   })
 
   it('shows dynamic date windows as a range filter and falls back to text inputs for placeholders', () => {
@@ -141,6 +199,6 @@ describe('useSaplingTableColumnFilter', () => {
 
     expect(wrapper.vm.filterVariant).toBe('range')
     expect(wrapper.vm.inputType).toBe('text')
-    expect(wrapper.vm.filterSummary).toBe('today.start filter.to tomorrow.start')
+    expect(wrapper.vm.filterSummary).toBe('Heute bis Morgen')
   })
 })

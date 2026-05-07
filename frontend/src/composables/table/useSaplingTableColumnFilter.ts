@@ -1,10 +1,12 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
+import type { SaplingGenericItem } from '@/entity/entity'
 import type { ColumnFilterItem, ColumnFilterOperator, EntityTemplate } from '@/entity/structure'
 import { normalizeTableColumnTemplate, type TableColumnLike } from './useSaplingTableFilterHelpers'
 import { useGenericStore } from '@/stores/genericStore'
 import { getEntityValueLabel } from '@/utils/saplingTableUtil'
+import ApiGenericService from '@/services/api.generic.service'
 import {
   isBooleanTemplate,
   isDateTemplate,
@@ -51,11 +53,13 @@ export function useSaplingTableColumnFilter(
   emit: SaplingTableColumnFilterEmit,
 ) {
   const { t } = useI18n()
-  const { isLoading: isTranslationLoading } = useTranslationLoader('filter')
+  const { isLoading: isTranslationLoading } = useTranslationLoader('filter', 'person', 'company')
   const genericStore = useGenericStore()
   const isComponentLoading = computed(() => isTranslationLoading.value || props.loading === true)
   const menuOpen = ref(false)
+  const resolvedRelationItems = ref<Record<string, SaplingGenericItem>>({})
   let filterEmitTimeout: ReturnType<typeof setTimeout> | null = null
+  let latestRelationLookupRequestId = 0
 
   const normalizedColumn = computed<Partial<EntityTemplate>>(
     () => normalizeTableColumnTemplate(props.column) ?? {},
@@ -112,6 +116,33 @@ export function useSaplingTableColumnFilter(
   const localFilter = ref<ColumnFilterItem>(
     createFilterState(props.filterItem, defaultOperator.value),
   )
+  const activeFilter = computed<ColumnFilterItem>(() => localFilter.value)
+  const singleValue = computed(() => activeFilter.value.value)
+  const rangeStartValue = computed(() => activeFilter.value.rangeStart ?? '')
+  const rangeEndValue = computed(() => activeFilter.value.rangeEnd ?? '')
+  const relationItems = computed(() => activeFilter.value.relationItems ?? [])
+  const referenceIdentifierKeys = computed(() => {
+    if (normalizedColumn.value.referencedPks?.length) {
+      return normalizedColumn.value.referencedPks
+    }
+
+    const availableIdentifierKeys = ['handle', 'id'].filter((key) =>
+      relationItems.value.some((item) => {
+        const value = item?.[key]
+        return typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
+      }),
+    )
+
+    return availableIdentifierKeys.length ? availableIdentifierKeys : ['handle']
+  })
+  const referenceEntityHandle = computed(() => normalizedColumn.value.referenceName ?? '')
+  const referenceTemplates = computed(() => {
+    if (!referenceEntityHandle.value) {
+      return []
+    }
+
+    return genericStore.getState(referenceEntityHandle.value).entityTemplates
+  })
 
   watch(
     [() => props.filterItem, defaultOperator],
@@ -132,22 +163,17 @@ export function useSaplingTableColumnFilter(
     { deep: true, immediate: true },
   )
 
+  watch(
+    [referenceEntityHandle, referenceTemplates, relationItems],
+    () => {
+      void resolveRelationLabels()
+    },
+    { deep: true, immediate: true },
+  )
+
   onBeforeUnmount(() => {
     cancelPendingFilterEmit()
-  })
-
-  const activeFilter = computed<ColumnFilterItem>(() => localFilter.value)
-  const singleValue = computed(() => activeFilter.value.value)
-  const rangeStartValue = computed(() => activeFilter.value.rangeStart ?? '')
-  const rangeEndValue = computed(() => activeFilter.value.rangeEnd ?? '')
-  const relationItems = computed(() => activeFilter.value.relationItems ?? [])
-  const referenceEntityHandle = computed(() => normalizedColumn.value.referenceName ?? '')
-  const referenceTemplates = computed(() => {
-    if (!referenceEntityHandle.value) {
-      return []
-    }
-
-    return genericStore.getState(referenceEntityHandle.value).entityTemplates
+    latestRelationLookupRequestId += 1
   })
 
   const hasValue = computed(() => {
@@ -271,21 +297,21 @@ export function useSaplingTableColumnFilter(
 
     if (filterVariant.value === 'range') {
       if (rangeStartValue.value && rangeEndValue.value) {
-        return `${formatFilterSummaryValue(rangeStartValue.value)} ${t('filter.to').toLowerCase()} ${formatFilterSummaryValue(rangeEndValue.value)}`
+        return `${formatFilterSummaryValue(rangeStartValue.value, t)} ${t('filter.to').toLowerCase()} ${formatFilterSummaryValue(rangeEndValue.value, t)}`
       }
 
       if (rangeStartValue.value) {
-        return `${t('filter.from').toLowerCase()} ${formatFilterSummaryValue(rangeStartValue.value)}`
+        return `${t('filter.from').toLowerCase()} ${formatFilterSummaryValue(rangeStartValue.value, t)}`
       }
 
       if (rangeEndValue.value) {
-        return `${t('filter.to').toLowerCase()} ${formatFilterSummaryValue(rangeEndValue.value)}`
+        return `${t('filter.to').toLowerCase()} ${formatFilterSummaryValue(rangeEndValue.value, t)}`
       }
     }
 
     if (filterVariant.value === 'relation') {
       if (relationItems.value.length === 1) {
-        return getEntityValueLabel(relationItems.value[0], referenceTemplates.value)
+        return getRelationItemSummary(relationItems.value[0])
       }
 
       return t('filter.selectedCount', { count: relationItems.value.length })
@@ -295,7 +321,7 @@ export function useSaplingTableColumnFilter(
       return singleValue.value === 'true' ? t('filter.yes') : t('filter.no')
     }
 
-    return formatFilterSummaryValue(singleValue.value)
+    return formatFilterSummaryValue(singleValue.value, t)
   })
 
   function updateOperator(value: ColumnFilterOperator | null) {
@@ -444,6 +470,75 @@ export function useSaplingTableColumnFilter(
     }
   }
 
+  function getRelationItemSummary(item: SaplingGenericItem) {
+    const relationLookupKey = getRelationLookupKey(item, referenceIdentifierKeys.value)
+    const resolvedRelationItem =
+      relationLookupKey != null ? resolvedRelationItems.value[relationLookupKey] : undefined
+
+    if (resolvedRelationItem) {
+      return getEntityValueLabel(resolvedRelationItem, referenceTemplates.value)
+    }
+
+    const translatedIdentifier = getTranslatedRelationIdentifier(item, referenceIdentifierKeys.value, t)
+    if (translatedIdentifier) {
+      return translatedIdentifier
+    }
+
+    return getEntityValueLabel(item, referenceTemplates.value)
+  }
+
+  async function resolveRelationLabels() {
+    const currentReferenceEntityHandle = referenceEntityHandle.value.trim()
+    if (!currentReferenceEntityHandle || relationItems.value.length === 0) {
+      resolvedRelationItems.value = {}
+      return
+    }
+
+    const itemsToResolve = relationItems.value.filter((item) =>
+      shouldResolveRelationItem(item, referenceIdentifierKeys.value, referenceTemplates.value),
+    )
+
+    if (itemsToResolve.length === 0) {
+      resolvedRelationItems.value = {}
+      return
+    }
+
+    const lookupFilter = buildReferenceLookupFilter(itemsToResolve, referenceIdentifierKeys.value)
+    if (!lookupFilter) {
+      resolvedRelationItems.value = {}
+      return
+    }
+
+    const requestId = ++latestRelationLookupRequestId
+
+    try {
+      const result = await ApiGenericService.find<SaplingGenericItem>(currentReferenceEntityHandle, {
+        filter: lookupFilter,
+        limit: itemsToResolve.length,
+      })
+
+      if (requestId !== latestRelationLookupRequestId) {
+        return
+      }
+
+      const nextResolvedRelationItems: Record<string, SaplingGenericItem> = {}
+      result.data.forEach((item) => {
+        const lookupKey = getRelationLookupKey(item, referenceIdentifierKeys.value)
+        if (lookupKey) {
+          nextResolvedRelationItems[lookupKey] = item
+        }
+      })
+
+      resolvedRelationItems.value = nextResolvedRelationItems
+    } catch {
+      if (requestId !== latestRelationLookupRequestId) {
+        return
+      }
+
+      resolvedRelationItems.value = {}
+    }
+  }
+
   return {
     clearFilter,
     currentOperator,
@@ -544,9 +639,12 @@ function isAllowedOperator(
   return operatorOptions.some((option) => option.value === operator)
 }
 
-function formatFilterSummaryValue(value: string) {
-  const tokenMatch = value.trim().match(/^\{\{\s*([^}]+?)\s*\}\}$/)
-  return tokenMatch?.[1]?.trim() ?? value
+function formatFilterSummaryValue(
+  value: string,
+  t: (key: string, values?: Record<string, unknown>) => string,
+) {
+  const tokenPath = extractDynamicFilterTokenPath(value)
+  return tokenPath ? translateDynamicFilterTokenPath(tokenPath, t) : value
 }
 
 function isTokenFilterValue(value: string) {
@@ -559,4 +657,203 @@ function isValueLessOperator(operator: ColumnFilterOperator) {
 
 function getDefaultRangeEndOperator(inputKind: InputKind): 'lt' | 'lte' {
   return ['date', 'datetime', 'time'].includes(inputKind) ? 'lt' : 'lte'
+}
+
+function extractDynamicFilterTokenPath(value: string) {
+  const tokenMatch = value.trim().match(/^\{\{\s*([^}]+?)\s*\}\}$/)
+  return tokenMatch?.[1]?.trim() ?? null
+}
+
+function translateDynamicFilterTokenPath(
+  tokenPath: string,
+  t: (key: string, values?: Record<string, unknown>) => string,
+) {
+  switch (tokenPath) {
+    case 'today.start':
+      return t('filter.todayStart')
+    case 'tomorrow.start':
+      return t('filter.tomorrowStart')
+    case 'dayAfterTomorrow.start':
+      return t('filter.dayAfterTomorrowStart')
+    case 'week.start':
+      return t('filter.weekStart')
+    case 'week.end':
+      return t('filter.weekEnd')
+    case 'month.start':
+      return t('filter.monthStart')
+    case 'month.end':
+      return t('filter.monthEnd')
+    case 'now':
+      return t('filter.now')
+    default:
+      return translateScopedDynamicFilterToken(tokenPath, t)
+  }
+}
+
+function translateScopedDynamicFilterToken(
+  tokenPath: string,
+  t: (key: string, values?: Record<string, unknown>) => string,
+) {
+  if (tokenPath.startsWith('currentUser.company.')) {
+    return formatScopedDynamicFilterToken(
+      'filter.currentCompany',
+      'company',
+      tokenPath.slice('currentUser.company.'.length),
+      t,
+    )
+  }
+
+  if (tokenPath.startsWith('currentCompany.')) {
+    return formatScopedDynamicFilterToken(
+      'filter.currentCompany',
+      'company',
+      tokenPath.slice('currentCompany.'.length),
+      t,
+    )
+  }
+
+  if (tokenPath.startsWith('currentUser.')) {
+    return formatScopedDynamicFilterToken(
+      'filter.currentUser',
+      'person',
+      tokenPath.slice('currentUser.'.length),
+      t,
+    )
+  }
+
+  if (tokenPath.startsWith('currentPerson.')) {
+    return formatScopedDynamicFilterToken(
+      'filter.currentUser',
+      'person',
+      tokenPath.slice('currentPerson.'.length),
+      t,
+    )
+  }
+
+  return tokenPath
+}
+
+function formatScopedDynamicFilterToken(
+  scopeKey: string,
+  entityKey: string,
+  propertyKey: string,
+  t: (key: string, values?: Record<string, unknown>) => string,
+) {
+  if (!propertyKey.trim()) {
+    return t(scopeKey)
+  }
+
+  return `${t(scopeKey)}: ${t(`${entityKey}.${propertyKey}`)}`
+}
+
+function getTranslatedRelationIdentifier(
+  item: SaplingGenericItem,
+  identifierKeys: string[],
+  t: (key: string, values?: Record<string, unknown>) => string,
+) {
+  const translatedValues = identifierKeys
+    .map((key) => item?.[key])
+    .filter((value): value is string => typeof value === 'string')
+    .map((value) => {
+      const tokenPath = extractDynamicFilterTokenPath(value)
+      return tokenPath ? translateDynamicFilterTokenPath(tokenPath, t) : ''
+    })
+    .filter(Boolean)
+
+  return translatedValues[0] ?? ''
+}
+
+function shouldResolveRelationItem(
+  item: SaplingGenericItem,
+  identifierKeys: string[],
+  referenceTemplates: EntityTemplate[],
+) {
+  const hasTranslatableValueField = referenceTemplates
+    .filter((template) => template.options?.includes('isValue'))
+    .some((template) => {
+      const value = item?.[template.name]
+      return (
+        (typeof value === 'string' && value.trim().length > 0) ||
+        typeof value === 'number' ||
+        typeof value === 'boolean'
+      )
+    })
+
+  if (hasTranslatableValueField) {
+    return false
+  }
+
+  return identifierKeys.some((key) => {
+    const value = item?.[key]
+    return (
+      (typeof value === 'string' && value.trim().length > 0 && !isTokenFilterValue(value)) ||
+      typeof value === 'number' ||
+      typeof value === 'boolean'
+    )
+  })
+}
+
+function buildReferenceLookupFilter(items: SaplingGenericItem[], identifierKeys: string[]) {
+  const relationIdentifiers = items
+    .map((item) => buildRelationIdentifier(item, identifierKeys))
+    .filter((identifier): identifier is Record<string, string | number | boolean> => identifier !== null)
+
+  if (relationIdentifiers.length === 0) {
+    return null
+  }
+
+  if (identifierKeys.length === 1) {
+    const identifierKey = identifierKeys[0]
+    const values = relationIdentifiers
+      .map((identifier) => identifier[identifierKey])
+      .filter((value): value is string | number | boolean => typeof value !== 'undefined')
+
+    if (values.length === 0) {
+      return null
+    }
+
+    if (values.length === 1) {
+      return { [identifierKey]: values[0] }
+    }
+
+    return { [identifierKey]: { $in: values } }
+  }
+
+  if (relationIdentifiers.length === 1) {
+    return relationIdentifiers[0]
+  }
+
+  return {
+    $or: relationIdentifiers,
+  }
+}
+
+function buildRelationIdentifier(item: SaplingGenericItem, identifierKeys: string[]) {
+  const identifier: Record<string, string | number | boolean> = {}
+
+  for (const key of identifierKeys) {
+    const value = item?.[key]
+    if (typeof value === 'string') {
+      if (!value.trim() || isTokenFilterValue(value)) {
+        return null
+      }
+
+      identifier[key] = value
+      continue
+    }
+
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      identifier[key] = value
+      continue
+    }
+
+    return null
+  }
+
+  return identifier
+}
+
+function getRelationLookupKey(item: SaplingGenericItem, identifierKeys: string[]) {
+  const identifier = buildRelationIdentifier(item, identifierKeys)
+  return identifier ? JSON.stringify(identifier) : null
 }

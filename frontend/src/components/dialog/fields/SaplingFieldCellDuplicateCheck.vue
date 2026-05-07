@@ -25,7 +25,7 @@
         class="glass-panel"
         :entity-handle="entityHandle"
         :items="items"
-        :search="inputValue"
+        :search="tableSearch"
         :page="page"
         :items-per-page="itemsPerPage"
         :total-items="totalItems"
@@ -37,6 +37,7 @@
         :entity="entity"
         :entity-permission="entityPermission"
         :show-actions="false"
+        :show-search="false"
         :multi-select="false"
         :table-key="entityHandle"
         :selected="selectedItem ? [selectedItem] : []"
@@ -76,6 +77,7 @@ const emit = defineEmits(['update:modelValue', 'select-record'])
 
 const menuOpen = ref(false)
 const inputValue = ref(typeof props.modelValue === 'string' ? props.modelValue : '')
+const tableSearch = ref(inputValue.value)
 const selectedItem = ref<SaplingGenericItem | null>(null)
 let searchUpdateTimeout: ReturnType<typeof setTimeout> | null = null
 
@@ -99,6 +101,11 @@ const {
   onSortByUpdate,
 } = useSaplingTable(ref(props.entityHandle), 5)
 
+function applySearchValue(nextValue: string) {
+  tableSearch.value = nextValue
+  onSearchUpdate(nextValue)
+}
+
 function onTableSelect(newSelected: SaplingGenericItem[]) {
   if (searchUpdateTimeout) {
     clearTimeout(searchUpdateTimeout)
@@ -109,7 +116,7 @@ function onTableSelect(newSelected: SaplingGenericItem[]) {
   if (newSelected[0]) {
     const selectedValue = String(newSelected[0][props.modelName ?? ''] ?? '')
     inputValue.value = selectedValue
-    onSearchUpdate(selectedValue)
+    applySearchValue(selectedValue)
     menuOpen.value = false
     emit('update:modelValue', selectedValue) // Immer search-Wert ins Form schreiben
     emit('select-record', newSelected[0]) // selectedItem nur für Duplikatscheck
@@ -131,7 +138,7 @@ function onSearchInput(val: string) {
   searchUpdateTimeout = setTimeout(() => {
     searchUpdateTimeout = null
     emit('update:modelValue', nextValue)
-    onSearchUpdate(nextValue)
+    applySearchValue(nextValue)
   }, DUPLICATE_CHECK_SEARCH_DEBOUNCE_MS)
 }
 
@@ -150,7 +157,7 @@ watch(
     }
 
     inputValue.value = nextValue
-    onSearchUpdate(nextValue)
+    applySearchValue(nextValue)
   },
 )
 

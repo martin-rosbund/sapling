@@ -14,7 +14,6 @@
 
         <div class="sapling-page-hero__title-copy">
           <component :is="titleTag" class="sapling-page-hero__title">{{ title }}</component>
-          <p v-if="subtitle" class="sapling-page-hero__subtitle">{{ subtitle }}</p>
         </div>
       </div>
 

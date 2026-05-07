@@ -38,7 +38,10 @@
           />
         </div>
 
-        <div class="sapling-table-toolbar-slot sapling-table-toolbar-slot--search">
+        <div
+          v-if="showSearchField"
+          class="sapling-table-toolbar-slot sapling-table-toolbar-slot--search"
+        >
           <SaplingSearch
             class="sapling-table-toolbar-search"
             :model-value="search ?? ''"
@@ -240,6 +243,7 @@ import {
 type SaplingTableProps = UseSaplingTableProps & {
   showFavorite?: boolean
   showAdd?: boolean
+  showSearch?: boolean
   showSidePanelToggle?: boolean
   sidePanelVisible?: boolean
   sidePanelToggleLabel?: string
@@ -250,7 +254,9 @@ type SaplingTableEmit = UseSaplingTableEmit & {
   (event: 'toggleSidePanel'): void
 }
 
-const props = defineProps<SaplingTableProps>()
+const props = withDefaults(defineProps<SaplingTableProps>(), {
+  showSearch: true,
+})
 const emit = defineEmits<SaplingTableEmit>()
 const { t, te } = useI18n()
 const { isLoading: isHeaderTranslationLoading } = useTranslationLoader(props.entityHandle)
@@ -285,6 +291,7 @@ const showAddButton = computed(
     Boolean(props.entity?.canInsert) &&
     Boolean(props.entityPermission?.allowInsert),
 )
+const showSearchField = computed(() => props.showSearch !== false)
 const showSidePanelToggleButton = computed(() => props.showSidePanelToggle === true)
 const sidePanelVisible = computed(() => props.sidePanelVisible === true)
 const sidePanelToggleLabel = computed(
