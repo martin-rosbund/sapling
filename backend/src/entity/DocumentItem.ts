@@ -40,16 +40,6 @@ export class DocumentItem {
   handle!: number;
 
   /**
-   * Reference string for the document.
-   * @type {string}
-   */
-  @ApiProperty()
-  @Sapling(['isSystem', 'isValue'])
-  @SaplingGenericReference({ entityField: 'entity', handleField: 'reference' })
-  @Property({ length: 64 })
-  reference!: string;
-
-  /**
    * Path to the document file.
    * @type {string}
    */
@@ -99,6 +89,22 @@ export class DocumentItem {
   })
   @Property({ nullable: true, length: 256 })
   description?: string;
+
+  /**
+   * Reference string for the document.
+   * @type {string}
+   */
+  @ApiProperty()
+  @Sapling(['isSystem', 'isValue'])
+  @SaplingGenericReference({ entityField: 'entity', handleField: 'reference' })
+  @SaplingForm({
+    order: 100,
+    group: 'document.groupReference',
+    groupOrder: 250,
+    width: 2,
+  })
+  @Property({ length: 64 })
+  reference!: string;
   // #endregion
 
   // #region Properties: Relation
