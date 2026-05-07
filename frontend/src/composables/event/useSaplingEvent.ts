@@ -481,10 +481,28 @@ export function useSaplingEvent() {
   }
 
   /**
+   * Moves the calendar anchor to a specific date while keeping the current view aligned.
+   */
+  function goToDate(target: Date | string) {
+    const parsedDate = typeof target === 'string' ? parseLocalCalendarDate(target) : new Date(target)
+    if (!isValidDate(parsedDate)) {
+      return
+    }
+
+    const nextValue = formatLocalDate(normalizeDateForCalendarType(parsedDate))
+    if (value.value === nextValue) {
+      queueScrollToCurrentTime(0)
+      return
+    }
+
+    value.value = nextValue
+  }
+
+  /**
    * Moves the calendar to today's date.
    */
   function goToToday() {
-    value.value = formatLocalDate(new Date())
+    goToDate(new Date())
   }
 
   /**
@@ -505,7 +523,7 @@ export function useSaplingEvent() {
    * Applies the correct day, week or month shift to the active calendar date.
    */
   function shiftCalendar(direction: 1 | -1) {
-    const current = value.value ? parseLocalCalendarDate(value.value) : new Date()
+    const current = normalizeDateForCalendarType(value.value ? parseLocalCalendarDate(value.value) : new Date())
     const nextDate = new Date(current)
 
     switch (calendarType.value) {
@@ -521,7 +539,32 @@ export function useSaplingEvent() {
         break
     }
 
-    value.value = formatLocalDate(nextDate)
+    value.value = formatLocalDate(normalizeDateForCalendarType(nextDate))
+  }
+
+  /**
+   * Normalizes an anchor date so weekly and monthly views always land on stable boundaries.
+   */
+  function normalizeDateForCalendarType(date: Date) {
+    const normalized = new Date(date)
+    normalized.setHours(0, 0, 0, 0)
+
+    switch (calendarType.value) {
+      case 'day':
+        return normalized
+      case 'workweek':
+      case 'week': {
+        const day = normalized.getDay()
+        const offsetToMonday = day === 0 ? -6 : 1 - day
+        normalized.setDate(normalized.getDate() + offsetToMonday)
+        return normalized
+      }
+      case 'month':
+        normalized.setDate(1)
+        return normalized
+      default:
+        return normalized
+    }
   }
 
   /**
@@ -1579,6 +1622,7 @@ export function useSaplingEvent() {
     getPersonName,
     getSideBySideEvents,
     getWorkHourStyle,
+    goToDate,
     goToNext,
     goToPrevious,
     goToToday,

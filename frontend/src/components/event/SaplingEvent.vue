@@ -75,9 +75,11 @@
             v-model:calendar-view-mode="calendarViewMode"
             :is-narrow-screen="isNarrowScreen"
             :calendar-type-options="calendarTypeOptions"
+            :model-value="value"
             @previous="goToPrevious"
             @today="goToToday"
             @next="goToNext"
+            @select-date="goToDate"
           />
 
           <div ref="calendarScrollContainer" class="sapling-event-calendar-body">
@@ -216,6 +218,7 @@ const {
   getPersonName,
   getSideBySideEvents,
   getWorkHourStyle,
+  goToDate,
   goToNext,
   goToPrevious,
   goToToday,

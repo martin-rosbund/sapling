@@ -830,6 +830,7 @@
   { "entity": "calendar", "property": "workweek", "de": "Arbeitswoche", "en": "Workweek" },
   { "entity": "calendar", "property": "week", "de": "Woche", "en": "Week" },
   { "entity": "calendar", "property": "month", "de": "Monat", "en": "Month" },
+  { "entity": "calendar", "property": "selectDate", "de": "Datum wählen", "en": "Select date" },
   { "entity": "calendar", "property": "combined", "de": "Kombiniert", "en": "Combined" },
   { "entity": "calendar", "property": "sideBySide", "de": "Spaltenansicht", "en": "Side by side" },
   { "entity": "calendar", "property": "unknownProvider", "de": "Unbekannter Anbieter", "en": "Unknown provider" },
