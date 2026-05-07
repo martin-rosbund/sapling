@@ -50,13 +50,13 @@
             :title="$t('navigation.favorite')"
             :aria-label="$t('navigation.favorite')"
           >
-            <v-icon>mdi-star-outline</v-icon>
+            <v-icon>mdi-bookmark-outline</v-icon>
           </v-btn>
         </template>
 
         <v-list density="compact" class="glass-panel" nav>
           <v-list-item
-            prepend-icon="mdi-content-save-outline"
+            prepend-icon="mdi-bookmark-plus"
             :title="$t('global.saveAsFavorite')"
             @click="emit('favorite')"
           />
@@ -73,7 +73,7 @@
             >
               <template #prepend>
                 <v-icon>{{
-                  favoriteItem.handle === activeFavoriteHandle ? 'mdi-star' : 'mdi-star-outline'
+                  favoriteItem.handle === activeFavoriteHandle ? 'mdi-bookmark' : 'mdi-bookmark-outline'
                 }}</v-icon>
               </template>
               <v-list-item-title>{{ favoriteItem.title }}</v-list-item-title>
@@ -120,13 +120,13 @@
             :title="$t('navigation.favorite')"
             :aria-label="$t('navigation.favorite')"
           >
-            <v-icon>mdi-star-outline</v-icon>
+            <v-icon>mdi-bookmark-outline</v-icon>
           </v-btn>
         </template>
 
         <v-list density="compact" class="glass-panel" nav>
           <v-list-item
-            prepend-icon="mdi-content-save-outline"
+            prepend-icon="mdi-bookmark-plus"
             :title="$t('global.saveAsFavorite')"
             @click="emit('favorite')"
           />
@@ -143,7 +143,7 @@
             >
               <template #prepend>
                 <v-icon>{{
-                  favoriteItem.handle === activeFavoriteHandle ? 'mdi-star' : 'mdi-star-outline'
+                  favoriteItem.handle === activeFavoriteHandle ? 'mdi-bookmark' : 'mdi-bookmark-outline'
                 }}</v-icon>
               </template>
               <v-list-item-title>{{ favoriteItem.title }}</v-list-item-title>
