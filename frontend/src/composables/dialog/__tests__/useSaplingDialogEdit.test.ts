@@ -147,7 +147,11 @@ const TestHost = defineComponent({
     }
 
     return {
+      cancel: dialog.cancel,
+      discardChanges: dialog.discardChanges,
+      keepEditing: dialog.keepEditing,
       saveAndClose: dialog.saveAndClose,
+      unsavedChangesDialog: dialog.unsavedChangesDialog,
     }
   },
   template: '<div />',
@@ -174,5 +178,48 @@ describe('useSaplingDialogEdit', () => {
     expect(wrapper.emitted('save')).toHaveLength(1)
     expect(wrapper.emitted('save')?.[0]?.[1]).toBe('saveAndClose')
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+  })
+
+  it('asks for confirmation before cancelling a dirty dialog', async () => {
+    const wrapper = mount(TestHost)
+    const vm = wrapper.vm as { cancel: () => void; unsavedChangesDialog: boolean }
+
+    vm.cancel()
+
+    expect(vm.unsavedChangesDialog).toBe(true)
+    expect(wrapper.emitted('cancel')).toBeUndefined()
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+  })
+
+  it('keeps editing when the unsaved changes prompt is cancelled', async () => {
+    const wrapper = mount(TestHost)
+    const vm = wrapper.vm as {
+      cancel: () => void
+      keepEditing: () => void
+      unsavedChangesDialog: boolean
+    }
+
+    vm.cancel()
+    vm.keepEditing()
+
+    expect(vm.unsavedChangesDialog).toBe(false)
+    expect(wrapper.emitted('cancel')).toBeUndefined()
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+  })
+
+  it('closes the dialog when dirty changes are discarded', async () => {
+    const wrapper = mount(TestHost)
+    const vm = wrapper.vm as {
+      cancel: () => void
+      discardChanges: () => void
+      unsavedChangesDialog: boolean
+    }
+
+    vm.cancel()
+    vm.discardChanges()
+
+    expect(vm.unsavedChangesDialog).toBe(false)
+    expect(wrapper.emitted('cancel')).toHaveLength(1)
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([false])
   })
 })
