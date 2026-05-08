@@ -40,11 +40,11 @@
 
 <script lang="ts" setup>
 import { ref, toRef } from 'vue'
-import { useRouter } from 'vue-router'
 import type { EntityTemplate } from '@/entity/structure'
 import type { SaplingGenericItem } from '@/entity/entity'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
 import { useSaplingGenericReferenceTarget } from '@/composables/reference/useSaplingGenericReferenceTarget'
+import { useTimelineDialogStore } from '@/stores/timelineDialogStore'
 
 const props = defineProps<{
   item: SaplingGenericItem
@@ -52,8 +52,8 @@ const props = defineProps<{
   label: string
 }>()
 
-const router = useRouter()
 const dialogOpen = ref(false)
+const timelineDialogStore = useTimelineDialogStore()
 
 const {
   displayLabel,
@@ -85,7 +85,7 @@ function openTimeline() {
     return
   }
 
-  void router.push(`/timeline/${targetEntityHandle.value}/${String(targetHandle.value)}`)
+  timelineDialogStore.openTimeline(targetEntityHandle.value, String(targetHandle.value))
 }
 </script>
 

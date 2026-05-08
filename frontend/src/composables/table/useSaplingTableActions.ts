@@ -21,6 +21,7 @@ import ApiGenericService, { type FilterQuery } from '@/services/api.generic.serv
 import ApiScriptService from '@/services/api.script.service'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
+import { useTimelineDialogStore } from '@/stores/timelineDialogStore'
 import { buildFavoritePath } from '@/utils/saplingFavoriteNavigation'
 import { buildTableFilter, buildTableOrderBy } from '@/utils/saplingTableUtil'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
@@ -90,6 +91,7 @@ export function useSaplingTableActions({
   const router = useRouter()
   const currentPersonStore = useCurrentPersonStore()
   const currentPermissionStore = useCurrentPermissionStore()
+  const timelineDialogStore = useTimelineDialogStore()
   const { pushMessage } = useSaplingMessageCenter()
 
   const loadedScriptButtons = ref<ScriptButtonItem[]>([])
@@ -345,7 +347,7 @@ export function useSaplingTableActions({
       return
     }
 
-    void router.push(`/timeline/${props.entityHandle}/${String(item.handle)}`)
+    timelineDialogStore.openTimeline(props.entityHandle, String(item.handle))
   }
 
   function navigateToDocuments(item: SaplingGenericItem) {

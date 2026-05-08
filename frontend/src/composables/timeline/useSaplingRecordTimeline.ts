@@ -1,4 +1,13 @@
-import { computed, onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue'
+import {
+  computed,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  toValue,
+  watch,
+  type MaybeRefOrGetter,
+  type Ref,
+} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useGenericStore } from '@/stores/genericStore'
@@ -8,7 +17,14 @@ import type { TimelineMonth, TimelineResponse } from '@/entity/structure'
 
 const DEFAULT_TIMELINE_MONTH_BATCH = 6
 
-export function useSaplingRecordTimeline() {
+interface UseSaplingRecordTimelineOptions {
+  entityHandle?: MaybeRefOrGetter<string | null | undefined>
+  recordHandle?: MaybeRefOrGetter<string | number | null | undefined>
+  active?: MaybeRefOrGetter<boolean | null | undefined>
+  onNavigate?: () => void | Promise<void>
+}
+
+export function useSaplingRecordTimeline(options: UseSaplingRecordTimelineOptions = {}) {
   const route = useRoute()
   const router = useRouter()
   const { t } = useI18n()
@@ -19,8 +35,17 @@ export function useSaplingRecordTimeline() {
     'timeline',
   )
 
-  const entityHandle = computed(() => String(route.params.entity ?? ''))
-  const recordHandle = computed(() => String(route.params.handle ?? ''))
+  const entityHandle = computed(() => {
+    const value = options.entityHandle != null ? toValue(options.entityHandle) : route.params.entity
+    return String(value ?? '')
+  })
+  const recordHandle = computed(() => {
+    const value = options.recordHandle != null ? toValue(options.recordHandle) : route.params.handle
+    return String(value ?? '')
+  })
+  const isActive = computed(() =>
+    options.active == null ? true : Boolean(toValue(options.active)),
+  )
   const response = ref<TimelineResponse | null>(null)
   const months = ref<TimelineMonth[]>([])
   const hasMore = ref(false)
@@ -63,7 +88,7 @@ export function useSaplingRecordTimeline() {
   }
 
   async function initialize() {
-    if (!entityHandle.value || !recordHandle.value) {
+    if (!isActive.value || !entityHandle.value || !recordHandle.value) {
       return
     }
 
@@ -143,6 +168,8 @@ export function useSaplingRecordTimeline() {
         filter: JSON.stringify({ handle: anchor.value.handle }),
       },
     })
+
+    await Promise.resolve(options.onNavigate?.())
   }
 
   async function openDrilldown(entityHandleValue: string, filter: Record<string, unknown>) {
@@ -152,6 +179,8 @@ export function useSaplingRecordTimeline() {
         filter: JSON.stringify(filter),
       },
     })
+
+    await Promise.resolve(options.onNavigate?.())
   }
 
   function refreshObserver() {
@@ -182,7 +211,12 @@ export function useSaplingRecordTimeline() {
     }
   }
 
-  watch([entityHandle, recordHandle], () => {
+  watch([entityHandle, recordHandle, isActive], ([nextEntityHandle, nextRecordHandle, nextIsActive]) => {
+    if (!nextIsActive || !nextEntityHandle || !nextRecordHandle) {
+      disconnectObserver()
+      return
+    }
+
     void initialize()
   })
 
@@ -191,7 +225,9 @@ export function useSaplingRecordTimeline() {
   })
 
   onMounted(() => {
-    void initialize()
+    if (isActive.value) {
+      void initialize()
+    }
   })
 
   onBeforeUnmount(() => {

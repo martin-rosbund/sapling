@@ -203,6 +203,7 @@
       @close-dialog="closeDialog"
       @update:edit-mode="editDialog.mode = $event"
       @update:edit-item="editDialog.item = $event"
+      @record-deleted="refreshTable"
       @context-action="onContextMenuAction"
       @update:context-visible="(value) => (contextMenu.visible = value)"
       @close-upload="closeUploadDialog"

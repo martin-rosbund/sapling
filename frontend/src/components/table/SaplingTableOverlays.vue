@@ -31,6 +31,7 @@
     @cancel="emit('close-dialog')"
     @update:mode="emit('update:edit-mode', $event)"
     @update:item="emit('update:edit-item', $event)"
+    @deleted="emit('record-deleted', $event)"
   />
 
   <SaplingContextMenuTable
@@ -135,6 +136,7 @@ const emit = defineEmits<{
   (event: 'close-dialog'): void
   (event: 'update:edit-mode', value: EditDialogOptions['mode']): void
   (event: 'update:edit-item', value: SaplingGenericItem | null): void
+  (event: 'record-deleted', value: SaplingGenericItem | null): void
   (event: 'context-action', value: SaplingContextMenuTableActionPayload): void
   (event: 'update:context-visible', value: boolean): void
   (event: 'close-upload'): void

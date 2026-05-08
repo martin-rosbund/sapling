@@ -1,172 +1,220 @@
 <template>
-  <v-container
-    class="sapling-page-shell sapling-page-shell--fill sapling-record-timeline sapling-fill-shell"
-    fluid
-  >
-    <div v-if="isLoading" class="sapling-record-timeline__loading">
-      <v-skeleton-loader class="glass-panel" type="article, article, article" />
-    </div>
-
-    <template v-else>
-      <SaplingPageHero
-        v-if="anchor"
-        class="sapling-record-timeline__hero"
-        variant="workspace"
-        :eyebrow="t('timeline.title')"
-        :title="anchor.label"
-        :subtitle="`${entityLabel} · ${anchor.entityHandle} · #${anchor.handle}`"
+  <v-dialog v-if="dialog" v-model="dialogModel" persistent class="sapling-dialog-large">
+    <v-card
+      class="glass-panel tilt-content sapling-inbox-dialog sapling-record-timeline-dialog"
+      v-tilt="TILT_DEFAULT_OPTIONS"
+      elevation="12"
+    >
+      <SaplingDialogShell
+        fill-shell
+        body-class="sapling-inbox-dialog__body sapling-record-timeline-dialog__body"
+        :show-divider="false"
       >
-        <template #title-prefix>
-          <div class="sapling-record-timeline__hero-icon-wrap">
-            <v-icon size="28">{{ entity?.icon || 'mdi-timeline-outline' }}</v-icon>
+        <template #hero>
+          <SaplingDialogHero
+            v-if="isLoading"
+            loading
+            :loading-stats-count="3"
+            :stats-columns="3"
+            stats-layout="compact"
+          />
+          <SaplingDialogHero
+            v-else
+            :eyebrow="t('timeline.title')"
+            :title="anchor?.label ?? t('timeline.record')"
+            :stats="heroStats"
+            :stats-columns="3"
+            stats-layout="compact"
+          >
+            <template #title-trailing>
+              <v-btn
+                class="sapling-record-timeline__hero-action"
+                color="primary"
+                variant="flat"
+                prepend-icon="mdi-table-search"
+                :disabled="!anchor"
+                @click="openMainTable"
+              >
+                {{ t('timeline.openRecord') }}
+              </v-btn>
+            </template>
+          </SaplingDialogHero>
+        </template>
+
+        <template #body>
+          <div class="sapling-inbox-dialog__content sapling-record-timeline-dialog__content">
+            <template v-if="isLoading">
+              <section class="sapling-record-timeline__summary-grid">
+                <v-skeleton-loader
+                  v-for="item in 3"
+                  :key="item"
+                  class="sapling-record-timeline__loading-summary"
+                  elevation="12"
+                  type="article"
+                />
+              </section>
+
+              <section class="sapling-record-timeline__loading">
+                <v-skeleton-loader
+                  v-for="item in 3"
+                  :key="`loading-${item}`"
+                  class="sapling-record-timeline__loading-section glass-panel"
+                  elevation="12"
+                  type="article, article"
+                />
+              </section>
+            </template>
+
+            <template v-else>
+              <section v-if="summaryCards.length > 0" class="sapling-record-timeline__summary-grid">
+                <article
+                  v-for="card in summaryCards"
+                  :key="card.key"
+                  class="sapling-record-timeline__summary-card glass-panel"
+                >
+                  <div class="sapling-record-timeline__summary-card-header">
+                    <div>
+                      <div class="sapling-record-timeline__summary-card-label">{{ card.label }}</div>
+                      <strong class="sapling-record-timeline__summary-card-value">{{ card.value }}</strong>
+                    </div>
+                    <v-icon :icon="card.icon" size="22" />
+                  </div>
+                </article>
+              </section>
+
+              <section
+                v-if="error"
+                class="sapling-record-timeline__empty glass-panel sapling-empty-state-panel"
+              >
+                <v-icon size="42">mdi-alert-circle-outline</v-icon>
+                <p>{{ error }}</p>
+              </section>
+
+              <section
+                v-else-if="months.length === 0"
+                class="sapling-record-timeline__empty glass-panel sapling-empty-state-panel"
+              >
+                <v-icon size="42">mdi-timeline-text-outline</v-icon>
+                <p>{{ t('timeline.empty') }}</p>
+              </section>
+
+              <div v-else-if="smAndDown" class="sapling-record-timeline__mobile-list">
+                <article
+                  v-for="month in months"
+                  :key="month.key"
+                  class="sapling-record-timeline__mobile-item"
+                >
+                  <div class="sapling-record-timeline__mobile-divider" aria-hidden="true">
+                    <span class="sapling-record-timeline__mobile-dot">
+                      <v-icon size="16">mdi-calendar-month-outline</v-icon>
+                    </span>
+                  </div>
+
+                  <div class="sapling-record-timeline__mobile-body">
+                    <SaplingRecordTimelineMonthCard :month="month" @drilldown="openDrilldown" />
+                  </div>
+                </article>
+
+                <article
+                  v-if="!hasMore && months.length > 0"
+                  class="sapling-record-timeline__mobile-item sapling-record-timeline__mobile-item--end"
+                >
+                  <div class="sapling-record-timeline__mobile-divider" aria-hidden="true">
+                    <span
+                      class="sapling-record-timeline__mobile-dot sapling-record-timeline__mobile-dot--end"
+                    >
+                      <v-icon size="14">mdi-check</v-icon>
+                    </span>
+                  </div>
+
+                  <div class="sapling-record-timeline__mobile-body">
+                    <div class="sapling-record-timeline__timeline-end glass-panel">
+                      {{ t('timeline.noMoreMonths') }}
+                    </div>
+                  </div>
+                </article>
+              </div>
+
+              <v-timeline
+                v-else
+                class="sapling-record-timeline__timeline"
+                align="start"
+                justify="center"
+                line-inset="12"
+                truncate-line="both"
+              >
+                <v-timeline-item
+                  v-for="month in months"
+                  :key="month.key"
+                  dot-color="primary"
+                  fill-dot
+                  size="small"
+                  icon="mdi-calendar-month-outline"
+                >
+                  <div class="sapling-record-timeline__lane sapling-record-timeline__lane--body">
+                    <SaplingRecordTimelineMonthCard :month="month" @drilldown="openDrilldown" />
+                  </div>
+                </v-timeline-item>
+
+                <v-timeline-item
+                  v-if="!hasMore && months.length > 0"
+                  dot-color="primary"
+                  size="x-small"
+                  icon="mdi-check"
+                >
+                  <div class="sapling-record-timeline__lane sapling-record-timeline__lane--body">
+                    <div class="sapling-record-timeline__timeline-end glass-panel">
+                      {{ t('timeline.noMoreMonths') }}
+                    </div>
+                  </div>
+                </v-timeline-item>
+              </v-timeline>
+
+              <div ref="loadMoreTriggerRef" class="sapling-record-timeline__sentinel"></div>
+
+              <div v-if="isLoadingMore" class="sapling-record-timeline__footer-state">
+                <v-progress-circular indeterminate color="primary" size="22" width="3" />
+                <span>{{ t('timeline.loadingMore') }}</span>
+              </div>
+            </template>
           </div>
         </template>
 
-        <template #meta>
-          <v-chip v-if="anchor.startAt" size="small" variant="tonal" color="primary">
-            {{ fieldLabel(anchor.entityHandle, anchor.startField) }}
-            {{ formatDateTime(anchor.startAt) }}
-          </v-chip>
-          <v-chip v-if="anchor.endAt" size="small" variant="outlined" color="primary">
-            {{ fieldLabel(anchor.entityHandle, anchor.endField) }}
-            {{ formatDateTime(anchor.endAt) }}
-          </v-chip>
+        <template #actions>
+          <SaplingActionClose :close="closeDialog" />
         </template>
-
-        <template #side>
-          <div class="sapling-record-timeline__hero-side">
-            <div class="sapling-record-timeline__hero-stats">
-              <article class="sapling-record-timeline__hero-stat glass-panel">
-                <span>{{ t('timeline.month') }}</span>
-                <strong>{{ months.length }}</strong>
-              </article>
-              <article class="sapling-record-timeline__hero-stat glass-panel">
-                <span>{{ t('timeline.sections') }}</span>
-                <strong>{{ timelineSectionCount }}</strong>
-              </article>
-            </div>
-
-            <v-btn
-              color="primary"
-              variant="flat"
-              prepend-icon="mdi-table-search"
-              @click="openMainTable"
-            >
-              {{ t('timeline.openRecord') }}
-            </v-btn>
-          </div>
-        </template>
-      </SaplingPageHero>
-
-      <section
-        v-if="error"
-        class="sapling-record-timeline__empty glass-panel sapling-empty-state-panel"
-      >
-        <v-icon size="42">mdi-alert-circle-outline</v-icon>
-        <p>{{ error }}</p>
-      </section>
-
-      <section
-        v-else-if="months.length === 0"
-        class="sapling-record-timeline__empty glass-panel sapling-empty-state-panel"
-      >
-        <v-icon size="42">mdi-timeline-text-outline</v-icon>
-        <p>{{ t('timeline.empty') }}</p>
-      </section>
-
-      <div v-else-if="smAndDown" class="sapling-record-timeline__mobile-list">
-        <article
-          v-for="month in months"
-          :key="month.key"
-          class="sapling-record-timeline__mobile-item"
-        >
-          <div class="sapling-record-timeline__mobile-divider" aria-hidden="true">
-            <span class="sapling-record-timeline__mobile-dot">
-              <v-icon size="16">mdi-calendar-month-outline</v-icon>
-            </span>
-          </div>
-
-          <div class="sapling-record-timeline__mobile-body">
-            <SaplingRecordTimelineMonthCard :month="month" @drilldown="openDrilldown" />
-          </div>
-        </article>
-
-        <article
-          v-if="!hasMore && months.length > 0"
-          class="sapling-record-timeline__mobile-item sapling-record-timeline__mobile-item--end"
-        >
-          <div class="sapling-record-timeline__mobile-divider" aria-hidden="true">
-            <span
-              class="sapling-record-timeline__mobile-dot sapling-record-timeline__mobile-dot--end"
-            >
-              <v-icon size="14">mdi-check</v-icon>
-            </span>
-          </div>
-
-          <div class="sapling-record-timeline__mobile-body">
-            <div class="sapling-record-timeline__timeline-end glass-panel">
-              {{ t('timeline.noMoreMonths') }}
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <v-timeline
-        v-else
-        class="sapling-record-timeline__timeline"
-        align="start"
-        justify="center"
-        line-inset="12"
-        truncate-line="both"
-      >
-        <v-timeline-item
-          v-for="month in months"
-          :key="month.key"
-          dot-color="primary"
-          fill-dot
-          size="small"
-          icon="mdi-calendar-month-outline"
-        >
-          <div class="sapling-record-timeline__lane sapling-record-timeline__lane--body">
-            <SaplingRecordTimelineMonthCard :month="month" @drilldown="openDrilldown" />
-          </div>
-        </v-timeline-item>
-
-        <v-timeline-item
-          v-if="!hasMore && months.length > 0"
-          dot-color="primary"
-          size="x-small"
-          icon="mdi-check"
-        >
-          <div class="sapling-record-timeline__lane sapling-record-timeline__lane--body">
-            <div class="sapling-record-timeline__timeline-end glass-panel">
-              {{ t('timeline.noMoreMonths') }}
-            </div>
-          </div>
-        </v-timeline-item>
-      </v-timeline>
-
-      <div ref="loadMoreTriggerRef" class="sapling-record-timeline__sentinel"></div>
-
-      <div v-if="isLoadingMore" class="sapling-record-timeline__footer-state">
-        <v-progress-circular indeterminate color="primary" size="22" width="3" />
-        <span>{{ t('timeline.loadingMore') }}</span>
-      </div>
-    </template>
-  </v-container>
+      </SaplingDialogShell>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
-import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
+import SaplingActionClose from '@/components/actions/SaplingActionClose.vue'
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
+import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue'
 import SaplingRecordTimelineMonthCard from '@/components/timeline/SaplingRecordTimelineMonthCard.vue'
 import { useSaplingRecordTimeline } from '@/composables/timeline/useSaplingRecordTimeline'
+import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
+import { useTimelineDialogStore } from '@/stores/timelineDialogStore'
 import { formatDateTimeValue } from '@/utils/saplingFormatUtil'
 
 const { t } = useI18n()
 const { smAndDown } = useDisplay()
+const timelineDialogStore = useTimelineDialogStore()
+const { dialog, entityHandle, recordHandle } = storeToRefs(timelineDialogStore)
+
+const dialogModel = computed({
+  get: () => dialog.value,
+  set: (value: boolean) => {
+    if (!value) {
+      timelineDialogStore.closeTimeline()
+    }
+  },
+})
 
 const {
   entity,
@@ -179,7 +227,12 @@ const {
   loadMoreTriggerRef,
   openMainTable,
   openDrilldown,
-} = useSaplingRecordTimeline()
+} = useSaplingRecordTimeline({
+  entityHandle,
+  recordHandle,
+  active: dialog,
+  onNavigate: () => timelineDialogStore.closeTimeline(),
+})
 
 const entityLabel = computed(() => {
   const translationKey = `navigation.${entity.value?.handle ?? ''}`
@@ -194,6 +247,57 @@ const entityLabel = computed(() => {
 const timelineSectionCount = computed(() =>
   months.value.reduce((total, month) => total + month.entities.length, 0),
 )
+
+const heroStats = computed(() => [
+  { label: t('timeline.record'), value: anchor.value ? `#${anchor.value.handle}` : '-' },
+  { label: t('timeline.month'), value: months.value.length },
+  { label: t('timeline.sections'), value: timelineSectionCount.value },
+])
+
+const summaryCards = computed(() => {
+  if (!anchor.value) {
+    return []
+  }
+
+  const cards = [
+    {
+      key: 'entity',
+      label: entityLabel.value,
+      value: anchor.value.entityHandle,
+      icon: entity.value?.icon || 'mdi-shape-outline',
+    },
+    {
+      key: 'record',
+      label: t('timeline.record'),
+      value: `#${anchor.value.handle}`,
+      icon: 'mdi-pound',
+    },
+  ]
+
+  if (anchor.value.startAt) {
+    cards.push({
+      key: 'startAt',
+      label: fieldLabel(anchor.value.entityHandle, anchor.value.startField),
+      value: formatDateTime(anchor.value.startAt),
+      icon: 'mdi-calendar-start',
+    })
+  }
+
+  if (anchor.value.endAt) {
+    cards.push({
+      key: 'endAt',
+      label: fieldLabel(anchor.value.entityHandle, anchor.value.endField),
+      value: formatDateTime(anchor.value.endAt),
+      icon: 'mdi-calendar-end',
+    })
+  }
+
+  return cards
+})
+
+function closeDialog() {
+  timelineDialogStore.closeTimeline()
+}
 
 function fieldLabel(entityHandle: string, fieldName: string) {
   const translationKey = `${entityHandle}.${fieldName}`
