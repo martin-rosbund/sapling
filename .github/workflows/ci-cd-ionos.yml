@@ -1,0 +1,170 @@
+name: CI/CD IONOS
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'release/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: CI (type-check + tests)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          npm ci
+          npm ci --prefix backend
+          npm ci --prefix frontend
+
+      - name: Type-check
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          npm run type-check
+
+      - name: Test
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          npm run test
+
+  deploy:
+    name: Deploy production
+    runs-on: ubuntu-latest
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment:
+      name: production
+    concurrency:
+      group: deployment-production
+      cancel-in-progress: false
+    env:
+      SAPLING_SSH_HOST: ${{ secrets.SAPLING_SSH_HOST }}
+      SAPLING_SSH_PORT: ${{ secrets.SAPLING_SSH_PORT }}
+      SAPLING_SSH_USER: ${{ secrets.SAPLING_SSH_USER }}
+      SAPLING_SSH_PRIVATE_KEY: ${{ secrets.SAPLING_SSH_PRIVATE_KEY }}
+      SAPLING_SSH_KNOWN_HOSTS: ${{ secrets.SAPLING_SSH_KNOWN_HOSTS }}
+      SAPLING_APP_ROOT: ${{ secrets.SAPLING_APP_ROOT }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare deploy metadata
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          if [[ -z "${SAPLING_SSH_HOST:-}" ]]; then
+            echo "Missing required secret: SAPLING_SSH_HOST" >&2
+            exit 1
+          fi
+          if [[ -z "${SAPLING_SSH_USER:-}" ]]; then
+            echo "Missing required secret: SAPLING_SSH_USER" >&2
+            exit 1
+          fi
+          if [[ -z "${SAPLING_SSH_PRIVATE_KEY:-}" ]]; then
+            echo "Missing required secret: SAPLING_SSH_PRIVATE_KEY" >&2
+            exit 1
+          fi
+
+          SSH_PORT="${SAPLING_SSH_PORT:-22}"
+          APP_ROOT="${SAPLING_APP_ROOT:-/var/www/sapling}"
+          RELEASE_ID="$(date -u +'%Y%m%d%H%M%S')-${GITHUB_SHA::12}"
+          RELEASE_DIR="${APP_ROOT}/releases/${RELEASE_ID}"
+
+          {
+            echo "SSH_PORT=${SSH_PORT}"
+            echo "APP_ROOT=${APP_ROOT}"
+            echo "RELEASE_ID=${RELEASE_ID}"
+            echo "RELEASE_DIR=${RELEASE_DIR}"
+          } >> "$GITHUB_ENV"
+
+      - name: Configure SSH
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$SAPLING_SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          if [[ -n "${SAPLING_SSH_KNOWN_HOSTS:-}" ]]; then
+            printf '%s\n' "$SAPLING_SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          else
+            : > ~/.ssh/known_hosts
+            for attempt in 1 2 3; do
+              if ssh-keyscan -p "$SSH_PORT" -H "$SAPLING_SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null; then
+                break
+              fi
+              if [[ "$attempt" -eq 3 ]]; then
+                echo "ssh-keyscan for ${SAPLING_SSH_HOST}:${SSH_PORT} failed" >&2
+                exit 1
+              fi
+              sleep 2
+            done
+          fi
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Create release directory
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          ssh \
+            -i ~/.ssh/id_ed25519 \
+            -p "$SSH_PORT" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$SAPLING_SSH_USER@$SAPLING_SSH_HOST" \
+            "mkdir -p '$RELEASE_DIR'"
+
+      - name: Upload repository to release
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          rsync -az --delete \
+            --rsync-path="mkdir -p '$RELEASE_DIR' && rsync" \
+            --exclude='.git/' \
+            --exclude='**/node_modules/' \
+            --exclude='**/.env' \
+            --exclude='frontend/dist/' \
+            -e "ssh -i ~/.ssh/id_ed25519 -p $SSH_PORT -o BatchMode=yes -o StrictHostKeyChecking=yes" \
+            ./ "$SAPLING_SSH_USER@$SAPLING_SSH_HOST:$RELEASE_DIR/"
+
+      - name: Run remote deployment
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          ssh \
+            -i ~/.ssh/id_ed25519 \
+            -p "$SSH_PORT" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$SAPLING_SSH_USER@$SAPLING_SSH_HOST" \
+            "bash '$RELEASE_DIR/deploy/remote-deploy.sh' '$RELEASE_ID' '$APP_ROOT'"

@@ -336,7 +336,7 @@ Fuer ein selbst betriebenes Deployment empfiehlt sich:
 - PostgreSQL lokal oder als verwalteter Dienst
 - optional Redis fuer Queue-basierte Verarbeitung
 - Backend als PM2-Prozess auf Port `3000`
-- Frontend als Vite-/Node-Prozess oder alternativ statisch aus `frontend/dist`
+- Frontend statisch aus `frontend/dist` via Nginx
 - Nginx als Reverse Proxy fuer `/` und `/api/`
 
 ### Build und Deployment-Schritte
@@ -353,20 +353,19 @@ npm run build
 npm run orm:deploy --prefix backend
 ```
 
-### PM2
+### PM2 (Backend)
 
 ```bash
 sudo npm install -g pm2
 
 pm2 start npm --name sapling-backend -- run release:backend
-pm2 start npm --name sapling-frontend -- run release:frontend
 pm2 save
 pm2 startup
 ```
 
 Danach den von `pm2 startup` ausgegebenen `sudo`-Befehl ausfuehren.
 
-### Nginx-Beispiel
+### Nginx-Beispiel (statisches Frontend)
 
 ```nginx
 server {
@@ -375,26 +374,20 @@ server {
 
     server_name sapling.example.com;
 
-    ssl_certificate /etc/nginx/ssl/sapling_fullchain.pem;
-    ssl_certificate_key /etc/nginx/ssl/sapling_private.key;
+    ssl_certificate /etc/letsencrypt/live/sapling.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/sapling.example.com/privkey.pem;
 
     client_max_body_size 20M;
+    root /var/www/sapling/current/frontend/dist;
+    index index.html;
 
     location / {
-        proxy_pass http://localhost:5173;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-        proxy_set_header X-Real-IP $remote_addr;
+        try_files $uri $uri/ /index.html;
     }
 
     location /api/ {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -418,6 +411,8 @@ Nach Nginx-Aenderungen:
 sudo nginx -t
 sudo systemctl reload nginx
 ```
+
+Ein produktionsreifes Bootstrap- und CI/CD-Setup liegt unter [deploy/README.md](./deploy/README.md).
 
 ## Logging
 
