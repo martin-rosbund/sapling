@@ -64,6 +64,26 @@ describe('GenericFilterService', () => {
     expect(result.createdAt.$gte).toEqual(new Date('2026-04-01'));
   });
 
+  it('preserves Date instances in read criteria', () => {
+    const service = new GenericFilterService();
+    const template = [createTemplateField({ name: 'createdAt', type: 'date' })];
+    const lowerBound = new Date('2026-04-01T00:00:00.000Z');
+
+    const result = service.prepareReadCriteria(
+      {
+        $or: [
+          { createdAt: { $gte: lowerBound } },
+          { createdAt: null },
+        ],
+      },
+      template,
+    ) as {
+      $or: [{ createdAt: { $gte: Date } }, { createdAt: null }];
+    };
+
+    expect(result.$or[0].createdAt.$gte).toBe(lowerBound);
+  });
+
   it('resolves supported current-user placeholders before read criteria normalization', () => {
     const service = new GenericFilterService();
 
