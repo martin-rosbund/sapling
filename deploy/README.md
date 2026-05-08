@@ -51,7 +51,7 @@ Das Bootstrap-Skript richtet eine Ubuntu-22.04+-Maschine idempotent ein:
 - Nginx-Site mit statischem Frontend + `/api/` Reverse Proxy
 - SSL via Let's Encrypt
 
-Auf dem Server im ausgecheckten Repo ausführen:
+Auf dem Server im ausgecheckten Repo ausführen (alternativ mindestens den Ordner `deploy/` auf den Server kopieren):
 
 ```bash
 sudo DOMAIN=sapling.example.com EMAIL=ops@example.com APP_USER=sapling APP_GROUP=sapling APP_ROOT=/var/www/sapling bash deploy/bootstrap-server.sh
@@ -86,7 +86,7 @@ Workflow `.github/workflows/ci-cd-ionos.yml`:
 - Symlink `current` erst nach Erfolg umstellen
 - PM2 `startOrReload`
 - `nginx -t` + Reload
-- Backend-Healthcheck
+- Backend-Healthcheck gegen `http://127.0.0.1:3000/api`
 - Cleanup alter Releases (Default: 5)
 
 ## Rollback

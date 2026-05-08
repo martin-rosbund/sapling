@@ -34,6 +34,25 @@ ensure_command() {
   }
 }
 
+validate_inputs() {
+  if [[ ! "$APP_USER" =~ ^[a-z_][a-z0-9_-]*[$]?$ ]]; then
+    echo "APP_USER contains unsupported characters: $APP_USER" >&2
+    exit 1
+  fi
+  if [[ ! "$APP_GROUP" =~ ^[a-z_][a-z0-9_-]*[$]?$ ]]; then
+    echo "APP_GROUP contains unsupported characters: $APP_GROUP" >&2
+    exit 1
+  fi
+  if [[ "$APP_ROOT" != /* ]]; then
+    echo "APP_ROOT must be an absolute path: $APP_ROOT" >&2
+    exit 1
+  fi
+  if [[ "$APP_HOME" != /* ]]; then
+    echo "APP_HOME must be an absolute path: $APP_HOME" >&2
+    exit 1
+  fi
+}
+
 install_base_packages() {
   log "Installing base packages"
   apt-get update
@@ -183,7 +202,7 @@ setup_certbot() {
   fi
 
   log "Setting up Let's Encrypt certificate"
-  certbot --nginx --non-interactive --agree-tos --email "$EMAIL" --redirect -d "$DOMAIN"
+  certbot certonly --webroot --non-interactive --agree-tos --email "$EMAIL" -w /var/www/html -d "$DOMAIN"
 }
 
 configure_firewall() {
@@ -195,19 +214,12 @@ configure_firewall() {
 
 setup_pm2_startup() {
   log "Configuring PM2 startup for $APP_USER"
-  local startup_cmd
-  startup_cmd="$(
-    su - "$APP_USER" -c "pm2 startup systemd -u '$APP_USER' --hp '$APP_HOME'" |
-      grep -E '^sudo ' |
-      tail -n 1 || true
-  )"
-  if [[ -n "$startup_cmd" ]]; then
-    eval "$startup_cmd"
-  fi
+  pm2 startup systemd -u "$APP_USER" --hp "$APP_HOME"
   su - "$APP_USER" -c "pm2 save"
 }
 
 ensure_command sed
+validate_inputs
 install_base_packages
 install_nodejs_20
 install_pm2

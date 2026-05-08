@@ -70,7 +70,9 @@ link_shared_env() {
 cleanup_old_releases() {
   log "Cleaning up old releases (keeping ${KEEP_RELEASES})"
 
-  mapfile -t releases < <(find "$RELEASES_DIR" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort -r)
+  mapfile -t releases < <(
+    find "$RELEASES_DIR" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort -r
+  )
 
   if (( ${#releases[@]} <= KEEP_RELEASES )); then
     return
@@ -122,7 +124,10 @@ reload_nginx
 
 log "Running backend healthcheck"
 curl --fail --silent --show-error --location --max-time 10 --retry 5 --retry-delay 2 --retry-connrefused \
-  "http://127.0.0.1:${BACKEND_PORT}/api" > /dev/null
+  "http://127.0.0.1:${BACKEND_PORT}/api" || {
+  log "Backend healthcheck failed on /api"
+  exit 1
+}
 
 cleanup_old_releases
 

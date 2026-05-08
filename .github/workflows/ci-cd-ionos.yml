@@ -95,7 +95,7 @@ jobs:
 
           SSH_PORT="${SAPLING_SSH_PORT:-22}"
           APP_ROOT="${SAPLING_APP_ROOT:-/var/www/sapling}"
-          RELEASE_ID="$(date -u +'%Y%m%d%H%M%S')-${GITHUB_SHA::12}"
+          RELEASE_ID="$(date -u +'%Y%m%d%H%M%S')-${GITHUB_RUN_NUMBER}-$(echo "$GITHUB_SHA" | cut -c1-8)"
           RELEASE_DIR="${APP_ROOT}/releases/${RELEASE_ID}"
 
           {
