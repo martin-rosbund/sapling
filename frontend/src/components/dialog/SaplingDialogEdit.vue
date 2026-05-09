@@ -386,56 +386,14 @@
     @saved="closeInformationDialog"
   />
 
-  <v-dialog
+  <SaplingDialogUnsavedChanges
     :model-value="unsavedChangesDialog"
-    class="sapling-dialog-medium"
-    persistent
-    @update:model-value="handleUnsavedChangesDialogUpdate"
-  >
-    <v-card class="glass-panel" elevation="12">
-      <div class="sapling-dialog-shell">
-        <SaplingDialogHero
-          :eyebrow="$t('global.unsavedChanges')"
-          :title="$t('global.unsavedChanges')"
-        />
-        <v-card-text class="sapling-dialog__body">
-          {{ $t('global.unsavedChangesQuestion') }}
-        </v-card-text>
-
-        <div class="sapling-dialog__footer">
-          <v-card-actions class="sapling-dialog__actions">
-            <v-btn
-              variant="text"
-              prepend-icon="mdi-pencil"
-              :disabled="isSaving"
-              @click="keepEditing"
-            >
-              {{ $t('global.keepEditing') }}
-            </v-btn>
-            <v-spacer />
-            <v-btn
-              variant="text"
-              color="warning"
-              prepend-icon="mdi-delete-outline"
-              :disabled="isSaving"
-              @click="discardChanges"
-            >
-              {{ $t('global.discardChanges') }}
-            </v-btn>
-            <v-btn
-              color="primary"
-              append-icon="mdi-content-save-check"
-              :loading="pendingSaveAction === 'saveAndClose'"
-              :disabled="isSaving"
-              @click="saveChangesAndClose"
-            >
-              {{ $t('global.saveAndClose') }}
-            </v-btn>
-          </v-card-actions>
-        </div>
-      </div>
-    </v-card>
-  </v-dialog>
+    :is-saving="isSaving"
+    :is-saving-and-closing="pendingSaveAction === 'saveAndClose'"
+    @keep-editing="keepEditing"
+    @discard="discardChanges"
+    @save-and-close="saveChangesAndClose"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -455,9 +413,9 @@ import { useSaplingDialogEdit } from '@/composables/dialog/useSaplingDialogEdit'
 import { getSaplingContextMenuTableItems, type SaplingContextMenuTableMenuItem } from '@/composables/context/useSaplingContextMenuTable'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import SaplingDialogEditHero from '@/components/common/SaplingDialogEditHero.vue'
-import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import SaplingActionBar from '@/components/actions/SaplingActionBar.vue'
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
+import SaplingDialogUnsavedChanges from '@/components/dialog/SaplingDialogUnsavedChanges.vue'
 import SaplingDialogEditFieldRenderer from './SaplingDialogEditFieldRenderer.vue'
 import SaplingDialogEditRelationTab from './SaplingDialogEditRelationTab.vue'
 import SaplingTableRowInformation from '@/components/table/SaplingTableRowInformation.vue'
@@ -553,12 +511,6 @@ const {
 
 function getFallbackCopy(german: string, english: string): string {
   return String(locale.value).toLowerCase().startsWith('de') ? german : english
-}
-
-function handleUnsavedChangesDialogUpdate(value: boolean): void {
-  if (!value) {
-    keepEditing()
-  }
 }
 
 const entityLabel = computed(() =>
