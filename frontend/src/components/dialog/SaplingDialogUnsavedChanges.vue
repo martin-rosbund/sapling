@@ -12,37 +12,13 @@
       {{ $t('global.unsavedChangesQuestion') }}
     </template>
     <template #actions>
-      <div class="sapling-dialog__footer">
-        <v-card-actions class="sapling-dialog__actions">
-          <v-btn
-            variant="text"
-            prepend-icon="mdi-pencil"
-            :disabled="isSaving"
-            @click="handleKeepEditing"
-          >
-            {{ $t('global.keepEditing') }}
-          </v-btn>
-          <v-spacer />
-          <v-btn
-            variant="text"
-            color="warning"
-            prepend-icon="mdi-delete-outline"
-            :disabled="isSaving"
-            @click="handleDiscard"
-          >
-            {{ $t('global.discardChanges') }}
-          </v-btn>
-          <v-btn
-            color="primary"
-            append-icon="mdi-content-save-check"
-            :loading="isSavingAndClosing"
-            :disabled="isSaving"
-            @click="handleSaveAndClose"
-          >
-            {{ $t('global.saveAndClose') }}
-          </v-btn>
-        </v-card-actions>
-      </div>
+      <SaplingActionUnsavedChanges
+        :keep-editing="handleKeepEditing"
+        :discard="handleDiscard"
+        :save-and-close="handleSaveAndClose"
+        :busy="isSaving"
+        :save-loading="isSavingAndClosing"
+      />
     </template>
   </SaplingDialogConfirm>
 </template>
@@ -50,6 +26,7 @@
 <script lang="ts" setup>
 // #region Imports
 import SaplingDialogConfirm from '@/components/dialog/SaplingDialogConfirm.vue'
+import SaplingActionUnsavedChanges from '@/components/actions/SaplingActionUnsavedChanges.vue'
 import { useSaplingDialogUnsavedChanges } from '@/composables/dialog/useSaplingDialogUnsavedChanges'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 // #endregion

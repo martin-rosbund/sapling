@@ -85,11 +85,7 @@
           </div>
         </v-card-text>
 
-        <v-card-actions v-if="isTranslationLoading" class="sapling-dialog__actions justify-end">
-          <v-skeleton-loader type="button" width="112" />
-          <v-skeleton-loader type="button" width="140" />
-          <v-skeleton-loader type="button" width="112" />
-        </v-card-actions>
+        <SaplingActionBarSkeleton v-if="isTranslationLoading" :leading="1" :trailing="2" />
         <SaplingActionMail
           v-else
           :close="closeMailDialog"
@@ -105,6 +101,7 @@
 
 <script lang="ts" setup>
 import SaplingActionMail from '@/components/actions/SaplingActionMail.vue'
+import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import SaplingDialogMailComposer from '@/components/dialog/mail/SaplingDialogMailComposer.vue'
 import SaplingDialogMailPreview from '@/components/dialog/mail/SaplingDialogMailPreview.vue'

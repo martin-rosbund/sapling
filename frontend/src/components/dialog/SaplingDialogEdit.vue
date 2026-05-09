@@ -225,22 +225,7 @@
             </v-window>
           </template>
         </v-card-text>
-        <div v-if="isLoading" class="sapling-dialog__footer">
-          <v-card-actions class="sapling-dialog__actions">
-            <v-btn text prepend-icon="mdi-close" @click="cancel">
-              <template v-if="$vuetify.display.mdAndUp"></template>
-            </v-btn>
-            <v-spacer />
-            <v-btn
-              v-if="mode !== 'readonly'"
-              color="primary"
-              append-icon="mdi-content-save"
-              disabled
-            >
-              <template v-if="$vuetify.display.mdAndUp"></template>
-            </v-btn>
-          </v-card-actions>
-        </div>
+        <SaplingActionBarSkeleton v-if="isLoading" />
         <SaplingActionBar v-else-if="mode === 'readonly'">
           <template #leading>
             <v-btn variant="text" prepend-icon="mdi-close" @click="cancel">
@@ -414,6 +399,7 @@ import { getSaplingContextMenuTableItems, type SaplingContextMenuTableMenuItem }
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import SaplingDialogEditHero from '@/components/common/SaplingDialogEditHero.vue'
 import SaplingActionBar from '@/components/actions/SaplingActionBar.vue'
+import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
 import SaplingDialogUnsavedChanges from '@/components/dialog/SaplingDialogUnsavedChanges.vue'
 import SaplingDialogEditFieldRenderer from './SaplingDialogEditFieldRenderer.vue'

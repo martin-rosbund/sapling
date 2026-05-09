@@ -19,13 +19,7 @@
       <div class="sapling-dialog-shell">
         <template v-if="loading">
           <SaplingDialogHero :variant="variant" loading />
-          <div class="sapling-dialog__footer">
-            <v-card-actions class="sapling-dialog__actions">
-              <v-skeleton-loader type="button" width="112" />
-              <v-spacer />
-              <v-skeleton-loader type="button" width="112" />
-            </v-card-actions>
-          </div>
+          <SaplingActionBarSkeleton />
         </template>
         <template v-else>
           <SaplingDialogHero
@@ -51,6 +45,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
+import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
 
 // #region Props & Emits

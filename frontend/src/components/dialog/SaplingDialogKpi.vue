@@ -17,13 +17,7 @@
           <div class="sapling-dialog-form-body">
             <v-skeleton-loader elevation="12" type="article" />
           </div>
-          <div class="sapling-dialog__footer">
-            <v-card-actions class="sapling-dialog__actions">
-              <v-skeleton-loader type="button" width="112" />
-              <v-spacer />
-              <v-skeleton-loader type="button" width="140" />
-            </v-card-actions>
-          </div>
+          <SaplingActionBarSkeleton :trailing="[140]" />
         </template>
         <template v-else>
           <SaplingDialogHero
@@ -62,6 +56,7 @@ import { useSaplingDialogKpi } from '@/composables/dialog/useSaplingDialogKpi'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
 import SaplingActionSave from '../actions/SaplingActionSave.vue'
+import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 // #endregion
 

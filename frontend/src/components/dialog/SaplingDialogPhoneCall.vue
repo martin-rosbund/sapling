@@ -77,11 +77,7 @@
             </v-btn>
           </template>
         </SaplingActionBar>
-        <v-card-actions v-else class="sapling-dialog__actions justify-end">
-          <v-skeleton-loader type="button" width="112" />
-          <v-skeleton-loader type="button" width="112" />
-          <v-skeleton-loader type="button" width="112" />
-        </v-card-actions>
+        <SaplingActionBarSkeleton v-else :leading="1" :trailing="2" />
       </div>
     </v-card>
   </v-dialog>
@@ -91,6 +87,7 @@
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SaplingActionBar from '@/components/actions/SaplingActionBar.vue'
+import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import { useSaplingPhoneDialog } from '@/composables/dialog/useSaplingPhoneDialog'
 import { useSaplingPhoneNumber } from '@/composables/phone/useSaplingPhoneNumber'

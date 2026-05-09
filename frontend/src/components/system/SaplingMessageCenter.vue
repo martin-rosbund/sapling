@@ -34,13 +34,7 @@
             <div class="sapling-message-center-dialog__body">
               <v-skeleton-loader class="glass-panel" type="article, article, article" />
             </div>
-            <div class="sapling-dialog__footer">
-              <v-card-actions class="sapling-dialog__actions">
-                <v-skeleton-loader type="button" width="112" />
-                <v-spacer />
-                <v-skeleton-loader type="button" width="112" />
-              </v-card-actions>
-            </div>
+            <SaplingActionBarSkeleton />
           </template>
           <template v-else>
             <SaplingDialogHero
@@ -98,35 +92,12 @@
               </v-list>
             </div>
 
-            <div class="sapling-dialog__footer">
-              <v-card-actions
-                class="sapling-dialog__actions sapling-message-center-dialog__actions"
-              >
-                <v-btn variant="text" prepend-icon="mdi-close" @click="closeDialog">
-                  <template v-if="$vuetify.display.mdAndUp">{{ $t('global.cancel') }}</template>
-                </v-btn>
-
-                <v-spacer />
-
-                <v-btn
-                  variant="text"
-                  prepend-icon="mdi-download"
-                  :disabled="messages.length === 0"
-                  @click="exportMessages"
-                >
-                  <template v-if="$vuetify.display.mdAndUp">{{ $t('global.download') }}</template>
-                </v-btn>
-
-                <v-btn
-                  color="error"
-                  append-icon="mdi-delete"
-                  :disabled="messages.length === 0"
-                  @click="clearAll"
-                >
-                  <template v-if="$vuetify.display.mdAndUp">{{ $t('global.clearAll') }}</template>
-                </v-btn>
-              </v-card-actions>
-            </div>
+            <SaplingActionMessageCenter
+              :close="closeDialog"
+              :export-messages="exportMessages"
+              :clear-all="clearAll"
+              :empty="messages.length === 0"
+            />
           </template>
         </div>
       </v-card>
@@ -142,6 +113,8 @@ import { useTranslationLoader } from '@/composables/generic/useTranslationLoader
 import type { Message } from '@/composables/system/useSaplingMessageCenter'
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
+import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
+import SaplingActionMessageCenter from '@/components/actions/SaplingActionMessageCenter.vue'
 // #endregion
 
 // #region Composable
