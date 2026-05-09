@@ -390,11 +390,18 @@ import type {
   DialogState,
   EntityTemplate,
 } from '@/entity/structure'
-import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_SMALL, NAVIGATION_URL } from '@/constants/project.constants'
+import {
+  DEFAULT_ENTITY_ITEMS_COUNT,
+  DEFAULT_PAGE_SIZE_SMALL,
+  NAVIGATION_URL,
+} from '@/constants/project.constants'
 import { SAPLING_DIALOG_MAX_WIDTH, SAPLING_DIALOG_HEIGHT } from '@/constants/dialog.constants'
 import type { EntityItem, SaplingGenericItem, ScriptButtonItem } from '@/entity/entity'
 import { useSaplingDialogEdit } from '@/composables/dialog/useSaplingDialogEdit'
-import { getSaplingContextMenuTableItems, type SaplingContextMenuTableMenuItem } from '@/composables/context/useSaplingContextMenuTable'
+import {
+  getSaplingContextMenuTableItems,
+  type SaplingContextMenuTableMenuItem,
+} from '@/composables/context/useSaplingContextMenuTable'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog'
 import { buildMailMenuActions } from '@/utils/saplingMailMenuUtil'

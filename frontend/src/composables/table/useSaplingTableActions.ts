@@ -365,7 +365,12 @@ export function useSaplingTableActions({
     window.open(url, '_blank')
   }
 
-  function onContextMenuAction({ type, item, scriptButton, mailAction }: SaplingContextMenuTableActionPayload) {
+  function onContextMenuAction({
+    type,
+    item,
+    scriptButton,
+    mailAction,
+  }: SaplingContextMenuTableActionPayload) {
     switch (type) {
       case 'edit':
         void openEditDialog(item)

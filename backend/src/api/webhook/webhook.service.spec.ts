@@ -42,11 +42,9 @@ type TemplateField = {
 };
 
 const createTemplateField = (overrides: TemplateField) => ({
-  name: '',
   type: 'string',
   isReference: false,
   referenceName: '',
-  kind: undefined,
   ...overrides,
 });
 
@@ -74,10 +72,12 @@ describe('WebhookService', () => {
 
     const persistedDeliveries: Array<{ payload?: object; handle?: number }> =
       [];
-    const flushPersist = jest.fn().mockResolvedValue(undefined);
+    const flushPersist = jest
+      .fn<() => Promise<undefined>>()
+      .mockResolvedValue(undefined);
     const em = {
       findOne: jest
-        .fn()
+        .fn<(...args: unknown[]) => Promise<unknown>>()
         .mockResolvedValueOnce({
           handle: 5,
           isActive: true,
@@ -94,8 +94,12 @@ describe('WebhookService', () => {
           flush: flushPersist,
         };
       }),
-      populate: jest.fn().mockResolvedValue(undefined),
-      flush: jest.fn().mockResolvedValue(undefined),
+      populate: jest
+        .fn<(...args: unknown[]) => Promise<undefined>>()
+        .mockResolvedValue(undefined),
+      flush: jest
+        .fn<(...args: unknown[]) => Promise<undefined>>()
+        .mockResolvedValue(undefined),
     };
     const templateService = {
       getEntityTemplate: jest.fn((entityHandle: string) => {
@@ -133,7 +137,9 @@ describe('WebhookService', () => {
       }),
     };
     const queue = {
-      add: jest.fn().mockResolvedValue(undefined),
+      add: jest
+        .fn<(...args: unknown[]) => Promise<undefined>>()
+        .mockResolvedValue(undefined),
     };
     const service = new WebhookService(
       em as never,

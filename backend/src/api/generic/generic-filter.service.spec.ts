@@ -48,16 +48,16 @@ describe('GenericFilterService', () => {
       createTemplateField({ name: 'createdAt', type: 'date' }),
     ];
 
-    const result = service.prepareReadCriteria(
+    const result: {
+      title: Record<string, unknown>;
+      createdAt: Record<string, unknown>;
+    } = service.prepareReadCriteria(
       {
         title: { $like: '%Ada%' },
         createdAt: { $gte: '2026-04-01' },
       },
       template,
-    ) as {
-      title: Record<string, unknown>;
-      createdAt: Record<string, unknown>;
-    };
+    );
 
     expect(result.title).toEqual({ $ilike: '%Ada%' });
     expect(result.createdAt.$gte).toBeInstanceOf(Date);
@@ -71,17 +71,12 @@ describe('GenericFilterService', () => {
 
     const result = service.prepareReadCriteria(
       {
-        $or: [
-          { createdAt: { $gte: lowerBound } },
-          { createdAt: null },
-        ],
+        $or: [{ createdAt: { $gte: lowerBound } }, { createdAt: null }],
       },
       template,
-    ) as {
-      $or: [{ createdAt: { $gte: Date } }, { createdAt: null }];
-    };
+    );
 
-    expect(result.$or[0].createdAt.$gte).toBe(lowerBound);
+    expect(result.$or[0].createdAt?.$gte).toBe(lowerBound);
   });
 
   it('resolves supported current-user placeholders before read criteria normalization', () => {

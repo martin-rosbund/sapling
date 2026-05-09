@@ -1,10 +1,7 @@
 import { computed } from 'vue'
 import type { EntityItem, SaplingGenericItem, ScriptButtonItem } from '@/entity/entity'
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure'
-import {
-  buildBulkMailActions,
-  type SaplingBulkMailAction,
-} from '@/utils/saplingMailMenuUtil'
+import { buildBulkMailActions, type SaplingBulkMailAction } from '@/utils/saplingMailMenuUtil'
 
 export interface UseSaplingTableMultiSelectProps {
   multiSelect: boolean
@@ -50,9 +47,7 @@ export function useSaplingTableMultiSelect(
       props.entityPermission?.allowDelete,
   )
   const bulkMailActions = computed<SaplingBulkMailAction[]>(() =>
-    canClearSelection.value
-      ? buildBulkMailActions(props.entityTemplates, props.selectedItems)
-      : [],
+    canClearSelection.value ? buildBulkMailActions(props.entityTemplates, props.selectedItems) : [],
   )
   const canMailSelection = computed(() => bulkMailActions.value.length > 0)
   const hasSelectionActions = computed(

@@ -9,7 +9,7 @@ import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 import { GenericFilterService } from './generic-filter.service';
 import { GenericMutationService } from './generic-mutation.service';
 
-(global as { log?: { error: jest.Mock } }).log = {
+(global as unknown as { log?: { error: jest.Mock } }).log = {
   error: jest.fn(),
 };
 

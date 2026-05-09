@@ -76,7 +76,10 @@ import type {
   EntityTemplate,
 } from '@/entity/structure'
 import type { EntityItem, SaplingGenericItem, ScriptButtonItem } from '@/entity/entity'
-import type { SaplingContextMenuTableActionPayload, SaplingMailMenuAction } from '@/composables/context/useSaplingContextMenuTable'
+import type {
+  SaplingContextMenuTableActionPayload,
+  SaplingMailMenuAction,
+} from '@/composables/context/useSaplingContextMenuTable'
 import SaplingContextMenuTable from '@/components/context/SaplingContextMenuTable.vue'
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'

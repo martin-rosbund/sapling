@@ -44,7 +44,7 @@ describe('DashboardTemplateController', () => {
   it('stamps new templates with the current user and normalizes visibility', async () => {
     const items = [
       { name: 'Ops', isShared: 'yes' as unknown as boolean, person: 7 },
-    ] as DashboardTemplateItem[];
+    ] as unknown as DashboardTemplateItem[];
     const controller = new DashboardTemplateController(
       { handle: 'dashboardTemplate' } as never,
       { handle: 11 } as never,

@@ -490,7 +490,8 @@ export function useSaplingEvent() {
    * Moves the calendar anchor to a specific date while keeping the current view aligned.
    */
   function goToDate(target: Date | string) {
-    const parsedDate = typeof target === 'string' ? parseLocalCalendarDate(target) : new Date(target)
+    const parsedDate =
+      typeof target === 'string' ? parseLocalCalendarDate(target) : new Date(target)
     if (!isValidDate(parsedDate)) {
       return
     }
@@ -529,7 +530,9 @@ export function useSaplingEvent() {
    * Applies the correct day, week or month shift to the active calendar date.
    */
   function shiftCalendar(direction: 1 | -1) {
-    const current = normalizeDateForCalendarType(value.value ? parseLocalCalendarDate(value.value) : new Date())
+    const current = normalizeDateForCalendarType(
+      value.value ? parseLocalCalendarDate(value.value) : new Date(),
+    )
     const nextDate = new Date(current)
 
     switch (calendarType.value) {

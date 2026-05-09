@@ -39,7 +39,7 @@ jest.mock('../../entity/PersonSessionItem', () => ({
   PersonSessionItem: class PersonSessionItem {},
 }));
 
-const graphApiGet = jest.fn();
+const graphApiGet = jest.fn<(...args: unknown[]) => Promise<unknown>>();
 const graphApiSelect = jest.fn(() => ({ get: graphApiGet }));
 const graphApi = jest.fn(() => ({ select: graphApiSelect }));
 const graphInit = jest.fn(() => ({ api: graphApi }));
@@ -72,9 +72,11 @@ function createMessageTemplateServiceMock(
   context: Record<string, unknown> = {},
 ) {
   return {
-    buildContext: jest.fn().mockResolvedValue(context),
+    buildContext: jest
+      .fn<(...args: unknown[]) => Promise<Record<string, unknown>>>()
+      .mockResolvedValue(context),
     replaceRecipients: jest
-      .fn()
+      .fn<(input: string[] | string | undefined) => string[]>()
       .mockImplementation((input: string[] | string | undefined) => {
         if (!input) {
           return [];
@@ -83,7 +85,9 @@ function createMessageTemplateServiceMock(
         return Array.isArray(input) ? input : input.split(/[;,]/);
       }),
     replacePlaceholders: jest
-      .fn()
+      .fn<
+        (template: string, templateContext: Record<string, unknown>) => string
+      >()
       .mockImplementation(
         (template: string, templateContext: Record<string, unknown>) =>
           template.replace(
@@ -204,7 +208,7 @@ describe('MailService', () => {
 
     const em = {
       findOne: jest
-        .fn()
+        .fn<(...args: unknown[]) => Promise<unknown>>()
         .mockResolvedValueOnce({
           handle: 1,
           firstName: 'Martin',
@@ -248,7 +252,7 @@ describe('MailService', () => {
 
     const em = {
       findOne: jest
-        .fn()
+        .fn<(...args: unknown[]) => Promise<unknown>>()
         .mockResolvedValueOnce({
           handle: 1,
           firstName: 'Martin',

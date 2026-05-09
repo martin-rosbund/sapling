@@ -5,7 +5,9 @@ import { AzureCalendarController } from './azure.calendar.controller';
 describe('AzureCalendarController', () => {
   it('queues calendar deliveries for authenticated users', async () => {
     const azureCalendarService = {
-      queueEvent: jest.fn().mockResolvedValue({ handle: 11 }),
+      queueEvent: jest
+        .fn<(...args: unknown[]) => Promise<{ handle: number }>>()
+        .mockResolvedValue({ handle: 11 }),
     };
     const controller = new AzureCalendarController(
       azureCalendarService as never,

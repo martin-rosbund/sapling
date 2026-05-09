@@ -18,7 +18,9 @@ describe('EventDeliveryController', () => {
 
   it('retries persisted event deliveries', async () => {
     const eventDeliveryService = {
-      retryDelivery: jest.fn().mockResolvedValue({ handle: 21 }),
+      retryDelivery: jest
+        .fn<(...args: unknown[]) => Promise<{ handle: number }>>()
+        .mockResolvedValue({ handle: 21 }),
     };
     const controller = new EventDeliveryController(
       { handle: 'eventDelivery' } as never,
@@ -38,7 +40,9 @@ describe('EventDeliveryController', () => {
 
   it('injects eventDeliveryService via constructor', async () => {
     const eventDeliveryService = {
-      retryDelivery: jest.fn().mockResolvedValue({ handle: 22 }),
+      retryDelivery: jest
+        .fn<(...args: unknown[]) => Promise<{ handle: number }>>()
+        .mockResolvedValue({ handle: 22 }),
     };
     const controller = new EventDeliveryController(
       { handle: 'eventDelivery' } as never,

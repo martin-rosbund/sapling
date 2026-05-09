@@ -40,7 +40,9 @@ const createTemplateField = (
 describe('GenericRelationService', () => {
   it('adds references through the relation collection and flushes once', async () => {
     const add = jest.fn();
-    const init = jest.fn(() => Promise.resolve(undefined));
+    const init = jest
+      .fn<(...args: unknown[]) => Promise<undefined>>()
+      .mockResolvedValue(undefined);
     const relation = {
       init,
       add,

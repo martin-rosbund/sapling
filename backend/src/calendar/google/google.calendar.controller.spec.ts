@@ -5,7 +5,9 @@ import { GoogleCalendarController } from './google.calendar.controller';
 describe('GoogleCalendarController', () => {
   it('queues calendar deliveries for authenticated users', async () => {
     const googleCalendarService = {
-      queueEvent: jest.fn().mockResolvedValue({ handle: 7 }),
+      queueEvent: jest
+        .fn<(...args: unknown[]) => Promise<{ handle: number }>>()
+        .mockResolvedValue({ handle: 7 }),
     };
     const controller = new GoogleCalendarController(
       googleCalendarService as never,

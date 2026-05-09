@@ -252,9 +252,11 @@ describe('GenericPermissionGuard entity resolvers', () => {
     } as never) as unknown as HandlerOwner;
     const findOne = jest
       .fn<EntityManager['findOne']>()
-      .mockResolvedValueOnce({ entity: { handle: 'contract' } })
-      .mockResolvedValueOnce({ entity: { handle: 'salesOpportunity' } });
-    const guard = createGuard(findOne);
+      .mockResolvedValueOnce({ entity: { handle: 'contract' } } as never)
+      .mockResolvedValueOnce({
+        entity: { handle: 'salesOpportunity' },
+      } as never);
+    const guard = createGuard(findOne as never);
     const allowedContext = createExecutionContext(
       controller,
       'download',

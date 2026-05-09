@@ -79,7 +79,8 @@ describe('PhoneCallController', () => {
       note: 'Rueckruf',
       createdAt: phoneCallCreatedAt,
       person: phoneCallPerson,
-    } as PhoneCallItem;
+      entity: { handle: null },
+    } as unknown as PhoneCallItem;
     const controller = new PhoneCallController(
       { handle: 'phoneCall' } as never,
       currentUser,
@@ -208,7 +209,7 @@ describe('PhoneCallController', () => {
       2,
       PhoneCallItem,
       { handle: 44 },
-      { populate: ['person', 'person.company'] },
+      { populate: ['person', 'person.company', 'entity'] },
     );
     expect(asMock(create)).toHaveBeenCalledWith(
       EventItem,

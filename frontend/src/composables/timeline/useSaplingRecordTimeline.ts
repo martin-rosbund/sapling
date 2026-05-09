@@ -211,14 +211,17 @@ export function useSaplingRecordTimeline(options: UseSaplingRecordTimelineOption
     }
   }
 
-  watch([entityHandle, recordHandle, isActive], ([nextEntityHandle, nextRecordHandle, nextIsActive]) => {
-    if (!nextIsActive || !nextEntityHandle || !nextRecordHandle) {
-      disconnectObserver()
-      return
-    }
+  watch(
+    [entityHandle, recordHandle, isActive],
+    ([nextEntityHandle, nextRecordHandle, nextIsActive]) => {
+      if (!nextIsActive || !nextEntityHandle || !nextRecordHandle) {
+        disconnectObserver()
+        return
+      }
 
-    void initialize()
-  })
+      void initialize()
+    },
+  )
 
   watch(loadMoreTriggerRef as Ref<HTMLElement | null>, () => {
     refreshObserver()

@@ -18,7 +18,9 @@ describe('TeamsDeliveryController', () => {
 
   it('retries persisted teams deliveries', async () => {
     const teamsService = {
-      retryDelivery: jest.fn().mockResolvedValue({ handle: 42 }),
+      retryDelivery: jest
+        .fn<(...args: unknown[]) => Promise<{ handle: number }>>()
+        .mockResolvedValue({ handle: 42 }),
     };
     const controller = new TeamsDeliveryController(
       { handle: 'teamsDelivery' } as never,
@@ -38,7 +40,9 @@ describe('TeamsDeliveryController', () => {
 
   it('injects teamsService via constructor', async () => {
     const teamsService = {
-      retryDelivery: jest.fn().mockResolvedValue({ handle: 43 }),
+      retryDelivery: jest
+        .fn<(...args: unknown[]) => Promise<{ handle: number }>>()
+        .mockResolvedValue({ handle: 43 }),
     };
     const controller = new TeamsDeliveryController(
       { handle: 'teamsDelivery' } as never,

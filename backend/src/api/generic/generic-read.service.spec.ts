@@ -4,7 +4,7 @@ import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 import { GenericFilterService } from './generic-filter.service';
 import { GenericReadService } from './generic-read.service';
 
-(global as { log?: { error: jest.Mock } }).log = {
+(global as unknown as { log?: { error: jest.Mock } }).log = {
   error: jest.fn(),
 };
 
@@ -33,10 +33,10 @@ const createTemplateField = (
 describe('GenericReadService', () => {
   it('runs beforeRead scripts and normalizes criteria before fetching collections', async () => {
     const findOne = jest
-      .fn<() => Promise<object | null>>()
+      .fn<(...args: unknown[]) => Promise<object | null>>()
       .mockResolvedValueOnce({ handle: 'ticket' });
     const find = jest
-      .fn<() => Promise<object[]>>()
+      .fn<(...args: unknown[]) => Promise<object[]>>()
       .mockResolvedValue([{ handle: 1, title: 'Ada' }]);
     const em = {
       findOne,
@@ -147,7 +147,9 @@ describe('GenericReadService', () => {
 
   it('still loads entity metadata when afterRead scripts may run', async () => {
     const em = {
-      findOne: jest.fn(() => Promise.resolve({ handle: 'ticket' })),
+      findOne: jest
+        .fn<(...args: unknown[]) => Promise<unknown>>()
+        .mockResolvedValue({ handle: 'ticket' }),
       findAndCount: jest.fn(() => Promise.resolve([[], 0])),
     };
     const scriptService = {

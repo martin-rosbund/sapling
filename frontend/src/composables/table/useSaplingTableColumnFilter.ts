@@ -479,7 +479,11 @@ export function useSaplingTableColumnFilter(
       return getEntityValueLabel(resolvedRelationItem, referenceTemplates.value)
     }
 
-    const translatedIdentifier = getTranslatedRelationIdentifier(item, referenceIdentifierKeys.value, t)
+    const translatedIdentifier = getTranslatedRelationIdentifier(
+      item,
+      referenceIdentifierKeys.value,
+      t,
+    )
     if (translatedIdentifier) {
       return translatedIdentifier
     }
@@ -512,10 +516,13 @@ export function useSaplingTableColumnFilter(
     const requestId = ++latestRelationLookupRequestId
 
     try {
-      const result = await ApiGenericService.find<SaplingGenericItem>(currentReferenceEntityHandle, {
-        filter: lookupFilter,
-        limit: itemsToResolve.length,
-      })
+      const result = await ApiGenericService.find<SaplingGenericItem>(
+        currentReferenceEntityHandle,
+        {
+          filter: lookupFilter,
+          limit: itemsToResolve.length,
+        },
+      )
 
       if (requestId !== latestRelationLookupRequestId) {
         return
@@ -796,7 +803,9 @@ function shouldResolveRelationItem(
 function buildReferenceLookupFilter(items: SaplingGenericItem[], identifierKeys: string[]) {
   const relationIdentifiers = items
     .map((item) => buildRelationIdentifier(item, identifierKeys))
-    .filter((identifier): identifier is Record<string, string | number | boolean> => identifier !== null)
+    .filter(
+      (identifier): identifier is Record<string, string | number | boolean> => identifier !== null,
+    )
 
   if (relationIdentifiers.length === 0) {
     return null

@@ -971,7 +971,9 @@ describe('GenericService', () => {
 
   it('runs addReference scripts with relation context after the reference flush', async () => {
     const relation = {
-      init: jest.fn(() => Promise.resolve(undefined)),
+      init: jest
+        .fn<(...args: unknown[]) => Promise<undefined>>()
+        .mockResolvedValue(undefined),
       add: jest.fn(),
       remove: jest.fn(),
     };
@@ -1080,7 +1082,9 @@ describe('GenericService', () => {
 
   it('runs deleteReference scripts with relation context after the reference flush', async () => {
     const relation = {
-      init: jest.fn(() => Promise.resolve(undefined)),
+      init: jest
+        .fn<(...args: unknown[]) => Promise<undefined>>()
+        .mockResolvedValue(undefined),
       add: jest.fn(),
       remove: jest.fn(),
     };

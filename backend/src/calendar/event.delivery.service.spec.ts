@@ -27,12 +27,13 @@ describe('EventDeliveryService', () => {
       sessionHandle: 7,
     });
 
-    expect(delivery.event).toBe(event);
-    expect(delivery.payload).toEqual({
+    expect(delivery).not.toBeNull();
+    expect(delivery?.event).toBe(event);
+    expect(delivery?.payload).toEqual({
       provider: 'azure',
       sessionHandle: 7,
     });
-    expect(delivery.payload).not.toHaveProperty('handle');
+    expect(delivery?.payload).not.toHaveProperty('handle');
     expect(asMock(queue.add)).toHaveBeenCalledWith('deliver-calendar-event', {
       deliveryId: 15,
     });

@@ -136,10 +136,7 @@ export class PhoneCallController extends ScriptClass {
       ) {
         const ticketHandle = Number(sourceReferenceHandle);
         if (Number.isFinite(ticketHandle)) {
-          ticketRef = this.em.getReference(
-            TicketItem,
-            ticketHandle as never,
-          );
+          ticketRef = this.em.getReference(TicketItem, ticketHandle as never);
           this.logDebug(
             'afterInsert',
             'Linked phone call event to source ticket',

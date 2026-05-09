@@ -250,7 +250,10 @@ describe('CurrentController', () => {
     const currentService = {
       getPerson: jest.fn(async () => hydratedUser),
     };
-    const controller = new CurrentController(currentService as never);
+    const controller = new CurrentController(
+      currentService as never,
+      {} as never,
+    );
     const req = { user: createMockUser() };
 
     await expect(controller.getPerson(req as never)).resolves.toBe(
@@ -263,7 +266,10 @@ describe('CurrentController', () => {
     const currentService = {
       getPerson: jest.fn(async () => null),
     };
-    const controller = new CurrentController(currentService as never);
+    const controller = new CurrentController(
+      currentService as never,
+      {} as never,
+    );
     const req = { user: createMockUser() };
 
     await expect(controller.getPerson(req as never)).resolves.toBe(req.user);
@@ -273,7 +279,10 @@ describe('CurrentController', () => {
     const currentService = {
       changePassword: jest.fn(async () => undefined),
     };
-    const controller = new CurrentController(currentService as never);
+    const controller = new CurrentController(
+      currentService as never,
+      {} as never,
+    );
     const req = { user: createMockUser() };
 
     await expect(
@@ -286,7 +295,7 @@ describe('CurrentController', () => {
   });
 
   it('rejects password changes when fields are missing', async () => {
-    const controller = new CurrentController({} as never);
+    const controller = new CurrentController({} as never, {} as never);
 
     await expect(
       controller.changePassword({ user: createMockUser() } as never, '', ''),
@@ -294,7 +303,7 @@ describe('CurrentController', () => {
   });
 
   it('rejects password changes when passwords do not match', async () => {
-    const controller = new CurrentController({} as never);
+    const controller = new CurrentController({} as never, {} as never);
 
     await expect(
       controller.changePassword({ user: createMockUser() } as never, 'a', 'b'),
@@ -306,7 +315,10 @@ describe('CurrentController', () => {
     const currentService = {
       getOpenTickets: jest.fn(async () => tickets),
     };
-    const controller = new CurrentController(currentService as never);
+    const controller = new CurrentController(
+      currentService as never,
+      {} as never,
+    );
     const req = { user: createMockUser() };
 
     await expect(controller.getOpenTickets(req as never)).resolves.toBe(
@@ -322,7 +334,10 @@ describe('CurrentController', () => {
     const currentService = {
       getOpenEvents: jest.fn(async () => events),
     };
-    const controller = new CurrentController(currentService as never);
+    const controller = new CurrentController(
+      currentService as never,
+      {} as never,
+    );
     const req = { user: createMockUser() };
 
     await expect(controller.getOpenEvents(req as never)).resolves.toBe(events);
@@ -334,7 +349,10 @@ describe('CurrentController', () => {
     const currentService = {
       getOpenSalesOpportunities: jest.fn(async () => salesOpportunities),
     };
-    const controller = new CurrentController(currentService as never);
+    const controller = new CurrentController(
+      currentService as never,
+      {} as never,
+    );
     const req = { user: createMockUser() };
 
     await expect(
@@ -350,7 +368,10 @@ describe('CurrentController', () => {
     const currentService = {
       countOpenTasks: jest.fn(async () => count),
     };
-    const controller = new CurrentController(currentService as never);
+    const controller = new CurrentController(
+      currentService as never,
+      {} as never,
+    );
     const req = { user: createMockUser() };
 
     await expect(controller.countOpenTasks(req as never)).resolves.toBe(count);
@@ -364,7 +385,10 @@ describe('CurrentController', () => {
     const currentService = {
       getAllEntityPermissions: jest.fn(() => permissions),
     };
-    const controller = new CurrentController(currentService as never);
+    const controller = new CurrentController(
+      currentService as never,
+      {} as never,
+    );
     const req = { user: createMockUser() };
 
     expect(controller.getAllEntityPermissions(req as never)).toBe(permissions);
@@ -378,7 +402,10 @@ describe('CurrentController', () => {
     const currentService = {
       getEntityPermissions: jest.fn(() => permission),
     };
-    const controller = new CurrentController(currentService as never);
+    const controller = new CurrentController(
+      currentService as never,
+      {} as never,
+    );
     const req = { user: createMockUser() };
 
     expect(controller.getEntityPermission(req as never, 'ticket')).toBe(
@@ -391,7 +418,7 @@ describe('CurrentController', () => {
   });
 
   it('rejects entity permission lookups without an entity handle', () => {
-    const controller = new CurrentController({} as never);
+    const controller = new CurrentController({} as never, {} as never);
 
     expect(() =>
       controller.getEntityPermission({ user: createMockUser() } as never, ''),
@@ -403,7 +430,10 @@ describe('CurrentController', () => {
     const currentService = {
       getWorkWeek: jest.fn(async () => workWeek),
     };
-    const controller = new CurrentController(currentService as never);
+    const controller = new CurrentController(
+      currentService as never,
+      {} as never,
+    );
     const req = { user: createMockUser() };
 
     await expect(controller.getWorkWeek(req as never)).resolves.toBe(workWeek);

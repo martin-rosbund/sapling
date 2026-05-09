@@ -68,7 +68,7 @@ const createService = ({
 }: {
   genericService?: Record<string, jest.Mock>;
   currentService?: Record<string, jest.Mock>;
-  templateService?: { getEntityTemplate: jest.Mock };
+  templateService?: { getEntityTemplate: jest.Mock<any> };
   aiService?: { searchVectorDocuments: jest.Mock };
   permissionService?: { assertEntityPermission: jest.Mock };
 } = {}) =>
@@ -371,11 +371,13 @@ describe('SaplingMcpService', () => {
 
   it('forwards semantic_search to AiService with normalized limits', async () => {
     const aiService = {
-      searchVectorDocuments: jest.fn().mockResolvedValue({
-        entityHandle: 'ticket',
-        indexed: true,
-        results: [],
-      }),
+      searchVectorDocuments: jest
+        .fn<(...args: unknown[]) => Promise<unknown>>()
+        .mockResolvedValue({
+          entityHandle: 'ticket',
+          indexed: true,
+          results: [],
+        }),
     };
     const service = createService({ aiService });
     const user = { handle: 1 } as never;

@@ -699,9 +699,7 @@ export class MailService {
       endDate.setMinutes(endDate.getMinutes() + MAIL_EVENT_DURATION_MINUTES);
 
       const recipientList = (delivery.toRecipients ?? []).join(', ');
-      const baseTitle = recipientList
-        ? `E-Mail an ${recipientList}`
-        : 'E-Mail';
+      const baseTitle = recipientList ? `E-Mail an ${recipientList}` : 'E-Mail';
       const title =
         baseTitle.length > 128 ? `${baseTitle.slice(0, 125)}...` : baseTitle;
 
@@ -718,10 +716,7 @@ export class MailService {
 
       const creatorCompanyRef =
         creator.company?.handle != null
-          ? eventEm.getReference(
-              CompanyItem,
-              creator.company.handle as never,
-            )
+          ? eventEm.getReference(CompanyItem, creator.company.handle as never)
           : undefined;
       const creatorPersonRef =
         creator.handle != null
@@ -744,10 +739,7 @@ export class MailService {
       ) {
         const ticketHandle = Number(sourceReferenceHandle);
         if (Number.isFinite(ticketHandle)) {
-          ticketRef = eventEm.getReference(
-            TicketItem,
-            ticketHandle as never,
-          );
+          ticketRef = eventEm.getReference(TicketItem, ticketHandle as never);
         }
       } else if (
         sourceEntityHandle === 'salesOpportunity' &&

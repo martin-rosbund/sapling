@@ -49,7 +49,10 @@ describe('CurrentService', () => {
   it('provisions starter dashboards and favorites from role templates when none exist', async () => {
     const flush = jest.fn();
     const persist = jest.fn();
-    const count = jest.fn().mockResolvedValueOnce(0).mockResolvedValueOnce(0);
+    const count = jest
+      .fn<(...args: unknown[]) => Promise<number>>()
+      .mockResolvedValueOnce(0)
+      .mockResolvedValueOnce(0);
     const hydratedPerson = {
       handle: 7,
       roles: [
@@ -74,7 +77,7 @@ describe('CurrentService', () => {
       ],
     };
     const findOne = jest
-      .fn()
+      .fn<(...args: unknown[]) => Promise<unknown>>()
       .mockResolvedValueOnce(hydratedPerson)
       .mockResolvedValueOnce({
         handle: 7,
@@ -130,7 +133,7 @@ describe('CurrentService', () => {
 
   it('counts open tasks via database count queries instead of loading full lists', async () => {
     const count = jest
-      .fn()
+      .fn<(...args: unknown[]) => Promise<number>>()
       .mockResolvedValueOnce(3)
       .mockResolvedValueOnce(5)
       .mockResolvedValueOnce(2);
@@ -139,11 +142,11 @@ describe('CurrentService', () => {
       count,
       find,
     };
-    const service = new CurrentService(em);
+    const service = new CurrentService(em as never);
 
     const result = await service.countOpenTasks({
       handle: 7,
-    });
+    } as never);
 
     expect(result).toEqual({ count: 10 });
     expect(count).toHaveBeenCalledTimes(3);

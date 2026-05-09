@@ -7,20 +7,10 @@
     </template>
 
     <template #trailing>
-      <v-btn
-        variant="text"
-        prepend-icon="mdi-download"
-        :disabled="empty"
-        @click="exportMessages"
-      >
+      <v-btn variant="text" prepend-icon="mdi-download" :disabled="empty" @click="exportMessages">
         <template v-if="$vuetify.display.mdAndUp">{{ $t('global.download') }}</template>
       </v-btn>
-      <v-btn
-        color="error"
-        append-icon="mdi-delete"
-        :disabled="empty"
-        @click="clearAll"
-      >
+      <v-btn color="error" append-icon="mdi-delete" :disabled="empty" @click="clearAll">
         <template v-if="$vuetify.display.mdAndUp">{{ $t('global.clearAll') }}</template>
       </v-btn>
     </template>

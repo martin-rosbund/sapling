@@ -61,10 +61,14 @@ describe('PersonController', () => {
       socialMediaProfiles: [socialMediaProfile],
       apiTokens: [apiToken],
       session,
-    } as PersonItem;
+    } as unknown as PersonItem;
     const em = {
-      findOne: jest.fn().mockResolvedValue(loadedPerson),
-      flush: jest.fn().mockResolvedValue(undefined),
+      findOne: jest
+        .fn<(...args: unknown[]) => Promise<unknown>>()
+        .mockResolvedValue(loadedPerson),
+      flush: jest
+        .fn<(...args: unknown[]) => Promise<undefined>>()
+        .mockResolvedValue(undefined),
       remove: jest.fn(),
     };
     const controller = new PersonController(

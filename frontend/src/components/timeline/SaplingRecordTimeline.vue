@@ -70,8 +70,12 @@
                 >
                   <div class="sapling-record-timeline__summary-card-header">
                     <div>
-                      <div class="sapling-record-timeline__summary-card-label">{{ card.label }}</div>
-                      <strong class="sapling-record-timeline__summary-card-value">{{ card.value }}</strong>
+                      <div class="sapling-record-timeline__summary-card-label">
+                        {{ card.label }}
+                      </div>
+                      <strong class="sapling-record-timeline__summary-card-value">{{
+                        card.value
+                      }}</strong>
                     </div>
                     <v-icon :icon="card.icon" size="22" />
                   </div>

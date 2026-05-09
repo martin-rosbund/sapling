@@ -1,12 +1,7 @@
 <template>
   <SaplingActionBar>
     <template #leading>
-      <v-btn
-        variant="text"
-        prepend-icon="mdi-pencil"
-        :disabled="busy"
-        @click="keepEditing"
-      >
+      <v-btn variant="text" prepend-icon="mdi-pencil" :disabled="busy" @click="keepEditing">
         <template v-if="$vuetify.display.mdAndUp">{{ $t('global.keepEditing') }}</template>
       </v-btn>
     </template>

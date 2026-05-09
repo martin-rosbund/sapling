@@ -28,6 +28,9 @@
         "npx mikro-orm": true,
         "npx jest": true,
         "Group-Object": true,
-        "npx vue-tsc": true
+        "npx vue-tsc": true,
+        "npx tsc": true,
+        "Set-Content": true,
+        "Out-File": true
     }
 }

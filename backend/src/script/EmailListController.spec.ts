@@ -52,10 +52,14 @@ describe('EmailListController', () => {
       persons: [{ email: 'person@example.com' }, { email: '' }],
     } as unknown as EMailListItem;
     const em = {
-      findOne: jest.fn().mockResolvedValue(loadedMailList),
+      findOne: jest
+        .fn<(...args: unknown[]) => Promise<unknown>>()
+        .mockResolvedValue(loadedMailList),
     };
     const mailService = {
-      sendEmail: jest.fn().mockResolvedValue({ handle: 99 }),
+      sendEmail: jest
+        .fn<(...args: unknown[]) => Promise<unknown>>()
+        .mockResolvedValue({ handle: 99 }),
     };
     const controller = new EmailListController(
       { handle: 'emailList' } as never,
@@ -91,7 +95,9 @@ describe('EmailListController', () => {
       persons: [],
     } as unknown as EMailListItem;
     const em = {
-      findOne: jest.fn().mockResolvedValue(loadedMailList),
+      findOne: jest
+        .fn<(...args: unknown[]) => Promise<unknown>>()
+        .mockResolvedValue(loadedMailList),
     };
     const controller = new EmailListController(
       { handle: 'emailList' } as never,
@@ -116,7 +122,9 @@ describe('EmailListController', () => {
       persons: [],
     } as unknown as EMailListItem;
     const em = {
-      findOne: jest.fn().mockResolvedValue(loadedMailList),
+      findOne: jest
+        .fn<(...args: unknown[]) => Promise<unknown>>()
+        .mockResolvedValue(loadedMailList),
     };
     const controller = new EmailListController(
       { handle: 'emailList' } as never,
