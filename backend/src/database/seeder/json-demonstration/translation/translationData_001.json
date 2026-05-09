@@ -623,6 +623,7 @@
   { "entity": "eventType", "property": "icon", "de": "Icon", "en": "Icon" },
   { "entity": "eventType", "property": "color", "de": "Farbe", "en": "Color" },
   { "entity": "eventType", "property": "events", "de": "Termine", "en": "Events" },
+  { "entity": "eventType", "property": "showInDefaultCalendar", "de": "Im Standardkalender anzeigen", "en": "Show in default calendar" },
   { "entity": "eventType", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "eventType", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
