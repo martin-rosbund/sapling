@@ -3,7 +3,7 @@
   <v-dialog
     :model-value="addKpiDialog"
     @update:model-value="handleDialogUpdate"
-    max-width="500"
+    :max-width="SAPLING_DIALOG_MAX_WIDTH.sm"
     class="sapling-add-kpi-dialog"
   >
     <v-card
@@ -55,6 +55,7 @@ import type { KPIItem } from '@/entity/entity'
 import { useSaplingDialogKpi } from '@/composables/dialog/useSaplingDialogKpi'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
+import { SAPLING_DIALOG_MAX_WIDTH } from '@/constants/dialog.constants'
 import SaplingActionSave from '../actions/SaplingActionSave.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'

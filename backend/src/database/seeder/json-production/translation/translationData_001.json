@@ -840,6 +840,8 @@
   { "entity": "calendar", "property": "selectDate", "de": "Datum wählen", "en": "Select date" },
   { "entity": "calendar", "property": "combined", "de": "Kombiniert", "en": "Combined" },
   { "entity": "calendar", "property": "sideBySide", "de": "Spaltenansicht", "en": "Side by side" },
+  { "entity": "calendar", "property": "standard", "de": "Standard", "en": "Standard" },
+  { "entity": "calendar", "property": "extended", "de": "Erweitert", "en": "Extended" },
   { "entity": "calendar", "property": "unknownProvider", "de": "Unbekannter Anbieter", "en": "Unknown provider" },
   
   { "entity": "inbox", "property": "today", "de": "Heute", "en": "Today" },

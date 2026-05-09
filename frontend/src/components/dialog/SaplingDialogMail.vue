@@ -1,10 +1,8 @@
 <template>
   <v-dialog
     :model-value="isOpen"
-    min-width="95vw"
-    min-height="95vh"
-    max-width="95vw"
-    max-height="95vh"
+    :max-width="SAPLING_DIALOG_MAX_WIDTH.xxl"
+    :height="SAPLING_DIALOG_HEIGHT.xl"
     persistent
     @update:model-value="handleVisibilityChange"
   >
@@ -103,6 +101,7 @@
 import SaplingActionMail from '@/components/actions/SaplingActionMail.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
+import { SAPLING_DIALOG_MAX_WIDTH, SAPLING_DIALOG_HEIGHT } from '@/constants/dialog.constants'
 import SaplingDialogMailComposer from '@/components/dialog/mail/SaplingDialogMailComposer.vue'
 import SaplingDialogMailPreview from '@/components/dialog/mail/SaplingDialogMailPreview.vue'
 import { useSaplingDialogMailEditor } from '@/composables/dialog/useSaplingDialogMailEditor'

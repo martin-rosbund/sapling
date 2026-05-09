@@ -33,12 +33,14 @@
     "handle": "call",
     "title": "Telefonat",
     "icon": "mdi-phone",
-    "color": "#3F51B5"
+    "color": "#3F51B5",
+    "showInDefaultCalendar": false
   },
   {
     "handle": "mail",
     "title": "E-Mail",
     "icon": "mdi-email",
-    "color": "#00BCD4"
+    "color": "#00BCD4",
+    "showInDefaultCalendar": false
   }
 ]

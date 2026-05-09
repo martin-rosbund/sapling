@@ -1,5 +1,9 @@
 <template>
-  <v-dialog :model-value="show" max-width="680px" @update:model-value="onDialogModelValueUpdate">
+  <v-dialog
+    :model-value="show"
+    :max-width="SAPLING_DIALOG_MAX_WIDTH.lg"
+    @update:model-value="onDialogModelValueUpdate"
+  >
     <v-card
       class="glass-panel tilt-content sapling-dialog-compact-card"
       v-tilt="TILT_DEFAULT_OPTIONS"
@@ -26,16 +30,11 @@
               {{ errorMessage }}
             </v-alert>
 
-            <v-textarea
+            <SaplingMarkdownField
               v-model="content"
-              auto-grow
-              rows="10"
-              :counter="2048"
-              :maxlength="2048"
               :label="$t('information.content')"
-              :placeholder="$t('information.empty')"
+              :rows="10"
               :disabled="!canEdit"
-              variant="outlined"
             />
 
             <div class="sapling-table-row-information__hint">
@@ -66,6 +65,8 @@ import SaplingActionClose from '@/components/actions/SaplingActionClose.vue'
 import SaplingActionSave from '@/components/actions/SaplingActionSave.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
+import SaplingMarkdownField from '@/components/dialog/fields/SaplingFieldMarkdown.vue'
+import { SAPLING_DIALOG_MAX_WIDTH } from '@/constants/dialog.constants'
 import {
   useSaplingTableRowInformation,
   type UseSaplingTableRowInformationEmit,

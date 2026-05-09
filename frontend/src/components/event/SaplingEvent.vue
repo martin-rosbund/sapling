@@ -73,6 +73,7 @@
           <SaplingEventToolbar
             v-model:calendar-type="calendarType"
             v-model:calendar-view-mode="calendarViewMode"
+            v-model:calendar-mode="calendarMode"
             :is-narrow-screen="isNarrowScreen"
             :calendar-type-options="calendarTypeOptions"
             :model-value="value"
@@ -130,7 +131,7 @@
     v-if="isMobileContextLayout"
     v-model="mobileContextDialogVisible"
     class="sapling-event-context-dialog"
-    max-width="720"
+    :max-width="SAPLING_DIALOG_MAX_WIDTH.md"
     scrollable
   >
     <div class="sapling-event-context-dialog__surface">
@@ -172,6 +173,7 @@ import SaplingEventContextPanels from '@/components/event/SaplingEventContextPan
 import SaplingEventToolbar from '@/components/event/SaplingEventToolbar.vue'
 import SaplingWorkFilterPanel from '@/components/filter/SaplingWorkFilterPanel.vue'
 import SaplingDialogEdit from '../dialog/SaplingDialogEdit.vue'
+import { SAPLING_DIALOG_MAX_WIDTH } from '@/constants/dialog.constants'
 
 defineOptions({
   inheritAttrs: false,
@@ -205,6 +207,7 @@ const {
   calendarDisplayType,
   calendarType,
   calendarTypeOptions,
+  calendarMode,
   currentCalendarLayoutLabel,
   currentDateRangeLabel,
   currentCalendarViewLabel,

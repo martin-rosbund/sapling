@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     :model-value="modelValue"
-    max-width="500"
+    :max-width="SAPLING_DIALOG_MAX_WIDTH.sm"
     @update:model-value="emit('update:modelValue', $event)"
   >
     <v-card class="glass-panel tilt-content sapling-dialog-compact-card" elevation="12">
@@ -35,6 +35,7 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SaplingActionSave from '@/components/actions/SaplingActionSave.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
+import { SAPLING_DIALOG_MAX_WIDTH } from '@/constants/dialog.constants'
 
 type FavoriteFormRef = {
   validate?: () => Promise<boolean | { valid: boolean }>

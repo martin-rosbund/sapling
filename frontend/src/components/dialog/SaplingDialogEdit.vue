@@ -3,10 +3,8 @@
     :model-value="modelValue"
     class="sapling-dialog-edit-dialog"
     @update:model-value="handleDialogUpdate"
-    min-width="95vw"
-    min-height="95vh"
-    max-width="95vw"
-    max-height="95vh"
+    :max-width="SAPLING_DIALOG_MAX_WIDTH['3xl']"
+    :height="SAPLING_DIALOG_HEIGHT.xl"
     persistent
   >
     <v-card class="glass-panel sapling-dialog-edit-card" elevation="12">
@@ -393,6 +391,7 @@ import type {
   EntityTemplate,
 } from '@/entity/structure'
 import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_SMALL, NAVIGATION_URL } from '@/constants/project.constants'
+import { SAPLING_DIALOG_MAX_WIDTH, SAPLING_DIALOG_HEIGHT } from '@/constants/dialog.constants'
 import type { EntityItem, SaplingGenericItem, ScriptButtonItem } from '@/entity/entity'
 import { useSaplingDialogEdit } from '@/composables/dialog/useSaplingDialogEdit'
 import { getSaplingContextMenuTableItems, type SaplingContextMenuTableMenuItem } from '@/composables/context/useSaplingContextMenuTable'

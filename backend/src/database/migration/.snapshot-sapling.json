@@ -6553,19 +6553,19 @@
         },
         "description": {
           "name": "description",
-          "type": "varchar(1024)",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "unique": false,
-          "length": 1024,
+          "length": null,
           "precision": null,
           "scale": null,
           "default": null,
           "comment": null,
           "enumItems": [],
-          "mappedType": "string"
+          "mappedType": "text"
         },
         "end_date": {
           "name": "end_date",
@@ -7037,6 +7037,22 @@
           "comment": null,
           "enumItems": [],
           "mappedType": "string"
+        },
+        "show_in_default_calendar": {
+          "name": "show_in_default_calendar",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "true",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "boolean"
         },
         "title": {
           "name": "title",
@@ -7776,19 +7792,19 @@
       "columns": {
         "content": {
           "name": "content",
-          "type": "varchar(2048)",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "unique": false,
-          "length": 2048,
+          "length": null,
           "precision": null,
           "scale": null,
           "default": null,
           "comment": null,
           "enumItems": [],
-          "mappedType": "string"
+          "mappedType": "text"
         },
         "created_at": {
           "name": "created_at",
@@ -10681,19 +10697,19 @@
         },
         "note": {
           "name": "note",
-          "type": "varchar(2048)",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "unique": false,
-          "length": 2048,
+          "length": null,
           "precision": null,
           "scale": null,
           "default": null,
           "comment": null,
           "enumItems": [],
-          "mappedType": "string"
+          "mappedType": "text"
         },
         "person_handle": {
           "name": "person_handle",

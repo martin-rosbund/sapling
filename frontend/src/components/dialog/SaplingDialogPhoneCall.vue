@@ -1,5 +1,9 @@
 <template>
-  <v-dialog :model-value="isOpen" max-width="680px" @update:model-value="handleVisibilityChange">
+  <v-dialog
+    :model-value="isOpen"
+    :max-width="SAPLING_DIALOG_MAX_WIDTH.lg"
+    @update:model-value="handleVisibilityChange"
+  >
     <v-card class="glass-panel tilt-content sapling-dialog-compact-card" elevation="12">
       <div class="sapling-dialog-shell">
         <SaplingDialogHero
@@ -30,15 +34,11 @@
             hide-details="auto"
           />
 
-          <v-textarea
+          <SaplingMarkdownField
             v-model="note"
             class="mt-4"
-            auto-grow
-            rows="6"
-            :counter="2048"
-            :maxlength="2048"
             :label="translate('phoneCall.note')"
-            variant="outlined"
+            :rows="6"
           />
 
           <v-checkbox
@@ -89,6 +89,8 @@ import { useI18n } from 'vue-i18n'
 import SaplingActionBar from '@/components/actions/SaplingActionBar.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
+import SaplingMarkdownField from '@/components/dialog/fields/SaplingFieldMarkdown.vue'
+import { SAPLING_DIALOG_MAX_WIDTH } from '@/constants/dialog.constants'
 import { useSaplingPhoneDialog } from '@/composables/dialog/useSaplingPhoneDialog'
 import { useSaplingPhoneNumber } from '@/composables/phone/useSaplingPhoneNumber'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
