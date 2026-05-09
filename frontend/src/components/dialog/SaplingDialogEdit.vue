@@ -397,6 +397,8 @@ import type { EntityItem, SaplingGenericItem, ScriptButtonItem } from '@/entity/
 import { useSaplingDialogEdit } from '@/composables/dialog/useSaplingDialogEdit'
 import { getSaplingContextMenuTableItems, type SaplingContextMenuTableMenuItem } from '@/composables/context/useSaplingContextMenuTable'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
+import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog'
+import { buildMailMenuActions } from '@/utils/saplingMailMenuUtil'
 import SaplingDialogEditHero from '@/components/common/SaplingDialogEditHero.vue'
 import SaplingActionBar from '@/components/actions/SaplingActionBar.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
@@ -442,6 +444,7 @@ const { t, d, te, locale } = useI18n()
 const { pushMessage } = useSaplingMessageCenter()
 const currentPersonStore = useCurrentPersonStore()
 const timelineDialogStore = useTimelineDialogStore()
+const { openMailDialog } = useSaplingMailDialog()
 
 // #region Composable
 const {
@@ -575,12 +578,17 @@ const recordActionMenuItems = computed<SaplingContextMenuTableMenuItem[]>(() => 
     return []
   }
 
+  const mailToLabel = te('global.mailTo') ? t('global.mailTo') : 'E-Mail an'
+  const mailActions = buildMailMenuActions(props.templates, form.value)
+
   return getSaplingContextMenuTableItems({
     canShowInformation: canShowInformation.value,
     entityPermission: entityPermission.value,
     canNavigate: canNavigate.value,
     canTimeline: true,
     scriptButtons: loadedScriptButtons.value,
+    mailActions,
+    mailToLabel,
   }).filter((menuItem) => !['edit', 'show', 'delete'].includes(menuItem.type))
 })
 
@@ -826,6 +834,16 @@ async function handleRecordAction(menuItem: SaplingContextMenuTableMenuItem): Pr
       break
     case 'showInformation':
       openInformationDialog()
+      break
+    case 'mail':
+      if (menuItem.mailAction?.email && entityHandle.value) {
+        openMailDialog({
+          entityHandle: entityHandle.value,
+          itemHandle: itemHandle.value ?? undefined,
+          draftValues: form.value,
+          initialTo: [menuItem.mailAction.email],
+        })
+      }
       break
     case 'script':
       if (menuItem.scriptButton) {

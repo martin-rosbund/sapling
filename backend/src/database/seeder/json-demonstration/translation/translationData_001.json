@@ -136,6 +136,8 @@
   { "entity": "global", "property": "vectorization", "de": "Vektorisierung", "en": "Vectorization" },
   { "entity": "global", "property": "inbox", "de": "Posteingang", "en": "Inbox" },
   { "entity": "global", "property": "more", "de": "Mehr", "en": "More" },
+  { "entity": "global", "property": "mailTo", "de": "E-Mail an", "en": "Mail to" },
+  { "entity": "global", "property": "mailToSelected", "de": "E-Mail an alle Ausgewählten", "en": "Mail to all selected" },
 
   { "entity": "system", "property": "isReady", "de": "System ist bereit", "en": "System is ready" },
   { "entity": "system", "property": "isNotReady", "de": "System ist nicht bereit", "en": "System is not ready" },

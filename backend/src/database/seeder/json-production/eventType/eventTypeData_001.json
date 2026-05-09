@@ -34,5 +34,11 @@
     "title": "Telefonat",
     "icon": "mdi-phone",
     "color": "#3F51B5"
+  },
+  {
+    "handle": "mail",
+    "title": "E-Mail",
+    "icon": "mdi-email",
+    "color": "#00BCD4"
   }
 ]

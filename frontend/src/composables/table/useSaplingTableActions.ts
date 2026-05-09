@@ -25,6 +25,8 @@ import { useTimelineDialogStore } from '@/stores/timelineDialogStore'
 import { buildFavoritePath } from '@/utils/saplingFavoriteNavigation'
 import { buildTableFilter, buildTableOrderBy } from '@/utils/saplingTableUtil'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
+import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog'
+import { buildMailMenuActions } from '@/utils/saplingMailMenuUtil'
 import type { SaplingContextMenuTableActionPayload } from '@/composables/context/useSaplingContextMenuTable'
 import type { SaplingTableRowContextMenuOpenPayload } from '@/composables/table/useSaplingTableRow'
 
@@ -93,6 +95,7 @@ export function useSaplingTableActions({
   const currentPermissionStore = useCurrentPermissionStore()
   const timelineDialogStore = useTimelineDialogStore()
   const { pushMessage } = useSaplingMessageCenter()
+  const { openMailDialog } = useSaplingMailDialog()
 
   const loadedScriptButtons = ref<ScriptButtonItem[]>([])
   const editDialog = ref<EditDialogOptions>({ visible: false, mode: 'create', item: null })
@@ -131,6 +134,9 @@ export function useSaplingTableActions({
       currentPermissionStore.accumulatedPermission?.some(
         (permission) => permission.entityHandle === 'information' && permission.allowRead,
       ) ?? false,
+  )
+  const contextMenuMailActions = computed(() =>
+    buildMailMenuActions(props.entityTemplates, contextMenu.value.item),
   )
 
   watch(
@@ -359,7 +365,7 @@ export function useSaplingTableActions({
     window.open(url, '_blank')
   }
 
-  function onContextMenuAction({ type, item, scriptButton }: SaplingContextMenuTableActionPayload) {
+  function onContextMenuAction({ type, item, scriptButton, mailAction }: SaplingContextMenuTableActionPayload) {
     switch (type) {
       case 'edit':
         void openEditDialog(item)
@@ -387,6 +393,16 @@ export function useSaplingTableActions({
         break
       case 'showInformation':
         openInformationDialog(item)
+        break
+      case 'mail':
+        if (mailAction?.email) {
+          openMailDialog({
+            entityHandle: props.entityHandle,
+            itemHandle: item.handle as string | number | undefined,
+            draftValues: item,
+            initialTo: [mailAction.email],
+          })
+        }
         break
       case 'script':
         if (scriptButton) {
@@ -738,6 +754,7 @@ export function useSaplingTableActions({
     showInformationDialog,
     informationDialogItem,
     contextMenu,
+    contextMenuMailActions,
     favoriteDialog,
     currentEntityFavorites,
     isCurrentEntityFavoritesLoading,

@@ -26,6 +26,8 @@
           <SaplingTableMultiSelect
             :multiSelect="multiSelect"
             :selectedRows="selectedRows"
+            :selected-items="selectedItems"
+            :entity-templates="entityTemplates"
             :script-buttons="multiSelectScriptButtons"
             :showActions="showActions"
             :entity="entity"
@@ -35,6 +37,7 @@
             @exportSelected="exportSelectedJSON"
             @runScriptButton="runSelectionScriptButton"
             @selectAll="selectAllRows"
+            @mailToSelected="onMailToSelected"
           />
         </div>
 
@@ -188,6 +191,7 @@
       :delete-dialog="deleteDialog"
       :bulk-delete-dialog="bulkDeleteDialog"
       :context-menu="{ ...contextMenu, visible: showActions && contextMenu.visible }"
+      :context-menu-mail-actions="contextMenuMailActions"
       :show-upload-dialog="showUploadDialog"
       :upload-dialog-item="uploadDialogItem"
       :show-information-dialog="showInformationDialog"
@@ -227,6 +231,8 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SaplingSearch from '@/components/system/SaplingSearch.vue'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
+import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog'
+import type { SaplingBulkMailAction } from '@/utils/saplingMailMenuUtil'
 import SaplingTableDesktopView from './SaplingTableDesktopView.vue'
 import SaplingTableFavoriteDialog from './SaplingTableFavoriteDialog.vue'
 import SaplingTableMobileView from './SaplingTableMobileView.vue'
@@ -320,6 +326,8 @@ const {
   showInformationDialog,
   informationDialogItem,
   contextMenu,
+  contextMenuMailActions,
+  selectedItems,
   favoriteDialog,
   currentEntityFavorites,
   isCurrentEntityFavoritesLoading,
@@ -373,5 +381,18 @@ const {
   openDeleteDialog,
   closeDeleteDialog,
 } = useSaplingTableComponent(props, emit)
+
+const { openMailDialog } = useSaplingMailDialog()
+
+function onMailToSelected(action: SaplingBulkMailAction): void {
+  if (action.emails.length === 0) {
+    return
+  }
+
+  openMailDialog({
+    entityHandle: props.entityHandle,
+    initialTo: action.emails,
+  })
+}
 // #endregion
 </script>

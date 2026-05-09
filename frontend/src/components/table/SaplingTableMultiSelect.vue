@@ -40,6 +40,18 @@
             <v-icon start>mdi-delete</v-icon>
             <span>{{ $t('global.deleteSelected') }}</span>
           </v-list-item>
+          <template v-if="canMailSelection">
+            <v-list-item
+              v-for="mailAction in bulkMailActions"
+              :key="`mail-${mailAction.templateName}`"
+              @click="mailToSelected(mailAction)"
+            >
+              <v-icon start>mdi-email-fast-outline</v-icon>
+              <span>
+                {{ resolveMailToSelectedLabel() }}
+              </span>
+            </v-list-item>
+          </template>
           <template v-if="canRunScriptButtons">
             <v-list-item
               v-for="scriptButton in scriptButtons"
@@ -78,15 +90,22 @@ const {
   canSelectAll,
   canRunScriptButtons,
   canDeleteSelection,
+  canMailSelection,
+  bulkMailActions,
   scriptButtons,
   clearSelection,
   deleteAllSelected,
   exportSelected,
   runScriptButton,
   selectAll,
+  mailToSelected,
 } = useSaplingTableMultiSelect(props, emit)
 
 function resolveScriptButtonTitle(title: string) {
   return te(title) ? t(title) : title
+}
+
+function resolveMailToSelectedLabel() {
+  return te('global.mailToSelected') ? t('global.mailToSelected') : 'E-Mail an alle Ausgewählten'
 }
 </script>
