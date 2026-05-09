@@ -726,6 +726,39 @@ export class MailService {
           ? eventEm.getReference(PersonItem, creator.handle as never)
           : undefined;
 
+      let resolvedCreatorCompanyRef = creatorCompanyRef;
+      let resolvedCreatorPersonRef = creatorPersonRef;
+      let sourcePersonRef: PersonItem | null = null;
+
+      if (
+        delivery.entity?.handle === 'person' &&
+        delivery.referenceHandle != null &&
+        delivery.referenceHandle !== ''
+      ) {
+        const sourcePersonHandle = Number(delivery.referenceHandle);
+        if (Number.isFinite(sourcePersonHandle)) {
+          const sourcePerson = await eventEm.findOne(
+            PersonItem,
+            { handle: sourcePersonHandle },
+            { populate: ['company'] },
+          );
+
+          if (sourcePerson?.handle != null) {
+            resolvedCreatorPersonRef = eventEm.getReference(
+              PersonItem,
+              sourcePerson.handle as never,
+            );
+            if (sourcePerson.company?.handle != null) {
+              resolvedCreatorCompanyRef = eventEm.getReference(
+                CompanyItem,
+                sourcePerson.company.handle as never,
+              );
+            }
+            sourcePersonRef = resolvedCreatorPersonRef;
+          }
+        }
+      }
+
       const event = eventEm.create(EventItem, {
         title,
         description,
@@ -737,8 +770,8 @@ export class MailService {
         status: eventStatusRef,
         assigneeCompany: creatorCompanyRef,
         assigneePerson: creatorPersonRef,
-        creatorCompany: creatorCompanyRef,
-        creatorPerson: creatorPersonRef,
+        creatorCompany: resolvedCreatorCompanyRef,
+        creatorPerson: resolvedCreatorPersonRef,
       } as RequiredEntityData<EventItem>);
 
       if (creatorPersonRef) {
@@ -755,6 +788,10 @@ export class MailService {
             eventEm.getReference(PersonItem, person.handle as never),
           );
         }
+      }
+
+      if (sourcePersonRef) {
+        event.participants.add(sourcePersonRef);
       }
 
       eventEm.persist(event);

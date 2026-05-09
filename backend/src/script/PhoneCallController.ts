@@ -118,6 +118,47 @@ export class PhoneCallController extends ScriptClass {
         'completed' as never,
       );
 
+      let resolvedCreatorCompanyRef = creatorCompanyRef;
+      let resolvedCreatorPersonRef = creatorPersonRef;
+      let sourcePersonRef: PersonItem | null = null;
+
+      if (
+        phoneCall.entity?.handle === 'person' &&
+        phoneCall.reference != null &&
+        phoneCall.reference !== ''
+      ) {
+        const sourcePerson = await this.em.findOne(
+          PersonItem,
+          { handle: phoneCall.reference as never },
+          { populate: ['company'] },
+        );
+
+        if (sourcePerson?.handle != null) {
+          resolvedCreatorPersonRef = this.em.getReference(
+            PersonItem,
+            sourcePerson.handle as never,
+          );
+          if (sourcePerson.company?.handle != null) {
+            resolvedCreatorCompanyRef = this.em.getReference(
+              CompanyItem,
+              sourcePerson.company.handle as never,
+            );
+          }
+          if (String(sourcePerson.handle) !== String(assigneePersonHandle)) {
+            sourcePersonRef = resolvedCreatorPersonRef;
+          }
+          this.logDebug(
+            'afterInsert',
+            'Resolved source person as event customer',
+            {
+              phoneCallHandle: phoneCall.handle,
+              sourcePersonHandle: sourcePerson.handle,
+              sourceCompanyHandle: sourcePerson.company?.handle,
+            },
+          );
+        }
+      }
+
       const startDate = phoneCall.createdAt
         ? new Date(phoneCall.createdAt)
         : new Date();
@@ -137,11 +178,15 @@ export class PhoneCallController extends ScriptClass {
         status: eventStatusRef,
         assigneeCompany: assigneeCompanyRef,
         assigneePerson: assigneePersonRef,
-        creatorCompany: creatorCompanyRef,
-        creatorPerson: creatorPersonRef,
+        creatorCompany: resolvedCreatorCompanyRef,
+        creatorPerson: resolvedCreatorPersonRef,
       } as RequiredEntityData<EventItem>);
 
       event.participants.add(assigneePersonRef);
+
+      if (sourcePersonRef) {
+        event.participants.add(sourcePersonRef);
+      }
 
       this.em.persist(event);
       this.logInfo('afterInsert', 'Prepared follow-up event for phone call', {
@@ -186,7 +231,7 @@ export class PhoneCallController extends ScriptClass {
     if (
       !this.em ||
       phoneCall.handle == null ||
-      (phoneCall.person && phoneCall.person.company)
+      (phoneCall.person && phoneCall.person.company && phoneCall.entity)
     ) {
       this.logDebug(
         'loadPhoneCallWithRelations',
@@ -201,7 +246,7 @@ export class PhoneCallController extends ScriptClass {
     const loadedPhoneCall = await this.em.findOne(
       PhoneCallItem,
       { handle: phoneCall.handle },
-      { populate: ['person', 'person.company'] },
+      { populate: ['person', 'person.company', 'entity'] },
     );
 
     this.logDebug(
