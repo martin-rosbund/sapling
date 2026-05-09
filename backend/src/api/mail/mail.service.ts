@@ -1,5 +1,6 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import { EntityManager } from '@mikro-orm/core';
+import type { RequiredEntityData } from '@mikro-orm/core';
 import {
   BadRequestException,
   Injectable,
@@ -28,6 +29,12 @@ import { EmailDeliveryStatusItem } from '../../entity/EmailDeliveryStatusItem';
 import { EntityItem } from '../../entity/EntityItem';
 import { DocumentItem } from '../../entity/DocumentItem';
 import { PersonSessionItem } from '../../entity/PersonSessionItem';
+import { CompanyItem } from '../../entity/CompanyItem';
+import { EventItem } from '../../entity/EventItem';
+import { EventStatusItem } from '../../entity/EventStatusItem';
+import { EventTypeItem } from '../../entity/EventTypeItem';
+import { TicketItem } from '../../entity/TicketItem';
+import { SalesOpportunityItem } from '../../entity/SalesOpportunityItem';
 import {
   AZURE_AD_CLIENT_ID,
   AZURE_AD_CLIENT_SECRET,
@@ -56,6 +63,8 @@ type SendResult = {
 };
 
 type MailSenderOption = MailSenderOptionDto;
+
+const MAIL_EVENT_DURATION_MINUTES = 5;
 
 function isRecord(value: unknown): value is JsonRecord {
   return typeof value === 'object' && value !== null;
@@ -530,6 +539,7 @@ export class MailService {
       delivery.providerMessageId = result.providerMessageId;
       delivery.completedAt = new Date();
       await em.flush();
+      await this.createMailFollowUpEvent(em, delivery);
       return delivery;
     } catch (error) {
       const failed = await this.ensureStatus(em, 'failed');
@@ -652,6 +662,205 @@ export class MailService {
 
   private renderMarkdown(markdown: string): string {
     return renderMarkdownBlocks(markdown);
+  }
+
+  /**
+   * Creates a follow-up calendar event after a successful email dispatch,
+   * mirroring the behaviour of PhoneCallController for phone calls.
+   * Errors are logged but never propagated, so they cannot break the send pipeline.
+   */
+  private async createMailFollowUpEvent(
+    em: EntityManager,
+    delivery: EmailDeliveryItem,
+  ): Promise<void> {
+    try {
+      const eventEm = em.fork();
+      const creator = await eventEm.findOne(
+        PersonItem,
+        { handle: delivery.createdBy?.handle },
+        { populate: ['company'] },
+      );
+
+      if (!creator) {
+        this.logger.warn(
+          `mailService - createMailFollowUpEvent - missing creator for delivery ${delivery.handle}`,
+        );
+        return;
+      }
+
+      const eventTypeRef = eventEm.getReference(EventTypeItem, 'mail' as never);
+      const eventStatusRef = eventEm.getReference(
+        EventStatusItem,
+        'completed' as never,
+      );
+
+      const startDate = delivery.completedAt ?? new Date();
+      const endDate = new Date(startDate);
+      endDate.setMinutes(endDate.getMinutes() + MAIL_EVENT_DURATION_MINUTES);
+
+      const recipientList = (delivery.toRecipients ?? []).join(', ');
+      const baseTitle = recipientList
+        ? `E-Mail an ${recipientList}`
+        : 'E-Mail';
+      const title =
+        baseTitle.length > 128 ? `${baseTitle.slice(0, 125)}...` : baseTitle;
+
+      const description = (() => {
+        const subjectLine = delivery.subject
+          ? `Betreff: ${delivery.subject}\n\n`
+          : '';
+        const body = delivery.bodyMarkdown ?? '';
+        const combined = `${subjectLine}${body}`;
+        return combined.length > 1024
+          ? `${combined.slice(0, 1021)}...`
+          : combined;
+      })();
+
+      const creatorCompanyRef =
+        creator.company?.handle != null
+          ? eventEm.getReference(
+              CompanyItem,
+              creator.company.handle as never,
+            )
+          : undefined;
+      const creatorPersonRef =
+        creator.handle != null
+          ? eventEm.getReference(PersonItem, creator.handle as never)
+          : undefined;
+
+      let resolvedCreatorCompanyRef = creatorCompanyRef;
+      let resolvedCreatorPersonRef = creatorPersonRef;
+      let sourcePersonRef: PersonItem | null = null;
+      let ticketRef: TicketItem | undefined;
+      let salesOpportunityRef: SalesOpportunityItem | undefined;
+
+      const sourceEntityHandle = delivery.entity?.handle;
+      const sourceReferenceHandle = delivery.referenceHandle;
+
+      if (
+        sourceEntityHandle === 'ticket' &&
+        sourceReferenceHandle != null &&
+        sourceReferenceHandle !== ''
+      ) {
+        const ticketHandle = Number(sourceReferenceHandle);
+        if (Number.isFinite(ticketHandle)) {
+          ticketRef = eventEm.getReference(
+            TicketItem,
+            ticketHandle as never,
+          );
+        }
+      } else if (
+        sourceEntityHandle === 'salesOpportunity' &&
+        sourceReferenceHandle != null &&
+        sourceReferenceHandle !== ''
+      ) {
+        const salesOpportunityHandle = Number(sourceReferenceHandle);
+        if (Number.isFinite(salesOpportunityHandle)) {
+          salesOpportunityRef = eventEm.getReference(
+            SalesOpportunityItem,
+            salesOpportunityHandle as never,
+          );
+        }
+      }
+
+      if (
+        delivery.entity?.handle === 'person' &&
+        delivery.referenceHandle != null &&
+        delivery.referenceHandle !== ''
+      ) {
+        const sourcePersonHandle = Number(delivery.referenceHandle);
+        if (Number.isFinite(sourcePersonHandle)) {
+          const sourcePerson = await eventEm.findOne(
+            PersonItem,
+            { handle: sourcePersonHandle },
+            { populate: ['company'] },
+          );
+
+          if (sourcePerson?.handle != null) {
+            resolvedCreatorPersonRef = eventEm.getReference(
+              PersonItem,
+              sourcePerson.handle as never,
+            );
+            if (sourcePerson.company?.handle != null) {
+              resolvedCreatorCompanyRef = eventEm.getReference(
+                CompanyItem,
+                sourcePerson.company.handle as never,
+              );
+            }
+            sourcePersonRef = resolvedCreatorPersonRef;
+          }
+        }
+      }
+
+      const event = eventEm.create(EventItem, {
+        title,
+        description,
+        startDate,
+        endDate,
+        isAllDay: false,
+        onlineMeetingURL: '',
+        type: eventTypeRef,
+        status: eventStatusRef,
+        assigneeCompany: creatorCompanyRef,
+        assigneePerson: creatorPersonRef,
+        creatorCompany: resolvedCreatorCompanyRef,
+        creatorPerson: resolvedCreatorPersonRef,
+        ticket: ticketRef,
+        salesOpportunity: salesOpportunityRef,
+      } as RequiredEntityData<EventItem>);
+
+      if (creatorPersonRef) {
+        event.participants.add(creatorPersonRef);
+      }
+
+      const recipientPersons = await this.findPersonsByEmails(
+        eventEm,
+        delivery.toRecipients ?? [],
+      );
+      for (const person of recipientPersons) {
+        if (person.handle != null) {
+          event.participants.add(
+            eventEm.getReference(PersonItem, person.handle as never),
+          );
+        }
+      }
+
+      if (sourcePersonRef) {
+        event.participants.add(sourcePersonRef);
+      }
+
+      eventEm.persist(event);
+      await eventEm.flush();
+    } catch (error) {
+      this.logger.error(
+        `mailService - createMailFollowUpEvent - failed for delivery ${delivery.handle}: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
+      );
+    }
+  }
+
+  /**
+   * Resolves PersonItems whose `email` matches one of the provided addresses.
+   * Used to attach mail recipients as participants on the follow-up event.
+   */
+  private async findPersonsByEmails(
+    em: EntityManager,
+    emails: string[],
+  ): Promise<PersonItem[]> {
+    const normalized = Array.from(
+      new Set(
+        emails
+          .map((email) => normalizeEmailAddress(email))
+          .filter((value): value is string => Boolean(value)),
+      ),
+    );
+
+    if (normalized.length === 0) {
+      return [];
+    }
+
+    return await em.find(PersonItem, { email: { $in: normalized } });
   }
 
   private async ensureStatus(

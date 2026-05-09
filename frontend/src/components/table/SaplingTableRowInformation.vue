@@ -1,10 +1,10 @@
 <template>
-  <v-dialog :model-value="show" max-width="680px" @update:model-value="onDialogModelValueUpdate">
-    <v-card
-      class="glass-panel tilt-content sapling-dialog-compact-card"
-      v-tilt="TILT_DEFAULT_OPTIONS"
-      elevation="12"
-    >
+  <v-dialog
+    :model-value="show"
+    :max-width="SAPLING_DIALOG_MAX_WIDTH.lg"
+    @update:model-value="onDialogModelValueUpdate"
+  >
+    <SaplingDialogCard class="sapling-dialog-compact-card">
       <div class="sapling-dialog-shell">
         <template v-if="isLoading">
           <SaplingDialogHero loading :loading-stats-count="2" />
@@ -26,16 +26,11 @@
               {{ errorMessage }}
             </v-alert>
 
-            <v-textarea
+            <SaplingMarkdownField
               v-model="content"
-              auto-grow
-              rows="10"
-              :counter="2048"
-              :maxlength="2048"
               :label="$t('information.content')"
-              :placeholder="$t('information.empty')"
+              :rows="10"
               :disabled="!canEdit"
-              variant="outlined"
             />
 
             <div class="sapling-table-row-information__hint">
@@ -45,17 +40,7 @@
         </template>
 
         <template v-if="isLoading">
-          <div class="sapling-dialog__footer">
-            <v-card-actions class="sapling-dialog__actions">
-              <v-btn text prepend-icon="mdi-close" @click="$emit('close')">
-                <template v-if="$vuetify.display.mdAndUp"></template>
-              </v-btn>
-              <v-spacer />
-              <v-btn color="primary" append-icon="mdi-content-save" disabled>
-                <template v-if="$vuetify.display.mdAndUp"></template>
-              </v-btn>
-            </v-card-actions>
-          </div>
+          <SaplingActionBarSkeleton />
         </template>
         <template v-else-if="canEdit">
           <SaplingActionSave :cancel="() => $emit('close')" :save="save" />
@@ -64,17 +49,20 @@
           <SaplingActionClose :close="() => $emit('close')" />
         </template>
       </div>
-    </v-card>
+    </SaplingDialogCard>
   </v-dialog>
 </template>
 
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
 import SaplingActionClose from '@/components/actions/SaplingActionClose.vue'
 import SaplingActionSave from '@/components/actions/SaplingActionSave.vue'
+import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
+import SaplingMarkdownField from '@/components/dialog/fields/SaplingFieldMarkdown.vue'
+import { SAPLING_DIALOG_MAX_WIDTH } from '@/constants/dialog.constants'
 import {
   useSaplingTableRowInformation,
   type UseSaplingTableRowInformationEmit,

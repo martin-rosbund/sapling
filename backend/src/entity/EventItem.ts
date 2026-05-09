@@ -76,17 +76,18 @@ export class EventItem {
   title!: string;
 
   /**
-   * Description of the event (optional).
+   * Description of the event (optional, markdown).
    * @type {string}
    */
   @ApiProperty()
+  @Sapling(['isMarkdown'])
   @SaplingForm({
     order: 100,
     group: 'event.groupContent',
     groupOrder: 200,
     width: 4,
   })
-  @Property({ nullable: true, length: 1024 })
+  @Property({ nullable: true, type: 'text' })
   description?: string;
 
   /**

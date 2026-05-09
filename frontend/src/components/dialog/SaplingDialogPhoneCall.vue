@@ -1,6 +1,10 @@
 <template>
-  <v-dialog :model-value="isOpen" max-width="680px" @update:model-value="handleVisibilityChange">
-    <v-card class="glass-panel tilt-content sapling-dialog-compact-card" elevation="12">
+  <v-dialog
+    :model-value="isOpen"
+    :max-width="SAPLING_DIALOG_MAX_WIDTH.lg"
+    @update:model-value="handleVisibilityChange"
+  >
+    <SaplingDialogCard class="sapling-dialog-compact-card">
       <div class="sapling-dialog-shell">
         <SaplingDialogHero
           :loading="isTranslationLoading"
@@ -30,15 +34,11 @@
             hide-details="auto"
           />
 
-          <v-textarea
+          <SaplingMarkdownField
             v-model="note"
             class="mt-4"
-            auto-grow
-            rows="6"
-            :counter="2048"
-            :maxlength="2048"
             :label="translate('phoneCall.note')"
-            variant="outlined"
+            :rows="6"
           />
 
           <v-checkbox
@@ -77,13 +77,9 @@
             </v-btn>
           </template>
         </SaplingActionBar>
-        <v-card-actions v-else class="sapling-dialog__actions justify-end">
-          <v-skeleton-loader type="button" width="112" />
-          <v-skeleton-loader type="button" width="112" />
-          <v-skeleton-loader type="button" width="112" />
-        </v-card-actions>
+        <SaplingActionBarSkeleton v-else :leading="1" :trailing="2" />
       </div>
-    </v-card>
+    </SaplingDialogCard>
   </v-dialog>
 </template>
 
@@ -91,7 +87,11 @@
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SaplingActionBar from '@/components/actions/SaplingActionBar.vue'
+import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
+import SaplingMarkdownField from '@/components/dialog/fields/SaplingFieldMarkdown.vue'
+import { SAPLING_DIALOG_MAX_WIDTH } from '@/constants/dialog.constants'
 import { useSaplingPhoneDialog } from '@/composables/dialog/useSaplingPhoneDialog'
 import { useSaplingPhoneNumber } from '@/composables/phone/useSaplingPhoneNumber'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'

@@ -6,6 +6,7 @@ export type SaplingContextMenuTableAction =
   | 'copy'
   | 'delete'
   | 'edit'
+  | 'mail'
   | 'navigate'
   | 'script'
   | 'show'
@@ -14,11 +15,18 @@ export type SaplingContextMenuTableAction =
   | 'timeline'
   | 'uploadDocument'
 
+export interface SaplingMailMenuAction {
+  templateName: string
+  email: string
+  fieldLabel?: string
+}
+
 export interface SaplingContextMenuTableProps {
   canShowInformation: boolean
   entityPermission: AccumulatedPermission | null
   canNavigate: boolean
   scriptButtons?: ScriptButtonItem[]
+  mailActions?: SaplingMailMenuAction[]
   item: SaplingGenericItem | null
   show: boolean
   x: number
@@ -29,6 +37,7 @@ export interface SaplingContextMenuTableActionPayload {
   type: SaplingContextMenuTableAction
   item: SaplingGenericItem
   scriptButton?: ScriptButtonItem
+  mailAction?: SaplingMailMenuAction
 }
 
 export interface SaplingContextMenuTableMenuItem {
@@ -37,6 +46,7 @@ export interface SaplingContextMenuTableMenuItem {
   titleKey?: string
   title?: string
   scriptButton?: ScriptButtonItem
+  mailAction?: SaplingMailMenuAction
 }
 
 export interface SaplingContextMenuTableMenuOptions {
@@ -45,6 +55,8 @@ export interface SaplingContextMenuTableMenuOptions {
   canNavigate: boolean
   canTimeline: boolean
   scriptButtons?: ScriptButtonItem[]
+  mailActions?: SaplingMailMenuAction[]
+  mailToLabel?: string
 }
 
 export interface SaplingContextMenuTableEmit {
@@ -57,7 +69,11 @@ export interface UseSaplingContextMenuTableResult {
   menuStyle: ComputedRef<CSSProperties>
   menuItems: ComputedRef<SaplingContextMenuTableMenuItem[]>
   closeMenu: () => void
-  emitAction: (type: SaplingContextMenuTableAction, scriptButton?: ScriptButtonItem) => void
+  emitAction: (
+    type: SaplingContextMenuTableAction,
+    scriptButton?: ScriptButtonItem,
+    mailAction?: SaplingMailMenuAction,
+  ) => void
 }
 
 export function getSaplingContextMenuTableItems(
@@ -117,6 +133,16 @@ export function getSaplingContextMenuTableItems(
     })
   }
 
+  const mailToLabel = options.mailToLabel ?? 'E-Mail an'
+  for (const mailAction of options.mailActions ?? []) {
+    items.push({
+      type: 'mail',
+      icon: 'mdi-email-fast-outline',
+      title: `${mailToLabel} ${mailAction.email}`,
+      mailAction,
+    })
+  }
+
   return items
 }
 
@@ -145,6 +171,7 @@ export function useSaplingContextMenuTable(
       canNavigate: props.canNavigate,
       canTimeline: props.item?.handle != null,
       scriptButtons: props.scriptButtons,
+      mailActions: props.mailActions,
     }),
   )
   //#endregion
@@ -194,13 +221,17 @@ export function useSaplingContextMenuTable(
   /**
    * Emits the selected table menu action and closes the menu immediately.
    */
-  function emitAction(type: SaplingContextMenuTableAction, scriptButton?: ScriptButtonItem) {
+  function emitAction(
+    type: SaplingContextMenuTableAction,
+    scriptButton?: ScriptButtonItem,
+    mailAction?: SaplingMailMenuAction,
+  ) {
     if (!props.item) {
       closeMenu()
       return
     }
 
-    emit('action', { type, item: props.item, scriptButton })
+    emit('action', { type, item: props.item, scriptButton, mailAction })
     closeMenu()
   }
   //#endregion

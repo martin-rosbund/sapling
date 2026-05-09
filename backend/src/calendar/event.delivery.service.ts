@@ -39,7 +39,26 @@ export class EventDeliveryService {
   async queueEventDelivery(
     event: EventItem,
     payload: Record<string, unknown>,
-  ): Promise<EventDeliveryItem> {
+  ): Promise<EventDeliveryItem | null> {
+    // Events whose type is excluded from the default calendar (e.g. internal
+    // mail/phone-call follow-ups) must not be propagated to external
+    // calendars such as Outlook or Google.
+    const eventType =
+      event.type ??
+      (event.handle != null
+        ? (
+            await this.em.findOne(
+              EventItem,
+              { handle: event.handle },
+              { populate: ['type'] },
+            )
+          )?.type
+        : undefined);
+
+    if (eventType && eventType.showInDefaultCalendar === false) {
+      return null;
+    }
+
     const pending = await this.em.findOne(EventDeliveryStatusItem, {
       handle: 'pending',
     });

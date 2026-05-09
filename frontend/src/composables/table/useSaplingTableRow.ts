@@ -8,6 +8,9 @@ import type {
   SaplingTableHeaderItem,
 } from '@/entity/structure'
 import { getEntityValueLabel } from '@/utils/saplingTableUtil'
+import { buildMailMenuActions } from '@/utils/saplingMailMenuUtil'
+import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog'
+import { useI18n } from 'vue-i18n'
 import {
   getSaplingContextMenuTableItems,
   type SaplingContextMenuTableMenuItem,
@@ -76,6 +79,8 @@ const INTERACTIVE_ROW_SELECTOR = [
 export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSaplingTableRowEmit) {
   // #region State
   const genericStore = useGenericStore()
+  const { t, te } = useI18n()
+  const { openMailDialog } = useSaplingMailDialog()
   const menuActive = ref(false)
   const showDialogMap = ref<Record<string, boolean>>({})
 
@@ -83,6 +88,8 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     props.columns.some((column) => column.key === '__actions'),
   )
   const scriptButtons = computed(() => props.scriptButtons ?? [])
+  const mailActions = computed(() => buildMailMenuActions(props.entityTemplates, props.item))
+  const mailToLabel = computed(() => (te('global.mailTo') ? t('global.mailTo') : 'E-Mail an'))
   const rowMenuItems = computed<SaplingContextMenuTableMenuItem[]>(() =>
     getSaplingContextMenuTableItems({
       canShowInformation: props.canShowInformation,
@@ -90,6 +97,8 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
       canNavigate: props.canNavigate,
       canTimeline: props.item?.handle != null,
       scriptButtons: scriptButtons.value,
+      mailActions: mailActions.value,
+      mailToLabel: mailToLabel.value,
     }),
   )
   const compactPanelTitles = computed<Record<string, string>>(() => {
@@ -252,6 +261,20 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     closeMenu()
     emit('show-information', item)
   }
+
+  function requestMail(item: SaplingGenericItem, email: string) {
+    closeMenu()
+    if (!email) {
+      return
+    }
+
+    openMailDialog({
+      entityHandle: props.entityHandle,
+      itemHandle: item.handle as string | number | undefined,
+      draftValues: item,
+      initialTo: [email],
+    })
+  }
   // #endregion
 
   // #region Cell Helpers
@@ -325,6 +348,7 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     requestUploadDocument,
     requestShowDocuments,
     requestShowInformation,
+    requestMail,
     getReferenceTemplates,
     getReferenceEntity,
     isReferenceColumn,

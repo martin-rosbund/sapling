@@ -1,11 +1,10 @@
 <!-- Dialog for changing the user password -->
 <template>
-  <v-dialog :model-value="props.modelValue" max-width="600" persistent>
-    <v-card
-      v-tilt="TILT_DEFAULT_OPTIONS"
-      class="glass-panel tilt-content sapling-change-password-dialog"
-      max-width="600"
-      elevation="10"
+  <v-dialog :model-value="props.modelValue" :max-width="SAPLING_DIALOG_MAX_WIDTH.sm" persistent>
+    <SaplingDialogCard
+      class="sapling-change-password-dialog"
+      :max-width="SAPLING_DIALOG_MAX_WIDTH.sm"
+      :elevation="10"
     >
       <SaplingDialogShell body-class="sapling-change-password-dialog__body">
         <template #hero>
@@ -41,23 +40,7 @@
         </template>
 
         <template #actions>
-          <div v-if="isLoading" class="sapling-dialog__footer">
-            <v-card-actions class="sapling-dialog__actions d-flex justify-center">
-              <v-btn
-                v-if="props.allowCancel"
-                color="default"
-                prepend-icon="mdi-close"
-                @click="closeDialog"
-                class="ma-2"
-              >
-                <template v-if="$vuetify.display.mdAndUp"></template>
-              </v-btn>
-              <v-spacer />
-              <v-btn color="primary" append-icon="mdi-lock-reset" disabled class="ma-2">
-                <template v-if="$vuetify.display.mdAndUp"></template>
-              </v-btn>
-            </v-card-actions>
-          </div>
+          <SaplingActionBarSkeleton v-if="isLoading" />
 
           <SaplingActionChangePassword
             v-else
@@ -67,15 +50,17 @@
           />
         </template>
       </SaplingDialogShell>
-    </v-card>
+    </SaplingDialogCard>
   </v-dialog>
 </template>
 
 <script setup lang="ts">
 // #region Imports
 import { useSaplingChangePassword } from '@/composables/account/useSaplingChangePassword'
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
+import { SAPLING_DIALOG_MAX_WIDTH } from '@/constants/dialog.constants'
 import SaplingActionChangePassword from '../actions/SaplingActionChangePassword.vue'
+import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue'
 // #endregion

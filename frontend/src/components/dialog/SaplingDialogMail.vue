@@ -1,14 +1,12 @@
 <template>
   <v-dialog
     :model-value="isOpen"
-    min-width="95vw"
-    min-height="95vh"
-    max-width="95vw"
-    max-height="95vh"
+    :max-width="SAPLING_DIALOG_MAX_WIDTH.xxl"
+    :height="SAPLING_DIALOG_HEIGHT.xl"
     persistent
     @update:model-value="handleVisibilityChange"
   >
-    <v-card class="glass-panel sapling-mail-dialog" elevation="12">
+    <SaplingDialogCard class="sapling-mail-dialog">
       <div class="sapling-mail-dialog__shell">
         <v-card-title class="sapling-mail-dialog__header">
           <SaplingDialogHero
@@ -85,11 +83,7 @@
           </div>
         </v-card-text>
 
-        <v-card-actions v-if="isTranslationLoading" class="sapling-dialog__actions justify-end">
-          <v-skeleton-loader type="button" width="112" />
-          <v-skeleton-loader type="button" width="140" />
-          <v-skeleton-loader type="button" width="112" />
-        </v-card-actions>
+        <SaplingActionBarSkeleton v-if="isTranslationLoading" :leading="1" :trailing="2" />
         <SaplingActionMail
           v-else
           :close="closeMailDialog"
@@ -99,13 +93,16 @@
           :is-sending="isSending"
         />
       </div>
-    </v-card>
+    </SaplingDialogCard>
   </v-dialog>
 </template>
 
 <script lang="ts" setup>
 import SaplingActionMail from '@/components/actions/SaplingActionMail.vue'
+import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
+import { SAPLING_DIALOG_MAX_WIDTH, SAPLING_DIALOG_HEIGHT } from '@/constants/dialog.constants'
 import SaplingDialogMailComposer from '@/components/dialog/mail/SaplingDialogMailComposer.vue'
 import SaplingDialogMailPreview from '@/components/dialog/mail/SaplingDialogMailPreview.vue'
 import { useSaplingDialogMailEditor } from '@/composables/dialog/useSaplingDialogMailEditor'

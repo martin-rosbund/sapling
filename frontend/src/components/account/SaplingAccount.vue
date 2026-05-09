@@ -1,11 +1,7 @@
 <template>
   <!-- Dialog container for the account -->
   <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-medium">
-    <v-card
-      class="glass-panel tilt-content sapling-account-dialog"
-      v-tilt="TILT_DEFAULT_OPTIONS"
-      elevation="12"
-    >
+    <SaplingDialogCard class="sapling-account-dialog">
       <SaplingDialogShell
         fill-shell
         body-class="sapling-account-dialog__body"
@@ -119,21 +115,11 @@
         </template>
 
         <template #actions>
-          <div v-if="isLoading || !currentPersonStore.loaded" class="sapling-dialog__footer">
-            <v-card-actions class="sapling-dialog__actions">
-              <v-btn text prepend-icon="mdi-close" class="mb-2 mb-sm-0" @click="handleClose">
-                <template v-if="$vuetify.display.mdAndUp"></template>
-              </v-btn>
-              <v-spacer />
-              <v-btn color="primary" append-icon="mdi-lock-reset" class="ma-2" disabled>
-                <template v-if="$vuetify.display.mdAndUp"></template>
-              </v-btn>
-              <v-spacer />
-              <v-btn color="error" append-icon="mdi-logout" class="ma-2" disabled>
-                <template v-if="$vuetify.display.mdAndUp"></template>
-              </v-btn>
-            </v-card-actions>
-          </div>
+          <SaplingActionBarSkeleton
+            v-if="isLoading || !currentPersonStore.loaded"
+            :leading="1"
+            :trailing="2"
+          />
 
           <SaplingActionAccount
             v-else
@@ -143,7 +129,7 @@
           />
         </template>
       </SaplingDialogShell>
-    </v-card>
+    </SaplingDialogCard>
     <!-- Password change dialog -->
     <SaplingChangePassword v-model="showPasswordChange" />
   </v-dialog>
@@ -154,8 +140,9 @@
 import { computed } from 'vue'
 import { useSaplingAccount } from '@/composables/account/useSaplingAccount'
 import SaplingChangePassword from '@/components/account/SaplingChangePassword.vue'
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
 import SaplingActionAccount from '@/components/actions/SaplingActionAccount.vue'
+import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue'
 // #endregion

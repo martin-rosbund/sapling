@@ -3,13 +3,11 @@
     :model-value="modelValue"
     class="sapling-dialog-edit-dialog"
     @update:model-value="handleDialogUpdate"
-    min-width="95vw"
-    min-height="95vh"
-    max-width="95vw"
-    max-height="95vh"
+    :max-width="SAPLING_DIALOG_MAX_WIDTH['3xl']"
+    :height="SAPLING_DIALOG_HEIGHT.xl"
     persistent
   >
-    <v-card class="glass-panel sapling-dialog-edit-card" elevation="12">
+    <SaplingDialogCard class="sapling-dialog-edit-card">
       <div class="sapling-dialog-edit-shell">
         <v-card-title class="sapling-dialog-edit-header">
           <SaplingDialogEditHero :loading="isLoading" :eyebrow="entityLabel" :title="dialogTitle">
@@ -225,39 +223,160 @@
             </v-window>
           </template>
         </v-card-text>
-        <div v-if="isLoading" class="sapling-dialog__footer">
-          <v-card-actions class="sapling-dialog__actions">
-            <v-btn text prepend-icon="mdi-close" @click="cancel">
-              <template v-if="$vuetify.display.mdAndUp"></template>
+        <SaplingActionBarSkeleton v-if="isLoading" />
+        <SaplingActionBar v-else-if="mode === 'readonly'">
+          <template #leading>
+            <v-btn variant="text" prepend-icon="mdi-close" @click="cancel">
+              <template v-if="$vuetify.display.mdAndUp">{{ $t('global.close') }}</template>
             </v-btn>
-            <v-spacer />
+          </template>
+
+          <template #trailing>
+            <v-menu v-if="recordActionMenuItems.length > 0">
+              <template #activator="{ props: menuProps }">
+                <v-btn
+                  variant="text"
+                  prepend-icon="mdi-dots-horizontal-circle-outline"
+                  v-bind="menuProps"
+                  :disabled="recordActionButtonsDisabled"
+                >
+                  <template v-if="$vuetify.display.mdAndUp">{{ $t('global.more') }}</template>
+                </v-btn>
+              </template>
+
+              <v-list density="comfortable" min-width="260">
+                <v-list-item
+                  v-for="menuItem in recordActionMenuItems"
+                  :key="`${menuItem.type}-${menuItem.title ?? menuItem.titleKey ?? menuItem.scriptButton?.name ?? ''}`"
+                  :prepend-icon="menuItem.icon"
+                  :title="getRecordActionTitle(menuItem)"
+                  @click="handleRecordAction(menuItem)"
+                />
+              </v-list>
+            </v-menu>
+
             <v-btn
-              v-if="mode !== 'readonly'"
+              v-if="canDeleteRecord"
+              variant="text"
+              color="error"
+              prepend-icon="mdi-delete-outline"
+              :disabled="recordActionButtonsDisabled"
+              @click="openRecordDeleteDialog"
+            >
+              <template v-if="$vuetify.display.mdAndUp">{{ $t('global.delete') }}</template>
+            </v-btn>
+          </template>
+        </SaplingActionBar>
+        <SaplingActionBar v-else>
+          <template #leading>
+            <v-btn variant="text" prepend-icon="mdi-close" :disabled="isSaving" @click="cancel">
+              <template v-if="$vuetify.display.mdAndUp">{{ $t('global.cancel') }}</template>
+            </v-btn>
+          </template>
+
+          <template #trailing>
+            <v-menu v-if="recordActionMenuItems.length > 0">
+              <template #activator="{ props: menuProps }">
+                <v-btn
+                  variant="text"
+                  prepend-icon="mdi-dots-horizontal-circle-outline"
+                  v-bind="menuProps"
+                  :disabled="recordActionButtonsDisabled"
+                >
+                  <template v-if="$vuetify.display.mdAndUp">{{ $t('global.more') }}</template>
+                </v-btn>
+              </template>
+
+              <v-list density="comfortable" min-width="260">
+                <v-list-item
+                  v-for="menuItem in recordActionMenuItems"
+                  :key="`${menuItem.type}-${menuItem.title ?? menuItem.titleKey ?? menuItem.scriptButton?.name ?? ''}`"
+                  :prepend-icon="menuItem.icon"
+                  :title="getRecordActionTitle(menuItem)"
+                  @click="handleRecordAction(menuItem)"
+                />
+              </v-list>
+            </v-menu>
+
+            <v-btn
+              v-if="canDeleteRecord"
+              variant="text"
+              color="error"
+              prepend-icon="mdi-delete-outline"
+              :disabled="recordActionButtonsDisabled"
+              @click="openRecordDeleteDialog"
+            >
+              <template v-if="$vuetify.display.mdAndUp">{{ $t('global.delete') }}</template>
+            </v-btn>
+
+            <v-btn
+              variant="text"
+              prepend-icon="mdi-restore"
+              :disabled="!isDirty || isSaving"
+              @click="resetForm"
+            >
+              <template v-if="$vuetify.display.mdAndUp">{{ resetButtonLabel }}</template>
+            </v-btn>
+            <v-btn
               color="primary"
               append-icon="mdi-content-save"
-              disabled
+              :disabled="!isDirty || isSaving"
+              :loading="pendingSaveAction === 'save'"
+              @click="save"
             >
-              <template v-if="$vuetify.display.mdAndUp"></template>
+              <template v-if="$vuetify.display.mdAndUp">{{ $t('global.save') }}</template>
             </v-btn>
-          </v-card-actions>
-        </div>
-        <SaplingActionClose v-else-if="mode == 'readonly'" :close="cancel" />
-        <SaplingActionSave
-          v-else
-          :cancel="cancel"
-          :reset="resetForm"
-          :reset-disabled="!isDirty || isSaving"
-          :reset-label="resetButtonLabel"
-          :save="save"
-          :save-and-close="saveAndClose"
-          :save-disabled="!isDirty || isSaving"
-          :save-loading="pendingSaveAction === 'save'"
-          :save-and-close-loading="pendingSaveAction === 'saveAndClose'"
-          :busy="isSaving"
-        />
+            <v-btn
+              color="primary"
+              variant="tonal"
+              append-icon="mdi-content-save-check"
+              :disabled="!isDirty || isSaving"
+              :loading="pendingSaveAction === 'saveAndClose'"
+              @click="saveAndClose"
+            >
+              <template v-if="$vuetify.display.mdAndUp">{{ $t('global.saveAndClose') }}</template>
+            </v-btn>
+          </template>
+        </SaplingActionBar>
       </div>
-    </v-card>
+    </SaplingDialogCard>
   </v-dialog>
+
+  <SaplingDialogDelete
+    persistent
+    :model-value="recordDeleteDialog"
+    :item="item"
+    @update:model-value="recordDeleteDialog = $event"
+    @confirm="confirmRecordDelete"
+    @cancel="closeRecordDeleteDialog"
+  />
+
+  <SaplingTableRowUpload
+    v-if="showUploadDialog"
+    :show="showUploadDialog"
+    :item="item"
+    :entityHandle="entityHandle"
+    @close="closeUploadDialog"
+    @uploaded="closeUploadDialog"
+  />
+
+  <SaplingTableRowInformation
+    v-if="showInformationDialog"
+    :show="showInformationDialog"
+    :item="item"
+    :entityHandle="entityHandle"
+    @close="closeInformationDialog"
+    @saved="closeInformationDialog"
+  />
+
+  <SaplingDialogUnsavedChanges
+    :model-value="unsavedChangesDialog"
+    :is-saving="isSaving"
+    :is-saving-and-closing="pendingSaveAction === 'saveAndClose'"
+    @keep-editing="keepEditing"
+    @discard="discardChanges"
+    @save-and-close="saveChangesAndClose"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -265,19 +384,35 @@
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type {
+  AccumulatedPermission,
   DialogSaveAction,
   DialogSaveContext,
   DialogState,
   EntityTemplate,
 } from '@/entity/structure'
-import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants'
-import type { EntityItem, SaplingGenericItem } from '@/entity/entity'
-import SaplingActionClose from '../actions/SaplingActionClose.vue'
+import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_SMALL, NAVIGATION_URL } from '@/constants/project.constants'
+import { SAPLING_DIALOG_MAX_WIDTH, SAPLING_DIALOG_HEIGHT } from '@/constants/dialog.constants'
+import type { EntityItem, SaplingGenericItem, ScriptButtonItem } from '@/entity/entity'
 import { useSaplingDialogEdit } from '@/composables/dialog/useSaplingDialogEdit'
-import SaplingActionSave from '../actions/SaplingActionSave.vue'
+import { getSaplingContextMenuTableItems, type SaplingContextMenuTableMenuItem } from '@/composables/context/useSaplingContextMenuTable'
+import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
+import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog'
+import { buildMailMenuActions } from '@/utils/saplingMailMenuUtil'
 import SaplingDialogEditHero from '@/components/common/SaplingDialogEditHero.vue'
+import SaplingActionBar from '@/components/actions/SaplingActionBar.vue'
+import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
+import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
+import SaplingDialogUnsavedChanges from '@/components/dialog/SaplingDialogUnsavedChanges.vue'
 import SaplingDialogEditFieldRenderer from './SaplingDialogEditFieldRenderer.vue'
 import SaplingDialogEditRelationTab from './SaplingDialogEditRelationTab.vue'
+import SaplingTableRowInformation from '@/components/table/SaplingTableRowInformation.vue'
+import SaplingTableRowUpload from '@/components/table/SaplingTableRowUpload.vue'
+import ApiGenericService from '@/services/api.generic.service'
+import ApiScriptService from '@/services/api.script.service'
+import { useCurrentPersonStore } from '@/stores/currentPersonStore'
+import { useTimelineDialogStore } from '@/stores/timelineDialogStore'
+import { buildTableOrderBy } from '@/utils/saplingTableUtil'
 // #endregion
 
 // #region Props & Emits
@@ -301,10 +436,15 @@ const emit = defineEmits<{
   (event: 'cancel'): void
   (event: 'update:mode', value: DialogState): void
   (event: 'update:item', value: SaplingGenericItem | null): void
+  (event: 'deleted', value: SaplingGenericItem | null): void
 }>()
 // #endregion
 
 const { t, d, te, locale } = useI18n()
+const { pushMessage } = useSaplingMessageCenter()
+const currentPersonStore = useCurrentPersonStore()
+const timelineDialogStore = useTimelineDialogStore()
+const { openMailDialog } = useSaplingMailDialog()
 
 // #region Composable
 const {
@@ -330,6 +470,7 @@ const {
   selectedItems,
   isDirty,
   isSaving,
+  unsavedChangesDialog,
   pendingSaveAction,
   dirtyFieldCount,
   getRules,
@@ -342,6 +483,9 @@ const {
   handleDialogUpdate,
   onDuplicateSelect,
   cancel,
+  keepEditing,
+  discardChanges,
+  saveChangesAndClose,
   resetForm,
   save,
   saveAndClose,
@@ -378,6 +522,75 @@ const dialogTitle = computed(() => {
 const itemHandleLabel = computed(() =>
   props.item?.handle == null ? '' : String(props.item.handle),
 )
+
+const entityHandle = computed(() => props.entity?.handle ?? '')
+
+const entityPermission = computed<AccumulatedPermission | null>(() => {
+  if (!props.entity?.handle) {
+    return null
+  }
+
+  return {
+    entityHandle: props.entity.handle,
+    allowRead: props.entity.canRead === true,
+    allowInsert: props.entity.canInsert === true,
+    allowUpdate: props.entity.canUpdate === true,
+    allowDelete: props.entity.canDelete === true,
+    allowShow: props.entity.canShow === true,
+  }
+})
+
+const itemHandle = computed<string | number | null>(() => {
+  const handle = props.item?.handle
+  return typeof handle === 'string' || typeof handle === 'number' ? handle : null
+})
+
+const hasPersistedItem = computed(() => itemHandle.value != null)
+
+const canNavigate = computed(() =>
+  props.templates.some((template) => template.options?.includes('isNavigation')),
+)
+
+const canShowInformation = computed(
+  () =>
+    permissions.value?.some(
+      (permission) => permission.entityHandle === 'information' && permission.allowRead,
+    ) ?? false,
+)
+
+const canDeleteRecord = computed(
+  () => hasPersistedItem.value && Boolean(entityPermission.value?.allowDelete),
+)
+
+const recordActionButtonsDisabled = computed(
+  () => isSaving.value || (props.mode === 'edit' && isDirty.value),
+)
+
+const recordDeleteDialog = ref(false)
+const showUploadDialog = ref(false)
+const showInformationDialog = ref(false)
+const loadedScriptButtons = ref<ScriptButtonItem[]>([])
+
+let scriptButtonsRequestId = 0
+
+const recordActionMenuItems = computed<SaplingContextMenuTableMenuItem[]>(() => {
+  if (!hasPersistedItem.value || props.mode === 'create') {
+    return []
+  }
+
+  const mailToLabel = te('global.mailTo') ? t('global.mailTo') : 'E-Mail an'
+  const mailActions = buildMailMenuActions(props.templates, form.value)
+
+  return getSaplingContextMenuTableItems({
+    canShowInformation: canShowInformation.value,
+    entityPermission: entityPermission.value,
+    canNavigate: canNavigate.value,
+    canTimeline: true,
+    scriptButtons: loadedScriptButtons.value,
+    mailActions,
+    mailToLabel,
+  }).filter((menuItem) => !['edit', 'show', 'delete'].includes(menuItem.type))
+})
 
 function getTimestampTitle(field: 'createdAt' | 'updatedAt', fallback: string): string {
   const entityHandle = props.entity?.handle
@@ -463,6 +676,228 @@ function updateSelectedRelationTableItems(items: SaplingGenericItem[]): void {
   selectedItems.value = items
 }
 
+function getRecordActionTitle(menuItem: SaplingContextMenuTableMenuItem): string {
+  if (menuItem.titleKey) {
+    const translated = t(menuItem.titleKey)
+    return translated !== menuItem.titleKey ? translated : menuItem.titleKey
+  }
+
+  if (menuItem.title) {
+    return te(menuItem.title) ? t(menuItem.title) : menuItem.title
+  }
+
+  return ''
+}
+
+function closeUploadDialog(): void {
+  showUploadDialog.value = false
+}
+
+function closeInformationDialog(): void {
+  showInformationDialog.value = false
+}
+
+function openRecordDeleteDialog(): void {
+  if (!canDeleteRecord.value) {
+    return
+  }
+
+  recordDeleteDialog.value = true
+}
+
+function closeRecordDeleteDialog(): void {
+  recordDeleteDialog.value = false
+}
+
+function openCopyDialogFromRecord(): void {
+  if (!props.item || !entityPermission.value?.allowInsert) {
+    return
+  }
+
+  const copiedItem = { ...props.item }
+
+  props.templates
+    .filter((template) => template.name === 'handle' || template.isUnique)
+    .forEach((template) => {
+      delete copiedItem[template.name]
+    })
+
+  activeTab.value = 0
+  emit('update:item', copiedItem)
+  emit('update:mode', 'create')
+}
+
+function openTimelineFromRecord(): void {
+  if (!entityHandle.value || itemHandle.value == null) {
+    return
+  }
+
+  timelineDialogStore.openTimeline(entityHandle.value, itemHandle.value)
+}
+
+function navigateToAddress(): void {
+  if (!props.item || !canNavigate.value) {
+    return
+  }
+
+  const address = props.templates
+    .filter((template) => template.options?.includes('isNavigation'))
+    .map((template) => props.item?.[template.name || ''])
+    .filter(Boolean)
+    .join(' ')
+
+  if (!address) {
+    return
+  }
+
+  window.open(`${NAVIGATION_URL}${encodeURIComponent(address)}`, '_blank')
+}
+
+function navigateToDocuments(): void {
+  if (!entityHandle.value || itemHandle.value == null) {
+    return
+  }
+
+  const url = `/file/document?filter={"reference":"${String(itemHandle.value)}","entity":"${entityHandle.value}"}`
+  window.open(url, '_blank')
+}
+
+function openUploadDialog(): void {
+  if (!hasPersistedItem.value || !entityPermission.value?.allowInsert) {
+    return
+  }
+
+  showUploadDialog.value = true
+}
+
+function openInformationDialog(): void {
+  if (!hasPersistedItem.value || !canShowInformation.value) {
+    return
+  }
+
+  showInformationDialog.value = true
+}
+
+async function reloadDialogItem(): Promise<void> {
+  if (!entityHandle.value || itemHandle.value == null) {
+    return
+  }
+
+  const result = await ApiGenericService.find<SaplingGenericItem>(entityHandle.value, {
+    filter: { handle: itemHandle.value },
+    limit: 1,
+    relations: ['m:1'],
+  })
+
+  emit('update:item', result.data[0] ?? props.item)
+}
+
+async function runScriptButtonFromRecord(scriptButton: ScriptButtonItem): Promise<void> {
+  if (!props.entity || !props.item) {
+    return
+  }
+
+  await currentPersonStore.fetchCurrentPerson()
+  if (!currentPersonStore.person) {
+    return
+  }
+
+  const result = await ApiScriptService.runClient(
+    [props.item],
+    props.entity,
+    currentPersonStore.person,
+    scriptButton.name,
+    scriptButton.parameter,
+  )
+
+  if (result.isSuccess !== false) {
+    await reloadDialogItem()
+  }
+}
+
+async function handleRecordAction(menuItem: SaplingContextMenuTableMenuItem): Promise<void> {
+  switch (menuItem.type) {
+    case 'copy':
+      openCopyDialogFromRecord()
+      break
+    case 'timeline':
+      openTimelineFromRecord()
+      break
+    case 'navigate':
+      navigateToAddress()
+      break
+    case 'uploadDocument':
+      openUploadDialog()
+      break
+    case 'showDocuments':
+      navigateToDocuments()
+      break
+    case 'showInformation':
+      openInformationDialog()
+      break
+    case 'mail':
+      if (menuItem.mailAction?.email && entityHandle.value) {
+        openMailDialog({
+          entityHandle: entityHandle.value,
+          itemHandle: itemHandle.value ?? undefined,
+          draftValues: form.value,
+          initialTo: [menuItem.mailAction.email],
+        })
+      }
+      break
+    case 'script':
+      if (menuItem.scriptButton) {
+        await runScriptButtonFromRecord(menuItem.scriptButton)
+      }
+      break
+    default:
+      break
+  }
+}
+
+async function loadScriptButtons(): Promise<void> {
+  if (!entityHandle.value || !hasPersistedItem.value || props.mode === 'create') {
+    loadedScriptButtons.value = []
+    return
+  }
+
+  const currentRequestId = ++scriptButtonsRequestId
+  const result = await ApiGenericService.find<ScriptButtonItem>('scriptButton', {
+    filter: { entity: { handle: entityHandle.value } },
+    orderBy: buildTableOrderBy([{ key: 'title', order: 'asc' }]),
+    limit: DEFAULT_ENTITY_ITEMS_COUNT,
+    relations: ['m:1'],
+  })
+
+  if (currentRequestId !== scriptButtonsRequestId) {
+    return
+  }
+
+  loadedScriptButtons.value = result.data
+}
+
+async function confirmRecordDelete(): Promise<void> {
+  if (!entityHandle.value || itemHandle.value == null) {
+    return
+  }
+
+  try {
+    await ApiGenericService.delete(entityHandle.value, itemHandle.value)
+    closeRecordDeleteDialog()
+    pushMessage(
+      'success',
+      t('global.recordDeleted'),
+      t('global.recordDeletedDescription'),
+      entityHandle.value,
+    )
+    emit('deleted', props.item)
+    emit('update:modelValue', false)
+    emit('cancel')
+  } catch {
+    // API errors are already routed through the shared message center.
+  }
+}
+
 function onRelationSearch(templateName: string, search: string): void {
   relationTableSearch.value[templateName] = search
   relationTablePage.value[templateName] = 1
@@ -470,6 +905,22 @@ function onRelationSearch(templateName: string, search: string): void {
 }
 
 watch(visibleTemplateGroups, () => syncExpandedGroups(), { immediate: true })
+
+watch(
+  () => [props.modelValue, entityHandle.value, itemHandle.value, props.mode] as const,
+  ([isOpen]) => {
+    if (!isOpen) {
+      loadedScriptButtons.value = []
+      closeRecordDeleteDialog()
+      closeUploadDialog()
+      closeInformationDialog()
+      return
+    }
+
+    void loadScriptButtons()
+  },
+  { immediate: true },
+)
 
 watch(
   () => props.modelValue,

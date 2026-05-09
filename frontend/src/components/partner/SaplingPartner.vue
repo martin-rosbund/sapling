@@ -57,7 +57,7 @@
         v-if="isMobileFilterLayout"
         v-model="mobileFilterDialogVisible"
         class="sapling-partner-filter-dialog"
-        max-width="720"
+        :max-width="SAPLING_DIALOG_MAX_WIDTH.md"
         scrollable
       >
         <div class="sapling-partner-filter-dialog__surface">
@@ -82,6 +82,7 @@ import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
 import SaplingWorkFilterPanel from '@/components/filter/SaplingWorkFilterPanel.vue'
 import { useSaplingPartner } from '@/composables/partner/useSaplingPartner'
+import { SAPLING_DIALOG_MAX_WIDTH } from '@/constants/dialog.constants'
 // #endregion
 
 const SaplingTable = defineAsyncComponent(() => import('@/components/table/SaplingTable.vue'))

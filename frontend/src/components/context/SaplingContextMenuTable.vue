@@ -9,10 +9,10 @@
     <v-list density="compact" elevation="8" min-width="200" class="glass-panel">
       <v-list-item
         v-for="menuItem in menuItems"
-        :key="`${menuItem.type}-${String(menuItem.scriptButton?.handle ?? menuItem.titleKey ?? menuItem.title ?? '')}`"
+        :key="`${menuItem.type}-${String(menuItem.scriptButton?.handle ?? menuItem.mailAction?.email ?? menuItem.titleKey ?? menuItem.title ?? '')}`"
         :prepend-icon="menuItem.icon"
         :title="resolveMenuItemTitle(menuItem.titleKey, menuItem.title)"
-        @click="emitAction(menuItem.type, menuItem.scriptButton)"
+        @click="emitAction(menuItem.type, menuItem.scriptButton, menuItem.mailAction)"
       >
       </v-list-item>
       <v-list-item prepend-icon="mdi-close" :title="$t('global.close')" @click="closeMenu">

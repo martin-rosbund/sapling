@@ -31,6 +31,7 @@
     @cancel="emit('close-dialog')"
     @update:mode="emit('update:edit-mode', $event)"
     @update:item="emit('update:edit-item', $event)"
+    @deleted="emit('record-deleted', $event)"
   />
 
   <SaplingContextMenuTable
@@ -42,6 +43,7 @@
     :can-navigate="canNavigate"
     :can-show-information="canShowInformation"
     :script-buttons="rowScriptButtons"
+    :mail-actions="contextMenuMailActions"
     @action="emit('context-action', $event)"
     @update:show="emit('update:context-visible', $event)"
   />
@@ -74,7 +76,7 @@ import type {
   EntityTemplate,
 } from '@/entity/structure'
 import type { EntityItem, SaplingGenericItem, ScriptButtonItem } from '@/entity/entity'
-import type { SaplingContextMenuTableActionPayload } from '@/composables/context/useSaplingContextMenuTable'
+import type { SaplingContextMenuTableActionPayload, SaplingMailMenuAction } from '@/composables/context/useSaplingContextMenuTable'
 import SaplingContextMenuTable from '@/components/context/SaplingContextMenuTable.vue'
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
@@ -116,6 +118,7 @@ defineProps<{
   uploadDialogItem: SaplingGenericItem | null
   showInformationDialog: boolean
   informationDialogItem: SaplingGenericItem | null
+  contextMenuMailActions?: SaplingMailMenuAction[]
 }>()
 
 const emit = defineEmits<{
@@ -135,6 +138,7 @@ const emit = defineEmits<{
   (event: 'close-dialog'): void
   (event: 'update:edit-mode', value: EditDialogOptions['mode']): void
   (event: 'update:edit-item', value: SaplingGenericItem | null): void
+  (event: 'record-deleted', value: SaplingGenericItem | null): void
   (event: 'context-action', value: SaplingContextMenuTableActionPayload): void
   (event: 'update:context-visible', value: boolean): void
   (event: 'close-upload'): void

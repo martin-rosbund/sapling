@@ -9,13 +9,11 @@
 
     <v-dialog
       v-model="dialog"
-      min-width="90vw"
-      min-height="90vh"
-      max-width="90vw"
-      max-height="90vh"
+      :max-width="SAPLING_DIALOG_MAX_WIDTH.xxl"
+      :height="SAPLING_DIALOG_HEIGHT.xl"
       persistent
     >
-      <v-card class="glass-panel sapling-dialog-json-card sapling-dialog-card--fullscreen">
+      <SaplingDialogCard class="sapling-dialog-json-card sapling-dialog-card--fullscreen">
         <div class="sapling-dialog-shell sapling-fill-shell">
           <v-card-title class="sapling-dialog-json-title">{{ label }}</v-card-title>
           <v-card-text class="sapling-dialog-json-content">
@@ -32,7 +30,7 @@
           </v-card-text>
         </div>
         <SaplingActionSave :cancel="closeDialog" :save="saveJson" />
-      </v-card>
+      </SaplingDialogCard>
     </v-dialog>
   </div>
 </template>
@@ -41,6 +39,8 @@
 import { ref, watch } from 'vue'
 import SaplingActionSave from '@/components/actions/SaplingActionSave.vue'
 import SaplingCodeMirror from '@/components/common/SaplingCodeMirror.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
+import { SAPLING_DIALOG_MAX_WIDTH, SAPLING_DIALOG_HEIGHT } from '@/constants/dialog.constants'
 
 const props = defineProps<{
   modelValue: Record<string, unknown> | unknown[] | null

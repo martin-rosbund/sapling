@@ -1,10 +1,16 @@
 import { computed } from 'vue'
-import type { EntityItem, ScriptButtonItem } from '@/entity/entity'
-import type { AccumulatedPermission } from '@/entity/structure'
+import type { EntityItem, SaplingGenericItem, ScriptButtonItem } from '@/entity/entity'
+import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure'
+import {
+  buildBulkMailActions,
+  type SaplingBulkMailAction,
+} from '@/utils/saplingMailMenuUtil'
 
 export interface UseSaplingTableMultiSelectProps {
   multiSelect: boolean
   selectedRows: number[]
+  selectedItems?: SaplingGenericItem[]
+  entityTemplates?: EntityTemplate[]
   scriptButtons?: ScriptButtonItem[]
   showActions: boolean
   entity: EntityItem | null
@@ -17,6 +23,7 @@ export type UseSaplingTableMultiSelectEmit = {
   (event: 'exportSelected'): void
   (event: 'runScriptButton', value: ScriptButtonItem): void
   (event: 'selectAll'): void
+  (event: 'mailToSelected', value: SaplingBulkMailAction): void
 }
 
 /**
@@ -42,13 +49,20 @@ export function useSaplingTableMultiSelect(
       props.entity?.canDelete &&
       props.entityPermission?.allowDelete,
   )
+  const bulkMailActions = computed<SaplingBulkMailAction[]>(() =>
+    canClearSelection.value
+      ? buildBulkMailActions(props.entityTemplates, props.selectedItems)
+      : [],
+  )
+  const canMailSelection = computed(() => bulkMailActions.value.length > 0)
   const hasSelectionActions = computed(
     () =>
       canClearSelection.value ||
       canExportSelection.value ||
       canSelectAll.value ||
       canRunScriptButtons.value ||
-      canDeleteSelection.value,
+      canDeleteSelection.value ||
+      canMailSelection.value,
   )
   // #endregion
 
@@ -72,6 +86,10 @@ export function useSaplingTableMultiSelect(
   function selectAll() {
     emit('selectAll')
   }
+
+  function mailToSelected(action: SaplingBulkMailAction) {
+    emit('mailToSelected', action)
+  }
   // #endregion
 
   // #region Return
@@ -83,12 +101,15 @@ export function useSaplingTableMultiSelect(
     canSelectAll,
     canRunScriptButtons,
     canDeleteSelection,
+    canMailSelection,
+    bulkMailActions,
     scriptButtons,
     clearSelection,
     deleteAllSelected,
     exportSelected,
     runScriptButton,
     selectAll,
+    mailToSelected,
   }
   // #endregion
 }

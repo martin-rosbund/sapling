@@ -77,6 +77,7 @@ export interface SelectedPersonPreviewItem {
 
 type CalendarType = 'workweek' | 'month' | 'day' | 'week'
 type CalendarViewMode = 'single' | 'sidebyside'
+type CalendarMode = 'default' | 'extended'
 type CalendarParticipant = PersonItem | number | string
 type CalendarRecord = EventItem | HolidayItem
 type CalendarSource = 'event' | 'holiday'
@@ -143,6 +144,7 @@ export function useSaplingEvent() {
   const events = ref<SaplingCalendarEvent[]>([])
   const templates = ref<EntityTemplate[]>([])
   const selectedPeoples = ref<number[]>([])
+  const calendarMode = ref<CalendarMode>('default')
   const calendarType = ref<CalendarType>(
     windowWatcher.getCurrentSize() === 'small' ? 'day' : 'workweek',
   )
@@ -374,6 +376,10 @@ export function useSaplingEvent() {
     void nextTick(() => {
       queueScrollToCurrentTime()
     })
+  })
+
+  watch(calendarMode, async () => {
+    await refreshVisibleEvents()
   })
   //#endregion
 
@@ -761,10 +767,12 @@ export function useSaplingEvent() {
         : Promise.resolve({ data: [] as HolidayItem[] }),
     ])
 
-    events.value = filterWorkweekEvents([
-      ...response.data.flatMap((event) => expandRecurringEvent(event, startDate, endDate)),
-      ...holidayResponse.data.map((holiday) => toHolidayCalendarEvent(holiday)),
-    ])
+    events.value = filterWorkweekEvents(
+      filterByCalendarMode([
+        ...response.data.flatMap((event) => expandRecurringEvent(event, startDate, endDate)),
+        ...holidayResponse.data.map((holiday) => toHolidayCalendarEvent(holiday)),
+      ]),
+    )
   }
 
   /**
@@ -1165,6 +1173,26 @@ export function useSaplingEvent() {
     }
 
     return calendarEvents.filter((event) => overlapsWorkweek(event.start, event.end))
+  }
+
+  /**
+   * Hides events whose type is excluded from the default calendar
+   * (e.g. internal mail/phone-call follow-ups) unless the user explicitly
+   * requested the extended calendar mode.
+   */
+  function filterByCalendarMode(calendarEvents: SaplingCalendarEvent[]) {
+    if (calendarMode.value === 'extended') {
+      return calendarEvents
+    }
+
+    return calendarEvents.filter((event) => {
+      if (event.saplingSource !== 'event') {
+        return true
+      }
+
+      const typeRecord = (event.event as EventItem | undefined)?.type
+      return typeRecord?.showInDefaultCalendar !== false
+    })
   }
 
   /**
@@ -1607,6 +1635,7 @@ export function useSaplingEvent() {
     calendarType,
     calendarTypeOptions: CALENDAR_TYPE_OPTIONS,
     calendarViewMode,
+    calendarMode,
     calendarWeekdays,
     createEvent,
     currentCalendarLayoutLabel,

@@ -73,6 +73,21 @@ export class EventTypeItem {
   })
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color!: string;
+
+  /**
+   * Indicates whether events of this type are shown in the default calendar
+   * view and synchronized with external calendars (Outlook/Google).
+   * @type {boolean}
+   */
+  @ApiProperty()
+  @SaplingForm({
+    order: 200,
+    group: 'eventType.groupBasics',
+    groupOrder: 100,
+    width: 1,
+  })
+  @Property({ default: true, nullable: false })
+  showInDefaultCalendar!: boolean;
   // #endregion
 
   // #region Properties: Relation

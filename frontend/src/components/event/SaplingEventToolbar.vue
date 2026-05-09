@@ -53,6 +53,16 @@
 
     <div class="sapling-event-toolbar__secondary">
       <v-btn-toggle
+        v-model="calendarModeModel"
+        class="sapling-event-toolbar__mode-toggle"
+        density="comfortable"
+        mandatory
+      >
+        <v-btn variant="outlined" value="default">{{ $t('calendar.standard') }}</v-btn>
+        <v-btn variant="outlined" value="extended">{{ $t('calendar.extended') }}</v-btn>
+      </v-btn-toggle>
+
+      <v-btn-toggle
         v-if="!isNarrowScreen"
         v-model="calendarViewModeModel"
         class="sapling-event-toolbar__view-toggle"
@@ -104,6 +114,7 @@ import { useI18n } from 'vue-i18n'
 
 type CalendarType = 'workweek' | 'month' | 'day' | 'week'
 type CalendarViewMode = 'single' | 'sidebyside'
+type CalendarMode = 'default' | 'extended'
 
 const { t } = useI18n()
 
@@ -112,12 +123,14 @@ const props = defineProps<{
   calendarType: CalendarType
   calendarTypeOptions: CalendarType[]
   calendarViewMode: CalendarViewMode
+  calendarMode: CalendarMode
   modelValue: string
 }>()
 
 const emit = defineEmits<{
   (event: 'update:calendarType', value: CalendarType): void
   (event: 'update:calendarViewMode', value: CalendarViewMode): void
+  (event: 'update:calendarMode', value: CalendarMode): void
   (event: 'previous'): void
   (event: 'today'): void
   (event: 'next'): void
@@ -132,6 +145,11 @@ const calendarTypeModel = computed({
 const calendarViewModeModel = computed({
   get: () => props.calendarViewMode,
   set: (value: CalendarViewMode) => emit('update:calendarViewMode', value),
+})
+
+const calendarModeModel = computed({
+  get: () => props.calendarMode,
+  set: (value: CalendarMode) => emit('update:calendarMode', value),
 })
 
 const pickerMenuOpen = ref(false)

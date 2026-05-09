@@ -1,5 +1,5 @@
 :root {
-  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.06);
   --glass-border: rgba(255, 255, 255, 0.2);
   --glass-shadow: 0 var(--sapling-space-sm) var(--sapling-space-3xl) 0 rgba(0, 0, 0, 0.37);
   --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -13,7 +13,7 @@
   --sapling-tilt-footer-border: rgba(200, 220, 255, 0.18);
   --sapling-tilt-table-header-bg: rgba(0, 0, 0, 0.2);
   --sapling-tilt-table-header-border: rgba(255, 255, 255, 0.1);
-  --sapling-tilt-table-row-border: rgba(255, 255, 255, 0.05);
+  --sapling-tilt-table-row-border: rgba(255, 255, 255, 0.06);
   --sapling-tilt-table-row-hover: rgba(255, 255, 255, 0.08);
   --sapling-tilt-drawer-bg: rgba(15, 12, 41, 0.6);
   --sapling-tilt-drawer-border: rgba(255, 255, 255, 0.1);
@@ -51,7 +51,7 @@
   --sapling-surface-gradient-muted: linear-gradient(
     180deg,
     color-mix(in srgb, var(--sapling-tilt-drawer-bg) 82%, rgba(255, 255, 255, 0.04)),
-    color-mix(in srgb, var(--glass-bg) 84%, rgba(255, 255, 255, 0.05))
+    color-mix(in srgb, var(--glass-bg) 84%, rgba(255, 255, 255, 0.06))
   );
   --sapling-surface-accent-fill: linear-gradient(
     160deg,

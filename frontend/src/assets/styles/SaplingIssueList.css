@@ -65,7 +65,7 @@
 .sapling-issue-card__accent {
   position: absolute;
   inset: 0 auto 0 0;
-  width: 5px;
+  width: var(--sapling-space-2xs);
 }
 
 .sapling-issue-stream--open .sapling-issue-card__accent {

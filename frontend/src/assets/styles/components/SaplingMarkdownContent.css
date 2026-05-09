@@ -63,7 +63,7 @@
 .sapling-markdown-content blockquote {
   padding-left: var(--sapling-space-md-plus);
   border-left: 3px solid rgba(var(--v-theme-primary), 0.55);
-  opacity: 0.92;
+  opacity: 0.9;
 }
 
 .sapling-markdown-content pre {

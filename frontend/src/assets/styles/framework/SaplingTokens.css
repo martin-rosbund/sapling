@@ -45,8 +45,8 @@
   --sapling-dialog-loading-width: 520px;
   --sapling-space-3xs: 2px;
   --sapling-space-2xs: 4px;
-  --sapling-space-xs: 6px;
   --sapling-space-sm: 8px;
+  --sapling-space-xs: var(--sapling-space-sm);
   --sapling-space-sm-plus: 10px;
   --sapling-space-md: 12px;
   --sapling-space-md-plus: 14px;
@@ -102,22 +102,22 @@
   --sapling-opacity-strong: 0.88;
   --sapling-opacity-overlay: 0.08;
   --sapling-text-label-size-xs: 0.72rem;
-  --sapling-text-label-size-sm: 0.74rem;
+  --sapling-text-label-size-sm: var(--sapling-text-label-size-xs);
   --sapling-text-label-size: 0.78rem;
   --sapling-text-label-size-lg: 0.82rem;
-  --sapling-text-meta-size-sm: 0.8rem;
-  --sapling-text-body-size-xs: 0.9rem;
-  --sapling-text-body-size-sm: 0.92rem;
-  --sapling-text-body-size-md: 0.97rem;
-  --sapling-text-body-size-lg: 1rem;
   --sapling-text-meta-size: 0.85rem;
-  --sapling-text-meta-size-lg: 0.88rem;
+  --sapling-text-meta-size-sm: var(--sapling-text-meta-size);
+  --sapling-text-meta-size-lg: var(--sapling-text-meta-size);
+  --sapling-text-body-size-xs: 0.9rem;
+  --sapling-text-body-size-sm: var(--sapling-text-body-size-xs);
+  --sapling-text-body-size-lg: 1rem;
+  --sapling-text-body-size-md: var(--sapling-text-body-size-lg);
   --sapling-letter-spacing-label: 0.08em;
   --sapling-letter-spacing-eyebrow: 0.12em;
   --sapling-surface-fill: rgba(255, 255, 255, 0.06);
-  --sapling-surface-fill-soft: rgba(255, 255, 255, 0.03);
   --sapling-surface-fill-subtle: rgba(255, 255, 255, 0.04);
-  --sapling-surface-fill-muted: rgba(255, 255, 255, 0.05);
+  --sapling-surface-fill-soft: var(--sapling-surface-fill-subtle);
+  --sapling-surface-fill-muted: var(--sapling-surface-fill);
   --sapling-surface-fill-strong: rgba(255, 255, 255, 0.1);
   --sapling-surface-border: var(--sapling-file-panel-border);
   --sapling-surface-border-muted: rgba(255, 255, 255, 0.07);
@@ -136,11 +136,11 @@
   --sapling-surface-gradient-soft: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.16),
-    rgba(255, 255, 255, 0.05)
+    rgba(255, 255, 255, 0.06)
   );
   --sapling-surface-gradient-panel: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.06),
     rgba(15, 23, 42, 0.14)
   );
   --sapling-surface-gradient-muted: linear-gradient(
@@ -165,7 +165,7 @@
   );
   --sapling-status-text-danger: #d32f2f;
   --sapling-status-text-success: #388e3c;
-  --sapling-inset-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --sapling-inset-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
   --sapling-shadow-lift: 0 16px 34px rgba(0, 0, 0, 0.12);
   --sapling-shadow-soft: 0 10px 24px rgba(15, 23, 42, 0.08);
   --sapling-shadow-soft-md: 0 10px 20px rgba(15, 23, 42, 0.16);

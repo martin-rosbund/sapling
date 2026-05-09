@@ -4,7 +4,7 @@
 
 .sapling-markdown-workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(var(--sapling-panel-width-sm), 0.8fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--sapling-gap-lg);
   align-items: stretch;
 }

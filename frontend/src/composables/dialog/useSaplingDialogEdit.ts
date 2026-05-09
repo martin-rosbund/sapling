@@ -81,6 +81,7 @@ export function useSaplingDialogEdit(
   const isHydratingForm = ref(false)
   const initialFormSnapshot = ref<Record<string, string>>({})
   const pendingSaveAction = ref<DialogSaveAction | null>(null)
+  const unsavedChangesDialog = ref(false)
   const isSaving = computed(() => pendingSaveAction.value !== null)
   // #endregion
 
@@ -388,11 +389,12 @@ export function useSaplingDialogEdit(
    * Synchronizes the dialog visibility with the parent state.
    */
   function handleDialogUpdate(val: boolean): void {
-    if (!val) {
-      pendingSaveAction.value = null
+    if (val) {
+      emit('update:modelValue', true)
+      return
     }
 
-    emit('update:modelValue', val)
+    cancel()
   }
 
   function completeSave(action?: DialogSaveAction): void {
@@ -676,9 +678,37 @@ export function useSaplingDialogEdit(
   // #endregion
 
   // #region Cancel
-  function cancel(): void {
+  function closeDialog(): void {
+    pendingSaveAction.value = null
+    unsavedChangesDialog.value = false
     emit('update:modelValue', false)
     emit('cancel')
+  }
+
+  function shouldConfirmUnsavedChanges(): boolean {
+    return props.mode !== 'readonly' && isDirty.value && !isSaving.value
+  }
+
+  function cancel(): void {
+    if (shouldConfirmUnsavedChanges()) {
+      unsavedChangesDialog.value = true
+      return
+    }
+
+    closeDialog()
+  }
+
+  function keepEditing(): void {
+    unsavedChangesDialog.value = false
+  }
+
+  function discardChanges(): void {
+    closeDialog()
+  }
+
+  async function saveChangesAndClose(): Promise<void> {
+    unsavedChangesDialog.value = false
+    await saveAndClose()
   }
   // #endregion
 
@@ -706,6 +736,7 @@ export function useSaplingDialogEdit(
     selectedItems,
     isDirty,
     isSaving,
+    unsavedChangesDialog,
     pendingSaveAction,
     dirtyFieldCount,
     getRules,
@@ -720,6 +751,9 @@ export function useSaplingDialogEdit(
     handleDialogUpdate,
     onDuplicateSelect,
     cancel,
+    keepEditing,
+    discardChanges,
+    saveChangesAndClose,
     resetForm,
     save,
     saveAndClose,

@@ -20,6 +20,7 @@
       <SaplingMessageCenter />
       <SaplingDialogMail />
       <SaplingDialogPhoneCall />
+      <SaplingRecordTimeline />
     </template>
 
     <div v-else class="sapling-app-layout__loading">
@@ -43,6 +44,9 @@ const SaplingDialogMail = defineAsyncComponent(
 )
 const SaplingDialogPhoneCall = defineAsyncComponent(
   () => import('@/components/dialog/SaplingDialogPhoneCall.vue'),
+)
+const SaplingRecordTimeline = defineAsyncComponent(
+  () => import('@/components/timeline/SaplingRecordTimeline.vue'),
 )
 
 const navigationDrawer = ref(false)

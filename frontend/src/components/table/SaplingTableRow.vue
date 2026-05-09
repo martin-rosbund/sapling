@@ -251,6 +251,7 @@ const {
   requestUploadDocument,
   requestShowDocuments,
   requestShowInformation,
+  requestMail,
   getReferenceTemplates,
   getReferenceEntity,
   isReferenceColumn,
@@ -294,6 +295,11 @@ function onMenuItemClick(menuItem: SaplingContextMenuTableMenuItem) {
       break
     case 'showInformation':
       requestShowInformation(props.item)
+      break
+    case 'mail':
+      if (menuItem.mailAction) {
+        requestMail(props.item, menuItem.mailAction.email)
+      }
       break
     case 'script':
       if (menuItem.scriptButton) {

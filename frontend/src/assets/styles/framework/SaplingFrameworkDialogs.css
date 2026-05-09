@@ -10,33 +10,21 @@
   padding: var(--sapling-space-panel-xl);
 }
 
-.sapling-dialog-card,
-.sapling-dialog-compact-card,
-.sapling-dialog-delete-card,
-.sapling-dialog-json-card,
-.sapling-account-dialog,
-.sapling-change-password-dialog,
-.sapling-login-dialog,
-.sapling-dialog-edit-card,
-.sapling-mail-dialog,
-.sapling-message-center-dialog,
-.sapling-inbox-dialog {
+/*
+ * Unified dialog card surface. Every dialog renders a SaplingDialogCard which
+ * always applies the `.sapling-dialog-card` class, so this single selector
+ * replaces the previous list of per-dialog aliases (sapling-account-dialog,
+ * sapling-mail-dialog, sapling-inbox-dialog, ...). Per-dialog modifier
+ * classes are still used for layout-specific overrides further down.
+ */
+.sapling-dialog-card {
   display: flex;
   flex-direction: column;
+  width: 100%;
   min-width: 0;
   overflow: hidden;
   border: 1px solid var(--sapling-surface-border);
   border-radius: var(--sapling-file-panel-radius-compact);
-}
-
-.sapling-dialog-card,
-.sapling-dialog-compact-card,
-.sapling-dialog-delete-card,
-.sapling-dialog-json-card,
-.sapling-account-dialog,
-.sapling-change-password-dialog,
-.sapling-login-dialog {
-  width: 100%;
 }
 
 .sapling-dialog-form-body,

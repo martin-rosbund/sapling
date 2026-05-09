@@ -1,10 +1,6 @@
 <template>
   <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-large">
-    <v-card
-      class="glass-panel tilt-content sapling-inbox-dialog"
-      v-tilt="TILT_DEFAULT_OPTIONS"
-      elevation="12"
-    >
+    <SaplingDialogCard class="sapling-inbox-dialog">
       <SaplingDialogShell fill-shell body-class="sapling-inbox-dialog__body" :show-divider="false">
         <template #hero>
           <SaplingDialogHero
@@ -81,7 +77,7 @@
           <SaplingActionClose :close="closeDialog" />
         </template>
       </SaplingDialogShell>
-    </v-card>
+    </SaplingDialogCard>
   </v-dialog>
 </template>
 
@@ -91,11 +87,11 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSaplingInbox } from '@/composables/account/useSaplingInbox'
 import SaplingActionClose from '@/components/actions/SaplingActionClose.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue'
 import SaplingInboxSection from '@/components/account/inbox/SaplingInboxSection.vue'
 import SaplingInboxSummaryCard from '@/components/account/inbox/SaplingInboxSummaryCard.vue'
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
 //#endregion
 
 //#region Composable

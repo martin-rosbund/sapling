@@ -27,13 +27,14 @@ export class PhoneCallItem {
   phoneNumber!: string;
 
   @ApiPropertyOptional()
+  @Sapling(['isMarkdown'])
   @SaplingForm({
     order: 100,
     group: 'phoneCall.groupContent',
     groupOrder: 200,
     width: 4,
   })
-  @Property({ length: 2048, nullable: true })
+  @Property({ type: 'text', nullable: true })
   note?: string | null;
 
   @ApiProperty()

@@ -28,13 +28,14 @@ export class InformationItem {
   reference!: string;
 
   @ApiProperty()
+  @Sapling(['isMarkdown'])
   @SaplingForm({
     order: 100,
     group: 'information.groupContent',
     groupOrder: 100,
     width: 4,
   })
-  @Property({ length: 2048 })
+  @Property({ type: 'text' })
   content!: string;
 
   @ApiProperty({ type: () => EntityItem })
