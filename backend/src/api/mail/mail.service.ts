@@ -33,6 +33,8 @@ import { CompanyItem } from '../../entity/CompanyItem';
 import { EventItem } from '../../entity/EventItem';
 import { EventStatusItem } from '../../entity/EventStatusItem';
 import { EventTypeItem } from '../../entity/EventTypeItem';
+import { TicketItem } from '../../entity/TicketItem';
+import { SalesOpportunityItem } from '../../entity/SalesOpportunityItem';
 import {
   AZURE_AD_CLIENT_ID,
   AZURE_AD_CLIENT_SECRET,
@@ -729,6 +731,37 @@ export class MailService {
       let resolvedCreatorCompanyRef = creatorCompanyRef;
       let resolvedCreatorPersonRef = creatorPersonRef;
       let sourcePersonRef: PersonItem | null = null;
+      let ticketRef: TicketItem | undefined;
+      let salesOpportunityRef: SalesOpportunityItem | undefined;
+
+      const sourceEntityHandle = delivery.entity?.handle;
+      const sourceReferenceHandle = delivery.referenceHandle;
+
+      if (
+        sourceEntityHandle === 'ticket' &&
+        sourceReferenceHandle != null &&
+        sourceReferenceHandle !== ''
+      ) {
+        const ticketHandle = Number(sourceReferenceHandle);
+        if (Number.isFinite(ticketHandle)) {
+          ticketRef = eventEm.getReference(
+            TicketItem,
+            ticketHandle as never,
+          );
+        }
+      } else if (
+        sourceEntityHandle === 'salesOpportunity' &&
+        sourceReferenceHandle != null &&
+        sourceReferenceHandle !== ''
+      ) {
+        const salesOpportunityHandle = Number(sourceReferenceHandle);
+        if (Number.isFinite(salesOpportunityHandle)) {
+          salesOpportunityRef = eventEm.getReference(
+            SalesOpportunityItem,
+            salesOpportunityHandle as never,
+          );
+        }
+      }
 
       if (
         delivery.entity?.handle === 'person' &&
@@ -772,6 +805,8 @@ export class MailService {
         assigneePerson: creatorPersonRef,
         creatorCompany: resolvedCreatorCompanyRef,
         creatorPerson: resolvedCreatorPersonRef,
+        ticket: ticketRef,
+        salesOpportunity: salesOpportunityRef,
       } as RequiredEntityData<EventItem>);
 
       if (creatorPersonRef) {

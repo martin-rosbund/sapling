@@ -6,6 +6,8 @@ import { EventStatusItem } from '../entity/EventStatusItem.js';
 import { EventTypeItem } from '../entity/EventTypeItem.js';
 import { PersonItem } from '../entity/PersonItem.js';
 import { PhoneCallItem } from '../entity/PhoneCallItem.js';
+import { SalesOpportunityItem } from '../entity/SalesOpportunityItem.js';
+import { TicketItem } from '../entity/TicketItem.js';
 import { ScriptClass } from './core/script.class.js';
 import { ScriptResultServer } from './core/script.result.server.js';
 
@@ -121,6 +123,47 @@ export class PhoneCallController extends ScriptClass {
       let resolvedCreatorCompanyRef = creatorCompanyRef;
       let resolvedCreatorPersonRef = creatorPersonRef;
       let sourcePersonRef: PersonItem | null = null;
+      let ticketRef: TicketItem | undefined;
+      let salesOpportunityRef: SalesOpportunityItem | undefined;
+
+      const sourceEntityHandle = phoneCall.entity?.handle;
+      const sourceReferenceHandle = phoneCall.reference;
+
+      if (
+        sourceEntityHandle === 'ticket' &&
+        sourceReferenceHandle != null &&
+        sourceReferenceHandle !== ''
+      ) {
+        const ticketHandle = Number(sourceReferenceHandle);
+        if (Number.isFinite(ticketHandle)) {
+          ticketRef = this.em.getReference(
+            TicketItem,
+            ticketHandle as never,
+          );
+          this.logDebug(
+            'afterInsert',
+            'Linked phone call event to source ticket',
+            { phoneCallHandle: phoneCall.handle, ticketHandle },
+          );
+        }
+      } else if (
+        sourceEntityHandle === 'salesOpportunity' &&
+        sourceReferenceHandle != null &&
+        sourceReferenceHandle !== ''
+      ) {
+        const salesOpportunityHandle = Number(sourceReferenceHandle);
+        if (Number.isFinite(salesOpportunityHandle)) {
+          salesOpportunityRef = this.em.getReference(
+            SalesOpportunityItem,
+            salesOpportunityHandle as never,
+          );
+          this.logDebug(
+            'afterInsert',
+            'Linked phone call event to source sales opportunity',
+            { phoneCallHandle: phoneCall.handle, salesOpportunityHandle },
+          );
+        }
+      }
 
       if (
         phoneCall.entity?.handle === 'person' &&
@@ -180,6 +223,8 @@ export class PhoneCallController extends ScriptClass {
         assigneePerson: assigneePersonRef,
         creatorCompany: resolvedCreatorCompanyRef,
         creatorPerson: resolvedCreatorPersonRef,
+        ticket: ticketRef,
+        salesOpportunity: salesOpportunityRef,
       } as RequiredEntityData<EventItem>);
 
       event.participants.add(assigneePersonRef);
