@@ -266,7 +266,7 @@
   background: linear-gradient(
     180deg,
     rgba(var(--v-theme-surface), 0.94),
-    rgba(var(--v-theme-surface), 0.88)
+    rgba(var(--v-theme-surface), 0.9)
   );
   cursor: pointer;
   transition:

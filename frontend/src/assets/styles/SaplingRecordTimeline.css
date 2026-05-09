@@ -152,7 +152,7 @@
   justify-self: stretch;
   min-width: 0;
   width: 100%;
-  padding-inline-start: 22px;
+  padding-inline-start: var(--sapling-space-2xl);
 }
 
 .sapling-record-timeline__timeline .v-timeline-item__opposite {
@@ -160,7 +160,7 @@
   justify-self: stretch;
   min-width: 0;
   width: 100%;
-  padding-inline-end: 22px;
+  padding-inline-end: var(--sapling-space-2xl);
 }
 
 .sapling-record-timeline__timeline .v-timeline-divider {
@@ -173,7 +173,7 @@
 }
 
 .sapling-record-timeline__timeline .v-timeline-item:not(:last-child) {
-  padding-bottom: 22px;
+  padding-bottom: var(--sapling-space-2xl);
 }
 
 .sapling-record-timeline__lane {

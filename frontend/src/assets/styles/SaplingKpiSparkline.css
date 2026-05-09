@@ -117,7 +117,7 @@
   gap: var(--sapling-gap-3xs);
   padding: var(--sapling-space-3xs);
   border-radius: var(--sapling-radius-sm);
-  background: rgba(var(--v-theme-surface), 0.92);
+  background: rgba(var(--v-theme-surface), 0.9);
   box-shadow: var(--sapling-shadow-soft);
 }
 

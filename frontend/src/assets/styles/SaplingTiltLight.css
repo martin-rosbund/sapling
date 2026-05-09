@@ -70,7 +70,7 @@
   --sapling-ai-fab-shadow-hover:
     0 var(--sapling-space-lg-plus) calc(var(--sapling-space-lg) + var(--sapling-space-xl))
       rgba(150, 188, 255, 0.34),
-    0 0 0 1px rgba(255, 255, 255, 0.92),
+    0 0 0 1px rgba(255, 255, 255, 0.9),
     0 0 var(--sapling-control-size-md) rgba(126, 231, 255, 0.48),
     0 0 var(--sapling-control-size-2xl) rgba(255, 141, 194, 0.36),
     0 0 var(--sapling-empty-state-min-height-xs) rgba(140, 167, 255, 0.2);

@@ -141,7 +141,7 @@
   height: var(--sapling-icon-box-lg);
   align-self: center;
   border-radius: 50%;
-  background: rgba(var(--v-theme-surface), 0.88);
+  background: rgba(var(--v-theme-surface), 0.9);
   box-shadow:
     var(--sapling-shadow-soft),
     inset 0 0 0 1px rgba(var(--v-theme-on-surface), 0.08);

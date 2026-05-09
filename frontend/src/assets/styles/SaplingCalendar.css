@@ -85,7 +85,7 @@
   width: var(--sapling-icon-box-2xl);
   height: var(--sapling-icon-box-2xl);
   border-radius: var(--sapling-radius-sm);
-  background: linear-gradient(145deg, rgba(0, 140, 149, 0.92), rgba(0, 193, 213, 0.72));
+  background: linear-gradient(145deg, rgba(0, 140, 149, 0.9), rgba(0, 193, 213, 0.7));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
@@ -110,7 +110,7 @@
   width: var(--sapling-icon-box-md);
   height: var(--sapling-icon-box-md);
   border-radius: var(--sapling-radius-sm);
-  background: linear-gradient(135deg, rgba(0, 140, 149, 0.92), rgba(0, 193, 213, 0.72));
+  background: linear-gradient(135deg, rgba(0, 140, 149, 0.9), rgba(0, 193, 213, 0.7));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
 }
 

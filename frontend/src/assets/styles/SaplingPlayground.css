@@ -16,7 +16,7 @@
   background:
     radial-gradient(circle at top left, var(--sapling-playground-highlight), transparent 32%),
     radial-gradient(circle at right center, rgba(14, 165, 233, 0.12), transparent 30%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(248, 250, 252, 0.78));
+    linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.8));
 }
 
 .sapling-playground__hero-content {

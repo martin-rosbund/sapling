@@ -37,7 +37,7 @@
 
 .sapling-access-pending__text {
   margin: 0;
-  color: rgba(var(--v-theme-on-surface), 0.78);
+  color: rgba(var(--v-theme-on-surface), 0.8);
   font-size: 1rem;
   line-height: 1.6;
 }

@@ -157,7 +157,7 @@
   width: var(--sapling-icon-box-action);
   height: var(--sapling-icon-box-action);
   border-radius: var(--sapling-radius-sm);
-  background: linear-gradient(140deg, rgba(0, 140, 149, 0.92), rgba(0, 193, 213, 0.68));
+  background: linear-gradient(140deg, rgba(0, 140, 149, 0.9), rgba(0, 193, 213, 0.7));
   margin-right: var(--sapling-gap-md);
   font-weight: 700;
 }

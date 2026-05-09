@@ -29,8 +29,8 @@
 }
 
 .sapling-calendar-event-card__accent {
-  width: 5px;
-  flex: 0 0 5px;
+  width: var(--sapling-space-2xs);
+  flex: 0 0 var(--sapling-space-2xs);
 }
 
 .sapling-calendar-event-card__content {
@@ -45,7 +45,7 @@
 }
 
 .sapling-calendar-event-card--resizable .sapling-calendar-event-card__content {
-  padding-right: calc(var(--sapling-gap-xs) + 22px);
+  padding-right: calc(var(--sapling-gap-xs) + var(--sapling-space-2xl));
 }
 
 .sapling-calendar-event-card__header {
@@ -71,10 +71,10 @@
 }
 
 .sapling-calendar-event-card__status-dot {
-  width: 9px;
-  height: 9px;
+  width: var(--sapling-space-sm);
+  height: var(--sapling-space-sm);
   border-radius: var(--sapling-radius-pill);
-  flex: 0 0 9px;
+  flex: 0 0 var(--sapling-space-sm);
   box-shadow: 0 0 0 3px var(--sapling-surface-fill);
 }
 
