@@ -21,10 +21,7 @@
     </button>
 
     <v-dialog v-if="dialog" v-model="dialog" class="sapling-dialog-medium" persistent>
-      <v-card
-        class="glass-panel tilt-content sapling-account-dialog sapling-field-event-recurrence__dialog"
-        elevation="12"
-      >
+      <SaplingDialogCard class="sapling-account-dialog sapling-field-event-recurrence__dialog">
         <SaplingDialogShell
           fill-shell
           body-class="sapling-account-dialog__body sapling-field-event-recurrence__body"
@@ -171,7 +168,7 @@
             <SaplingActionRecurrence :cancel="closeDialog" :reset="resetDraft" :save="saveDialog" />
           </template>
         </SaplingDialogShell>
-      </v-card>
+      </SaplingDialogCard>
     </v-dialog>
   </div>
 </template>
@@ -180,6 +177,7 @@
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SaplingActionRecurrence from '@/components/actions/SaplingActionRecurrence.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue'
 import SaplingNumberField from '@/components/dialog/fields/SaplingFieldNumber.vue'

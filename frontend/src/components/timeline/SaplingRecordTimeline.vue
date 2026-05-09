@@ -1,10 +1,6 @@
 <template>
   <v-dialog v-if="dialog" v-model="dialogModel" persistent class="sapling-dialog-large">
-    <v-card
-      class="glass-panel tilt-content sapling-inbox-dialog sapling-record-timeline-dialog"
-      v-tilt="TILT_DEFAULT_OPTIONS"
-      elevation="12"
-    >
+    <SaplingDialogCard class="sapling-inbox-dialog sapling-record-timeline-dialog">
       <SaplingDialogShell
         fill-shell
         body-class="sapling-inbox-dialog__body sapling-record-timeline-dialog__body"
@@ -184,7 +180,7 @@
           <SaplingActionClose :close="closeDialog" />
         </template>
       </SaplingDialogShell>
-    </v-card>
+    </SaplingDialogCard>
   </v-dialog>
 </template>
 
@@ -194,11 +190,11 @@ import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
 import SaplingActionClose from '@/components/actions/SaplingActionClose.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue'
 import SaplingRecordTimelineMonthCard from '@/components/timeline/SaplingRecordTimelineMonthCard.vue'
 import { useSaplingRecordTimeline } from '@/composables/timeline/useSaplingRecordTimeline'
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
 import { useTimelineDialogStore } from '@/stores/timelineDialogStore'
 import { formatDateTimeValue } from '@/utils/saplingFormatUtil'
 

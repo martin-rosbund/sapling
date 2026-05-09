@@ -6,7 +6,7 @@
     persistent
     @update:model-value="handleVisibilityChange"
   >
-    <v-card class="glass-panel sapling-mail-dialog" elevation="12">
+    <SaplingDialogCard class="sapling-mail-dialog">
       <div class="sapling-mail-dialog__shell">
         <v-card-title class="sapling-mail-dialog__header">
           <SaplingDialogHero
@@ -93,13 +93,14 @@
           :is-sending="isSending"
         />
       </div>
-    </v-card>
+    </SaplingDialogCard>
   </v-dialog>
 </template>
 
 <script lang="ts" setup>
 import SaplingActionMail from '@/components/actions/SaplingActionMail.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import { SAPLING_DIALOG_MAX_WIDTH, SAPLING_DIALOG_HEIGHT } from '@/constants/dialog.constants'
 import SaplingDialogMailComposer from '@/components/dialog/mail/SaplingDialogMailComposer.vue'

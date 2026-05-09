@@ -1,11 +1,10 @@
 <!-- Dialog for changing the user password -->
 <template>
   <v-dialog :model-value="props.modelValue" :max-width="SAPLING_DIALOG_MAX_WIDTH.sm" persistent>
-    <v-card
-      v-tilt="TILT_DEFAULT_OPTIONS"
-      class="glass-panel tilt-content sapling-change-password-dialog"
+    <SaplingDialogCard
+      class="sapling-change-password-dialog"
       :max-width="SAPLING_DIALOG_MAX_WIDTH.sm"
-      elevation="10"
+      :elevation="10"
     >
       <SaplingDialogShell body-class="sapling-change-password-dialog__body">
         <template #hero>
@@ -51,17 +50,17 @@
           />
         </template>
       </SaplingDialogShell>
-    </v-card>
+    </SaplingDialogCard>
   </v-dialog>
 </template>
 
 <script setup lang="ts">
 // #region Imports
 import { useSaplingChangePassword } from '@/composables/account/useSaplingChangePassword'
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
 import { SAPLING_DIALOG_MAX_WIDTH } from '@/constants/dialog.constants'
 import SaplingActionChangePassword from '../actions/SaplingActionChangePassword.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue'
 // #endregion

@@ -4,11 +4,7 @@
     @update:model-value="onDialogModelValueUpdate"
     class="sapling-dialog-medium"
   >
-    <v-card
-      class="glass-panel tilt-content sapling-dialog-compact-card"
-      v-tilt="TILT_DEFAULT_OPTIONS"
-      elevation="12"
-    >
+    <SaplingDialogCard class="sapling-dialog-compact-card">
       <div class="sapling-dialog-shell">
         <template v-if="isLoading">
           <SaplingDialogHero loading :loading-stats-count="2" />
@@ -120,7 +116,7 @@
           />
         </template>
       </div>
-    </v-card>
+    </SaplingDialogCard>
   </v-dialog>
 </template>
 
@@ -128,9 +124,9 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { DOCUMENT_MAX_FILE_SIZE_MB } from '@/constants/project.constants'
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
 import SaplingActionUpload from '../actions/SaplingActionUpload.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import {
   useSaplingTableRowUpload,

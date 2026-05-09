@@ -6,11 +6,7 @@
     :max-width="SAPLING_DIALOG_MAX_WIDTH.sm"
     class="sapling-add-kpi-dialog"
   >
-    <v-card
-      class="glass-panel tilt-content sapling-dialog-compact-card"
-      v-tilt="TILT_DEFAULT_OPTIONS"
-      elevation="12"
-    >
+    <SaplingDialogCard class="sapling-dialog-compact-card">
       <div class="sapling-dialog-shell">
         <template v-if="isTranslationLoading">
           <SaplingDialogHero loading />
@@ -44,7 +40,7 @@
           <SaplingActionSave :cancel="handleCancel" :save="handleSave" />
         </template>
       </div>
-    </v-card>
+    </SaplingDialogCard>
   </v-dialog>
 </template>
 
@@ -54,10 +50,10 @@ import { computed } from 'vue'
 import type { KPIItem } from '@/entity/entity'
 import { useSaplingDialogKpi } from '@/composables/dialog/useSaplingDialogKpi'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
 import { SAPLING_DIALOG_MAX_WIDTH } from '@/constants/dialog.constants'
 import SaplingActionSave from '../actions/SaplingActionSave.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 // #endregion
 

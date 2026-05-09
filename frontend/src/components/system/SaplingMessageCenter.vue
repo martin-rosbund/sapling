@@ -23,11 +23,7 @@
       <template v-slot:activator="{ props }">
         <slot name="activator" v-bind="props" />
       </template>
-      <v-card
-        class="glass-panel tilt-content sapling-message-center-dialog"
-        v-tilt="TILT_DEFAULT_OPTIONS"
-        elevation="12"
-      >
+      <SaplingDialogCard class="sapling-message-center-dialog">
         <div class="sapling-dialog-shell sapling-fill-shell">
           <template v-if="isTranslationLoading">
             <SaplingDialogHero loading />
@@ -100,7 +96,7 @@
             />
           </template>
         </div>
-      </v-card>
+      </SaplingDialogCard>
     </v-dialog>
   </div>
 </template>
@@ -111,7 +107,7 @@ import { useI18n } from 'vue-i18n'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import type { Message } from '@/composables/system/useSaplingMessageCenter'
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
 import SaplingActionMessageCenter from '@/components/actions/SaplingActionMessageCenter.vue'

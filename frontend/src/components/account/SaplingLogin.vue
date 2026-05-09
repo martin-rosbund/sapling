@@ -2,11 +2,7 @@
   <!-- Container for the login form, styled to center content both vertically and horizontally -->
   <v-container class="sapling-login-shell d-flex flex-column justify-center align-center" fluid>
     <!-- Card container for the login form -->
-    <v-card
-      v-tilt="TILT_DEFAULT_OPTIONS"
-      class="glass-panel tilt-content sapling-dialog-small sapling-login-dialog"
-      elevation="10"
-    >
+    <SaplingDialogCard class="sapling-dialog-small sapling-login-dialog" :elevation="10">
       <template v-if="isLoading">
         <SaplingInstanceBooting />
       </template>
@@ -57,7 +53,7 @@
           </template>
         </SaplingDialogShell>
       </template>
-    </v-card>
+    </SaplingDialogCard>
     <!-- Password change dialog displayed after login if required -->
     <SaplingChangePassword
       v-model="showPasswordChange"
@@ -74,10 +70,9 @@ import SaplingInstanceBooting from '@/components/account/SaplingInstanceBooting.
 import { useSaplingLogin } from '@/composables/account/useSaplingLogin'
 // Import the password change dialog component
 import SaplingChangePassword from '@/components/account/SaplingChangePassword.vue'
-// Import the tilt constants for styling
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
 // Import the extracted SaplingActionLogin component
 import SaplingActionLogin from '@/components/actions/SaplingActionLogin.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue'
 //#endregion

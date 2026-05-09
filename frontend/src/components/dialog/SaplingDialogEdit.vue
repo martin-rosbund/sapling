@@ -7,7 +7,7 @@
     :height="SAPLING_DIALOG_HEIGHT.xl"
     persistent
   >
-    <v-card class="glass-panel sapling-dialog-edit-card" elevation="12">
+    <SaplingDialogCard class="sapling-dialog-edit-card">
       <div class="sapling-dialog-edit-shell">
         <v-card-title class="sapling-dialog-edit-header">
           <SaplingDialogEditHero :loading="isLoading" :eyebrow="entityLabel" :title="dialogTitle">
@@ -339,7 +339,7 @@
           </template>
         </SaplingActionBar>
       </div>
-    </v-card>
+    </SaplingDialogCard>
   </v-dialog>
 
   <SaplingDialogDelete
@@ -401,6 +401,7 @@ import { buildMailMenuActions } from '@/utils/saplingMailMenuUtil'
 import SaplingDialogEditHero from '@/components/common/SaplingDialogEditHero.vue'
 import SaplingActionBar from '@/components/actions/SaplingActionBar.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
 import SaplingDialogUnsavedChanges from '@/components/dialog/SaplingDialogUnsavedChanges.vue'
 import SaplingDialogEditFieldRenderer from './SaplingDialogEditFieldRenderer.vue'

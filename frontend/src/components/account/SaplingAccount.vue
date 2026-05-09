@@ -1,11 +1,7 @@
 <template>
   <!-- Dialog container for the account -->
   <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-medium">
-    <v-card
-      class="glass-panel tilt-content sapling-account-dialog"
-      v-tilt="TILT_DEFAULT_OPTIONS"
-      elevation="12"
-    >
+    <SaplingDialogCard class="sapling-account-dialog">
       <SaplingDialogShell
         fill-shell
         body-class="sapling-account-dialog__body"
@@ -133,7 +129,7 @@
           />
         </template>
       </SaplingDialogShell>
-    </v-card>
+    </SaplingDialogCard>
     <!-- Password change dialog -->
     <SaplingChangePassword v-model="showPasswordChange" />
   </v-dialog>
@@ -144,9 +140,9 @@
 import { computed } from 'vue'
 import { useSaplingAccount } from '@/composables/account/useSaplingAccount'
 import SaplingChangePassword from '@/components/account/SaplingChangePassword.vue'
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
 import SaplingActionAccount from '@/components/actions/SaplingActionAccount.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue'
 // #endregion

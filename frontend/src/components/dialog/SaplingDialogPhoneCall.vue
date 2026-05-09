@@ -4,7 +4,7 @@
     :max-width="SAPLING_DIALOG_MAX_WIDTH.lg"
     @update:model-value="handleVisibilityChange"
   >
-    <v-card class="glass-panel tilt-content sapling-dialog-compact-card" elevation="12">
+    <SaplingDialogCard class="sapling-dialog-compact-card">
       <div class="sapling-dialog-shell">
         <SaplingDialogHero
           :loading="isTranslationLoading"
@@ -79,7 +79,7 @@
         </SaplingActionBar>
         <SaplingActionBarSkeleton v-else :leading="1" :trailing="2" />
       </div>
-    </v-card>
+    </SaplingDialogCard>
   </v-dialog>
 </template>
 
@@ -88,6 +88,7 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SaplingActionBar from '@/components/actions/SaplingActionBar.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import SaplingMarkdownField from '@/components/dialog/fields/SaplingFieldMarkdown.vue'
 import { SAPLING_DIALOG_MAX_WIDTH } from '@/constants/dialog.constants'

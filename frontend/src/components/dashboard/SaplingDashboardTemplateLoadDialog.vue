@@ -1,10 +1,6 @@
 <template>
   <v-dialog v-if="dialog" v-model="dialog" :persistent="busy" class="sapling-dialog-medium">
-    <v-card
-      class="glass-panel tilt-content sapling-account-dialog sapling-dashboard-template-dialog"
-      v-tilt="TILT_DEFAULT_OPTIONS"
-      elevation="12"
-    >
+    <SaplingDialogCard class="sapling-account-dialog sapling-dashboard-template-dialog">
       <SaplingDialogShell
         fill-shell
         body-class="sapling-account-dialog__body sapling-dashboard-template-dialog__body"
@@ -101,15 +97,15 @@
           <SaplingActionClose :close="handleClose" :disabled="busy" />
         </template>
       </SaplingDialogShell>
-    </v-card>
+    </SaplingDialogCard>
   </v-dialog>
 </template>
 
 <script setup lang="ts">
 import SaplingActionClose from '@/components/actions/SaplingActionClose.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue'
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
 import type { DashboardTemplateItem } from '@/entity/entity'
 import { computed } from 'vue'
 

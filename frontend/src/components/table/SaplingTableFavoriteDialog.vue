@@ -4,7 +4,7 @@
     :max-width="SAPLING_DIALOG_MAX_WIDTH.sm"
     @update:model-value="emit('update:modelValue', $event)"
   >
-    <v-card class="glass-panel tilt-content sapling-dialog-compact-card" elevation="12">
+    <SaplingDialogCard class="sapling-dialog-compact-card">
       <div class="sapling-dialog-shell">
         <SaplingDialogHero
           :eyebrow="$t('global.add')"
@@ -26,7 +26,7 @@
 
         <SaplingActionSave :cancel="onCancel" :save="onSave" />
       </div>
-    </v-card>
+    </SaplingDialogCard>
   </v-dialog>
 </template>
 
@@ -34,6 +34,7 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SaplingActionSave from '@/components/actions/SaplingActionSave.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import { SAPLING_DIALOG_MAX_WIDTH } from '@/constants/dialog.constants'
 

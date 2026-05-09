@@ -27,6 +27,7 @@
         "npx prettier": true,
         "npx mikro-orm": true,
         "npx jest": true,
-        "Group-Object": true
+        "Group-Object": true,
+        "npx vue-tsc": true
     }
 }

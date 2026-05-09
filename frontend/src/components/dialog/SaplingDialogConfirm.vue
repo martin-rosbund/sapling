@@ -10,12 +10,7 @@
     :persistent="persistent"
     @update:model-value="handleDialogUpdate"
   >
-    <v-card
-      v-tilt="tilt ? TILT_DEFAULT_OPTIONS : null"
-      class="glass-panel"
-      :class="cardClass"
-      elevation="12"
-    >
+    <SaplingDialogCard :tilt="tilt" :class="cardClass">
       <div class="sapling-dialog-shell">
         <template v-if="loading">
           <SaplingDialogHero :variant="variant" loading />
@@ -38,15 +33,15 @@
           <slot name="actions" />
         </template>
       </div>
-    </v-card>
+    </SaplingDialogCard>
   </v-dialog>
 </template>
 
 <script lang="ts" setup>
 import { computed } from 'vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
 
 // #region Props & Emits
 const props = withDefaults(
