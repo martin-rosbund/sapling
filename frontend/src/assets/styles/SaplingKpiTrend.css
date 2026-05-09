@@ -86,7 +86,7 @@
   padding: var(--sapling-gap-sm) var(--sapling-gap-md);
   border: 0;
   border-radius: var(--sapling-radius-sm);
-  background: rgba(var(--v-theme-on-surface), 0.03);
+  background: rgba(var(--v-theme-on-surface), 0.04);
   text-align: left;
   transition:
     background-color var(--sapling-motion-fast) ease,

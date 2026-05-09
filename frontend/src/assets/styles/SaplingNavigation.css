@@ -216,7 +216,7 @@
 
 .sapling-profile-menu__section--danger {
   background:
-    linear-gradient(180deg, rgba(194, 52, 52, 0.08), rgba(194, 52, 52, 0.03)),
+    linear-gradient(180deg, rgba(194, 52, 52, 0.08), rgba(194, 52, 52, 0.04)),
     rgba(255, 255, 255, 0.01);
 }
 
@@ -538,6 +538,16 @@
   color: inherit;
   cursor: pointer;
   text-align: left;
+  border-radius: var(--sapling-radius-sm);
+  outline: none;
+}
+
+.sapling-navigation-section__trigger:focus-visible,
+.sapling-navigation-subgroup__trigger:focus-visible,
+.sapling-navigation-entity__single:focus-visible,
+.sapling-navigation-route:focus-visible {
+  outline: 2px solid var(--sapling-surface-border-accent-strong);
+  outline-offset: -2px;
 }
 
 .sapling-navigation-section__trigger {

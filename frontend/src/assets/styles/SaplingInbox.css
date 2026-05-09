@@ -210,7 +210,7 @@
   width: 36px;
   height: 36px;
   border-radius: 12px;
-  background: rgba(var(--v-theme-on-surface), 0.05);
+  background: rgba(var(--v-theme-on-surface), 0.06);
 }
 
 .sapling-inbox-section__title {
@@ -219,7 +219,7 @@
 }
 
 .sapling-inbox-section__subtitle {
-  margin: 6px 0 0;
+  margin: var(--sapling-space-sm) 0 0;
   line-height: 1.5;
   opacity: var(--sapling-opacity-secondary);
 }

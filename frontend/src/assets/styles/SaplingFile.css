@@ -194,8 +194,8 @@
   align-items: center;
   justify-content: center;
   background:
-    linear-gradient(180deg, var(--sapling-surface-fill-soft), rgba(255, 255, 255, 0.03)),
-    rgba(8, 15, 24, 0.03);
+    linear-gradient(180deg, var(--sapling-surface-fill-soft), rgba(255, 255, 255, 0.04)),
+    rgba(8, 15, 24, 0.04);
 }
 
 .sapling-file-media-surface--stacked {

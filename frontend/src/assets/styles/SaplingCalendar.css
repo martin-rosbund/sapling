@@ -226,7 +226,7 @@
   border: 1px solid var(--sapling-surface-border);
   border-radius: var(--sapling-radius-sm);
   background:
-    linear-gradient(180deg, var(--sapling-surface-fill), rgba(255, 255, 255, 0.03)),
+    linear-gradient(180deg, var(--sapling-surface-fill), rgba(255, 255, 255, 0.04)),
     rgba(8, 15, 24, 0.06);
 }
 
@@ -343,7 +343,7 @@
 .sapling-event-panel--accent {
   background:
     linear-gradient(160deg, rgba(255, 255, 255, 0.12), rgba(0, 140, 149, 0.08)),
-    rgba(255, 255, 255, 0.03);
+    rgba(255, 255, 255, 0.04);
 }
 
 .sapling-event-panel__header {
@@ -478,7 +478,7 @@
 .sapling-event-agenda-item__participants {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--sapling-space-sm);
   margin-top: var(--sapling-gap-md);
 }
 
