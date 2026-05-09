@@ -731,13 +731,13 @@ function updateSelectedRelationTableItems(items: SaplingGenericItem[]): void {
 }
 
 function getRecordActionTitle(menuItem: SaplingContextMenuTableMenuItem): string {
-  if (menuItem.title) {
-    return menuItem.title
-  }
-
   if (menuItem.titleKey) {
     const translated = t(menuItem.titleKey)
     return translated !== menuItem.titleKey ? translated : menuItem.titleKey
+  }
+
+  if (menuItem.title) {
+    return te(menuItem.title) ? t(menuItem.title) : menuItem.title
   }
 
   return ''
