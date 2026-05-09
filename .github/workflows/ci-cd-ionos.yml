@@ -57,7 +57,10 @@ jobs:
     name: Deploy production
     runs-on: ubuntu-latest
     needs: ci
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Deploy ist standardmäßig deaktiviert. Zum Aktivieren in GitHub
+    # unter Settings → Secrets and variables → Actions → Variables die
+    # Repository-Variable DEPLOY_ENABLED auf 'true' setzen.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
     environment:
       name: production
     concurrency:
