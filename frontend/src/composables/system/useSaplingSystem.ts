@@ -1,6 +1,7 @@
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import ApiService from '@/services/api.service'
 import { useTranslationLoader } from '../generic/useTranslationLoader'
+import { useVisibilityAwarePolling } from './useVisibilityAwarePolling'
 import type {
   ApplicationState,
   ApplicationVersion,
@@ -61,7 +62,6 @@ export function useSaplingSystem() {
 
   const lastUpdated = ref<Date | null>(null)
 
-  let interval: number = 0
   const POLL_INTERVAL = 3000
 
   const { translationService, isLoading } = useTranslationLoader('global', 'system')
@@ -159,14 +159,11 @@ export function useSaplingSystem() {
 
   onMounted(async () => {
     await fetchAll()
-    interval = window.setInterval(fetchNonPersistent, POLL_INTERVAL)
   })
 
-  onUnmounted(() => {
-    if (interval) {
-      clearInterval(interval)
-    }
-  })
+  // Poll non-persistent metrics (CPU speed, time) only while the dashboard tab
+  // is visible to avoid useless backend round-trips when the tab is hidden.
+  useVisibilityAwarePolling(fetchNonPersistent, POLL_INTERVAL)
   //#endregion
 
   //#region Formatters

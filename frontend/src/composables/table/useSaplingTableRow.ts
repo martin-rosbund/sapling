@@ -79,7 +79,7 @@ const INTERACTIVE_ROW_SELECTOR = [
 export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSaplingTableRowEmit) {
   // #region State
   const genericStore = useGenericStore()
-  const { t, te } = useI18n()
+  const { t } = useI18n()
   const { openMailDialog } = useSaplingMailDialog()
   const menuActive = ref(false)
   const showDialogMap = ref<Record<string, boolean>>({})
@@ -89,7 +89,7 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
   )
   const scriptButtons = computed(() => props.scriptButtons ?? [])
   const mailActions = computed(() => buildMailMenuActions(props.entityTemplates, props.item))
-  const mailToLabel = computed(() => (te('global.mailTo') ? t('global.mailTo') : 'E-Mail an'))
+  const mailToLabel = computed(() => t('global.mailTo'))
   const rowMenuItems = computed<SaplingContextMenuTableMenuItem[]>(() =>
     getSaplingContextMenuTableItems({
       canShowInformation: props.canShowInformation,
@@ -206,6 +206,35 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     }
 
     requestShow(props.item)
+  }
+
+  /**
+   * Keyboard activation for table rows. Enter opens the edit (or show)
+   * dialog for the current row; Space toggles the selection. We only react
+   * when the focus is on the row itself — clicks on nested buttons/inputs
+   * still propagate their native behavior.
+   */
+  function onRowKeydown(event: KeyboardEvent, index: number) {
+    if (event.repeat || isInteractiveRowTarget(event.target)) {
+      return
+    }
+
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      if (props.entityPermission?.allowUpdate) {
+        requestEdit(props.item)
+        return
+      }
+      if (props.entityPermission?.allowShow !== false) {
+        requestShow(props.item)
+      }
+      return
+    }
+
+    if (event.key === ' ' || event.code === 'Space') {
+      event.preventDefault()
+      emit('select-row', index)
+    }
   }
 
   function toggleRowSelection(index: number) {
@@ -333,6 +362,7 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     openContextMenu,
     onRowMouseDown,
     onRowDoubleClick,
+    onRowKeydown,
     toggleRowSelection,
     openDialogForCol,
     closeDialogForCol,

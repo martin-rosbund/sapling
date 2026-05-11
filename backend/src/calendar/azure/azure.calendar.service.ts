@@ -67,8 +67,8 @@ export class AzureCalendarService {
    * - If the event is canceled and exists in Azure, it will be deleted.
    * - If the event exists, it will be updated.
    * - Otherwise, a new event will be created.
-   * @param {EventItem} event The event to set
-   * @param {PersonSessionItem} session The user session containing access tokens
+   * @param {number} eventHandle Handle of the EventItem to synchronize
+   * @param {string} accessToken OAuth access token of the calling user
    * @returns {Promise<any>} The result of the operation (create, update, or delete)
    */
   async setEvent(eventHandle: number, accessToken: string): Promise<any> {
@@ -93,7 +93,7 @@ export class AzureCalendarService {
       case 'canceled':
       case 'completed':
         if (reference) {
-          return await this.deleteEvent(client, event, reference, emFork);
+          return await this.deleteEvent(client, reference, emFork);
         }
         break;
       default:
@@ -187,23 +187,15 @@ export class AzureCalendarService {
   /**
    * Deletes an event from the Azure calendar and removes its reference from the database.
    * @param {Client} client Authenticated Microsoft Graph Client
-   * @param {EventItem} event The event to delete
    * @param {EventAzureItem} reference The EventAzureItem containing the Azure event ID
    * @param {EntityManager} emFork Forked EntityManager for database operations
    * @returns {Promise<any>} An object indicating success
    */
   private async deleteEvent(
     client: Client,
-    event: EventItem,
     reference: EventAzureItem,
     emFork: EntityManager,
   ): Promise<any> {
-    //if (event.type?.handle === 'online') {
-    //  await client.api(`/me/events/${reference.referenceHandle}/decline`).post({
-    //    comment: 'Declined via API',
-    //    sendResponse: true,
-    //  });
-    //}
     await client.api(`/me/events/${reference.referenceHandle}`).delete();
     // Remove the EventAzureItem from the database
     await emFork.remove(reference).flush();

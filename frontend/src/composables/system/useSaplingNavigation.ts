@@ -79,6 +79,44 @@ export function useSaplingNavigation(props: SaplingNavigationProps, emit: Saplin
   const expandedGroups = ref<string[]>([])
   const expandedSubgroups = ref<string[]>([])
 
+  // Persisted user state for navigation expansion. Read once on init; further
+  // changes are written back automatically while the user is not searching.
+  const NAV_EXPANDED_GROUPS_KEY = 'sapling:navigation:expandedGroups'
+  const NAV_EXPANDED_SUBGROUPS_KEY = 'sapling:navigation:expandedSubgroups'
+
+  function readPersistedExpansion(key: string): string[] | null {
+    if (typeof window === 'undefined') {
+      return null
+    }
+    try {
+      const raw = window.localStorage.getItem(key)
+      if (!raw) {
+        return null
+      }
+      const parsed = JSON.parse(raw)
+      return Array.isArray(parsed) && parsed.every((entry) => typeof entry === 'string')
+        ? parsed
+        : null
+    } catch {
+      return null
+    }
+  }
+
+  function writePersistedExpansion(key: string, value: string[]): void {
+    if (typeof window === 'undefined') {
+      return
+    }
+    try {
+      window.localStorage.setItem(key, JSON.stringify(value))
+    } catch {
+      // Ignore quota errors — expansion state is non-critical.
+    }
+  }
+
+  const persistedExpandedGroups = readPersistedExpansion(NAV_EXPANDED_GROUPS_KEY)
+  const persistedExpandedSubgroups = readPersistedExpansion(NAV_EXPANDED_SUBGROUPS_KEY)
+  const hasPersistedState = persistedExpandedGroups !== null || persistedExpandedSubgroups !== null
+
   const normalizedSearch = computed(() => normalizeText(navigationSearch.value))
   const currentPath = computed(() => currentRoute.path.replace(/^\/+/, ''))
   const navigationGroups = computed<NavigationTopGroup[]>(() => {
@@ -173,11 +211,37 @@ export function useSaplingNavigation(props: SaplingNavigationProps, emit: Saplin
         return
       }
 
-      expandedGroups.value = [...nextDefaultGroups]
-      expandedSubgroups.value = [...nextDefaultSubgroups]
+      // Restore persisted user expansion on first run; afterwards trust the
+      // user-controlled state and only seed missing entries from defaults.
+      if (hasPersistedState && expandedGroups.value.length === 0 && expandedSubgroups.value.length === 0) {
+        expandedGroups.value = persistedExpandedGroups ?? [...nextDefaultGroups]
+        expandedSubgroups.value = persistedExpandedSubgroups ?? [...nextDefaultSubgroups]
+        return
+      }
+
+      if (!hasPersistedState && expandedGroups.value.length === 0 && expandedSubgroups.value.length === 0) {
+        expandedGroups.value = [...nextDefaultGroups]
+        expandedSubgroups.value = [...nextDefaultSubgroups]
+      }
     },
     { immediate: true },
   )
+
+  // Persist user-driven expansion changes (only when not searching, since the
+  // search branch expands everything regardless of preference).
+  watch(expandedGroups, (value) => {
+    if (normalizedSearch.value) {
+      return
+    }
+    writePersistedExpansion(NAV_EXPANDED_GROUPS_KEY, value)
+  })
+
+  watch(expandedSubgroups, (value) => {
+    if (normalizedSearch.value) {
+      return
+    }
+    writePersistedExpansion(NAV_EXPANDED_SUBGROUPS_KEY, value)
+  })
   //#endregion
 
   //#region Methods

@@ -106,6 +106,6 @@ function resolveScriptButtonTitle(title: string) {
 }
 
 function resolveMailToSelectedLabel() {
-  return te('global.mailToSelected') ? t('global.mailToSelected') : 'E-Mail an alle Ausgewählten'
+  return t('global.mailToSelected')
 }
 </script>

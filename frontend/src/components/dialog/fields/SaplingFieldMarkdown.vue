@@ -219,7 +219,7 @@ onMounted(() => {
   enhanceTimeout = setTimeout(() => {
     enhanceTimeout = null
     isEnhancedEditorReady.value = true
-  }, 250)
+  }, 20)
 })
 
 onBeforeUnmount(() => {

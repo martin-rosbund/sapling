@@ -44,7 +44,15 @@ const config: Partial<Options> = {
   password: DB_PASSWORD,
   dbName: DB_NAME,
   debug: DB_LOGGING,
-  logger: (message: string) => console.log(message),
+  logger: (message: string) => {
+    if (typeof global !== 'undefined' && global.log) {
+      global.log.debug(message);
+    } else {
+      // Fallback if logger has not been initialized yet (e.g. during CLI bootstrap).
+
+      console.log(message);
+    }
+  },
 };
 
 export default config;

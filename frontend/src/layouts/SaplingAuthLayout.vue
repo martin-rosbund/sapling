@@ -21,6 +21,8 @@
       <SaplingDialogMail />
       <SaplingDialogPhoneCall />
       <SaplingRecordTimeline />
+      <SaplingCommandPalette />
+      <SaplingHelpDialog />
     </template>
 
     <div v-else class="sapling-app-layout__loading">
@@ -33,12 +35,19 @@
 import { defineAsyncComponent, ref } from 'vue'
 import { RouterView } from 'vue-router'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
-import SaplingAiChat from '@/components/system/SaplingAiChat.vue'
-import SaplingMessageCenter from '@/components/system/SaplingMessageCenter.vue'
-import SaplingVectorizationDialog from '@/components/system/SaplingVectorizationDialog.vue'
 import SaplingHeader from '@/components/system/SaplingHeader.vue'
 import SaplingNavigation from '@/components/system/SaplingNavigation.vue'
 
+// Heavy or rarely used shell widgets: load them only when actually mounted/opened.
+const SaplingAiChat = defineAsyncComponent(
+  () => import('@/components/system/SaplingAiChat.vue'),
+)
+const SaplingMessageCenter = defineAsyncComponent(
+  () => import('@/components/system/SaplingMessageCenter.vue'),
+)
+const SaplingVectorizationDialog = defineAsyncComponent(
+  () => import('@/components/system/SaplingVectorizationDialog.vue'),
+)
 const SaplingDialogMail = defineAsyncComponent(
   () => import('@/components/dialog/SaplingDialogMail.vue'),
 )
@@ -47,6 +56,12 @@ const SaplingDialogPhoneCall = defineAsyncComponent(
 )
 const SaplingRecordTimeline = defineAsyncComponent(
   () => import('@/components/timeline/SaplingRecordTimeline.vue'),
+)
+const SaplingCommandPalette = defineAsyncComponent(
+  () => import('@/components/system/SaplingCommandPalette.vue'),
+)
+const SaplingHelpDialog = defineAsyncComponent(
+  () => import('@/components/system/SaplingHelpDialog.vue'),
 )
 
 const navigationDrawer = ref(false)

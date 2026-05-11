@@ -2,6 +2,7 @@ import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 import { TranslationSeeder } from './TranslationSeeder';
 import { GenericSeeder } from './GenericSeeder';
+import { loadSeedJson } from './utils/load-seed-json';
 import { AddressItem } from '../../entity/AddressItem';
 import { AddressTypeItem } from '../../entity/AddressTypeItem';
 import { CompanyItem } from '../../entity/CompanyItem';
@@ -9,8 +10,6 @@ import { CompanyRelationshipItem } from '../../entity/CompanyRelationshipItem';
 import { CompanyRelationshipTypeItem } from '../../entity/CompanyRelationshipTypeItem';
 import { DashboardTemplateItem } from '../../entity/DashboardTemplateItem';
 import { PermissionSeeder } from './PermissionSeeder';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 import { ContractItem } from '../../entity/ContractItem';
 import { ContractServiceItem } from '../../entity/ContractServiceItem';
 import { LanguageItem } from '../../entity/LanguageItem';
@@ -36,7 +35,6 @@ import { EventStatusItem } from '../../entity/EventStatusItem';
 import { KpiItem } from '../../entity/KpiItem';
 import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
 import { WorkHourItem } from '../../entity/WorkHourItem';
-import { DB_DATA_SEEDER } from '../../constants/project.constants';
 import { PersonDepartmentItem } from '../../entity/PersonDepartmentItem';
 import { PersonTypeItem } from '../../entity/PersonTypeItem';
 import { WebhookAuthenticationTypeItem } from '../../entity/WebhookAuthenticationTypeItem';
@@ -79,6 +77,104 @@ import { TeamsDeliveryStatusItem } from '../../entity/TeamsDeliveryStatusItem';
 import { HolidayItem } from '../../entity/HolidayItem';
 import { HolidayGroupItem } from '../../entity/HolidayGroupItem';
 import { RoleStarterSeeder } from './RoleStarterSeeder';
+import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
+import type { EntityName } from '@mikro-orm/core';
+
+/**
+ * Declarative seed order.
+ *
+ * Each entry is either:
+ *  - an entity class — gets wrapped in `GenericSeeder.for(entity)` at runtime
+ *    and seeded from `seeder/json-{env}/{entity}/{entity}Data_NNN.json`, or
+ *  - a specialized seeder class (e.g. {@link TranslationSeeder},
+ *    {@link PermissionSeeder}, {@link RoleStarterSeeder}) — used as-is.
+ *
+ * Reorder carefully — entries depend on the rows above them being seeded
+ * first (foreign keys).
+ */
+const SEED_ORDER: Array<EntityName<object> | (new () => Seeder)> = [
+  LanguageItem,
+  MoneyItem,
+  CountryItem,
+  TranslationSeeder,
+  WorkHourItem,
+  WorkHourWeekItem,
+  HolidayGroupItem,
+  AddressTypeItem,
+  CompanyItem,
+  AddressItem,
+  CompanyRelationshipTypeItem,
+  CompanyRelationshipItem,
+  EntityGroupItem,
+  EntityItem,
+  EntityRouteItem,
+  ScriptButtonItem,
+  KpiAggregationItem,
+  KpiTimeframeItem,
+  KpiTypeItem,
+  KpiItem,
+  RoleStageItem,
+  RoleItem,
+  PermissionSeeder,
+  PersonDepartmentItem,
+  PersonTypeItem,
+  PersonItem,
+  PhoneCallItem,
+  SocialMediaTypeItem,
+  SocialMediaItem,
+  TicketPriorityItem,
+  TicketStatusItem,
+  TicketTypeItem,
+  TicketCategoryItem,
+  TicketSourceItem,
+  SupportTeamItem,
+  SlaPolicyItem,
+  SupportQueueItem,
+  NoteGroupItem,
+  EventStatusItem,
+  EventDeliveryStatusItem,
+  EventTypeItem,
+  HolidayItem,
+  ContractServiceItem,
+  ContractItem,
+  TicketItem,
+  EventItem,
+  DashboardTemplateItem,
+  FavoriteTemplateItem,
+  RoleStarterSeeder,
+  ServerLandscapeTypeItem,
+  ServerLandscapeTypeUsageItem,
+  ServerLandscapeItem,
+  ProductItem,
+  NoteItem,
+  WebhookAuthenticationTypeItem,
+  WebhookSubscriptionTypeItem,
+  WebhookSubscriptionPayloadType,
+  WebhookSubscriptionMethodItem,
+  WebhookDeliveryStatusItem,
+  WebhookSubscriptionItem,
+  SalesOpportunityStageItem,
+  SalesOpportunityForecastItem,
+  SalesOpportunitySourceItem,
+  SalesOpportunityItem,
+  DocumentTypeItem,
+  EmailTemplateItem,
+  EMailListItem,
+  TeamsTemplateItem,
+  TeamsDeliveryStatusItem,
+  TeamsSubscriptionItem,
+  TeamsDeliveryItem,
+  AiChatTranscriptionItem,
+  AiProviderTypeItem,
+  AiProviderModelItem,
+  McpServerConfigItem,
+];
+
+function isEntityClass(
+  entry: EntityName<object> | (new () => Seeder),
+): entry is EntityName<object> {
+  return ENTITY_REGISTRY.some((registryEntry) => registryEntry.class === entry);
+}
 
 // entfernt
 
@@ -98,102 +194,30 @@ export class DatabaseSeeder extends Seeder {
   /**
    * Executes all seeders in sequence to initialize the database.
    * Calls each seeder for entities, translations, permissions, and more.
+   *
+   * The order is expressed declaratively via {@link SEED_ORDER}; entries that
+   * are entity classes are wrapped in a `GenericSeeder.for(...)`, special
+   * seeders (e.g. {@link TranslationSeeder}, {@link PermissionSeeder},
+   * {@link RoleStarterSeeder}) are forwarded as-is.
    * @param {EntityManager} em - MikroORM entity manager
    * @returns {Promise<void>}
    */
   async run(em: EntityManager): Promise<void> {
-    await this.call(em, [
-      GenericSeeder.for(LanguageItem),
-      GenericSeeder.for(MoneyItem),
-      GenericSeeder.for(CountryItem),
-      TranslationSeeder,
-      GenericSeeder.for(WorkHourItem),
-      GenericSeeder.for(WorkHourWeekItem),
-      GenericSeeder.for(HolidayGroupItem),
-      GenericSeeder.for(AddressTypeItem),
-      GenericSeeder.for(CompanyItem),
-      GenericSeeder.for(AddressItem),
-      GenericSeeder.for(CompanyRelationshipTypeItem),
-      GenericSeeder.for(CompanyRelationshipItem),
-      GenericSeeder.for(EntityGroupItem),
-      GenericSeeder.for(EntityItem),
-      GenericSeeder.for(EntityRouteItem),
-      GenericSeeder.for(ScriptButtonItem),
-      GenericSeeder.for(KpiAggregationItem),
-      GenericSeeder.for(KpiTimeframeItem),
-      GenericSeeder.for(KpiTypeItem),
-      GenericSeeder.for(KpiItem),
-      GenericSeeder.for(RoleStageItem),
-      GenericSeeder.for(RoleItem),
-      PermissionSeeder,
-      GenericSeeder.for(PersonDepartmentItem),
-      GenericSeeder.for(PersonTypeItem),
-      GenericSeeder.for(PersonItem),
-      GenericSeeder.for(PhoneCallItem),
-      GenericSeeder.for(SocialMediaTypeItem),
-      GenericSeeder.for(SocialMediaItem),
-      GenericSeeder.for(TicketPriorityItem),
-      GenericSeeder.for(TicketStatusItem),
-      GenericSeeder.for(TicketTypeItem),
-      GenericSeeder.for(TicketCategoryItem),
-      GenericSeeder.for(TicketSourceItem),
-      GenericSeeder.for(SupportTeamItem),
-      GenericSeeder.for(SlaPolicyItem),
-      GenericSeeder.for(SupportQueueItem),
-      GenericSeeder.for(NoteGroupItem),
-      GenericSeeder.for(EventStatusItem),
-      GenericSeeder.for(EventDeliveryStatusItem),
-      GenericSeeder.for(EventTypeItem),
-      GenericSeeder.for(HolidayItem),
-      GenericSeeder.for(ContractServiceItem),
-      GenericSeeder.for(ContractItem),
-      GenericSeeder.for(TicketItem),
-      GenericSeeder.for(EventItem),
-      GenericSeeder.for(DashboardTemplateItem),
-      GenericSeeder.for(FavoriteTemplateItem),
-      RoleStarterSeeder,
-      GenericSeeder.for(ServerLandscapeTypeItem),
-      GenericSeeder.for(ServerLandscapeTypeUsageItem),
-      GenericSeeder.for(ServerLandscapeItem),
-      GenericSeeder.for(ProductItem),
-      GenericSeeder.for(NoteItem),
-      GenericSeeder.for(WebhookAuthenticationTypeItem),
-      GenericSeeder.for(WebhookSubscriptionTypeItem),
-      GenericSeeder.for(WebhookSubscriptionPayloadType),
-      GenericSeeder.for(WebhookSubscriptionMethodItem),
-      GenericSeeder.for(WebhookDeliveryStatusItem),
-      GenericSeeder.for(WebhookSubscriptionItem),
-      GenericSeeder.for(SalesOpportunityStageItem),
-      GenericSeeder.for(SalesOpportunityForecastItem),
-      GenericSeeder.for(SalesOpportunitySourceItem),
-      GenericSeeder.for(SalesOpportunityItem),
-      GenericSeeder.for(DocumentTypeItem),
-      GenericSeeder.for(EmailTemplateItem),
-      GenericSeeder.for(EMailListItem),
-      GenericSeeder.for(TeamsTemplateItem),
-      GenericSeeder.for(TeamsDeliveryStatusItem),
-      GenericSeeder.for(TeamsSubscriptionItem),
-      GenericSeeder.for(TeamsDeliveryItem),
-      GenericSeeder.for(AiChatTranscriptionItem),
-      GenericSeeder.for(AiProviderTypeItem),
-      GenericSeeder.for(AiProviderModelItem),
-      GenericSeeder.for(McpServerConfigItem),
-    ]);
+    const seeders = SEED_ORDER.map((entry) =>
+      isEntityClass(entry)
+        ? GenericSeeder.for(entry)
+        : (entry as new () => Seeder),
+    );
+    await this.call(em, seeders);
   }
 
   /**
-   * Generic static method to load JSON data with import assertion
-   */
-  /**
    * Static method to load JSON data for seeding.
-   * Reads the specified JSON file and parses its contents.
+   * Delegates to the shared {@link loadSeedJson} helper.
    * @param {string} fileBase - Base filename (without extension)
    * @returns {T[]} - Parsed array of data
    */
   static loadJsonData<T>(fileBase: string): T[] {
-    const env = DB_DATA_SEEDER;
-    const jsonPath = join(__dirname, `./json-${env}/${fileBase}.json`);
-    const fileContent = readFileSync(jsonPath, 'utf-8');
-    return JSON.parse(fileContent) as T[];
+    return loadSeedJson<T>(fileBase);
   }
 }

@@ -92,6 +92,14 @@
       <SaplingTableMobileCard
         v-for="(item, index) in items"
         :key="String(item.handle ?? index)"
+        v-memo="[
+          item.handle,
+          item.updatedAt,
+          isRowSelected(index),
+          multiSelect,
+          showActions,
+          mobileCardHeaders,
+        ]"
         :item="item"
         :columns="mobileCardHeaders"
         :index="index"

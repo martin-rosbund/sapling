@@ -64,6 +64,7 @@
             :label="$t('issue.titleFieldLabel')"
             variant="outlined"
             density="comfortable"
+            autocomplete="off"
             hide-details="auto"
             maxlength="256"
             counter="256"

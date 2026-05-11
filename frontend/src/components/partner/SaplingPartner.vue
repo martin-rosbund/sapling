@@ -93,7 +93,7 @@ const props = defineProps<{ entityHandle: string }>()
 const entityHandleRef = toRef(props, 'entityHandle')
 // #endregion
 
-const { t, te } = useI18n()
+const { t } = useI18n()
 const { width } = useDisplay()
 
 const isMobileFilterLayout = computed(() => width.value <= PARTNER_FILTER_DIALOG_BREAKPOINT)
@@ -109,8 +109,8 @@ const isFilterPanelVisible = computed(() =>
 )
 
 const filterPanelLabel = computed(() => {
-  const peopleLabel = te('navigation.person') ? t('navigation.person') : 'Person'
-  const companyLabel = te('navigation.company') ? t('navigation.company') : 'Unternehmen'
+  const peopleLabel = t('navigation.person')
+  const companyLabel = t('navigation.company')
 
   return `${peopleLabel} & ${companyLabel}`
 })
@@ -121,9 +121,7 @@ const filterPanelToggleLabel = computed(() =>
     : `${filterPanelLabel.value} einblenden`,
 )
 
-const filterDialogCloseLabel = computed(() =>
-  te('global.close') ? t('global.close') : 'Schliessen',
-)
+const filterDialogCloseLabel = computed(() => t('global.close'))
 
 watch(isMobileFilterLayout, (isMobile) => {
   if (!isMobile) {

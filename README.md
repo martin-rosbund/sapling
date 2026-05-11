@@ -1,14 +1,14 @@
 # Sapling
 
-Sapling ist eine Full-Stack-Plattform fuer CRM, Service, operative Ablaeufe und teaminterne Zusammenarbeit. Die Anwendung buendelt Stammdaten, Tickets, Termine, Dateien, Kennzahlen, Arbeitslisten, Vorlagen, Integrationen und KI-gestuetzte Assistenz in einer gemeinsamen Oberflaeche.
+Sapling ist eine Full-Stack-Plattform für CRM, Service, operative Ablaeufe und teaminterne Zusammenarbeit. Die Anwendung buendelt Stammdaten, Tickets, Termine, Dateien, Kennzahlen, Arbeitslisten, Vorlagen, Integrationen und KI-gestuetzte Assistenz in einer gemeinsamen Oberflaeche.
 
-Das Repository ist als JavaScript/TypeScript-Monorepo aufgebaut und kombiniert ein NestJS-Backend mit einem Vue-3-Frontend. Sapling eignet sich fuer lokale Entwicklung, Docker-gestuetzte Infrastruktur und selbst betriebene Ubuntu-Deployments mit PostgreSQL, optional Redis und Reverse Proxy.
+Das Repository ist als JavaScript/TypeScript-Monorepo aufgebaut und kombiniert ein NestJS-Backend mit einem Vue-3-Frontend. Sapling eignet sich für lokale Entwicklung, Docker-gestuetzte Infrastruktur und selbst betriebene Ubuntu-Deployments mit PostgreSQL, optional Redis und Reverse Proxy.
 
 ## Highlights
 
 - **Generisches Datenmodell:** Unternehmen, Personen, Tickets, Verkaufschancen, Vertraege, Produkte, Termine, Dokumente, Rollen, Systemlandschaften und weitere Fachobjekte laufen ueber ein einheitliches Entity-, Template- und Berechtigungsmodell.
 - **Arbeitslisten:** Vordefinierte und personalisierbare Arbeitslisten basieren auf gespeicherten Filtern, z. B. offene eigene Tickets, ueberfaellige Tickets, heutige Termine, aktive Verkaufschancen oder relevante Kunden-/Vertragslisten.
-- **Vorlagen fuer Dashboards und Arbeitslisten:** Rollen koennen Starter-Dashboards und Starter-Arbeitslisten erhalten. Neue Benutzer bekommen damit direkt passende KPI-Sichten und operative Listen.
+- **Vorlagen für Dashboards und Arbeitslisten:** Rollen koennen Starter-Dashboards und Starter-Arbeitslisten erhalten. Neue Benutzer bekommen damit direkt passende KPI-Sichten und operative Listen.
 - **Dashboard- und KPI-System:** KPI-Karten, Trends, Sparklines, Zeitraeume, Aggregationen, Drilldowns und Dashboard-Templates machen operative Kennzahlen nachvollziehbar.
 - **Teams-Integration:** Sapling kann Microsoft-Teams-Nachrichten aus Templates erzeugen, Platzhalter aus Datensaetzen fuellen, 1:1-Chats bzw. Self-Chats anlegen und Zustellungen als Deliveries nachverfolgen.
 - **Mail- und Message-Templates:** E-Mail- und Teams-Vorlagen unterstuetzen Markdown, Platzhalter und fachliche Kontexte aus Entitaeten.
@@ -16,7 +16,7 @@ Das Repository ist als JavaScript/TypeScript-Monorepo aufgebaut und kombiniert e
 - **Dateien und Dokumente:** Dokumenttypen, Uploads, Dateivorschauen und Zuordnung zu Fachobjekten sind integriert.
 - **Berechtigungen und Rollen:** Authentifizierung per lokaler Anmeldung sowie Microsoft- und Google-OAuth; Rollen steuern Zugriff auf Entitaeten und Funktionen.
 - **AI-Assistent Songbird:** AI-Chat mit Sitzungen, Modellwahl, Streaming, Seitenkontext, Transkription, Vektorisierung und interner Tool-Nutzung.
-- **MCP-Unterstuetzung:** Interner Sapling-MCP-Server fuer berechtigte Datenzugriffe sowie externe MCP-Server per HTTP oder `stdio`.
+- **MCP-Unterstuetzung:** Interner Sapling-MCP-Server für berechtigte Datenzugriffe sowie externe MCP-Server per HTTP oder `stdio`.
 - **Integrationen und Automatisierung:** Webhooks, GitHub-Anbindung, Script-Buttons, Systeminformationen, Mail-, Teams- und Kalenderfunktionen sowie optionale Queue-Verarbeitung mit Redis/BullMQ.
 
 ## Architektur
@@ -38,7 +38,7 @@ sapling/
 |-- backend/          NestJS API, ORM, Auth, Integrationen, Seeder
 |-- frontend/         Vue 3 Client, Views, Komponenten, Stores
 |-- log/              Lokale Laufzeitlogs
-|-- package.json      Root-Skripte fuer Build, Debug, Tests und ORM
+|-- package.json      Root-Skripte für Build, Debug, Tests und ORM
 |-- LICENSE
 `-- README.md
 ```
@@ -48,10 +48,10 @@ sapling/
 - Node.js `^20.19.0` oder `>=22.12.0`
 - npm
 - PostgreSQL
-- Redis optional, wenn Queues fuer Mail, Webhooks oder Teams genutzt werden sollen
-- Ubuntu 22.04 LTS oder neuer fuer die Deployment-Beispiele
+- Redis optional, wenn Queues für Mail, Webhooks oder Teams genutzt werden sollen
+- Ubuntu 22.04 LTS oder neuer für die Deployment-Beispiele
 
-Fuer lokale Entwicklung kann PostgreSQL klassisch installiert oder per Docker gestartet werden. Wenn AI-Vektorisierung genutzt werden soll, empfiehlt sich ein PostgreSQL-Image mit `pgvector`.
+für lokale Entwicklung kann PostgreSQL klassisch installiert oder per Docker gestartet werden. Wenn AI-Vektorisierung genutzt werden soll, empfiehlt sich ein PostgreSQL-Image mit `pgvector`.
 
 ## Lokale Installation
 
@@ -86,50 +86,50 @@ Passe danach mindestens Datenbank, Secret, Frontend-URL und Login-/Integrationsw
 
 Im Repository gibt es aktuell zwei dokumentierte Runtime-Umgebungen:
 
-- `backend/.env` fuer API, Datenbank, Sessions, Integrationen, Logging, AI und Queues
-- `frontend/.env` fuer den Vite-Client, API-Ziel, UI-Grenzwerte und Login-Schalter
+- `backend/.env` für API, Datenbank, Sessions, Integrationen, Logging, AI und Queues
+- `frontend/.env` für den Vite-Client, API-Ziel, UI-Grenzwerte und Login-Schalter
 
 ### Backend `.env`
 
 | Variable | Bedeutung |
 | --- | --- |
 | `PORT` | Port des NestJS-Backends, Standard `3000`. |
-| `SAPLING_WHITELISTED_IPS` | Kommagetrennte Liste erlaubter IPs fuer geschuetzte Systemzugriffe. |
-| `SAPLING_SECRET` | Pflichtwert fuer Session- und Sicherheitslogik; produktiv immer stark und eindeutig setzen. |
-| `SAPLING_FRONTEND_URL` | Exakte Frontend-URL fuer CORS, Redirects und Cookies, z. B. `http://localhost:5173`. |
+| `SAPLING_WHITELISTED_IPS` | Kommagetrennte Liste erlaubter IPs für geschuetzte Systemzugriffe. |
+| `SAPLING_SECRET` | Pflichtwert für Session- und Sicherheitslogik; produktiv immer stark und eindeutig setzen. |
+| `SAPLING_FRONTEND_URL` | Exakte Frontend-URL für CORS, Redirects und Cookies, z. B. `http://localhost:5173`. |
 | `SAPLING_HASH_INDICATOR` / `SAPLING_HASH_COST` | Passwort-Hashing-Konfiguration. |
 | `DB_DRIVER` | Datenbanktreiber, aktuell `postgresql`. |
 | `DB_HOST` / `DB_PORT` | PostgreSQL Host und Port. |
 | `DB_USER` / `DB_PASSWORD` / `DB_NAME` | Datenbankzugang und Datenbankname. |
 | `DB_DATA_SEEDER` | Seed-Datensatz, typischerweise `demonstration` oder `production`. |
-| `DB_LOGGING` | Aktiviert SQL-Logging fuer Debugging. |
+| `DB_LOGGING` | Aktiviert SQL-Logging für Debugging. |
 | `SESSION_COOKIE_NAME` | Name des Session-Cookies. |
 | `SESSION_MAX_AGE` / `SESSION_REMEMBER_ME_MAX_AGE` | Session-Lebensdauer in Millisekunden. |
 | `SESSION_COOKIE_SECURE` | Muss bei HTTPS/Produktion normalerweise `true` sein. |
 | `SESSION_COOKIE_SAME_SITE` | Cookie-SameSite-Policy: `lax`, `strict`, `none` oder `false`. |
 | `SESSION_TRUST_PROXY` | Anzahl vertrauter Reverse Proxies, meist `1` hinter Nginx. |
-| `GENERIC_DOWNLOAD_LIMIT` | Maximale Anzahl Datensaetze fuer generische Exporte. |
-| `LOG_OUTPUT_PATH` | Zielordner fuer Logs, relativ zum Backend-Prozess. |
+| `GENERIC_DOWNLOAD_LIMIT` | Maximale Anzahl Datensaetze für generische Exporte. |
+| `LOG_OUTPUT_PATH` | Zielordner für Logs, relativ zum Backend-Prozess. |
 | `LOG_BACKUP_FILES` | Anzahl rotierter Logdateien. |
 | `LOG_LEVEL` | Log-Level, z. B. `info` oder `debug`. |
-| `LOG_NAME_REQUESTS` / `LOG_NAME_SERVER` | Dateinamen fuer Request- und Serverlogs. |
+| `LOG_NAME_REQUESTS` / `LOG_NAME_SERVER` | Dateinamen für Request- und Serverlogs. |
 | `LOG_APPENDERS` | Log-Ziele, z. B. `console,file`. |
 | `REDIS_ENABLED` | Aktiviert Redis/BullMQ-Queues. |
 | `REDIS_SERVER` / `REDIS_PORT` | Redis Host und Port. |
 | `REDIS_USERNAME` / `REDIS_PASSWORD` | Redis-Zugang, falls erforderlich. |
-| `REDIS_ATTEMPTS` / `REDIS_BACKOFF_*` | Retry-Verhalten fuer Queue-Jobs. |
+| `REDIS_ATTEMPTS` / `REDIS_BACKOFF_*` | Retry-Verhalten für Queue-Jobs. |
 | `REDIS_REMOVE_ON_FAIL` / `REDIS_REMOVE_ON_COMPLETE` | Aufraeumverhalten abgeschlossener oder fehlgeschlagener Jobs. |
-| `WEBHOOK_TIMEOUT` / `WEBHOOK_MAX_REDIRECTS` | HTTP-Verhalten fuer Webhook-Zustellung. |
+| `WEBHOOK_TIMEOUT` / `WEBHOOK_MAX_REDIRECTS` | HTTP-Verhalten für Webhook-Zustellung. |
 | `AZURE_AD_TENNANT_ID` | Microsoft Tenant-ID. Der Name ist im Code aktuell so geschrieben. |
 | `AZURE_AD_CLIENT_ID` / `AZURE_AD_CLIENT_SECRET` | Microsoft OAuth App Credentials. |
 | `AZURE_AD_REDIRECT_URL` | Callback, z. B. `http://localhost:3000/api/auth/azure/callback`. |
-| `AZURE_AD_SCOPE` | Microsoft Graph Scopes fuer Login, Kalender, Mail und Teams. |
+| `AZURE_AD_SCOPE` | Microsoft Graph Scopes für Login, Kalender, Mail und Teams. |
 | `AZURE_AD_RESPONSE_TYPE` / `AZURE_AD_RESPONSE_MODE` | Optionales OAuth-Antwortverhalten. |
-| `AZURE_AD_ALLOW_HTTP` | Nur fuer lokale Microsoft-OAuth-Setups ohne HTTPS relevant. |
+| `AZURE_AD_ALLOW_HTTP` | Nur für lokale Microsoft-OAuth-Setups ohne HTTPS relevant. |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth App Credentials. |
 | `GOOGLE_CALLBACK_URL` | Callback, z. B. `http://localhost:3000/api/auth/google/callback`. |
-| `GOOGLE_SCOPE` | Google Scopes fuer Login und Kalender. |
-| `AI_CHAT_MESSAGE_PAGE_SIZE` | Standard-Seitengroesse fuer Chat-Historien. |
+| `GOOGLE_SCOPE` | Google Scopes für Login und Kalender. |
+| `AI_CHAT_MESSAGE_PAGE_SIZE` | Standard-Seitengroesse für Chat-Historien. |
 | `AI_MAX_CHAT_MESSAGE_PAGE_SIZE` | Maximale Chat-Historien-Seitengroesse. |
 | `AI_STREAM_HISTORY_MESSAGE_LIMIT` | Anzahl vorheriger Nachrichten im Streaming-Kontext. |
 | `GITHUB_REPO` / `GITHUB_API_URL` / `GITHUB_TOKEN` | GitHub-Integration. |
@@ -143,21 +143,21 @@ AI-Provider-Credentials werden im laufenden System datengetrieben ueber Provider
 | Variable | Bedeutung |
 | --- | --- |
 | `VITE_BACKEND_URL` | Backend-Basis inklusive `/api/`, z. B. `http://localhost:3000/api/`. |
-| `VITE_GIT_URL` | Repository-URL, die im Client fuer Projekt-/GitHub-Verweise genutzt wird. |
+| `VITE_GIT_URL` | Repository-URL, die im Client für Projekt-/GitHub-Verweise genutzt wird. |
 | `VITE_PORT` | Port des Vite-Dev-Servers, Standard `5173`. |
-| `VITE_ALLOWED_HOSTS` | Kommagetrennte erlaubte Hosts fuer lokale Vite-Zugriffe. |
-| `VITE_DEFAULT_SMALL_WINDOW_WIDTH` | Breakpoint fuer kleine Fenster. |
-| `VITE_DEFAULT_MEDIUM_WINDOW_WIDTH` | Breakpoint fuer mittlere Fenster. |
-| `VITE_DEFAULT_LARGE_WINDOW_WIDTH` | Breakpoint fuer grosse Fenster. |
-| `VITE_DEFAULT_PAGE_SIZE_SMALL` | Standard-Seitengroesse fuer kleine Viewports. |
-| `VITE_DEFAULT_PAGE_SIZE_MEDIUM` | Standard-Seitengroesse fuer mittlere Viewports. |
-| `VITE_DEFAULT_PAGE_SIZE_LARGE` | Standard-Seitengroesse fuer grosse Viewports. |
-| `VITE_DEFAULT_PAGE_SIZE_OPTIONS` | Auswahlwerte fuer Tabellen-Pagination, z. B. `10,25,50,100`. |
-| `VITE_DEFAULT_ENTITY_ITEMS_COUNT` | Standardlimit fuer Entity-Abfragen im Client. |
+| `VITE_ALLOWED_HOSTS` | Kommagetrennte erlaubte Hosts für lokale Vite-Zugriffe. |
+| `VITE_DEFAULT_SMALL_WINDOW_WIDTH` | Breakpoint für kleine Fenster. |
+| `VITE_DEFAULT_MEDIUM_WINDOW_WIDTH` | Breakpoint für mittlere Fenster. |
+| `VITE_DEFAULT_LARGE_WINDOW_WIDTH` | Breakpoint für grosse Fenster. |
+| `VITE_DEFAULT_PAGE_SIZE_SMALL` | Standard-Seitengroesse für kleine Viewports. |
+| `VITE_DEFAULT_PAGE_SIZE_MEDIUM` | Standard-Seitengroesse für mittlere Viewports. |
+| `VITE_DEFAULT_PAGE_SIZE_LARGE` | Standard-Seitengroesse für grosse Viewports. |
+| `VITE_DEFAULT_PAGE_SIZE_OPTIONS` | Auswahlwerte für Tabellen-Pagination, z. B. `10,25,50,100`. |
+| `VITE_DEFAULT_ENTITY_ITEMS_COUNT` | Standardlimit für Entity-Abfragen im Client. |
 | `VITE_DOCUMENT_MAX_FILE_SIZE_MB` | Maximale Uploadgroesse pro Datei im Frontend. |
 | `VITE_MOBILE_CARD_FIELD_LIMIT` | Maximale Feldanzahl in mobilen Kartenansichten. |
 | `VITE_DESKTOP_TABLE_COLUMN_LIMIT` | Maximale Spaltenanzahl in Desktop-Tabellenansichten. |
-| `VITE_DEBUG_USERNAME` / `VITE_DEBUG_PASSWORD` | Komfortwerte fuer lokale Login-Entwicklung; nicht produktiv verwenden. |
+| `VITE_DEBUG_USERNAME` / `VITE_DEBUG_PASSWORD` | Komfortwerte für lokale Login-Entwicklung; nicht produktiv verwenden. |
 | `VITE_IS_LOGIN_WITH_AZURE_ENABLED` | Schaltet Microsoft-Login im Frontend sichtbar. |
 | `VITE_IS_LOGIN_WITH_GOOGLE_ENABLED` | Schaltet Google-Login im Frontend sichtbar. |
 | `VITE_NAVIGATION_URL` | Externe Navigations-/Maps-Basis-URL. |
@@ -176,7 +176,7 @@ npm run orm:deploy --prefix backend
 
 - `orm:migrate` baut das Backend und fuehrt ausstehende MikroORM-Migrationen aus.
 - `orm:seed` baut das Backend und startet die Seeder.
-- `orm:deploy` kombiniert Migrationen und Seeder und ist der beste Einstieg fuer frische Umgebungen.
+- `orm:deploy` kombiniert Migrationen und Seeder und ist der beste Einstieg für frische Umgebungen.
 - `orm:create-migration` erstellt eine neue MikroORM-Migration aus dem aktuellen Entity-Modell.
 
 Seed-Daten liegen unter `backend/src/database/seeder/json-${DB_DATA_SEEDER}/...`. Erfolgreich gelaufene Seed-Dateien werden in `seed_script_item` protokolliert und spaeter uebersprungen. Neue Seed-Daten sollten deshalb in neuen JSON-Dateien ausgeliefert werden.
@@ -189,7 +189,7 @@ Vom Repository-Root:
 # Backend und Frontend im lokalen Debug-/Watch-Modus starten
 npm run debug
 
-# Produktionsnahe Startkommandos fuer beide Teile
+# Produktionsnahe Startkommandos für beide Teile
 npm run release
 ```
 
@@ -212,10 +212,10 @@ Lokale Standard-Endpunkte:
 | `npm run test:backend` | Fuehrt Backend-Tests mit Jest aus. |
 | `npm run test:frontend` | Fuehrt Frontend-Unit-Tests mit Vitest aus. |
 | `npm run test` | Fuehrt Backend- und Frontend-Tests nacheinander aus. |
-| `npm run type-check:backend` | Fuehrt den TypeScript-Build-Check fuer das Backend aus. |
-| `npm run type-check:frontend` | Fuehrt Vue-/TypeScript-Type-Checks fuer das Frontend aus. |
+| `npm run type-check:backend` | Fuehrt den TypeScript-Build-Check für das Backend aus. |
+| `npm run type-check:frontend` | Fuehrt Vue-/TypeScript-Type-Checks für das Frontend aus. |
 | `npm run type-check` | Fuehrt alle Type-Checks aus. |
-| `npm run verify` | Fuehrt Type-Checks und Tests als Gesamtpruefung aus. |
+| `npm run verify` | Fuehrt Type-Checks und Tests als GesamtPrüfung aus. |
 | `npm run release:backend` | Startet nur das Backend ueber das produktionsnahe Startscript. |
 | `npm run release:frontend` | Startet nur das Frontend ueber das Release-Entry-Script. |
 | `npm run release` | Startet Backend und Frontend parallel ueber Release-Skripte. |
@@ -231,18 +231,18 @@ Lokale Standard-Endpunkte:
 
 ### Arbeitslisten
 
-Arbeitslisten werden als `FavoriteTemplateItem` gepflegt. Sie definieren Entity, Route und Filter und koennen Platzhalter wie `{{currentUser.handle}}`, `{{today.start}}`, `{{week.start}}` oder `{{month.end}}` nutzen. Dadurch entstehen dynamische Listen fuer den aktuellen Benutzer, z. B.:
+Arbeitslisten werden als `FavoriteTemplateItem` gepflegt. Sie definieren Entity, Route und Filter und koennen Platzhalter wie `{{currentUser.handle}}`, `{{today.start}}`, `{{week.start}}` oder `{{month.end}}` nutzen. Dadurch entstehen dynamische Listen für den aktuellen Benutzer, z. B.:
 
 - eigene offene, wartende, ueberfaellige oder heute faellige Tickets
 - eigene Verkaufschancen nach Pipeline-Phase
 - heutige, morgige oder wochenbezogene Termine
 - aktive Kontakte, Unternehmen, Vertraege und Systemlandschaften
 
-Rollen koennen Starter-Arbeitslisten referenzieren. Beim ersten Zugriff werden daraus persoenliche Favoriten fuer den Benutzer erzeugt.
+Rollen koennen Starter-Arbeitslisten referenzieren. Beim ersten Zugriff werden daraus persoenliche Favoriten für den Benutzer erzeugt.
 
 ### Dashboard-Vorlagen
 
-`DashboardTemplateItem` beschreibt wiederverwendbare Dashboard-Zusammenstellungen mit KPI-Sets. Der Produktions-Seed bringt unter anderem Vorlagen fuer Support Operations, Sales Pipeline, Event Coordination, Contracts & Products, Master Data Quality und System Operations mit.
+`DashboardTemplateItem` beschreibt wiederverwendbare Dashboard-Zusammenstellungen mit KPI-Sets. Der Produktions-Seed bringt unter anderem Vorlagen für Support Operations, Sales Pipeline, Event Coordination, Contracts & Products, Master Data Quality und System Operations mit.
 
 Rollen koennen Starter-Dashboards erhalten. Hat ein Benutzer noch keine persoenlichen Dashboards, werden passende Vorlagen automatisch provisioniert.
 
@@ -262,7 +262,7 @@ Songbird verwendet Provider- und Modelldaten aus der Datenbank. Der interne Sapl
 
 ## Docker
 
-Docker wird in diesem Repository vor allem fuer lokale Infrastruktur empfohlen. Backend und Frontend laufen weiterhin bequem per `npm run debug`; PostgreSQL und Redis koennen isoliert in Containern laufen.
+Docker wird in diesem Repository vor allem für lokale Infrastruktur empfohlen. Backend und Frontend laufen weiterhin bequem per `npm run debug`; PostgreSQL und Redis koennen isoliert in Containern laufen.
 
 ### PostgreSQL mit pgvector
 
@@ -290,7 +290,7 @@ DB_NAME=sapling
 
 Falls Port `5432` lokal bereits belegt ist, kann links ein anderer Host-Port verwendet werden, z. B. `-p 55432:5432`; dann muss `DB_PORT=55432` gesetzt werden.
 
-### Redis fuer Queues
+### Redis für Queues
 
 ```bash
 docker run \
@@ -331,13 +331,13 @@ npm run debug
 
 ## Ubuntu-Deployment
 
-Fuer ein selbst betriebenes Deployment empfiehlt sich:
+für ein selbst betriebenes Deployment empfiehlt sich:
 
 - PostgreSQL lokal oder als verwalteter Dienst
-- optional Redis fuer Queue-basierte Verarbeitung
+- optional Redis für Queue-basierte Verarbeitung
 - Backend als PM2-Prozess auf Port `3000`
 - Frontend statisch aus `frontend/dist` via Nginx
-- Nginx als Reverse Proxy fuer `/` und `/api/`
+- Nginx als Reverse Proxy für `/` und `/api/`
 
 ### Build und Deployment-Schritte
 
@@ -405,7 +405,7 @@ SESSION_TRUST_PROXY=1
 VITE_BACKEND_URL=https://sapling.example.com/api/
 ```
 
-Nach Nginx-Aenderungen:
+Nach Nginx-Änderungen:
 
 ```bash
 sudo nginx -t

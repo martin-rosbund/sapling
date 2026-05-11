@@ -11,7 +11,7 @@
     @update:model-value="handleDialogUpdate"
   >
     <SaplingDialogCard :tilt="tilt" :class="cardClass">
-      <div class="sapling-dialog-shell">
+      <div class="sapling-dialog-shell" @keydown="onShellKeydown" tabindex="-1">
         <template v-if="loading">
           <SaplingDialogHero :variant="variant" loading />
           <SaplingActionBarSkeleton />
@@ -72,6 +72,8 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (event: 'update:modelValue', value: boolean): void
+  (event: 'enter'): void
+  (event: 'escape'): void
 }>()
 // #endregion
 
@@ -82,6 +84,33 @@ const dialogClass = computed(() => `sapling-dialog-${props.size}`)
 // #region Methods
 function handleDialogUpdate(value: boolean): void {
   emit('update:modelValue', value)
+}
+
+/**
+ * Forwards keyboard intents so consumers can wire Enter/Escape to their
+ * primary and cancel actions without duplicating the listener boilerplate.
+ */
+function onShellKeydown(event: KeyboardEvent): void {
+  if (event.repeat) {
+    return
+  }
+
+  const target = event.target as HTMLElement | null
+  const isEditable =
+    target?.tagName === 'TEXTAREA' ||
+    (target?.tagName === 'INPUT' && (target as HTMLInputElement).type !== 'checkbox') ||
+    target?.isContentEditable === true
+
+  if (event.key === 'Enter' && !event.shiftKey && !event.altKey && !isEditable) {
+    event.preventDefault()
+    emit('enter')
+    return
+  }
+
+  if (event.key === 'Escape' && !event.altKey) {
+    event.preventDefault()
+    emit('escape')
+  }
 }
 // #endregion
 </script>

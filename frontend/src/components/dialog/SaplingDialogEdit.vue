@@ -7,8 +7,8 @@
     :height="SAPLING_DIALOG_HEIGHT.xl"
     persistent
   >
-    <SaplingDialogCard class="sapling-dialog-edit-card">
-      <div class="sapling-dialog-edit-shell">
+    <SaplingDialogCard class="sapling-dialog-edit-card" :tilt="false">
+      <div class="sapling-dialog-edit-shell" @keydown="onShellKeydown">
         <v-card-title class="sapling-dialog-edit-header">
           <SaplingDialogEditHero :loading="isLoading" :eyebrow="entityLabel" :title="dialogTitle">
             <template #timestamps>
@@ -95,7 +95,7 @@
             <v-window v-model="activeTab" class="sapling-dialog-edit-window">
               <v-window-item :value="0" class="sapling-dialog-edit-window-item">
                 <div class="sapling-dialog-edit-tab-scroll">
-                  <div class="sapling-dialog-edit-form-surface">
+                  <div ref="formSurfaceRef" class="sapling-dialog-edit-form-surface">
                     <v-form ref="formRef" class="sapling-dialog-edit-form" @submit.prevent="save">
                       <div class="sapling-dialog-edit-form-layout">
                         <section
@@ -183,8 +183,11 @@
                 :key="template.name"
                 :value="idx + 1"
                 class="sapling-dialog-edit-window-item"
+                :transition="false"
+                :reverse-transition="false"
               >
                 <SaplingDialogEditRelationTab
+                  v-if="activeTab === idx + 1"
                   :template="template"
                   :entity-handle="entity?.handle ?? ''"
                   :entity-label="entityLabel"
@@ -381,7 +384,7 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type {
   AccumulatedPermission,
@@ -447,7 +450,7 @@ const emit = defineEmits<{
 }>()
 // #endregion
 
-const { t, d, te, locale } = useI18n()
+const { t, d, te } = useI18n()
 const { pushMessage } = useSaplingMessageCenter()
 const currentPersonStore = useCurrentPersonStore()
 const timelineDialogStore = useTimelineDialogStore()
@@ -505,8 +508,32 @@ const {
   onRelationTableReload,
 } = useSaplingDialogEdit(props, emit, { forceDirty: computed(() => props.forceDirty === true) })
 
-function getFallbackCopy(german: string, english: string): string {
-  return String(locale.value).toLowerCase().startsWith('de') ? german : english
+function onShellKeydown(event: KeyboardEvent) {
+  // Keyboard shortcuts inside the edit dialog:
+  //   Ctrl/Cmd + S        -> save (keep dialog open)
+  //   Ctrl/Cmd + Enter    -> save & close
+  //   Escape              -> cancel (uses unsaved-changes confirmation when dirty)
+  const isMod = event.ctrlKey || event.metaKey
+  if (event.repeat) {
+    return
+  }
+
+  if (isMod && !event.altKey && event.key.toLowerCase() === 's') {
+    event.preventDefault()
+    void save()
+    return
+  }
+
+  if (isMod && !event.altKey && event.key === 'Enter') {
+    event.preventDefault()
+    void saveAndClose()
+    return
+  }
+
+  if (event.key === 'Escape' && !isMod && !event.altKey) {
+    event.preventDefault()
+    cancel()
+  }
 }
 
 const entityLabel = computed(() =>
@@ -577,6 +604,7 @@ const recordDeleteDialog = ref(false)
 const showUploadDialog = ref(false)
 const showInformationDialog = ref(false)
 const loadedScriptButtons = ref<ScriptButtonItem[]>([])
+const formSurfaceRef = ref<HTMLElement | null>(null)
 
 let scriptButtonsRequestId = 0
 
@@ -585,7 +613,7 @@ const recordActionMenuItems = computed<SaplingContextMenuTableMenuItem[]>(() => 
     return []
   }
 
-  const mailToLabel = te('global.mailTo') ? t('global.mailTo') : 'E-Mail an'
+  const mailToLabel = t('global.mailTo')
   const mailActions = buildMailMenuActions(props.templates, form.value)
 
   return getSaplingContextMenuTableItems({
@@ -624,19 +652,14 @@ const updatedAtTitle = computed(() => getTimestampTitle('updatedAt', 'global.upd
 const createdAtLabel = computed(() => formatTimestamp(props.item?.createdAt))
 const updatedAtLabel = computed(() => formatTimestamp(props.item?.updatedAt))
 
-const resetButtonLabel = computed(() =>
-  te('filter.reset') ? t('filter.reset') : getFallbackCopy('Zuruecksetzen', 'Reset'),
-)
+const resetButtonLabel = computed(() => t('filter.reset'))
 
 const dirtySummaryLabel = computed(() => {
   if (dirtyFieldCount.value <= 0) {
     return ''
   }
 
-  return getFallbackCopy(
-    dirtyFieldCount.value === 1 ? '1 Feld geaendert' : `${dirtyFieldCount.value} Felder geaendert`,
-    dirtyFieldCount.value === 1 ? '1 field changed' : `${dirtyFieldCount.value} fields changed`,
-  )
+  return t('global.dirtyFieldCount', { count: dirtyFieldCount.value }, dirtyFieldCount.value)
 })
 
 const expandedGroupIds = ref<string[]>([])
@@ -934,6 +957,50 @@ watch(
   (isOpen) => {
     if (isOpen) {
       syncExpandedGroups(true)
+    }
+  },
+)
+
+/**
+ * Auto-focus the first editable, non-disabled input once the dialog has
+ * finished its initial loading. Saves the user a `Tab` step when entering
+ * data and matches typical CRUD UX conventions.
+ */
+async function focusFirstField(): Promise<void> {
+  if (props.mode === 'readonly') {
+    return
+  }
+
+  await nextTick()
+  const surface = formSurfaceRef.value
+  if (!surface) {
+    return
+  }
+
+  const candidates = surface.querySelectorAll<HTMLElement>(
+    'input:not([type=hidden]):not([disabled]):not([readonly]), textarea:not([disabled]):not([readonly])',
+  )
+
+  for (const candidate of Array.from(candidates)) {
+    if (candidate.offsetParent === null) {
+      continue
+    }
+    if (candidate.getAttribute('aria-hidden') === 'true') {
+      continue
+    }
+    candidate.focus({ preventScroll: true })
+    if (candidate instanceof HTMLInputElement && candidate.type === 'text') {
+      candidate.select?.()
+    }
+    return
+  }
+}
+
+watch(
+  () => [props.modelValue, isLoading.value, props.mode] as const,
+  ([isOpen, loading]) => {
+    if (isOpen && !loading) {
+      void focusFirstField()
     }
   },
 )

@@ -6,6 +6,7 @@ import { EntityRouteItem } from '../../entity/EntityRouteItem';
 import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
 import { SeedScriptItem } from '../../entity/SeedScriptItem';
 import { DB_DATA_SEEDER } from '../../constants/project.constants';
+import { getErrorMessage } from '../../common/error.utils';
 import fs from 'fs';
 import path from 'path';
 
@@ -33,10 +34,6 @@ export class GenericSeeder extends Seeder {
    * @type {string}
    */
   static entityHandle: string;
-
-  private static getErrorMessage(error: unknown): string {
-    return error instanceof Error ? error.message : String(error);
-  }
 
   /**
    * Executes seeding for the specified entity.
@@ -111,7 +108,7 @@ export class GenericSeeder extends Seeder {
         statusItem.isSuccess = false;
         await em.persist(statusItem).flush();
         global.log.error(
-          `Script ${scriptName} for ${entityHandle} failed: ${GenericSeeder.getErrorMessage(err)}`,
+          `Script ${scriptName} for ${entityHandle} failed: ${getErrorMessage(err)}`,
         );
       }
     }

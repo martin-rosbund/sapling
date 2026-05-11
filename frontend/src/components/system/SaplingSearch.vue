@@ -12,6 +12,7 @@
       hide-details
       single-line
       variant="solo"
+      autocomplete="off"
       clearable
       @update:model-value="onSearchUpdate"
     />

@@ -4,13 +4,30 @@ import { Seeder } from '@mikro-orm/seeder';
 import { EntityItem } from '../../entity/EntityItem';
 import { RoleItem } from '../../entity/RoleItem';
 import { PermissionItem } from '../../entity/PermissionItem';
+import {
+  PermissionMatrix,
+  createMatrix,
+  supportPermissionsInput,
+  salesPermissionsInput,
+  customerPermissionsInput,
+  contractorPermissionsInput,
+} from './permission-matrices';
+import { ROLE_HANDLE } from './role-handles';
 
-type PermissionMatrix = {
-  read: Set<string>;
-  insert: Set<string>;
-  update: Set<string>;
-  delete: Set<string>;
-  show: Set<string>;
+type PermissionGrant = {
+  allowRead: boolean;
+  allowInsert: boolean;
+  allowUpdate: boolean;
+  allowDelete: boolean;
+  allowShow: boolean;
+};
+
+const DENY_ALL: PermissionGrant = {
+  allowRead: false,
+  allowInsert: false,
+  allowUpdate: false,
+  allowDelete: false,
+  allowShow: false,
 };
 
 /**
@@ -18,537 +35,17 @@ type PermissionMatrix = {
  * @version         1.0
  * @author          Martin Rosbund
  * @summary         Seeder for populating the database with initial permission data. Creates missing permissions for all entities and roles.
+ *
+ * Uses a `Map<roleHandle, PermissionMatrix>` so adding/changing roles only
+ * requires touching {@link ROLE_HANDLE} + ./permission-matrices.ts.
  */
 export class PermissionSeeder extends Seeder {
-  private readonly supportPermissions = this.createMatrix({
-    read: [
-      'company',
-      'address',
-      'addressType',
-      'person',
-      'personType',
-      'personSession',
-      'personDepartment',
-      'socialMedia',
-      'socialMediaType',
-      'workHour',
-      'workHourWeek',
-      'product',
-      'contract',
-      'contractService',
-      'serverLandscape',
-      'serverLandscapeType',
-      'serverLandscapeTypeUsage',
-      'event',
-      'holidayGroup',
-      'holiday',
-      'eventStatus',
-      'eventType',
-      'eventDelivery',
-      'eventDeliveryStatus',
-      'ticket',
-      'ticketTimeTracking',
-      'ticketPriority',
-      'ticketStatus',
-      'ticketType',
-      'ticketCategory',
-      'ticketSource',
-      'supportTeam',
-      'supportQueue',
-      'slaPolicy',
-      'emailTemplate',
-      'emailDelivery',
-      'emailList',
-      'teamsTemplate',
-      'teamsSubscription',
-      'teamsDelivery',
-      'teamsDeliveryStatus',
-      'companyRelationship',
-      'companyRelationshipType',
-      'note',
-      'noteGroup',
-      'phoneCall',
-      'document',
-      'documentType',
-      'information',
-      'favorite',
-      'favoriteTemplate',
-      'dashboardTemplate',
-      'aiChatSession',
-      'aiChatMessage',
-      'aiChatTranscription',
-    ],
-    insert: [
-      'company',
-      'address',
-      'person',
-      'personDepartment',
-      'socialMedia',
-      'workHour',
-      'workHourWeek',
-      'product',
-      'contract',
-      'contractService',
-      'serverLandscape',
-      'event',
-      'holidayGroup',
-      'holiday',
-      'ticket',
-      'ticketTimeTracking',
-      'supportTeam',
-      'supportQueue',
-      'slaPolicy',
-      'emailTemplate',
-      'emailList',
-      'teamsTemplate',
-      'teamsSubscription',
-      'dashboard',
-      'dashboardTemplate',
-      'favoriteTemplate',
-      'favorite',
-      'companyRelationship',
-      'note',
-      'phoneCall',
-      'information',
-      'kpi',
-    ],
-    update: [
-      'company',
-      'address',
-      'person',
-      'personDepartment',
-      'socialMedia',
-      'workHour',
-      'workHourWeek',
-      'product',
-      'contract',
-      'contractService',
-      'serverLandscape',
-      'event',
-      'holidayGroup',
-      'holiday',
-      'ticket',
-      'ticketTimeTracking',
-      'supportTeam',
-      'supportQueue',
-      'slaPolicy',
-      'emailTemplate',
-      'emailList',
-      'teamsTemplate',
-      'teamsSubscription',
-      'dashboard',
-      'dashboardTemplate',
-      'favoriteTemplate',
-      'favorite',
-      'companyRelationship',
-      'note',
-      'phoneCall',
-      'document',
-      'information',
-      'kpi',
-    ],
-    delete: [
-      'socialMedia',
-      'workHour',
-      'workHourWeek',
-      'event',
-      'holidayGroup',
-      'holiday',
-      'ticketTimeTracking',
-      'note',
-      'phoneCall',
-      'favoriteTemplate',
-      'document',
-      'information',
-      'dashboard',
-      'kpi',
-    ],
-    show: [
-      'company',
-      'address',
-      'person',
-      'personDepartment',
-      'socialMedia',
-      'workHour',
-      'workHourWeek',
-      'product',
-      'contract',
-      'contractService',
-      'serverLandscape',
-      'event',
-      'holidayGroup',
-      'holiday',
-      'ticket',
-      'ticketTimeTracking',
-      'supportTeam',
-      'supportQueue',
-      'slaPolicy',
-      'emailTemplate',
-      'emailList',
-      'teamsTemplate',
-      'teamsSubscription',
-      'dashboard',
-      'dashboardTemplate',
-      'companyRelationship',
-      'note',
-      'phoneCall',
-      'document',
-      'information',
-      'aiChatSession',
-      'aiChatMessage',
-      'aiChatTranscription',
-      'favoriteTemplate',
-    ],
-  });
-
-  private readonly salesPermissions = this.createMatrix({
-    read: [
-      'company',
-      'address',
-      'addressType',
-      'person',
-      'personType',
-      'personSession',
-      'personDepartment',
-      'socialMedia',
-      'socialMediaType',
-      'product',
-      'contract',
-      'contractService',
-      'serverLandscape',
-      'serverLandscapeType',
-      'serverLandscapeTypeUsage',
-      'event',
-      'holidayGroup',
-      'holiday',
-      'eventStatus',
-      'eventType',
-      'eventDeliveryStatus',
-      'ticket',
-      'ticketPriority',
-      'ticketStatus',
-      'ticketType',
-      'ticketCategory',
-      'ticketSource',
-      'emailTemplate',
-      'emailDelivery',
-      'emailList',
-      'teamsTemplate',
-      'teamsSubscription',
-      'teamsDelivery',
-      'teamsDeliveryStatus',
-      'companyRelationship',
-      'companyRelationshipType',
-      'note',
-      'noteGroup',
-      'phoneCall',
-      'salesOpportunity',
-      'salesOpportunityStage',
-      'salesOpportunityForecast',
-      'salesOpportunitySource',
-      'document',
-      'documentType',
-      'information',
-      'favorite',
-      'favoriteTemplate',
-      'dashboardTemplate',
-      'aiChatSession',
-      'aiChatMessage',
-    ],
-    insert: [
-      'company',
-      'address',
-      'person',
-      'personDepartment',
-      'socialMedia',
-      'product',
-      'contract',
-      'contractService',
-      'event',
-      'holidayGroup',
-      'holiday',
-      'ticket',
-      'emailTemplate',
-      'emailList',
-      'teamsTemplate',
-      'teamsSubscription',
-      'dashboard',
-      'dashboardTemplate',
-      'favoriteTemplate',
-      'favorite',
-      'companyRelationship',
-      'note',
-      'phoneCall',
-      'salesOpportunity',
-      'information',
-      'kpi',
-    ],
-    update: [
-      'company',
-      'address',
-      'person',
-      'personDepartment',
-      'socialMedia',
-      'product',
-      'contract',
-      'contractService',
-      'event',
-      'holidayGroup',
-      'holiday',
-      'ticket',
-      'emailTemplate',
-      'emailList',
-      'teamsTemplate',
-      'teamsSubscription',
-      'dashboard',
-      'dashboardTemplate',
-      'favoriteTemplate',
-      'favorite',
-      'companyRelationship',
-      'note',
-      'phoneCall',
-      'salesOpportunity',
-      'document',
-      'information',
-      'kpi',
-    ],
-    delete: [
-      'socialMedia',
-      'event',
-      'holidayGroup',
-      'holiday',
-      'note',
-      'phoneCall',
-      'favoriteTemplate',
-      'salesOpportunity',
-      'document',
-      'information',
-      'dashboard',
-      'kpi',
-    ],
-    show: [
-      'company',
-      'address',
-      'person',
-      'personDepartment',
-      'socialMedia',
-      'product',
-      'contract',
-      'contractService',
-      'serverLandscape',
-      'event',
-      'holidayGroup',
-      'holiday',
-      'ticket',
-      'emailTemplate',
-      'emailList',
-      'teamsTemplate',
-      'teamsSubscription',
-      'dashboardTemplate',
-      'companyRelationship',
-      'note',
-      'phoneCall',
-      'salesOpportunity',
-      'document',
-      'information',
-      'aiChatSession',
-      'aiChatMessage',
-      'favoriteTemplate',
-    ],
-  });
-
-  private readonly customerPermissions = this.createMatrix({
-    read: [
-      'company',
-      'address',
-      'addressType',
-      'person',
-      'personType',
-      'personSession',
-      'product',
-      'contract',
-      'contractService',
-      'event',
-      'holidayGroup',
-      'holiday',
-      'eventStatus',
-      'eventType',
-      'eventDeliveryStatus',
-      'ticket',
-      'ticketTimeTracking',
-      'ticketPriority',
-      'ticketStatus',
-      'ticketType',
-      'ticketCategory',
-      'ticketSource',
-      'note',
-      'phoneCall',
-      'document',
-      'documentType',
-      'information',
-      'favorite',
-      'favoriteTemplate',
-      'dashboardTemplate',
-      'aiChatSession',
-      'aiChatMessage',
-    ],
-    insert: [
-      'ticket',
-      'ticketTimeTracking',
-      'note',
-      'phoneCall',
-      'dashboard',
-      'dashboardTemplate',
-      'favorite',
-      'kpi',
-    ],
-    update: [
-      'ticket',
-      'ticketTimeTracking',
-      'note',
-      'phoneCall',
-      'dashboard',
-      'favorite',
-      'kpi',
-    ],
-    delete: [
-      'ticketTimeTracking',
-      'note',
-      'phoneCall',
-      'dashboard',
-      'favorite',
-      'kpi',
-    ],
-    show: [
-      'company',
-      'address',
-      'person',
-      'product',
-      'contract',
-      'contractService',
-      'event',
-      'holiday',
-      'ticket',
-      'ticketTimeTracking',
-      'note',
-      'phoneCall',
-      'dashboardTemplate',
-      'document',
-      'information',
-      'aiChatSession',
-      'aiChatMessage',
-    ],
-  });
-
-  private readonly contractorPermissions = this.createMatrix({
-    read: [
-      'company',
-      'address',
-      'addressType',
-      'person',
-      'personType',
-      'personSession',
-      'workHour',
-      'workHourWeek',
-      'product',
-      'contract',
-      'contractService',
-      'serverLandscape',
-      'serverLandscapeType',
-      'serverLandscapeTypeUsage',
-      'event',
-      'holidayGroup',
-      'holiday',
-      'eventStatus',
-      'eventType',
-      'eventDeliveryStatus',
-      'ticket',
-      'ticketTimeTracking',
-      'ticketPriority',
-      'ticketStatus',
-      'ticketType',
-      'ticketCategory',
-      'ticketSource',
-      'supportTeam',
-      'supportQueue',
-      'note',
-      'phoneCall',
-      'document',
-      'documentType',
-      'information',
-      'favorite',
-      'favoriteTemplate',
-      'dashboardTemplate',
-      'aiChatSession',
-      'aiChatMessage',
-    ],
-    insert: [
-      'workHour',
-      'workHourWeek',
-      'event',
-      'holidayGroup',
-      'holiday',
-      'ticket',
-      'ticketTimeTracking',
-      'dashboard',
-      'dashboardTemplate',
-      'favorite',
-      'note',
-      'phoneCall',
-      'kpi',
-    ],
-    update: [
-      'workHour',
-      'workHourWeek',
-      'event',
-      'holidayGroup',
-      'holiday',
-      'ticket',
-      'ticketTimeTracking',
-      'note',
-      'phoneCall',
-      'document',
-      'information',
-      'dashboard',
-      'favorite',
-      'kpi',
-    ],
-    delete: [
-      'workHour',
-      'workHourWeek',
-      'ticketTimeTracking',
-      'note',
-      'phoneCall',
-      'dashboard',
-      'favorite',
-      'kpi',
-    ],
-    show: [
-      'company',
-      'address',
-      'person',
-      'workHour',
-      'workHourWeek',
-      'product',
-      'contract',
-      'contractService',
-      'serverLandscape',
-      'event',
-      'holidayGroup',
-      'holiday',
-      'ticket',
-      'ticketTimeTracking',
-      'supportTeam',
-      'supportQueue',
-      'note',
-      'phoneCall',
-      'dashboardTemplate',
-      'document',
-      'information',
-      'aiChatSession',
-      'aiChatMessage',
-    ],
-  });
+  private readonly matricesByRole: Map<number, PermissionMatrix> = new Map([
+    [ROLE_HANDLE.SUPPORT, createMatrix(supportPermissionsInput)],
+    [ROLE_HANDLE.SALES, createMatrix(salesPermissionsInput)],
+    [ROLE_HANDLE.CUSTOMER, createMatrix(customerPermissionsInput)],
+    [ROLE_HANDLE.CONTRACTOR, createMatrix(contractorPermissionsInput)],
+  ]);
 
   async run(em: EntityManager): Promise<void> {
     const entities = await em.findAll(EntityItem, { populate: ['group'] });
@@ -569,13 +66,14 @@ export class PermissionSeeder extends Seeder {
     for (const entity of entities) {
       for (const role of roles) {
         const key = `${entity.handle}|${role.handle ?? ''}`;
+        if (existingKeys.has(key)) {
+          continue;
+        }
+
         const nextPermission = this.getPermissionsForRole(
           entity,
           role.handle ?? 0,
         );
-        if (existingKeys.has(key)) {
-          continue;
-        }
 
         em.create(PermissionItem, {
           ...nextPermission,
@@ -591,56 +89,46 @@ export class PermissionSeeder extends Seeder {
     }
   }
 
-  private getPermissionsForRole(entity: EntityItem, roleHandle: number) {
-    switch (roleHandle) {
-      case 1:
-        return {
-          allowRead: true,
-          allowInsert: entity.canInsert,
-          allowUpdate: entity.canUpdate,
-          allowDelete: entity.canDelete,
-          allowShow: entity.canShow,
-        };
-      case 2:
-        return this.resolveMatrixPermission(entity, this.supportPermissions);
-      case 3:
-        return this.resolveMatrixPermission(entity, this.salesPermissions);
-      case 4:
-        return this.resolveMatrixPermission(entity, this.customerPermissions);
-      case 5:
-        return this.resolveMatrixPermission(entity, this.contractorPermissions);
-      default:
-        return {
-          allowRead: false,
-          allowInsert: false,
-          allowUpdate: false,
-          allowDelete: false,
-          allowShow: false,
-        };
+  /**
+   * Returns the permission grant for a single (entity, role) combination.
+   *
+   * - The admin role ({@link ROLE_HANDLE.ADMIN}) inherits the entity's own
+   *   `canRead/canInsert/...` flags (full power).
+   * - Known roles use their matrix from `matricesByRole`.
+   * - Unknown roles default to `DENY_ALL`.
+   */
+  private getPermissionsForRole(
+    entity: EntityItem,
+    roleHandle: number,
+  ): PermissionGrant {
+    if (roleHandle === ROLE_HANDLE.ADMIN) {
+      return {
+        allowRead: true,
+        allowInsert: entity.canInsert,
+        allowUpdate: entity.canUpdate,
+        allowDelete: entity.canDelete,
+        allowShow: entity.canShow,
+      };
     }
+
+    const matrix = this.matricesByRole.get(roleHandle);
+    if (!matrix) {
+      return DENY_ALL;
+    }
+
+    return this.resolveMatrixPermission(entity, matrix);
   }
 
   private resolveMatrixPermission(
     entity: EntityItem,
-    permissions: PermissionMatrix,
-  ) {
+    matrix: PermissionMatrix,
+  ): PermissionGrant {
     return {
-      allowRead:
-        entity.canRead === false || permissions.read.has(entity.handle),
-      allowInsert: entity.canInsert && permissions.insert.has(entity.handle),
-      allowUpdate: entity.canUpdate && permissions.update.has(entity.handle),
-      allowDelete: entity.canDelete && permissions.delete.has(entity.handle),
-      allowShow: entity.canShow && permissions.show.has(entity.handle),
-    };
-  }
-
-  private createMatrix(matrix: Record<keyof PermissionMatrix, string[]>) {
-    return {
-      read: new Set(matrix.read),
-      insert: new Set(matrix.insert),
-      update: new Set(matrix.update),
-      delete: new Set(matrix.delete),
-      show: new Set(matrix.show),
+      allowRead: entity.canRead === false || matrix.read.has(entity.handle),
+      allowInsert: entity.canInsert && matrix.insert.has(entity.handle),
+      allowUpdate: entity.canUpdate && matrix.update.has(entity.handle),
+      allowDelete: entity.canDelete && matrix.delete.has(entity.handle),
+      allowShow: entity.canShow && matrix.show.has(entity.handle),
     };
   }
 }

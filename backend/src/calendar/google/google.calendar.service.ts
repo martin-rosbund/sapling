@@ -67,8 +67,8 @@ export class GoogleCalendarService {
    * - If the event is canceled and exists in Google, it will be deleted.
    * - If the event exists, it will be updated.
    * - Otherwise, a new event will be created.
-   * @param {EventItem} event The event to set
-   * @param {PersonSessionItem} session The user session containing access tokens
+   * @param {number} eventHandle Handle of the EventItem to synchronize
+   * @param {string} accessToken OAuth access token of the calling user
    * @returns {Promise<any>} The result of the operation (create, update, or delete)
    */
   async setEvent(eventHandle: number, accessToken: string): Promise<any> {

@@ -15,6 +15,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { TemplateService } from '../template/template.service';
 import { MessageTemplateService } from '../template/message-template.service';
+import { renderMarkdownBlocks } from './markdown.util';
 import { EmailTemplateItem } from '../../entity/EmailTemplateItem';
 import { PersonItem } from '../../entity/PersonItem';
 import {
@@ -65,6 +66,40 @@ type SendResult = {
 type MailSenderOption = MailSenderOptionDto;
 
 const MAIL_EVENT_DURATION_MINUTES = 5;
+const MAIL_EVENT_TITLE_MAX_LENGTH = 128;
+const MAIL_EVENT_TITLE_TRUNCATE_AT = 125;
+const MAIL_EVENT_DESCRIPTION_MAX_LENGTH = 1024;
+const MAIL_EVENT_DESCRIPTION_TRUNCATE_AT = 1021;
+
+function truncateWithEllipsis(
+  value: string,
+  maxLength: number,
+  truncateAt: number,
+): string {
+  return value.length > maxLength ? `${value.slice(0, truncateAt)}...` : value;
+}
+
+function buildMailEventTitle(delivery: EmailDeliveryItem): string {
+  const recipientList = (delivery.toRecipients ?? []).join(', ');
+  const baseTitle = recipientList ? `E-Mail an ${recipientList}` : 'E-Mail';
+  return truncateWithEllipsis(
+    baseTitle,
+    MAIL_EVENT_TITLE_MAX_LENGTH,
+    MAIL_EVENT_TITLE_TRUNCATE_AT,
+  );
+}
+
+function buildMailEventDescription(delivery: EmailDeliveryItem): string {
+  const subjectLine = delivery.subject
+    ? `Betreff: ${delivery.subject}\n\n`
+    : '';
+  const body = delivery.bodyMarkdown ?? '';
+  return truncateWithEllipsis(
+    `${subjectLine}${body}`,
+    MAIL_EVENT_DESCRIPTION_MAX_LENGTH,
+    MAIL_EVENT_DESCRIPTION_TRUNCATE_AT,
+  );
+}
 
 function isRecord(value: unknown): value is JsonRecord {
   return typeof value === 'object' && value !== null;
@@ -108,249 +143,6 @@ function normalizeDisplayName(
 ): string | undefined {
   const normalized = value?.trim();
   return normalized ? normalized : undefined;
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function escapeAttribute(value: string): string {
-  return escapeHtml(value).replace(/\n/g, ' ');
-}
-
-function tokenizeTableRow(line: string): string[] {
-  const trimmed = line.trim().replace(/^\|/, '').replace(/\|$/, '');
-  return trimmed.split('|').map((cell) => cell.trim());
-}
-
-function isTableSeparatorLine(line: string): boolean {
-  const cells = tokenizeTableRow(line);
-
-  return cells.length > 0 && cells.every((cell) => /^:?-{3,}:?$/.test(cell));
-}
-
-function isHorizontalRuleLine(line: string): boolean {
-  return /^\s*(?:---+|\*\*\*+|___+)\s*$/.test(line);
-}
-
-function renderInlineMarkdown(value: string): string {
-  const placeholders: string[] = [];
-  const protect = (html: string): string =>
-    `@@SAPLINGPLACEHOLDER${placeholders.push(html) - 1}@@`;
-
-  let rendered = escapeHtml(value);
-
-  rendered = rendered.replace(/`([^`]+)`/g, (_match, code: string) =>
-    protect(`<code>${escapeHtml(code)}</code>`),
-  );
-  rendered = rendered.replace(
-    /!\[([^\]]*)\]\(([^)\s]+(?:\s+"[^"]*")?)\)/g,
-    (_match, alt: string, url: string) =>
-      protect(
-        `<img src="${escapeAttribute(url.trim())}" alt="${escapeAttribute(alt)}" />`,
-      ),
-  );
-  rendered = rendered.replace(
-    /\[([^\]]+)\]\(([^)\s]+(?:\s+"[^"]*")?)\)/g,
-    (_match, label: string, url: string) =>
-      protect(
-        `<a href="${escapeAttribute(url.trim())}" target="_blank" rel="noopener noreferrer">${renderInlineMarkdown(label)}</a>`,
-      ),
-  );
-  rendered = rendered.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-  rendered = rendered.replace(/~~([^~]+)~~/g, '<del>$1</del>');
-  rendered = rendered.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
-  rendered = rendered.replace(/(^|[^_])_([^_\n]+)_(?!_)/g, '$1<em>$2</em>');
-
-  return rendered.replace(
-    /@@SAPLINGPLACEHOLDER(\d+)@@/g,
-    (_match, index: string) => {
-      const placeholder = placeholders[Number(index)];
-      return placeholder ?? '';
-    },
-  );
-}
-
-function renderMarkdownBlocks(markdown: string): string {
-  const lines = markdown.replace(/\r\n?/g, '\n').split('\n');
-  const html: string[] = [];
-  let index = 0;
-
-  while (index < lines.length) {
-    const currentLine = lines[index] ?? '';
-    const trimmedLine = currentLine.trim();
-
-    if (!trimmedLine) {
-      index += 1;
-      continue;
-    }
-
-    const fenceMatch = currentLine.match(/^```([\w-]+)?\s*$/);
-    if (fenceMatch) {
-      const language = fenceMatch[1]?.trim();
-      const codeLines: string[] = [];
-
-      index += 1;
-      while (index < lines.length && !/^```\s*$/.test(lines[index] ?? '')) {
-        codeLines.push(lines[index] ?? '');
-        index += 1;
-      }
-
-      if (index < lines.length) {
-        index += 1;
-      }
-
-      const className = language
-        ? ` class="language-${escapeAttribute(language)}"`
-        : '';
-      html.push(
-        `<pre><code${className}>${escapeHtml(codeLines.join('\n'))}</code></pre>`,
-      );
-      continue;
-    }
-
-    const headingMatch = currentLine.match(/^(#{1,6})\s+(.+)$/);
-    if (headingMatch) {
-      const level = headingMatch[1].length;
-      html.push(
-        `<h${level}>${renderInlineMarkdown(headingMatch[2])}</h${level}>`,
-      );
-      index += 1;
-      continue;
-    }
-
-    if (isHorizontalRuleLine(currentLine)) {
-      html.push('<hr>');
-      index += 1;
-      continue;
-    }
-
-    if (/^>\s?/.test(currentLine)) {
-      const quoteLines: string[] = [];
-
-      while (index < lines.length && /^>\s?/.test(lines[index] ?? '')) {
-        quoteLines.push((lines[index] ?? '').replace(/^>\s?/, ''));
-        index += 1;
-      }
-
-      html.push(
-        `<blockquote>${renderMarkdownBlocks(quoteLines.join('\n'))}</blockquote>`,
-      );
-      continue;
-    }
-
-    const nextLine = lines[index + 1] ?? '';
-    if (currentLine.includes('|') && isTableSeparatorLine(nextLine)) {
-      const headerCells = tokenizeTableRow(currentLine);
-      const bodyRows: string[][] = [];
-
-      index += 2;
-      while (index < lines.length && (lines[index] ?? '').includes('|')) {
-        bodyRows.push(tokenizeTableRow(lines[index] ?? ''));
-        index += 1;
-      }
-
-      const head = `<thead><tr>${headerCells
-        .map((cell) => `<th>${renderInlineMarkdown(cell)}</th>`)
-        .join('')}</tr></thead>`;
-      const body = bodyRows.length
-        ? `<tbody>${bodyRows
-            .map(
-              (row) =>
-                `<tr>${row.map((cell) => `<td>${renderInlineMarkdown(cell)}</td>`).join('')}</tr>`,
-            )
-            .join('')}</tbody>`
-        : '';
-
-      html.push(`<table>${head}${body}</table>`);
-      continue;
-    }
-
-    if (/^- \[[ xX]\]\s+/.test(currentLine)) {
-      const items: string[] = [];
-
-      while (
-        index < lines.length &&
-        /^- \[[ xX]\]\s+/.test(lines[index] ?? '')
-      ) {
-        const match = (lines[index] ?? '').match(/^- \[([ xX])\]\s+(.*)$/);
-        const checked = (match?.[1] ?? ' ').toLowerCase() === 'x';
-        const content = renderInlineMarkdown(match?.[2] ?? '');
-        items.push(
-          `<li class="task-list-item"><input type="checkbox" disabled${checked ? ' checked' : ''}> ${content}</li>`,
-        );
-        index += 1;
-      }
-
-      html.push(`<ul class="contains-task-list">${items.join('')}</ul>`);
-      continue;
-    }
-
-    if (/^-\s+/.test(currentLine)) {
-      const items: string[] = [];
-
-      while (index < lines.length && /^-\s+/.test(lines[index] ?? '')) {
-        const content = (lines[index] ?? '').replace(/^-\s+/, '');
-        items.push(`<li>${renderInlineMarkdown(content)}</li>`);
-        index += 1;
-      }
-
-      html.push(`<ul>${items.join('')}</ul>`);
-      continue;
-    }
-
-    if (/^\d+\.\s+/.test(currentLine)) {
-      const items: string[] = [];
-
-      while (index < lines.length && /^\d+\.\s+/.test(lines[index] ?? '')) {
-        const content = (lines[index] ?? '').replace(/^\d+\.\s+/, '');
-        items.push(`<li>${renderInlineMarkdown(content)}</li>`);
-        index += 1;
-      }
-
-      html.push(`<ol>${items.join('')}</ol>`);
-      continue;
-    }
-
-    const paragraphLines: string[] = [];
-
-    while (index < lines.length) {
-      const paragraphLine = lines[index] ?? '';
-      const paragraphTrimmed = paragraphLine.trim();
-
-      if (!paragraphTrimmed) {
-        break;
-      }
-
-      if (
-        /^```([\w-]+)?\s*$/.test(paragraphLine) ||
-        /^(#{1,6})\s+/.test(paragraphLine) ||
-        /^>\s?/.test(paragraphLine) ||
-        isHorizontalRuleLine(paragraphLine) ||
-        /^- \[[ xX]\]\s+/.test(paragraphLine) ||
-        /^-\s+/.test(paragraphLine) ||
-        /^\d+\.\s+/.test(paragraphLine) ||
-        (paragraphLine.includes('|') &&
-          isTableSeparatorLine(lines[index + 1] ?? ''))
-      ) {
-        break;
-      }
-
-      paragraphLines.push(paragraphLine);
-      index += 1;
-    }
-
-    html.push(
-      `<p>${paragraphLines.map((line) => renderInlineMarkdown(line)).join('<br>')}</p>`,
-    );
-  }
-
-  return html.join('');
 }
 
 @Injectable()
@@ -698,22 +490,6 @@ export class MailService {
       const endDate = new Date(startDate);
       endDate.setMinutes(endDate.getMinutes() + MAIL_EVENT_DURATION_MINUTES);
 
-      const recipientList = (delivery.toRecipients ?? []).join(', ');
-      const baseTitle = recipientList ? `E-Mail an ${recipientList}` : 'E-Mail';
-      const title =
-        baseTitle.length > 128 ? `${baseTitle.slice(0, 125)}...` : baseTitle;
-
-      const description = (() => {
-        const subjectLine = delivery.subject
-          ? `Betreff: ${delivery.subject}\n\n`
-          : '';
-        const body = delivery.bodyMarkdown ?? '';
-        const combined = `${subjectLine}${body}`;
-        return combined.length > 1024
-          ? `${combined.slice(0, 1021)}...`
-          : combined;
-      })();
-
       const creatorCompanyRef =
         creator.company?.handle != null
           ? eventEm.getReference(CompanyItem, creator.company.handle as never)
@@ -723,70 +499,16 @@ export class MailService {
           ? eventEm.getReference(PersonItem, creator.handle as never)
           : undefined;
 
-      let resolvedCreatorCompanyRef = creatorCompanyRef;
-      let resolvedCreatorPersonRef = creatorPersonRef;
-      let sourcePersonRef: PersonItem | null = null;
-      let ticketRef: TicketItem | undefined;
-      let salesOpportunityRef: SalesOpportunityItem | undefined;
-
-      const sourceEntityHandle = delivery.entity?.handle;
-      const sourceReferenceHandle = delivery.referenceHandle;
-
-      if (
-        sourceEntityHandle === 'ticket' &&
-        sourceReferenceHandle != null &&
-        sourceReferenceHandle !== ''
-      ) {
-        const ticketHandle = Number(sourceReferenceHandle);
-        if (Number.isFinite(ticketHandle)) {
-          ticketRef = eventEm.getReference(TicketItem, ticketHandle as never);
-        }
-      } else if (
-        sourceEntityHandle === 'salesOpportunity' &&
-        sourceReferenceHandle != null &&
-        sourceReferenceHandle !== ''
-      ) {
-        const salesOpportunityHandle = Number(sourceReferenceHandle);
-        if (Number.isFinite(salesOpportunityHandle)) {
-          salesOpportunityRef = eventEm.getReference(
-            SalesOpportunityItem,
-            salesOpportunityHandle as never,
-          );
-        }
-      }
-
-      if (
-        delivery.entity?.handle === 'person' &&
-        delivery.referenceHandle != null &&
-        delivery.referenceHandle !== ''
-      ) {
-        const sourcePersonHandle = Number(delivery.referenceHandle);
-        if (Number.isFinite(sourcePersonHandle)) {
-          const sourcePerson = await eventEm.findOne(
-            PersonItem,
-            { handle: sourcePersonHandle },
-            { populate: ['company'] },
-          );
-
-          if (sourcePerson?.handle != null) {
-            resolvedCreatorPersonRef = eventEm.getReference(
-              PersonItem,
-              sourcePerson.handle as never,
-            );
-            if (sourcePerson.company?.handle != null) {
-              resolvedCreatorCompanyRef = eventEm.getReference(
-                CompanyItem,
-                sourcePerson.company.handle as never,
-              );
-            }
-            sourcePersonRef = resolvedCreatorPersonRef;
-          }
-        }
-      }
+      const sourceRefs = await this.resolveMailEventSourceRefs(
+        eventEm,
+        delivery,
+        creatorCompanyRef,
+        creatorPersonRef,
+      );
 
       const event = eventEm.create(EventItem, {
-        title,
-        description,
+        title: buildMailEventTitle(delivery),
+        description: buildMailEventDescription(delivery),
         startDate,
         endDate,
         isAllDay: false,
@@ -795,31 +517,19 @@ export class MailService {
         status: eventStatusRef,
         assigneeCompany: creatorCompanyRef,
         assigneePerson: creatorPersonRef,
-        creatorCompany: resolvedCreatorCompanyRef,
-        creatorPerson: resolvedCreatorPersonRef,
-        ticket: ticketRef,
-        salesOpportunity: salesOpportunityRef,
+        creatorCompany: sourceRefs.creatorCompanyRef,
+        creatorPerson: sourceRefs.creatorPersonRef,
+        ticket: sourceRefs.ticketRef,
+        salesOpportunity: sourceRefs.salesOpportunityRef,
       } as RequiredEntityData<EventItem>);
 
-      if (creatorPersonRef) {
-        event.participants.add(creatorPersonRef);
-      }
-
-      const recipientPersons = await this.findPersonsByEmails(
+      await this.attachMailEventParticipants(
         eventEm,
+        event,
+        creatorPersonRef,
+        sourceRefs.sourcePersonRef,
         delivery.toRecipients ?? [],
       );
-      for (const person of recipientPersons) {
-        if (person.handle != null) {
-          event.participants.add(
-            eventEm.getReference(PersonItem, person.handle as never),
-          );
-        }
-      }
-
-      if (sourcePersonRef) {
-        event.participants.add(sourcePersonRef);
-      }
 
       eventEm.persist(event);
       await eventEm.flush();
@@ -829,6 +539,121 @@ export class MailService {
           error instanceof Error ? error.message : 'Unknown error'
         }`,
       );
+    }
+  }
+
+  /**
+   * Resolves the ticket / sales opportunity / person source references for a
+   * mail follow-up event. If the delivery originated from a person record the
+   * resolved creator company / person references are overridden with the
+   * source person's company and the source person is returned for participant
+   * attachment.
+   */
+  private async resolveMailEventSourceRefs(
+    eventEm: EntityManager,
+    delivery: EmailDeliveryItem,
+    defaultCreatorCompanyRef: CompanyItem | undefined,
+    defaultCreatorPersonRef: PersonItem | undefined,
+  ): Promise<{
+    creatorCompanyRef: CompanyItem | undefined;
+    creatorPersonRef: PersonItem | undefined;
+    sourcePersonRef: PersonItem | null;
+    ticketRef?: TicketItem;
+    salesOpportunityRef?: SalesOpportunityItem;
+  }> {
+    let creatorCompanyRef = defaultCreatorCompanyRef;
+    let creatorPersonRef = defaultCreatorPersonRef;
+    let sourcePersonRef: PersonItem | null = null;
+    let ticketRef: TicketItem | undefined;
+    let salesOpportunityRef: SalesOpportunityItem | undefined;
+
+    const sourceEntityHandle = delivery.entity?.handle;
+    const sourceReferenceHandle = delivery.referenceHandle;
+    const hasSourceReference =
+      sourceReferenceHandle != null && sourceReferenceHandle !== '';
+
+    if (sourceEntityHandle === 'ticket' && hasSourceReference) {
+      const ticketHandle = Number(sourceReferenceHandle);
+      if (Number.isFinite(ticketHandle)) {
+        ticketRef = eventEm.getReference(TicketItem, ticketHandle as never);
+      }
+    } else if (
+      sourceEntityHandle === 'salesOpportunity' &&
+      hasSourceReference
+    ) {
+      const salesOpportunityHandle = Number(sourceReferenceHandle);
+      if (Number.isFinite(salesOpportunityHandle)) {
+        salesOpportunityRef = eventEm.getReference(
+          SalesOpportunityItem,
+          salesOpportunityHandle as never,
+        );
+      }
+    }
+
+    if (sourceEntityHandle === 'person' && hasSourceReference) {
+      const sourcePersonHandle = Number(sourceReferenceHandle);
+      if (Number.isFinite(sourcePersonHandle)) {
+        const sourcePerson = await eventEm.findOne(
+          PersonItem,
+          { handle: sourcePersonHandle },
+          { populate: ['company'] },
+        );
+
+        if (sourcePerson?.handle != null) {
+          creatorPersonRef = eventEm.getReference(
+            PersonItem,
+            sourcePerson.handle as never,
+          );
+          if (sourcePerson.company?.handle != null) {
+            creatorCompanyRef = eventEm.getReference(
+              CompanyItem,
+              sourcePerson.company.handle as never,
+            );
+          }
+          sourcePersonRef = creatorPersonRef;
+        }
+      }
+    }
+
+    return {
+      creatorCompanyRef,
+      creatorPersonRef,
+      sourcePersonRef,
+      ticketRef,
+      salesOpportunityRef,
+    };
+  }
+
+  /**
+   * Attaches the creator, all recipient persons (resolved by e-mail address)
+   * and the source person (if different) as participants on the follow-up
+   * event.
+   */
+  private async attachMailEventParticipants(
+    eventEm: EntityManager,
+    event: EventItem,
+    creatorPersonRef: PersonItem | undefined,
+    sourcePersonRef: PersonItem | null,
+    recipientEmails: string[],
+  ): Promise<void> {
+    if (creatorPersonRef) {
+      event.participants.add(creatorPersonRef);
+    }
+
+    const recipientPersons = await this.findPersonsByEmails(
+      eventEm,
+      recipientEmails,
+    );
+    for (const person of recipientPersons) {
+      if (person.handle != null) {
+        event.participants.add(
+          eventEm.getReference(PersonItem, person.handle as never),
+        );
+      }
+    }
+
+    if (sourcePersonRef) {
+      event.participants.add(sourcePersonRef);
     }
   }
 

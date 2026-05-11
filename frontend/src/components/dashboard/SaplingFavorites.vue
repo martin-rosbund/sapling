@@ -25,6 +25,7 @@
         hide-details
         prepend-inner-icon="mdi-magnify"
         :placeholder="$t('global.search')"
+        autocomplete="off"
       />
 
       <v-list density="comfortable" class="sapling-favorites-panel__content">

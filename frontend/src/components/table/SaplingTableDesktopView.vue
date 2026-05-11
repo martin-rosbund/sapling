@@ -7,6 +7,7 @@
     class="sapling-table"
     :headers="visibleHeaders"
     :items="items"
+    :item-value="getItemValue"
     :page="page"
     :items-per-page="itemsPerPage"
     :items-per-page-options="DEFAULT_PAGE_SIZE_OPTIONS"
@@ -67,6 +68,14 @@
 
     <template #item="{ item, index }">
       <SaplingTableRow
+        v-memo="[
+          item.handle,
+          item.updatedAt,
+          isRowSelected(index),
+          multiSelect,
+          showActions,
+          visibleHeaders,
+        ]"
         :item="item"
         :columns="visibleHeaders"
         :index="index"
@@ -169,6 +178,11 @@ function getHeaderCellClasses(column: Record<string, unknown> & { key?: string |
 
 function isRowSelected(index: number) {
   return props.multiSelect ? props.selectedRows.includes(index) : props.selectedRow === index
+}
+
+function getItemValue(item: SaplingGenericItem): string | number {
+  const handle = item?.handle
+  return typeof handle === 'string' || typeof handle === 'number' ? handle : ''
 }
 
 function isDesktopColumnFilterable(column: TableColumnLike) {

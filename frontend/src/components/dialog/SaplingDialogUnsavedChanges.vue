@@ -7,6 +7,8 @@
     :title="$t('global.unsavedChanges')"
     persistent
     @update:model-value="handleDialogUpdate"
+    @enter="handleSaveAndClose"
+    @escape="handleKeepEditing"
   >
     <template #body>
       {{ $t('global.unsavedChangesQuestion') }}
