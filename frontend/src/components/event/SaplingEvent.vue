@@ -182,15 +182,13 @@ defineOptions({
 const EVENT_CONTEXT_DIALOG_BREAKPOINT = 1080
 
 const attrs = useAttrs()
-const { t, te } = useI18n()
+const { t } = useI18n()
 const { width } = useDisplay()
 
 const isMobileContextLayout = computed(() => width.value <= EVENT_CONTEXT_DIALOG_BREAKPOINT)
 const mobileContextDialogVisible = ref(false)
 
-const contextDialogCloseLabel = computed(() =>
-  te('global.close') ? t('global.close') : 'Schliessen',
-)
+const contextDialogCloseLabel = computed(() => t('global.close'))
 
 watch(isMobileContextLayout, (isMobile) => {
   if (!isMobile) {

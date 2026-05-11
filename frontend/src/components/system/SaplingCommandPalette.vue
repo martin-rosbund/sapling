@@ -1,9 +1,11 @@
 <template>
   <v-dialog
     v-model="isOpen"
+    width="640"
     max-width="640"
     transition="dialog-top-transition"
     scrollable
+    content-class="sapling-command-palette__overlay"
     @update:model-value="onDialogToggle"
   >
     <v-card class="sapling-command-palette glass-panel" rounded="lg">
@@ -11,8 +13,7 @@
         <v-text-field
           ref="searchInputRef"
           v-model="query"
-          :placeholder="tr('global.commandPalette.placeholder', 'Suchen oder Befehl ausführen…')"
-          variant="solo"
+          :placeholder="t('global.commandPalette.placeholder')"
           density="comfortable"
           hide-details
           autofocus
@@ -33,7 +34,7 @@
 
         <template v-else-if="filteredResults.length === 0">
           <div class="sapling-command-palette__empty">
-            {{ tr('global.commandPalette.empty', 'Keine Treffer') }}
+            {{ t('global.commandPalette.empty') }}
           </div>
         </template>
 
@@ -71,13 +72,13 @@
 
       <div class="sapling-command-palette__footer">
         <span class="sapling-command-palette__shortcut">
-          <kbd>↑</kbd><kbd>↓</kbd> {{ tr('global.commandPalette.navigate', 'Navigieren') }}
+          <kbd>↑</kbd><kbd>↓</kbd> {{ t('global.commandPalette.navigate') }}
         </span>
         <span class="sapling-command-palette__shortcut">
-          <kbd>↵</kbd> {{ tr('global.commandPalette.open', 'Öffnen') }}
+          <kbd>↵</kbd> {{ t('global.commandPalette.open') }}
         </span>
         <span class="sapling-command-palette__shortcut">
-          <kbd>Esc</kbd> {{ tr('global.commandPalette.close', 'Schließen') }}
+          <kbd>Esc</kbd> {{ t('global.commandPalette.close') }}
         </span>
       </div>
     </v-card>
@@ -92,6 +93,8 @@ import ApiGenericService from '@/services/api.generic.service'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
 import { buildFavoritePath } from '@/utils/saplingFavoriteNavigation'
+import { useSaplingPreferences } from '@/composables/system/useSaplingPreferences'
+import { useSaplingAccount } from '@/composables/account/useSaplingAccount'
 import type {
   EntityItem,
   EntityRouteItem,
@@ -100,8 +103,13 @@ import type {
 } from '@/entity/entity'
 import type { AccumulatedPermission } from '@/entity/structure'
 
-type CommandPaletteGroupKey = 'favorite' | 'entity'
+type CommandPaletteGroupKey = 'favorite' | 'entity' | 'action'
 
+/**
+ * Optional `run` callback lets action items execute side-effects (toggle theme,
+ * switch language, logout) instead of navigating. When `run` is provided the
+ * stored `path` is ignored.
+ */
 interface CommandPaletteItem {
   id: string
   group: CommandPaletteGroupKey
@@ -111,18 +119,16 @@ interface CommandPaletteItem {
   haystack: string
   path: string
   flatIndex: number
+  run?: () => void | Promise<void>
 }
 
 const router = useRouter()
 const { t, te } = useI18n()
 const currentPersonStore = useCurrentPersonStore()
 const currentPermissionStore = useCurrentPermissionStore()
+const { toggleTheme, setLanguage, currentLanguage, isDarkTheme } = useSaplingPreferences()
+const { logout } = useSaplingAccount()
 
-// Inline labels keep the palette functional even if the global namespace does not
-// yet provide command-palette translations. Once seeded these keys take over.
-function tr(key: string, fallback: string) {
-  return te(key) ? t(key) : fallback
-}
 
 const isOpen = ref(false)
 const isLoaded = ref(false)
@@ -141,7 +147,17 @@ function onKeyDown(event: KeyboardEvent) {
   }
   const isPaletteShortcut =
     (event.ctrlKey || event.metaKey) && !event.altKey && event.key.toLowerCase() === 'k'
-  if (!isPaletteShortcut) {
+  // Slash-shortcut (GitHub / Slack style): only when the user is not currently
+  // typing into an input, textarea or contentEditable surface.
+  const target = event.target as HTMLElement | null
+  const isEditable =
+    target?.tagName === 'INPUT' ||
+    target?.tagName === 'TEXTAREA' ||
+    target?.isContentEditable === true
+  const isSlashShortcut =
+    event.key === '/' && !event.ctrlKey && !event.metaKey && !event.altKey && !isEditable
+
+  if (!isPaletteShortcut && !isSlashShortcut) {
     return
   }
   event.preventDefault()
@@ -231,6 +247,29 @@ function getRouteLabel(entity: EntityItem, route: EntityRouteItem) {
   return getEntityLabel(entity)
 }
 
+/**
+ * Resolves the human-readable entity label for a favorite. Favorites store
+ * the entity either as an inlined object (after `relations: ['entity']`) or
+ * as a plain handle reference, so we accept both.
+ */
+function getFavoriteEntityLabel(favorite: FavoriteItem): string {
+  const entityValue = favorite.entity
+  if (entityValue && typeof entityValue === 'object' && 'handle' in entityValue) {
+    return getEntityLabel(entityValue as EntityItem)
+  }
+
+  if (typeof entityValue === 'string' && entityValue) {
+    const match = entities.value.find((entity) => entity.handle === entityValue)
+    if (match) {
+      return getEntityLabel(match)
+    }
+    const key = `navigation.${entityValue}`
+    return te(key) ? t(key) : entityValue
+  }
+
+  return ''
+}
+
 const allItems = computed<CommandPaletteItem[]>(() => {
   const items: Omit<CommandPaletteItem, 'flatIndex'>[] = []
 
@@ -239,16 +278,24 @@ const allItems = computed<CommandPaletteItem[]>(() => {
     if (!path) {
       continue
     }
+    // Favorites carry their user-set label in `title`. Fall back to the
+    // backend `name`/`handle` only if title is empty so we never render the
+    // generic "Favorit" placeholder for a properly named entry.
     const itemLabel =
+      (typeof favorite.title === 'string' && favorite.title.trim()) ||
       (typeof favorite.name === 'string' && favorite.name.trim()) ||
-      (typeof favorite.handle === 'string' ? favorite.handle : '') ||
-      tr('global.commandPalette.favorite', 'Favorit')
+      (typeof favorite.handle === 'string' || typeof favorite.handle === 'number'
+        ? String(favorite.handle)
+        : '') ||
+      t('global.commandPalette.favorite')
+    const favoriteEntityLabel = getFavoriteEntityLabel(favorite)
     items.push({
       id: `favorite:${favorite.handle ?? itemLabel}`,
       group: 'favorite',
       label: itemLabel,
+      hint: favoriteEntityLabel && favoriteEntityLabel !== itemLabel ? favoriteEntityLabel : undefined,
       icon: (typeof favorite.icon === 'string' && favorite.icon) || 'mdi-star',
-      haystack: itemLabel.toLowerCase(),
+      haystack: `${itemLabel} ${favoriteEntityLabel}`.toLowerCase(),
       path,
     })
   }
@@ -274,7 +321,71 @@ const allItems = computed<CommandPaletteItem[]>(() => {
     }
   }
 
+  // Static action commands (theme, language, logout) live at the bottom and
+  // execute side-effects via `run` instead of navigating.
+  for (const action of actionItems.value) {
+    items.push(action)
+  }
+
   return items.map((item, index) => ({ ...item, flatIndex: index }))
+})
+
+/**
+ * Returns the static action commands available in the palette. The list is
+ * recomputed on theme / language changes so labels and icons stay accurate.
+ */
+const actionItems = computed<Omit<CommandPaletteItem, 'flatIndex'>[]>(() => {
+  const themeLabel = isDarkTheme.value
+    ? t('global.themeLight')
+    : t('global.themeDark')
+  const themeHint = t('global.commandPalette.actionThemeHint')
+  const targetLanguage: 'de' | 'en' = currentLanguage.value === 'de' ? 'en' : 'de'
+  const languageLabel =
+    targetLanguage === 'de'
+      ? t('global.commandPalette.actionLanguageDe')
+      : t('global.commandPalette.actionLanguageEn')
+  const languageHint = t('global.commandPalette.actionLanguageHint')
+  const logoutLabel = t('login.logout')
+  const logoutHint = t('global.commandPalette.actionLogoutHint')
+
+  return [
+    {
+      id: 'action:theme',
+      group: 'action',
+      label: themeLabel,
+      hint: themeHint,
+      icon: isDarkTheme.value ? 'mdi-white-balance-sunny' : 'mdi-weather-night',
+      haystack: `${themeLabel} ${themeHint} theme design`.toLowerCase(),
+      path: '',
+      run: () => {
+        toggleTheme()
+      },
+    },
+    {
+      id: 'action:language',
+      group: 'action',
+      label: languageLabel,
+      hint: languageHint,
+      icon: 'mdi-translate',
+      haystack: `${languageLabel} ${languageHint} language sprache`.toLowerCase(),
+      path: '',
+      run: () => {
+        setLanguage(targetLanguage)
+      },
+    },
+    {
+      id: 'action:logout',
+      group: 'action',
+      label: logoutLabel,
+      hint: logoutHint,
+      icon: 'mdi-logout',
+      haystack: `${logoutLabel} ${logoutHint} logout abmelden`.toLowerCase(),
+      path: '',
+      run: async () => {
+        await logout()
+      },
+    },
+  ]
 })
 
 const filteredResults = computed<CommandPaletteItem[]>(() => {
@@ -295,19 +406,27 @@ const groupedResults = computed<CommandPaletteGroup[]>(() => {
   const reindexed = filteredResults.value.map((item, idx) => ({ ...item, flatIndex: idx }))
   const favoriteGroup = reindexed.filter((item) => item.group === 'favorite')
   const entityGroup = reindexed.filter((item) => item.group === 'entity')
+  const actionGroup = reindexed.filter((item) => item.group === 'action')
   const groups: CommandPaletteGroup[] = []
   if (favoriteGroup.length > 0) {
     groups.push({
       key: 'favorite',
-      label: tr('global.commandPalette.favorites', 'Favoriten'),
+      label: t('global.commandPalette.favorites'),
       items: favoriteGroup,
     })
   }
   if (entityGroup.length > 0) {
     groups.push({
       key: 'entity',
-      label: tr('global.commandPalette.entities', 'Bereiche'),
+      label: t('global.commandPalette.entities'),
       items: entityGroup,
+    })
+  }
+  if (actionGroup.length > 0) {
+    groups.push({
+      key: 'action',
+      label: t('global.commandPalette.actions'),
+      items: actionGroup,
     })
   }
   return groups
@@ -327,6 +446,10 @@ function moveActive(delta: number) {
 
 async function runItem(item: CommandPaletteItem) {
   close()
+  if (item.run) {
+    await item.run()
+    return
+  }
   await router.push(item.path)
 }
 
@@ -370,7 +493,11 @@ onBeforeUnmount(() => {
 .sapling-command-palette {
   display: flex;
   flex-direction: column;
-  max-height: 70vh;
+  width: 640px;
+  max-width: 100%;
+  /* Shrink to content so a small list does not leave a large empty area,
+     but cap the height so long lists stay scrollable. */
+  max-height: min(560px, 80vh);
   overflow: hidden;
 }
 
@@ -462,5 +589,18 @@ onBeforeUnmount(() => {
   font-size: 10px;
   line-height: 14px;
   font-family: inherit;
+}
+</style>
+
+<!--
+  The Vuetify overlay content lives outside the scoped component tree, so its
+  positioning rule must be unscoped. We anchor the palette near the top of the
+  viewport instead of centering it: when the list shrinks the bottom edge
+  collapses upward and the top edge stays fixed.
+-->
+<style>
+.sapling-command-palette__overlay {
+  align-self: flex-start;
+  margin-top: 12vh;
 }
 </style>

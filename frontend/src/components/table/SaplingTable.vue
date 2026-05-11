@@ -265,7 +265,7 @@ const props = withDefaults(defineProps<SaplingTableProps>(), {
   showSearch: true,
 })
 const emit = defineEmits<SaplingTableEmit>()
-const { t, te } = useI18n()
+const { t } = useI18n()
 const { isLoading: isHeaderTranslationLoading } = useTranslationLoader(props.entityHandle)
 
 const hasCompletedInitialLoad = ref(!props.isLoading)
@@ -288,9 +288,7 @@ watch(
 )
 
 const showInitialSkeleton = computed(() => !hasCompletedInitialLoad.value)
-const refreshButtonLabel = computed(() =>
-  te('global.refresh') ? t('global.refresh') : 'Aktualisieren',
-)
+const refreshButtonLabel = computed(() => t('global.refresh'))
 const showFavoriteButton = computed(() => props.showFavorite !== false)
 const showAddButton = computed(
   () =>
@@ -302,7 +300,7 @@ const showSearchField = computed(() => props.showSearch !== false)
 const showSidePanelToggleButton = computed(() => props.showSidePanelToggle === true)
 const sidePanelVisible = computed(() => props.sidePanelVisible === true)
 const sidePanelToggleLabel = computed(
-  () => props.sidePanelToggleLabel?.trim() || (te('global.filter') ? t('global.filter') : 'Filter'),
+  () => props.sidePanelToggleLabel?.trim() || t('global.filter'),
 )
 const sidePanelToggleIcon = computed(
   () => props.sidePanelToggleIcon?.trim() || 'mdi-account-group-outline',

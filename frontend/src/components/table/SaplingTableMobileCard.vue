@@ -7,8 +7,10 @@
       'sapling-table-mobile-card--with-select': props.multiSelect,
       'sapling-table-mobile-card--with-actions': hasRowActions,
     }"
+    tabindex="0"
     @click="handleCardClick"
     @dblclick="onRowDoubleClick($event)"
+    @keydown="onRowKeydown($event, index)"
   >
     <div v-if="displayColumns.length > 0" class="sapling-table-mobile-card__grid">
       <section
@@ -270,6 +272,7 @@ const {
   requestShowDocuments,
   requestShowInformation,
   onRowDoubleClick,
+  onRowKeydown,
   toggleRowSelection,
   getReferenceTemplates,
   getReferenceEntity,

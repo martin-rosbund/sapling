@@ -1,6 +1,11 @@
 <!-- Dialog for changing the user password -->
 <template>
-  <v-dialog :model-value="props.modelValue" :max-width="SAPLING_DIALOG_MAX_WIDTH.sm" persistent>
+  <v-dialog
+    :model-value="props.modelValue"
+    :max-width="SAPLING_DIALOG_MAX_WIDTH.sm"
+    persistent
+    @keydown.esc="onEscape"
+  >
     <SaplingDialogCard
       class="sapling-change-password-dialog"
       :max-width="SAPLING_DIALOG_MAX_WIDTH.sm"
@@ -88,5 +93,11 @@ const { newPassword, confirmPassword, isLoading, handlePasswordChange, closeDial
     onCancel: () => emit('cancel'),
     onSuccess: () => emit('success'),
   })
+
+function onEscape(): void {
+  if (props.allowCancel) {
+    closeDialog()
+  }
+}
 // #endregion
 </script>

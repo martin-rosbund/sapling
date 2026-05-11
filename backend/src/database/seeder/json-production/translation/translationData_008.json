@@ -70,6 +70,7 @@
   { "entity": "favoriteTemplate", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
   { "entity": "favoriteTemplate", "property": "groupBasics", "de": "Grundlagen", "en": "Basics" },
   { "entity": "favoriteTemplate", "property": "groupContent", "de": "Inhalt", "en": "Content" },
+  { "entity": "favoriteTemplate", "property": "entityRoute", "de": "Seitennavigation", "en": "Page navigation" },
 
   { "entity": "favorite", "property": "loadTemplate", "de": "Vorlage laden", "en": "Load template" },
   { "entity": "favorite", "property": "templatePickerTitle", "de": "Arbeitslisten-Vorlage wählen", "en": "Choose worklist template" },
@@ -78,14 +79,52 @@
   { "entity": "favorite", "property": "templateEmptyText", "de": "Lege Arbeitslisten-Vorlagen in der Administration an, um sie hier bereitzustellen.", "en": "Create worklist templates in the administration area to make them available here." },
   { "entity": "favorite", "property": "templateLoadAction", "de": "Als Arbeitsliste verwenden", "en": "Use as worklist" },
   { "entity": "favorite", "property": "templateRecommended", "de": "Empfohlen", "en": "Recommended" },
+  { "entity": "favorite", "property": "entityRoute", "de": "Seitennavigation", "en": "Page navigation" },
 
   { "entity": "aiChatTranscription", "property": "groupReference", "de": "Referenz", "en": "Reference" },
   { "entity": "aiChatTranscription", "property": "groupBasics", "de": "Grundlagen", "en": "Basics" },
   { "entity": "aiChatTranscription", "property": "groupIntegration", "de": "Integration", "en": "Integration" },
   { "entity": "aiChatTranscription", "property": "groupContent", "de": "Inhalt", "en": "Content" },
 
+  { "entity": "entityRoute", "property": "favoriteTemplates", "de": "Arbeitsliste-Vorlagen", "en": "Worklist Templates" },
+  { "entity": "entityRoute", "property": "favorites", "de": "Arbeitslisten", "en": "Worklists" },
+
   { "entity": "navigation", "property": "aiChatTranscription", "de": "AI-Transkription", "en": "AI Transcription" },
   { "entity": "navigation", "property": "favoriteTemplate", "de": "Arbeitslisten-Vorlagen", "en": "Worklist Templates" },
 
-  { "entity": "navigationGroup", "property": "teams", "de": "Teams", "en": "Teams" }
+  { "entity": "navigationGroup", "property": "teams", "de": "Teams", "en": "Teams" },
+
+  { "entity": "global", "property": "commandPalette.placeholder", "de": "Suchen oder Befehl ausführen…", "en": "Search or run command…" },
+  { "entity": "global", "property": "commandPalette.empty", "de": "Keine Treffer", "en": "No matches" },
+  { "entity": "global", "property": "commandPalette.navigate", "de": "Navigieren", "en": "Navigate" },
+  { "entity": "global", "property": "commandPalette.open", "de": "Öffnen", "en": "Open" },
+  { "entity": "global", "property": "commandPalette.close", "de": "Schließen", "en": "Close" },
+  { "entity": "global", "property": "commandPalette.favorite", "de": "Favorit", "en": "Favorite" },
+  { "entity": "global", "property": "commandPalette.favorites", "de": "Favoriten", "en": "Favorites" },
+  { "entity": "global", "property": "commandPalette.entities", "de": "Bereiche", "en": "Areas" },
+  { "entity": "global", "property": "commandPalette.actions", "de": "Aktionen", "en": "Actions" },
+  { "entity": "global", "property": "commandPalette.actionThemeHint", "de": "Design wechseln", "en": "Toggle theme" },
+  { "entity": "global", "property": "commandPalette.actionLanguageDe", "de": "Sprache: Deutsch", "en": "Language: German" },
+  { "entity": "global", "property": "commandPalette.actionLanguageEn", "de": "Sprache: Englisch", "en": "Language: English" },
+  { "entity": "global", "property": "commandPalette.actionLanguageHint", "de": "Sprache umschalten", "en": "Switch language" },
+  { "entity": "global", "property": "commandPalette.actionLogoutHint", "de": "Sitzung beenden", "en": "End session" },
+
+  { "entity": "global", "property": "help.title", "de": "Hilfe & Tastenkürzel", "en": "Help & shortcuts" },
+  { "entity": "global", "property": "help.shortcutsTitle", "de": "Tastenkürzel", "en": "Keyboard shortcuts" },
+  { "entity": "global", "property": "help.commandsTitle", "de": "Befehle der Command Palette", "en": "Command palette commands" },
+  { "entity": "global", "property": "help.commandsIntro", "de": "Öffne die Command Palette mit Strg/⌘+K oder „/“, um Bereiche, Favoriten und Aktionen schnell zu erreichen.", "en": "Open the command palette with Ctrl/⌘+K or “/” to quickly reach areas, favorites and actions." },
+  { "entity": "global", "property": "help.shortcutPalette", "de": "Command Palette öffnen", "en": "Open command palette" },
+  { "entity": "global", "property": "help.shortcutPaletteSlash", "de": "Command Palette öffnen (außerhalb von Eingabefeldern)", "en": "Open command palette (outside of input fields)" },
+  { "entity": "global", "property": "help.shortcutHelp", "de": "Diese Hilfe anzeigen", "en": "Show this help" },
+  { "entity": "global", "property": "help.shortcutNavigate", "de": "In Listen und Tabellen navigieren", "en": "Navigate within lists and tables" },
+  { "entity": "global", "property": "help.shortcutEnter", "de": "Eintrag öffnen oder bestätigen", "en": "Open or confirm entry" },
+  { "entity": "global", "property": "help.shortcutEscape", "de": "Dialog oder Palette schließen", "en": "Close dialog or palette" },
+  { "entity": "global", "property": "help.commandFavoritesHint", "de": "Deine persönlichen Arbeitslisten und Sprünge", "en": "Your personal worklists and jumps" },
+  { "entity": "global", "property": "help.commandEntitiesHint", "de": "Direkter Sprung zu jedem freigeschalteten Bereich", "en": "Direct jump to every accessible area" },
+  { "entity": "global", "property": "help.commandThemeHint", "de": "Zwischen hellem und dunklem Design wechseln", "en": "Switch between light and dark design" },
+  { "entity": "global", "property": "help.commandLanguageHint", "de": "Zwischen Deutsch und Englisch umschalten", "en": "Switch between German and English" },
+  { "entity": "global", "property": "help.commandLogoutHint", "de": "Sitzung beenden und zur Anmeldung zurückkehren", "en": "End the session and return to the login" },
+  { "entity": "global", "property": "help.footerHint", "de": "F1 schließt die Hilfe wieder.", "en": "Press F1 again to close this help." },
+
+  { "entity": "global", "property": "dirtyFieldCount", "de": "1 Feld geändert | {count} Felder geändert", "en": "1 field changed | {count} fields changed" }
 ]

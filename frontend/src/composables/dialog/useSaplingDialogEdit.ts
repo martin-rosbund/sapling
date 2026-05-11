@@ -1,5 +1,5 @@
 // #region Imports
-import { ref, watch, onMounted, computed, nextTick, type ComputedRef, type Ref } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount, computed, nextTick, type ComputedRef, type Ref } from 'vue'
 import type {
   AccumulatedPermission,
   DialogSaveAction,
@@ -475,6 +475,25 @@ export function useSaplingDialogEdit(
 
   // #region Lifecycle
   onMounted(initialize)
+
+  // Warn the user before unloading the tab while the dialog has unsaved
+  // changes. Browsers ignore the returned string nowadays but require the
+  // `returnValue` assignment to trigger the native confirmation prompt.
+  function onBeforeUnload(event: BeforeUnloadEvent): string | void {
+    if (!isDirty.value || !props.modelValue) {
+      return
+    }
+    event.preventDefault()
+    event.returnValue = ''
+    return ''
+  }
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('beforeunload', onBeforeUnload)
+    onBeforeUnmount(() => {
+      window.removeEventListener('beforeunload', onBeforeUnload)
+    })
+  }
 
   /**
    * Stable signature of the structural shape of `props.templates`.

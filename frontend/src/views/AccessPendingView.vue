@@ -29,17 +29,11 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { buildApiUrl } from '@/services/api.client'
 
-const { t, te } = useI18n()
+const { t } = useI18n()
 
-const translatedTitle = computed(() =>
-  te('login.accessPendingTitle') ? t('login.accessPendingTitle') : 'Anmeldung erfolgreich',
-)
+const translatedTitle = computed(() => t('login.accessPendingTitle'))
 
-const translatedDescription = computed(() =>
-  te('login.accessPendingDescription')
-    ? t('login.accessPendingDescription')
-    : 'Ihre Anmeldung war erfolgreich, aber Ihrem Benutzerkonto ist derzeit keine Rolle zugewiesen. Bitte wenden Sie sich an Ihren Vorgesetzten, um Zugriff auf Sapling zu erhalten.',
-)
+const translatedDescription = computed(() => t('login.accessPendingDescription'))
 
 async function logout() {
   await axios.post(buildApiUrl('auth/logout'))

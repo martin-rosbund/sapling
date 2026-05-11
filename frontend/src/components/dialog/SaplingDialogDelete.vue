@@ -10,6 +10,8 @@
     card-class="tilt-content sapling-dialog-delete-card"
     persistent
     @update:model-value="handleDialogUpdate"
+    @enter="handleConfirm"
+    @escape="handleCancel"
   >
     <template #actions>
       <SaplingActionDelete :handleCancel="handleCancel" :handleConfirm="handleConfirm" />

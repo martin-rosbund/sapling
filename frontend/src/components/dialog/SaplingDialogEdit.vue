@@ -450,7 +450,7 @@ const emit = defineEmits<{
 }>()
 // #endregion
 
-const { t, d, te, locale } = useI18n()
+const { t, d, te } = useI18n()
 const { pushMessage } = useSaplingMessageCenter()
 const currentPersonStore = useCurrentPersonStore()
 const timelineDialogStore = useTimelineDialogStore()
@@ -536,10 +536,6 @@ function onShellKeydown(event: KeyboardEvent) {
   }
 }
 
-function getFallbackCopy(german: string, english: string): string {
-  return String(locale.value).toLowerCase().startsWith('de') ? german : english
-}
-
 const entityLabel = computed(() =>
   props.entity?.handle ? t(`navigation.${props.entity.handle}`) : '',
 )
@@ -617,7 +613,7 @@ const recordActionMenuItems = computed<SaplingContextMenuTableMenuItem[]>(() => 
     return []
   }
 
-  const mailToLabel = te('global.mailTo') ? t('global.mailTo') : 'E-Mail an'
+  const mailToLabel = t('global.mailTo')
   const mailActions = buildMailMenuActions(props.templates, form.value)
 
   return getSaplingContextMenuTableItems({
@@ -656,19 +652,14 @@ const updatedAtTitle = computed(() => getTimestampTitle('updatedAt', 'global.upd
 const createdAtLabel = computed(() => formatTimestamp(props.item?.createdAt))
 const updatedAtLabel = computed(() => formatTimestamp(props.item?.updatedAt))
 
-const resetButtonLabel = computed(() =>
-  te('filter.reset') ? t('filter.reset') : getFallbackCopy('Zuruecksetzen', 'Reset'),
-)
+const resetButtonLabel = computed(() => t('filter.reset'))
 
 const dirtySummaryLabel = computed(() => {
   if (dirtyFieldCount.value <= 0) {
     return ''
   }
 
-  return getFallbackCopy(
-    dirtyFieldCount.value === 1 ? '1 Feld geaendert' : `${dirtyFieldCount.value} Felder geaendert`,
-    dirtyFieldCount.value === 1 ? '1 field changed' : `${dirtyFieldCount.value} fields changed`,
-  )
+  return t('global.dirtyFieldCount', { count: dirtyFieldCount.value }, dirtyFieldCount.value)
 })
 
 const expandedGroupIds = ref<string[]>([])

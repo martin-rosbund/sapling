@@ -6,8 +6,10 @@
       'selected-row': !props.multiSelect && props.isSelected,
       'multi-selected-row': props.multiSelect && props.isSelected,
     }"
+    tabindex="0"
     @mousedown="onRowMouseDown($event, index)"
     @dblclick="onRowDoubleClick($event)"
+    @keydown="onRowKeydown($event, index)"
     @contextmenu.prevent="openContextMenu($event, item, index)"
   >
     <!-- Multi-select checkbox cell -->
@@ -237,6 +239,7 @@ const {
   openContextMenu,
   onRowMouseDown,
   onRowDoubleClick,
+  onRowKeydown,
   openDialogForCol,
   closeDialogForCol,
   isDialogOpenForCol,
