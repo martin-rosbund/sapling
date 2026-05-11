@@ -10,7 +10,6 @@ import type {
 import ApiGenericService from '@/services/api.generic.service'
 import { useI18n } from 'vue-i18n'
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity'
-import { mdiIcons } from '@/constants/mdi.icons'
 import { getEditDialogHeaders } from '@/utils/saplingTableUtil'
 import {
   getDialogTemplateColumns,
@@ -77,7 +76,19 @@ export function useSaplingDialogEdit(
   const activeTab = ref(0)
   const permissions = ref<AccumulatedPermission[] | null>(null)
   const currentPersonStore = useCurrentPersonStore()
-  const iconNames = mdiIcons
+  // Icon list (~340kB source) is loaded on demand when an icon template is
+  // present, so entities without icon fields never pull it into their bundle.
+  const iconNames = ref<Array<{ name: string; unicode?: string }>>([])
+  let iconsLoadPromise: Promise<void> | null = null
+  function ensureIconsLoaded() {
+    if (iconNames.value.length > 0 || iconsLoadPromise) {
+      return iconsLoadPromise
+    }
+    iconsLoadPromise = import('@/constants/mdi.icons').then((mod) => {
+      iconNames.value = mod.mdiIcons
+    })
+    return iconsLoadPromise
+  }
   const isHydratingForm = ref(false)
   const initialFormSnapshot = ref<Record<string, string>>({})
   const pendingSaveAction = ref<DialogSaveAction | null>(null)
@@ -148,6 +159,17 @@ export function useSaplingDialogEdit(
 
   const visibleTemplateGroups = computed(() =>
     groupDialogTemplates(visibleTemplates.value, translateDialogGroupLabel),
+  )
+
+  // Trigger lazy icon-list load as soon as the dialog actually exposes an icon field.
+  watch(
+    visibleTemplates,
+    (next) => {
+      if (next.some((template) => template.options?.includes('isIcon'))) {
+        void ensureIconsLoaded()
+      }
+    },
+    { immediate: true },
   )
 
   const {
@@ -454,31 +476,58 @@ export function useSaplingDialogEdit(
   // #region Lifecycle
   onMounted(initialize)
 
-  watch(
-    () => [props.item, props.mode],
-    async () => {
-      clearSelectedItems()
-      resetRelationTableItems()
-      await loadActiveRelationTableItems()
-    },
+  /**
+   * Stable signature of the structural shape of `props.templates`.
+   * Used to avoid `deep: true` watchers that fire on every nested mutation
+   * (which used to re-trigger initialize/initializeForm/syncParentReferences
+   * on every parent re-render and was a major cause of the dialog flickering
+   * once relation tabs were active).
+   */
+  const templatesSignature = computed(() =>
+    templates.value
+      .map(
+        (template) =>
+          `${template.name}|${template.type ?? ''}|${template.kind ?? ''}|${template.referenceName ?? ''}|${template.options?.join(',') ?? ''}`,
+      )
+      .join('::'),
   )
+
+  /**
+   * Stable record identity. Relation tables only need to reset when we
+   * actually switch to another record (entity handle + item handle) — not
+   * every time the parent emits a fresh `props.item` reference with identical
+   * content (e.g. after a save round-trip).
+   */
+  const recordIdentity = computed(
+    () => `${props.entity?.handle ?? ''}::${getItemHandle(props.item) ?? ''}::${props.mode}`,
+  )
+
+  watch(recordIdentity, async (next, previous) => {
+    if (next === previous) {
+      return
+    }
+
+    clearSelectedItems()
+    resetRelationTableItems()
+    await loadActiveRelationTableItems()
+  })
 
   watch(activeTab, () => {
     void loadActiveRelationTableItems()
   })
 
   watch(
-    () => props.templates,
+    templatesSignature,
     async () => {
       await initialize()
     },
-    { deep: true },
   )
 
-  watch(() => [props.item, props.mode, props.templates], initializeForm, {
-    immediate: true,
-    deep: true,
-  })
+  watch(
+    () => [recordIdentity.value, templatesSignature.value] as const,
+    initializeForm,
+    { immediate: true },
+  )
 
   watch(
     () =>
@@ -504,11 +553,10 @@ export function useSaplingDialogEdit(
   watch(() => currentPersonStore.person, applyCurrentDefaults)
 
   watch(
-    () => [props.parent, props.parentEntity, props.mode, props.templates],
+    () => [props.parent, props.parentEntity, props.mode, templatesSignature.value] as const,
     syncParentReferences,
     {
       immediate: true,
-      deep: true,
     },
   )
 

@@ -14,7 +14,7 @@ export class GenericFilterService {
       currentUser,
     );
     const stringFields = template
-      .filter((field) => field.type === 'string')
+      .filter((field) => GenericFilterService.isStringLikeFieldType(field.type))
       .map((field) => field.name)
       .filter((name): name is string => typeof name === 'string');
 
@@ -241,6 +241,23 @@ export class GenericFilterService {
 
       this.normalizeLikeOperators(value);
     }
+  }
+
+  private static readonly STRING_LIKE_FIELD_TYPES = new Set<string>([
+    'string',
+    'text',
+    'character varying',
+    'varchar',
+    'char',
+    'uuid',
+  ]);
+
+  private static isStringLikeFieldType(type: unknown): boolean {
+    if (typeof type !== 'string') {
+      return false;
+    }
+
+    return GenericFilterService.STRING_LIKE_FIELD_TYPES.has(type.toLowerCase());
   }
 
   private isPlainRecord(value: unknown): value is Record<string, unknown> {

@@ -9,6 +9,7 @@
     variant="outlined"
     hide-details
     clearable
+    :loading="isLoading"
     class="sapling-table-filter-menu__field"
     @update:model-value="updateValue"
   >
@@ -25,7 +26,22 @@
 </template>
 
 <script lang="ts" setup>
-import { mdiIcons } from '@/constants/mdi.icons'
+import { onMounted, ref } from 'vue'
+
+// The full icon catalog is large (~340kB source). Defer loading it until this
+// filter actually mounts so tables without an icon filter never pay the cost.
+const mdiIcons = ref<Array<{ name: string; unicode?: string }>>([])
+const isLoading = ref(false)
+
+onMounted(async () => {
+  isLoading.value = true
+  try {
+    const mod = await import('@/constants/mdi.icons')
+    mdiIcons.value = mod.mdiIcons
+  } finally {
+    isLoading.value = false
+  }
+})
 
 defineProps<{
   modelValue: string

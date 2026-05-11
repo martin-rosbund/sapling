@@ -11,8 +11,8 @@
               <span class="sapling-playground__eyebrow">Component Showcase</span>
               <h1 class="sapling-playground__hero-title">Sapling Playground</h1>
               <p class="sapling-playground__hero-description">
-                Interaktive Showcase-Flaeche fuer Actions, Dialoge, Form-Felder, KPI-Karten und
-                Tabellen. Alles hier ist direkt anklickbar und als Referenz fuer die uebrigen
+                Interaktive Showcase-Flaeche für Actions, Dialoge, Form-Felder, KPI-Karten und
+                Tabellen. Alles hier ist direkt anklickbar und als Referenz für die übrigen
                 Komponenten gedacht.
               </p>
 
@@ -812,7 +812,7 @@ const actionShowcases: ShowcaseActionCard[] = [
   {
     key: 'delete',
     title: 'Delete',
-    description: 'Destruktive Bestaetigungsaktion fuer Delete-Dialoge.',
+    description: 'Destruktive Bestaetigungsaktion für Delete-Dialoge.',
     component: markRaw(SaplingActionDelete),
     props: {
       handleCancel: () => pushDemoFeedback('Delete abgebrochen.', 'info'),
@@ -822,7 +822,7 @@ const actionShowcases: ShowcaseActionCard[] = [
   {
     key: 'close',
     title: 'Close',
-    description: 'Minimaler Footer fuer Readonly- oder Preview-Screens.',
+    description: 'Minimaler Footer für Readonly- oder Preview-Screens.',
     component: markRaw(SaplingActionClose),
     props: {
       close: () => pushDemoFeedback('Close-Aktion ausgelost.', 'info'),
@@ -856,7 +856,7 @@ const actionShowcases: ShowcaseActionCard[] = [
   {
     key: 'upload',
     title: 'Upload',
-    description: 'Upload-Footer fuer Dateidialoge mit Event-API.',
+    description: 'Upload-Footer für Dateidialoge mit Event-API.',
     component: markRaw(SaplingActionUpload),
     props: {
       isLoading: false,
@@ -869,7 +869,7 @@ const actionShowcases: ShowcaseActionCard[] = [
   {
     key: 'account',
     title: 'Account',
-    description: 'Kombinierte Footer-Aktion fuer Account-Dialoge.',
+    description: 'Kombinierte Footer-Aktion für Account-Dialoge.',
     component: markRaw(SaplingActionAccount),
     props: {
       handleClose: () => pushDemoFeedback('Account-Dialog geschlossen.', 'info'),
@@ -880,7 +880,7 @@ const actionShowcases: ShowcaseActionCard[] = [
   {
     key: 'change-password',
     title: 'Change Password',
-    description: 'Spezialisierte Action fuer Passwortwechsel-Flaechen.',
+    description: 'Spezialisierte Action für Passwortwechsel-Flaechen.',
     component: markRaw(SaplingActionChangePassword),
     props: {
       allowCancel: true,
@@ -894,7 +894,7 @@ const dialogLaunchers = computed<ShowcaseDialogLauncher[]>(() => [
   {
     key: 'delete',
     title: 'Delete Dialog',
-    description: 'Kompakter Danger-Dialog fuer Loesch-Workflows.',
+    description: 'Kompakter Danger-Dialog für Loesch-Workflows.',
     icon: 'mdi-delete-outline',
     color: 'error',
     open: openDeleteShowcaseDialog,

@@ -133,6 +133,28 @@ export function useSaplingTable(
     }
   }
 
+  function getUrlPageParam(): number {
+    if (!isUseQueryParameter) {
+      return 1
+    }
+
+    const value = Array.isArray(route.query.page) ? route.query.page[0] : route.query.page
+    const parsed = typeof value === 'string' ? Number.parseInt(value, 10) : NaN
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 1
+  }
+
+  function getUrlItemsPerPageParam(): number | null {
+    if (!isUseQueryParameter) {
+      return null
+    }
+
+    const value = Array.isArray(route.query.itemsPerPage)
+      ? route.query.itemsPerPage[0]
+      : route.query.itemsPerPage
+    const parsed = typeof value === 'string' ? Number.parseInt(value, 10) : NaN
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null
+  }
+
   const activeFilter = computed(() =>
     buildTableFilter({
       search: search.value,
@@ -262,7 +284,11 @@ export function useSaplingTable(
     items.value = []
     totalItems.value = 0
     headers.value = []
-    page.value = 1
+    page.value = getUrlPageParam()
+    const urlItemsPerPage = getUrlItemsPerPageParam()
+    if (urlItemsPerPage !== null) {
+      itemsPerPage.value = urlItemsPerPage
+    }
     search.value = getUrlSearchParam()
     sortBy.value = []
     columnFilters.value = {}
@@ -352,6 +378,7 @@ export function useSaplingTable(
       }
 
       scheduleLoadData()
+      syncUrlState()
     },
     { deep: true },
   )
@@ -363,6 +390,61 @@ export function useSaplingTable(
 
     void initializeEntityState()
   })
+  // #endregion
+
+  // #region URL Sync
+  /**
+   * Persists user-controlled table state (search, page, itemsPerPage, sortBy, filter)
+   * into the location bar via history.replaceState. We bypass vue-router's
+   * `router.replace` here on purpose so the existing `route.query` watcher does
+   * not trigger a full re-initialization for our own writes — browser back/forward
+   * still works because popstate updates `route.query` and re-runs the watcher.
+   */
+  function syncUrlState() {
+    if (!isUseQueryParameter || typeof window === 'undefined') {
+      return
+    }
+
+    const params = new URLSearchParams(window.location.search)
+
+    const searchValue = search.value.trim()
+    if (searchValue) {
+      params.set('search', searchValue)
+    } else {
+      params.delete('search')
+    }
+
+    if (page.value > 1) {
+      params.set('page', String(page.value))
+    } else {
+      params.delete('page')
+    }
+
+    if (itemsPerPage.value && itemsPerPage.value !== itemsPerPageDefault.value) {
+      params.set('itemsPerPage', String(itemsPerPage.value))
+    } else {
+      params.delete('itemsPerPage')
+    }
+
+    if (validSortBy.value.length > 0) {
+      params.set('sortBy', JSON.stringify(validSortBy.value))
+    } else {
+      params.delete('sortBy')
+    }
+
+    const filterPayload = activeFilter.value
+    if (filterPayload && Object.keys(filterPayload).length > 0) {
+      params.set('filter', JSON.stringify(filterPayload))
+    } else {
+      params.delete('filter')
+    }
+
+    const queryString = params.toString()
+    const nextUrl = `${window.location.pathname}${queryString ? `?${queryString}` : ''}${window.location.hash}`
+    if (nextUrl !== `${window.location.pathname}${window.location.search}${window.location.hash}`) {
+      window.history.replaceState(window.history.state, '', nextUrl)
+    }
+  }
   // #endregion
 
   // #region Event Handlers

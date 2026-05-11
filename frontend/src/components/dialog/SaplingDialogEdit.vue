@@ -7,8 +7,8 @@
     :height="SAPLING_DIALOG_HEIGHT.xl"
     persistent
   >
-    <SaplingDialogCard class="sapling-dialog-edit-card">
-      <div class="sapling-dialog-edit-shell">
+    <SaplingDialogCard class="sapling-dialog-edit-card" :tilt="false">
+      <div class="sapling-dialog-edit-shell" @keydown="onShellKeydown">
         <v-card-title class="sapling-dialog-edit-header">
           <SaplingDialogEditHero :loading="isLoading" :eyebrow="entityLabel" :title="dialogTitle">
             <template #timestamps>
@@ -183,8 +183,11 @@
                 :key="template.name"
                 :value="idx + 1"
                 class="sapling-dialog-edit-window-item"
+                :transition="false"
+                :reverse-transition="false"
               >
                 <SaplingDialogEditRelationTab
+                  v-if="activeTab === idx + 1"
                   :template="template"
                   :entity-handle="entity?.handle ?? ''"
                   :entity-label="entityLabel"
@@ -504,6 +507,34 @@ const {
   onRelationTableColumnFilters,
   onRelationTableReload,
 } = useSaplingDialogEdit(props, emit, { forceDirty: computed(() => props.forceDirty === true) })
+
+function onShellKeydown(event: KeyboardEvent) {
+  // Keyboard shortcuts inside the edit dialog:
+  //   Ctrl/Cmd + S        -> save (keep dialog open)
+  //   Ctrl/Cmd + Enter    -> save & close
+  //   Escape              -> cancel (uses unsaved-changes confirmation when dirty)
+  const isMod = event.ctrlKey || event.metaKey
+  if (event.repeat) {
+    return
+  }
+
+  if (isMod && !event.altKey && event.key.toLowerCase() === 's') {
+    event.preventDefault()
+    void save()
+    return
+  }
+
+  if (isMod && !event.altKey && event.key === 'Enter') {
+    event.preventDefault()
+    void saveAndClose()
+    return
+  }
+
+  if (event.key === 'Escape' && !isMod && !event.altKey) {
+    event.preventDefault()
+    cancel()
+  }
+}
 
 function getFallbackCopy(german: string, english: string): string {
   return String(locale.value).toLowerCase().startsWith('de') ? german : english

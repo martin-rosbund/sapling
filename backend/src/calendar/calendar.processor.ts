@@ -409,7 +409,7 @@ export class CalendarProcessor extends WorkerHost {
     const accessToken = await this.resolveAccessToken(provider, sessionContext);
     if (!accessToken) {
       const reason =
-        'Es konnte kein gueltiger Access-Token fuer die Kalendersynchronisation ermittelt werden.';
+        'Es konnte kein gueltiger Access-Token für die Kalendersynchronisation ermittelt werden.';
       this.logger.warn(
         `Calendar delivery #${deliveryId} uses fallback because no access token is available.`,
       );

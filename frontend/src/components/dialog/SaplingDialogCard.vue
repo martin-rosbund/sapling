@@ -7,7 +7,8 @@
   -->
   <v-card
     v-tilt="tilt ? TILT_DEFAULT_OPTIONS : null"
-    class="glass-panel tilt-content sapling-dialog-card"
+    class="glass-panel sapling-dialog-card"
+    :class="{ 'tilt-content': tilt }"
     :elevation="elevation"
   >
     <slot />
