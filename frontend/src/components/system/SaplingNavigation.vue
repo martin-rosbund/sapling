@@ -69,6 +69,7 @@
           clearable
           density="comfortable"
           hide-details
+          autocomplete="off"
           prepend-inner-icon="mdi-magnify"
           :disabled="isLoading"
           :placeholder="isLoading ? '' : $t('global.search')"

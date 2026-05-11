@@ -17,6 +17,7 @@
           density="comfortable"
           hide-details
           autofocus
+          autocomplete="off"
           flat
           prepend-inner-icon="mdi-magnify"
           @keydown="onSearchKeydown"

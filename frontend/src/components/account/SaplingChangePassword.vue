@@ -34,12 +34,14 @@
               :label="$t('login.newPassword')"
               prepend-icon="mdi-lock"
               type="password"
+              autocomplete="off"
             />
             <v-text-field
               v-model="confirmPassword"
               :label="$t('login.confirmPassword')"
               prepend-icon="mdi-lock-check"
               type="password"
+              autocomplete="off"
             />
           </v-form>
         </template>

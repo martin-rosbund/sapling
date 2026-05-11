@@ -86,6 +86,7 @@
               v-model="editingSessionTitleModel"
               density="compact"
               hide-details
+              autocomplete="off"
               autofocus
               @click.stop
               @keyup.enter="emit('saveTitle', session)"
