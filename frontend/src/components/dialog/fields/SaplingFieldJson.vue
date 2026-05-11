@@ -13,7 +13,7 @@
       :height="SAPLING_DIALOG_HEIGHT.xl"
       persistent
     >
-      <SaplingDialogCard class="sapling-dialog-json-card sapling-dialog-card--fullscreen">
+      <SaplingDialogCard class="sapling-dialog-json-card sapling-dialog-card--fullscreen" :tilt="false">
         <div class="sapling-dialog-shell sapling-fill-shell">
           <v-card-title class="sapling-dialog-json-title">{{ label }}</v-card-title>
           <v-card-text class="sapling-dialog-json-content">
