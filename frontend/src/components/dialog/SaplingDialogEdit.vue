@@ -95,7 +95,7 @@
             <v-window v-model="activeTab" class="sapling-dialog-edit-window">
               <v-window-item :value="0" class="sapling-dialog-edit-window-item">
                 <div class="sapling-dialog-edit-tab-scroll">
-                  <div class="sapling-dialog-edit-form-surface">
+                  <div ref="formSurfaceRef" class="sapling-dialog-edit-form-surface">
                     <v-form ref="formRef" class="sapling-dialog-edit-form" @submit.prevent="save">
                       <div class="sapling-dialog-edit-form-layout">
                         <section
@@ -384,7 +384,7 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type {
   AccumulatedPermission,
@@ -608,6 +608,7 @@ const recordDeleteDialog = ref(false)
 const showUploadDialog = ref(false)
 const showInformationDialog = ref(false)
 const loadedScriptButtons = ref<ScriptButtonItem[]>([])
+const formSurfaceRef = ref<HTMLElement | null>(null)
 
 let scriptButtonsRequestId = 0
 
@@ -965,6 +966,50 @@ watch(
   (isOpen) => {
     if (isOpen) {
       syncExpandedGroups(true)
+    }
+  },
+)
+
+/**
+ * Auto-focus the first editable, non-disabled input once the dialog has
+ * finished its initial loading. Saves the user a `Tab` step when entering
+ * data and matches typical CRUD UX conventions.
+ */
+async function focusFirstField(): Promise<void> {
+  if (props.mode === 'readonly') {
+    return
+  }
+
+  await nextTick()
+  const surface = formSurfaceRef.value
+  if (!surface) {
+    return
+  }
+
+  const candidates = surface.querySelectorAll<HTMLElement>(
+    'input:not([type=hidden]):not([disabled]):not([readonly]), textarea:not([disabled]):not([readonly])',
+  )
+
+  for (const candidate of Array.from(candidates)) {
+    if (candidate.offsetParent === null) {
+      continue
+    }
+    if (candidate.getAttribute('aria-hidden') === 'true') {
+      continue
+    }
+    candidate.focus({ preventScroll: true })
+    if (candidate instanceof HTMLInputElement && candidate.type === 'text') {
+      candidate.select?.()
+    }
+    return
+  }
+}
+
+watch(
+  () => [props.modelValue, isLoading.value, props.mode] as const,
+  ([isOpen, loading]) => {
+    if (isOpen && !loading) {
+      void focusFirstField()
     }
   },
 )

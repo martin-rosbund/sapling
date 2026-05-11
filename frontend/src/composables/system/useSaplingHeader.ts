@@ -1,7 +1,8 @@
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import ApiService from '@/services/api.service'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
+import { useVisibilityAwarePolling } from '@/composables/system/useVisibilityAwarePolling'
 
 /**
  * Provides the state and interaction handlers for the shared application header.
@@ -13,7 +14,6 @@ export function useSaplingHeader() {
   const showAccount = ref(false)
   const inboxCount = ref(0)
   const currentPersonStore = useCurrentPersonStore()
-  let timerTasks: number | undefined
   //#endregion
 
   //#region Lifecycle Hooks
@@ -22,20 +22,10 @@ export function useSaplingHeader() {
    */
   onMounted(async () => {
     await Promise.all([currentPersonStore.fetchCurrentPerson(), countInboxItems()])
-
-    timerTasks = window.setInterval(() => {
-      countInboxItems()
-    }, 60000)
   })
 
-  /**
-   * Disposes the running header timer.
-   */
-  onUnmounted(() => {
-    if (timerTasks != null) {
-      clearInterval(timerTasks)
-    }
-  })
+  // Refresh the inbox badge once per minute while the tab is visible.
+  useVisibilityAwarePolling(countInboxItems, 60000)
   //#endregion
 
   //#region Methods

@@ -160,7 +160,7 @@ export function useSaplingTableColumnFilter(
           : fallbackOperator,
       )
     },
-    { deep: true, immediate: true },
+    { immediate: true },
   )
 
   watch(
@@ -168,7 +168,7 @@ export function useSaplingTableColumnFilter(
     () => {
       void resolveRelationLabels()
     },
-    { deep: true, immediate: true },
+    { immediate: true },
   )
 
   onBeforeUnmount(() => {

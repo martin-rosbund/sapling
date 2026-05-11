@@ -533,7 +533,12 @@ export function useSaplingDialogEdit(
     () =>
       templates.value
         .filter((template) => template.referenceDependency)
-        .map((template) => form.value[template.referenceDependency?.parentField ?? '']),
+        .map((template) => {
+          const value = form.value[template.referenceDependency?.parentField ?? '']
+          const identifier = extractDependencyIdentifier(value)
+          return `${template.name}::${identifier ?? ''}`
+        })
+        .join('|'),
     () => {
       if (isHydratingForm.value) {
         return
@@ -547,7 +552,6 @@ export function useSaplingDialogEdit(
           }
         })
     },
-    { deep: true },
   )
 
   watch(() => currentPersonStore.person, applyCurrentDefaults)

@@ -27,19 +27,27 @@
                 :label="$t('login.username')"
                 prepend-icon="mdi-account"
                 type="email"
+                autocomplete="username"
+                autofocus
                 v-model="email"
+                @keyup.enter="handleLogin"
               />
               <v-text-field
                 :label="$t('login.password')"
                 prepend-icon="mdi-lock"
                 type="password"
+                autocomplete="current-password"
                 v-model="password"
+                @keyup.enter="handleLogin"
               />
               <v-checkbox
                 v-model="rememberMe"
                 :label="$t('login.rememberMe')"
                 class="d-flex justify-end"
               />
+              <!-- Hidden submit button so browsers treat Enter as form submission
+                   even though the visible primary button lives in the action bar. -->
+              <button type="submit" class="sapling-login-hidden-submit" tabindex="-1" aria-hidden="true" />
             </v-form>
           </template>
 
@@ -95,3 +103,18 @@ const {
 } = useSaplingLogin()
 //#endregion
 </script>
+
+<style scoped>
+.sapling-login-hidden-submit {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+</style>

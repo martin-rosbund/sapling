@@ -370,18 +370,27 @@ export function useSaplingTable(
     activeLoadController = null
   })
 
-  watch(
-    [search, page, itemsPerPage, sortBy, parentFilter, columnFilters],
-    () => {
-      if (isResettingEntityState.value || !isInitialized.value) {
-        return
-      }
-
-      scheduleLoadData()
-      syncUrlState()
-    },
-    { deep: true },
+  // Stable serialization of the dynamic query inputs. Watching this avoids
+  // `deep: true` traversal on every keystroke and only fires the reload when
+  // the effective filter/sort/pagination payload truly changes.
+  const tableQuerySignature = computed(() =>
+    JSON.stringify({
+      search: search.value,
+      page: page.value,
+      itemsPerPage: itemsPerPage.value,
+      sortBy: validSortBy.value,
+      filter: activeFilter.value,
+    }),
   )
+
+  watch(tableQuerySignature, () => {
+    if (isResettingEntityState.value || !isInitialized.value) {
+      return
+    }
+
+    scheduleLoadData()
+    syncUrlState()
+  })
 
   watch([entityHandle, () => route.query], () => {
     if (!autoInitialize && !isInitialized.value) {
