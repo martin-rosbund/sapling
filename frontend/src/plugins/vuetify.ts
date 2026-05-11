@@ -7,17 +7,12 @@ import { de, en } from 'vuetify/locale'
 // Vuetify
 import { createVuetify } from 'vuetify'
 
-// Import all components and directives
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
-
-// https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
+// Components and directives are auto-imported on demand by vite-plugin-vuetify
+// (see vite.config.ts). Only labs components must be registered explicitly.
 export default createVuetify({
   components: {
-    ...components,
     VDateInput,
   },
-  directives,
   theme: {
     defaultTheme: 'dark', // <-- This line enables dark mode
   },
