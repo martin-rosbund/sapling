@@ -1,5 +1,14 @@
 // #region Imports
-import { ref, watch, onMounted, onBeforeUnmount, computed, nextTick, type ComputedRef, type Ref } from 'vue'
+import {
+  ref,
+  watch,
+  onMounted,
+  onBeforeUnmount,
+  computed,
+  nextTick,
+  type ComputedRef,
+  type Ref,
+} from 'vue'
 import type {
   AccumulatedPermission,
   DialogSaveAction,
@@ -535,18 +544,13 @@ export function useSaplingDialogEdit(
     void loadActiveRelationTableItems()
   })
 
-  watch(
-    templatesSignature,
-    async () => {
-      await initialize()
-    },
-  )
+  watch(templatesSignature, async () => {
+    await initialize()
+  })
 
-  watch(
-    () => [recordIdentity.value, templatesSignature.value] as const,
-    initializeForm,
-    { immediate: true },
-  )
+  watch(() => [recordIdentity.value, templatesSignature.value] as const, initializeForm, {
+    immediate: true,
+  })
 
   watch(
     () =>
@@ -627,7 +631,13 @@ export function useSaplingDialogEdit(
 
   function emitSave(output: SaplingGenericItem, action: DialogSaveAction): void {
     emit('save', output, action, {
-      complete: () => completeSave(action),
+      complete: () => {
+        completeSave(action)
+        // After a successful save the current form values represent the new
+        // baseline. Re-sync the snapshot so previously edited fields are no
+        // longer reported as dirty.
+        syncInitialFormSnapshot()
+      },
     })
   }
 

@@ -39,9 +39,7 @@ import SaplingHeader from '@/components/system/SaplingHeader.vue'
 import SaplingNavigation from '@/components/system/SaplingNavigation.vue'
 
 // Heavy or rarely used shell widgets: load them only when actually mounted/opened.
-const SaplingAiChat = defineAsyncComponent(
-  () => import('@/components/system/SaplingAiChat.vue'),
-)
+const SaplingAiChat = defineAsyncComponent(() => import('@/components/system/SaplingAiChat.vue'))
 const SaplingMessageCenter = defineAsyncComponent(
   () => import('@/components/system/SaplingMessageCenter.vue'),
 )

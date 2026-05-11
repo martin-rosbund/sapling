@@ -96,12 +96,7 @@ import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
 import { buildFavoritePath } from '@/utils/saplingFavoriteNavigation'
 import { useSaplingPreferences } from '@/composables/system/useSaplingPreferences'
 import { useSaplingAccount } from '@/composables/account/useSaplingAccount'
-import type {
-  EntityItem,
-  EntityRouteItem,
-  FavoriteItem,
-  PersonItem,
-} from '@/entity/entity'
+import type { EntityItem, EntityRouteItem, FavoriteItem, PersonItem } from '@/entity/entity'
 import type { AccumulatedPermission } from '@/entity/structure'
 
 type CommandPaletteGroupKey = 'favorite' | 'entity' | 'action'
@@ -129,7 +124,6 @@ const currentPersonStore = useCurrentPersonStore()
 const currentPermissionStore = useCurrentPermissionStore()
 const { toggleTheme, setLanguage, currentLanguage, isDarkTheme } = useSaplingPreferences()
 const { logout } = useSaplingAccount()
-
 
 const isOpen = ref(false)
 const isLoaded = ref(false)
@@ -294,7 +288,8 @@ const allItems = computed<CommandPaletteItem[]>(() => {
       id: `favorite:${favorite.handle ?? itemLabel}`,
       group: 'favorite',
       label: itemLabel,
-      hint: favoriteEntityLabel && favoriteEntityLabel !== itemLabel ? favoriteEntityLabel : undefined,
+      hint:
+        favoriteEntityLabel && favoriteEntityLabel !== itemLabel ? favoriteEntityLabel : undefined,
       icon: (typeof favorite.icon === 'string' && favorite.icon) || 'mdi-star',
       haystack: `${itemLabel} ${favoriteEntityLabel}`.toLowerCase(),
       path,
@@ -336,9 +331,7 @@ const allItems = computed<CommandPaletteItem[]>(() => {
  * recomputed on theme / language changes so labels and icons stay accurate.
  */
 const actionItems = computed<Omit<CommandPaletteItem, 'flatIndex'>[]>(() => {
-  const themeLabel = isDarkTheme.value
-    ? t('global.themeLight')
-    : t('global.themeDark')
+  const themeLabel = isDarkTheme.value ? t('global.themeLight') : t('global.themeDark')
   const themeHint = t('global.commandPalette.actionThemeHint')
   const targetLanguage: 'de' | 'en' = currentLanguage.value === 'de' ? 'en' : 'de'
   const languageLabel =

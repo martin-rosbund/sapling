@@ -1,19 +1,4 @@
 [
-    {
-        "title":  "Sapling Basic Vertrag",
-        "description":  "Wartung und Support für IT-Infrastruktur.",
-        "startDate":  "2022-01-15T00:00:00Z",
-        "endDate":  "2028-01-14T00:00:00Z",
-        "isActive":  true,
-        "company":  7,
-        "lastServiceDate":  "2024-08-21T00:00:00Z",
-        "nextServiceDate":  "2025-06-09T00:00:00Z",
-        "serviceLevel":  "professional",
-        "hasUpdateservice":  true,
-        "annualIncludedHours":  32,
-        "defaultSupportTeam":  "service_desk",
-        "defaultSupportQueue":  "application_incidents",
-        "slaPolicy":  "priority"
-    }
+    
 ]
 

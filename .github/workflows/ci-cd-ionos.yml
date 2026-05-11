@@ -3,12 +3,10 @@ name: CI/CD IONOS
 on:
   push:
     branches:
-      - main
       - develop
       - 'release/**'
   pull_request:
     branches:
-      - main
       - develop
 
 permissions:

@@ -213,13 +213,21 @@ export function useSaplingNavigation(props: SaplingNavigationProps, emit: Saplin
 
       // Restore persisted user expansion on first run; afterwards trust the
       // user-controlled state and only seed missing entries from defaults.
-      if (hasPersistedState && expandedGroups.value.length === 0 && expandedSubgroups.value.length === 0) {
+      if (
+        hasPersistedState &&
+        expandedGroups.value.length === 0 &&
+        expandedSubgroups.value.length === 0
+      ) {
         expandedGroups.value = persistedExpandedGroups ?? [...nextDefaultGroups]
         expandedSubgroups.value = persistedExpandedSubgroups ?? [...nextDefaultSubgroups]
         return
       }
 
-      if (!hasPersistedState && expandedGroups.value.length === 0 && expandedSubgroups.value.length === 0) {
+      if (
+        !hasPersistedState &&
+        expandedGroups.value.length === 0 &&
+        expandedSubgroups.value.length === 0
+      ) {
         expandedGroups.value = [...nextDefaultGroups]
         expandedSubgroups.value = [...nextDefaultSubgroups]
       }

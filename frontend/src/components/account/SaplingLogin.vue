@@ -47,7 +47,12 @@
               />
               <!-- Hidden submit button so browsers treat Enter as form submission
                    even though the visible primary button lives in the action bar. -->
-              <button type="submit" class="sapling-login-hidden-submit" tabindex="-1" aria-hidden="true" />
+              <button
+                type="submit"
+                class="sapling-login-hidden-submit"
+                tabindex="-1"
+                aria-hidden="true"
+              />
             </v-form>
           </template>
 

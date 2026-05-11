@@ -1,9 +1,8 @@
 [
 		{
-			"title": "Sapling CRM",
-			"name": "Sapling Customer Relationship Management",
-			"version": "1.0.0",
-			"description": "Modernes und leistungsstarkes CRM-System für selbstständige, sowie kleine und mittlere Unternehmen. Cloudbasiert oder Self-Hosted, jederzeit die eigenen Daten im Griff.",
-			"contracts": [1]
+			"title": "Sapling Cloud CRM",
+			"name": "CRM für Selbstständige, kleine und mittlere Unternehmen.",
+			"version": "1.51.990",
+			"description": "Modernes und leistungsstarkes CRM-System für selbstständige, sowie kleine und mittlere Unternehmen. Cloudbasiert oder Self-Hosted, jederzeit die eigenen Daten im Griff."
 		}
 ]

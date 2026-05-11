@@ -162,14 +162,22 @@ export function useSaplingDialogEditDirty(options: UseSaplingDialogEditDirtyOpti
     return serializeComparableValue(normalizeComparableValue(source[template.name]))
   }
 
+  function isTrackableTemplate(template: EntityTemplate): boolean {
+    // Non-persistent fields are derived/virtual and never produce a real diff
+    // on save, so they must never contribute to the dirty state.
+    return template.isPersistent !== false
+  }
+
   function createFormComparisonSnapshot(
     source: SaplingGenericItem = options.form.value,
   ): Record<string, string> {
     return Object.fromEntries(
-      options.templates.value.map((template) => [
-        template.name,
-        createTemplateComparisonToken(template, source),
-      ]),
+      options.templates.value
+        .filter(isTrackableTemplate)
+        .map((template) => [
+          template.name,
+          createTemplateComparisonToken(template, source),
+        ]),
     )
   }
 
@@ -185,6 +193,7 @@ export function useSaplingDialogEditDirty(options: UseSaplingDialogEditDirtyOpti
     }
 
     return options.templates.value
+      .filter(isTrackableTemplate)
       .filter(
         (template) =>
           options.initialFormSnapshot.value[template.name] !==
