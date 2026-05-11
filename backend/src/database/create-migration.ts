@@ -59,13 +59,13 @@ async function createMigration() {
     );
 
     if (!result.fileName) {
-      console.log('No schema changes detected.');
+      global.log.info('No schema changes detected.');
       return;
     }
 
-    console.log(`Created migration: ${result.fileName}`);
+    global.log.info(`Created migration: ${result.fileName}`);
   } catch (error) {
-    console.error('Migration creation failed:', error);
+    global.log.error('Migration creation failed:', error);
     process.exit(1);
   } finally {
     await orm.close(true);

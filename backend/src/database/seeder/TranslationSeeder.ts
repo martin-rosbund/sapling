@@ -5,6 +5,7 @@ import { LanguageItem } from '../../entity/LanguageItem';
 import { TranslationItem } from '../../entity/TranslationItem';
 import { DB_DATA_SEEDER } from '../../constants/project.constants';
 import { SeedScriptItem } from '../../entity/SeedScriptItem';
+import { getErrorMessage } from '../../common/error.utils';
 import fs from 'fs';
 import path from 'path';
 
@@ -26,10 +27,6 @@ type TranslationFileItem = {
  * @method          run                     Executes translation seeding, loading JSON scripts and creating translation records for each language.
  */
 export class TranslationSeeder extends Seeder {
-  private static getErrorMessage(error: unknown): string {
-    return error instanceof Error ? error.message : String(error);
-  }
-
   /**
    * Runs the translation seeder. If there are no translations for 'login', it creates translations for DE and EN from the JSON data.
    */
@@ -123,7 +120,7 @@ export class TranslationSeeder extends Seeder {
         statusItem.isSuccess = false;
         await em.persist(statusItem).flush();
         global.log.error(
-          `Script ${scriptName} for ${entityHandle} failed: ${TranslationSeeder.getErrorMessage(err)}`,
+          `Script ${scriptName} for ${entityHandle} failed: ${getErrorMessage(err)}`,
         );
       }
     }

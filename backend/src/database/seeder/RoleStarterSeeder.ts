@@ -1,16 +1,19 @@
-import { EntityManager } from '@mikro-orm/core';
+import { EntityManager, EntityName, Collection } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
-import { readFileSync } from 'fs';
-import { join } from 'path';
-import { DB_DATA_SEEDER } from '../../constants/project.constants';
 import { DashboardTemplateItem } from '../../entity/DashboardTemplateItem';
 import { FavoriteTemplateItem } from '../../entity/FavoriteTemplateItem';
 import { RoleItem } from '../../entity/RoleItem';
+import { loadSeedJson } from './utils/load-seed-json';
 
 type RoleStarterTemplateSeed = {
   role: string;
   templates: string[];
 };
+
+type TemplateLike = { name: string };
+type RoleCollectionAccessor<T extends TemplateLike> = (
+  role: RoleItem,
+) => Collection<T>;
 
 /**
  * Applies role starter template mappings after roles, persons and templates
@@ -30,19 +33,35 @@ export class RoleStarterSeeder extends Seeder {
       roleItems.map((roleItem) => [roleItem.title, roleItem]),
     );
 
-    await this.applyDashboardAssignments(em, roleByTitle);
-    await this.applyFavoriteAssignments(em, roleByTitle);
+    await this.applyAssignments(
+      em,
+      roleByTitle,
+      DashboardTemplateItem,
+      'roleStarterDashboard/roleStarterDashboardData_001',
+      'dashboard template',
+      (role) => role.starterDashboardTemplates,
+    );
+    await this.applyAssignments(
+      em,
+      roleByTitle,
+      FavoriteTemplateItem,
+      'roleStarterFavorite/roleStarterFavoriteData_001',
+      'favorite template',
+      (role) => role.starterFavoriteTemplates,
+    );
     await em.flush();
   }
 
-  private async applyDashboardAssignments(
+  private async applyAssignments<T extends TemplateLike>(
     em: EntityManager,
     roleByTitle: Map<string, RoleItem>,
+    templateClass: EntityName<T>,
+    fileBase: string,
+    templateType: string,
+    getCollection: RoleCollectionAccessor<T>,
   ): Promise<void> {
-    const seedItems = this.loadJsonData(
-      'roleStarterDashboard/roleStarterDashboardData_001',
-    );
-    const templateItems = await em.find(DashboardTemplateItem, {});
+    const seedItems = loadSeedJson<RoleStarterTemplateSeed>(fileBase);
+    const templateItems = await em.find(templateClass, {});
     const templateByName = new Map(
       templateItems.map((templateItem) => [templateItem.name, templateItem]),
     );
@@ -53,49 +72,13 @@ export class RoleStarterSeeder extends Seeder {
         this.requireTemplate(
           templateByName,
           templateName,
-          'dashboard template',
+          templateType,
           seedItem.role,
         ),
       );
 
-      roleItem.starterDashboardTemplates.set(resolvedTemplates);
+      getCollection(roleItem).set(resolvedTemplates);
     }
-  }
-
-  private async applyFavoriteAssignments(
-    em: EntityManager,
-    roleByTitle: Map<string, RoleItem>,
-  ): Promise<void> {
-    const seedItems = this.loadJsonData(
-      'roleStarterFavorite/roleStarterFavoriteData_001',
-    );
-    const templateItems = await em.find(FavoriteTemplateItem, {});
-    const templateByName = new Map(
-      templateItems.map((templateItem) => [templateItem.name, templateItem]),
-    );
-
-    for (const seedItem of seedItems) {
-      const roleItem = this.requireRole(roleByTitle, seedItem.role);
-      const resolvedTemplates = seedItem.templates.map((templateName) =>
-        this.requireTemplate(
-          templateByName,
-          templateName,
-          'favorite template',
-          seedItem.role,
-        ),
-      );
-
-      roleItem.starterFavoriteTemplates.set(resolvedTemplates);
-    }
-  }
-
-  private loadJsonData(fileBase: string): RoleStarterTemplateSeed[] {
-    const jsonPath = join(
-      __dirname,
-      `./json-${DB_DATA_SEEDER}/${fileBase}.json`,
-    );
-    const fileContent = readFileSync(jsonPath, 'utf-8');
-    return JSON.parse(fileContent) as RoleStarterTemplateSeed[];
   }
 
   private requireRole(

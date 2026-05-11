@@ -31,7 +31,8 @@ import {
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
 } from '../constants/project.constants';
-import { parseRecurrenceRule } from './calendar.recurrence';
+import { buildCalendarFallback } from './calendar.fallback';
+import { getErrorMessage } from '../common/error.utils';
 
 type CalendarProvider = 'google' | 'azure';
 
@@ -125,101 +126,8 @@ function getErrorResponse(error: unknown): HttpResponseLike | null {
   return toHttpResponseLike(error.response);
 }
 
-function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'Unknown error';
-}
-
 function toPersistedObject(value: unknown): object | undefined {
   return isRecord(value) ? value : undefined;
-}
-
-function padCalendarValue(value: number): string {
-  return String(value).padStart(2, '0');
-}
-
-function formatUtcDate(date: Date): string {
-  return (
-    `${date.getUTCFullYear()}` +
-    `${padCalendarValue(date.getUTCMonth() + 1)}` +
-    `${padCalendarValue(date.getUTCDate())}` +
-    `T${padCalendarValue(date.getUTCHours())}` +
-    `${padCalendarValue(date.getUTCMinutes())}` +
-    `${padCalendarValue(date.getUTCSeconds())}Z`
-  );
-}
-
-function escapeICalendarText(value: string): string {
-  return value
-    .replace(/\\/g, '\\\\')
-    .replace(/\r?\n/g, '\\n')
-    .replace(/;/g, '\\;')
-    .replace(/,/g, '\\,');
-}
-
-function buildCalendarFallback(
-  delivery: EventDeliveryItem,
-  reason: string,
-): object {
-  const event = delivery.event;
-  const parsedRecurrenceRule = parseRecurrenceRule(event.recurrenceRule);
-  const participants = (event.participants ?? [])
-    .map((participant) => ({
-      email: participant.email?.trim() ?? '',
-      name: `${participant.firstName ?? ''} ${participant.lastName ?? ''}`.trim(),
-    }))
-    .filter((participant) => participant.email.length > 0);
-  const recipients = [
-    ...new Set(participants.map((participant) => participant.email)),
-  ];
-  const creatorEmail = event.creatorPerson?.email?.trim() ?? '';
-  const organizerName =
-    `${event.creatorPerson?.firstName ?? ''} ${event.creatorPerson?.lastName ?? ''}`.trim() ||
-    'Sapling';
-  const description = event.description?.trim() ?? '';
-  const lines = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//Sapling//Calendar Fallback//EN',
-    'BEGIN:VEVENT',
-    `UID:sapling-event-${event.handle ?? 'unknown'}-delivery-${delivery.handle ?? 'unknown'}`,
-    `DTSTAMP:${formatUtcDate(new Date())}`,
-    `DTSTART:${formatUtcDate(event.startDate)}`,
-    `DTEND:${formatUtcDate(event.endDate)}`,
-    parsedRecurrenceRule ? `RRULE:${parsedRecurrenceRule.raw}` : '',
-    `SUMMARY:${escapeICalendarText(event.title ?? 'Sapling event')}`,
-    `DESCRIPTION:${escapeICalendarText(description || reason)}`,
-    creatorEmail
-      ? `ORGANIZER;CN=${escapeICalendarText(organizerName)}:MAILTO:${creatorEmail}`
-      : '',
-    ...participants.map(
-      (participant) =>
-        `ATTENDEE;CN=${escapeICalendarText(participant.name || participant.email)}:MAILTO:${participant.email}`,
-    ),
-    'END:VEVENT',
-    'END:VCALENDAR',
-  ].filter(Boolean);
-
-  return {
-    fallback: {
-      strategy: 'email-draft',
-      reason,
-      subject: `Kalendereintrag fallback: ${event.title ?? 'Termin'}`,
-      to: recipients,
-      from: creatorEmail || undefined,
-      bodyText: [
-        `Der Kalendereintrag "${event.title ?? 'Termin'}" konnte nicht automatisch synchronisiert werden.`,
-        reason,
-        '',
-        `Beginn: ${event.startDate.toISOString()}`,
-        `Ende: ${event.endDate.toISOString()}`,
-        description ? `Beschreibung: ${description}` : '',
-      ]
-        .filter(Boolean)
-        .join('\n'),
-      icsFilename: `sapling-event-${event.handle ?? 'unknown'}.ics`,
-      icsContent: lines.join('\r\n'),
-    },
-  };
 }
 
 @Processor('calendar')
@@ -368,12 +276,99 @@ export class CalendarProcessor extends WorkerHost {
   }
 
   /**
+   * Persists a successful provider response on the delivery and marks it
+   * as `success`. Centralises the success path so it is identical between
+   * the first attempt and the post-refresh retry attempt.
+   */
+  private async persistSuccess(
+    em: EntityManager,
+    delivery: EventDeliveryItem,
+    providerResponse: unknown,
+  ): Promise<boolean> {
+    const success = await em.findOne(EventDeliveryStatusItem, {
+      handle: 'success',
+    });
+
+    if (!success) {
+      return false;
+    }
+
+    const response = toHttpResponseLike(providerResponse);
+    delivery.status = success;
+    delivery.responseStatusCode = response?.status || 200;
+    delivery.responseBody =
+      toPersistedObject(response?.data) ||
+      (isRecord(providerResponse)
+        ? providerResponse
+        : { result: providerResponse });
+    delivery.responseHeaders = toPersistedObject(response?.headers);
+    delivery.completedAt = new Date();
+    await em.flush();
+    return true;
+  }
+
+  /**
+   * Attempts to retry the provider delivery after refreshing the access
+   * token. Returns `true` if the retry succeeded, `false` otherwise.
+   */
+  private async retryWithRefreshedToken(
+    em: EntityManager,
+    delivery: EventDeliveryItem,
+    provider: CalendarProvider,
+    sessionContext: ResolvedCalendarSession,
+    eventHandle: number,
+    deliveryId: number,
+  ): Promise<boolean> {
+    if (!sessionContext.refreshToken) {
+      return false;
+    }
+
+    try {
+      const refreshedToken = await this.refreshAccessToken(
+        provider,
+        sessionContext.refreshToken,
+      );
+
+      if (!refreshedToken) {
+        return false;
+      }
+
+      if (sessionContext.session) {
+        sessionContext.session.accessToken = refreshedToken;
+      }
+      sessionContext.accessToken = refreshedToken;
+
+      const providerResponse = await this.executeProviderDelivery(
+        provider,
+        eventHandle,
+        refreshedToken,
+      );
+
+      const persisted = await this.persistSuccess(
+        em,
+        delivery,
+        providerResponse,
+      );
+      if (persisted) {
+        this.logger.log(
+          `Calendar delivery #${deliveryId} sent successfully after token refresh.`,
+        );
+      }
+      return persisted;
+    } catch (refreshError) {
+      this.logger.warn(
+        `Calendar delivery #${deliveryId} token refresh failed: ${getErrorMessage(refreshError)}`,
+      );
+      return false;
+    }
+  }
+
+  /**
    * Processes a calendar delivery job.
    * @param {Job<{ deliveryId: number }>} job Job containing deliveryId
-   * @returns {Promise<any>} Result of processing
+   * @returns {Promise<void>} Resolves once the delivery has been finalised.
    */
-  async process(job: Job<{ deliveryId: number }>): Promise<any> {
-    // Use a forked EntityManager for isolation
+  async process(job: Job<{ deliveryId: number }>): Promise<void> {
     const em = this.em.fork();
     const deliveryId = job.data.deliveryId;
     this.logger.debug(
@@ -434,74 +429,20 @@ export class CalendarProcessor extends WorkerHost {
         accessToken,
       );
 
-      const response = toHttpResponseLike(providerResponse);
-
-      // Success
-      const success = await em.findOne(EventDeliveryStatusItem, {
-        handle: 'success',
-      });
-
-      if (success) {
-        delivery.status = success;
-        delivery.responseStatusCode = response?.status || 200;
-        delivery.responseBody =
-          toPersistedObject(response?.data) ||
-          (isRecord(providerResponse)
-            ? providerResponse
-            : { result: providerResponse });
-        delivery.responseHeaders = toPersistedObject(response?.headers);
-        delivery.completedAt = new Date();
-        await em.flush();
+      if (await this.persistSuccess(em, delivery, providerResponse)) {
         this.logger.log(`Calendar delivery #${deliveryId} sent successfully.`);
       }
     } catch (error: unknown) {
-      const canRetryWithRefresh = !!sessionContext.refreshToken;
-
-      if (canRetryWithRefresh) {
-        try {
-          const refreshedToken = await this.refreshAccessToken(
-            provider,
-            sessionContext.refreshToken,
-          );
-
-          if (refreshedToken) {
-            if (sessionContext.session) {
-              sessionContext.session.accessToken = refreshedToken;
-            }
-
-            sessionContext.accessToken = refreshedToken;
-            const providerResponse = await this.executeProviderDelivery(
-              provider,
-              eventHandle,
-              refreshedToken,
-            );
-            const response = toHttpResponseLike(providerResponse);
-            const success = await em.findOne(EventDeliveryStatusItem, {
-              handle: 'success',
-            });
-
-            if (success) {
-              delivery.status = success;
-              delivery.responseStatusCode = response?.status || 200;
-              delivery.responseBody =
-                toPersistedObject(response?.data) ||
-                (isRecord(providerResponse)
-                  ? providerResponse
-                  : { result: providerResponse });
-              delivery.responseHeaders = toPersistedObject(response?.headers);
-              delivery.completedAt = new Date();
-              await em.flush();
-              this.logger.log(
-                `Calendar delivery #${deliveryId} sent successfully after token refresh.`,
-              );
-              return;
-            }
-          }
-        } catch (refreshError) {
-          this.logger.warn(
-            `Calendar delivery #${deliveryId} token refresh failed: ${getErrorMessage(refreshError)}`,
-          );
-        }
+      const retried = await this.retryWithRefreshedToken(
+        em,
+        delivery,
+        provider,
+        sessionContext,
+        eventHandle,
+        deliveryId,
+      );
+      if (retried) {
+        return;
       }
 
       const reason =
