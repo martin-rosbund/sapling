@@ -389,17 +389,22 @@ export function useSaplingInbox(emit: CloseEmitter) {
     salesOpportunities.value.map(createSalesOpportunityEntry),
   )
   const notificationEntries = computed(() => notifications.value.map(createNotificationEntry))
-  const allEntries = computed(() =>
+  const actionableEntries = computed(() =>
     [
-      ...notificationEntries.value,
       ...ticketEntries.value,
       ...taskEntries.value,
       ...salesOpportunityEntries.value,
     ].sort(compareEntriesByDate),
   )
+  const allEntries = computed(() =>
+    [
+      ...notificationEntries.value,
+      ...actionableEntries.value,
+    ].sort(compareEntriesByDate),
+  )
 
   function getSectionItems(sectionKey: InboxSectionKey) {
-    return allEntries.value.filter((entry) => getSectionKey(entry.dateValue) === sectionKey)
+    return actionableEntries.value.filter((entry) => getSectionKey(entry.dateValue) === sectionKey)
   }
 
   const overdueEntries = computed(() => getSectionItems('overdue'))

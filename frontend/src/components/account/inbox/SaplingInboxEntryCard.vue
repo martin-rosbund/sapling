@@ -1,6 +1,7 @@
 <template>
   <article
     class="sapling-inbox-entry glass-panel"
+    :class="{ 'sapling-inbox-entry--expanded': expanded }"
     role="button"
     tabindex="0"
     @click="emit('open', entry)"
@@ -75,9 +76,15 @@
 <script setup lang="ts">
 import type { InboxEntry } from '@/composables/account/useSaplingInbox'
 
-defineProps<{
-  entry: InboxEntry
-}>()
+withDefaults(
+  defineProps<{
+    entry: InboxEntry
+    expanded?: boolean
+  }>(),
+  {
+    expanded: false,
+  },
+)
 
 const emit = defineEmits<{
   (event: 'open', entry: InboxEntry): void
