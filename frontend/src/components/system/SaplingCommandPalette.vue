@@ -387,6 +387,50 @@ const filteredResults = computed<CommandPaletteItem[]>(() => {
   if (!needle) {
     return allItems.value.slice(0, 50)
   }
+
+  // UX: Wenn nur ein Doppelpunkt am Ende steht, zeige weiterhin die normalen Treffer für den Präfix vor dem Doppelpunkt
+  if (needle.endsWith(":") && needle.length > 1) {
+    const prefix = needle.slice(0, -1)
+    return allItems.value.filter((item) => item.haystack.includes(prefix)).slice(0, 50)
+  }
+
+  // Spezialfall: entity:searchtext
+  const colonIdx = needle.indexOf(":")
+  if (colonIdx > 1 && colonIdx < needle.length - 1) {
+    const entityPart = needle.slice(0, colonIdx)
+    const searchPart = needle.slice(colonIdx + 1).trim()
+    // Fuzzy-Match: alle passenden Entitäten suchen
+    const matchingEntities = entities.value.filter(
+      (entity) =>
+        entity.handle.toLowerCase().startsWith(entityPart) ||
+        getEntityLabel(entity).toLowerCase().startsWith(entityPart)
+    )
+    // Wenn mindestens eine Entität und ein Suchtext vorhanden ist, für jede einen Eintrag erzeugen
+    if (matchingEntities.length > 0 && searchPart.length > 0) {
+      const searchItems = matchingEntities.map((entity, idx) => {
+        const routes = entity.routes ?? []
+        let listRoute = routes.find(r => r.route && r.route.includes('list'))
+        if (!listRoute && routes.length > 0) listRoute = routes[0]
+        const routePath = listRoute ? `/${(listRoute.route ?? '').replace(/^\/+/, '')}` : `/${entity.handle}`
+        return {
+          id: `entitysearch:${entity.handle}:${searchPart}`,
+          group: 'entity' as CommandPaletteGroupKey,
+          label: `${getEntityLabel(entity)} durchsuchen nach: ${searchPart}`,
+          hint: undefined,
+          icon: entity.icon || 'mdi-magnify',
+          haystack: '',
+          path: routePath + `?search=${encodeURIComponent(searchPart)}`,
+          flatIndex: idx,
+        } as CommandPaletteItem
+      })
+      // Zusätzlich: die "normalen" Treffer für das entityPart anzeigen
+      return [
+        ...searchItems,
+        ...allItems.value.filter((item) => item.haystack.includes(entityPart)).slice(0, 50 - searchItems.length)
+      ]
+    }
+  }
+
   return allItems.value.filter((item) => item.haystack.includes(needle)).slice(0, 50)
 })
 
@@ -451,9 +495,12 @@ async function activateCurrent() {
   const flat = filteredResults.value
   const target = flat[activeIndex.value] ?? flat[0]
   if (target) {
+    // Wenn das Item nicht in allItems ist (z.B. dynamische entitysearch-Items), direkt ausführen
     const original = allItems.value.find((entry) => entry.id === target.id)
     if (original) {
       await runItem(original)
+    } else {
+      await runItem(target)
     }
   }
 }
