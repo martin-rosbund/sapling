@@ -133,8 +133,7 @@ const dialogModel = computed({
   },
 })
 
-const { entity, entries, error, isLoading } = useSaplingRecordChangeLog({
-  entityTemplates,
+const { entity, entries, error, isLoading, entityTemplates } = useSaplingRecordChangeLog({
   entityHandle,
   recordHandle,
   active: dialog,

@@ -7,6 +7,7 @@ import ApiGenericService from '@/services/api.generic.service'
 import type { ChangeLogEntry } from '@/entity/structure'
 
 interface UseSaplingRecordChangeLogOptions {
+  entityTemplates?: MaybeRefOrGetter<string | null | undefined>
   entityHandle?: MaybeRefOrGetter<string | null | undefined>
   recordHandle?: MaybeRefOrGetter<string | number | null | undefined>
   active?: MaybeRefOrGetter<boolean | null | undefined>
