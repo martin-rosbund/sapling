@@ -55,9 +55,15 @@ export class MailController {
 
   @Get('senders')
   @ApiOperation({
-    summary: 'List available sender addresses for the current mail provider',
+    summary: 'List available sender addresses',
+    description:
+      'Returns the sender addresses that the authenticated user can choose from for the currently configured mail provider.',
   })
-  @ApiResponse({ status: 200, type: MailSenderListResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Available sender addresses grouped by the active provider.',
+    type: MailSenderListResponseDto,
+  })
   async listSenders(
     @Req() req: Request & { user: PersonItem },
   ): Promise<MailSenderListResponseDto> {
@@ -65,9 +71,21 @@ export class MailController {
   }
 
   @Post('preview')
-  @ApiOperation({ summary: 'Render an email preview from entity context' })
-  @ApiBody({ type: MailPreviewDto })
-  @ApiResponse({ status: 201, type: MailPreviewResponseDto })
+  @ApiOperation({
+    summary: 'Render an email preview',
+    description:
+      'Builds an email draft from entity context, template data, and optional manual overrides without dispatching it.',
+  })
+  @ApiBody({
+    type: MailPreviewDto,
+    description:
+      'Message draft and rendering context used to resolve recipients, subject, body, and attachments.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Resolved email preview with recipients, subject, and rendered body.',
+    type: MailPreviewResponseDto,
+  })
   @UseGuards(GenericPermissionGuard)
   @GenericPermission('allowRead')
   @SetMetadata(GENERIC_PERMISSION_RESOLVE_KEY, resolveMailEntityPermission)
@@ -79,9 +97,21 @@ export class MailController {
   }
 
   @Post('send')
-  @ApiOperation({ summary: 'Queue or dispatch an email from entity context' })
-  @ApiBody({ type: MailSendDto })
-  @ApiResponse({ status: 201, type: EmailDeliveryItem })
+  @ApiOperation({
+    summary: 'Queue or send an email',
+    description:
+      'Builds an email from entity context and dispatches it through the configured delivery pipeline.',
+  })
+  @ApiBody({
+    type: MailSendDto,
+    description:
+      'Message payload that should be rendered and then queued or sent immediately.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Persisted email delivery record for the queued or sent message.',
+    type: EmailDeliveryItem,
+  })
   @UseGuards(GenericPermissionGuard)
   @GenericPermission('allowUpdate')
   @SetMetadata(GENERIC_PERMISSION_RESOLVE_KEY, resolveMailEntityPermission)

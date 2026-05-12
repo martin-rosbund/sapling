@@ -32,7 +32,10 @@ export class KpiResponseDto {
    * The KPI metadata object.
    * @type {KpiItem}
    */
-  @ApiProperty({ description: 'The KPI metadata object.' })
+  @ApiProperty({
+    description:
+      'KPI configuration and presentation metadata used to interpret the computed result.',
+  })
   kpi?: KpiItem;
 
   /**
@@ -41,32 +44,35 @@ export class KpiResponseDto {
    */
   @ApiProperty({
     description:
-      'The result value of the KPI execution. Can be a number, object, trend result, or sparkline array.',
+      'Computed KPI result. Depending on the KPI type this can be a single number, a trend comparison, a sparkline series, grouped rows, or another structured value.',
     oneOf: [
-      { type: 'number', description: 'Numeric result value.' },
+      { type: 'number', description: 'Single numeric KPI result.' },
       { $ref: getSchemaPath(TrendResultDto) },
       {
         type: 'array',
         items: { $ref: getSchemaPath(SparklineMonthPointDto) },
-        description: 'Array of monthly sparkline points.',
+        description: 'Monthly sparkline series.',
       },
       {
         type: 'array',
         items: { $ref: getSchemaPath(SparklineDayPointDto) },
-        description: 'Array of daily sparkline points.',
+        description: 'Daily sparkline series.',
       },
       {
         type: 'array',
         items: { $ref: getSchemaPath(SparklineWeekPointDto) },
-        description: 'Array of weekly sparkline points.',
+        description: 'Weekly sparkline series.',
       },
       {
         type: 'array',
         items: { type: 'object', additionalProperties: true },
-        description: 'Array of grouped KPI rows.',
+        description: 'Grouped KPI rows for table-style results.',
       },
-      { type: 'object', description: 'Generic object result.' },
-      { type: 'null', description: 'Null if no result.' },
+      {
+        type: 'object',
+        description: 'Structured KPI result object for custom visualizations.',
+      },
+      { type: 'null', description: 'No KPI result is available.' },
     ],
     nullable: true,
   })
@@ -81,7 +87,8 @@ export class KpiResponseDto {
     | null;
 
   @ApiPropertyOptional({
-    description: 'Optional drilldown metadata for KPI cards and chart points.',
+    description:
+      'Optional drilldown metadata that can be used to navigate from KPI cards or chart points to matching entity records.',
     type: () => KpiDrilldownDto,
     nullable: true,
   })

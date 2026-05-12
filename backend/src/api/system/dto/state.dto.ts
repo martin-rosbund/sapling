@@ -12,7 +12,8 @@ export class ApplicationStateDto {
   /** Indicates if the application is ready */
   @ApiProperty({
     example: true,
-    description: 'Indicates if the application is ready',
+    description:
+      'Indicates whether the backend has finished bootstrapping and is ready to serve requests.',
   })
   isReady: boolean = false;
 }

@@ -81,8 +81,16 @@ export class SystemController {
    */
   @Get('cpu')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'CPU information' })
-  @ApiResponse({ status: 200, type: CpuDto })
+  @ApiOperation({
+    summary: 'Get CPU information',
+    description:
+      'Returns aggregated processor details for the current Sapling server, including model, core count, and architecture-related metadata.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'CPU information for the current Sapling server.',
+    type: CpuDto,
+  })
   async getCpu(): Promise<CpuDto> {
     return await this.cpuService.getCpu();
   }
@@ -93,8 +101,16 @@ export class SystemController {
    */
   @Get('cpu/speed')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'CPU speed' })
-  @ApiResponse({ status: 200, type: CpuSpeedDto })
+  @ApiOperation({
+    summary: 'Get CPU speed information',
+    description:
+      'Returns the current, minimum, and maximum CPU frequency values reported by the system.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Measured CPU speed information for the current Sapling server.',
+    type: CpuSpeedDto,
+  })
   async getCpuSpeed(): Promise<CpuSpeedDto> {
     return await this.cpuService.getCpuSpeed();
   }
@@ -105,8 +121,16 @@ export class SystemController {
    */
   @Get('memory')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Memory information' })
-  @ApiResponse({ status: 200, type: MemoryDto })
+  @ApiOperation({
+    summary: 'Get memory information',
+    description:
+      'Returns total, used, and available memory values for the current Sapling server.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Memory usage information for the current Sapling server.',
+    type: MemoryDto,
+  })
   async getMemory(): Promise<MemoryDto> {
     return await this.memoryService.getMemory();
   }
@@ -117,8 +141,17 @@ export class SystemController {
    */
   @Get('filesystem')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Filesystem information' })
-  @ApiResponse({ status: 200, type: FilesystemDto, isArray: true })
+  @ApiOperation({
+    summary: 'Get filesystem information',
+    description:
+      'Returns mounted filesystems together with size, usage, and mount-point information.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Filesystem information for all mounted volumes visible to the server.',
+    type: FilesystemDto,
+    isArray: true,
+  })
   async getFilesystem(): Promise<FilesystemDto[]> {
     return await this.filesystemService.getFilesystem();
   }
@@ -129,8 +162,17 @@ export class SystemController {
    */
   @Get('network')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Network information' })
-  @ApiResponse({ status: 200, type: NetworkInterfaceDto, isArray: true })
+  @ApiOperation({
+    summary: 'Get network interface information',
+    description:
+      'Returns the network interfaces reported by the server, including address and adapter details.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Network interface information for the current Sapling server.',
+    type: NetworkInterfaceDto,
+    isArray: true,
+  })
   async getNetwork(): Promise<NetworkInterfaceDto[]> {
     return await this.networkService.getNetwork();
   }
@@ -141,8 +183,16 @@ export class SystemController {
    */
   @Get('os')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Operating system information' })
-  @ApiResponse({ status: 200, type: OperatingSystemDto })
+  @ApiOperation({
+    summary: 'Get operating system information',
+    description:
+      'Returns operating system and platform metadata for the current Sapling server.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Operating system information for the current Sapling server.',
+    type: OperatingSystemDto,
+  })
   async getOs(): Promise<OperatingSystemDto> {
     return await this.osService.getOs();
   }
@@ -153,8 +203,16 @@ export class SystemController {
    */
   @Get('time')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Time information' })
-  @ApiResponse({ status: 200, type: TimeDto })
+  @ApiOperation({
+    summary: 'Get server time information',
+    description:
+      'Returns the current server time together with timezone-related metadata used by the backend.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Current time information reported by the Sapling server.',
+    type: TimeDto,
+  })
   getTime(): TimeDto {
     return this.timeService.getTime();
   }
@@ -165,8 +223,16 @@ export class SystemController {
    */
   @Get('version')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Application version' })
-  @ApiResponse({ status: 200, type: ApplicationVersionDto })
+  @ApiOperation({
+    summary: 'Get application version information',
+    description:
+      'Returns version metadata for the currently running Sapling backend application.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Version information for the running Sapling backend.',
+    type: ApplicationVersionDto,
+  })
   getVersion(): ApplicationVersionDto {
     return this.versionService.getVersion();
   }
@@ -176,8 +242,17 @@ export class SystemController {
    * @returns {ApplicationStateDto} Application state DTO
    */
   @Get('state')
-  @ApiOperation({ summary: 'Application state' })
-  @ApiResponse({ status: 200, type: ApplicationStateDto })
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get application state',
+    description:
+      'Returns lightweight runtime state information, such as whether the backend has finished bootstrapping and is ready to serve requests.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Current readiness state of the Sapling backend.',
+    type: ApplicationStateDto,
+  })
   getState(): ApplicationStateDto {
     return { isReady: global.isReady || false };
   }

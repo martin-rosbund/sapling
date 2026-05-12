@@ -55,89 +55,127 @@ function normalizeOptionalString(value: unknown): string | undefined {
 }
 
 export class MailSenderOptionDto {
-  @ApiProperty()
+  @ApiProperty({ description: 'Sender email address that can be selected.' })
   email!: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Optional human-readable display name for the sender.',
+  })
   displayName?: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Technical identifier of the mail provider.' })
   provider!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Origin of the sender option, for example configuration or provider discovery.',
+  })
   source!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Indicates whether this sender should be preselected by default.',
+  })
   isDefault!: boolean;
 }
 
 export class MailSenderListResponseDto {
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Active provider for which sender options were resolved.',
+  })
   provider?: string;
 
-  @ApiProperty({ type: [MailSenderOptionDto] })
+  @ApiProperty({
+    type: [MailSenderOptionDto],
+    description: 'Sender options that the user may choose from.',
+  })
   senders!: MailSenderOptionDto[];
 }
 
 export class MailPreviewDto {
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Entity handle used to resolve template data and permissions.',
+  })
   @IsString()
   @IsNotEmpty()
   entityHandle!: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Optional record handle that provides the entity context for the email.',
+  })
   @IsOptional()
   itemHandle?: string | number;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Optional mail template handle that should be used to render the message.',
+  })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   templateHandle?: number;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Optional subject override applied after template resolution.',
+  })
   @IsOptional()
   @IsString()
   subject?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Optional Markdown body override applied after template resolution.',
+  })
   @IsOptional()
   @IsString()
   bodyMarkdown?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Optional sender email address that should be used for the message.',
+  })
   @IsOptional()
   @Transform(({ value }) => normalizeOptionalString(value))
   @IsString()
   senderEmail?: string;
 
-  @ApiPropertyOptional({ type: [String] })
+  @ApiPropertyOptional({
+    type: [String],
+    description: 'Optional primary recipient list.',
+  })
   @IsOptional()
   @Transform(({ value }) => normalizeStringArray(value))
   @IsArray()
   @IsString({ each: true })
   to?: string[];
 
-  @ApiPropertyOptional({ type: [String] })
+  @ApiPropertyOptional({
+    type: [String],
+    description: 'Optional carbon-copy recipient list.',
+  })
   @IsOptional()
   @Transform(({ value }) => normalizeStringArray(value))
   @IsArray()
   @IsString({ each: true })
   cc?: string[];
 
-  @ApiPropertyOptional({ type: [String] })
+  @ApiPropertyOptional({
+    type: [String],
+    description: 'Optional blind-carbon-copy recipient list.',
+  })
   @IsOptional()
   @Transform(({ value }) => normalizeStringArray(value))
   @IsArray()
   @IsString({ each: true })
   bcc?: string[];
 
-  @ApiPropertyOptional({ type: Object })
+  @ApiPropertyOptional({
+    type: Object,
+    description: 'Optional ad-hoc values that should be available during template rendering.',
+  })
   @IsOptional()
   @IsObject()
   draftValues?: Record<string, unknown>;
 
-  @ApiPropertyOptional({ type: [Number] })
+  @ApiPropertyOptional({
+    type: [Number],
+    description: 'Optional list of document handles that should be attached to the message.',
+  })
   @IsOptional()
   @Transform(({ value }) => normalizeNumberArray(value))
   @IsArray()
@@ -148,36 +186,56 @@ export class MailPreviewDto {
 export class MailSendDto extends MailPreviewDto {}
 
 export class MailPreviewResponseDto {
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Entity handle that was used to resolve the preview.',
+  })
   entityHandle!: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Record handle that was used as the entity context, when provided.',
+  })
   itemHandle?: string | number;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Mail template handle that contributed to the rendered preview, when applicable.',
+  })
   templateHandle?: number;
 
-  @ApiProperty({ type: [String] })
+  @ApiProperty({
+    type: [String],
+    description: 'Resolved primary recipient list.',
+  })
   to!: string[];
 
-  @ApiProperty({ type: [String] })
+  @ApiProperty({
+    type: [String],
+    description: 'Resolved carbon-copy recipient list.',
+  })
   cc!: string[];
 
-  @ApiProperty({ type: [String] })
+  @ApiProperty({
+    type: [String],
+    description: 'Resolved blind-carbon-copy recipient list.',
+  })
   bcc!: string[];
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Resolved email subject line.' })
   subject!: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Resolved Markdown body.' })
   bodyMarkdown!: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Resolved HTML body ready for rendering.' })
   bodyHtml!: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Resolved sender email address, when one could be determined.',
+  })
   senderEmail?: string;
 
-  @ApiPropertyOptional({ type: [Number] })
+  @ApiPropertyOptional({
+    type: [Number],
+    description: 'Attachment document handles that are part of the preview.',
+  })
   attachmentHandles?: number[];
 }

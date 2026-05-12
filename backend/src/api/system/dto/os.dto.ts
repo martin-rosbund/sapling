@@ -19,36 +19,63 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class OperatingSystemDto {
   /** Operating system platform */
-  @ApiProperty({ example: 'Windows', description: 'Platform' })
+  @ApiProperty({
+    example: 'Windows',
+    description: 'Operating system platform family.',
+  })
   platform?: string;
   /** Operating system distribution */
   @ApiProperty({
     example: 'Microsoft Windows 10 Pro',
-    description: 'Distribution',
+    description: 'Human-readable operating system distribution or edition.',
   })
   distro?: string;
   /** Operating system release version */
-  @ApiProperty({ example: '10.0.19045', description: 'Release' })
+  @ApiProperty({
+    example: '10.0.19045',
+    description: 'Operating system release version.',
+  })
   release?: string;
   /** Operating system kernel version */
-  @ApiProperty({ example: '10.0.19045', description: 'Kernel' })
+  @ApiProperty({
+    example: '10.0.19045',
+    description: 'Kernel version reported by the operating system.',
+  })
   kernel?: string;
   /** Operating system codename */
-  @ApiProperty({ example: '', description: 'Codename' })
+  @ApiProperty({
+    example: '',
+    description: 'Operating system codename, when available.',
+  })
   codename?: string;
   /** Operating system architecture */
-  @ApiProperty({ example: 'x64', description: 'Architecture' })
+  @ApiProperty({
+    example: 'x64',
+    description: 'CPU architecture used by the operating system.',
+  })
   arch?: string;
   /** Hostname */
-  @ApiProperty({ example: 'localhost', description: 'Hostname' })
+  @ApiProperty({
+    example: 'localhost',
+    description: 'System hostname reported by the operating system.',
+  })
   hostname?: string;
   /** Fully qualified domain name */
-  @ApiProperty({ example: 'localhost.local', description: 'FQDN' })
+  @ApiProperty({
+    example: 'localhost.local',
+    description: 'Fully qualified domain name, when available.',
+  })
   fqdn?: string;
   /** Codepage */
-  @ApiProperty({ example: '850', description: 'Codepage' })
+  @ApiProperty({
+    example: '850',
+    description: 'Active system code page, when reported.',
+  })
   codepage?: string;
   /** Logofile */
-  @ApiProperty({ example: 'windows', description: 'Logofile' })
+  @ApiProperty({
+    example: 'windows',
+    description: 'Operating system logo or theme identifier, when available.',
+  })
   logofile?: string;
 }

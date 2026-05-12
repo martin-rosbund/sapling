@@ -73,18 +73,19 @@ export class KpiController {
    */
   @Get('execute/:handle')
   @ApiOperation({
-    summary: 'Execute KPI by ID',
-    description: 'Executes a KPI by its ID and returns the result.',
+    summary: 'Execute a KPI',
+    description:
+      'Executes the KPI identified by the given handle and returns the computed KPI result together with its metadata.',
   })
   @ApiParam({
     name: 'handle',
     type: Number,
-    description: 'The KPI handle (ID)',
+    description: 'Numeric handle of the KPI that should be executed.',
   })
   @ApiResponse({
     status: 200,
     description:
-      'Result of the KPI execution. Contains the KPI metadata and the computed value/result.',
+      'Computed KPI result including KPI metadata, formatted output, and drilldown information when available.',
     type: KpiResponseDto,
   })
   @UseGuards(GenericPermissionGuard)

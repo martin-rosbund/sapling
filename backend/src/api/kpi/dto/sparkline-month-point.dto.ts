@@ -15,14 +15,20 @@ export class SparklineMonthPointDto {
    * Month of the year (numeric).
    * @type {number}
    */
-  @ApiProperty({ description: 'Month', type: 'number' })
+  @ApiProperty({
+    description: 'Calendar month of the sparkline point.',
+    type: 'number',
+  })
   month: number;
 
   /**
    * Year (numeric).
    * @type {number}
    */
-  @ApiProperty({ description: 'Year', type: 'number' })
+  @ApiProperty({
+    description: 'Calendar year of the sparkline point.',
+    type: 'number',
+  })
   year: number;
 
   /**
@@ -30,10 +36,18 @@ export class SparklineMonthPointDto {
    * @type {number|object|null}
    */
   @ApiProperty({
-    description: 'Value',
+    description:
+      'KPI value recorded for this month. This can be numeric, structured, or null.',
     type: 'number',
     nullable: true,
-    oneOf: [{ type: 'number' }, { type: 'object' }],
+    oneOf: [
+      { type: 'number', description: 'Single numeric point value.' },
+      {
+        type: 'object',
+        description: 'Structured point value for grouped or composite metrics.',
+      },
+      { type: 'null', description: 'No value is available for this month.' },
+    ],
   })
   value: number | object | null;
 

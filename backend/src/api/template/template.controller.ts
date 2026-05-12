@@ -45,18 +45,19 @@ export class TemplateController {
   @Get(':entityHandle')
   @ApiOperation({
     summary: 'Get entity template metadata',
-    description: 'Returns the properties (columns) of an entity as metadata.',
+    description:
+      'Returns the property metadata that describes the fields, relations, and structural characteristics of the requested entity.',
   })
   @ApiParam({
     name: 'entityHandle',
     type: String,
-    description: 'The name of the entity',
+    description: 'Registered Sapling entity handle whose template should be returned.',
   })
   @ApiGenericEntityOperation('Returns the properties (columns) of an entity')
   @ApiResponse({
     status: 200,
     description:
-      'Array of entity property metadata objects. Each object describes a property (column) of the entity.',
+      'Array of entity property metadata objects describing fields, relation types, nullability, and other template details.',
     type: EntityTemplateDto,
     isArray: true,
   })
