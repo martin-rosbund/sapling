@@ -248,13 +248,38 @@
               </template>
 
               <v-list density="comfortable" min-width="260">
-                <v-list-item
-                  v-for="menuItem in recordActionMenuItems"
-                  :key="`${menuItem.type}-${menuItem.title ?? menuItem.titleKey ?? menuItem.scriptButton?.name ?? ''}`"
-                  :prepend-icon="menuItem.icon"
-                  :title="getRecordActionTitle(menuItem)"
-                  @click="handleRecordAction(menuItem)"
-                />
+                <template v-if="Array.isArray(recordActionMenuItems[0])">
+                  <template v-for="(group, groupIdx) in recordActionMenuItems" :key="`group-${groupIdx}`">
+                    <template v-if="Array.isArray(group)">
+                      <v-list-item
+                        v-for="menuItem in group.filter((mi: any) => mi && typeof mi === 'object' && 'type' in mi)"
+                        :key="`${menuItem.type}-${menuItem.title ?? menuItem.titleKey ?? menuItem.scriptButton?.name ?? ''}`"
+                        :prepend-icon="menuItem.icon"
+                        :title="getRecordActionTitle(menuItem)"
+                        @click="handleRecordAction(menuItem)"
+                      />
+                    </template>
+                    <template v-else>
+                      <v-list-item
+                        v-if="group && typeof group === 'object' && 'type' in group"
+                        :key="`${group.type}-${group.title ?? group.titleKey ?? group.scriptButton?.name ?? ''}`"
+                        :prepend-icon="group.icon"
+                        :title="getRecordActionTitle(group)"
+                        @click="handleRecordAction(group)"
+                      />
+                    </template>
+                    <v-divider v-if="groupIdx < recordActionMenuItems.length - 1" :key="`divider-${groupIdx}`" />
+                  </template>
+                </template>
+                <template v-else>
+                  <v-list-item
+                    v-for="menuItem in recordActionMenuItems.filter(mi => mi && typeof mi === 'object' && 'type' in mi)"
+                    :key="`${menuItem.type}-${menuItem.title ?? menuItem.titleKey ?? menuItem.scriptButton?.name ?? ''}`"
+                    :prepend-icon="menuItem.icon"
+                    :title="getRecordActionTitle(menuItem)"
+                    @click="handleRecordAction(menuItem)"
+                  />
+                </template>
               </v-list>
             </v-menu>
 
@@ -277,6 +302,7 @@
             </v-btn>
           </template>
 
+
           <template #trailing>
             <v-menu v-if="recordActionMenuItems.length > 0">
               <template #activator="{ props: menuProps }">
@@ -290,14 +316,39 @@
                 </v-btn>
               </template>
 
-              <v-list density="comfortable" min-width="260">
-                <v-list-item
-                  v-for="menuItem in recordActionMenuItems"
-                  :key="`${menuItem.type}-${menuItem.title ?? menuItem.titleKey ?? menuItem.scriptButton?.name ?? ''}`"
-                  :prepend-icon="menuItem.icon"
-                  :title="getRecordActionTitle(menuItem)"
-                  @click="handleRecordAction(menuItem)"
-                />
+              <v-list density="comfortable" min-width="260" class="glass-panel">
+                <template v-if="Array.isArray(recordActionMenuItems[0])">
+                  <template v-for="(group, groupIdx) in recordActionMenuItems" :key="`group-edit-${groupIdx}`">
+                    <template v-if="Array.isArray(group)">
+                      <v-list-item
+                        v-for="menuItem in group.filter((mi: any) => mi && typeof mi === 'object' && 'type' in mi)"
+                        :key="`${menuItem.type}-${menuItem.title ?? menuItem.titleKey ?? menuItem.scriptButton?.name ?? ''}`"
+                        :prepend-icon="menuItem.icon"
+                        :title="getRecordActionTitle(menuItem)"
+                        @click="handleRecordAction(menuItem)"
+                      />
+                    </template>
+                    <template v-else>
+                      <v-list-item
+                        v-if="group && typeof group === 'object' && 'type' in group"
+                        :key="`${group.type}-${group.title ?? group.titleKey ?? group.scriptButton?.name ?? ''}`"
+                        :prepend-icon="group.icon"
+                        :title="getRecordActionTitle(group)"
+                        @click="handleRecordAction(group)"
+                      />
+                    </template>
+                    <v-divider v-if="groupIdx < recordActionMenuItems.length - 1" :key="`divider-edit-${groupIdx}`" />
+                  </template>
+                </template>
+                <template v-else>
+                  <v-list-item
+                    v-for="menuItem in recordActionMenuItems.filter(mi => mi && typeof mi === 'object' && 'type' in mi)"
+                    :key="`${menuItem.type}-${menuItem.title ?? menuItem.titleKey ?? menuItem.scriptButton?.name ?? ''}`"
+                    :prepend-icon="menuItem.icon"
+                    :title="getRecordActionTitle(menuItem)"
+                    @click="handleRecordAction(menuItem)"
+                  />
+                </template>
               </v-list>
             </v-menu>
 

@@ -65,14 +65,17 @@
               </template>
 
               <v-list class="glass-panel sapling-table-mobile-card__menu-list">
-                <v-list-item
-                  v-for="menuItem in rowMenuItems"
-                  :key="`${menuItem.type}-${menuItem.scriptButton?.handle ?? menuItem.titleKey ?? menuItem.title ?? ''}`"
-                  @click.stop="onMenuItemClick(menuItem)"
-                >
-                  <v-icon start>{{ menuItem.icon }}</v-icon>
-                  <span>{{ resolveMenuItemTitle(menuItem) }}</span>
-                </v-list-item>
+                <template v-for="(group, groupIdx) in rowMenuItems">
+                  <v-list-item
+                    v-for="menuItem in group"
+                    :key="`${menuItem.type}-${menuItem.scriptButton?.handle ?? menuItem.titleKey ?? menuItem.title ?? ''}`"
+                    @click.stop="onMenuItemClick(menuItem)"
+                  >
+                    <v-icon start>{{ menuItem.icon }}</v-icon>
+                    <span>{{ resolveMenuItemTitle(menuItem) }}</span>
+                  </v-list-item>
+                  <v-divider v-if="groupIdx < rowMenuItems.length - 1" />
+                </template>
                 <v-list-item @click.stop="closeMenu()">
                   <v-icon start>mdi-close</v-icon>
                   <span>{{ $t('global.close') }}</span>

@@ -157,7 +157,10 @@ const heroStats = computed(() => [
 const systemProperties = computed(() => {
   return new Set(
     entityTemplates.value
-      .filter((template) => template.options?.includes('isSystem'))
+      .filter(
+        (template) =>
+          template.options?.includes('isSystem') || template.options?.includes('isReadOnly')
+      )
       .map((template) => template.name),
   )
 })
