@@ -51,6 +51,13 @@ export class GenericReferenceService {
   ): object {
     if (template) {
       for (const field of template.filter((x) => x.isReference)) {
+        // Inverse one-to-many collections are derived from the owning side and
+        // must not be reassigned through generic create/update payloads.
+        if (field.kind === '1:m') {
+          delete (data as Record<string, any>)[field.name];
+          continue;
+        }
+
         if (
           field.kind &&
           !(

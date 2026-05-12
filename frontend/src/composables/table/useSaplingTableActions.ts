@@ -22,6 +22,7 @@ import ApiScriptService from '@/services/api.script.service'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
 import { useTimelineDialogStore } from '@/stores/timelineDialogStore'
+import { useChangeLogDialogStore } from '@/stores/changeLogDialogStore'
 import { buildFavoritePath } from '@/utils/saplingFavoriteNavigation'
 import { buildTableFilter, buildTableOrderBy } from '@/utils/saplingTableUtil'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
@@ -94,6 +95,7 @@ export function useSaplingTableActions({
   const currentPersonStore = useCurrentPersonStore()
   const currentPermissionStore = useCurrentPermissionStore()
   const timelineDialogStore = useTimelineDialogStore()
+  const changeLogDialogStore = useChangeLogDialogStore()
   const { pushMessage } = useSaplingMessageCenter()
   const { openMailDialog } = useSaplingMailDialog()
 
@@ -356,6 +358,14 @@ export function useSaplingTableActions({
     timelineDialogStore.openTimeline(props.entityHandle, String(item.handle))
   }
 
+  function openChangeLog(item: SaplingGenericItem) {
+    if (item.handle == null) {
+      return
+    }
+
+    changeLogDialogStore.openChangeLog(props.entityHandle, String(item.handle))
+  }
+
   function navigateToDocuments(item: SaplingGenericItem) {
     if (item.handle == null) {
       return
@@ -374,6 +384,9 @@ export function useSaplingTableActions({
     switch (type) {
       case 'edit':
         void openEditDialog(item)
+        break
+      case 'changeLog':
+        openChangeLog(item)
         break
       case 'show':
         openShowDialog(item)
@@ -773,6 +786,7 @@ export function useSaplingTableActions({
     onContextMenuAction,
     navigateToAddress,
     openTimeline,
+    openChangeLog,
     openUploadDialog,
     closeUploadDialog,
     navigateToDocuments,

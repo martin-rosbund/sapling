@@ -422,6 +422,7 @@ import ApiGenericService from '@/services/api.generic.service'
 import ApiScriptService from '@/services/api.script.service'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { useTimelineDialogStore } from '@/stores/timelineDialogStore'
+import { useChangeLogDialogStore } from '@/stores/changeLogDialogStore'
 import { buildTableOrderBy } from '@/utils/saplingTableUtil'
 // #endregion
 
@@ -454,6 +455,7 @@ const { t, d, te } = useI18n()
 const { pushMessage } = useSaplingMessageCenter()
 const currentPersonStore = useCurrentPersonStore()
 const timelineDialogStore = useTimelineDialogStore()
+const changeLogDialogStore = useChangeLogDialogStore()
 const { openMailDialog } = useSaplingMailDialog()
 
 // #region Composable
@@ -617,6 +619,7 @@ const recordActionMenuItems = computed<SaplingContextMenuTableMenuItem[]>(() => 
   const mailActions = buildMailMenuActions(props.templates, form.value)
 
   return getSaplingContextMenuTableItems({
+    canChangeLog: hasPersistedItem.value,
     canShowInformation: canShowInformation.value,
     entityPermission: entityPermission.value,
     canNavigate: canNavigate.value,
@@ -765,6 +768,14 @@ function openTimelineFromRecord(): void {
   timelineDialogStore.openTimeline(entityHandle.value, itemHandle.value)
 }
 
+function openChangeLogFromRecord(): void {
+  if (!entityHandle.value || itemHandle.value == null) {
+    return
+  }
+
+  changeLogDialogStore.openChangeLog(entityHandle.value, itemHandle.value)
+}
+
 function navigateToAddress(): void {
   if (!props.item || !canNavigate.value) {
     return
@@ -849,6 +860,9 @@ async function handleRecordAction(menuItem: SaplingContextMenuTableMenuItem): Pr
   switch (menuItem.type) {
     case 'copy':
       openCopyDialogFromRecord()
+      break
+    case 'changeLog':
+      openChangeLogFromRecord()
       break
     case 'timeline':
       openTimelineFromRecord()

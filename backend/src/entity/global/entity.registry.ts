@@ -63,6 +63,8 @@ import { SalesOpportunityStageItem } from '../SalesOpportunityStageItem';
 import { SalesOpportunityForecastItem } from '../SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from '../SalesOpportunitySourceItem';
 import { EntityRouteItem } from '../EntityRouteItem';
+import { ChangeLogItem } from '../ChangeLogItem';
+import { ChangeLogDetailItem } from '../ChangeLogDetailItem';
 import { MoneyItem } from '../MoneyItem';
 import { ServerLandscapeItem } from '../ServerLandscapeItem';
 import { ServerLandscapeTypeItem } from '../ServerLandscapeTypeItem';
@@ -140,6 +142,8 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'entityGroup', class: EntityGroupItem },
   { name: 'entity', class: EntityItem },
   { name: 'entityRoute', class: EntityRouteItem },
+  { name: 'changeLog', class: ChangeLogItem },
+  { name: 'changeLogDetail', class: ChangeLogDetailItem },
   { name: 'favorite', class: FavoriteItem },
   { name: 'favoriteTemplate', class: FavoriteTemplateItem },
   { name: 'kpi', class: KpiItem },

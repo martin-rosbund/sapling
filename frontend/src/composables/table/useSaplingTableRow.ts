@@ -44,6 +44,7 @@ export interface UseSaplingTableRowProps {
 
 export type UseSaplingTableRowEmit = {
   (event: 'select-row', value: number): void
+  (event: 'change-log', value: SaplingGenericItem): void
   (event: 'edit', value: SaplingGenericItem): void
   (event: 'delete', value: SaplingGenericItem): void
   (event: 'show', value: SaplingGenericItem): void
@@ -92,6 +93,7 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
   const mailToLabel = computed(() => t('global.mailTo'))
   const rowMenuItems = computed<SaplingContextMenuTableMenuItem[]>(() =>
     getSaplingContextMenuTableItems({
+      canChangeLog: props.item?.handle != null,
       canShowInformation: props.canShowInformation,
       entityPermission: props.entityPermission,
       canNavigate: props.canNavigate,
@@ -246,6 +248,11 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     emit('edit', item)
   }
 
+  function requestChangeLog(item: SaplingGenericItem) {
+    closeMenu()
+    emit('change-log', item)
+  }
+
   function requestShow(item: SaplingGenericItem) {
     closeMenu()
     emit('show', item)
@@ -369,6 +376,7 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     isDialogOpenForCol,
     closeMenu,
     requestEdit,
+    requestChangeLog,
     requestShow,
     requestDelete,
     requestCopy,

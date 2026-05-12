@@ -1,0 +1,16 @@
+[
+  {
+    "handle": "changeLog",
+    "canShow": true,
+    "icon": "mdi-history",
+    "group": "administration",
+    "order": 100
+  },
+  {
+    "handle": "changeLogDetail",
+    "canShow": true,
+    "icon": "mdi-format-list-bulleted-square",
+    "group": "administration",
+    "order": 110
+  }
+]

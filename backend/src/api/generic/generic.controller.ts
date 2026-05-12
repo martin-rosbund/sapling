@@ -29,6 +29,7 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 import { PaginatedResponseDto } from './dto/paginated-response.dto';
+import { ChangeLogResponseDto } from './dto/change-log-response.dto';
 import { TimelineResponseDto } from './dto/timeline-response.dto';
 import {
   ApiGenericEntityOperation,
@@ -118,6 +119,40 @@ export class GenericController {
       req.user,
       query.before,
       query.months,
+    );
+  }
+
+  /**
+   * Retrieves the persisted change log for a single entity record.
+   * @param {Request & { user: PersonItem }} req Express request object with authenticated user
+   * @param {string} entityHandle Name of the entity
+   * @param {string} handle Record handle of the entity
+   * @returns {ChangeLogResponseDto[]} Change log entries ordered by newest first
+   */
+  @UseGuards(GenericPermissionGuard)
+  @Get(':entityHandle/:handle/change-log')
+  @GenericPermission('allowRead')
+  @ApiOperation({
+    summary: 'Get record change log',
+    description:
+      'Retrieves the stored create, update and delete log entries for a single record.',
+  })
+  @ApiGenericEntityOperation('Returns the persisted change log for one record')
+  @ApiResponse({
+    status: 200,
+    description: 'Successful request',
+    type: ChangeLogResponseDto,
+    isArray: true,
+  })
+  async getChangeLog(
+    @Req() req: Request & { user: PersonItem },
+    @Param('entityHandle') entityHandle: string,
+    @Param('handle') handle: string,
+  ): Promise<ChangeLogResponseDto[]> {
+    return this.genericService.getRecordChangeLog(
+      entityHandle,
+      handle,
+      req.user,
     );
   }
 

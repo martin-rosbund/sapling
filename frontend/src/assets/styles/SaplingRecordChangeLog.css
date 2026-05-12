@@ -1,0 +1,113 @@
+.sapling-record-change-log {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sapling-record-change-log-dialog__body {
+  overflow: hidden;
+}
+
+.sapling-record-change-log__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sapling-record-change-log__entry {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.sapling-record-change-log__entry-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.sapling-record-change-log__entry-meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.sapling-record-change-log__entry-caption {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  color: rgba(var(--v-theme-on-surface), 0.7);
+  font-size: 0.9rem;
+}
+
+.sapling-record-change-log__detail-table {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.sapling-record-change-log__detail-row {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.8fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+}
+
+.sapling-record-change-log__detail-row--head {
+  background: rgba(var(--v-theme-surface-variant), 0.45);
+  border-top: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sapling-record-change-log__detail-row pre,
+.sapling-record-change-log__payload pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: inherit;
+  font-size: 0.92rem;
+}
+
+.sapling-record-change-log__no-details {
+  margin: 0;
+  color: rgba(var(--v-theme-on-surface), 0.7);
+}
+
+.sapling-record-change-log__payload-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.sapling-record-change-log__payload {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  background: rgba(var(--v-theme-surface-variant), 0.32);
+}
+
+.sapling-record-change-log__payload h4 {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+@media (max-width: 960px) {
+  .sapling-record-change-log__detail-row {
+    grid-template-columns: 1fr;
+  }
+
+  .sapling-record-change-log__payload-grid {
+    grid-template-columns: 1fr;
+  }
+}

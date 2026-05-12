@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { PaginatedResponse, TimelineResponse } from '../entity/structure'
+import type { ChangeLogEntry, PaginatedResponse, TimelineResponse } from '../entity/structure'
 import { BACKEND_URL } from '@/constants/project.constants'
 import { pushApiErrorMessage } from '@/services/api.error.service'
 
@@ -106,6 +106,21 @@ class ApiGenericService {
       const response = await axios.get<TimelineResponse>(
         `${BACKEND_URL}generic/${entityHandle}/${handle}/timeline`,
         { params },
+      )
+      return response.data
+    } catch (error: unknown) {
+      pushApiErrorMessage(error, 'exception.unknownError', entityHandle)
+      throw error
+    }
+  }
+
+  static async getChangeLog(
+    entityHandle: string,
+    handle: EntityHandleValue,
+  ): Promise<ChangeLogEntry[]> {
+    try {
+      const response = await axios.get<ChangeLogEntry[]>(
+        `${BACKEND_URL}generic/${entityHandle}/${handle}/change-log`,
       )
       return response.data
     } catch (error: unknown) {

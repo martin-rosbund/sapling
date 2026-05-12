@@ -262,6 +262,7 @@ const {
   isDialogOpenForCol,
   closeMenu,
   requestEdit,
+  requestChangeLog,
   requestShow,
   requestDelete,
   requestCopy,
@@ -331,6 +332,9 @@ function onMenuItemClick(menuItem: SaplingContextMenuTableMenuItem) {
   switch (menuItem.type) {
     case 'edit':
       requestEdit(props.item)
+      break
+    case 'changeLog':
+      requestChangeLog(props.item)
       break
     case 'show':
       requestShow(props.item)

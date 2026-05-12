@@ -17,23 +17,11 @@
           <SaplingDialogHero
             v-else
             :eyebrow="t('timeline.title')"
-            :title="anchor?.label ?? t('timeline.record')"
+            :title="anchor?.label"
             :stats="heroStats"
             :stats-columns="3"
             stats-layout="compact"
           >
-            <template #title-trailing>
-              <v-btn
-                class="sapling-record-timeline__hero-action"
-                color="primary"
-                variant="flat"
-                prepend-icon="mdi-table-search"
-                :disabled="!anchor"
-                @click="openMainTable"
-              >
-                {{ t('timeline.openRecord') }}
-              </v-btn>
-            </template>
           </SaplingDialogHero>
         </template>
 
@@ -225,7 +213,6 @@ const {
   isLoading,
   isLoadingMore,
   loadMoreTriggerRef,
-  openMainTable,
   openDrilldown,
 } = useSaplingRecordTimeline({
   entityHandle,

@@ -42,6 +42,7 @@
 @import './SaplingPermission.css';
 @import './SaplingPlayground.css';
 @import './SaplingRecordTimeline.css';
+@import './SaplingRecordChangeLog.css';
 @import './SaplingSystem.css';
 @import './SaplingTable.css';
 @import './SaplingTableColumnFilter.css';

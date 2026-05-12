@@ -174,10 +174,7 @@ export function useSaplingDialogEditDirty(options: UseSaplingDialogEditDirtyOpti
     return Object.fromEntries(
       options.templates.value
         .filter(isTrackableTemplate)
-        .map((template) => [
-          template.name,
-          createTemplateComparisonToken(template, source),
-        ]),
+        .map((template) => [template.name, createTemplateComparisonToken(template, source)]),
     )
   }
 

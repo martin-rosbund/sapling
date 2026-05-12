@@ -7,10 +7,16 @@ import { EntityManager } from '@mikro-orm/core';
 import { TemplateService } from '../template/template.service';
 import { EntityItem } from '../../entity/EntityItem';
 import { PersonItem } from '../../entity/PersonItem';
+import {
+  ChangeLogItem,
+  type ChangeLogAction,
+} from '../../entity/ChangeLogItem';
+import { ChangeLogDetailItem } from '../../entity/ChangeLogDetailItem';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 import { performance } from 'perf_hooks';
 import { ScriptMethods } from '../script/script.service';
 import type { ScriptServerContext } from '../../script/core/script.interface';
+import { ChangeLogResponseDto } from './dto/change-log-response.dto';
 import { TimelineResponseDto } from './dto/timeline-response.dto';
 import { GenericMutationService } from './generic-mutation.service';
 import { GenericPayloadService } from './generic-payload.service';
@@ -27,6 +33,10 @@ import {
   TimelineRelationDescriptor,
 } from './generic-timeline.service';
 import { GENERIC_DOWNLOAD_LIMIT } from '../../constants/project.constants';
+
+type ChangeLogPayload = Record<string, unknown> | null;
+
+const CHANGE_LOG_DETAIL_IGNORED_FIELDS = new Set(['updatedAt']);
 
 /**
  * @class
@@ -356,6 +366,57 @@ export class GenericService {
   }
   // #endregion
 
+  // #region Change Log
+  async getRecordChangeLog(
+    entityHandle: string,
+    handle: string | number,
+    _currentUser: PersonItem,
+  ): Promise<ChangeLogResponseDto[]> {
+    const normalizedHandle = this.genericReferenceService.normalizeHandleValue(
+      entityHandle,
+      handle,
+    );
+
+    const items = await this.em.find(
+      ChangeLogItem,
+      {
+        entity: { handle: entityHandle },
+        reference: String(normalizedHandle),
+      },
+      {
+        populate: ['entity', 'person', 'details'],
+        orderBy: { createdAt: 'DESC', handle: 'DESC' },
+      },
+    );
+
+    return items.map((item) => {
+      const response = new ChangeLogResponseDto();
+      response.handle = item.handle ?? 0;
+      response.action = item.action;
+      response.reference = item.reference;
+      response.entity = {
+        handle: item.entity.handle,
+        icon: item.entity.icon ?? null,
+      };
+      response.person = this.genericSanitizerService.sanitizeEntityResult(
+        'person',
+        item.person,
+      ) as ChangeLogResponseDto['person'];
+      response.oldPayload = this.normalizeChangeLogPayload(item.oldPayload);
+      response.newPayload = this.normalizeChangeLogPayload(item.newPayload);
+      response.details = [...item.details]
+        .sort((left, right) => (left.handle ?? 0) - (right.handle ?? 0))
+        .map((detail) => ({
+          property: detail.property,
+          oldValue: this.normalizeChangeLogValue(detail.oldValue),
+          newValue: this.normalizeChangeLogValue(detail.newValue),
+        }));
+      response.createdAt = item.createdAt ?? new Date();
+      return response;
+    });
+  }
+  // #endregion
+
   // #region Create
   /**
    * Creates a new entry for an entity, applies security, and runs before/after scripts.
@@ -369,6 +430,12 @@ export class GenericService {
     data: { createdAt?: Date; updatedAt?: Date; [key: string]: any },
     currentUser: PersonItem,
   ): Promise<object> {
+    const template = this.templateService.getEntityTemplate(entityHandle);
+    const submittedSnapshot = this.captureSubmittedChangeLogPayload(
+      template,
+      data,
+    );
+
     this.genericPermissionService.checkTopLevelPermission(
       entityHandle,
       data,
@@ -376,7 +443,6 @@ export class GenericService {
       'allowInsertStage',
     );
 
-    const template = this.templateService.getEntityTemplate(entityHandle);
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
     let newData: object;
     const scriptContext: ScriptServerContext = {};
@@ -425,6 +491,15 @@ export class GenericService {
         );
       }
     }
+
+    await this.safeStoreChangeLog(
+      'create',
+      entity,
+      currentUser,
+      null,
+      submittedSnapshot,
+    );
+
     return this.genericSanitizerService.sanitizeEntityResult(
       entityHandle,
       newData,
@@ -454,6 +529,10 @@ export class GenericService {
     const entityClass = this.genericQueryService.getEntityClass(entityHandle);
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
     const template = this.templateService.getEntityTemplate(entityHandle);
+    const submittedSnapshot = this.captureSubmittedChangeLogPayload(
+      template,
+      data,
+    );
     const populate = this.genericQueryService.buildPopulate(
       relations,
       template,
@@ -471,6 +550,13 @@ export class GenericService {
     if (!item) {
       throw new NotFoundException(`global.entityNotFound`);
     }
+
+    const oldSnapshot = this.captureEntityChangeLogPayload(
+      entityHandle,
+      item,
+      template,
+      submittedSnapshot,
+    );
 
     this.genericPermissionService.checkTopLevelPermission(
       entityHandle,
@@ -521,6 +607,15 @@ export class GenericService {
         );
       }
     }
+
+    await this.safeStoreChangeLog(
+      'update',
+      entity,
+      currentUser,
+      oldSnapshot,
+      submittedSnapshot,
+    );
+
     return this.genericSanitizerService.sanitizeEntityResult(
       entityHandle,
       newData,
@@ -544,6 +639,7 @@ export class GenericService {
     currentUser: PersonItem,
   ): Promise<void> {
     const entityClass = this.genericQueryService.getEntityClass(entityHandle);
+    const template = this.templateService.getEntityTemplate(entityHandle);
     const handleFilter = this.genericReferenceService.getHandleFilter(
       entityHandle,
       handle,
@@ -554,6 +650,12 @@ export class GenericService {
     if (!item) {
       throw new NotFoundException(`global.entityNotFound`);
     }
+
+    const oldSnapshot = this.captureEntityChangeLogPayload(
+      entityHandle,
+      item,
+      template,
+    );
 
     this.genericPermissionService.checkTopLevelPermission(
       entityHandle,
@@ -587,6 +689,14 @@ export class GenericService {
         currentUser,
       );
     }
+
+    await this.safeStoreChangeLog(
+      'delete',
+      entity,
+      currentUser,
+      oldSnapshot,
+      null,
+    );
   }
 
   // #endregion
@@ -803,6 +913,317 @@ export class GenericService {
       records,
       template,
     );
+  }
+
+  private async safeStoreChangeLog(
+    action: ChangeLogAction,
+    entity: EntityItem | null,
+    currentUser: PersonItem,
+    oldPayload: ChangeLogPayload,
+    newPayload: ChangeLogPayload,
+  ): Promise<void> {
+    try {
+      await this.storeChangeLog(
+        action,
+        entity,
+        currentUser,
+        oldPayload,
+        newPayload,
+      );
+    } catch (error) {
+      global.log?.error?.('changeLog:', error);
+    }
+  }
+
+  private async storeChangeLog(
+    action: ChangeLogAction,
+    entity: EntityItem | null,
+    currentUser: PersonItem,
+    oldPayload: ChangeLogPayload,
+    newPayload: ChangeLogPayload,
+  ): Promise<void> {
+    if (
+      !entity ||
+      entity.handle == null ||
+      currentUser.handle == null ||
+      typeof this.em.create !== 'function' ||
+      typeof this.em.flush !== 'function'
+    ) {
+      return;
+    }
+
+    const reference = this.extractChangeLogReference(newPayload ?? oldPayload);
+    if (reference == null) {
+      return;
+    }
+
+    const logEm = typeof this.em.fork === 'function' ? this.em.fork() : this.em;
+
+    const log = logEm.create(ChangeLogItem, {
+      action,
+      reference: String(reference),
+      entity: entity.handle,
+      person: currentUser.handle,
+      oldPayload,
+      newPayload,
+    } as any);
+    const details = this.buildChangeLogDetails(action, oldPayload, newPayload);
+
+    for (const detail of details) {
+      log.details.add(
+        logEm.create(ChangeLogDetailItem, {
+          log,
+          property: detail.property,
+          oldValue: detail.oldValue,
+          newValue: detail.newValue,
+        }),
+      );
+    }
+
+    await logEm.flush();
+  }
+
+  private buildChangeLogDetails(
+    action: ChangeLogAction,
+    oldPayload: ChangeLogPayload,
+    newPayload: ChangeLogPayload,
+  ): Array<{
+    property: string;
+    oldValue: unknown;
+    newValue: unknown;
+  }> {
+    const oldRecord = this.asChangeLogRecord(oldPayload);
+    const newRecord = this.asChangeLogRecord(newPayload);
+    const propertyNames =
+      action === 'delete'
+        ? new Set(Object.keys(oldRecord))
+        : new Set(Object.keys(newRecord));
+    const details: Array<{
+      property: string;
+      oldValue: unknown;
+      newValue: unknown;
+    }> = [];
+
+    [...propertyNames]
+      .sort((left, right) => left.localeCompare(right))
+      .forEach((property) => {
+        if (CHANGE_LOG_DETAIL_IGNORED_FIELDS.has(property)) {
+          return;
+        }
+
+        const oldValue = this.normalizeChangeLogValue(oldRecord[property]);
+        const newValue = this.normalizeChangeLogValue(newRecord[property]);
+
+        if (this.areChangeLogValuesEqual(oldValue, newValue)) {
+          return;
+        }
+
+        details.push({
+          property,
+          oldValue,
+          newValue,
+        });
+      });
+
+    return details;
+  }
+
+  private areChangeLogValuesEqual(left: unknown, right: unknown): boolean {
+    return JSON.stringify(left) === JSON.stringify(right);
+  }
+
+  private extractChangeLogReference(
+    payload: ChangeLogPayload | object,
+  ): string | number | null {
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+      return null;
+    }
+
+    const handle = (payload as Record<string, unknown>).handle;
+    return typeof handle === 'string' || typeof handle === 'number'
+      ? handle
+      : null;
+  }
+
+  private asChangeLogRecord(
+    payload: ChangeLogPayload,
+  ): Record<string, unknown> {
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+      return {};
+    }
+
+    return payload;
+  }
+
+  private normalizeChangeLogPayload(
+    payload: Record<string, unknown> | null | undefined,
+  ): ChangeLogPayload {
+    if (!payload) {
+      return null;
+    }
+
+    const normalized = this.normalizeChangeLogValue(payload);
+    return normalized &&
+      typeof normalized === 'object' &&
+      !Array.isArray(normalized)
+      ? (normalized as Record<string, unknown>)
+      : null;
+  }
+
+  private captureEntityChangeLogPayload(
+    entityHandle: string,
+    value: object,
+    template: EntityTemplateDto[],
+    shapeSource?: ChangeLogPayload,
+  ): ChangeLogPayload {
+    const sanitized = this.normalizeChangeLogPayload(
+      this.genericSanitizerService.sanitizeEntityResult(
+        entityHandle,
+        value,
+        template,
+      ) as Record<string, unknown>,
+    );
+
+    return this.projectChangeLogPayload(template, sanitized, shapeSource);
+  }
+
+  private captureSubmittedChangeLogPayload(
+    template: EntityTemplateDto[],
+    payload: Record<string, unknown> | null | undefined,
+  ): ChangeLogPayload {
+    if (!payload) {
+      return null;
+    }
+
+    const normalized = this.normalizeChangeLogPayload({
+      ...payload,
+    });
+
+    return this.projectChangeLogPayload(template, normalized);
+  }
+
+  private projectChangeLogPayload(
+    template: EntityTemplateDto[],
+    payload: ChangeLogPayload,
+    shapeSource?: ChangeLogPayload,
+  ): ChangeLogPayload {
+    if (!payload) {
+      return null;
+    }
+
+    const templateFieldMap = new Map(
+      template.map((field) => [field.name, field]),
+    );
+    const sourceRecord = this.asChangeLogRecord(payload);
+    const shapeRecord = this.asChangeLogRecord(shapeSource ?? null);
+    const keys =
+      shapeSource == null
+        ? Object.keys(sourceRecord)
+        : Object.keys(shapeRecord);
+    const projected: Record<string, unknown> = {};
+
+    keys.forEach((key) => {
+      const field = templateFieldMap.get(key);
+      const sourceValue = sourceRecord[key];
+
+      if (field?.options?.includes('isSecurity')) {
+        projected[key] =
+          shapeSource == null
+            ? (sourceValue ?? null)
+            : Object.prototype.hasOwnProperty.call(shapeRecord, key)
+              ? shapeRecord[key]
+              : null;
+        return;
+      }
+
+      projected[key] = this.projectChangeLogFieldValue(field, sourceValue);
+    });
+
+    return projected;
+  }
+
+  private projectChangeLogFieldValue(
+    field: EntityTemplateDto | undefined,
+    value: unknown,
+  ): unknown {
+    if (value == null || !field?.isReference) {
+      return value ?? null;
+    }
+
+    if (Array.isArray(value)) {
+      return value.map((entry) =>
+        this.projectChangeLogReferenceValue(field, entry),
+      );
+    }
+
+    return this.projectChangeLogReferenceValue(field, value);
+  }
+
+  private projectChangeLogReferenceValue(
+    field: EntityTemplateDto,
+    value: unknown,
+  ): unknown {
+    if (value == null) {
+      return null;
+    }
+
+    if (typeof value !== 'object' || Array.isArray(value)) {
+      return value;
+    }
+
+    if (field.referencedPks.length <= 1) {
+      const pk = field.referencedPks[0] ?? 'handle';
+      return this.normalizeChangeLogValue(
+        (value as Record<string, unknown>)[pk],
+      );
+    }
+
+    return Object.fromEntries(
+      field.referencedPks.map((pk) => [
+        pk,
+        this.normalizeChangeLogValue((value as Record<string, unknown>)[pk]),
+      ]),
+    );
+  }
+
+  private normalizeChangeLogValue(
+    value: unknown,
+    visited = new WeakMap<object, unknown>(),
+  ): unknown {
+    if (value == null) {
+      return null;
+    }
+
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+
+    if (Array.isArray(value)) {
+      return value.map((entry) => this.normalizeChangeLogValue(entry, visited));
+    }
+
+    if (typeof value !== 'object') {
+      return value;
+    }
+
+    const cached = visited.get(value);
+    if (typeof cached !== 'undefined') {
+      return cached;
+    }
+
+    const normalizedRecord: Record<string, unknown> = {};
+    visited.set(value, normalizedRecord);
+
+    Object.keys(value as Record<string, unknown>)
+      .sort((left, right) => left.localeCompare(right))
+      .forEach((key) => {
+        normalizedRecord[key] = this.normalizeChangeLogValue(
+          (value as Record<string, unknown>)[key],
+          visited,
+        );
+      });
+
+    return normalizedRecord;
   }
   // #endregion
 }

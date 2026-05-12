@@ -3,6 +3,7 @@ import type { SaplingGenericItem, ScriptButtonItem } from '@/entity/entity'
 import type { AccumulatedPermission } from '@/entity/structure'
 
 export type SaplingContextMenuTableAction =
+  | 'changeLog'
   | 'copy'
   | 'delete'
   | 'edit'
@@ -50,6 +51,7 @@ export interface SaplingContextMenuTableMenuItem {
 }
 
 export interface SaplingContextMenuTableMenuOptions {
+  canChangeLog: boolean
   canShowInformation: boolean
   entityPermission: AccumulatedPermission | null
   canNavigate: boolean
@@ -95,6 +97,10 @@ export function getSaplingContextMenuTableItems(
 
   if (options.canTimeline) {
     items.push({ type: 'timeline', icon: 'mdi-timeline-outline', titleKey: 'global.timeline' })
+  }
+
+  if (options.canChangeLog) {
+    items.push({ type: 'changeLog', icon: 'mdi-history', titleKey: 'global.changeLog' })
   }
 
   if (options.canNavigate) {
@@ -166,6 +172,7 @@ export function useSaplingContextMenuTable(
 
   const menuItems = computed<SaplingContextMenuTableMenuItem[]>(() =>
     getSaplingContextMenuTableItems({
+      canChangeLog: props.item?.handle != null,
       canShowInformation: props.canShowInformation,
       entityPermission: props.entityPermission,
       canNavigate: props.canNavigate,
