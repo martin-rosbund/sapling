@@ -1,8 +1,10 @@
-import { onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import ApiService from '@/services/api.service'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { useVisibilityAwarePolling } from '@/composables/system/useVisibilityAwarePolling'
+
+const INBOX_CHANGED_EVENT = 'sapling-inbox-changed'
 
 /**
  * Provides the state and interaction handlers for the shared application header.
@@ -22,10 +24,20 @@ export function useSaplingHeader() {
    */
   onMounted(async () => {
     await Promise.all([currentPersonStore.fetchCurrentPerson(), countInboxItems()])
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener(INBOX_CHANGED_EVENT, countInboxItems)
+    }
   })
 
   // Refresh the inbox badge once per minute while the tab is visible.
   useVisibilityAwarePolling(countInboxItems, 60000)
+
+  onBeforeUnmount(() => {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener(INBOX_CHANGED_EVENT, countInboxItems)
+    }
+  })
   //#endregion
 
   //#region Methods

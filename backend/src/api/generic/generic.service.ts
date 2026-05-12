@@ -7,10 +7,7 @@ import { EntityManager } from '@mikro-orm/core';
 import { TemplateService } from '../template/template.service';
 import { EntityItem } from '../../entity/EntityItem';
 import { PersonItem } from '../../entity/PersonItem';
-import {
-  ChangeLogItem,
-  type ChangeLogAction,
-} from '../../entity/ChangeLogItem';
+import { ChangeLogItem } from '../../entity/ChangeLogItem';
 import { ChangeLogDetailItem } from '../../entity/ChangeLogDetailItem';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 import { performance } from 'perf_hooks';
@@ -26,6 +23,7 @@ import { GenericReadService } from './generic-read.service';
 import { GenericRelationService } from './generic-relation.service';
 import { GenericReferenceService } from './generic-reference.service';
 import { GenericSanitizerService } from './generic-sanitizer.service';
+import { ChangeLogActionItem } from '../../entity/ChangeLogActionItem';
 import {
   GenericTimelineService,
   TimelineDescriptorDataset,
@@ -35,6 +33,7 @@ import {
 import { GENERIC_DOWNLOAD_LIMIT } from '../../constants/project.constants';
 
 type ChangeLogPayload = Record<string, unknown> | null;
+type ChangeLogAction = 'create' | 'update' | 'delete';
 
 const CHANGE_LOG_DETAIL_IGNORED_FIELDS = new Set(['updatedAt']);
 
@@ -384,7 +383,7 @@ export class GenericService {
         reference: String(normalizedHandle),
       },
       {
-        populate: ['entity', 'person', 'details'],
+        populate: ['action', 'entity', 'person', 'details'],
         orderBy: { createdAt: 'DESC', handle: 'DESC' },
       },
     );
@@ -392,7 +391,7 @@ export class GenericService {
     return items.map((item) => {
       const response = new ChangeLogResponseDto();
       response.handle = item.handle ?? 0;
-      response.action = item.action;
+      response.action = item.action.handle as ChangeLogAction;
       response.reference = item.reference;
       response.entity = {
         handle: item.entity.handle,
@@ -959,8 +958,15 @@ export class GenericService {
 
     const logEm = typeof this.em.fork === 'function' ? this.em.fork() : this.em;
 
+    const actionEntity = await logEm.findOne(ChangeLogActionItem, {
+      handle: action,
+    });
+    if (!actionEntity) {
+      return;
+    }
+
     const log = logEm.create(ChangeLogItem, {
-      action,
+      action: actionEntity.handle,
       reference: String(reference),
       entity: entity.handle,
       person: currentUser.handle,

@@ -24,6 +24,7 @@ import {
 import { TicketItem } from '../../entity/TicketItem';
 import { EventItem } from '../../entity/EventItem';
 import { SalesOpportunityItem } from '../../entity/SalesOpportunityItem';
+import { InboxNotificationItem } from '../../entity/InboxNotificationItem';
 import { AccumulatedPermissionDto } from './dto/accumulated-permission.dto';
 import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
 import { UseGuards } from '@nestjs/common';
@@ -227,6 +228,47 @@ export class CurrentController {
   async countOpenTasks(@Req() req: Request): Promise<{ count: number }> {
     const user = req.user as PersonItem;
     return this.currentService.countOpenTasks(user);
+  }
+
+  @Get('openInboxNotifications')
+  @ApiOperation({
+    summary: 'Get unread inbox notifications',
+    description:
+      'Returns unread Sapling inbox notifications for the current user.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of unread inbox notifications',
+    type: [InboxNotificationItem],
+  })
+  async getOpenInboxNotifications(
+    @Req() req: Request,
+  ): Promise<InboxNotificationItem[]> {
+    const user = req.user as PersonItem;
+    return this.currentService.getOpenInboxNotifications(user);
+  }
+
+  @Post('inboxNotification/:handle/read')
+  @ApiOperation({
+    summary: 'Mark inbox notification as read',
+    description:
+      'Marks a Sapling inbox notification as read for the current user.',
+  })
+  @ApiParam({
+    name: 'handle',
+    description: 'Numeric inbox notification handle',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Updated inbox notification',
+    type: InboxNotificationItem,
+  })
+  async markInboxNotificationRead(
+    @Req() req: Request,
+    @Param('handle') handle: string,
+  ): Promise<InboxNotificationItem> {
+    const user = req.user as PersonItem;
+    return this.currentService.markInboxNotificationRead(Number(handle), user);
   }
 
   /**

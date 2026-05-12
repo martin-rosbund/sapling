@@ -1,12 +1,18 @@
 import { computed, onMounted, ref } from 'vue'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
-import type { EventItem, SalesOpportunityItem, TicketItem } from '@/entity/entity'
+import { useI18n } from 'vue-i18n'
+import type {
+  EventItem,
+  InboxNotificationItem,
+  SalesOpportunityItem,
+  TicketItem,
+} from '@/entity/entity'
 import ApiService from '@/services/api.service'
-import { formatDate, formatDateFromTo } from '@/utils/saplingFormatUtil'
+import { formatDate, formatDateFromTo, formatDateTimeValue } from '@/utils/saplingFormatUtil'
 import { useRouter, type RouteLocationRaw } from 'vue-router'
 
 type CloseEmitter = (event: 'close') => void
-export type InboxEntryKind = 'ticket' | 'event' | 'salesOpportunity'
+export type InboxEntryKind = 'ticket' | 'event' | 'salesOpportunity' | 'notification'
 export type InboxSectionKey = 'overdue' | 'today' | 'upcoming' | 'later' | 'unplanned'
 
 const UPCOMING_DAY_RANGE = 7
@@ -14,7 +20,11 @@ const UPCOMING_DAY_RANGE = 7
 export interface InboxEntry {
   id: string
   kind: InboxEntryKind
-  kindLabelKey: 'navigation.ticket' | 'navigation.event' | 'navigation.salesOpportunity'
+  kindLabelKey:
+    | 'navigation.ticket'
+    | 'navigation.event'
+    | 'navigation.salesOpportunity'
+    | 'navigation.inboxNotification'
   title: string
   description: string
   dateText: string
@@ -27,6 +37,8 @@ export interface InboxEntry {
   statusColor?: string | null
   supportLabels: string[]
   route: RouteLocationRaw
+  notificationHandle?: number | null
+  dismissible?: boolean
 }
 
 export interface InboxSection {
@@ -52,21 +64,30 @@ export interface InboxSection {
 }
 
 export interface InboxSummaryCard {
-  key: 'total' | 'overdue' | 'today' | 'upcoming'
-  labelKey: 'navigation.inbox' | 'inbox.overdue' | 'inbox.today' | 'inbox.upcoming'
+  key: 'total' | 'notifications' | 'overdue' | 'today' | 'upcoming'
+  labelKey:
+    | 'navigation.inbox'
+    | 'navigation.inboxNotification'
+    | 'inbox.overdue'
+    | 'inbox.today'
+    | 'inbox.upcoming'
   icon: string
   count: number
   tone: 'primary' | 'warning' | 'info' | 'success'
 }
 
+const INBOX_CHANGED_EVENT = 'sapling-inbox-changed'
+
 export function useSaplingInbox(emit: CloseEmitter) {
   //#region State
+  const { t } = useI18n()
   const { isLoading: isTranslationLoading } = useTranslationLoader('global', 'inbox', 'navigation')
   const dialog = ref(true)
   const isDataLoading = ref(false)
   const tickets = ref<TicketItem[]>([])
   const tasks = ref<EventItem[]>([])
   const salesOpportunities = ref<SalesOpportunityItem[]>([])
+  const notifications = ref<InboxNotificationItem[]>([])
   const router = useRouter()
   const isLoading = computed(() => isTranslationLoading.value || isDataLoading.value)
   //#endregion
@@ -158,6 +179,14 @@ export function useSaplingInbox(emit: CloseEmitter) {
     void router.push(entry.route)
   }
 
+  function notifyInboxChanged() {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    window.dispatchEvent(new CustomEvent(INBOX_CHANGED_EVENT))
+  }
+
   function getTicketRoute(ticket: TicketItem): RouteLocationRaw {
     return {
       path: '/table/ticket',
@@ -181,6 +210,30 @@ export function useSaplingInbox(emit: CloseEmitter) {
       path: '/table/salesOpportunity',
       query: {
         filter: JSON.stringify({ handle: opportunity.handle }),
+      },
+    }
+  }
+
+  function getNotificationRoute(notification: InboxNotificationItem): RouteLocationRaw {
+    const entityHandle =
+      typeof notification.entity === 'object'
+        ? String(notification.entity.handle ?? '').trim()
+        : String(notification.entity ?? '').trim()
+    const referenceHandle = notification.referenceHandle?.trim()
+
+    if (entityHandle && referenceHandle) {
+      return {
+        path: `/table/${entityHandle}`,
+        query: {
+          filter: JSON.stringify({ handle: referenceHandle }),
+        },
+      }
+    }
+
+    return {
+      path: '/table/inboxNotification',
+      query: {
+        filter: JSON.stringify({ handle: notification.handle }),
       },
     }
   }
@@ -255,6 +308,54 @@ export function useSaplingInbox(emit: CloseEmitter) {
       route: getSalesOpportunityRoute(opportunity),
     }
   }
+
+  function createNotificationEntry(notification: InboxNotificationItem): InboxEntry {
+    const dateValue = toDate(notification.createdAt)
+    const entityHandle =
+      typeof notification.entity === 'object'
+        ? String(notification.entity.handle ?? '').trim()
+        : String(notification.entity ?? '').trim()
+    const entityTranslationKey = entityHandle ? `navigation.${entityHandle}` : ''
+    const entityLabel =
+      entityTranslationKey && t(entityTranslationKey) !== entityTranslationKey
+        ? t(entityTranslationKey)
+        : entityHandle
+
+    return {
+      id: `notification-${notification.handle ?? notification.title}`,
+      kind: 'notification',
+      kindLabelKey: 'navigation.inboxNotification',
+      title: notification.title,
+      description: notification.bodyText ?? '',
+      dateText: notification.createdAt ? formatDateTimeValue(notification.createdAt) : '',
+      dateValue,
+      icon:
+        typeof notification.entity === 'object'
+          ? (notification.entity.icon ?? 'mdi-bell-outline')
+          : 'mdi-bell-outline',
+      accentColor: null,
+      contextLabel: notification.referenceHandle ? `#${notification.referenceHandle}` : undefined,
+      contextColor: 'primary',
+      statusLabel: entityLabel || undefined,
+      statusColor: 'primary',
+      supportLabels: [],
+      route: getNotificationRoute(notification),
+      notificationHandle: notification.handle ?? null,
+      dismissible: true,
+    }
+  }
+
+  async function dismissEntry(entry: InboxEntry) {
+    if (entry.notificationHandle == null) {
+      return
+    }
+
+    await ApiService.post(`current/inboxNotification/${entry.notificationHandle}/read`)
+    notifications.value = notifications.value.filter(
+      (notification) => notification.handle !== entry.notificationHandle,
+    )
+    notifyInboxChanged()
+  }
   //#endregion
 
   //#region Data Loading
@@ -262,15 +363,19 @@ export function useSaplingInbox(emit: CloseEmitter) {
     isDataLoading.value = true
 
     try {
-      const [loadedTickets, loadedTasks, loadedSalesOpportunities] = await Promise.all([
-        ApiService.findAll<TicketItem[]>('current/openTickets'),
-        ApiService.findAll<EventItem[]>('current/openEvents'),
-        ApiService.findAll<SalesOpportunityItem[]>('current/openSalesOpportunities'),
-      ])
+      const [loadedTickets, loadedTasks, loadedSalesOpportunities, loadedNotifications] =
+        await Promise.all([
+          ApiService.findAll<TicketItem[]>('current/openTickets'),
+          ApiService.findAll<EventItem[]>('current/openEvents'),
+          ApiService.findAll<SalesOpportunityItem[]>('current/openSalesOpportunities'),
+          ApiService.findAll<InboxNotificationItem[]>('current/openInboxNotifications'),
+        ])
 
       tickets.value = loadedTickets
       tasks.value = loadedTasks
       salesOpportunities.value = loadedSalesOpportunities
+      notifications.value = loadedNotifications
+      notifyInboxChanged()
     } finally {
       isDataLoading.value = false
     }
@@ -283,10 +388,14 @@ export function useSaplingInbox(emit: CloseEmitter) {
   const salesOpportunityEntries = computed(() =>
     salesOpportunities.value.map(createSalesOpportunityEntry),
   )
+  const notificationEntries = computed(() => notifications.value.map(createNotificationEntry))
   const allEntries = computed(() =>
-    [...ticketEntries.value, ...taskEntries.value, ...salesOpportunityEntries.value].sort(
-      compareEntriesByDate,
-    ),
+    [
+      ...notificationEntries.value,
+      ...ticketEntries.value,
+      ...taskEntries.value,
+      ...salesOpportunityEntries.value,
+    ].sort(compareEntriesByDate),
   )
 
   function getSectionItems(sectionKey: InboxSectionKey) {
@@ -309,6 +418,13 @@ export function useSaplingInbox(emit: CloseEmitter) {
       icon: 'mdi-briefcase-clock-outline',
       count: totalEntries.value,
       tone: 'primary',
+    },
+    {
+      key: 'notifications',
+      labelKey: 'navigation.inboxNotification',
+      icon: 'mdi-bell-outline',
+      count: notificationEntries.value.length,
+      tone: 'info',
     },
     {
       key: 'overdue',
@@ -403,6 +519,7 @@ export function useSaplingInbox(emit: CloseEmitter) {
   return {
     isLoading,
     dialog,
+    notificationEntries,
     ticketEntries,
     taskEntries,
     salesOpportunityEntries,
@@ -411,6 +528,7 @@ export function useSaplingInbox(emit: CloseEmitter) {
     summaryCards,
     sections,
     openEntry,
+    dismissEntry,
     loadInboxItems,
     closeDialog,
   }

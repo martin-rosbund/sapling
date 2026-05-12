@@ -56,7 +56,10 @@
       @update:model-value="(val: string) => updateField(template.name, val)"
     />
     <SaplingFieldTeamsRecipient
-      v-else-if="entityHandle === 'teamsSubscription' && template.name === 'recipientField'"
+      v-else-if="
+        ['teamsSubscription', 'inboxSubscription'].includes(entityHandle) &&
+        template.name === 'recipientField'
+      "
       :label="requiredLabel"
       :model-value="stringValue(template.name) || null"
       :disabled="fieldDisabled"
@@ -352,11 +355,7 @@ const canReadReference = computed(
     props.permissions?.find((entry) => entry.entityHandle === props.template.referenceName)
       ?.allowRead,
 )
-const jsonValue = computed(() =>
-  typeof props.formValues[props.template.name] === 'string'
-    ? null
-    : props.formValues[props.template.name],
-)
+const jsonValue = computed(() => props.formValues[props.template.name])
 
 function stringValue(fieldName: string): string {
   const value = props.formValues[fieldName]

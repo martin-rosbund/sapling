@@ -50,6 +50,11 @@ export interface SaplingContextMenuTableMenuItem {
   mailAction?: SaplingMailMenuAction
 }
 
+export type SaplingContextMenuTableMenuGroup = SaplingContextMenuTableMenuItem[]
+export type SaplingContextMenuTableMenuEntry =
+  | SaplingContextMenuTableMenuItem
+  | SaplingContextMenuTableMenuGroup
+
 export interface SaplingContextMenuTableMenuOptions {
   canChangeLog: boolean
   canShowInformation: boolean
@@ -69,7 +74,7 @@ export interface SaplingContextMenuTableEmit {
 export interface UseSaplingContextMenuTableResult {
   menuVisible: Ref<boolean>
   menuStyle: ComputedRef<CSSProperties>
-  menuItems: ComputedRef<SaplingContextMenuTableMenuItem[]>
+  menuItems: ComputedRef<SaplingContextMenuTableMenuEntry[]>
   closeMenu: () => void
   emitAction: (
     type: SaplingContextMenuTableAction,
@@ -80,7 +85,7 @@ export interface UseSaplingContextMenuTableResult {
 
 export function getSaplingContextMenuTableItems(
   options: SaplingContextMenuTableMenuOptions,
-): SaplingContextMenuTableMenuItem[] {
+): SaplingContextMenuTableMenuEntry[] {
   // Gruppierung: Standardaktionen, Zeitachsen/Navigate, Dokumente/Information, Skript/Mail
   const group1: SaplingContextMenuTableMenuItem[] = [
     options.entityPermission?.allowUpdate
@@ -148,7 +153,7 @@ export function getSaplingContextMenuTableItems(
   }
 
   // Filter leere Gruppen raus
-  const groups = [group1, group2, group3, group4].filter(g => g.length > 0)
+  const groups = [group1, group2, group3, group4].filter((group) => group.length > 0)
   return groups
 }
 
@@ -170,7 +175,7 @@ export function useSaplingContextMenuTable(
     left: `${x.value}px`,
   }))
 
-  const menuItems = computed<SaplingContextMenuTableMenuItem[]>(() =>
+  const menuItems = computed<SaplingContextMenuTableMenuEntry[]>(() =>
     getSaplingContextMenuTableItems({
       canChangeLog: props.item?.handle != null,
       canShowInformation: props.canShowInformation,

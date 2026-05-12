@@ -12,6 +12,7 @@ export class ChangeLogDetailItem {
   handle?: number;
 
   @ApiProperty({ type: () => ChangeLogItem })
+  @Sapling(['isHideAsReference'])
   @SaplingForm({
     order: 100,
     group: 'changeLogDetail.groupReference',

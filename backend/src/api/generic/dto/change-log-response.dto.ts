@@ -37,7 +37,7 @@ export class ChangeLogResponseDto {
   @ApiProperty()
   handle!: number;
 
-  @ApiProperty({ enum: ['create', 'update', 'delete'] })
+  @ApiProperty()
   action!: 'create' | 'update' | 'delete';
 
   @ApiProperty()

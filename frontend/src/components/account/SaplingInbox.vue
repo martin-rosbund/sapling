@@ -6,8 +6,8 @@
           <SaplingDialogHero
             v-if="isLoading"
             loading
-            :loading-stats-count="3"
-            :stats-columns="3"
+            :loading-stats-count="4"
+            :stats-columns="4"
             stats-layout="compact"
           />
           <SaplingDialogHero
@@ -15,7 +15,7 @@
             :eyebrow="$t('navigation.inbox')"
             :title="$t('inbox.heroTitle')"
             :stats="heroStats"
-            :stats-columns="3"
+            :stats-columns="4"
             stats-layout="compact"
           />
         </template>
@@ -25,7 +25,7 @@
             <template v-if="isLoading">
               <section class="sapling-inbox-summary-grid">
                 <v-skeleton-loader
-                  v-for="item in 4"
+                  v-for="item in 5"
                   :key="item"
                   class="sapling-inbox-loading-summary"
                   elevation="12"
@@ -67,6 +67,7 @@
                   :key="section.key"
                   :section="section"
                   @open="openEntry"
+                  @dismiss="dismissEntry"
                 />
               </section>
             </template>
@@ -104,6 +105,7 @@ const { t } = useI18n()
 const {
   isLoading,
   dialog,
+  notificationEntries,
   ticketEntries,
   taskEntries,
   salesOpportunityEntries,
@@ -111,10 +113,12 @@ const {
   summaryCards,
   sections,
   openEntry,
+  dismissEntry,
   closeDialog,
 } = useSaplingInbox(emit)
 
 const heroStats = computed(() => [
+  { label: t('navigation.inboxNotification'), value: notificationEntries.value.length },
   { label: t('navigation.ticket'), value: ticketEntries.value.length },
   { label: t('navigation.event'), value: taskEntries.value.length },
   { label: t('navigation.salesOpportunity'), value: salesOpportunityEntries.value.length },

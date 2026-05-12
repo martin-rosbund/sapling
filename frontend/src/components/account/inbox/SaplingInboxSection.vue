@@ -31,6 +31,7 @@
         :key="entry.id"
         :entry="entry"
         @open="emit('open', $event)"
+        @dismiss="emit('dismiss', $event)"
       />
     </div>
   </article>
@@ -46,5 +47,6 @@ defineProps<{
 
 const emit = defineEmits<{
   (event: 'open', entry: InboxEntry): void
+  (event: 'dismiss', entry: InboxEntry): void
 }>()
 </script>

@@ -13,7 +13,7 @@ import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog'
 import { useI18n } from 'vue-i18n'
 import {
   getSaplingContextMenuTableItems,
-  type SaplingContextMenuTableMenuItem,
+  type SaplingContextMenuTableMenuEntry,
 } from '@/composables/context/useSaplingContextMenuTable'
 // #endregion
 
@@ -91,7 +91,7 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
   const scriptButtons = computed(() => props.scriptButtons ?? [])
   const mailActions = computed(() => buildMailMenuActions(props.entityTemplates, props.item))
   const mailToLabel = computed(() => t('global.mailTo'))
-  const rowMenuItems = computed<SaplingContextMenuTableMenuItem[]>(() =>
+  const rowMenuItems = computed<SaplingContextMenuTableMenuEntry[]>(() =>
     getSaplingContextMenuTableItems({
       canChangeLog: props.item?.handle != null,
       canShowInformation: props.canShowInformation,

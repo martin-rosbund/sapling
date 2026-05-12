@@ -17,6 +17,8 @@ import { MailService } from '../mail/mail.service.js';
 import { EventDeliveryService } from '../../calendar/event.delivery.service.js';
 import { TeamsService } from '../teams/teams.service.js';
 import { TeamsSubscriptionItem } from '../../entity/TeamsSubscriptionItem.js';
+import { InboxService } from '../inbox/inbox.service.js';
+import { InboxSubscriptionItem } from '../../entity/InboxSubscriptionItem.js';
 
 // #region Enum
 /**
@@ -103,6 +105,7 @@ export class ScriptService {
     private readonly mailService: MailService,
     private readonly eventDeliveryService: EventDeliveryService,
     private readonly teamsService: TeamsService,
+    private readonly inboxService: InboxService,
   ) {}
   // #endregion
 
@@ -478,6 +481,16 @@ export class ScriptService {
             },
           },
         );
+        const inboxSubscriptions = await this.em.findAll(
+          InboxSubscriptionItem,
+          {
+            where: {
+              entity: { handle: entity.handle },
+              type: { handle: ScriptMethods[method] },
+              isActive: true,
+            },
+          },
+        );
 
         if (webhookSubscriptions.length > 0) {
           for (const subscription of webhookSubscriptions) {
@@ -508,7 +521,26 @@ export class ScriptService {
           }
         }
 
-        if (webhookSubscriptions.length > 0 || teamsSubscriptions.length > 0) {
+        if (inboxSubscriptions.length > 0) {
+          for (const subscription of inboxSubscriptions) {
+            if (subscription?.handle) {
+              global.log.info(
+                `Processing inbox subscription: ${subscription.handle}`,
+              );
+              await this.inboxService.querySubscription(
+                subscription.handle,
+                Array.isArray(items) ? items : [items],
+                user,
+              );
+            }
+          }
+        }
+
+        if (
+          webhookSubscriptions.length > 0 ||
+          teamsSubscriptions.length > 0 ||
+          inboxSubscriptions.length > 0
+        ) {
           if (user) {
             const executionTime = (performance.now() - startTime) / 1000;
             global.log.debug(

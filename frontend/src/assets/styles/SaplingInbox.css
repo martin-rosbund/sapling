@@ -25,7 +25,7 @@
 
 .sapling-inbox-summary-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: var(--sapling-gap-md);
 }
 
@@ -346,6 +346,12 @@
 .sapling-inbox-entry__chips {
   display: flex;
   flex-wrap: wrap;
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-inbox-entry__actions {
+  display: inline-flex;
+  align-items: center;
   gap: var(--sapling-gap-xs);
 }
 

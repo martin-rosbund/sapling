@@ -57,14 +57,22 @@ const error = ref('')
 
 const jsonString = ref('')
 
+function formatJsonValue(value: unknown): string {
+  if (value === undefined) {
+    return 'null'
+  }
+
+  return JSON.stringify(value, null, 2)
+}
+
 watch(
   () => props.modelValue,
   (val) => {
     try {
-      jsonString.value = val ? JSON.stringify(val, null, 2) : '{}'
+      jsonString.value = formatJsonValue(val)
       error.value = ''
     } catch {
-      jsonString.value = '{}'
+      jsonString.value = 'null'
       error.value = 'Invalid JSON'
     }
   },
@@ -74,10 +82,10 @@ watch(
 function openDialog() {
   dialog.value = true
   try {
-    jsonString.value = props.modelValue ? JSON.stringify(props.modelValue, null, 2) : '{}'
+    jsonString.value = formatJsonValue(props.modelValue)
     error.value = ''
   } catch {
-    jsonString.value = '{}'
+    jsonString.value = 'null'
     error.value = 'Invalid JSON'
   }
 }

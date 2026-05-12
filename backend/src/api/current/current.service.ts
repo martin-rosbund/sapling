@@ -12,6 +12,8 @@ import { FavoriteItem } from '../../entity/FavoriteItem';
 import { FavoriteTemplateItem } from '../../entity/FavoriteTemplateItem';
 import { RoleItem } from '../../entity/RoleItem';
 import { KpiItem } from '../../entity/KpiItem';
+import { InboxService } from '../inbox/inbox.service';
+import { InboxNotificationItem } from '../../entity/InboxNotificationItem';
 import {
   AccumulatedPermissionDto,
   AccumulatedPermissionBufferDto,
@@ -52,7 +54,10 @@ export class CurrentService {
    * Injects the MikroORM EntityManager for database access.
    * @param em EntityManager instance
    */
-  constructor(private readonly em: EntityManager) {}
+  constructor(
+    private readonly em: EntityManager,
+    private readonly inboxService: InboxService,
+  ) {}
 
   private forkEntityManager(): EntityManager {
     return this.em.fork();
@@ -244,19 +249,41 @@ export class CurrentService {
    * @returns Object containing the count of open tasks
    */
   async countOpenTasks(user: PersonItem): Promise<{ count: number }> {
-    const [openEventCount, openTicketCount, openSalesOpportunityCount] =
-      await Promise.all([
-        this.em.count(EventItem, this.buildOpenEventWhere(user)),
-        this.em.count(TicketItem, this.buildOpenTicketWhere(user)),
-        this.em.count(
-          SalesOpportunityItem,
-          this.buildOpenSalesOpportunityWhere(user),
-        ),
-      ]);
+    const [
+      openEventCount,
+      openTicketCount,
+      openSalesOpportunityCount,
+      unreadInboxNotificationCount,
+    ] = await Promise.all([
+      this.em.count(EventItem, this.buildOpenEventWhere(user)),
+      this.em.count(TicketItem, this.buildOpenTicketWhere(user)),
+      this.em.count(
+        SalesOpportunityItem,
+        this.buildOpenSalesOpportunityWhere(user),
+      ),
+      this.inboxService.countUnreadNotifications(user),
+    ]);
 
     return {
-      count: openEventCount + openTicketCount + openSalesOpportunityCount,
+      count:
+        openEventCount +
+        openTicketCount +
+        openSalesOpportunityCount +
+        unreadInboxNotificationCount,
     };
+  }
+
+  async getOpenInboxNotifications(
+    user: PersonItem,
+  ): Promise<InboxNotificationItem[]> {
+    return this.inboxService.getUnreadNotifications(user);
+  }
+
+  async markInboxNotificationRead(
+    handle: number,
+    user: PersonItem,
+  ): Promise<InboxNotificationItem> {
+    return this.inboxService.markNotificationRead(handle, user);
   }
 
   private buildOpenTicketWhere(user: PersonItem): object {

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { CurrentController } from './current.controller';
 import { CurrentService } from './current.service';
 import { CurrentMetadataService } from './current-metadata.service';
@@ -6,6 +6,7 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
 import { AuthModule } from '../../auth/auth.module';
 import { TemplateService } from '../template/template.service';
+import { InboxModule } from '../inbox/inbox.module';
 
 /**
  * @class
@@ -19,7 +20,8 @@ import { TemplateService } from '../template/template.service';
 
 @Module({
   imports: [
-    AuthModule,
+    forwardRef(() => AuthModule),
+    InboxModule,
     MikroOrmModule.forFeature(
       ENTITY_REGISTRY.map((e) => e.class as new () => any),
     ),

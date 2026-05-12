@@ -9,13 +9,12 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EntityItem } from './EntityItem';
 import { PersonItem } from './PersonItem';
 import { ChangeLogDetailItem } from './ChangeLogDetailItem';
+import { ChangeLogActionItem } from './ChangeLogActionItem';
 import {
   Sapling,
   SaplingForm,
   SaplingGenericReference,
 } from './global/entity.decorator';
-
-export type ChangeLogAction = 'create' | 'update' | 'delete';
 
 @Entity()
 export class ChangeLogItem {
@@ -24,16 +23,16 @@ export class ChangeLogItem {
   @Property({ primary: true, autoincrement: true })
   handle?: number;
 
-  @ApiProperty({ enum: ['create', 'update', 'delete'] })
-  @Sapling(['isValue'])
+  @ApiProperty({ type: () => ChangeLogActionItem })
+  @Sapling(['isChip'])
   @SaplingForm({
     order: 100,
     group: 'changeLog.groupContent',
     groupOrder: 100,
     width: 1,
   })
-  @Property({ length: 16, nullable: false })
-  action!: ChangeLogAction;
+  @ManyToOne(() => ChangeLogActionItem, { nullable: false })
+  action!: Rel<ChangeLogActionItem>;
 
   @ApiProperty()
   @Sapling(['isSystem', 'isValue'])

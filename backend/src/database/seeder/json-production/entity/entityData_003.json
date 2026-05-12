@@ -1,0 +1,38 @@
+[
+  {
+    "handle": "changeLogAction",
+    "canShow": true,
+    "icon": "mdi-history",
+    "group": "administration",
+    "order": 120,
+    "canUpdate": true
+  },
+  {
+    "handle": "inboxTemplate",
+    "canShow": true,
+    "icon": "mdi-bell-cog-outline",
+    "group": "inbox",
+    "order": 90,
+    "canInsert": true,
+    "canUpdate": true,
+    "canDelete": true
+  },
+  {
+    "handle": "inboxSubscription",
+    "canShow": true,
+    "icon": "mdi-bell-badge-outline",
+    "group": "inbox",
+    "order": 100,
+    "canInsert": true,
+    "canUpdate": true,
+    "canDelete": true
+  },
+  {
+    "handle": "inboxNotification",
+    "canShow": true,
+    "icon": "mdi-bell-outline",
+    "group": "inbox",
+    "order": 110,
+    "canUpdate": true
+  }
+]

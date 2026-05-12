@@ -65,9 +65,12 @@
               </template>
 
               <v-list class="glass-panel sapling-table-mobile-card__menu-list">
-                <template v-for="(group, groupIdx) in rowMenuItems">
+                <template
+                  v-for="(group, groupIdx) in rowMenuItems"
+                  :key="`group-mobile-${groupIdx}`"
+                >
                   <v-list-item
-                    v-for="menuItem in group"
+                    v-for="menuItem in getMenuGroupItems(group)"
                     :key="`${menuItem.type}-${menuItem.scriptButton?.handle ?? menuItem.titleKey ?? menuItem.title ?? ''}`"
                     @click.stop="onMenuItemClick(menuItem)"
                   >
@@ -226,7 +229,10 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { SaplingContextMenuTableMenuItem } from '@/composables/context/useSaplingContextMenuTable'
+import type {
+  SaplingContextMenuTableMenuEntry,
+  SaplingContextMenuTableMenuItem,
+} from '@/composables/context/useSaplingContextMenuTable'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
 import SaplingTableJson from '@/components/table/SaplingTableJson.vue'
 import SaplingTableChip from '@/components/table/SaplingTableChip.vue'
@@ -372,5 +378,17 @@ function onMenuItemClick(menuItem: SaplingContextMenuTableMenuItem) {
       closeMenu()
       break
   }
+}
+
+function isMenuItem(
+  value: SaplingContextMenuTableMenuEntry,
+): value is SaplingContextMenuTableMenuItem {
+  return !Array.isArray(value)
+}
+
+function getMenuGroupItems(
+  group: SaplingContextMenuTableMenuEntry,
+): SaplingContextMenuTableMenuItem[] {
+  return isMenuItem(group) ? [group] : group
 }
 </script>

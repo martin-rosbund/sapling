@@ -177,40 +177,16 @@
           ></v-btn>
         </template>
         <v-list class="glass-panel">
-          <template v-if="Array.isArray(rowMenuItems[0])">
-            <template v-for="(group, groupIdx) in rowMenuItems" :key="`group-row-${groupIdx}`">
-              <template v-if="Array.isArray(group)">
-                <v-list-item
-                  v-for="menuItem in group.filter((mi: any) => mi && typeof mi === 'object' && 'type' in mi)"
-                  :key="`${menuItem.type}-${menuItem.scriptButton?.handle ?? menuItem.titleKey ?? menuItem.title ?? ''}`"
-                  @click.stop="onMenuItemClick(menuItem)"
-                >
-                  <v-icon start>{{ menuItem.icon }}</v-icon>
-                  <span>{{ resolveMenuItemTitle(menuItem) }}</span>
-                </v-list-item>
-              </template>
-              <template v-else>
-                <v-list-item
-                  v-if="group && typeof group === 'object' && 'type' in group"
-                  :key="`${group.type}-${group.title ?? group.titleKey ?? group.scriptButton?.name ?? ''}`"
-                  @click.stop="onMenuItemClick(group)"
-                >
-                  <v-icon start>{{ group.icon }}</v-icon>
-                  <span>{{ resolveMenuItemTitle(group) }}</span>
-                </v-list-item>
-              </template>
-              <v-divider v-if="groupIdx < rowMenuItems.length - 1" :key="`divider-row-${groupIdx}`" />
-            </template>
-          </template>
-          <template v-else>
+          <template v-for="(group, groupIdx) in rowMenuItems" :key="`group-row-${groupIdx}`">
             <v-list-item
-              v-for="menuItem in rowMenuItems.filter(mi => mi && typeof mi === 'object' && 'type' in mi)"
+              v-for="menuItem in getMenuGroupItems(group)"
               :key="`${menuItem.type}-${menuItem.scriptButton?.handle ?? menuItem.titleKey ?? menuItem.title ?? ''}`"
               @click.stop="onMenuItemClick(menuItem)"
             >
               <v-icon start>{{ menuItem.icon }}</v-icon>
               <span>{{ resolveMenuItemTitle(menuItem) }}</span>
             </v-list-item>
+            <v-divider v-if="groupIdx < rowMenuItems.length - 1" :key="`divider-row-${groupIdx}`" />
           </template>
           <v-list-item @click.stop="closeMenu()">
             <v-icon start>mdi-close</v-icon>
@@ -225,7 +201,10 @@
 <script lang="ts" setup>
 // #region Imports
 import { useI18n } from 'vue-i18n'
-import type { SaplingContextMenuTableMenuItem } from '@/composables/context/useSaplingContextMenuTable'
+import type {
+  SaplingContextMenuTableMenuEntry,
+  SaplingContextMenuTableMenuItem,
+} from '@/composables/context/useSaplingContextMenuTable'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
 import SaplingTableJson from '@/components/table/SaplingTableJson.vue'
 import SaplingTableChip from '@/components/table/SaplingTableChip.vue'
@@ -356,6 +335,18 @@ function resolveMenuItemTitle(menuItem: SaplingContextMenuTableMenuItem) {
   }
 
   return te(menuItem.title) ? t(menuItem.title) : menuItem.title
+}
+
+function isMenuItem(
+  value: SaplingContextMenuTableMenuEntry,
+): value is SaplingContextMenuTableMenuItem {
+  return !Array.isArray(value)
+}
+
+function getMenuGroupItems(
+  group: SaplingContextMenuTableMenuEntry,
+): SaplingContextMenuTableMenuItem[] {
+  return isMenuItem(group) ? [group] : group
 }
 // #endregion
 </script>

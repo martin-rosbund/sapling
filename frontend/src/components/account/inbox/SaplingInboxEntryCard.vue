@@ -49,14 +49,25 @@
         </v-chip>
       </div>
 
-      <v-btn
-        icon="mdi-arrow-top-right"
-        variant="tonal"
-        color="primary"
-        size="small"
-        :title="$t('inbox.openEntry')"
-        @click.stop="emit('open', entry)"
-      />
+      <div class="sapling-inbox-entry__actions">
+        <v-btn
+          v-if="entry.dismissible"
+          icon="mdi-close"
+          variant="text"
+          color="primary"
+          size="small"
+          :title="$t('global.close')"
+          @click.stop="emit('dismiss', entry)"
+        />
+        <v-btn
+          icon="mdi-arrow-top-right"
+          variant="tonal"
+          color="primary"
+          size="small"
+          :title="$t('inbox.openEntry')"
+          @click.stop="emit('open', entry)"
+        />
+      </div>
     </div>
   </article>
 </template>
@@ -70,6 +81,7 @@ defineProps<{
 
 const emit = defineEmits<{
   (event: 'open', entry: InboxEntry): void
+  (event: 'dismiss', entry: InboxEntry): void
 }>()
 
 function entryAccentStyle(color?: string | null) {

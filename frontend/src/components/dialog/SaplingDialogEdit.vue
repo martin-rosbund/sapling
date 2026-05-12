@@ -248,36 +248,20 @@
               </template>
 
               <v-list density="comfortable" min-width="260">
-                <template v-if="Array.isArray(recordActionMenuItems[0])">
-                  <template v-for="(group, groupIdx) in recordActionMenuItems" :key="`group-${groupIdx}`">
-                    <template v-if="Array.isArray(group)">
-                      <v-list-item
-                        v-for="menuItem in group.filter((mi: any) => mi && typeof mi === 'object' && 'type' in mi)"
-                        :key="`${menuItem.type}-${menuItem.title ?? menuItem.titleKey ?? menuItem.scriptButton?.name ?? ''}`"
-                        :prepend-icon="menuItem.icon"
-                        :title="getRecordActionTitle(menuItem)"
-                        @click="handleRecordAction(menuItem)"
-                      />
-                    </template>
-                    <template v-else>
-                      <v-list-item
-                        v-if="group && typeof group === 'object' && 'type' in group"
-                        :key="`${group.type}-${group.title ?? group.titleKey ?? group.scriptButton?.name ?? ''}`"
-                        :prepend-icon="group.icon"
-                        :title="getRecordActionTitle(group)"
-                        @click="handleRecordAction(group)"
-                      />
-                    </template>
-                    <v-divider v-if="groupIdx < recordActionMenuItems.length - 1" :key="`divider-${groupIdx}`" />
-                  </template>
-                </template>
-                <template v-else>
+                <template
+                  v-for="(group, groupIdx) in recordActionMenuItems"
+                  :key="`group-${groupIdx}`"
+                >
                   <v-list-item
-                    v-for="menuItem in recordActionMenuItems.filter(mi => mi && typeof mi === 'object' && 'type' in mi)"
+                    v-for="menuItem in getRecordActionGroupItems(group)"
                     :key="`${menuItem.type}-${menuItem.title ?? menuItem.titleKey ?? menuItem.scriptButton?.name ?? ''}`"
                     :prepend-icon="menuItem.icon"
                     :title="getRecordActionTitle(menuItem)"
                     @click="handleRecordAction(menuItem)"
+                  />
+                  <v-divider
+                    v-if="groupIdx < recordActionMenuItems.length - 1"
+                    :key="`divider-${groupIdx}`"
                   />
                 </template>
               </v-list>
@@ -302,7 +286,6 @@
             </v-btn>
           </template>
 
-
           <template #trailing>
             <v-menu v-if="recordActionMenuItems.length > 0">
               <template #activator="{ props: menuProps }">
@@ -317,36 +300,20 @@
               </template>
 
               <v-list density="comfortable" min-width="260" class="glass-panel">
-                <template v-if="Array.isArray(recordActionMenuItems[0])">
-                  <template v-for="(group, groupIdx) in recordActionMenuItems" :key="`group-edit-${groupIdx}`">
-                    <template v-if="Array.isArray(group)">
-                      <v-list-item
-                        v-for="menuItem in group.filter((mi: any) => mi && typeof mi === 'object' && 'type' in mi)"
-                        :key="`${menuItem.type}-${menuItem.title ?? menuItem.titleKey ?? menuItem.scriptButton?.name ?? ''}`"
-                        :prepend-icon="menuItem.icon"
-                        :title="getRecordActionTitle(menuItem)"
-                        @click="handleRecordAction(menuItem)"
-                      />
-                    </template>
-                    <template v-else>
-                      <v-list-item
-                        v-if="group && typeof group === 'object' && 'type' in group"
-                        :key="`${group.type}-${group.title ?? group.titleKey ?? group.scriptButton?.name ?? ''}`"
-                        :prepend-icon="group.icon"
-                        :title="getRecordActionTitle(group)"
-                        @click="handleRecordAction(group)"
-                      />
-                    </template>
-                    <v-divider v-if="groupIdx < recordActionMenuItems.length - 1" :key="`divider-edit-${groupIdx}`" />
-                  </template>
-                </template>
-                <template v-else>
+                <template
+                  v-for="(group, groupIdx) in recordActionMenuItems"
+                  :key="`group-edit-${groupIdx}`"
+                >
                   <v-list-item
-                    v-for="menuItem in recordActionMenuItems.filter(mi => mi && typeof mi === 'object' && 'type' in mi)"
+                    v-for="menuItem in getRecordActionGroupItems(group)"
                     :key="`${menuItem.type}-${menuItem.title ?? menuItem.titleKey ?? menuItem.scriptButton?.name ?? ''}`"
                     :prepend-icon="menuItem.icon"
                     :title="getRecordActionTitle(menuItem)"
                     @click="handleRecordAction(menuItem)"
+                  />
+                  <v-divider
+                    v-if="groupIdx < recordActionMenuItems.length - 1"
+                    :key="`divider-edit-${groupIdx}`"
                   />
                 </template>
               </v-list>
@@ -454,6 +421,7 @@ import type { EntityItem, SaplingGenericItem, ScriptButtonItem } from '@/entity/
 import { useSaplingDialogEdit } from '@/composables/dialog/useSaplingDialogEdit'
 import {
   getSaplingContextMenuTableItems,
+  type SaplingContextMenuTableMenuEntry,
   type SaplingContextMenuTableMenuItem,
 } from '@/composables/context/useSaplingContextMenuTable'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
@@ -661,7 +629,7 @@ const formSurfaceRef = ref<HTMLElement | null>(null)
 
 let scriptButtonsRequestId = 0
 
-const recordActionMenuItems = computed<SaplingContextMenuTableMenuItem[]>(() => {
+const recordActionMenuItems = computed<SaplingContextMenuTableMenuEntry[]>(() => {
   if (!hasPersistedItem.value || props.mode === 'create') {
     return []
   }
@@ -678,7 +646,13 @@ const recordActionMenuItems = computed<SaplingContextMenuTableMenuItem[]>(() => 
     scriptButtons: loadedScriptButtons.value,
     mailActions,
     mailToLabel,
-  }).filter((menuItem) => !['edit', 'show', 'delete'].includes(menuItem.type))
+  })
+    .map((group) =>
+      getRecordActionGroupItems(group).filter(
+        (menuItem) => !['edit', 'show', 'delete'].includes(menuItem.type),
+      ),
+    )
+    .filter((group) => group.length > 0)
 })
 
 function getTimestampTitle(field: 'createdAt' | 'updatedAt', fallback: string): string {
@@ -771,6 +745,18 @@ function getRecordActionTitle(menuItem: SaplingContextMenuTableMenuItem): string
   }
 
   return ''
+}
+
+function isRecordActionMenuItem(
+  value: SaplingContextMenuTableMenuEntry,
+): value is SaplingContextMenuTableMenuItem {
+  return !Array.isArray(value)
+}
+
+function getRecordActionGroupItems(
+  group: SaplingContextMenuTableMenuEntry,
+): SaplingContextMenuTableMenuItem[] {
+  return isRecordActionMenuItem(group) ? [group] : group
 }
 
 function closeUploadDialog(): void {

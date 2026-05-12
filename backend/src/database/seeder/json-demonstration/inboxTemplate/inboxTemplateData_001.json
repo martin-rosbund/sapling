@@ -1,0 +1,29 @@
+[
+  {
+    "name": "Ticket Eingang Inbox",
+    "description": "Inbox-Benachrichtigung fuer neu angelegte Tickets.",
+    "titleTemplate": "Ticket #{{handle}} wurde erfasst",
+    "bodyMarkdown": "Das Ticket **{{title}}** wurde neu angelegt.\n\n- Status: {{status.description}}\n- Prioritaet: {{priority.description}}\n- Kunde: {{creatorCompany.name}}\n\nBitte pruefe die naechsten Schritte direkt in Sapling.",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "ticket"
+  },
+  {
+    "name": "Opportunity Update Inbox",
+    "description": "Inbox-Benachrichtigung fuer geaenderte Verkaufschancen.",
+    "titleTemplate": "Opportunity {{title}} wurde aktualisiert",
+    "bodyMarkdown": "Die Verkaufschance **{{title}}** bei **{{company.name}}** hat ein Update erhalten.\n\n- Phase: {{stage.title}}\n- Forecast: {{forecast.title}}\n- Erwarteter Umsatz: {{expectedRevenue}}\n\nBitte die Opportunity in Sapling nachverfolgen.",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "salesOpportunity"
+  },
+  {
+    "name": "Kalendereintrag Inbox",
+    "description": "Inbox-Benachrichtigung fuer neue Kalendereintraege.",
+    "titleTemplate": "Neuer Termin: {{title}}",
+    "bodyMarkdown": "Ein neuer Termin wurde geplant.\n\n- Start: {{startDate}}\n- Ende: {{endDate}}\n- Status: {{status.description}}\n- Typ: {{type.title}}\n\nBitte pruefe den Termin in Sapling.",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "event"
+  }
+]

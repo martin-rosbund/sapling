@@ -159,7 +159,7 @@ const systemProperties = computed(() => {
     entityTemplates.value
       .filter(
         (template) =>
-          template.options?.includes('isSystem') || template.options?.includes('isReadOnly')
+          template.options?.includes('isSystem') || template.options?.includes('isReadOnly'),
       )
       .map((template) => template.name),
   )
