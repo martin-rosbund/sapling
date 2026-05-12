@@ -7,7 +7,7 @@
   { "entity": "navigation", "property": "changeLogAction", "de": "Änderungsaktionen", "en": "Change log actions" },
   { "entity": "navigation", "property": "inboxTemplate", "de": "Inbox-Vorlagen", "en": "Inbox templates" },
   { "entity": "navigation", "property": "inboxSubscription", "de": "Inbox-Abonnements", "en": "Inbox subscriptions" },
-  { "entity": "navigation", "property": "inboxNotification", "de": "Inbox-Benachrichtigungen", "en": "Inbox notifications" },
+  { "entity": "navigation", "property": "inboxNotification", "de": "Inbox-Nachrichten", "en": "Inbox messages" },
 
   { "entity": "navigationGroup", "property": "inbox", "de": "Posteingang", "en": "Inbox" },
 

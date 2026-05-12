@@ -56,6 +56,7 @@
 .sapling-inline-pre {
   margin-left: var(--sapling-space-2xs);
   white-space: pre;
+  max-width: 200px;
 }
 
 .sapling-text-truncate {

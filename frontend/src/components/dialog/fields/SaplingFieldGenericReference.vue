@@ -7,13 +7,11 @@
       <v-btn
         class="glass-panel sapling-field-generic-reference__target"
         :disabled="!hasTarget"
+        prepend-icon="mdi-eye"
         :loading="isLoading"
+        :text="displayLabel"
         @click.stop="openTargetDialog"
       >
-        <v-icon class="pr-3" left>mdi-eye</v-icon>
-        <span v-if="displayLabel" class="sapling-inline-pre">
-          {{ displayLabel }}
-        </span>
       </v-btn>
       <v-btn
         icon="mdi-timeline-outline"
@@ -112,6 +110,9 @@ function openTimeline() {
   justify-content: flex-start;
   flex: 1 1 auto;
   min-height: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sapling-field-generic-reference__hint {
