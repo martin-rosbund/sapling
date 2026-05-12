@@ -1,10 +1,7 @@
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import ApiService from '@/services/api.service'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
-import { useVisibilityAwarePolling } from '@/composables/system/useVisibilityAwarePolling'
-
-const INBOX_CHANGED_EVENT = 'sapling-inbox-changed'
+import { useOpenTaskCountEvents } from '@/composables/system/useOpenTaskCountEvents'
 
 /**
  * Provides the state and interaction handlers for the shared application header.
@@ -18,36 +15,20 @@ export function useSaplingHeader() {
   const currentPersonStore = useCurrentPersonStore()
   //#endregion
 
-  //#region Lifecycle Hooks
-  /**
-   * Initializes the header state and starts the refresh timer.
-   */
-  onMounted(async () => {
-    await Promise.all([currentPersonStore.fetchCurrentPerson(), countInboxItems()])
-
-    if (typeof window !== 'undefined') {
-      window.addEventListener(INBOX_CHANGED_EVENT, countInboxItems)
-    }
+  useOpenTaskCountEvents((snapshot) => {
+    inboxCount.value = snapshot.count
   })
 
-  // Refresh the inbox badge once per minute while the tab is visible.
-  useVisibilityAwarePolling(countInboxItems, 60000)
-
-  onBeforeUnmount(() => {
-    if (typeof window !== 'undefined') {
-      window.removeEventListener(INBOX_CHANGED_EVENT, countInboxItems)
-    }
+  //#region Lifecycle Hooks
+  /**
+   * Initializes the header state and starts the backend event stream.
+   */
+  onMounted(async () => {
+    await currentPersonStore.fetchCurrentPerson()
   })
   //#endregion
 
   //#region Methods
-  /**
-   * Fetches the current number of open inbox items.
-   */
-  async function countInboxItems() {
-    const result = await ApiService.findOne<{ count: number }>('current/countOpenTasks')
-    inboxCount.value = result.count
-  }
 
   /**
    * Opens the inbox dialog.
@@ -96,7 +77,6 @@ export function useSaplingHeader() {
     openAccount,
     closeAccount,
     goHome,
-    countInboxItems,
   }
   //#endregion
 }

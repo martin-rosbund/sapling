@@ -24,6 +24,10 @@ import { GenericRelationService } from './generic-relation.service';
 import { GenericReferenceService } from './generic-reference.service';
 import { GenericSanitizerService } from './generic-sanitizer.service';
 import { ChangeLogActionItem } from '../../entity/ChangeLogActionItem';
+import { EventItem } from '../../entity/EventItem';
+import { OpenTaskEventsService } from '../current/open-task-events.service';
+import { SalesOpportunityItem } from '../../entity/SalesOpportunityItem';
+import { TicketItem } from '../../entity/TicketItem';
 import {
   GenericTimelineService,
   TimelineDescriptorDataset,
@@ -36,6 +40,7 @@ type ChangeLogPayload = Record<string, unknown> | null;
 type ChangeLogAction = 'create' | 'update' | 'delete';
 
 const CHANGE_LOG_DETAIL_IGNORED_FIELDS = new Set(['updatedAt']);
+const OPEN_TASK_ENTITY_HANDLES = new Set(['ticket', 'event', 'salesOpportunity']);
 
 /**
  * @class
@@ -96,6 +101,7 @@ export class GenericService {
     private readonly genericReferenceService: GenericReferenceService,
     private readonly genericSanitizerService: GenericSanitizerService,
     private readonly genericTimelineService: GenericTimelineService,
+    private readonly openTaskEventsService: OpenTaskEventsService,
   ) {}
   // #endregion
 
@@ -499,6 +505,11 @@ export class GenericService {
       submittedSnapshot,
     );
 
+    await this.emitOpenTaskCountChangesForHandle(
+      entityHandle,
+      this.extractEntityHandle(newData),
+    );
+
     return this.genericSanitizerService.sanitizeEntityResult(
       entityHandle,
       newData,
@@ -525,6 +536,11 @@ export class GenericService {
     currentUser: PersonItem,
     relations: string[] = [],
   ): Promise<object> {
+    const previousOpenTaskUserHandles = await this.loadOpenTaskUserHandles(
+      entityHandle,
+      handle,
+    );
+
     const entityClass = this.genericQueryService.getEntityClass(entityHandle);
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
     const template = this.templateService.getEntityTemplate(entityHandle);
@@ -615,6 +631,12 @@ export class GenericService {
       submittedSnapshot,
     );
 
+    await this.emitOpenTaskCountChangesForHandle(
+      entityHandle,
+      handle,
+      previousOpenTaskUserHandles,
+    );
+
     return this.genericSanitizerService.sanitizeEntityResult(
       entityHandle,
       newData,
@@ -637,6 +659,11 @@ export class GenericService {
     handle: string | number,
     currentUser: PersonItem,
   ): Promise<void> {
+    const previousOpenTaskUserHandles = await this.loadOpenTaskUserHandles(
+      entityHandle,
+      handle,
+    );
+
     const entityClass = this.genericQueryService.getEntityClass(entityHandle);
     const template = this.templateService.getEntityTemplate(entityHandle);
     const handleFilter = this.genericReferenceService.getHandleFilter(
@@ -696,6 +723,8 @@ export class GenericService {
       oldSnapshot,
       null,
     );
+
+    this.openTaskEventsService.notifyUsers(previousOpenTaskUserHandles);
   }
 
   // #endregion
@@ -717,6 +746,13 @@ export class GenericService {
     referenceHandleValue: string | number,
     currentUser: PersonItem,
   ): Promise<object> {
+    const previousOpenTaskUserHandles =
+      await this.loadReferenceOpenTaskUserHandles(
+        entityHandle,
+        referenceName,
+        entityHandleValue,
+      );
+
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
     const mutation = await this.genericRelationService.addReferenceAndFlush(
       entityHandle,
@@ -750,6 +786,13 @@ export class GenericService {
       }
     }
 
+    await this.emitReferenceOpenTaskCountChanges(
+      entityHandle,
+      referenceName,
+      entityHandleValue,
+      previousOpenTaskUserHandles,
+    );
+
     return this.genericSanitizerService.sanitizeEntityResult(
       entityHandle,
       newData,
@@ -773,6 +816,13 @@ export class GenericService {
     referenceHandleValue: string | number,
     currentUser: PersonItem,
   ): Promise<object> {
+    const previousOpenTaskUserHandles =
+      await this.loadReferenceOpenTaskUserHandles(
+        entityHandle,
+        referenceName,
+        entityHandleValue,
+      );
+
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
     const mutation = await this.genericRelationService.deleteReferenceAndFlush(
       entityHandle,
@@ -806,6 +856,13 @@ export class GenericService {
       }
     }
 
+    await this.emitReferenceOpenTaskCountChanges(
+      entityHandle,
+      referenceName,
+      entityHandleValue,
+      previousOpenTaskUserHandles,
+    );
+
     return this.genericSanitizerService.sanitizeEntityResult(
       entityHandle,
       newData,
@@ -813,6 +870,221 @@ export class GenericService {
     );
   }
   // #endregion
+
+  private async emitOpenTaskCountChangesForHandle(
+    entityHandle: string,
+    handle: string | number | null,
+    previousUserHandles: ReadonlySet<number> = new Set<number>(),
+  ): Promise<void> {
+    if (handle == null) {
+      this.openTaskEventsService.notifyUsers(previousUserHandles);
+      return;
+    }
+
+    const nextUserHandles = await this.loadOpenTaskUserHandles(
+      entityHandle,
+      handle,
+    );
+    this.openTaskEventsService.notifyUsers(
+      this.mergeUserHandles(previousUserHandles, nextUserHandles),
+    );
+  }
+
+  private async emitReferenceOpenTaskCountChanges(
+    entityHandle: string,
+    referenceName: string,
+    handle: string | number,
+    previousUserHandles: ReadonlySet<number>,
+  ): Promise<void> {
+    const nextUserHandles = await this.loadReferenceOpenTaskUserHandles(
+      entityHandle,
+      referenceName,
+      handle,
+    );
+
+    this.openTaskEventsService.notifyUsers(
+      this.mergeUserHandles(previousUserHandles, nextUserHandles),
+    );
+  }
+
+  private async loadReferenceOpenTaskUserHandles(
+    entityHandle: string,
+    referenceName: string,
+    handle: string | number,
+  ): Promise<Set<number>> {
+    if (entityHandle !== 'event' || referenceName !== 'participants') {
+      return new Set<number>();
+    }
+
+    return this.loadOpenTaskUserHandles(entityHandle, handle);
+  }
+
+  private async loadOpenTaskUserHandles(
+    entityHandle: string,
+    handle: string | number,
+  ): Promise<Set<number>> {
+    if (!OPEN_TASK_ENTITY_HANDLES.has(entityHandle)) {
+      return new Set<number>();
+    }
+
+    switch (entityHandle) {
+      case 'ticket':
+        return this.loadTicketOpenTaskUserHandles(handle);
+      case 'event':
+        return this.loadEventOpenTaskUserHandles(handle);
+      case 'salesOpportunity':
+        return this.loadSalesOpportunityOpenTaskUserHandles(handle);
+      default:
+        return new Set<number>();
+    }
+  }
+
+  private async loadTicketOpenTaskUserHandles(
+    handle: string | number,
+  ): Promise<Set<number>> {
+    const normalizedHandle = this.normalizeNumericOpenTaskHandle(
+      'ticket',
+      handle,
+    );
+    if (normalizedHandle == null) {
+      return new Set<number>();
+    }
+
+    const ticket = await this.em.findOne(
+      TicketItem,
+      { handle: normalizedHandle },
+      {
+        populate: ['assigneePerson', 'status'],
+      },
+    );
+
+    if (!ticket) {
+      return new Set<number>();
+    }
+
+    const assigneeHandle =
+      typeof ticket.assigneePerson === 'object'
+        ? ticket.assigneePerson.handle
+        : undefined;
+    const statusHandle =
+      typeof ticket.status === 'object' ? ticket.status.handle : undefined;
+
+    if (typeof assigneeHandle !== 'number' || statusHandle === 'closed') {
+      return new Set<number>();
+    }
+
+    return new Set<number>([assigneeHandle]);
+  }
+
+  private async loadEventOpenTaskUserHandles(
+    handle: string | number,
+  ): Promise<Set<number>> {
+    const normalizedHandle = this.normalizeNumericOpenTaskHandle(
+      'event',
+      handle,
+    );
+    if (normalizedHandle == null) {
+      return new Set<number>();
+    }
+
+    const event = await this.em.findOne(
+      EventItem,
+      { handle: normalizedHandle },
+      {
+        populate: ['participants', 'status'],
+      },
+    );
+
+    if (!event) {
+      return new Set<number>();
+    }
+
+    const statusHandle =
+      typeof event.status === 'object' ? event.status.handle : undefined;
+    if (statusHandle === 'canceled' || statusHandle === 'completed') {
+      return new Set<number>();
+    }
+
+    return new Set<number>(
+      event.participants
+        .getItems()
+        .map((participant) => participant.handle)
+        .filter((participantHandle): participantHandle is number =>
+          typeof participantHandle === 'number',
+        ),
+    );
+  }
+
+  private async loadSalesOpportunityOpenTaskUserHandles(
+    handle: string | number,
+  ): Promise<Set<number>> {
+    const normalizedHandle = this.normalizeNumericOpenTaskHandle(
+      'salesOpportunity',
+      handle,
+    );
+    if (normalizedHandle == null) {
+      return new Set<number>();
+    }
+
+    const salesOpportunity = await this.em.findOne(
+      SalesOpportunityItem,
+      { handle: normalizedHandle },
+      {
+        populate: ['assigneePerson'],
+      },
+    );
+
+    if (!salesOpportunity || salesOpportunity.isActive !== true) {
+      return new Set<number>();
+    }
+
+    const assigneeHandle =
+      typeof salesOpportunity.assigneePerson === 'object'
+        ? salesOpportunity.assigneePerson.handle
+        : undefined;
+
+    if (typeof assigneeHandle !== 'number') {
+      return new Set<number>();
+    }
+
+    return new Set<number>([assigneeHandle]);
+  }
+
+  private mergeUserHandles(
+    ...userHandleCollections: Iterable<number>[]
+  ): Set<number> {
+    const mergedUserHandles = new Set<number>();
+
+    for (const userHandleCollection of userHandleCollections) {
+      for (const userHandle of userHandleCollection) {
+        mergedUserHandles.add(userHandle);
+      }
+    }
+
+    return mergedUserHandles;
+  }
+
+  private extractEntityHandle(item: object): string | number | null {
+    const handle = (item as { handle?: unknown }).handle;
+
+    if (typeof handle === 'string' || typeof handle === 'number') {
+      return handle;
+    }
+
+    return null;
+  }
+
+  private normalizeNumericOpenTaskHandle(
+    entityHandle: 'ticket' | 'event' | 'salesOpportunity',
+    handle: string | number,
+  ): number | null {
+    const normalizedHandle = this.genericReferenceService.normalizeHandleValue(
+      entityHandle,
+      handle,
+    );
+
+    return typeof normalizedHandle === 'number' ? normalizedHandle : null;
+  }
 
   private async findTimelineRecord(
     entityHandle: string,

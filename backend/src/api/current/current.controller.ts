@@ -7,12 +7,17 @@ import {
   BadRequestException,
   Param,
   Query,
+  Sse,
+  MessageEvent,
+  Header,
 } from '@nestjs/common';
 import { CurrentService } from './current.service';
 import { CurrentMetadataService } from './current-metadata.service';
+import { OpenTaskEventsService } from './open-task-events.service';
 import { PersonItem } from '../../entity/PersonItem';
 import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
 import type { Request } from 'express';
+import { concatMap, from, map, Observable } from 'rxjs';
 import {
   ApiBearerAuth,
   ApiParam,
@@ -21,9 +26,6 @@ import {
   ApiResponse,
   ApiBody,
 } from '@nestjs/swagger';
-import { TicketItem } from '../../entity/TicketItem';
-import { EventItem } from '../../entity/EventItem';
-import { SalesOpportunityItem } from '../../entity/SalesOpportunityItem';
 import { InboxNotificationItem } from '../../entity/InboxNotificationItem';
 import { AccumulatedPermissionDto } from './dto/accumulated-permission.dto';
 import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
@@ -42,14 +44,6 @@ import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth
  *                  Get the current logged-in user profile.
  * @method          changePassword(req: Request, newPassword: string, confirmPassword: string): Promise<void>
  *                  Change the password for the current user.
- * @method          getOpenTickets(req: Request): Promise<TicketItem[]>
- *                  Get all open tickets assigned to the current user.
- * @method          getOpenEvents(req: Request): Promise<EventItem[]>
- *                  Get all open events assigned to the current user.
- * @method          getOpenSalesOpportunities(req: Request): Promise<SalesOpportunityItem[]>
- *                  Get all open sales opportunities assigned to the current user.
- * @method          countOpenTasks(req: Request): Promise<{ count: number }>
- *                  Get the count of open tasks for the current user.
  * @method          getAllEntityPermissions(req: Request): AccumulatedPermissionDto[]
  *                  Get all entity permissions for the current user.
  * @method          getEntityPermission(req: Request, entityHandle: string): AccumulatedPermissionDto
@@ -73,6 +67,7 @@ export class CurrentController {
   constructor(
     private readonly currentService: CurrentService,
     private readonly currentMetadataService: CurrentMetadataService,
+    private readonly openTaskEventsService: OpenTaskEventsService,
   ) {}
 
   /**
@@ -142,110 +137,21 @@ export class CurrentController {
     await this.currentService.changePassword(user, newPassword);
   }
 
-  /**
-   * Get all open tickets assigned to the current user.
-   * @param req Express request object
-   * @returns Array of open tickets
-   */
-  @Get('openTickets')
-  @ApiOperation({
-    summary: 'Get open tickets',
-    description: 'Returns all open tickets assigned to the current user.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'List of open tickets',
-    type: [TicketItem],
-  })
-  async getOpenTickets(@Req() req: Request): Promise<TicketItem[]> {
+  @Sse('openTaskCountEvents')
+  @Header('Cache-Control', 'no-cache, no-transform')
+  @Header('X-Accel-Buffering', 'no')
+  streamOpenTaskCountEvents(@Req() req: Request): Observable<MessageEvent> {
     const user = req.user as PersonItem;
-    return this.currentService.getOpenTickets(user);
-  }
-
-  /**
-   * Get all open events assigned to the current user.
-   * @param req Express request object
-   * @returns Array of open events
-   */
-  @Get('openEvents')
-  @ApiOperation({
-    summary: 'Get open events',
-    description: 'Returns all open events assigned to the current user.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'List of open events',
-    type: [EventItem],
-  })
-  async getOpenEvents(@Req() req: Request): Promise<EventItem[]> {
-    const user = req.user as PersonItem;
-    return this.currentService.getOpenEvents(user);
-  }
-
-  /**
-   * Get all open sales opportunities assigned to the current user.
-   * @param req Express request object
-   * @returns Array of open sales opportunities
-   */
-  @Get('openSalesOpportunities')
-  @ApiOperation({
-    summary: 'Get open sales opportunities',
-    description:
-      'Returns all open sales opportunities assigned to the current user.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'List of open sales opportunities',
-    type: [SalesOpportunityItem],
-  })
-  async getOpenSalesOpportunities(
-    @Req() req: Request,
-  ): Promise<SalesOpportunityItem[]> {
-    const user = req.user as PersonItem;
-    return this.currentService.getOpenSalesOpportunities(user);
-  }
-
-  /**
-   * Get the count of open tasks for the current user.
-   * @param req Express request object
-   * @returns Number of open tasks
-   */
-  @Get('countOpenTasks')
-  @ApiOperation({
-    summary: 'Count open tasks',
-    description: 'Returns the count of open tasks for the current user.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Number of open tasks',
-    schema: {
-      type: 'object',
-      properties: {
-        count: { type: 'number', description: 'Number of open tasks' },
-      },
-    },
-  })
-  async countOpenTasks(@Req() req: Request): Promise<{ count: number }> {
-    const user = req.user as PersonItem;
-    return this.currentService.countOpenTasks(user);
-  }
-
-  @Get('openInboxNotifications')
-  @ApiOperation({
-    summary: 'Get unread inbox notifications',
-    description:
-      'Returns unread Sapling inbox notifications for the current user.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'List of unread inbox notifications',
-    type: [InboxNotificationItem],
-  })
-  async getOpenInboxNotifications(
-    @Req() req: Request,
-  ): Promise<InboxNotificationItem[]> {
-    const user = req.user as PersonItem;
-    return this.currentService.getOpenInboxNotifications(user);
+    return this.openTaskEventsService.streamForUser(user?.handle).pipe(
+      concatMap(() => from(this.currentService.getOpenTaskSnapshot(user))),
+      map(
+        (snapshot): MessageEvent => ({
+          type: 'open-task-snapshot',
+          retry: 5000,
+          data: snapshot,
+        }),
+      ),
+    );
   }
 
   @Post('inboxNotification/:handle/read')

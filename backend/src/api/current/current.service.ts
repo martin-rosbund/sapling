@@ -19,6 +19,14 @@ import {
   AccumulatedPermissionBufferDto,
 } from './dto/accumulated-permission.dto';
 
+export interface OpenTaskSnapshot {
+  count: number;
+  tickets: TicketItem[];
+  tasks: EventItem[];
+  salesOpportunities: SalesOpportunityItem[];
+  notifications: InboxNotificationItem[];
+}
+
 /**
  * @class
  * @version         1.0
@@ -29,14 +37,6 @@ import {
  *
  * @method          changePassword(user: PersonItem, newPassword: string): Promise<void>
  *                  Changes the password for the given user.
- * @method          getOpenTickets(user: PersonItem): Promise<TicketItem[]>
- *                  Returns all open tickets assigned to the user.
- * @method          getOpenEvents(user: PersonItem): Promise<EventItem[]>
- *                  Returns all open events assigned to the user.
- * @method          getOpenSalesOpportunities(user: PersonItem): Promise<SalesOpportunityItem[]>
- *                  Returns all open sales opportunities assigned to the user.
- * @method          countOpenTasks(user: PersonItem): Promise<{ count: number }>
- *                  Returns the count of open tasks for the user.
  * @method          getEntityPermissions(person: PersonItem, entityHandle: string): AccumulatedPermissionDto
  *                  Aggregates permissions for a person and entityHandle, prioritizing stages and boolean values.
  * @method          getAllEntityPermissions(person: PersonItem): AccumulatedPermissionDto[]
@@ -243,40 +243,26 @@ export class CurrentService {
     return items || [];
   }
 
-  /**
-   * Returns the count of open tasks for the user.
-   * @param user The user whose open tasks are to be counted
-   * @returns Object containing the count of open tasks
-   */
-  async countOpenTasks(user: PersonItem): Promise<{ count: number }> {
-    const [
-      openEventCount,
-      openTicketCount,
-      openSalesOpportunityCount,
-      unreadInboxNotificationCount,
-    ] = await Promise.all([
-      this.em.count(EventItem, this.buildOpenEventWhere(user)),
-      this.em.count(TicketItem, this.buildOpenTicketWhere(user)),
-      this.em.count(
-        SalesOpportunityItem,
-        this.buildOpenSalesOpportunityWhere(user),
-      ),
-      this.inboxService.countUnreadNotifications(user),
-    ]);
+  async getOpenTaskSnapshot(user: PersonItem): Promise<OpenTaskSnapshot> {
+    const [tickets, tasks, salesOpportunities, notifications] =
+      await Promise.all([
+        this.getOpenTickets(user),
+        this.getOpenEvents(user),
+        this.getOpenSalesOpportunities(user),
+        this.inboxService.getUnreadNotifications(user),
+      ]);
 
     return {
       count:
-        openEventCount +
-        openTicketCount +
-        openSalesOpportunityCount +
-        unreadInboxNotificationCount,
+        tickets.length +
+        tasks.length +
+        salesOpportunities.length +
+        notifications.length,
+      tickets,
+      tasks,
+      salesOpportunities,
+      notifications,
     };
-  }
-
-  async getOpenInboxNotifications(
-    user: PersonItem,
-  ): Promise<InboxNotificationItem[]> {
-    return this.inboxService.getUnreadNotifications(user);
   }
 
   async markInboxNotificationRead(

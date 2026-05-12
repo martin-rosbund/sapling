@@ -4,6 +4,7 @@ import { MessageTemplateService } from '../template/message-template.service';
 import { InboxNotificationItem } from '../../entity/InboxNotificationItem';
 import { InboxSubscriptionItem } from '../../entity/InboxSubscriptionItem';
 import { PersonItem } from '../../entity/PersonItem';
+import { OpenTaskEventsService } from '../current/open-task-events.service';
 
 type JsonRecord = Record<string, unknown>;
 
@@ -16,6 +17,7 @@ export class InboxService {
   constructor(
     private readonly em: EntityManager,
     private readonly messageTemplateService: MessageTemplateService,
+    private readonly openTaskEventsService: OpenTaskEventsService,
   ) {}
 
   async querySubscription(
@@ -52,6 +54,7 @@ export class InboxService {
 
     const items = Array.isArray(payload) ? payload : [payload];
     const notifications: InboxNotificationItem[] = [];
+    const affectedUserHandles = new Set<number>();
 
     for (const item of items) {
       const prepared = await this.prepareNotifications({
@@ -61,6 +64,10 @@ export class InboxService {
       });
 
       for (const recipient of prepared.recipients) {
+        if (typeof recipient.handle === 'number') {
+          affectedUserHandles.add(recipient.handle);
+        }
+
         const notification = this.em.create(InboxNotificationItem, {
           subscription,
           template,
@@ -85,6 +92,7 @@ export class InboxService {
 
     if (notifications.length > 0) {
       await this.em.flush();
+      this.openTaskEventsService.notifyUsers(affectedUserHandles);
     }
 
     return notifications;
@@ -116,19 +124,6 @@ export class InboxService {
     );
   }
 
-  async countUnreadNotifications(
-    user: Pick<PersonItem, 'handle'>,
-  ): Promise<number> {
-    if (user.handle == null) {
-      return 0;
-    }
-
-    return this.em.count(InboxNotificationItem, {
-      recipientPerson: { handle: user.handle },
-      isRead: false,
-    });
-  }
-
   async markNotificationRead(
     handle: number,
     user: Pick<PersonItem, 'handle'>,
@@ -157,6 +152,7 @@ export class InboxService {
     notification.isRead = true;
     notification.readAt = new Date();
     await this.em.flush();
+    this.openTaskEventsService.notifyUsers([user.handle]);
     return notification;
   }
 

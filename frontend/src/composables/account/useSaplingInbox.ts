@@ -1,4 +1,4 @@
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import { useI18n } from 'vue-i18n'
 import type {
@@ -10,6 +10,11 @@ import type {
 import ApiService from '@/services/api.service'
 import { formatDate, formatDateFromTo, formatDateTimeValue } from '@/utils/saplingFormatUtil'
 import { useRouter, type RouteLocationRaw } from 'vue-router'
+import {
+  useOpenTaskCountEvents,
+  updateOpenTaskSnapshot,
+  type OpenTaskSnapshot,
+} from '@/composables/system/useOpenTaskCountEvents'
 
 type CloseEmitter = (event: 'close') => void
 export type InboxEntryKind = 'ticket' | 'event' | 'salesOpportunity' | 'notification'
@@ -76,14 +81,12 @@ export interface InboxSummaryCard {
   tone: 'primary' | 'warning' | 'info' | 'success'
 }
 
-const INBOX_CHANGED_EVENT = 'sapling-inbox-changed'
-
 export function useSaplingInbox(emit: CloseEmitter) {
   //#region State
   const { t } = useI18n()
   const { isLoading: isTranslationLoading } = useTranslationLoader('global', 'inbox', 'navigation')
   const dialog = ref(true)
-  const isDataLoading = ref(false)
+  const isDataLoading = ref(true)
   const tickets = ref<TicketItem[]>([])
   const tasks = ref<EventItem[]>([])
   const salesOpportunities = ref<SalesOpportunityItem[]>([])
@@ -92,11 +95,9 @@ export function useSaplingInbox(emit: CloseEmitter) {
   const isLoading = computed(() => isTranslationLoading.value || isDataLoading.value)
   //#endregion
 
-  //#region Lifecycle
-  onMounted(async () => {
-    await loadInboxItems()
+  useOpenTaskCountEvents((snapshot) => {
+    applyOpenTaskSnapshot(snapshot)
   })
-  //#endregion
 
   //#region Utility Functions
   function toDate(date: Date | string | null | undefined): Date | null {
@@ -179,12 +180,26 @@ export function useSaplingInbox(emit: CloseEmitter) {
     void router.push(entry.route)
   }
 
-  function notifyInboxChanged() {
-    if (typeof window === 'undefined') {
-      return
-    }
+  function applyOpenTaskSnapshot(snapshot: OpenTaskSnapshot) {
+    tickets.value = snapshot.tickets
+    tasks.value = snapshot.tasks
+    salesOpportunities.value = snapshot.salesOpportunities
+    notifications.value = snapshot.notifications
+    isDataLoading.value = false
+  }
 
-    window.dispatchEvent(new CustomEvent(INBOX_CHANGED_EVENT))
+  function publishOpenTaskSnapshot() {
+    updateOpenTaskSnapshot({
+      count:
+        tickets.value.length +
+        tasks.value.length +
+        salesOpportunities.value.length +
+        notifications.value.length,
+      tickets: [...tickets.value],
+      tasks: [...tasks.value],
+      salesOpportunities: [...salesOpportunities.value],
+      notifications: [...notifications.value],
+    })
   }
 
   function getTicketRoute(ticket: TicketItem): RouteLocationRaw {
@@ -354,31 +369,7 @@ export function useSaplingInbox(emit: CloseEmitter) {
     notifications.value = notifications.value.filter(
       (notification) => notification.handle !== entry.notificationHandle,
     )
-    notifyInboxChanged()
-  }
-  //#endregion
-
-  //#region Data Loading
-  async function loadInboxItems() {
-    isDataLoading.value = true
-
-    try {
-      const [loadedTickets, loadedTasks, loadedSalesOpportunities, loadedNotifications] =
-        await Promise.all([
-          ApiService.findAll<TicketItem[]>('current/openTickets'),
-          ApiService.findAll<EventItem[]>('current/openEvents'),
-          ApiService.findAll<SalesOpportunityItem[]>('current/openSalesOpportunities'),
-          ApiService.findAll<InboxNotificationItem[]>('current/openInboxNotifications'),
-        ])
-
-      tickets.value = loadedTickets
-      tasks.value = loadedTasks
-      salesOpportunities.value = loadedSalesOpportunities
-      notifications.value = loadedNotifications
-      notifyInboxChanged()
-    } finally {
-      isDataLoading.value = false
-    }
+    publishOpenTaskSnapshot()
   }
   //#endregion
 
@@ -534,7 +525,6 @@ export function useSaplingInbox(emit: CloseEmitter) {
     sections,
     openEntry,
     dismissEntry,
-    loadInboxItems,
     closeDialog,
   }
   //#endregion
