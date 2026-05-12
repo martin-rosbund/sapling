@@ -247,24 +247,13 @@
                 </v-btn>
               </template>
 
-              <v-list density="comfortable" min-width="260">
-                <template
-                  v-for="(group, groupIdx) in recordActionMenuItems"
-                  :key="`group-${groupIdx}`"
-                >
-                  <v-list-item
-                    v-for="menuItem in getRecordActionGroupItems(group)"
-                    :key="`${menuItem.type}-${menuItem.title ?? menuItem.titleKey ?? menuItem.scriptButton?.name ?? ''}`"
-                    :prepend-icon="menuItem.icon"
-                    :title="getRecordActionTitle(menuItem)"
-                    @click="handleRecordAction(menuItem)"
-                  />
-                  <v-divider
-                    v-if="groupIdx < recordActionMenuItems.length - 1"
-                    :key="`divider-${groupIdx}`"
-                  />
-                </template>
-              </v-list>
+              <SaplingRecordActionMenuList
+                density="comfortable"
+                min-width="260"
+                :menu-items="recordActionMenuItems"
+                :show-edit="false"
+                @select="handleRecordAction"
+              />
             </v-menu>
 
             <v-btn
@@ -299,24 +288,14 @@
                 </v-btn>
               </template>
 
-              <v-list density="comfortable" min-width="260" class="glass-panel">
-                <template
-                  v-for="(group, groupIdx) in recordActionMenuItems"
-                  :key="`group-edit-${groupIdx}`"
-                >
-                  <v-list-item
-                    v-for="menuItem in getRecordActionGroupItems(group)"
-                    :key="`${menuItem.type}-${menuItem.title ?? menuItem.titleKey ?? menuItem.scriptButton?.name ?? ''}`"
-                    :prepend-icon="menuItem.icon"
-                    :title="getRecordActionTitle(menuItem)"
-                    @click="handleRecordAction(menuItem)"
-                  />
-                  <v-divider
-                    v-if="groupIdx < recordActionMenuItems.length - 1"
-                    :key="`divider-edit-${groupIdx}`"
-                  />
-                </template>
-              </v-list>
+              <SaplingRecordActionMenuList
+                class="glass-panel"
+                density="comfortable"
+                min-width="260"
+                :menu-items="recordActionMenuItems"
+                :show-edit="false"
+                @select="handleRecordAction"
+              />
             </v-menu>
 
             <v-btn
@@ -428,6 +407,7 @@ import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageC
 import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog'
 import { buildMailMenuActions } from '@/utils/saplingMailMenuUtil'
 import SaplingDialogEditHero from '@/components/common/SaplingDialogEditHero.vue'
+import SaplingRecordActionMenuList from '@/components/common/SaplingRecordActionMenuList.vue'
 import SaplingActionBar from '@/components/actions/SaplingActionBar.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
 import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
@@ -646,9 +626,10 @@ const recordActionMenuItems = computed<SaplingContextMenuTableMenuEntry[]>(() =>
     scriptButtons: loadedScriptButtons.value,
     mailActions,
     mailToLabel,
+    showEdit: false,
   })
     .map((group) =>
-      getRecordActionGroupItems(group).filter(
+      (Array.isArray(group) ? group : [group]).filter(
         (menuItem) => !['edit', 'show', 'delete'].includes(menuItem.type),
       ),
     )
@@ -732,31 +713,6 @@ function updateSelectedRelationItems(templateName: string, items: SaplingGeneric
 
 function updateSelectedRelationTableItems(items: SaplingGenericItem[]): void {
   selectedItems.value = items
-}
-
-function getRecordActionTitle(menuItem: SaplingContextMenuTableMenuItem): string {
-  if (menuItem.titleKey) {
-    const translated = t(menuItem.titleKey)
-    return translated !== menuItem.titleKey ? translated : menuItem.titleKey
-  }
-
-  if (menuItem.title) {
-    return te(menuItem.title) ? t(menuItem.title) : menuItem.title
-  }
-
-  return ''
-}
-
-function isRecordActionMenuItem(
-  value: SaplingContextMenuTableMenuEntry,
-): value is SaplingContextMenuTableMenuItem {
-  return !Array.isArray(value)
-}
-
-function getRecordActionGroupItems(
-  group: SaplingContextMenuTableMenuEntry,
-): SaplingContextMenuTableMenuItem[] {
-  return isRecordActionMenuItem(group) ? [group] : group
 }
 
 function closeUploadDialog(): void {

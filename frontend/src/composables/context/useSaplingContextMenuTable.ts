@@ -28,6 +28,7 @@ export interface SaplingContextMenuTableProps {
   canNavigate: boolean
   scriptButtons?: ScriptButtonItem[]
   mailActions?: SaplingMailMenuAction[]
+  showEdit?: boolean
   item: SaplingGenericItem | null
   show: boolean
   x: number
@@ -64,6 +65,7 @@ export interface SaplingContextMenuTableMenuOptions {
   scriptButtons?: ScriptButtonItem[]
   mailActions?: SaplingMailMenuAction[]
   mailToLabel?: string
+  showEdit?: boolean
 }
 
 export interface SaplingContextMenuTableEmit {
@@ -87,11 +89,14 @@ export function getSaplingContextMenuTableItems(
   options: SaplingContextMenuTableMenuOptions,
 ): SaplingContextMenuTableMenuEntry[] {
   // Gruppierung: Standardaktionen, Zeitachsen/Navigate, Dokumente/Information, Skript/Mail
-  const group1: SaplingContextMenuTableMenuItem[] = [
-    options.entityPermission?.allowUpdate
-      ? { type: 'edit', icon: 'mdi-pencil', titleKey: 'global.edit' }
-      : { type: 'show', icon: 'mdi-eye', titleKey: 'global.show' },
-  ]
+  const group1: SaplingContextMenuTableMenuItem[] = []
+  if (options.showEdit !== false) {
+    group1.push(
+      options.entityPermission?.allowUpdate
+        ? { type: 'edit', icon: 'mdi-pencil', titleKey: 'global.edit' }
+        : { type: 'show', icon: 'mdi-eye', titleKey: 'global.show' },
+    )
+  }
   if (options.entityPermission?.allowDelete) {
     group1.push({ type: 'delete', icon: 'mdi-delete', titleKey: 'global.delete' })
   }
@@ -184,6 +189,7 @@ export function useSaplingContextMenuTable(
       canTimeline: props.item?.handle != null,
       scriptButtons: props.scriptButtons,
       mailActions: props.mailActions,
+      showEdit: props.showEdit,
     }),
   )
   //#endregion
