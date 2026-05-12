@@ -2,7 +2,7 @@
   {
     "name": "Ticket Anlage Inbox",
     "description": "Inbox-Benachrichtigung für neu angelegte Tickets.",
-    "titleTemplate": "Ticket #{{handle}} wurde erfasst",
+    "titleTemplate": "Ticket {{number}} wurde erfasst",
     "bodyMarkdown": "Das Ticket **{{title}}** wurde neu angelegt.\n\n- Status: {{status.description}}\n- Prioritaet: {{priority.description}}\n- Kunde: {{creatorCompany.name}}\n\nBitte prüfe die naechsten Schritte direkt in Sapling.",
     "isDefault": true,
     "isActive": true,
@@ -11,7 +11,7 @@
   {
     "name": "Ticket Update Inbox",
     "description": "Inbox-Benachrichtigung für geänderte Tickets.",
-    "titleTemplate": "Ticket #{{handle}} wurde aktualisiert",
+    "titleTemplate": "Ticket {{number}} wurde aktualisiert",
     "bodyMarkdown": "Zum Ticket **{{title}}** gibt es ein Update.\n\n- Status: {{status.description}}\n- Prioritaet: {{priority.description}}\n- Zustaendig: {{assigneePerson.firstName}} {{assigneePerson.lastName}}\n\nBitte prüfe die Aenderungen direkt in Sapling.",
     "isDefault": true,
     "isActive": true,
