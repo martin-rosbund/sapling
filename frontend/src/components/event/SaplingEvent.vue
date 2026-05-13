@@ -114,8 +114,6 @@
         <SaplingEventContextPanels
           :is-mobile-filter-layout="isMobileContextLayout"
           :upcoming-events="upcomingEvents"
-          :current-calendar-view-label="currentCalendarViewLabel"
-          :current-calendar-layout-label="currentCalendarLayoutLabel"
           :selected-peoples="selectedPeoples"
           :selected-people-preview="selectedPeoplePreview"
           :selected-people-overflow-count="selectedPeopleOverflowCount"
@@ -153,7 +151,7 @@
     :templates="templates"
     :entity="entityEvent"
     :showReference="true"
-    :force-dirty="forceEditDialogDirty"
+    :force-dirty-fields="forceEditDialogDirtyFields"
     @update:modelValue="(val) => (showEditDialog = val)"
     @update:mode="onEditDialogModeUpdate"
     @update:item="onEditDialogItemUpdate"
@@ -201,14 +199,12 @@ function toggleContextDialog() {
 }
 
 const {
-  forceEditDialogDirty,
+  forceEditDialogDirtyFields,
   calendarDisplayType,
   calendarType,
   calendarTypeOptions,
   calendarMode,
-  currentCalendarLayoutLabel,
   currentDateRangeLabel,
-  currentCalendarViewLabel,
   calendarViewMode,
   calendarWeekdays,
   currentMonthLabel,

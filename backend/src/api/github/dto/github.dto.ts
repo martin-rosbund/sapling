@@ -14,7 +14,7 @@ export enum GithubIssueType {
 
 export class GithubIssueStatusQueryDto {
   @ApiPropertyOptional({
-    description: 'Filtert Issues nach Status.',
+    description: 'Issue status filter used for repository issue queries.',
     enum: GithubIssueStatus,
     default: GithubIssueStatus.OPEN,
   })
@@ -24,9 +24,9 @@ export class GithubIssueStatusQueryDto {
 
 export class CreateGithubIssueDto {
   @ApiProperty({
-    description: 'Titel des anzulegenden GitHub-Issues.',
+    description: 'Short title of the GitHub issue that should be created.',
     maxLength: 256,
-    example: 'Export bricht bei leerem Filter ab',
+    example: 'Export fails when no filter is applied',
   })
   @IsString()
   @IsNotEmpty()
@@ -34,10 +34,10 @@ export class CreateGithubIssueDto {
   title!: string;
 
   @ApiProperty({
-    description: 'Beschreibung des Problems oder Feature-Wunsches.',
+    description: 'Detailed description of the bug report or feature request.',
     maxLength: 10000,
     example:
-      'Beim Export ohne aktive Filter erscheint ein 500-Fehler im Backend.',
+      'Exporting without active filters triggers a 500 response from the backend.',
   })
   @IsString()
   @IsNotEmpty()
@@ -46,7 +46,7 @@ export class CreateGithubIssueDto {
 
   @ApiProperty({
     description:
-      'Kategorisierung des Issues. Wird im GitHub-Issue als Typ hinterlegt und nach Möglichkeit als Label gesetzt.',
+      'Issue category that is stored as metadata on the GitHub issue and, when possible, also mapped to a label.',
     enum: GithubIssueType,
     example: GithubIssueType.BUG,
   })

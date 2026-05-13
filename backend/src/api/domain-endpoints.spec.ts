@@ -2,6 +2,7 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { BadRequestException } from '@nestjs/common';
 import { Response } from 'express';
+import { firstValueFrom, of } from 'rxjs';
 
 jest.mock('./current/current.service', () => ({ CurrentService: class {} }));
 jest.mock('./generic/generic.service', () => ({ GenericService: class {} }));
@@ -253,6 +254,7 @@ describe('CurrentController', () => {
     const controller = new CurrentController(
       currentService as never,
       {} as never,
+      {} as never,
     );
     const req = { user: createMockUser() };
 
@@ -269,6 +271,7 @@ describe('CurrentController', () => {
     const controller = new CurrentController(
       currentService as never,
       {} as never,
+      {} as never,
     );
     const req = { user: createMockUser() };
 
@@ -281,6 +284,7 @@ describe('CurrentController', () => {
     };
     const controller = new CurrentController(
       currentService as never,
+      {} as never,
       {} as never,
     );
     const req = { user: createMockUser() };
@@ -295,7 +299,11 @@ describe('CurrentController', () => {
   });
 
   it('rejects password changes when fields are missing', async () => {
-    const controller = new CurrentController({} as never, {} as never);
+    const controller = new CurrentController(
+      {} as never,
+      {} as never,
+      {} as never,
+    );
 
     await expect(
       controller.changePassword({ user: createMockUser() } as never, '', ''),
@@ -303,79 +311,51 @@ describe('CurrentController', () => {
   });
 
   it('rejects password changes when passwords do not match', async () => {
-    const controller = new CurrentController({} as never, {} as never);
+    const controller = new CurrentController(
+      {} as never,
+      {} as never,
+      {} as never,
+    );
 
     await expect(
       controller.changePassword({ user: createMockUser() } as never, 'a', 'b'),
     ).rejects.toThrow(new BadRequestException('login.passwordsDoNotMatch'));
   });
 
-  it('returns open tickets for the current user', async () => {
-    const tickets = [{ handle: 1 }];
+  it('streams open-task snapshots for the current user', async () => {
+    const snapshot = {
+      count: 4,
+      tickets: [{ handle: 1 }],
+      tasks: [{ handle: 2 }],
+      salesOpportunities: [{ handle: 3 }],
+      notifications: [{ handle: 4 }],
+    };
     const currentService = {
-      getOpenTickets: jest.fn(async () => tickets),
+      getOpenTaskSnapshot: jest.fn(async () => snapshot),
+    };
+    const openTaskEventsService = {
+      streamForUser: jest.fn(() => of(undefined)),
     };
     const controller = new CurrentController(
       currentService as never,
       {} as never,
-    );
-    const req = { user: createMockUser() };
-
-    await expect(controller.getOpenTickets(req as never)).resolves.toBe(
-      tickets,
-    );
-    expect(asMock(currentService.getOpenTickets)).toHaveBeenCalledWith(
-      req.user,
-    );
-  });
-
-  it('returns open events for the current user', async () => {
-    const events = [{ handle: 1 }];
-    const currentService = {
-      getOpenEvents: jest.fn(async () => events),
-    };
-    const controller = new CurrentController(
-      currentService as never,
-      {} as never,
-    );
-    const req = { user: createMockUser() };
-
-    await expect(controller.getOpenEvents(req as never)).resolves.toBe(events);
-    expect(asMock(currentService.getOpenEvents)).toHaveBeenCalledWith(req.user);
-  });
-
-  it('returns open sales opportunities for the current user', async () => {
-    const salesOpportunities = [{ handle: 1 }];
-    const currentService = {
-      getOpenSalesOpportunities: jest.fn(async () => salesOpportunities),
-    };
-    const controller = new CurrentController(
-      currentService as never,
-      {} as never,
+      openTaskEventsService as never,
     );
     const req = { user: createMockUser() };
 
     await expect(
-      controller.getOpenSalesOpportunities(req as never),
-    ).resolves.toBe(salesOpportunities);
-    expect(
-      asMock(currentService.getOpenSalesOpportunities),
-    ).toHaveBeenCalledWith(req.user);
-  });
-
-  it('counts open tasks for the current user', async () => {
-    const count = { count: 4 };
-    const currentService = {
-      countOpenTasks: jest.fn(async () => count),
-    };
-    const controller = new CurrentController(
-      currentService as never,
-      {} as never,
+      firstValueFrom(controller.streamOpenTaskCountEvents(req as never)),
+    ).resolves.toEqual(
+      expect.objectContaining({
+        type: 'open-task-snapshot',
+        retry: 5000,
+        data: snapshot,
+      }),
     );
-    const req = { user: createMockUser() };
-
-    await expect(controller.countOpenTasks(req as never)).resolves.toBe(count);
-    expect(asMock(currentService.countOpenTasks)).toHaveBeenCalledWith(
+    expect(asMock(openTaskEventsService.streamForUser)).toHaveBeenCalledWith(
+      req.user.handle,
+    );
+    expect(asMock(currentService.getOpenTaskSnapshot)).toHaveBeenCalledWith(
       req.user,
     );
   });
@@ -387,6 +367,7 @@ describe('CurrentController', () => {
     };
     const controller = new CurrentController(
       currentService as never,
+      {} as never,
       {} as never,
     );
     const req = { user: createMockUser() };
@@ -405,6 +386,7 @@ describe('CurrentController', () => {
     const controller = new CurrentController(
       currentService as never,
       {} as never,
+      {} as never,
     );
     const req = { user: createMockUser() };
 
@@ -418,7 +400,11 @@ describe('CurrentController', () => {
   });
 
   it('rejects entity permission lookups without an entity handle', () => {
-    const controller = new CurrentController({} as never, {} as never);
+    const controller = new CurrentController(
+      {} as never,
+      {} as never,
+      {} as never,
+    );
 
     expect(() =>
       controller.getEntityPermission({ user: createMockUser() } as never, ''),
@@ -432,6 +418,7 @@ describe('CurrentController', () => {
     };
     const controller = new CurrentController(
       currentService as never,
+      {} as never,
       {} as never,
     );
     const req = { user: createMockUser() };

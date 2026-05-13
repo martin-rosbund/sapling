@@ -16,21 +16,30 @@ export class SparklineWeekPointDto {
    * Week of the year (numeric).
    * @type {number}
    */
-  @ApiProperty({ description: 'Week', type: 'number' })
+  @ApiProperty({
+    description: 'Calendar week of the sparkline point.',
+    type: 'number',
+  })
   week: number;
 
   /**
    * Month of the year (numeric).
    * @type {number}
    */
-  @ApiProperty({ description: 'Month', type: 'number' })
+  @ApiProperty({
+    description: 'Calendar month associated with the sparkline point.',
+    type: 'number',
+  })
   month: number;
 
   /**
    * Year (numeric).
    * @type {number}
    */
-  @ApiProperty({ description: 'Year', type: 'number' })
+  @ApiProperty({
+    description: 'Calendar year of the sparkline point.',
+    type: 'number',
+  })
   year: number;
 
   /**
@@ -38,10 +47,18 @@ export class SparklineWeekPointDto {
    * @type {number|object|null}
    */
   @ApiProperty({
-    description: 'Value',
+    description:
+      'KPI value recorded for this week. This can be numeric, structured, or null.',
     type: 'number',
     nullable: true,
-    oneOf: [{ type: 'number' }, { type: 'object' }],
+    oneOf: [
+      { type: 'number', description: 'Single numeric point value.' },
+      {
+        type: 'object',
+        description: 'Structured point value for grouped or composite metrics.',
+      },
+      { type: 'null', description: 'No value is available for this week.' },
+    ],
   })
   value: number | object | null;
 

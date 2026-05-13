@@ -64,20 +64,14 @@
                 />
               </template>
 
-              <v-list class="glass-panel sapling-table-mobile-card__menu-list">
-                <v-list-item
-                  v-for="menuItem in rowMenuItems"
-                  :key="`${menuItem.type}-${menuItem.scriptButton?.handle ?? menuItem.titleKey ?? menuItem.title ?? ''}`"
-                  @click.stop="onMenuItemClick(menuItem)"
-                >
-                  <v-icon start>{{ menuItem.icon }}</v-icon>
-                  <span>{{ resolveMenuItemTitle(menuItem) }}</span>
-                </v-list-item>
-                <v-list-item @click.stop="closeMenu()">
-                  <v-icon start>mdi-close</v-icon>
-                  <span>{{ $t('global.close') }}</span>
-                </v-list-item>
-              </v-list>
+              <SaplingRecordActionMenuList
+                class="glass-panel sapling-table-mobile-card__menu-list"
+                :menu-items="rowMenuItems"
+                :show-close-item="true"
+                :show-edit="true"
+                @select="onMenuItemClick"
+                @close="closeMenu"
+              />
             </v-menu>
           </div>
         </div>
@@ -222,8 +216,8 @@
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
 import type { SaplingContextMenuTableMenuItem } from '@/composables/context/useSaplingContextMenuTable'
+import SaplingRecordActionMenuList from '@/components/common/SaplingRecordActionMenuList.vue'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
 import SaplingTableJson from '@/components/table/SaplingTableJson.vue'
 import SaplingTableChip from '@/components/table/SaplingTableChip.vue'
@@ -251,7 +245,6 @@ import SaplingCellDateTime from './cells/SaplingCellDateTime.vue'
 
 const props = defineProps<UseSaplingTableRowProps>()
 const emit = defineEmits<UseSaplingTableRowEmit>()
-const { t, te } = useI18n()
 const detailsOpen = ref(false)
 
 const {
@@ -262,6 +255,7 @@ const {
   isDialogOpenForCol,
   closeMenu,
   requestEdit,
+  requestChangeLog,
   requestShow,
   requestDelete,
   requestCopy,
@@ -271,6 +265,7 @@ const {
   requestUploadDocument,
   requestShowDocuments,
   requestShowInformation,
+  requestMail,
   onRowDoubleClick,
   onRowKeydown,
   toggleRowSelection,
@@ -315,22 +310,13 @@ function handleCardClick() {
   emit('select-row', props.index)
 }
 
-function resolveMenuItemTitle(menuItem: SaplingContextMenuTableMenuItem) {
-  if (menuItem.titleKey) {
-    return t(menuItem.titleKey)
-  }
-
-  if (!menuItem.title) {
-    return ''
-  }
-
-  return te(menuItem.title) ? t(menuItem.title) : menuItem.title
-}
-
 function onMenuItemClick(menuItem: SaplingContextMenuTableMenuItem) {
   switch (menuItem.type) {
     case 'edit':
       requestEdit(props.item)
+      break
+    case 'changeLog':
+      requestChangeLog(props.item)
       break
     case 'show':
       requestShow(props.item)
@@ -355,6 +341,11 @@ function onMenuItemClick(menuItem: SaplingContextMenuTableMenuItem) {
       break
     case 'showInformation':
       requestShowInformation(props.item)
+      break
+    case 'mail':
+      if (menuItem.mailAction) {
+        requestMail(props.item, menuItem.mailAction.email)
+      }
       break
     case 'script':
       if (menuItem.scriptButton) {

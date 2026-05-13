@@ -29,6 +29,7 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 import { PaginatedResponseDto } from './dto/paginated-response.dto';
+import { ChangeLogResponseDto } from './dto/change-log-response.dto';
 import { TimelineResponseDto } from './dto/timeline-response.dto';
 import {
   ApiGenericEntityOperation,
@@ -83,7 +84,7 @@ export class GenericController {
   @ApiOperation({
     summary: 'Get record timeline',
     description:
-      'Retrieves a record-centric timeline with month-based summaries across directly related entities.',
+      'Returns a record-centric activity timeline grouped by month across the requested record and directly related entities.',
   })
   @ApiGenericEntityOperation(
     'Returns a record-centric timeline for an entity entry',
@@ -103,7 +104,8 @@ export class GenericController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Successful request',
+    description:
+      'Timeline data grouped by month, including anchor state and summarized related activity.',
     type: TimelineResponseDto,
   })
   async getTimeline(
@@ -122,6 +124,41 @@ export class GenericController {
   }
 
   /**
+   * Retrieves the persisted change log for a single entity record.
+   * @param {Request & { user: PersonItem }} req Express request object with authenticated user
+   * @param {string} entityHandle Name of the entity
+   * @param {string} handle Record handle of the entity
+   * @returns {ChangeLogResponseDto[]} Change log entries ordered by newest first
+   */
+  @UseGuards(GenericPermissionGuard)
+  @Get(':entityHandle/:handle/change-log')
+  @GenericPermission('allowRead')
+  @ApiOperation({
+    summary: 'Get record change log',
+    description:
+      'Returns the persisted create, update, and delete log entries for a single record.',
+  })
+  @ApiGenericEntityOperation('Returns the persisted change log for one record')
+  @ApiResponse({
+    status: 200,
+    description:
+      'Persisted create, update, and delete log entries for the requested record.',
+    type: ChangeLogResponseDto,
+    isArray: true,
+  })
+  async getChangeLog(
+    @Req() req: Request & { user: PersonItem },
+    @Param('entityHandle') entityHandle: string,
+    @Param('handle') handle: string,
+  ): Promise<ChangeLogResponseDto[]> {
+    return this.genericService.getRecordChangeLog(
+      entityHandle,
+      handle,
+      req.user,
+    );
+  }
+
+  /**
    * Retrieves a paginated list of entities.
    * @param {Request & { user: PersonItem }} req Express request object with authenticated user
    * @param {string} entityHandle Name of the entity
@@ -132,7 +169,8 @@ export class GenericController {
   @Get(':entityHandle')
   @ApiOperation({
     summary: 'Get paginated entity list',
-    description: 'Retrieves a paginated list for an entity.',
+    description:
+      'Returns a paginated result set for the requested entity, including optional filtering, sorting, and relation loading.',
   })
   @ApiGenericEntityOperation('Returns a paginated list for an entity')
   @ApiQuery({
@@ -170,7 +208,8 @@ export class GenericController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Successful request',
+    description:
+      'Paginated collection of entity records together with pagination metadata.',
     type: PaginatedResponseDto,
   })
   async findPaginated(
@@ -204,7 +243,8 @@ export class GenericController {
   @Get(':entityHandle/download')
   @ApiOperation({
     summary: 'Download entity data as JSON',
-    description: 'Downloads entity data as JSON file (no scripting, no count).',
+    description:
+      'Exports the filtered entity result set as a JSON file without pagination metadata or script execution.',
   })
   @ApiGenericEntityOperation('Downloads entity data as JSON')
   @ApiQuery({
@@ -230,7 +270,7 @@ export class GenericController {
   })
   @ApiResponse({
     status: 200,
-    description: 'JSON download',
+    description: 'JSON file download containing the matching entity records.',
     type: String,
   })
   async download(
@@ -268,18 +308,19 @@ export class GenericController {
   @Post(':entityHandle')
   @ApiOperation({
     summary: 'Create entity entry',
-    description: 'Creates a new entry for an entity.',
+    description:
+      'Creates a new record for the requested entity. The accepted payload depends on the entity schema.',
   })
   @ApiGenericEntityOperation('Creates a new entry for an entity')
   @ApiResponse({
     status: 201,
-    description: 'Entry created successfully',
+    description: 'Created entity record.',
     type: Object,
   })
   @ApiBody({
-    description: 'JSON object with the fields of the new entity.',
+    description: 'Entity-specific JSON payload for the new record.',
     required: true,
-    schema: { type: 'object' },
+    schema: { type: 'object', additionalProperties: true },
   })
   async create(
     @Req() req: Request & { user: PersonItem },
@@ -304,12 +345,13 @@ export class GenericController {
   @Patch(':entityHandle')
   @ApiOperation({
     summary: 'Update entity entry',
-    description: 'Updates an entry by its handle.',
+    description:
+      'Updates an existing record identified by the handle query parameter. The accepted payload depends on the entity schema.',
   })
   @ApiGenericEntityOperation('Updates an entry by its handle')
   @ApiResponse({
     status: 200,
-    description: 'Entry updated successfully',
+    description: 'Updated entity record.',
     type: Object,
   })
   @ApiQuery({
@@ -326,9 +368,10 @@ export class GenericController {
     type: String,
   })
   @ApiBody({
-    description: 'JSON object with the fields to update.',
+    description:
+      'Entity-specific JSON payload containing the fields to update.',
     required: true,
-    schema: { type: 'object' },
+    schema: { type: 'object', additionalProperties: true },
   })
   async update(
     @Req() req: Request & { user: PersonItem },
@@ -359,10 +402,14 @@ export class GenericController {
   @Delete(':entityHandle')
   @ApiOperation({
     summary: 'Delete entity entry',
-    description: 'Deletes an entry by its handle.',
+    description:
+      'Deletes an existing record identified by the handle query parameter.',
   })
   @ApiGenericEntityOperation('Deletes an entry by its handle')
-  @ApiResponse({ status: 204, description: 'Entry deleted successfully' })
+  @ApiResponse({
+    status: 204,
+    description: 'Record deleted successfully. No response body is returned.',
+  })
   @ApiQuery({
     name: 'handle',
     required: true,
@@ -392,14 +439,34 @@ export class GenericController {
   @Post(':entityHandle/:referenceName/create')
   @GenericPermission('allowUpdate')
   @ApiOperation({
-    summary: 'Insert n:m reference',
-    description: 'Fügt Referenzen zu einer n:m-Relation hinzu.',
+    summary: 'Create an n:m relation entry',
+    description:
+      'Adds a relation between the current entity record and another record through the specified many-to-many reference.',
   })
   @ApiGenericEntityReferenceOperation('Creates a reference for an entity')
   @ApiBody({
-    description: 'Body: { entityHandle, referenceHandle }',
+    description:
+      'Payload identifying the owning record and the related record to link.',
     required: true,
-    schema: { type: 'object' },
+    schema: {
+      type: 'object',
+      properties: {
+        entityHandle: {
+          type: 'string',
+          description: 'Handle of the primary record that owns the relation.',
+        },
+        referenceHandle: {
+          type: 'string',
+          description: 'Handle of the related record that should be linked.',
+        },
+      },
+      required: ['entityHandle', 'referenceHandle'],
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Relation created successfully.',
+    type: Object,
   })
   async createReference(
     @Req() req: Request & { user: PersonItem },
@@ -434,14 +501,34 @@ export class GenericController {
   @Post(':entityHandle/:referenceName/delete')
   @GenericPermission('allowUpdate')
   @ApiOperation({
-    summary: 'Delete n:m reference',
-    description: 'Entfernt Referenzen aus einer n:m-Relation.',
+    summary: 'Delete an n:m relation entry',
+    description:
+      'Removes a relation between the current entity record and another record through the specified many-to-many reference.',
   })
   @ApiGenericEntityReferenceOperation('Deletes a reference for an entity')
   @ApiBody({
-    description: 'Body: { entityHandle, referenceHandle }',
+    description:
+      'Payload identifying the owning record and the related record to unlink.',
     required: true,
-    schema: { type: 'object' },
+    schema: {
+      type: 'object',
+      properties: {
+        entityHandle: {
+          type: 'string',
+          description: 'Handle of the primary record that owns the relation.',
+        },
+        referenceHandle: {
+          type: 'string',
+          description: 'Handle of the related record that should be removed.',
+        },
+      },
+      required: ['entityHandle', 'referenceHandle'],
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Relation removed successfully.',
+    type: Object,
   })
   async deleteReference(
     @Req() req: Request & { user: PersonItem },

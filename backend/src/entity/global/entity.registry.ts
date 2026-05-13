@@ -63,6 +63,9 @@ import { SalesOpportunityStageItem } from '../SalesOpportunityStageItem';
 import { SalesOpportunityForecastItem } from '../SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from '../SalesOpportunitySourceItem';
 import { EntityRouteItem } from '../EntityRouteItem';
+import { ChangeLogItem } from '../ChangeLogItem';
+import { ChangeLogDetailItem } from '../ChangeLogDetailItem';
+import { ChangeLogActionItem } from '../ChangeLogActionItem';
 import { MoneyItem } from '../MoneyItem';
 import { ServerLandscapeItem } from '../ServerLandscapeItem';
 import { ServerLandscapeTypeItem } from '../ServerLandscapeTypeItem';
@@ -90,6 +93,9 @@ import { TeamsTemplateItem } from '../TeamsTemplateItem';
 import { TeamsSubscriptionItem } from '../TeamsSubscriptionItem';
 import { TeamsDeliveryItem } from '../TeamsDeliveryItem';
 import { TeamsDeliveryStatusItem } from '../TeamsDeliveryStatusItem';
+import { InboxTemplateItem } from '../InboxTemplateItem';
+import { InboxSubscriptionItem } from '../InboxSubscriptionItem';
+import { InboxNotificationItem } from '../InboxNotificationItem';
 import { HolidayItem } from '../HolidayItem';
 import { HolidayGroupItem } from '../HolidayGroupItem';
 import { SharedMailboxGroupItem } from '../SharedMailboxGroupItem';
@@ -140,6 +146,9 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'entityGroup', class: EntityGroupItem },
   { name: 'entity', class: EntityItem },
   { name: 'entityRoute', class: EntityRouteItem },
+  { name: 'changeLogAction', class: ChangeLogActionItem },
+  { name: 'changeLog', class: ChangeLogItem },
+  { name: 'changeLogDetail', class: ChangeLogDetailItem },
   { name: 'favorite', class: FavoriteItem },
   { name: 'favoriteTemplate', class: FavoriteTemplateItem },
   { name: 'kpi', class: KpiItem },
@@ -171,6 +180,9 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'teamsSubscription', class: TeamsSubscriptionItem },
   { name: 'teamsDelivery', class: TeamsDeliveryItem },
   { name: 'teamsDeliveryStatus', class: TeamsDeliveryStatusItem },
+  { name: 'inboxTemplate', class: InboxTemplateItem },
+  { name: 'inboxSubscription', class: InboxSubscriptionItem },
+  { name: 'inboxNotification', class: InboxNotificationItem },
   { name: 'aiChatSession', class: AiChatSessionItem },
   { name: 'aiChatMessage', class: AiChatMessageItem },
   { name: 'aiChatTranscription', class: AiChatTranscriptionItem },

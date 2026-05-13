@@ -16,6 +16,7 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -106,14 +107,49 @@ export class WebhookController {
    */
   @Post('trigger/:handle')
   @HttpCode(HttpStatus.ACCEPTED)
-  @ApiOperation({ summary: 'Trigger webhook delivery' })
+  @ApiOperation({
+    summary: 'Trigger a webhook delivery',
+    description:
+      'Creates a webhook delivery job for the selected subscription and immediately enqueues it for processing.',
+  })
+  @ApiParam({
+    name: 'handle',
+    type: Number,
+    description: 'Numeric handle of the webhook subscription to execute.',
+  })
   @ApiBody({
     description:
-      'JSON object with the fields of the entity to trigger the webhook for.',
+      'Payload object that will be delivered to the webhook subscriber.',
     required: true,
-    schema: { example: { payload: {} } },
+    schema: {
+      type: 'object',
+      properties: {
+        payload: {
+          type: 'object',
+          description:
+            'Event payload that should be delivered to the configured webhook endpoint.',
+          additionalProperties: true,
+        },
+      },
+      required: ['payload'],
+      example: { payload: {} },
+    },
   })
-  @ApiResponse({ status: 202, description: 'Webhook delivery queued' })
+  @ApiResponse({
+    status: 202,
+    description:
+      'Accepted delivery job information for the queued webhook call.',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: 'Webhook delivery queued' },
+        deliveryId: {
+          type: 'number',
+          description: 'Handle of the created webhook delivery record.',
+        },
+      },
+    },
+  })
   @UseGuards(GenericPermissionGuard)
   @GenericPermission('allowUpdate')
   @SetMetadata(
@@ -143,8 +179,37 @@ export class WebhookController {
    */
   @Post('retry/:handle')
   @HttpCode(HttpStatus.ACCEPTED)
-  @ApiOperation({ summary: 'Retry webhook delivery' })
-  @ApiResponse({ status: 202, description: 'Webhook retry queued' })
+  @ApiOperation({
+    summary: 'Retry a webhook delivery',
+    description:
+      'Creates a new delivery attempt for an existing webhook delivery record.',
+  })
+  @ApiParam({
+    name: 'handle',
+    type: Number,
+    description:
+      'Numeric handle of the webhook delivery that should be retried.',
+  })
+  @ApiResponse({
+    status: 202,
+    description:
+      'Accepted retry job information, including the next delivery attempt number.',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: 'Webhook retry queued' },
+        deliveryId: {
+          type: 'number',
+          description:
+            'Handle of the webhook delivery record that was retried.',
+        },
+        attempt: {
+          type: 'number',
+          description: 'Current attempt counter after the retry was queued.',
+        },
+      },
+    },
+  })
   @UseGuards(GenericPermissionGuard)
   @GenericPermission('allowUpdate')
   @SetMetadata(GENERIC_PERMISSION_RESOLVE_KEY, resolveWebhookDeliveryPermission)

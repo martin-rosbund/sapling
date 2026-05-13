@@ -11,6 +11,8 @@ export type MailPreviewPayload = {
   subject?: string
   bodyMarkdown?: string
   senderEmail?: string
+  clientLocale?: string
+  clientTimeZone?: string
   to?: string[] | string
   cc?: string[] | string
   bcc?: string[] | string
@@ -53,7 +55,10 @@ class ApiMailService {
 
   static async preview(payload: MailPreviewPayload): Promise<MailPreviewResult> {
     try {
-      const response = await axios.post<MailPreviewResult>(`${BACKEND_URL}mail/preview`, payload)
+      const response = await axios.post<MailPreviewResult>(
+        `${BACKEND_URL}mail/preview`,
+        this.withClientFormattingContext(payload),
+      )
 
       return response.data
     } catch (error) {
@@ -75,12 +80,28 @@ class ApiMailService {
 
   static async send(payload: MailPreviewPayload): Promise<MailDeliveryResult> {
     try {
-      const response = await axios.post<MailDeliveryResult>(`${BACKEND_URL}mail/send`, payload)
+      const response = await axios.post<MailDeliveryResult>(
+        `${BACKEND_URL}mail/send`,
+        this.withClientFormattingContext(payload),
+      )
 
       return response.data
     } catch (error) {
       pushApiErrorMessage(error, 'exception.unknownError', 'mail')
       throw error
+    }
+  }
+
+  private static withClientFormattingContext<T extends MailPreviewPayload>(payload: T): T {
+    const resolvedOptions = Intl.DateTimeFormat().resolvedOptions()
+    const timeZone = resolvedOptions.timeZone?.trim()
+    const locale =
+      typeof navigator !== 'undefined' ? navigator.language || resolvedOptions.locale : resolvedOptions.locale
+
+    return {
+      ...payload,
+      clientLocale: payload.clientLocale || locale || undefined,
+      clientTimeZone: payload.clientTimeZone || timeZone || undefined,
     }
   }
 }

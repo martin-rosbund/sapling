@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  forwardRef,
+} from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -9,11 +14,11 @@ import { GoogleStrategy } from './google/google.strategy';
 import rateLimit from 'express-rate-limit';
 import { SAPLING_WHITELISTED_IPS } from '../constants/project.constants';
 import { SessionOrBearerAuthGuard } from './guard/session-or-token-auth.guard';
-import { CurrentService } from '../api/current/current.service';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ENTITY_REGISTRY } from '../entity/global/entity.registry';
 import { GenericPermissionGuard } from './guard/generic-permission.guard';
 import { AdminPermissionGuard } from './guard/admin-permission.guard';
+import { CurrentModule } from '../api/current/current.module';
 
 /**
  * @class
@@ -35,6 +40,7 @@ const loginLimiter = rateLimit({
 
 @Module({
   imports: [
+    forwardRef(() => CurrentModule),
     MikroOrmModule.forFeature(
       ENTITY_REGISTRY.map((e) => e.class as new (...args: any[]) => unknown),
     ),
@@ -52,7 +58,6 @@ const loginLimiter = rateLimit({
     SessionOrBearerAuthGuard,
     AdminPermissionGuard,
     GenericPermissionGuard,
-    CurrentService,
   ],
   exports: [
     AuthService,

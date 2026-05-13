@@ -6,7 +6,7 @@
     persistent
     @update:model-value="handleVisibilityChange"
   >
-    <SaplingDialogCard class="sapling-mail-dialog">
+    <SaplingDialogCard class="sapling-mail-dialog" :tilt="false">
       <div class="sapling-mail-dialog__shell">
         <v-card-title class="sapling-mail-dialog__header">
           <SaplingDialogHero

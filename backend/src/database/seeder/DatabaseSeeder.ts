@@ -48,6 +48,7 @@ import { SalesOpportunityStageItem } from '../../entity/SalesOpportunityStageIte
 import { SalesOpportunityForecastItem } from '../../entity/SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from '../../entity/SalesOpportunitySourceItem';
 import { EntityRouteItem } from '../../entity/EntityRouteItem';
+import { ChangeLogActionItem } from '../../entity/ChangeLogActionItem';
 import { SalesOpportunityItem } from '../../entity/SalesOpportunityItem';
 import { MoneyItem } from '../../entity/MoneyItem';
 import { DocumentTypeItem } from '../../entity/DocumentTypeItem';
@@ -74,6 +75,9 @@ import { TeamsTemplateItem } from '../../entity/TeamsTemplateItem';
 import { TeamsSubscriptionItem } from '../../entity/TeamsSubscriptionItem';
 import { TeamsDeliveryItem } from '../../entity/TeamsDeliveryItem';
 import { TeamsDeliveryStatusItem } from '../../entity/TeamsDeliveryStatusItem';
+import { InboxTemplateItem } from '../../entity/InboxTemplateItem';
+import { InboxSubscriptionItem } from '../../entity/InboxSubscriptionItem';
+import { InboxNotificationItem } from '../../entity/InboxNotificationItem';
 import { HolidayItem } from '../../entity/HolidayItem';
 import { HolidayGroupItem } from '../../entity/HolidayGroupItem';
 import { RoleStarterSeeder } from './RoleStarterSeeder';
@@ -108,6 +112,7 @@ const SEED_ORDER: Array<EntityName<object> | (new () => Seeder)> = [
   EntityGroupItem,
   EntityItem,
   EntityRouteItem,
+  ChangeLogActionItem,
   ScriptButtonItem,
   KpiAggregationItem,
   KpiTimeframeItem,
@@ -164,6 +169,9 @@ const SEED_ORDER: Array<EntityName<object> | (new () => Seeder)> = [
   TeamsDeliveryStatusItem,
   TeamsSubscriptionItem,
   TeamsDeliveryItem,
+  InboxTemplateItem,
+  InboxSubscriptionItem,
+  InboxNotificationItem,
   AiChatTranscriptionItem,
   AiProviderTypeItem,
   AiProviderModelItem,

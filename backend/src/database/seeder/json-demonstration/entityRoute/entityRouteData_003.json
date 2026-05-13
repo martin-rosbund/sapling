@@ -1,0 +1,6 @@
+[
+  { "entity": "changeLogAction", "route": "table/changeLogAction" },
+  { "entity": "inboxTemplate", "route": "table/inboxTemplate" },
+  { "entity": "inboxSubscription", "route": "table/inboxSubscription" },
+  { "entity": "inboxNotification", "route": "table/inboxNotification" }
+]

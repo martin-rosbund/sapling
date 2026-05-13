@@ -1,0 +1,56 @@
+[
+  {
+    "name": "Ticket Anlage Inbox",
+    "description": "Inbox-Benachrichtigung für neu angelegte Tickets.",
+    "titleTemplate": "Ticket {{number}} wurde erfasst",
+    "bodyMarkdown": "Das Ticket **{{title}}** wurde neu angelegt.\n\n- Status: {{status.description}}\n- Prioritaet: {{priority.description}}\n- Kunde: {{creatorCompany.name}}\n\nBitte prüfe die naechsten Schritte direkt in Sapling.",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "ticket"
+  },
+  {
+    "name": "Ticket Update Inbox",
+    "description": "Inbox-Benachrichtigung für geänderte Tickets.",
+    "titleTemplate": "Ticket {{number}} wurde aktualisiert",
+    "bodyMarkdown": "Zum Ticket **{{title}}** gibt es ein Update.\n\n- Status: {{status.description}}\n- Prioritaet: {{priority.description}}\n- Zustaendig: {{assigneePerson.firstName}} {{assigneePerson.lastName}}\n\nBitte prüfe die Aenderungen direkt in Sapling.",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "ticket"
+  },
+  {
+    "name": "Verkaufschance Anlage Inbox",
+    "description": "Inbox-Benachrichtigung für neu angelegte Verkaufschancen.",
+    "titleTemplate": "Verkaufschance {{title}} wurde angelegt",
+    "bodyMarkdown": "Die Verkaufschance **{{title}}** bei **{{company.name}}** wurde neu angelegt.\n\n- Phase: {{stage.title}}\n- Forecast: {{forecast.title}}\n- Erwarteter Umsatz: {{expectedRevenue}}\n\nBitte die Opportunity in Sapling weiterverfolgen.",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "salesOpportunity"
+  },
+  {
+    "name": "Verkaufschance Update Inbox",
+    "description": "Inbox-Benachrichtigung für geänderte Verkaufschancen.",
+    "titleTemplate": "Opportunity {{title}} wurde aktualisiert",
+    "bodyMarkdown": "Die Verkaufschance **{{title}}** bei **{{company.name}}** hat ein Update erhalten.\n\n- Phase: {{stage.title}}\n- Forecast: {{forecast.title}}\n- Erwarteter Umsatz: {{expectedRevenue}}\n\nBitte die Opportunity in Sapling nachverfolgen.",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "salesOpportunity"
+  },
+  {
+    "name": "Termin Anlage Inbox",
+    "description": "Inbox-Benachrichtigung für neu angelegte Termine.",
+    "titleTemplate": "Neuer Termin: {{title}}",
+    "bodyMarkdown": "Ein neuer Termin wurde geplant.\n\n- Start: {{startDate | dateTime}}\n- Ende: {{endDate | dateTime}}\n- Status: {{status.description}}\n- Typ: {{type.title}}\n\nBitte prüfe den Termin in Sapling.",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "event"
+  },
+  {
+    "name": "Termin Update Inbox",
+    "description": "Inbox-Benachrichtigung für geänderte Termine.",
+    "titleTemplate": "Termin {{title}} wurde aktualisiert",
+    "bodyMarkdown": "Der Termin **{{title}}** wurde aktualisiert.\n\n- Start: {{startDate | dateTime}}\n- Ende: {{endDate | dateTime}}\n- Status: {{status.description}}\n- Typ: {{type.title}}\n\nBitte prüfe die Aenderungen direkt in Sapling.",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "event"
+  }
+]

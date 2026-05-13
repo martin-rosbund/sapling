@@ -134,6 +134,7 @@ export function useSaplingEvent() {
     'global',
     'event',
     'eventStatus',
+    'filter',
     'holiday',
   )
   const currentPersonStore = useCurrentPersonStore()
@@ -152,8 +153,11 @@ export function useSaplingEvent() {
   const isNarrowScreen = ref(windowWatcher.getCurrentSize() === 'small')
   const entityEvent = ref<EntityItem | null>(null)
   const editEvent = ref<CalendarEvent | null>(null)
-  // Force the edit dialog to be dirty (z.B. nach Drag&Drop)
-  const forceEditDialogDirty = ref(false)
+  // Names of fields that should be marked dirty in the edit dialog after an
+  // external interaction (e.g. drag/resize updated startDate/endDate before
+  // the form was hydrated). The dialog highlights these fields exactly like
+  // a manual edit and enables the save button.
+  const forceEditDialogDirtyFields = ref<string[]>([])
   const calendarDateRange = ref<CalendarDatePair | null>(null)
   const showEditDialog = ref(false)
   const dragEvent = ref<CalendarEvent | null>(null)
@@ -161,6 +165,23 @@ export function useSaplingEvent() {
   const createEvent = ref<CalendarEvent | null>(null)
   const createStart = ref<number | null>(null)
   const extendOriginal = ref<number | null>(null)
+  // Tracks whether the most recently completed pointer interaction actually
+  // moved/resized something. Used to swallow the synthetic `click` event the
+  // browser dispatches after a same-cell drag, which would otherwise re-open
+  // the dialog cleanly and overwrite the drag-induced dirty state.
+  const suppressNextEventClick = ref(false)
+  // Snapshot of the in-memory event before a drag/resize so a later "discard
+  // changes" can roll the local calendar entry (and its nested event payload)
+  // back to the pre-interaction state. Without this snapshot, the visual
+  // position of the event is restored only after the next server refresh,
+  // and re-opening the same record before that refresh would still show
+  // the dragged times.
+  const dragSnapshot = ref<{
+    target: CalendarEvent
+    start: number
+    end: number
+    event: CalendarEvent['event'] | undefined
+  } | null>(null)
   const value = ref(formatLocalDate(new Date()))
   const calendarScrollContainer = ref<CalendarScrollContainerRef>(null)
   const workHours = ref<WorkHourWeekItem | null>(null)
@@ -772,7 +793,12 @@ export function useSaplingEvent() {
 
     events.value = filterWorkweekEvents(
       filterByCalendarMode([
-        ...response.data.flatMap((event) => expandRecurringEvent(event, startDate, endDate)),
+        ...response.data.flatMap((event) =>
+          expandRecurringEvent(event, startDate, endDate).map((calendarEvent) => ({
+            ...calendarEvent,
+            saplingSource: 'event' as const,
+          })),
+        ),
         ...holidayResponse.data.map((holiday) => toHolidayCalendarEvent(holiday)),
       ]),
     )
@@ -801,6 +827,7 @@ export function useSaplingEvent() {
     dragEvent.value = event
     dragTime.value = null
     extendOriginal.value = null
+    captureDragSnapshot(event)
   }
 
   /**
@@ -838,6 +865,7 @@ export function useSaplingEvent() {
     createEvent.value = event
     createStart.value = event.start
     extendOriginal.value = event.end
+    captureDragSnapshot(event)
   }
 
   /**
@@ -865,21 +893,50 @@ export function useSaplingEvent() {
 
   /**
    * Finalizes drag interactions and opens the edit dialog with normalized date fields.
+   *
+   * The handler must distinguish between three completely different
+   * user gestures that all end with a `mouseup:time` event from Vuetify's
+   * calendar:
+   *
+   *   1. A pure click on an existing event card. `startDrag` was called by
+   *      Vuetify on mousedown but `mouseMove` never assigned `dragTime`, so
+   *      nothing actually moved. We must not open a dirty edit dialog in
+   *      this case — the card's own `@click` handler already invokes
+   *      `openEventEditor` which opens the dialog clean.
+   *   2. A drag/resize of an existing event. `dragTime`/`extendOriginal`
+   *      will be set. The dialog must open with `forceDirty=true` so the
+   *      save button is enabled even though the per-field snapshot already
+   *      reflects the new dates.
+   *   3. A click or drag on empty space which creates a brand new draft via
+   *      `startTime`. `createEvent` will be set with no backend handle yet,
+   *      so we open the create dialog with a fresh draft payload.
    */
   function endDrag() {
-    // Wenn ein Event verschoben, erstellt oder in der Zeit verändert wurde, Dialog dirty öffnen
-    if (createEvent.value && getCalendarEventHandle(createEvent.value) == null) {
+    const isNewDraft =
+      createEvent.value != null &&
+      getCalendarEventHandle(createEvent.value) == null &&
+      extendOriginal.value == null
+    const wasDragged = dragEvent.value != null && dragTime.value != null
+    const wasResized =
+      extendOriginal.value != null &&
+      createEvent.value != null &&
+      createEvent.value.end !== extendOriginal.value
+
+    if (isNewDraft) {
       editEvent.value = createEvent.value
-      editEvent.value.event = buildDraftEventPayload(createEvent.value)
-      forceEditDialogDirty.value = true
+      editEvent.value!.event = buildDraftEventPayload(createEvent.value!)
+      forceEditDialogDirtyFields.value = ['startDate', 'endDate']
       showEditDialog.value = true
-    } else {
+      suppressNextEventClick.value = true
+    } else if (wasDragged || wasResized) {
       editEvent.value = dragEvent.value ?? createEvent.value
       applyCalendarEventDateParts(editEvent.value)
-      // Dialog dirty, wenn Drag oder Resize (extendOriginal) aktiv war
-      forceEditDialogDirty.value = !!dragEvent.value || extendOriginal.value != null
+      forceEditDialogDirtyFields.value = wasResized ? ['endDate'] : ['startDate', 'endDate']
       showEditDialog.value = editEvent.value != null
+      suppressNextEventClick.value = true
     }
+    // Else: pure click on an existing event. Leave dialog handling to the
+    // explicit click handler that runs `openEventEditor` cleanly.
 
     dragTime.value = null
     dragEvent.value = null
@@ -896,13 +953,52 @@ export function useSaplingEvent() {
       return
     }
 
+    // Same-cell drags cause the browser to dispatch a synthetic `click` after
+    // `mouseup`. `endDrag` already opened the dialog with the drag-induced
+    // dirty state — swallow this stray click so we don't reset it here.
+    if (suppressNextEventClick.value) {
+      suppressNextEventClick.value = false
+      return
+    }
+
     editEvent.value =
       isRecurringCalendarEvent(event) && event.event
         ? toCalendarEvent(event.event as EventItem)
         : event
     applyCalendarEventDateParts(editEvent.value)
-    forceEditDialogDirty.value = false
+    forceEditDialogDirtyFields.value = []
+    dragSnapshot.value = null
     showEditDialog.value = true
+  }
+
+  /**
+   * Records the pre-interaction state of a calendar event before drag/resize
+   * mutates its numeric start/end fields (and, in endDrag, its nested event
+   * payload). Used to roll back local mutations when the user discards the
+   * changes from the edit dialog.
+   */
+  function captureDragSnapshot(target: CalendarEvent) {
+    dragSnapshot.value = {
+      target,
+      start: target.start,
+      end: target.end,
+      event: target.event,
+    }
+  }
+
+  /**
+   * Reverts the captured drag/resize snapshot on the original calendar entry.
+   */
+  function restoreDragSnapshot() {
+    const snapshot = dragSnapshot.value
+    if (!snapshot) {
+      return
+    }
+
+    snapshot.target.start = snapshot.start
+    snapshot.target.end = snapshot.end
+    snapshot.target.event = snapshot.event
+    dragSnapshot.value = null
   }
 
   /**
@@ -980,6 +1076,11 @@ export function useSaplingEvent() {
       }
 
       createEvent.value = null
+      // Clear the drag-induced forced-dirty fields once the save succeeded so
+      // that the dialog reflects the freshly persisted state (clean cancel,
+      // disabled save buttons) instead of staying "dirty" forever.
+      forceEditDialogDirtyFields.value = []
+      dragSnapshot.value = null
       await refreshVisibleEvents()
 
       if (action === 'saveAndClose') {
@@ -1021,9 +1122,10 @@ export function useSaplingEvent() {
    * Restores the calendar state after the edit dialog is dismissed.
    */
   async function onEditDialogCancel() {
+    restoreDragSnapshot()
     showEditDialog.value = false
     editEvent.value = null
-    forceEditDialogDirty.value = false
+    forceEditDialogDirtyFields.value = []
     await refreshVisibleEvents()
   }
 
@@ -1194,7 +1296,11 @@ export function useSaplingEvent() {
       }
 
       const typeRecord = (event.event as EventItem | undefined)?.type
-      return typeRecord?.showInDefaultCalendar !== false
+      if (typeRecord?.showInDefaultCalendar === false) {
+        return false
+      }
+
+      return typeRecord?.isStandardCalendar !== false
     })
   }
 
@@ -1632,7 +1738,7 @@ export function useSaplingEvent() {
 
   //#region Return
   return {
-    forceEditDialogDirty,
+    forceEditDialogDirtyFields,
     calendarScrollContainer,
     calendarDisplayType,
     calendarType,

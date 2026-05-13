@@ -15,8 +15,6 @@
 
     <SaplingEventAgendaPanel
       :upcoming-events="upcomingEvents"
-      :current-calendar-view-label="currentCalendarViewLabel"
-      :current-calendar-layout-label="currentCalendarLayoutLabel"
       @open-event="emit('openEvent', $event)"
     />
   </aside>
@@ -35,8 +33,6 @@ import type {
 defineProps<{
   isMobileFilterLayout: boolean
   upcomingEvents: EventAgendaItem[]
-  currentCalendarViewLabel: string
-  currentCalendarLayoutLabel: string
   selectedPeoples: number[]
   selectedPeoplePreview: SelectedPersonPreviewItem[]
   selectedPeopleOverflowCount: number

@@ -160,4 +160,63 @@ describe('GenericPayloadService', () => {
       title: 'After',
     });
   });
+
+  it('removes inverse one-to-many relations from update payloads', () => {
+    const referenceService = {
+      reduceReferenceFields: jest.fn(
+        (template: EntityTemplateDto[], data: object) => {
+          const nextData = { ...(data as Record<string, unknown>) };
+
+          for (const field of template.filter((entry) => entry.isReference)) {
+            if (field.kind === '1:m') {
+              delete nextData[field.name];
+              continue;
+            }
+
+            if (
+              (field.kind === 'm:n' || field.kind === 'n:m') &&
+              Array.isArray(nextData[field.name])
+            ) {
+              nextData[field.name] = (
+                nextData[field.name] as Array<Record<string, unknown>>
+              ).map((entry) => entry.handle);
+            }
+          }
+
+          return nextData;
+        },
+      ),
+    };
+    const service = new GenericPayloadService(
+      referenceService as unknown as GenericReferenceService,
+    );
+
+    const result = service.prepareUpdatePayload(
+      [
+        createTemplateField({ name: 'phone', type: 'string' }),
+        createTemplateField({
+          name: 'createdTickets',
+          isReference: true,
+          kind: '1:m',
+          referencedPks: ['handle'],
+        }),
+        createTemplateField({
+          name: 'roles',
+          isReference: true,
+          kind: 'm:n',
+          referencedPks: ['handle'],
+        }),
+      ],
+      {
+        phone: '+49 1234567890',
+        createdTickets: [{ handle: 1 }, { handle: 2 }],
+        roles: [{ handle: 5 }, { handle: 6 }],
+      },
+    );
+
+    expect(result).toEqual({
+      phone: '+49 1234567890',
+      roles: [5, 6],
+    });
+  });
 });

@@ -1,6 +1,8 @@
 <template>
   <article
     class="sapling-inbox-entry glass-panel"
+    :class="{ 'sapling-inbox-entry--expanded': expanded }"
+    :style="entryStyle(entry)"
     role="button"
     tabindex="0"
     @click="emit('open', entry)"
@@ -9,10 +11,7 @@
   >
     <div class="sapling-inbox-entry__meta-row">
       <div class="sapling-inbox-entry__kind">
-        <span
-          class="sapling-inbox-entry__kind-indicator"
-          :style="entryAccentStyle(entry.accentColor)"
-        ></span>
+        <span class="sapling-inbox-entry__kind-indicator"></span>
         <v-icon :icon="entry.icon" size="16" />
         <span>{{ $t(entry.kindLabelKey) }}</span>
       </div>
@@ -49,14 +48,25 @@
         </v-chip>
       </div>
 
-      <v-btn
-        icon="mdi-arrow-top-right"
-        variant="tonal"
-        color="primary"
-        size="small"
-        :title="$t('inbox.openEntry')"
-        @click.stop="emit('open', entry)"
-      />
+      <div class="sapling-inbox-entry__actions">
+        <v-btn
+          v-if="entry.dismissible"
+          icon="mdi-close"
+          variant="text"
+          color="primary"
+          size="small"
+          :title="$t('global.close')"
+          @click.stop="emit('dismiss', entry)"
+        />
+        <v-btn
+          icon="mdi-arrow-top-right"
+          variant="tonal"
+          color="primary"
+          size="small"
+          :title="$t('inbox.openEntry')"
+          @click.stop="emit('open', entry)"
+        />
+      </div>
     </div>
   </article>
 </template>
@@ -64,15 +74,50 @@
 <script setup lang="ts">
 import type { InboxEntry } from '@/composables/account/useSaplingInbox'
 
-defineProps<{
-  entry: InboxEntry
-}>()
+const themeColorKeys = new Set([
+  'primary',
+  'secondary',
+  'success',
+  'info',
+  'warning',
+  'error',
+  'surface',
+])
+
+withDefaults(
+  defineProps<{
+    entry: InboxEntry
+    expanded?: boolean
+  }>(),
+  {
+    expanded: false,
+  },
+)
 
 const emit = defineEmits<{
   (event: 'open', entry: InboxEntry): void
+  (event: 'dismiss', entry: InboxEntry): void
 }>()
 
-function entryAccentStyle(color?: string | null) {
-  return color ? { background: color } : undefined
+function resolveCssColor(color?: string | null) {
+  const normalizedColor = color?.trim()
+
+  if (!normalizedColor) {
+    return 'rgb(var(--v-theme-primary))'
+  }
+
+  if (themeColorKeys.has(normalizedColor)) {
+    return `rgb(var(--v-theme-${normalizedColor}))`
+  }
+
+  return normalizedColor
+}
+
+function entryStyle(entry: InboxEntry) {
+  const accentColor = entry.accentColor || entry.contextColor || entry.statusColor
+
+  return {
+    '--sapling-inbox-entry-accent-color': resolveCssColor(accentColor),
+  }
 }
 </script>

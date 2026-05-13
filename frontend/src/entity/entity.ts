@@ -428,6 +428,8 @@ export interface EventTypeItem extends SaplingGenericItem {
   icon: string | null
   /** Color used for displaying the event type */
   color: string
+  /** Indicates whether events of this type belong in the standard calendar view */
+  isStandardCalendar?: boolean
   /** Indicates whether events of this type are shown in the default calendar view and synchronized externally */
   showInDefaultCalendar?: boolean
   /** Events belonging to this event type */
@@ -582,6 +584,94 @@ export interface InformationItem extends SaplingGenericItem {
   person: PersonItem | number | null
   /** Creation date */
   createdAt: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a reusable Sapling inbox template.
+ */
+export interface InboxTemplateItem extends SaplingGenericItem {
+  /** Numeric primary key */
+  handle?: number | null
+  /** Internal display name for admins */
+  name: string
+  /** Optional description */
+  description?: string | null
+  /** Title template rendered for each notification */
+  titleTemplate: string
+  /** Markdown body template rendered for each notification */
+  bodyMarkdown: string
+  /** Whether the template is the default choice */
+  isDefault: boolean
+  /** Whether the template is active */
+  isActive: boolean
+  /** Linked entity */
+  entity: EntityItem | string
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a configurable Sapling inbox subscription.
+ */
+export interface InboxSubscriptionItem extends SaplingGenericItem {
+  /** Numeric primary key */
+  handle?: number | null
+  /** Visible description */
+  description: string
+  /** Recipient field path resolved from the entity context */
+  recipientField: string
+  /** Whether the subscription is active */
+  isActive: boolean
+  /** Linked entity */
+  entity: EntityItem | string
+  /** Trigger type such as afterInsert */
+  type: SaplingGenericItem | string
+  /** Associated template */
+  template: InboxTemplateItem | number
+  /** Optional loaded notifications */
+  notifications?: InboxNotificationItem[]
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a Sapling inbox notification stored for a recipient.
+ */
+export interface InboxNotificationItem extends SaplingGenericItem {
+  /** Numeric primary key */
+  handle?: number | null
+  /** Linked entity */
+  entity: EntityItem | string
+  /** Origin subscription */
+  subscription: InboxSubscriptionItem | number
+  /** Optional source template */
+  template?: InboxTemplateItem | number | null
+  /** Recipient */
+  recipientPerson: PersonItem | number
+  /** Triggering user */
+  createdBy: PersonItem | number
+  /** Handle of the referenced domain record */
+  referenceHandle?: string | null
+  /** Rendered notification title */
+  title: string
+  /** Rendered markdown body */
+  bodyMarkdown: string
+  /** Rendered plain-text body */
+  bodyText: string
+  /** Stored request metadata */
+  requestPayload?: Record<string, unknown> | null
+  /** Whether the notification has been read */
+  isRead: boolean
+  /** Read timestamp */
+  readAt?: Date | null
+  /** Creation date */
+  createdAt?: Date | null
   /** Last update date */
   updatedAt?: Date | null
 }

@@ -76,6 +76,7 @@ export class TeamsService {
     handle: number,
     payload: object | object[],
     currentUser: PersonItem,
+    relationExpressions: string[] = [],
   ): Promise<TeamsDeliveryItem[]> {
     const subscription = await this.em.findOne(
       TeamsSubscriptionItem,
@@ -115,6 +116,7 @@ export class TeamsService {
         item,
         currentUser,
         sender,
+        relationExpressions,
       });
 
       const delivery = new TeamsDeliveryItem();
@@ -308,6 +310,7 @@ export class TeamsService {
     item: object;
     currentUser: PersonItem;
     sender: PersonItem | null;
+    relationExpressions: string[];
   }): Promise<{
     createdBy: PersonItem;
     recipientPerson?: PersonItem;
@@ -335,6 +338,7 @@ export class TeamsService {
         ? await this.messageTemplateService.loadEntityContext(
             entityHandle,
             referenceHandle,
+            options.relationExpressions,
           )
         : (options.item as JsonRecord);
 
@@ -351,6 +355,10 @@ export class TeamsService {
     const bodyMarkdown = this.messageTemplateService.replacePlaceholders(
       bodySource,
       context,
+      {
+        entityHandle,
+        currentUser: options.currentUser,
+      },
     );
     const bodyHtml = this.messageTemplateService.renderMarkdown(bodyMarkdown);
 

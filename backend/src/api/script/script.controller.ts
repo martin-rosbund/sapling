@@ -124,27 +124,38 @@ export class ScriptController {
   @ApiOperation({
     summary: 'Run client-side script',
     description:
-      'Executes client-side script logic for the given entity and user.',
+      'Executes a named client-side script action for the supplied entity context and selected records.',
   })
   @ApiBody({
+    description:
+      'Payload containing the target entity, selected items, script action name, and an optional parameter object.',
     schema: {
       type: 'object',
       properties: {
         items: {
-          type: 'object',
-          description: 'Selected data records (object or array)',
+          description:
+            'Selected record payload passed to the script. This may be a single object or an array of objects.',
+          oneOf: [
+            { type: 'object' },
+            { type: 'array', items: { type: 'object' } },
+          ],
         },
         entity: {
           type: 'object',
-          description: 'Entity for which the script is executed',
+          description:
+            'Entity metadata that identifies the context in which the client-side script should run.',
+          additionalProperties: true,
         },
         name: {
           type: 'string',
-          description: 'Name of the client-side script action',
+          description: 'Registered client-side script action name.',
         },
         parameter: {
+          type: 'object',
           nullable: true,
-          description: 'Optional parameter payload for the script action',
+          description:
+            'Optional parameter payload forwarded to the client-side script action.',
+          additionalProperties: true,
         },
       },
       required: ['items', 'entity', 'name'],
@@ -152,7 +163,7 @@ export class ScriptController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Client script result',
+    description: 'Return value produced by the client-side script action.',
     schema: { type: 'object' },
   })
   @UseGuards(GenericPermissionGuard)
@@ -184,24 +195,33 @@ export class ScriptController {
   @ApiOperation({
     summary: 'Run server-side script',
     description:
-      'Executes server-side script logic for the given method, entity, and user.',
+      'Executes a server-side script lifecycle method for the supplied entity context and selected records.',
   })
   @ApiBody({
+    description:
+      'Payload containing the lifecycle method, selected items, and entity context for server-side script execution.',
     schema: {
       type: 'object',
       properties: {
         method: {
           type: 'string',
           enum: Object.keys(ScriptMethods),
-          description: 'Script lifecycle method',
+          description:
+            'Script lifecycle method to execute. The required permission is derived from this value.',
         },
         items: {
-          type: 'object',
-          description: 'Selected data records (object or array)',
+          description:
+            'Selected record payload passed to the script. This may be a single object or an array of objects.',
+          oneOf: [
+            { type: 'object' },
+            { type: 'array', items: { type: 'object' } },
+          ],
         },
         entity: {
           type: 'object',
-          description: 'Entity for which the script is executed',
+          description:
+            'Entity metadata that identifies the context in which the server-side script should run.',
+          additionalProperties: true,
         },
       },
       required: ['method', 'items', 'entity'],
@@ -209,7 +229,8 @@ export class ScriptController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Server script result',
+    description:
+      'Return value produced by the server-side script lifecycle method.',
     schema: { type: 'object' },
   })
   @UseGuards(GenericPermissionGuard)

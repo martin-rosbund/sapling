@@ -21,6 +21,7 @@
       <SaplingDialogMail />
       <SaplingDialogPhoneCall />
       <SaplingRecordTimeline />
+      <SaplingRecordChangeLog />
       <SaplingCommandPalette />
       <SaplingHelpDialog />
     </template>
@@ -54,6 +55,9 @@ const SaplingDialogPhoneCall = defineAsyncComponent(
 )
 const SaplingRecordTimeline = defineAsyncComponent(
   () => import('@/components/timeline/SaplingRecordTimeline.vue'),
+)
+const SaplingRecordChangeLog = defineAsyncComponent(
+  () => import('@/components/changeLog/SaplingRecordChangeLog.vue'),
 )
 const SaplingCommandPalette = defineAsyncComponent(
   () => import('@/components/system/SaplingCommandPalette.vue'),

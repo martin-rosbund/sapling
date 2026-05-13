@@ -24,19 +24,36 @@ export class KpiValueDto {
    * @type {number|object|TrendResultDto|SparklineMonthPointDto[]|SparklineDayPointDto[]|null}
    */
   @ApiProperty({
-    description: 'KPI value',
+    description:
+      'Computed KPI value. Depending on the KPI type this can be a single number, a trend comparison, a sparkline series, grouped rows, or another structured value.',
     oneOf: [
-      { type: 'number' },
+      { type: 'number', description: 'Single numeric KPI result.' },
       { $ref: getSchemaPath(TrendResultDto) },
-      { type: 'array', items: { $ref: getSchemaPath(SparklineMonthPointDto) } },
-      { type: 'array', items: { $ref: getSchemaPath(SparklineDayPointDto) } },
-      { type: 'array', items: { $ref: getSchemaPath(SparklineWeekPointDto) } },
+      {
+        type: 'array',
+        items: { $ref: getSchemaPath(SparklineMonthPointDto) },
+        description: 'Monthly sparkline series.',
+      },
+      {
+        type: 'array',
+        items: { $ref: getSchemaPath(SparklineDayPointDto) },
+        description: 'Daily sparkline series.',
+      },
+      {
+        type: 'array',
+        items: { $ref: getSchemaPath(SparklineWeekPointDto) },
+        description: 'Weekly sparkline series.',
+      },
       {
         type: 'array',
         items: { type: 'object', additionalProperties: true },
+        description: 'Grouped KPI rows for table-style results.',
       },
-      { type: 'object' },
-      { type: 'null' },
+      {
+        type: 'object',
+        description: 'Structured KPI result object for custom visualizations.',
+      },
+      { type: 'null', description: 'No KPI result is available.' },
     ],
     nullable: true,
   })

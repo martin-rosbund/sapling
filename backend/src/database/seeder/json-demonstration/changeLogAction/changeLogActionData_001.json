@@ -1,0 +1,23 @@
+[
+  {
+    "handle": "create",
+    "title": "Erstellt",
+    "description": "Datensatz wurde neu angelegt.",
+    "icon": "mdi-plus-circle-outline",
+    "color": "#4CAF50"
+  },
+  {
+    "handle": "update",
+    "title": "Geaendert",
+    "description": "Datensatz wurde aktualisiert.",
+    "icon": "mdi-pencil-circle-outline",
+    "color": "#FB8C00"
+  },
+  {
+    "handle": "delete",
+    "title": "Geloescht",
+    "description": "Datensatz wurde entfernt.",
+    "icon": "mdi-delete-outline",
+    "color": "#F44336"
+  }
+]

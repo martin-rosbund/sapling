@@ -26,7 +26,7 @@
 	{
 		"name": "Ticket Eingang bestaetigen",
 		"description": "Kurze Eingangsbestaetigung für neu angelegte Tickets.",
-		"bodyMarkdown": "Hallo,\n\nIhr Ticket **{{handle}}** zu **{{title}}** wurde erfasst.\n\n- Status: {{status.description}}\n- Prioritaet: {{priority.description}}\n- Start: {{startDate}}\n\nWir melden uns, sobald es ein Update gibt.",
+		"bodyMarkdown": "Hallo,\n\nIhr Ticket **{{number}}** zu **{{title}}** wurde erfasst.\n\n- Status: {{status.description}}\n- Prioritaet: {{priority.description}}\n- Start: {{startDate}}\n\nWir melden uns, sobald es ein Update gibt.",
 		"isDefault": true,
 		"isActive": true,
 		"entity": "ticket"
@@ -34,7 +34,7 @@
 	{
 		"name": "Ticket in Bearbeitung",
 		"description": "Statusmeldung, sobald ein Ticket aktiv bearbeitet wird.",
-		"bodyMarkdown": "Guten Tag,\n\nzu Ihrem Ticket **{{handle}}** gibt es ein Update:\n- Titel: {{title}}\n- Status: {{status.description}}\n- Prioritaet: {{priority.description}}\n- Deadline: {{deadlineDate}}\n\nWenn Sie noch Hinweise haben, antworten Sie bitte direkt hier.",
+		"bodyMarkdown": "Guten Tag,\n\nzu Ihrem Ticket **{{number}}** gibt es ein Update:\n- Titel: {{title}}\n- Status: {{status.description}}\n- Prioritaet: {{priority.description}}\n- Deadline: {{deadlineDate}}\n\nWenn Sie noch Hinweise haben, antworten Sie bitte direkt hier.",
 		"isDefault": false,
 		"isActive": true,
 		"entity": "ticket"
@@ -42,7 +42,7 @@
 	{
 		"name": "Ticket geloest",
 		"description": "Abschlussmeldung nach erfolgreicher Ticketbearbeitung.",
-		"bodyMarkdown": "Hallo,\n\nIhr Ticket **{{handle}}** wurde abgeschlossen.\n\n**Lösung**\n{{solutionDescription}}\n\nFalls noch etwas offen ist, melden Sie sich bitte direkt in diesem Chat.",
+		"bodyMarkdown": "Hallo,\n\nIhr Ticket **{{number}}** wurde abgeschlossen.\n\n**Lösung**\n{{solutionDescription}}\n\nFalls noch etwas offen ist, melden Sie sich bitte direkt in diesem Chat.",
 		"isDefault": false,
 		"isActive": true,
 		"entity": "ticket"

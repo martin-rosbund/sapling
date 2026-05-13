@@ -1,0 +1,50 @@
+[
+  {
+    "description": "Benachrichtigt den Ticketverantwortlichen über neue Tickets in Sapling Inbox.",
+    "recipientField": "assigneePerson",
+    "isActive": true,
+    "entity": "ticket",
+    "type": "afterInsert",
+    "template": 1
+  },
+  {
+    "description": "Benachrichtigt den Ticketverantwortlichen über Ticket-Änderungen in Sapling Inbox.",
+    "recipientField": "assigneePerson",
+    "isActive": true,
+    "entity": "ticket",
+    "type": "afterUpdate",
+    "template": 2
+  },
+  {
+    "description": "Benachrichtigt den verantwortlichen Vertrieb über neue Verkaufschancen.",
+    "recipientField": "assigneePerson",
+    "isActive": true,
+    "entity": "salesOpportunity",
+    "type": "afterInsert",
+    "template": 3
+  },
+  {
+    "description": "Benachrichtigt den verantwortlichen Vertrieb bei Opportunity-Änderungen.",
+    "recipientField": "assigneePerson",
+    "isActive": true,
+    "entity": "salesOpportunity",
+    "type": "afterUpdate",
+    "template": 4
+  },
+  {
+    "description": "Benachrichtigt alle Teilnehmer über neue Termine.",
+    "recipientField": "participants",
+    "isActive": true,
+    "entity": "event",
+    "type": "afterInsert",
+    "template": 5
+  },
+  {
+    "description": "Benachrichtigt alle Teilnehmer über Termin-Änderungen.",
+    "recipientField": "participants",
+    "isActive": true,
+    "entity": "event",
+    "type": "afterUpdate",
+    "template": 6
+  }
+]

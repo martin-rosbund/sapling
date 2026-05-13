@@ -14,18 +14,34 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class MemoryDto {
   /** Total memory (bytes) */
-  @ApiProperty({ example: 33441378304, description: 'Total' })
+  @ApiProperty({
+    example: 33441378304,
+    description: 'Total installed system memory in bytes.',
+  })
   total?: number;
   /** Free memory (bytes) */
-  @ApiProperty({ example: 16197595136, description: 'Free' })
+  @ApiProperty({
+    example: 16197595136,
+    description: 'Currently unused memory in bytes.',
+  })
   free?: number;
   /** Used memory (bytes) */
-  @ApiProperty({ example: 17243783168, description: 'Used' })
+  @ApiProperty({
+    example: 17243783168,
+    description: 'Currently allocated memory in bytes.',
+  })
   used?: number;
   /** Active memory (bytes) */
-  @ApiProperty({ example: 17243783168, description: 'Active' })
+  @ApiProperty({
+    example: 17243783168,
+    description:
+      'Memory actively in use by processes and the operating system in bytes.',
+  })
   active?: number;
   /** Available memory (bytes) */
-  @ApiProperty({ example: 16197595136, description: 'Available' })
+  @ApiProperty({
+    example: 16197595136,
+    description: 'Memory that can be allocated without swapping, in bytes.',
+  })
   available?: number;
 }

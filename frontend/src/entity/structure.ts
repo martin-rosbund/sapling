@@ -319,3 +319,35 @@ export type TimelineResponse = {
   hasMore: boolean
   months: TimelineMonth[]
 }
+
+export type ChangeLogAction = 'create' | 'update' | 'delete'
+
+export type ChangeLogDetail = {
+  property: string
+  oldValue?: unknown
+  newValue?: unknown
+}
+
+export type ChangeLogPerson = {
+  handle: string | number
+  firstName?: string
+  lastName?: string
+  email?: string
+}
+
+export type ChangeLogEntity = {
+  handle: string
+  icon?: string | null
+}
+
+export type ChangeLogEntry = {
+  handle: number
+  action: ChangeLogAction
+  reference: string
+  entity: ChangeLogEntity
+  person: ChangeLogPerson
+  oldPayload?: Record<string, unknown> | null
+  newPayload?: Record<string, unknown> | null
+  details: ChangeLogDetail[]
+  createdAt: string
+}

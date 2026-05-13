@@ -56,12 +56,16 @@
       @update:model-value="(val: string) => updateField(template.name, val)"
     />
     <SaplingFieldTeamsRecipient
-      v-else-if="entityHandle === 'teamsSubscription' && template.name === 'recipientField'"
+      v-else-if="
+        ['teamsSubscription', 'inboxSubscription'].includes(entityHandle) &&
+        template.name === 'recipientField'
+      "
       :label="requiredLabel"
       :model-value="stringValue(template.name) || null"
       :disabled="fieldDisabled"
       :rules="rules"
       :entity-reference="formValues.entity"
+      :allow-collection-recipients="entityHandle === 'inboxSubscription'"
       @update:model-value="(val: string | null) => updateField(template.name, val)"
     />
     <SaplingColorField
@@ -316,7 +320,7 @@ const SaplingFieldGenericReference = defineAsyncComponent(
   () => import('@/components/dialog/fields/SaplingFieldGenericReference.vue'),
 )
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   template: EntityTemplate
   entityHandle: string
   itemHandle?: string | number
@@ -330,7 +334,10 @@ const props = defineProps<{
   fieldDisabled: boolean
   referenceFieldDisabled: boolean
   referenceParentFilter?: FilterQuery
-}>()
+  showLabel?: boolean
+}>(), {
+  showLabel: true,
+})
 
 const emit = defineEmits<{
   (event: 'update-field', key: string, value: unknown): void
@@ -339,8 +346,20 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const plainLabel = computed(() => t(`${props.entityHandle}.${props.template.name}`))
-const requiredLabel = computed(() => `${plainLabel.value}${props.template.isRequired ? '*' : ''}`)
+const plainLabel = computed(() => {
+  if (!props.showLabel) {
+    return ''
+  }
+
+  return t(`${props.entityHandle}.${props.template.name}`)
+})
+const requiredLabel = computed(() => {
+  if (!props.showLabel) {
+    return ''
+  }
+
+  return `${plainLabel.value}${props.template.isRequired ? '*' : ''}`
+})
 const defaultPlaceholder = computed(() =>
   props.template.default != null ? String(props.template.default) : '',
 )
@@ -352,11 +371,7 @@ const canReadReference = computed(
     props.permissions?.find((entry) => entry.entityHandle === props.template.referenceName)
       ?.allowRead,
 )
-const jsonValue = computed(() =>
-  typeof props.formValues[props.template.name] === 'string'
-    ? null
-    : props.formValues[props.template.name],
-)
+const jsonValue = computed(() => props.formValues[props.template.name])
 
 function stringValue(fieldName: string): string {
   const value = props.formValues[fieldName]

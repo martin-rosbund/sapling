@@ -26,27 +26,45 @@ export class VectorizeEntityDto {
 }
 
 export class VectorizeEntityResponseDto {
-  @ApiProperty()
+  @ApiProperty({
+    description:
+      'Entity handle that was processed during the vectorization run.',
+  })
   entityHandle!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Embedding provider handle used for the run.',
+  })
   providerHandle!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Embedding model handle used for the run.',
+  })
   modelHandle!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Total number of source records evaluated for vectorization.',
+  })
   totalSourceRecords!: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Total number of vector documents considered during the run.',
+  })
   totalDocuments!: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Number of vector documents that were created or updated.',
+  })
   embeddedDocuments!: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    description:
+      'Number of source documents skipped because no update was required.',
+  })
   skippedDocuments!: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Number of obsolete vector documents removed during cleanup.',
+  })
   deletedDocuments!: number;
 }

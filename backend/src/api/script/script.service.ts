@@ -17,6 +17,8 @@ import { MailService } from '../mail/mail.service.js';
 import { EventDeliveryService } from '../../calendar/event.delivery.service.js';
 import { TeamsService } from '../teams/teams.service.js';
 import { TeamsSubscriptionItem } from '../../entity/TeamsSubscriptionItem.js';
+import { InboxService } from '../inbox/inbox.service.js';
+import { InboxSubscriptionItem } from '../../entity/InboxSubscriptionItem.js';
 
 // #region Enum
 /**
@@ -103,6 +105,7 @@ export class ScriptService {
     private readonly mailService: MailService,
     private readonly eventDeliveryService: EventDeliveryService,
     private readonly teamsService: TeamsService,
+    private readonly inboxService: InboxService,
   ) {}
   // #endregion
 
@@ -478,6 +481,25 @@ export class ScriptService {
             },
           },
         );
+        const inboxSubscriptions = await this.em.findAll(
+          InboxSubscriptionItem,
+          {
+            where: {
+              entity: { handle: entity.handle },
+              type: { handle: ScriptMethods[method] },
+              isActive: true,
+            },
+          },
+        );
+        const subscriptionPayloadItems = Array.isArray(items) ? items : [items];
+        await this.populateRecipientRelations(subscriptionPayloadItems, [
+          ...teamsSubscriptions.map(
+            (subscription) => subscription.recipientField,
+          ),
+          ...inboxSubscriptions.map(
+            (subscription) => subscription.recipientField,
+          ),
+        ]);
 
         if (webhookSubscriptions.length > 0) {
           for (const subscription of webhookSubscriptions) {
@@ -501,14 +523,35 @@ export class ScriptService {
               );
               await this.teamsService.querySubscription(
                 subscription.handle,
-                Array.isArray(items) ? items : [items],
+                subscriptionPayloadItems,
                 user,
+                [subscription.recipientField],
               );
             }
           }
         }
 
-        if (webhookSubscriptions.length > 0 || teamsSubscriptions.length > 0) {
+        if (inboxSubscriptions.length > 0) {
+          for (const subscription of inboxSubscriptions) {
+            if (subscription?.handle) {
+              global.log.info(
+                `Processing inbox subscription: ${subscription.handle}`,
+              );
+              await this.inboxService.querySubscription(
+                subscription.handle,
+                subscriptionPayloadItems,
+                user,
+                [subscription.recipientField],
+              );
+            }
+          }
+        }
+
+        if (
+          webhookSubscriptions.length > 0 ||
+          teamsSubscriptions.length > 0 ||
+          inboxSubscriptions.length > 0
+        ) {
           if (user) {
             const executionTime = (performance.now() - startTime) / 1000;
             global.log.debug(
@@ -523,6 +566,55 @@ export class ScriptService {
     }
 
     return result;
+  }
+
+  private async populateRecipientRelations(
+    items: object[],
+    relationExpressions: string[],
+  ): Promise<void> {
+    const populate = [
+      ...new Set(
+        relationExpressions.flatMap((expression) =>
+          this.expandRelationExpression(expression),
+        ),
+      ),
+    ];
+
+    if (populate.length === 0) {
+      return;
+    }
+
+    for (const item of items) {
+      if (
+        !item ||
+        typeof item !== 'object' ||
+        Array.isArray(item) ||
+        item.constructor === Object
+      ) {
+        continue;
+      }
+
+      try {
+        await this.em.populate(item, populate as never[]);
+      } catch (error) {
+        global.log.warn(
+          `scriptService - populateRecipientRelations failed: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+      }
+    }
+  }
+
+  private expandRelationExpression(expression: string): string[] {
+    const segments = expression
+      .split('.')
+      .map((segment) => segment.trim())
+      .filter(Boolean);
+
+    return segments.map((_segment, index) =>
+      segments.slice(0, index + 1).join('.'),
+    );
   }
   // #endregion
 }

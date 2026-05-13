@@ -7,6 +7,7 @@ import {
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -46,16 +47,18 @@ export class GithubController {
    */
   @Get('repository')
   @ApiOperation({
-    summary: 'Repository information',
-    description: 'Returns information about the configured GitHub repository.',
+    summary: 'Get repository details',
+    description:
+      'Returns metadata for the GitHub repository configured for the Sapling integration.',
   })
   @ApiResponse({
     status: 200,
-    description: 'Informationen zum konfigurierten GitHub-Repository.',
+    description: 'Configured GitHub repository details.',
     type: GithubRepositoryDto,
   })
   @ApiUnauthorizedResponse({
-    description: 'Der Zugriff auf die GitHub-API wurde nicht autorisiert.',
+    description:
+      'GitHub access is not authorized for the current request or integration configuration.',
   })
   getRepository(): Promise<GithubRepositoryDto> {
     return this.githubService.getRepository();
@@ -67,17 +70,19 @@ export class GithubController {
    */
   @Get('releases')
   @ApiOperation({
-    summary: 'Fetch releases',
-    description: 'Returns all releases of the configured GitHub repository.',
+    summary: 'List repository releases',
+    description:
+      'Returns the published releases of the GitHub repository configured for the Sapling integration.',
   })
   @ApiResponse({
     status: 200,
-    description: 'Alle Releases des konfigurierten GitHub-Repositories.',
+    description: 'Published releases of the configured GitHub repository.',
     type: GithubReleaseDto,
     isArray: true,
   })
   @ApiUnauthorizedResponse({
-    description: 'Der Zugriff auf die GitHub-API wurde nicht autorisiert.',
+    description:
+      'GitHub access is not authorized for the current request or integration configuration.',
   })
   getReleases(): Promise<GithubReleaseDto[]> {
     return this.githubService.getReleases();
@@ -90,21 +95,29 @@ export class GithubController {
    */
   @Get('issues')
   @ApiOperation({
-    summary: 'Fetch issues by status',
+    summary: 'List repository issues',
     description:
-      'Returns issues of the configured GitHub repository by status (open, closed, all).',
+      'Returns GitHub issues for the configured repository, optionally filtered by status.',
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: GithubIssueStatus,
+    description: 'Issue state filter. Defaults to open.',
+    example: GithubIssueStatus.OPEN,
   })
   @ApiResponse({
     status: 200,
-    description: 'GitHub-Issues des konfigurierten Repositories.',
+    description: 'GitHub issues from the configured repository.',
     type: GithubIssueDto,
     isArray: true,
   })
   @ApiBadRequestResponse({
-    description: 'Der angegebene Issue-Status ist ungültig.',
+    description: 'The supplied issue status filter is invalid.',
   })
   @ApiUnauthorizedResponse({
-    description: 'Der Zugriff auf die GitHub-API wurde nicht autorisiert.',
+    description:
+      'GitHub access is not authorized for the current request or integration configuration.',
   })
   getIssues(
     @Query() query: GithubIssueStatusQueryDto,
@@ -121,23 +134,23 @@ export class GithubController {
   @ApiOperation({
     summary: 'Create a GitHub issue',
     description:
-      'Creates a new issue in the configured GitHub repository and stores the selected type as metadata.',
+      'Creates a new issue in the configured GitHub repository and stores the selected issue type as metadata.',
   })
   @ApiBody({ type: CreateGithubIssueDto })
   @ApiCreatedResponse({
-    description: 'Das GitHub-Issue wurde erfolgreich erstellt.',
+    description: 'Newly created GitHub issue.',
     type: GithubIssueDto,
   })
   @ApiBadRequestResponse({
-    description: 'Die Nutzdaten des neuen GitHub-Issues sind ungültig.',
+    description: 'The issue payload is invalid.',
   })
   @ApiUnauthorizedResponse({
     description:
-      'Der aktuelle Benutzer oder das GitHub-Token ist nicht für das Erstellen von Issues berechtigt.',
+      'The current user or configured GitHub token is not authorized to create issues.',
   })
   @ApiInternalServerErrorResponse({
     description:
-      'Die GitHub-Integration ist nicht korrekt konfiguriert oder die Erstellung ist intern fehlgeschlagen.',
+      'The GitHub integration is misconfigured or issue creation failed internally.',
   })
   createIssue(@Body() issueDto: CreateGithubIssueDto): Promise<GithubIssueDto> {
     return this.githubService.createIssue(issueDto);

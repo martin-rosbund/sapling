@@ -6,51 +6,39 @@
     content-class="sapling-context-menu__content"
     transition="slide-y-transition"
   >
-    <v-list density="compact" elevation="8" min-width="200" class="glass-panel">
-      <v-list-item
-        v-for="menuItem in menuItems"
-        :key="`${menuItem.type}-${String(menuItem.scriptButton?.handle ?? menuItem.mailAction?.email ?? menuItem.titleKey ?? menuItem.title ?? '')}`"
-        :prepend-icon="menuItem.icon"
-        :title="resolveMenuItemTitle(menuItem.titleKey, menuItem.title)"
-        @click="emitAction(menuItem.type, menuItem.scriptButton, menuItem.mailAction)"
-      >
-      </v-list-item>
-      <v-list-item prepend-icon="mdi-close" :title="$t('global.close')" @click="closeMenu">
-      </v-list-item>
-    </v-list>
+    <SaplingRecordActionMenuList
+      class="glass-panel"
+      density="compact"
+      elevation="8"
+      min-width="200"
+      :menu-items="menuItems"
+      :show-close-item="true"
+      :show-edit="props.showEdit"
+      @select="(menuItem) => emitAction(menuItem.type, menuItem.scriptButton, menuItem.mailAction)"
+      @close="closeMenu"
+    />
   </v-menu>
 </template>
 
 <script lang="ts" setup>
-import { useI18n } from 'vue-i18n'
 import {
   useSaplingContextMenuTable,
   type SaplingContextMenuTableActionPayload,
   type SaplingContextMenuTableProps,
 } from '@/composables/context/useSaplingContextMenuTable'
+import SaplingRecordActionMenuList from '@/components/common/SaplingRecordActionMenuList.vue'
 
-const props = defineProps<SaplingContextMenuTableProps>()
+const props = withDefaults(defineProps<SaplingContextMenuTableProps>(), {
+  showEdit: true,
+})
 
 const emit = defineEmits<{
   (event: 'action', payload: SaplingContextMenuTableActionPayload): void
   (event: 'update:show', value: boolean): void
 }>()
-const { t, te } = useI18n()
 
 const { menuVisible, menuStyle, menuItems, closeMenu, emitAction } = useSaplingContextMenuTable(
   props,
   emit,
 )
-
-function resolveMenuItemTitle(titleKey?: string, title?: string | null) {
-  if (titleKey) {
-    return t(titleKey)
-  }
-
-  if (!title) {
-    return ''
-  }
-
-  return te(title) ? t(title) : title
-}
 </script>

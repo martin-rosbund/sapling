@@ -93,7 +93,7 @@ describe('CurrentService', () => {
     const em = {
       fork,
     };
-    const service = new CurrentService(em as never);
+    const service = new CurrentService(em as never, {} as never);
 
     const result = await service.getPerson({ handle: 7 });
 
@@ -131,43 +131,56 @@ describe('CurrentService', () => {
     expect(result).toEqual({ handle: 7, roles: [] });
   });
 
-  it('counts open tasks via database count queries instead of loading full lists', async () => {
-    const count = jest
-      .fn<(...args: unknown[]) => Promise<number>>()
-      .mockResolvedValueOnce(3)
-      .mockResolvedValueOnce(5)
-      .mockResolvedValueOnce(2);
-    const find = jest.fn();
+  it('builds an open-task snapshot from the assigned records and unread notifications', async () => {
+    const ticket = { handle: 1 };
+    const event = { handle: 2 };
+    const salesOpportunity = { handle: 3 };
+    const notification = { handle: 4 };
+    const find = jest
+      .fn<(...args: unknown[]) => Promise<unknown[]>>()
+      .mockResolvedValueOnce([ticket])
+      .mockResolvedValueOnce([event])
+      .mockResolvedValueOnce([salesOpportunity]);
     const em = {
-      count,
       find,
     };
-    const service = new CurrentService(em as never);
+    const inboxService = {
+      getUnreadNotifications: jest.fn(async () => [notification]),
+    };
+    const service = new CurrentService(em as never, inboxService as never);
 
-    const result = await service.countOpenTasks({
+    const result = await service.getOpenTaskSnapshot({
       handle: 7,
     } as never);
 
-    expect(result).toEqual({ count: 10 });
-    expect(count).toHaveBeenCalledTimes(3);
-    expect(find).not.toHaveBeenCalled();
-    expect(count.mock.calls[0]?.[1]).toEqual(
-      expect.objectContaining({
-        participants: { handle: 7 },
-        status: { handle: { $nin: ['canceled', 'completed'] } },
-      }),
-    );
-    expect(count.mock.calls[1]?.[1]).toEqual(
+    expect(result).toEqual({
+      count: 4,
+      tickets: [ticket],
+      tasks: [event],
+      salesOpportunities: [salesOpportunity],
+      notifications: [notification],
+    });
+    expect(find).toHaveBeenCalledTimes(3);
+    expect(find.mock.calls[0]?.[1]).toEqual(
       expect.objectContaining({
         assigneePerson: { handle: 7 },
         status: { handle: { $nin: ['closed'] } },
       }),
     );
-    expect(count.mock.calls[2]?.[1]).toEqual(
+    expect(find.mock.calls[1]?.[1]).toEqual(
+      expect.objectContaining({
+        participants: { handle: 7 },
+        status: { handle: { $nin: ['canceled', 'completed'] } },
+      }),
+    );
+    expect(find.mock.calls[2]?.[1]).toEqual(
       expect.objectContaining({
         assigneePerson: { handle: 7 },
         isActive: true,
       }),
     );
+    expect(inboxService.getUnreadNotifications).toHaveBeenCalledWith({
+      handle: 7,
+    });
   });
 });

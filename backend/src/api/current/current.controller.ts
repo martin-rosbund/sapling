@@ -7,12 +7,17 @@ import {
   BadRequestException,
   Param,
   Query,
+  Sse,
+  MessageEvent,
+  Header,
 } from '@nestjs/common';
 import { CurrentService } from './current.service';
 import { CurrentMetadataService } from './current-metadata.service';
+import { OpenTaskEventsService } from './open-task-events.service';
 import { PersonItem } from '../../entity/PersonItem';
 import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
 import type { Request } from 'express';
+import { concatMap, from, map, Observable } from 'rxjs';
 import {
   ApiBearerAuth,
   ApiParam,
@@ -20,10 +25,10 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBody,
+  ApiProduces,
+  ApiQuery,
 } from '@nestjs/swagger';
-import { TicketItem } from '../../entity/TicketItem';
-import { EventItem } from '../../entity/EventItem';
-import { SalesOpportunityItem } from '../../entity/SalesOpportunityItem';
+import { InboxNotificationItem } from '../../entity/InboxNotificationItem';
 import { AccumulatedPermissionDto } from './dto/accumulated-permission.dto';
 import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
 import { UseGuards } from '@nestjs/common';
@@ -41,14 +46,6 @@ import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth
  *                  Get the current logged-in user profile.
  * @method          changePassword(req: Request, newPassword: string, confirmPassword: string): Promise<void>
  *                  Change the password for the current user.
- * @method          getOpenTickets(req: Request): Promise<TicketItem[]>
- *                  Get all open tickets assigned to the current user.
- * @method          getOpenEvents(req: Request): Promise<EventItem[]>
- *                  Get all open events assigned to the current user.
- * @method          getOpenSalesOpportunities(req: Request): Promise<SalesOpportunityItem[]>
- *                  Get all open sales opportunities assigned to the current user.
- * @method          countOpenTasks(req: Request): Promise<{ count: number }>
- *                  Get the count of open tasks for the current user.
  * @method          getAllEntityPermissions(req: Request): AccumulatedPermissionDto[]
  *                  Get all entity permissions for the current user.
  * @method          getEntityPermission(req: Request, entityHandle: string): AccumulatedPermissionDto
@@ -72,6 +69,7 @@ export class CurrentController {
   constructor(
     private readonly currentService: CurrentService,
     private readonly currentMetadataService: CurrentMetadataService,
+    private readonly openTaskEventsService: OpenTaskEventsService,
   ) {}
 
   /**
@@ -81,13 +79,13 @@ export class CurrentController {
    */
   @Get('person')
   @ApiOperation({
-    summary: 'Get current user profile',
+    summary: 'Get the current user profile',
     description:
-      'Returns the current logged-in user (PersonItem) from the request.',
+      'Returns the authenticated Sapling user profile, including persisted user details when available.',
   })
   @ApiResponse({
     status: 200,
-    description: 'Current user profile',
+    description: 'Authenticated user profile.',
     type: PersonItem,
   })
   async getPerson(@Req() req: Request): Promise<PersonItem> {
@@ -106,7 +104,8 @@ export class CurrentController {
   @Post('changePassword')
   @ApiOperation({
     summary: 'Change current user password',
-    description: 'Changes the password for the current user.',
+    description:
+      'Changes the password of the authenticated user. Both password fields must be present and match exactly.',
   })
   @ApiBody({
     schema: {
@@ -121,10 +120,14 @@ export class CurrentController {
       required: ['newPassword', 'confirmPassword'],
     },
   })
-  @ApiResponse({ status: 200, description: 'Password changed successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Password updated successfully.',
+  })
   @ApiResponse({
     status: 400,
-    description: 'Bad request: passwords missing or do not match',
+    description:
+      'Validation failed because one or both password fields are missing, or the values do not match.',
   })
   async changePassword(
     @Req() req: Request,
@@ -141,92 +144,55 @@ export class CurrentController {
     await this.currentService.changePassword(user, newPassword);
   }
 
-  /**
-   * Get all open tickets assigned to the current user.
-   * @param req Express request object
-   * @returns Array of open tickets
-   */
-  @Get('openTickets')
+  @Sse('openTaskCountEvents')
+  @Header('Cache-Control', 'no-cache, no-transform')
+  @Header('X-Accel-Buffering', 'no')
   @ApiOperation({
-    summary: 'Get open tickets',
-    description: 'Returns all open tickets assigned to the current user.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'List of open tickets',
-    type: [TicketItem],
-  })
-  async getOpenTickets(@Req() req: Request): Promise<TicketItem[]> {
-    const user = req.user as PersonItem;
-    return this.currentService.getOpenTickets(user);
-  }
-
-  /**
-   * Get all open events assigned to the current user.
-   * @param req Express request object
-   * @returns Array of open events
-   */
-  @Get('openEvents')
-  @ApiOperation({
-    summary: 'Get open events',
-    description: 'Returns all open events assigned to the current user.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'List of open events',
-    type: [EventItem],
-  })
-  async getOpenEvents(@Req() req: Request): Promise<EventItem[]> {
-    const user = req.user as PersonItem;
-    return this.currentService.getOpenEvents(user);
-  }
-
-  /**
-   * Get all open sales opportunities assigned to the current user.
-   * @param req Express request object
-   * @returns Array of open sales opportunities
-   */
-  @Get('openSalesOpportunities')
-  @ApiOperation({
-    summary: 'Get open sales opportunities',
+    summary: 'Subscribe to open task count updates',
     description:
-      'Returns all open sales opportunities assigned to the current user.',
+      "Opens a server-sent event stream that emits the current open-task snapshot whenever the authenticated user's task count changes.",
   })
+  @ApiProduces('text/event-stream')
   @ApiResponse({
     status: 200,
-    description: 'List of open sales opportunities',
-    type: [SalesOpportunityItem],
+    description:
+      'Server-sent event stream with open-task snapshot events for the authenticated user.',
   })
-  async getOpenSalesOpportunities(
-    @Req() req: Request,
-  ): Promise<SalesOpportunityItem[]> {
+  streamOpenTaskCountEvents(@Req() req: Request): Observable<MessageEvent> {
     const user = req.user as PersonItem;
-    return this.currentService.getOpenSalesOpportunities(user);
+    return this.openTaskEventsService.streamForUser(user?.handle).pipe(
+      concatMap(() => from(this.currentService.getOpenTaskSnapshot(user))),
+      map(
+        (snapshot): MessageEvent => ({
+          type: 'open-task-snapshot',
+          retry: 5000,
+          data: snapshot,
+        }),
+      ),
+    );
   }
 
-  /**
-   * Get the count of open tasks for the current user.
-   * @param req Express request object
-   * @returns Number of open tasks
-   */
-  @Get('countOpenTasks')
+  @Post('inboxNotification/:handle/read')
   @ApiOperation({
-    summary: 'Count open tasks',
-    description: 'Returns the count of open tasks for the current user.',
+    summary: 'Mark inbox notification as read',
+    description:
+      'Marks one Sapling inbox notification as read for the authenticated user and returns the updated notification record.',
+  })
+  @ApiParam({
+    name: 'handle',
+    description: 'Numeric handle of the inbox notification to update.',
   })
   @ApiResponse({
     status: 200,
-    description: 'Number of open tasks',
-    schema: {
-      type: 'object',
-      properties: {
-        count: { type: 'number', description: 'Number of open tasks' },
-      },
-    },
+    description: 'Updated inbox notification record.',
+    type: InboxNotificationItem,
   })
-  async countOpenTasks(@Req() req: Request): Promise<{ count: number }> {
+  async markInboxNotificationRead(
+    @Req() req: Request,
+    @Param('handle') handle: string,
+  ): Promise<InboxNotificationItem> {
     const user = req.user as PersonItem;
-    return this.currentService.countOpenTasks(user);
+    return this.currentService.markInboxNotificationRead(Number(handle), user);
   }
 
   /**
@@ -237,11 +203,13 @@ export class CurrentController {
   @Get('permission')
   @ApiOperation({
     summary: 'Get all entity permissions',
-    description: 'Returns all entity permissions for the current user.',
+    description:
+      'Returns the resolved permission set for every entity available to the authenticated user.',
   })
   @ApiResponse({
     status: 200,
-    description: 'Permissions for all entities',
+    description:
+      'Resolved permissions for all entities available to the authenticated user.',
     type: [AccumulatedPermissionDto],
   })
   getAllEntityPermissions(@Req() req: Request): AccumulatedPermissionDto[] {
@@ -260,11 +228,20 @@ export class CurrentController {
   @ApiOperation({
     summary: 'Get entity metadata batch',
     description:
-      'Returns entity, template and current-user permission metadata for one or more entities.',
+      'Returns entity definitions, template metadata, and current-user permissions for one or more entity handles in a single request.',
+  })
+  @ApiQuery({
+    name: 'entities',
+    required: true,
+    description:
+      'Comma-separated list of entity handles to resolve in one metadata request.',
+    example: 'ticket,person,project',
+    type: String,
   })
   @ApiResponse({
     status: 200,
-    description: 'Metadata for requested entities',
+    description:
+      'Metadata bundle containing entity definitions, templates, and permission snapshots for the requested entities.',
   })
   async getEntityMetadata(
     @Req() req: Request,
@@ -296,21 +273,21 @@ export class CurrentController {
   @ApiOperation({
     summary: 'Get entity permissions',
     description:
-      'Returns entity permissions for the current user and a specific entity.',
+      'Returns the resolved permission set for the authenticated user on one specific entity.',
   })
   @ApiParam({
     name: 'entityHandle',
-    description: 'Name of the entity',
+    description: 'Registered Sapling entity handle.',
     enum: ENTITY_HANDLES,
   })
   @ApiResponse({
     status: 200,
-    description: 'Permissions for the specified entity',
+    description: 'Resolved permissions for the requested entity.',
     type: AccumulatedPermissionDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Bad request: entityHandle is required',
+    description: 'The entityHandle path parameter is missing or invalid.',
   })
   getEntityPermission(
     @Req() req: Request,
@@ -330,12 +307,13 @@ export class CurrentController {
    */
   @Get('workWeek')
   @ApiOperation({
-    summary: 'Get work week',
-    description: 'Returns the work week configuration for the current user.',
+    summary: 'Get the current work week configuration',
+    description:
+      'Returns the work week configuration that is currently assigned to the authenticated user.',
   })
   @ApiResponse({
     status: 200,
-    description: 'Work week configuration',
+    description: 'Work week configuration for the authenticated user.',
     type: WorkHourWeekItem,
   })
   getWorkWeek(@Req() req: Request): Promise<WorkHourWeekItem | null> {

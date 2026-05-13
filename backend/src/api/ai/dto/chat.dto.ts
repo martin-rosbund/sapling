@@ -228,20 +228,35 @@ export class ListAiChatMessagesQueryDto {
 }
 
 export class AiChatMessageListMetaDto {
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Maximum number of messages requested for the current page.',
+  })
   limit!: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Indicates whether older messages are still available.',
+  })
   hasMore!: boolean;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({
+    nullable: true,
+    description:
+      'Cursor value that can be sent as beforeSequence to load the next older page.',
+  })
   nextBeforeSequence!: number | null;
 }
 
 export class AiChatMessageListResponseDto {
-  @ApiProperty({ type: AiChatMessageItem, isArray: true })
+  @ApiProperty({
+    type: AiChatMessageItem,
+    isArray: true,
+    description: 'Persisted chat messages for the requested session page.',
+  })
   data: AiChatMessageItem[] = [];
 
-  @ApiProperty({ type: AiChatMessageListMetaDto })
+  @ApiProperty({
+    type: AiChatMessageListMetaDto,
+    description: 'Pagination metadata for requesting older messages.',
+  })
   meta: AiChatMessageListMetaDto = new AiChatMessageListMetaDto();
 }

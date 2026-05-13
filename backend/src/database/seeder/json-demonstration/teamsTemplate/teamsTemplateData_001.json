@@ -26,7 +26,7 @@
 	{
 		"name": "Ticket Eingang bestaetigen",
 		"description": "Kurze Eingangsbestaetigung für neu angelegte Tickets.",
-		"bodyMarkdown": "Hallo,\n\nIhr Ticket **{{handle}}** zu **{{title}}** wurde erfasst.\n\n- Status: {{status.description}}\n- Prioritaet: {{priority.description}}\n- Start: {{startDate}}\n\nWir melden uns, sobald es ein Update gibt.",
+		"bodyMarkdown": "Hallo,\n\nIhr Ticket **{{number}}** zu **{{title}}** wurde erfasst.\n\n- Status: {{status.description}}\n- Prioritaet: {{priority.description}}\n- Start: {{startDate | dateTime}}\n\nWir melden uns, sobald es ein Update gibt.",
 		"isDefault": true,
 		"isActive": true,
 		"entity": "ticket"
@@ -34,7 +34,7 @@
 	{
 		"name": "Ticket in Bearbeitung",
 		"description": "Statusmeldung, sobald ein Ticket aktiv bearbeitet wird.",
-		"bodyMarkdown": "Guten Tag,\n\nzu Ihrem Ticket **{{handle}}** gibt es ein Update:\n- Titel: {{title}}\n- Status: {{status.description}}\n- Prioritaet: {{priority.description}}\n- Deadline: {{deadlineDate}}\n\nWenn Sie noch Hinweise haben, antworten Sie bitte direkt hier.",
+		"bodyMarkdown": "Guten Tag,\n\nzu Ihrem Ticket **{{number}}** gibt es ein Update:\n- Titel: {{title}}\n- Status: {{status.description}}\n- Prioritaet: {{priority.description}}\n- Deadline: {{deadlineDate | dateTime}}\n\nWenn Sie noch Hinweise haben, antworten Sie bitte direkt hier.",
 		"isDefault": false,
 		"isActive": true,
 		"entity": "ticket"
@@ -42,7 +42,7 @@
 	{
 		"name": "Ticket geloest",
 		"description": "Abschlussmeldung nach erfolgreicher Ticketbearbeitung.",
-		"bodyMarkdown": "Hallo,\n\nIhr Ticket **{{handle}}** wurde abgeschlossen.\n\n**Lösung**\n{{solutionDescription}}\n\nFalls noch etwas offen ist, melden Sie sich bitte direkt in diesem Chat.",
+		"bodyMarkdown": "Hallo,\n\nIhr Ticket **{{number}}** wurde abgeschlossen.\n\n**Lösung**\n{{solutionDescription}}\n\nFalls noch etwas offen ist, melden Sie sich bitte direkt in diesem Chat.",
 		"isDefault": false,
 		"isActive": true,
 		"entity": "ticket"
@@ -50,7 +50,7 @@
 	{
 		"name": "Vertrag zur Freigabe",
 		"description": "Teams-Nachricht zur Abstimmung eines neuen Vertragsentwurfs.",
-		"bodyMarkdown": "Guten Tag,\n\nIhr Vertragsentwurf **{{title}}** liegt zur Prüfung bereit.\n\n- Beginn: {{startDate}}\n- Ende: {{endDate}}\n- Unternehmen: {{company.name}}\n\nBitte geben Sie die Freigabe oder Änderungswuensche direkt hier durch.",
+		"bodyMarkdown": "Guten Tag,\n\nIhr Vertragsentwurf **{{title}}** liegt zur Prüfung bereit.\n\n- Beginn: {{startDate | dateTime}}\n- Ende: {{endDate | dateTime}}\n- Unternehmen: {{company.name}}\n\nBitte geben Sie die Freigabe oder Änderungswuensche direkt hier durch.",
 		"isDefault": true,
 		"isActive": true,
 		"entity": "contract"
@@ -58,7 +58,7 @@
 	{
 		"name": "Vertragsverlängerung ankuendigen",
 		"description": "Erinnerung an einen auslaufenden Vertrag.",
-		"bodyMarkdown": "Hallo,\n\nder Vertrag **{{title}}** für **{{company.name}}** endet am **{{endDate}}**.\n\nBitte teilen Sie uns kurz mit, ob eine Verlängerung oder Anpassung gewuenscht ist.",
+		"bodyMarkdown": "Hallo,\n\nder Vertrag **{{title}}** für **{{company.name}}** endet am **{{endDate | dateTime}}**.\n\nBitte teilen Sie uns kurz mit, ob eine Verlängerung oder Anpassung gewuenscht ist.",
 		"isDefault": false,
 		"isActive": true,
 		"entity": "contract"
@@ -90,7 +90,7 @@
 	{
 		"name": "Event Einladung intern",
 		"description": "Einladung zu einem internen Termin mit kurzer Übersicht.",
-		"bodyMarkdown": "Hallo,\n\nSie sind zum Termin **{{title}}** eingeladen.\n\n- Beginn: {{startDate}}\n- Ende: {{endDate}}\n- Teilnehmer: {{participants.email}}\n\nBitte den Termin pruefen und bei Bedarf Rueckmeldung geben.",
+		"bodyMarkdown": "Hallo,\n\nSie sind zum Termin **{{title}}** eingeladen.\n\n- Beginn: {{startDate | dateTime}}\n- Ende: {{endDate | dateTime}}\n- Teilnehmer: {{participants.email}}\n\nBitte den Termin pruefen und bei Bedarf Rueckmeldung geben.",
 		"isDefault": true,
 		"isActive": true,
 		"entity": "event"
@@ -98,7 +98,7 @@
 	{
 		"name": "Event Erinnerung Kunde",
 		"description": "Erinnerung an einen bevorstehenden Kundentermin oder Workshop.",
-		"bodyMarkdown": "Guten Tag,\n\nErinnerung an den Termin **{{title}}**.\n\n- Start: {{startDate}}\n- Ende: {{endDate}}\n- Beschreibung: {{description}}\n\nBei Fragen oder Änderungen antworten Sie bitte direkt hier.",
+		"bodyMarkdown": "Guten Tag,\n\nErinnerung an den Termin **{{title}}**.\n\n- Start: {{startDate | dateTime}}\n- Ende: {{endDate | dateTime}}\n- Beschreibung: {{description}}\n\nBei Fragen oder Änderungen antworten Sie bitte direkt hier.",
 		"isDefault": false,
 		"isActive": true,
 		"entity": "event"
@@ -194,7 +194,7 @@
 	{
 		"name": "Abwesenheit bestaetigen",
 		"description": "Kurze Teams-Bestaetigung für einen Abwesenheitseintrag.",
-		"bodyMarkdown": "Hallo,\n\nIhre Abwesenheit **{{title}}** wurde eingetragen.\n\n- Von: {{startDate}}\n- Bis: {{endDate}}\n- Status: {{status.description}}\n\nBitte den Kalendereintrag kurz pruefen.",
+		"bodyMarkdown": "Hallo,\n\nIhre Abwesenheit **{{title}}** wurde eingetragen.\n\n- Von: {{startDate | dateTime}}\n- Bis: {{endDate | dateTime}}\n- Status: {{status.description}}\n\nBitte den Kalendereintrag kurz pruefen.",
 		"isDefault": false,
 		"isActive": true,
 		"entity": "event"

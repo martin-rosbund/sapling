@@ -19,6 +19,7 @@ import {
   ApiConsumes,
   ApiOperation,
   ApiParam,
+  ApiProduces,
   ApiQuery,
   ApiResponse,
   ApiTags,
@@ -78,7 +79,11 @@ export class AiController {
   ) {}
 
   @Post('mcp')
-  @ApiOperation({ summary: 'Handle Sapling MCP Streamable HTTP POST requests' })
+  @ApiOperation({
+    summary: 'Forward an MCP POST request',
+    description:
+      'Accepts a streamable HTTP POST request for the authenticated Sapling Model Context Protocol session and forwards it to the MCP runtime.',
+  })
   async handleMcpPost(
     @Req() req: Request & { user: PersonItem },
     @Res() res: Response,
@@ -87,7 +92,11 @@ export class AiController {
   }
 
   @Get('mcp')
-  @ApiOperation({ summary: 'Handle Sapling MCP Streamable HTTP GET requests' })
+  @ApiOperation({
+    summary: 'Forward an MCP GET request',
+    description:
+      'Opens, resumes, or reads a streamable HTTP interaction for the authenticated Sapling Model Context Protocol session.',
+  })
   async handleMcpGet(
     @Req() req: Request & { user: PersonItem },
     @Res() res: Response,
@@ -97,7 +106,9 @@ export class AiController {
 
   @Delete('mcp')
   @ApiOperation({
-    summary: 'Handle Sapling MCP Streamable HTTP DELETE requests',
+    summary: 'Forward an MCP DELETE request',
+    description:
+      'Terminates a streamable HTTP interaction for the authenticated Sapling Model Context Protocol session.',
   })
   async handleMcpDelete(
     @Req() req: Request & { user: PersonItem },
@@ -107,16 +118,40 @@ export class AiController {
   }
 
   @Get('chat/providers')
-  @ApiOperation({ summary: 'List active AI providers' })
-  @ApiResponse({ status: 200, type: AiProviderTypeItem, isArray: true })
+  @ApiOperation({
+    summary: 'List available chat providers',
+    description:
+      'Returns the active AI providers that can currently be used for chat completions.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Active chat providers available to the current user.',
+    type: AiProviderTypeItem,
+    isArray: true,
+  })
   async listProviders(): Promise<AiProviderTypeItem[]> {
     return this.aiService.listActiveProviders('chat', true);
   }
 
   @Get('chat/models')
-  @ApiOperation({ summary: 'List active AI models' })
-  @ApiQuery({ name: 'providerHandle', required: false, type: String })
-  @ApiResponse({ status: 200, type: AiProviderModelItem, isArray: true })
+  @ApiOperation({
+    summary: 'List available chat models',
+    description:
+      'Returns the active chat-capable models. When providerHandle is supplied, only models from that provider are returned.',
+  })
+  @ApiQuery({
+    name: 'providerHandle',
+    required: false,
+    type: String,
+    description:
+      'Optional provider handle used to limit the result to one AI provider.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Active chat models available to the current user.',
+    type: AiProviderModelItem,
+    isArray: true,
+  })
   async listModels(
     @Query('providerHandle') providerHandle?: string,
   ): Promise<AiProviderModelItem[]> {
@@ -124,16 +159,41 @@ export class AiController {
   }
 
   @Get('transcription/providers')
-  @ApiOperation({ summary: 'List active AI providers for transcription' })
-  @ApiResponse({ status: 200, type: AiProviderTypeItem, isArray: true })
+  @ApiOperation({
+    summary: 'List available transcription providers',
+    description:
+      'Returns the active AI providers that can currently be used for audio transcription.',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Active transcription providers available to the current user.',
+    type: AiProviderTypeItem,
+    isArray: true,
+  })
   async listTranscriptionProviders(): Promise<AiProviderTypeItem[]> {
     return this.aiService.listActiveProviders('transcription', true);
   }
 
   @Get('transcription/models')
-  @ApiOperation({ summary: 'List active AI transcription models' })
-  @ApiQuery({ name: 'providerHandle', required: false, type: String })
-  @ApiResponse({ status: 200, type: AiProviderModelItem, isArray: true })
+  @ApiOperation({
+    summary: 'List available transcription models',
+    description:
+      'Returns the active transcription models. When providerHandle is supplied, only models from that provider are returned.',
+  })
+  @ApiQuery({
+    name: 'providerHandle',
+    required: false,
+    type: String,
+    description:
+      'Optional provider handle used to limit the result to one transcription provider.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Active transcription models available to the current user.',
+    type: AiProviderModelItem,
+    isArray: true,
+  })
   async listTranscriptionModels(
     @Query('providerHandle') providerHandle?: string,
   ): Promise<AiProviderModelItem[]> {
@@ -145,16 +205,40 @@ export class AiController {
   }
 
   @Get('speech/providers')
-  @ApiOperation({ summary: 'List active AI providers for speech synthesis' })
-  @ApiResponse({ status: 200, type: AiProviderTypeItem, isArray: true })
+  @ApiOperation({
+    summary: 'List available speech providers',
+    description:
+      'Returns the active AI providers that can currently be used for speech synthesis.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Active speech providers available to the current user.',
+    type: AiProviderTypeItem,
+    isArray: true,
+  })
   async listSpeechProviders(): Promise<AiProviderTypeItem[]> {
     return this.aiService.listActiveProviders('speech', true);
   }
 
   @Get('speech/models')
-  @ApiOperation({ summary: 'List active AI speech models' })
-  @ApiQuery({ name: 'providerHandle', required: false, type: String })
-  @ApiResponse({ status: 200, type: AiProviderModelItem, isArray: true })
+  @ApiOperation({
+    summary: 'List available speech models',
+    description:
+      'Returns the active speech synthesis models. When providerHandle is supplied, only models from that provider are returned.',
+  })
+  @ApiQuery({
+    name: 'providerHandle',
+    required: false,
+    type: String,
+    description:
+      'Optional provider handle used to limit the result to one speech provider.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Active speech models available to the current user.',
+    type: AiProviderModelItem,
+    isArray: true,
+  })
   async listSpeechModels(
     @Query('providerHandle') providerHandle?: string,
   ): Promise<AiProviderModelItem[]> {
@@ -163,70 +247,100 @@ export class AiController {
 
   @Post('chat/transcriptions')
   @ApiOperation({
-    summary: 'Upload audio and create a persisted transcription draft',
+    summary: 'Create a transcription draft from uploaded audio',
+    description:
+      'Uploads an audio file, runs transcription, and stores the resulting draft so it can be reused in chat workflows.',
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
+    description:
+      'Multipart form-data payload containing the audio file and optional client context.',
     schema: {
       type: 'object',
       properties: {
         file: {
           type: 'string',
           format: 'binary',
+          description: 'Audio file that should be transcribed.',
         },
         sessionHandle: {
           type: 'number',
+          description:
+            'Optional existing chat session handle used to link the transcription to a conversation.',
           nullable: true,
         },
         providerHandle: {
           type: 'string',
+          description:
+            'Optional AI provider handle that should perform the transcription.',
           nullable: true,
         },
         modelHandle: {
           type: 'string',
+          description:
+            'Optional transcription model handle that should be used for the request.',
           nullable: true,
         },
         language: {
           type: 'string',
+          description:
+            'Optional language hint for the input audio, for example en or de.',
           nullable: true,
         },
         routeName: {
           type: 'string',
+          description: 'Optional frontend route name active at upload time.',
           nullable: true,
         },
         url: {
           type: 'string',
+          description: 'Optional full frontend URL active at upload time.',
           nullable: true,
         },
         pageTitle: {
           type: 'string',
+          description: 'Optional frontend page title active at upload time.',
           nullable: true,
         },
         clientCurrentDateTime: {
           type: 'string',
+          description:
+            'Optional client-side timestamp captured when the upload was started.',
           nullable: true,
         },
         clientTimeZone: {
           type: 'string',
+          description:
+            'Optional IANA timezone reported by the client, such as Europe/Berlin.',
           nullable: true,
         },
         clientLocale: {
           type: 'string',
+          description: 'Optional client locale, such as en-US or de-DE.',
           nullable: true,
         },
         clientUtcOffsetMinutes: {
           type: 'number',
+          description:
+            'Optional offset from UTC in minutes reported by the client.',
           nullable: true,
         },
         durationSeconds: {
           type: 'number',
+          description:
+            'Optional audio duration reported by the client recorder in seconds.',
           nullable: true,
         },
       },
       required: ['file'],
     },
   })
-  @ApiResponse({ status: 201, type: AiChatTranscriptionResponseDto })
+  @ApiResponse({
+    status: 201,
+    description:
+      'Persisted transcription draft with status, detected metadata, and linked document information.',
+    type: AiChatTranscriptionResponseDto,
+  })
   @UseInterceptors(FileInterceptor('file'))
   async createTranscription(
     @Req() req: Request & { user: PersonItem },
@@ -240,9 +354,16 @@ export class AiController {
   @AdminPermission()
   @UseGuards(AdminPermissionGuard)
   @ApiOperation({
-    summary: 'List active AI providers for embedding generation',
+    summary: 'List available embedding providers',
+    description:
+      'Returns the active AI providers that can currently generate vector embeddings for semantic search.',
   })
-  @ApiResponse({ status: 200, type: AiProviderTypeItem, isArray: true })
+  @ApiResponse({
+    status: 200,
+    description: 'Active embedding providers available to administrators.',
+    type: AiProviderTypeItem,
+    isArray: true,
+  })
   async listVectorizationProviders(): Promise<AiProviderTypeItem[]> {
     return this.aiService.listActiveProviders('embedding');
   }
@@ -250,9 +371,24 @@ export class AiController {
   @Get('vectorization/models')
   @AdminPermission()
   @UseGuards(AdminPermissionGuard)
-  @ApiOperation({ summary: 'List active AI embedding models' })
-  @ApiQuery({ name: 'providerHandle', required: false, type: String })
-  @ApiResponse({ status: 200, type: AiProviderModelItem, isArray: true })
+  @ApiOperation({
+    summary: 'List available embedding models',
+    description:
+      'Returns the active embedding models. When providerHandle is supplied, only models from that provider are returned.',
+  })
+  @ApiQuery({
+    name: 'providerHandle',
+    required: false,
+    type: String,
+    description:
+      'Optional provider handle used to limit the result to one embedding provider.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Active embedding models available to administrators.',
+    type: AiProviderModelItem,
+    isArray: true,
+  })
   async listVectorizationModels(
     @Query('providerHandle') providerHandle?: string,
   ): Promise<AiProviderModelItem[]> {
@@ -263,10 +399,17 @@ export class AiController {
   @AdminPermission()
   @UseGuards(AdminPermissionGuard)
   @ApiOperation({
-    summary: 'Vectorize one supported entity for semantic search',
+    summary: 'Generate embeddings for one entity type',
+    description:
+      'Runs vectorization for all supported records of the requested entity so they become available for semantic search.',
   })
   @ApiBody({ type: VectorizeEntityDto })
-  @ApiResponse({ status: 201, type: VectorizeEntityResponseDto })
+  @ApiResponse({
+    status: 201,
+    description:
+      'Summary of the vectorization run, including processed, skipped, and deleted document counts.',
+    type: VectorizeEntityResponseDto,
+  })
   async vectorizeEntity(
     @Body() body: VectorizeEntityDto,
   ): Promise<VectorizeEntityResponseDto> {
@@ -274,9 +417,24 @@ export class AiController {
   }
 
   @Get('chat/sessions')
-  @ApiOperation({ summary: 'List chat sessions for the current user' })
-  @ApiQuery({ name: 'includeArchived', required: false, type: Boolean })
-  @ApiResponse({ status: 200, type: AiChatSessionItem, isArray: true })
+  @ApiOperation({
+    summary: 'List chat sessions',
+    description:
+      "Returns the authenticated user's persisted chat sessions. Archived sessions can be included on demand.",
+  })
+  @ApiQuery({
+    name: 'includeArchived',
+    required: false,
+    type: Boolean,
+    description:
+      'Set to true to include archived sessions alongside active sessions.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Chat sessions that belong to the authenticated user.',
+    type: AiChatSessionItem,
+    isArray: true,
+  })
   async listSessions(
     @Req() req: Request & { user: PersonItem },
     @Query('includeArchived') includeArchived?: string,
@@ -288,9 +446,17 @@ export class AiController {
   }
 
   @Post('chat/sessions')
-  @ApiOperation({ summary: 'Create a new chat session for the current user' })
+  @ApiOperation({
+    summary: 'Create a chat session',
+    description:
+      'Creates an empty chat session for the authenticated user that can later receive chat messages.',
+  })
   @ApiBody({ type: CreateAiChatSessionDto })
-  @ApiResponse({ status: 201, type: AiChatSessionItem })
+  @ApiResponse({
+    status: 201,
+    description: 'Persisted chat session record.',
+    type: AiChatSessionItem,
+  })
   async createSession(
     @Req() req: Request & { user: PersonItem },
     @Body() body: CreateAiChatSessionDto,
@@ -299,9 +465,22 @@ export class AiController {
   }
 
   @Patch('chat/sessions/:handle')
-  @ApiOperation({ summary: 'Update a chat session for the current user' })
+  @ApiOperation({
+    summary: 'Update a chat session',
+    description:
+      'Updates chat session metadata such as the display title, archive state, or preferred provider and model settings.',
+  })
+  @ApiParam({
+    name: 'handle',
+    type: Number,
+    description: 'Numeric handle of the chat session to update.',
+  })
   @ApiBody({ type: UpdateAiChatSessionDto })
-  @ApiResponse({ status: 200, type: AiChatSessionItem })
+  @ApiResponse({
+    status: 200,
+    description: 'Updated chat session record.',
+    type: AiChatSessionItem,
+  })
   async updateSession(
     @Req() req: Request & { user: PersonItem },
     @Param('handle') handle: number,
@@ -312,11 +491,35 @@ export class AiController {
 
   @Get('chat/sessions/:handle/messages')
   @ApiOperation({
-    summary: 'List chat messages of a session for the current user',
+    summary: 'List chat messages for one session',
+    description:
+      'Returns persisted chat messages for one session, with cursor-based pagination for loading older messages.',
   })
-  @ApiQuery({ name: 'limit', required: false, type: Number })
-  @ApiQuery({ name: 'beforeSequence', required: false, type: Number })
-  @ApiResponse({ status: 200, type: AiChatMessageListResponseDto })
+  @ApiParam({
+    name: 'handle',
+    type: Number,
+    description:
+      'Numeric handle of the chat session whose messages should be listed.',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Maximum number of messages to return in one page.',
+  })
+  @ApiQuery({
+    name: 'beforeSequence',
+    required: false,
+    type: Number,
+    description:
+      'Cursor used to load messages with a smaller sequence number than the provided value.',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Paginated chat message list with cursor metadata for loading older messages.',
+    type: AiChatMessageListResponseDto,
+  })
   async listMessages(
     @Req() req: Request & { user: PersonItem },
     @Param('handle') handle: number,
@@ -327,12 +530,17 @@ export class AiController {
 
   @Post('chat/messages')
   @ApiOperation({
-    summary: 'Persist a new user chat message and create a session if needed',
+    summary: 'Create a user chat message',
+    description:
+      'Stores a new user message, creates a session when needed, and returns both the persisted session and message records.',
   })
   @ApiBody({ type: CreateAiChatMessageDto })
   @ApiResponse({
     status: 201,
+    description: 'Persisted session and user message records.',
     schema: {
+      type: 'object',
+      required: ['session', 'message'],
       properties: {
         session: { $ref: '#/components/schemas/AiChatSessionItem' },
         message: { $ref: '#/components/schemas/AiChatMessageItem' },
@@ -348,11 +556,22 @@ export class AiController {
 
   @Post('chat/messages/:handle/speech')
   @ApiOperation({
-    summary: 'Create or reuse persisted speech audio for an assistant message',
+    summary: 'Create or reuse speech audio for an assistant message',
+    description:
+      'Generates or reuses a speech synthesis asset for an assistant message and stores the resulting audio reference on the message.',
   })
   @ApiBody({ type: CreateAiChatMessageSpeechDto })
-  @ApiParam({ name: 'handle', type: 'number', description: 'Message handle' })
-  @ApiResponse({ status: 201, type: AiChatMessageItem })
+  @ApiParam({
+    name: 'handle',
+    type: 'number',
+    description: 'Numeric handle of the assistant message to synthesize.',
+  })
+  @ApiResponse({
+    status: 201,
+    description:
+      'Updated assistant message record with the persisted speech artifact reference.',
+    type: AiChatMessageItem,
+  })
   async ensureAssistantMessageSpeech(
     @Req() req: Request & { user: PersonItem },
     @Param('handle') handle: number,
@@ -363,9 +582,17 @@ export class AiController {
 
   @Post('chat/stream')
   @ApiOperation({
-    summary: 'Persist a user message and stream the assistant response',
+    summary: 'Create a user message and stream the assistant reply',
+    description:
+      'Persists the user message and streams structured NDJSON events for the assistant response, tool activity, and terminal errors.',
   })
   @ApiBody({ type: CreateAiChatMessageDto })
+  @ApiProduces('application/x-ndjson')
+  @ApiResponse({
+    status: 200,
+    description:
+      'NDJSON event stream containing the persisted session context and streamed assistant response chunks.',
+  })
   async streamChat(
     @Req() req: Request & { user: PersonItem },
     @Body() body: CreateAiChatMessageDto,

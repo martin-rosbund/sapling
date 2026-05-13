@@ -1,13 +1,12 @@
 <template>
   <v-dialog
     :model-value="modelValue"
-    class="sapling-dialog-edit-dialog"
     @update:model-value="handleDialogUpdate"
     :max-width="SAPLING_DIALOG_MAX_WIDTH['3xl']"
     :height="SAPLING_DIALOG_HEIGHT.xl"
     persistent
   >
-    <SaplingDialogCard class="sapling-dialog-edit-card" :tilt="false">
+    <SaplingDialogCard :tilt="false">
       <div class="sapling-dialog-edit-shell" @keydown="onShellKeydown">
         <v-card-title class="sapling-dialog-edit-header">
           <SaplingDialogEditHero :loading="isLoading" :eyebrow="entityLabel" :title="dialogTitle">
@@ -235,39 +234,85 @@
           </template>
 
           <template #trailing>
-            <v-menu v-if="recordActionMenuItems.length > 0">
-              <template #activator="{ props: menuProps }">
-                <v-btn
-                  variant="text"
-                  prepend-icon="mdi-dots-horizontal-circle-outline"
-                  v-bind="menuProps"
-                  :disabled="recordActionButtonsDisabled"
+            <template v-if="smAndDown">
+              <v-menu v-if="hasReadonlyMobileActionMenu">
+                <template #activator="{ props: menuProps }">
+                  <v-btn
+                    variant="text"
+                    icon="mdi-dots-horizontal-circle-outline"
+                    v-bind="menuProps"
+                    :disabled="recordActionButtonsDisabled"
+                  />
+                </template>
+
+                <v-list
+                  class="glass-panel sapling-dialog-edit__mobile-action-list"
+                  density="comfortable"
+                  min-width="260"
                 >
-                  <template v-if="$vuetify.display.mdAndUp">{{ $t('global.more') }}</template>
-                </v-btn>
-              </template>
+                  <template
+                    v-for="(group, groupIdx) in mobileRecordActionMenuGroups"
+                    :key="`readonly-group-${groupIdx}`"
+                  >
+                    <v-list-item
+                      v-for="(menuItem, itemIdx) in group"
+                      :key="getMobileRecordActionKey(menuItem, groupIdx, itemIdx)"
+                      :prepend-icon="menuItem.icon"
+                      :title="resolveRecordActionMenuTitle(menuItem)"
+                      :disabled="recordActionButtonsDisabled"
+                      @click="onRecordActionClick(menuItem)"
+                    />
+                    <v-divider
+                      v-if="
+                        groupIdx < mobileRecordActionMenuGroups.length - 1 ||
+                        (groupIdx === mobileRecordActionMenuGroups.length - 1 && canDeleteRecord)
+                      "
+                    />
+                  </template>
 
-              <v-list density="comfortable" min-width="260">
-                <v-list-item
-                  v-for="menuItem in recordActionMenuItems"
-                  :key="`${menuItem.type}-${menuItem.title ?? menuItem.titleKey ?? menuItem.scriptButton?.name ?? ''}`"
-                  :prepend-icon="menuItem.icon"
-                  :title="getRecordActionTitle(menuItem)"
-                  @click="handleRecordAction(menuItem)"
+                  <v-list-item
+                    v-if="canDeleteRecord"
+                    prepend-icon="mdi-delete-outline"
+                    :title="$t('global.delete')"
+                    :disabled="recordActionButtonsDisabled"
+                    @click="openRecordDeleteDialog"
+                  />
+                </v-list>
+              </v-menu>
+            </template>
+            <template v-else>
+              <v-menu v-if="recordActionMenuItems.length > 0">
+                <template #activator="{ props: menuProps }">
+                  <v-btn
+                    variant="text"
+                    prepend-icon="mdi-dots-horizontal-circle-outline"
+                    v-bind="menuProps"
+                    :disabled="recordActionButtonsDisabled"
+                  >
+                    <template v-if="$vuetify.display.mdAndUp">{{ $t('global.more') }}</template>
+                  </v-btn>
+                </template>
+
+                <SaplingRecordActionMenuList
+                  density="comfortable"
+                  min-width="260"
+                  :menu-items="recordActionMenuItems"
+                  :show-edit="false"
+                  @select="handleRecordAction"
                 />
-              </v-list>
-            </v-menu>
+              </v-menu>
 
-            <v-btn
-              v-if="canDeleteRecord"
-              variant="text"
-              color="error"
-              prepend-icon="mdi-delete-outline"
-              :disabled="recordActionButtonsDisabled"
-              @click="openRecordDeleteDialog"
-            >
-              <template v-if="$vuetify.display.mdAndUp">{{ $t('global.delete') }}</template>
-            </v-btn>
+              <v-btn
+                v-if="canDeleteRecord"
+                variant="text"
+                color="error"
+                prepend-icon="mdi-delete-outline"
+                :disabled="recordActionButtonsDisabled"
+                @click="openRecordDeleteDialog"
+              >
+                <template v-if="$vuetify.display.mdAndUp">{{ $t('global.delete') }}</template>
+              </v-btn>
+            </template>
           </template>
         </SaplingActionBar>
         <SaplingActionBar v-else>
@@ -278,67 +323,136 @@
           </template>
 
           <template #trailing>
-            <v-menu v-if="recordActionMenuItems.length > 0">
-              <template #activator="{ props: menuProps }">
-                <v-btn
-                  variant="text"
-                  prepend-icon="mdi-dots-horizontal-circle-outline"
-                  v-bind="menuProps"
-                  :disabled="recordActionButtonsDisabled"
+            <template v-if="smAndDown">
+              <v-menu>
+                <template #activator="{ props: menuProps }">
+                  <v-btn
+                    variant="text"
+                    icon="mdi-dots-horizontal-circle-outline"
+                    v-bind="menuProps"
+                    :disabled="editMobileSecondaryActionsDisabled"
+                  />
+                </template>
+
+                <v-list
+                  class="glass-panel sapling-dialog-edit__mobile-action-list"
+                  density="comfortable"
+                  min-width="260"
                 >
-                  <template v-if="$vuetify.display.mdAndUp">{{ $t('global.more') }}</template>
-                </v-btn>
-              </template>
+                  <v-list-item
+                    prepend-icon="mdi-content-save-check"
+                    :title="$t('global.saveAndClose')"
+                    :disabled="!isDirty || isSaving"
+                    @click="saveAndClose"
+                  />
+                  <v-list-item
+                    prepend-icon="mdi-restore"
+                    :title="resetButtonLabel"
+                    :disabled="!isDirty || isSaving"
+                    @click="resetForm"
+                  />
+                  <v-divider
+                    v-if="canDeleteRecord || mobileRecordActionMenuGroups.length > 0"
+                  />
+                  <v-list-item
+                    v-if="canDeleteRecord"
+                    prepend-icon="mdi-delete-outline"
+                    :title="$t('global.delete')"
+                    :disabled="recordActionButtonsDisabled"
+                    @click="openRecordDeleteDialog"
+                  />
+                  <v-divider
+                    v-if="canDeleteRecord && mobileRecordActionMenuGroups.length > 0"
+                  />
+                  <template
+                    v-for="(group, groupIdx) in mobileRecordActionMenuGroups"
+                    :key="`edit-group-${groupIdx}`"
+                  >
+                    <v-list-item
+                      v-for="(menuItem, itemIdx) in group"
+                      :key="getMobileRecordActionKey(menuItem, groupIdx, itemIdx)"
+                      :prepend-icon="menuItem.icon"
+                      :title="resolveRecordActionMenuTitle(menuItem)"
+                      :disabled="recordActionButtonsDisabled"
+                      @click="onRecordActionClick(menuItem)"
+                    />
+                    <v-divider v-if="groupIdx < mobileRecordActionMenuGroups.length - 1" />
+                  </template>
+                </v-list>
+              </v-menu>
 
-              <v-list density="comfortable" min-width="260">
-                <v-list-item
-                  v-for="menuItem in recordActionMenuItems"
-                  :key="`${menuItem.type}-${menuItem.title ?? menuItem.titleKey ?? menuItem.scriptButton?.name ?? ''}`"
-                  :prepend-icon="menuItem.icon"
-                  :title="getRecordActionTitle(menuItem)"
-                  @click="handleRecordAction(menuItem)"
+              <v-btn
+                class="sapling-dialog-edit__mobile-primary-action"
+                color="primary"
+                prepend-icon="mdi-content-save"
+                :disabled="!isDirty || isSaving"
+                :loading="pendingSaveAction === 'save'"
+                @click="save"
+              >
+              </v-btn>
+            </template>
+            <template v-else>
+              <v-menu v-if="recordActionMenuItems.length > 0">
+                <template #activator="{ props: menuProps }">
+                  <v-btn
+                    variant="text"
+                    prepend-icon="mdi-dots-horizontal-circle-outline"
+                    v-bind="menuProps"
+                    :disabled="recordActionButtonsDisabled"
+                  >
+                    <template v-if="$vuetify.display.mdAndUp">{{ $t('global.more') }}</template>
+                  </v-btn>
+                </template>
+
+                <SaplingRecordActionMenuList
+                  class="glass-panel"
+                  density="comfortable"
+                  min-width="260"
+                  :menu-items="recordActionMenuItems"
+                  :show-edit="false"
+                  @select="handleRecordAction"
                 />
-              </v-list>
-            </v-menu>
+              </v-menu>
 
-            <v-btn
-              v-if="canDeleteRecord"
-              variant="text"
-              color="error"
-              prepend-icon="mdi-delete-outline"
-              :disabled="recordActionButtonsDisabled"
-              @click="openRecordDeleteDialog"
-            >
-              <template v-if="$vuetify.display.mdAndUp">{{ $t('global.delete') }}</template>
-            </v-btn>
+              <v-btn
+                v-if="canDeleteRecord"
+                variant="text"
+                color="error"
+                prepend-icon="mdi-delete-outline"
+                :disabled="recordActionButtonsDisabled"
+                @click="openRecordDeleteDialog"
+              >
+                <template v-if="$vuetify.display.mdAndUp">{{ $t('global.delete') }}</template>
+              </v-btn>
 
-            <v-btn
-              variant="text"
-              prepend-icon="mdi-restore"
-              :disabled="!isDirty || isSaving"
-              @click="resetForm"
-            >
-              <template v-if="$vuetify.display.mdAndUp">{{ resetButtonLabel }}</template>
-            </v-btn>
-            <v-btn
-              color="primary"
-              append-icon="mdi-content-save"
-              :disabled="!isDirty || isSaving"
-              :loading="pendingSaveAction === 'save'"
-              @click="save"
-            >
-              <template v-if="$vuetify.display.mdAndUp">{{ $t('global.save') }}</template>
-            </v-btn>
-            <v-btn
-              color="primary"
-              variant="tonal"
-              append-icon="mdi-content-save-check"
-              :disabled="!isDirty || isSaving"
-              :loading="pendingSaveAction === 'saveAndClose'"
-              @click="saveAndClose"
-            >
-              <template v-if="$vuetify.display.mdAndUp">{{ $t('global.saveAndClose') }}</template>
-            </v-btn>
+              <v-btn
+                variant="text"
+                prepend-icon="mdi-restore"
+                :disabled="!isDirty || isSaving"
+                @click="resetForm"
+              >
+                <template v-if="$vuetify.display.mdAndUp">{{ resetButtonLabel }}</template>
+              </v-btn>
+              <v-btn
+                color="primary"
+                append-icon="mdi-content-save"
+                :disabled="!isDirty || isSaving"
+                :loading="pendingSaveAction === 'save'"
+                @click="save"
+              >
+                <template v-if="$vuetify.display.mdAndUp">{{ $t('global.save') }}</template>
+              </v-btn>
+              <v-btn
+                color="primary"
+                variant="tonal"
+                append-icon="mdi-content-save-check"
+                :disabled="!isDirty || isSaving"
+                :loading="pendingSaveAction === 'saveAndClose'"
+                @click="saveAndClose"
+              >
+                <template v-if="$vuetify.display.mdAndUp">{{ $t('global.saveAndClose') }}</template>
+              </v-btn>
+            </template>
           </template>
         </SaplingActionBar>
       </div>
@@ -386,6 +500,7 @@
 // #region Imports
 import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useDisplay } from 'vuetify'
 import type {
   AccumulatedPermission,
   DialogSaveAction,
@@ -403,12 +518,14 @@ import type { EntityItem, SaplingGenericItem, ScriptButtonItem } from '@/entity/
 import { useSaplingDialogEdit } from '@/composables/dialog/useSaplingDialogEdit'
 import {
   getSaplingContextMenuTableItems,
+  type SaplingContextMenuTableMenuEntry,
   type SaplingContextMenuTableMenuItem,
 } from '@/composables/context/useSaplingContextMenuTable'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog'
 import { buildMailMenuActions } from '@/utils/saplingMailMenuUtil'
 import SaplingDialogEditHero from '@/components/common/SaplingDialogEditHero.vue'
+import SaplingRecordActionMenuList from '@/components/common/SaplingRecordActionMenuList.vue'
 import SaplingActionBar from '@/components/actions/SaplingActionBar.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
 import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
@@ -422,6 +539,7 @@ import ApiGenericService from '@/services/api.generic.service'
 import ApiScriptService from '@/services/api.script.service'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { useTimelineDialogStore } from '@/stores/timelineDialogStore'
+import { useChangeLogDialogStore } from '@/stores/changeLogDialogStore'
 import { buildTableOrderBy } from '@/utils/saplingTableUtil'
 // #endregion
 
@@ -436,6 +554,7 @@ const props = defineProps<{
   entity: EntityItem | null
   showReference?: boolean
   forceDirty?: boolean
+  forceDirtyFields?: string[]
 }>()
 
 const emit = defineEmits<{
@@ -451,9 +570,11 @@ const emit = defineEmits<{
 // #endregion
 
 const { t, d, te } = useI18n()
+const { smAndDown } = useDisplay()
 const { pushMessage } = useSaplingMessageCenter()
 const currentPersonStore = useCurrentPersonStore()
 const timelineDialogStore = useTimelineDialogStore()
+const changeLogDialogStore = useChangeLogDialogStore()
 const { openMailDialog } = useSaplingMailDialog()
 
 // #region Composable
@@ -506,7 +627,12 @@ const {
   onRelationTableSort,
   onRelationTableColumnFilters,
   onRelationTableReload,
-} = useSaplingDialogEdit(props, emit, { forceDirty: computed(() => props.forceDirty === true) })
+} = useSaplingDialogEdit(props, emit, {
+  forceDirty: computed(() => props.forceDirty === true),
+  forceDirtyFields: computed(() =>
+    Array.isArray(props.forceDirtyFields) ? props.forceDirtyFields : [],
+  ),
+})
 
 function onShellKeydown(event: KeyboardEvent) {
   // Keyboard shortcuts inside the edit dialog:
@@ -608,7 +734,7 @@ const formSurfaceRef = ref<HTMLElement | null>(null)
 
 let scriptButtonsRequestId = 0
 
-const recordActionMenuItems = computed<SaplingContextMenuTableMenuItem[]>(() => {
+const recordActionMenuItems = computed<SaplingContextMenuTableMenuEntry[]>(() => {
   if (!hasPersistedItem.value || props.mode === 'create') {
     return []
   }
@@ -617,6 +743,7 @@ const recordActionMenuItems = computed<SaplingContextMenuTableMenuItem[]>(() => 
   const mailActions = buildMailMenuActions(props.templates, form.value)
 
   return getSaplingContextMenuTableItems({
+    canChangeLog: hasPersistedItem.value,
     canShowInformation: canShowInformation.value,
     entityPermission: entityPermission.value,
     canNavigate: canNavigate.value,
@@ -624,7 +751,14 @@ const recordActionMenuItems = computed<SaplingContextMenuTableMenuItem[]>(() => 
     scriptButtons: loadedScriptButtons.value,
     mailActions,
     mailToLabel,
-  }).filter((menuItem) => !['edit', 'show', 'delete'].includes(menuItem.type))
+    showEdit: false,
+  })
+    .map((group) =>
+      (Array.isArray(group) ? group : [group]).filter(
+        (menuItem) => !['edit', 'show', 'delete'].includes(menuItem.type),
+      ),
+    )
+    .filter((group) => group.length > 0)
 })
 
 function getTimestampTitle(field: 'createdAt' | 'updatedAt', fallback: string): string {
@@ -653,6 +787,25 @@ const createdAtLabel = computed(() => formatTimestamp(props.item?.createdAt))
 const updatedAtLabel = computed(() => formatTimestamp(props.item?.updatedAt))
 
 const resetButtonLabel = computed(() => t('filter.reset'))
+
+const mobileRecordActionMenuGroups = computed<SaplingContextMenuTableMenuItem[][]>(() =>
+  recordActionMenuItems.value
+    .map((group) => (Array.isArray(group) ? group : [group]))
+    .filter((group) => group.length > 0),
+)
+
+const hasReadonlyMobileActionMenu = computed(
+  () => mobileRecordActionMenuGroups.value.length > 0 || canDeleteRecord.value,
+)
+
+const editMobileSecondaryActionsDisabled = computed(() => {
+  const hasDirtyActions = isDirty.value && !isSaving.value
+  const hasPersistedActions =
+    !recordActionButtonsDisabled.value &&
+    (canDeleteRecord.value || mobileRecordActionMenuGroups.value.length > 0)
+
+  return !hasDirtyActions && !hasPersistedActions
+})
 
 const dirtySummaryLabel = computed(() => {
   if (dirtyFieldCount.value <= 0) {
@@ -706,19 +859,6 @@ function updateSelectedRelationTableItems(items: SaplingGenericItem[]): void {
   selectedItems.value = items
 }
 
-function getRecordActionTitle(menuItem: SaplingContextMenuTableMenuItem): string {
-  if (menuItem.titleKey) {
-    const translated = t(menuItem.titleKey)
-    return translated !== menuItem.titleKey ? translated : menuItem.titleKey
-  }
-
-  if (menuItem.title) {
-    return te(menuItem.title) ? t(menuItem.title) : menuItem.title
-  }
-
-  return ''
-}
-
 function closeUploadDialog(): void {
   showUploadDialog.value = false
 }
@@ -763,6 +903,14 @@ function openTimelineFromRecord(): void {
   }
 
   timelineDialogStore.openTimeline(entityHandle.value, itemHandle.value)
+}
+
+function openChangeLogFromRecord(): void {
+  if (!entityHandle.value || itemHandle.value == null) {
+    return
+  }
+
+  changeLogDialogStore.openChangeLog(entityHandle.value, itemHandle.value)
 }
 
 function navigateToAddress(): void {
@@ -850,6 +998,9 @@ async function handleRecordAction(menuItem: SaplingContextMenuTableMenuItem): Pr
     case 'copy':
       openCopyDialogFromRecord()
       break
+    case 'changeLog':
+      openChangeLogFromRecord()
+      break
     case 'timeline':
       openTimelineFromRecord()
       break
@@ -883,6 +1034,37 @@ async function handleRecordAction(menuItem: SaplingContextMenuTableMenuItem): Pr
     default:
       break
   }
+}
+
+function onRecordActionClick(menuItem: SaplingContextMenuTableMenuItem): void {
+  void handleRecordAction(menuItem)
+}
+
+function resolveRecordActionMenuTitle(menuItem: SaplingContextMenuTableMenuItem): string {
+  if (menuItem.titleKey) {
+    return t(menuItem.titleKey)
+  }
+
+  if (!menuItem.title) {
+    return ''
+  }
+
+  return te(menuItem.title) ? t(menuItem.title) : menuItem.title
+}
+
+function getMobileRecordActionKey(
+  menuItem: SaplingContextMenuTableMenuItem,
+  groupIdx: number,
+  itemIdx: number,
+): string {
+  return `${groupIdx}-${itemIdx}-${menuItem.type}-${String(
+    menuItem.scriptButton?.handle ??
+      menuItem.scriptButton?.name ??
+      menuItem.mailAction?.email ??
+      menuItem.titleKey ??
+      menuItem.title ??
+      '',
+  )}`
 }
 
 async function loadScriptButtons(): Promise<void> {
@@ -1006,3 +1188,13 @@ watch(
 )
 // #endregion
 </script>
+
+<style scoped>
+.sapling-dialog-edit__mobile-action-list {
+  min-width: min(18rem, calc(100vw - 2rem));
+}
+
+.sapling-dialog-edit__mobile-primary-action {
+  min-width: 0;
+}
+</style>

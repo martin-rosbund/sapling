@@ -122,6 +122,7 @@
         @toggle-column-sort="toggleColumnSort"
         @update:column-filter="({ key, value }) => onColumnFilterChange(key, value)"
         @select-row="selectRow"
+        @change-log="openChangeLog"
         @delete="openDeleteDialog"
         @edit="openEditDialog"
         @show="openShowDialog"
@@ -163,6 +164,7 @@
         @update:sort-by="onSortByUpdate"
         @update:column-filter="({ key, value }) => onColumnFilterChange(key, value)"
         @select-row="selectRow"
+        @change-log="openChangeLog"
         @delete="openDeleteDialog"
         @edit="openEditDialog"
         @show="openShowDialog"
@@ -360,6 +362,7 @@ const {
   runRowScriptButton,
   navigateToAddress,
   openTimeline,
+  openChangeLog,
   openUploadDialog,
   closeUploadDialog,
   navigateToDocuments,

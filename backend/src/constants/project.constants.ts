@@ -453,10 +453,12 @@ export const API_VERSION: string = process.env.API_VERSION || '1.0.0';
 
 /**
  * @constant {string} API_DESCRIPTION
- * API description for documentation. Defaults to 'API for Sapling application'.
+ * API description for documentation. Defaults to a human-readable overview of
+ * the Sapling backend domains and authentication model.
  */
 export const API_DESCRIPTION: string =
-  process.env.API_DESCRIPTION || 'API for Sapling application';
+  process.env.API_DESCRIPTION ||
+  'Sapling backend API for authenticated business workflows, including generic entity operations, documents, templates, messaging, webhooks, KPIs, system status, and AI-assisted features. Most endpoints require a valid session or bearer token, and selected endpoints are restricted to administrators.';
 
 /**
  * @constant {string} API_CONTACT_NAME

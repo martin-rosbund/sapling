@@ -176,20 +176,14 @@
             :max-height="32"
           ></v-btn>
         </template>
-        <v-list class="glass-panel">
-          <v-list-item
-            v-for="menuItem in rowMenuItems"
-            :key="`${menuItem.type}-${menuItem.scriptButton?.handle ?? menuItem.titleKey ?? menuItem.title ?? ''}`"
-            @click.stop="onMenuItemClick(menuItem)"
-          >
-            <v-icon start>{{ menuItem.icon }}</v-icon>
-            <span>{{ resolveMenuItemTitle(menuItem) }}</span>
-          </v-list-item>
-          <v-list-item @click.stop="closeMenu()">
-            <v-icon start>mdi-close</v-icon>
-            <span>{{ $t('global.close') }}</span>
-          </v-list-item>
-        </v-list>
+        <SaplingRecordActionMenuList
+          class="glass-panel"
+          :menu-items="rowMenuItems"
+          :show-close-item="true"
+          :show-edit="true"
+          @select="onMenuItemClick"
+          @close="closeMenu"
+        />
       </v-menu>
     </td>
   </tr>
@@ -197,8 +191,8 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { useI18n } from 'vue-i18n'
 import type { SaplingContextMenuTableMenuItem } from '@/composables/context/useSaplingContextMenuTable'
+import SaplingRecordActionMenuList from '@/components/common/SaplingRecordActionMenuList.vue'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
 import SaplingTableJson from '@/components/table/SaplingTableJson.vue'
 import SaplingTableChip from '@/components/table/SaplingTableChip.vue'
@@ -228,7 +222,6 @@ import SaplingCellDateTime from './cells/SaplingCellDateTime.vue'
 // #region Props and Emits
 const props = defineProps<UseSaplingTableRowProps>()
 const emit = defineEmits<UseSaplingTableRowEmit>()
-const { t, te } = useI18n()
 // #endregion
 
 // #region Composable
@@ -245,6 +238,7 @@ const {
   isDialogOpenForCol,
   closeMenu,
   requestEdit,
+  requestChangeLog,
   requestShow,
   requestDelete,
   requestCopy,
@@ -274,6 +268,9 @@ function onMenuItemClick(menuItem: SaplingContextMenuTableMenuItem) {
   switch (menuItem.type) {
     case 'edit':
       requestEdit(props.item)
+      break
+    case 'changeLog':
+      requestChangeLog(props.item)
       break
     case 'show':
       requestShow(props.item)
@@ -313,18 +310,6 @@ function onMenuItemClick(menuItem: SaplingContextMenuTableMenuItem) {
       closeMenu()
       break
   }
-}
-
-function resolveMenuItemTitle(menuItem: SaplingContextMenuTableMenuItem) {
-  if (menuItem.titleKey) {
-    return t(menuItem.titleKey)
-  }
-
-  if (!menuItem.title) {
-    return ''
-  }
-
-  return te(menuItem.title) ? t(menuItem.title) : menuItem.title
 }
 // #endregion
 </script>

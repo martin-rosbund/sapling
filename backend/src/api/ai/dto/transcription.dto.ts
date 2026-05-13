@@ -102,27 +102,51 @@ export class CreateAiChatTranscriptionDto {
 }
 
 export class AiChatTranscriptionResponseDto {
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Handle of the persisted transcription record.',
+  })
   transcriptionHandle!: number;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({
+    nullable: true,
+    description:
+      'Transcribed text, when the transcription has already finished.',
+  })
   transcript!: string | null;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({
+    nullable: true,
+    description: 'Detected language of the input audio, when available.',
+  })
   detectedLanguage!: string | null;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({
+    nullable: true,
+    description: 'Duration of the input audio in seconds, when known.',
+  })
   durationSeconds!: number | null;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Processing status of the transcription draft.',
+  })
   status!: string;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({
+    nullable: true,
+    description: 'Provider handle that processed the transcription request.',
+  })
   providerHandle!: string | null;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({
+    nullable: true,
+    description: 'Model handle that processed the transcription request.',
+  })
   modelHandle!: string | null;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({
+    nullable: true,
+    description:
+      'Linked document handle for the stored audio asset, when available.',
+  })
   documentHandle!: number | null;
 }

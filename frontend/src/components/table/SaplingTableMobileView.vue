@@ -114,6 +114,7 @@
         :can-show-information="canShowInformation"
         :show-actions="showActions"
         @select-row="emit('select-row', $event)"
+        @change-log="emit('change-log', $event)"
         @delete="emit('delete', $event)"
         @edit="emit('edit', $event)"
         @show="emit('show', $event)"

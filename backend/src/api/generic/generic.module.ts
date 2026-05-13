@@ -16,6 +16,7 @@ import { ScriptModule } from '../script/script.module';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
 import { CurrentModule } from '../current/current.module';
+import { OpenTaskEventsModule } from '../current/open-task-events.module';
 import { AuthModule } from '../../auth/auth.module';
 
 /**
@@ -38,6 +39,7 @@ import { AuthModule } from '../../auth/auth.module';
     TemplateModule,
     ScriptModule,
     CurrentModule,
+    OpenTaskEventsModule,
   ],
   controllers: [GenericController],
   providers: [

@@ -3,6 +3,7 @@ import type { SaplingGenericItem, ScriptButtonItem } from '@/entity/entity'
 import type { AccumulatedPermission } from '@/entity/structure'
 
 export type SaplingContextMenuTableAction =
+  | 'changeLog'
   | 'copy'
   | 'delete'
   | 'edit'
@@ -27,6 +28,7 @@ export interface SaplingContextMenuTableProps {
   canNavigate: boolean
   scriptButtons?: ScriptButtonItem[]
   mailActions?: SaplingMailMenuAction[]
+  showEdit?: boolean
   item: SaplingGenericItem | null
   show: boolean
   x: number
@@ -49,7 +51,13 @@ export interface SaplingContextMenuTableMenuItem {
   mailAction?: SaplingMailMenuAction
 }
 
+export type SaplingContextMenuTableMenuGroup = SaplingContextMenuTableMenuItem[]
+export type SaplingContextMenuTableMenuEntry =
+  | SaplingContextMenuTableMenuItem
+  | SaplingContextMenuTableMenuGroup
+
 export interface SaplingContextMenuTableMenuOptions {
+  canChangeLog: boolean
   canShowInformation: boolean
   entityPermission: AccumulatedPermission | null
   canNavigate: boolean
@@ -57,6 +65,7 @@ export interface SaplingContextMenuTableMenuOptions {
   scriptButtons?: ScriptButtonItem[]
   mailActions?: SaplingMailMenuAction[]
   mailToLabel?: string
+  showEdit?: boolean
 }
 
 export interface SaplingContextMenuTableEmit {
@@ -67,7 +76,7 @@ export interface SaplingContextMenuTableEmit {
 export interface UseSaplingContextMenuTableResult {
   menuVisible: Ref<boolean>
   menuStyle: ComputedRef<CSSProperties>
-  menuItems: ComputedRef<SaplingContextMenuTableMenuItem[]>
+  menuItems: ComputedRef<SaplingContextMenuTableMenuEntry[]>
   closeMenu: () => void
   emitAction: (
     type: SaplingContextMenuTableAction,
@@ -78,31 +87,37 @@ export interface UseSaplingContextMenuTableResult {
 
 export function getSaplingContextMenuTableItems(
   options: SaplingContextMenuTableMenuOptions,
-): SaplingContextMenuTableMenuItem[] {
-  const items: SaplingContextMenuTableMenuItem[] = [
-    options.entityPermission?.allowUpdate
-      ? { type: 'edit', icon: 'mdi-pencil', titleKey: 'global.edit' }
-      : { type: 'show', icon: 'mdi-eye', titleKey: 'global.show' },
-  ]
-
+): SaplingContextMenuTableMenuEntry[] {
+  // Gruppierung: Standardaktionen, Zeitachsen/Navigate, Dokumente/Information, Skript/Mail
+  const group1: SaplingContextMenuTableMenuItem[] = []
+  if (options.showEdit !== false) {
+    group1.push(
+      options.entityPermission?.allowUpdate
+        ? { type: 'edit', icon: 'mdi-pencil', titleKey: 'global.edit' }
+        : { type: 'show', icon: 'mdi-eye', titleKey: 'global.show' },
+    )
+  }
   if (options.entityPermission?.allowDelete) {
-    items.splice(1, 0, { type: 'delete', icon: 'mdi-delete', titleKey: 'global.delete' })
+    group1.push({ type: 'delete', icon: 'mdi-delete', titleKey: 'global.delete' })
   }
-
   if (options.entityPermission?.allowInsert) {
-    items.push({ type: 'copy', icon: 'mdi-content-copy', titleKey: 'global.copy' })
+    group1.push({ type: 'copy', icon: 'mdi-content-copy', titleKey: 'global.copy' })
   }
 
+  const group2: SaplingContextMenuTableMenuItem[] = []
   if (options.canTimeline) {
-    items.push({ type: 'timeline', icon: 'mdi-timeline-outline', titleKey: 'global.timeline' })
+    group2.push({ type: 'timeline', icon: 'mdi-timeline-outline', titleKey: 'global.timeline' })
   }
-
+  if (options.canChangeLog) {
+    group2.push({ type: 'changeLog', icon: 'mdi-history', titleKey: 'global.changeLog' })
+  }
   if (options.canNavigate) {
-    items.push({ type: 'navigate', icon: 'mdi-navigation', titleKey: 'global.navigate' })
+    group2.push({ type: 'navigate', icon: 'mdi-navigation', titleKey: 'global.navigate' })
   }
 
+  const group3: SaplingContextMenuTableMenuItem[] = []
   if (options.entityPermission?.allowInsert) {
-    items.push(
+    group3.push(
       {
         type: 'uploadDocument',
         icon: 'mdi-file-document-arrow-right',
@@ -115,27 +130,26 @@ export function getSaplingContextMenuTableItems(
       },
     )
   }
-
   if (options.canShowInformation) {
-    items.push({
+    group3.push({
       type: 'showInformation',
       icon: 'mdi-text-box-edit-outline',
       titleKey: 'global.showInformation',
     })
   }
 
+  const group4: SaplingContextMenuTableMenuItem[] = []
   for (const scriptButton of options.scriptButtons ?? []) {
-    items.push({
+    group4.push({
       type: 'script',
       icon: 'mdi-script-text-play-outline',
       title: scriptButton.title,
       scriptButton,
     })
   }
-
   const mailToLabel = options.mailToLabel ?? 'E-Mail an'
   for (const mailAction of options.mailActions ?? []) {
-    items.push({
+    group4.push({
       type: 'mail',
       icon: 'mdi-email-fast-outline',
       title: `${mailToLabel} ${mailAction.email}`,
@@ -143,7 +157,9 @@ export function getSaplingContextMenuTableItems(
     })
   }
 
-  return items
+  // Filter leere Gruppen raus
+  const groups = [group1, group2, group3, group4].filter((group) => group.length > 0)
+  return groups
 }
 
 /**
@@ -164,14 +180,16 @@ export function useSaplingContextMenuTable(
     left: `${x.value}px`,
   }))
 
-  const menuItems = computed<SaplingContextMenuTableMenuItem[]>(() =>
+  const menuItems = computed<SaplingContextMenuTableMenuEntry[]>(() =>
     getSaplingContextMenuTableItems({
+      canChangeLog: props.item?.handle != null,
       canShowInformation: props.canShowInformation,
       entityPermission: props.entityPermission,
       canNavigate: props.canNavigate,
       canTimeline: props.item?.handle != null,
       scriptButtons: props.scriptButtons,
       mailActions: props.mailActions,
+      showEdit: props.showEdit,
     }),
   )
   //#endregion

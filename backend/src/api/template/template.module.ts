@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TemplateController } from './template.controller';
 import { MessageTemplateService } from './message-template.service';
 import { TemplateService } from './template.service';
@@ -16,7 +16,7 @@ import { AuthModule } from '../../auth/auth.module';
  */
 
 @Module({
-  imports: [AuthModule],
+  imports: [forwardRef(() => AuthModule)],
   controllers: [TemplateController],
   providers: [TemplateService, MessageTemplateService],
   exports: [TemplateService, MessageTemplateService],

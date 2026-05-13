@@ -10,6 +10,9 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class ApplicationVersionDto {
   /** Application version */
-  @ApiProperty({ example: '1.0.0', description: 'Application version.' })
+  @ApiProperty({
+    example: '1.0.0',
+    description: 'Semantic version of the running Sapling backend.',
+  })
   version: string = '0.0.0';
 }

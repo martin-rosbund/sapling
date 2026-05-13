@@ -86,30 +86,43 @@ export class DocumentController {
    * @returns Uploaded DocumentItem
    */
   @Post('upload/:entityHandle/:reference')
-  @ApiOperation({ summary: 'Upload a document' })
+  @ApiOperation({
+    summary: 'Upload a document for an entity record',
+    description:
+      'Uploads a binary file, stores it as a Sapling document, and links it to the referenced entity record.',
+  })
   @ApiConsumes('multipart/form-data')
-  @ApiGenericEntityOperation('Returns a paginated list for an entity')
+  @ApiGenericEntityOperation(
+    'Uploads a document and links it to the requested entity reference',
+  )
   @ApiParam({
     name: 'reference',
     type: 'string',
-    description: 'Reference Handle',
+    description:
+      'Record handle or reference identifier the document should be attached to.',
   })
   @ApiBody({
+    description: 'Multipart form-data payload for the document upload.',
     schema: {
       type: 'object',
       properties: {
         file: {
           type: 'string',
           format: 'binary',
+          description: 'Binary file that should be stored as a document.',
           nullable: false,
         },
         typeHandle: {
           type: 'string',
+          description:
+            'Document type handle that classifies the uploaded file.',
           default: 'document',
           nullable: false,
         },
         description: {
           type: 'string',
+          description:
+            'Optional free-text note that describes the purpose or content of the document.',
           default: '',
           nullable: true,
         },
@@ -117,7 +130,11 @@ export class DocumentController {
       required: ['file', 'typeHandle'],
     },
   })
-  @ApiResponse({ status: 201, description: 'Document uploaded successfully' })
+  @ApiResponse({
+    status: 201,
+    description: 'Document metadata for the newly stored file.',
+    type: DocumentItem,
+  })
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(GenericPermissionGuard)
   @GenericPermission('allowUpdate')
@@ -145,11 +162,20 @@ export class DocumentController {
    * @param res Express response object
    */
   @Get('download/:handle')
-  @ApiOperation({ summary: 'Download a document' })
-  @ApiParam({ name: 'handle', type: 'number', description: 'Document Handle' })
+  @ApiOperation({
+    summary: 'Download a stored document',
+    description:
+      'Returns the original file as a binary attachment and preserves the stored filename and MIME type.',
+  })
+  @ApiParam({
+    name: 'handle',
+    type: 'number',
+    description: 'Numeric handle of the document to download.',
+  })
   @ApiResponse({
     status: 200,
-    description: 'Document file',
+    description:
+      'Binary file download with the stored MIME type and attachment filename.',
     schema: { type: 'string', format: 'binary' },
   })
   @UseGuards(GenericPermissionGuard)
@@ -178,11 +204,20 @@ export class DocumentController {
    * @param res Express response object
    */
   @Get('preview/:handle')
-  @ApiOperation({ summary: 'Preview a PDF document' })
-  @ApiParam({ name: 'handle', type: 'number', description: 'Document Handle' })
+  @ApiOperation({
+    summary: 'Preview a stored document',
+    description:
+      'Returns the document as an inline response when the browser can preview the MIME type. PDF files are served inline; other files fall back to attachment download behavior.',
+  })
+  @ApiParam({
+    name: 'handle',
+    type: 'number',
+    description: 'Numeric handle of the document to preview.',
+  })
   @ApiResponse({
     status: 200,
-    description: 'PDF preview',
+    description:
+      'Binary document response intended for inline preview when possible.',
     schema: { type: 'string', format: 'binary' },
   })
   @UseGuards(GenericPermissionGuard)

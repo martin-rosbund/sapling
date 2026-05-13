@@ -15,13 +15,24 @@ export class TrendResultDto {
    * @type {number|object|null}
    */
   @ApiProperty({
-    description: 'Current value',
+    description:
+      'Value for the current comparison period. This can be numeric, structured, grouped, or null.',
     nullable: true,
     oneOf: [
-      { type: 'number' },
-      { type: 'object' },
-      { type: 'array', items: { type: 'object', additionalProperties: true } },
-      { type: 'null' },
+      { type: 'number', description: 'Single numeric KPI value.' },
+      {
+        type: 'object',
+        description: 'Structured KPI result for the current period.',
+      },
+      {
+        type: 'array',
+        items: { type: 'object', additionalProperties: true },
+        description: 'Grouped KPI rows for the current period.',
+      },
+      {
+        type: 'null',
+        description: 'No value is available for the current period.',
+      },
     ],
   })
   current: number | object | Array<Record<string, unknown>> | null;
@@ -31,13 +42,24 @@ export class TrendResultDto {
    * @type {number|object|null}
    */
   @ApiProperty({
-    description: 'Previous value',
+    description:
+      'Value for the previous comparison period. This can be numeric, structured, grouped, or null.',
     nullable: true,
     oneOf: [
-      { type: 'number' },
-      { type: 'object' },
-      { type: 'array', items: { type: 'object', additionalProperties: true } },
-      { type: 'null' },
+      { type: 'number', description: 'Single numeric KPI value.' },
+      {
+        type: 'object',
+        description: 'Structured KPI result for the previous period.',
+      },
+      {
+        type: 'array',
+        items: { type: 'object', additionalProperties: true },
+        description: 'Grouped KPI rows for the previous period.',
+      },
+      {
+        type: 'null',
+        description: 'No value is available for the previous period.',
+      },
     ],
   })
   previous: number | object | Array<Record<string, unknown>> | null;

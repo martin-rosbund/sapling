@@ -25,8 +25,65 @@
 
 .sapling-inbox-summary-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: var(--sapling-gap-md);
+}
+
+.sapling-inbox-view-switch {
+  padding: var(--sapling-gap-xs);
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+}
+
+.sapling-inbox-view-switch__toggle {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-inbox-view-switch__button {
+  flex: 1 1 240px;
+  min-height: 54px;
+  text-transform: none;
+}
+
+.sapling-inbox-view-switch__button .v-btn__content {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-inbox-view-switch__button-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sapling-gap-sm);
+  min-width: 0;
+  font-weight: 600;
+}
+
+.sapling-inbox-view-switch__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 var(--sapling-gap-sm);
+  border-radius: var(--sapling-radius-pill);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.sapling-inbox-view-switch__count--idle {
+  color: rgb(var(--v-theme-primary));
+  background: rgba(var(--v-theme-primary), 0.12);
+}
+
+.sapling-inbox-view-switch__count--alert {
+  color: rgb(var(--v-theme-error));
+  background: rgba(var(--v-theme-error), 0.14);
+  box-shadow: inset 0 0 0 1px rgba(var(--v-theme-error), 0.16);
 }
 
 .sapling-inbox-loading-summary {
@@ -148,6 +205,49 @@
   border-radius: calc(var(--sapling-radius-sm) + 4px);
 }
 
+.sapling-inbox-notification-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-lg);
+  padding: var(--sapling-space-panel-md);
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+  border-radius: calc(var(--sapling-radius-sm) + 4px);
+}
+
+.sapling-inbox-notification-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-inbox-notification-panel__title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-inbox-notification-panel__icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: rgba(var(--v-theme-info), 0.14);
+  color: rgb(var(--v-theme-info));
+}
+
+.sapling-inbox-notification-panel__title {
+  margin: 0;
+  font-size: 1.08rem;
+}
+
+.sapling-inbox-notification-feed {
+  display: grid;
+  gap: var(--sapling-gap-md);
+}
+
 .sapling-inbox-section {
   position: relative;
   display: flex;
@@ -257,17 +357,26 @@
 }
 
 .sapling-inbox-entry {
+  --sapling-inbox-entry-accent-color: rgb(var(--v-theme-primary));
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   gap: var(--sapling-gap-md);
   padding: var(--sapling-gap-lg);
   border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
   border-radius: 20px;
-  background: linear-gradient(
-    180deg,
-    rgba(var(--v-theme-surface), 0.94),
-    rgba(var(--v-theme-surface), 0.9)
-  );
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--sapling-inbox-entry-accent-color) 9%, transparent) 0%,
+      transparent 58%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(var(--v-theme-surface), 0.96),
+      rgba(var(--v-theme-surface), 0.9)
+    );
   cursor: pointer;
   transition:
     transform 0.2s ease,
@@ -276,10 +385,35 @@
     background 0.2s ease;
 }
 
+.sapling-inbox-entry::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(
+      circle at top right,
+      color-mix(in srgb, var(--sapling-inbox-entry-accent-color) 12%, transparent) 0%,
+      transparent 48%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--sapling-inbox-entry-accent-color) 5%, transparent),
+      transparent 34%
+    );
+  opacity: 0.95;
+  pointer-events: none;
+  z-index: -1;
+}
+
 .sapling-inbox-entry:hover,
 .sapling-inbox-entry:focus-visible {
   transform: translateY(-2px);
-  border-color: rgba(var(--v-theme-primary), 0.22);
+  border-color: color-mix(
+    in srgb,
+    var(--sapling-inbox-entry-accent-color) 22%,
+    rgba(var(--v-theme-on-surface), 0.08)
+  );
   box-shadow: 0 18px 32px rgba(15, 23, 42, 0.08);
   outline: none;
 }
@@ -304,8 +438,8 @@
   width: 10px;
   height: 10px;
   border-radius: var(--sapling-radius-pill);
-  background: rgba(var(--v-theme-primary), 0.9);
-  box-shadow: 0 0 0 4px rgba(var(--v-theme-primary), 0.12);
+  background: var(--sapling-inbox-entry-accent-color);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--sapling-inbox-entry-accent-color) 14%, transparent);
 }
 
 .sapling-inbox-entry__date {
@@ -335,6 +469,23 @@
   white-space: nowrap;
 }
 
+.sapling-inbox-entry--expanded .sapling-inbox-entry__title {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.sapling-inbox-entry--expanded .sapling-inbox-entry__description {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.sapling-inbox-entry--expanded .sapling-inbox-entry__footer {
+  margin-top: var(--sapling-gap-lg);
+}
+
 .sapling-inbox-entry__footer {
   display: flex;
   align-items: center;
@@ -346,6 +497,12 @@
 .sapling-inbox-entry__chips {
   display: flex;
   flex-wrap: wrap;
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-inbox-entry__actions {
+  display: inline-flex;
+  align-items: center;
   gap: var(--sapling-gap-xs);
 }
 
@@ -379,6 +536,10 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .sapling-inbox-view-switch__button {
+    flex-basis: 100%;
+  }
+
   .sapling-inbox-section,
   .sapling-inbox-entry {
     border-radius: var(--sapling-radius-sm);
@@ -386,7 +547,8 @@
 
   .sapling-inbox-entry__meta-row,
   .sapling-inbox-entry__footer,
-  .sapling-inbox-section__header {
+  .sapling-inbox-section__header,
+  .sapling-inbox-notification-panel__header {
     flex-direction: column;
     align-items: flex-start;
   }

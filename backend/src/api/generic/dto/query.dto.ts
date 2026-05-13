@@ -124,8 +124,8 @@ export class PaginatedQueryDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  @Max(100)
-  limit: number = 100; // entries per page
+  @Max(200)
+  limit: number = 200; // entries per page
 
   @IsOptional()
   @Transform(({ value }) => parseJsonObjectQuery(value, 'filter'))

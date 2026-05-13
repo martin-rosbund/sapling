@@ -58,6 +58,32 @@
             </li>
           </ul>
         </section>
+
+        <v-divider />
+
+        <section class="sapling-help-dialog__section">
+          <h3 class="sapling-help-dialog__section-title">
+            {{ t('global.help.syntaxTitle') }}
+          </h3>
+          <p class="sapling-help-dialog__section-intro">
+            {{ t('global.help.syntaxIntro') }}
+          </p>
+          <ul class="sapling-help-dialog__list">
+            <li
+              v-for="entry in syntaxEntries"
+              :key="entry.id"
+              class="sapling-help-dialog__row sapling-help-dialog__row--syntax"
+            >
+              <code class="sapling-help-dialog__example">{{ entry.example }}</code>
+              <div class="sapling-help-dialog__row-stack">
+                <span class="sapling-help-dialog__row-label">{{ entry.label }}</span>
+                <span v-if="entry.hint" class="sapling-help-dialog__row-hint">
+                  {{ entry.hint }}
+                </span>
+              </div>
+            </li>
+          </ul>
+        </section>
       </div>
 
       <v-divider />
@@ -72,12 +98,15 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useSaplingHelp } from '@/composables/system/useSaplingHelp'
+import { useSaplingAiChat } from '@/composables/system/useSaplingAiChat'
 
 const { t } = useI18n()
 
-const isOpen = ref(false)
+const { isOpen, openSaplingHelp, closeSaplingHelp } = useSaplingHelp()
+const { hasSaplingAiChatAccess } = useSaplingAiChat()
 
 interface ShortcutEntry {
   id: string
@@ -88,6 +117,13 @@ interface ShortcutEntry {
 interface CommandEntry {
   id: string
   icon: string
+  label: string
+  hint?: string
+}
+
+interface SyntaxEntry {
+  id: string
+  example: string
   label: string
   hint?: string
 }
@@ -128,45 +164,106 @@ const shortcutEntries = computed<ShortcutEntry[]>(() => [
   },
 ])
 
-const commandEntries = computed<CommandEntry[]>(() => [
+const syntaxEntries = computed<SyntaxEntry[]>(() => [
   {
-    id: 'favorites',
-    icon: 'mdi-star',
-    label: t('global.commandPalette.favorites'),
-    hint: t('global.help.commandFavoritesHint'),
+    id: 'entity-search',
+    example: t('global.help.syntaxEntitySearchExample'),
+    label: t('global.help.syntaxEntitySearchLabel'),
+    hint: t('global.help.syntaxEntitySearchHint'),
   },
   {
-    id: 'entities',
-    icon: 'mdi-shape',
-    label: t('global.commandPalette.entities'),
-    hint: t('global.help.commandEntitiesHint'),
+    id: 'entity-prefix',
+    example: t('global.help.syntaxEntityPrefixExample'),
+    label: t('global.help.syntaxEntityPrefixLabel'),
+    hint: t('global.help.syntaxEntityPrefixHint'),
   },
   {
-    id: 'theme',
-    icon: 'mdi-theme-light-dark',
-    label: t('global.commandPalette.actionThemeHint'),
-    hint: t('global.help.commandThemeHint'),
-  },
-  {
-    id: 'language',
-    icon: 'mdi-translate',
-    label: t('global.commandPalette.actionLanguageHint'),
-    hint: t('global.help.commandLanguageHint'),
-  },
-  {
-    id: 'logout',
-    icon: 'mdi-logout',
-    label: t('login.logout'),
-    hint: t('global.help.commandLogoutHint'),
+    id: 'free-text',
+    example: t('global.help.syntaxFreeTextExample'),
+    label: t('global.help.syntaxFreeTextLabel'),
+    hint: t('global.help.syntaxFreeTextHint'),
   },
 ])
 
+const commandEntries = computed<CommandEntry[]>(() => {
+  const entries: CommandEntry[] = [
+    {
+      id: 'favorites',
+      icon: 'mdi-star',
+      label: t('global.commandPalette.favorites'),
+      hint: t('global.help.commandFavoritesHint'),
+    },
+    {
+      id: 'entities',
+      icon: 'mdi-shape',
+      label: t('global.commandPalette.entities'),
+      hint: t('global.help.commandEntitiesHint'),
+    },
+  ]
+
+  if (hasSaplingAiChatAccess.value) {
+    entries.push({
+      id: 'aiChat',
+      icon: 'mdi-robot-outline',
+      label: t('global.commandPalette.actionAiChat'),
+      hint: t('global.help.commandAiChatHint'),
+    })
+  }
+
+  entries.push(
+    {
+      id: 'issue',
+      icon: 'mdi-bug-outline',
+      label: t('global.commandPalette.actionIssue'),
+      hint: t('global.help.commandIssueHint'),
+    },
+    {
+      id: 'help',
+      icon: 'mdi-help-circle-outline',
+      label: t('global.commandPalette.actionHelp'),
+      hint: t('global.help.commandHelpHint'),
+    },
+    {
+      id: 'theme',
+      icon: 'mdi-theme-light-dark',
+      label: t('global.commandPalette.actionThemeHint'),
+      hint: t('global.help.commandThemeHint'),
+    },
+    {
+      id: 'glass',
+      icon: 'mdi-blur',
+      label: t('global.commandPalette.actionGlassHint'),
+      hint: t('global.help.commandGlassHint'),
+    },
+    {
+      id: 'tilt',
+      icon: 'mdi-image-filter-tilt-shift',
+      label: t('global.commandPalette.actionTiltHint'),
+      hint: t('global.help.commandTiltHint'),
+    },
+    {
+      id: 'language',
+      icon: 'mdi-translate',
+      label: t('global.commandPalette.actionLanguageHint'),
+      hint: t('global.help.commandLanguageHint'),
+    },
+    {
+      id: 'logout',
+      icon: 'mdi-logout',
+      label: t('login.logout'),
+      hint: t('global.help.commandLogoutHint'),
+    },
+  )
+
+  return entries
+})
+
 function close() {
-  isOpen.value = false
+  closeSaplingHelp()
 }
 
 function open() {
-  isOpen.value = true
+  openSaplingHelp()
 }
 
 /**
@@ -303,6 +400,23 @@ onBeforeUnmount(() => {
   line-height: 14px;
   font-family: inherit;
   opacity: 0.85;
+}
+
+.sapling-help-dialog__row--syntax {
+  align-items: flex-start;
+}
+
+.sapling-help-dialog__example {
+  flex: 0 0 auto;
+  min-width: 110px;
+  padding: 3px 8px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 16px;
+  opacity: 0.85;
+  white-space: nowrap;
 }
 
 .sapling-help-dialog__footer {

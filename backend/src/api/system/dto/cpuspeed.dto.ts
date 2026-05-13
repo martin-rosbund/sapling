@@ -14,19 +14,19 @@ export class CpuSpeedDto {
   /** Current CPU load */
   @ApiProperty({
     example: 1.5269886499237566,
-    description: 'Current load',
+    description: 'Current overall CPU load percentage.',
   })
   currentLoad?: number;
   /** Current CPU user load */
   @ApiProperty({
     example: 1.1504409845440617,
-    description: 'Current user load',
+    description: 'Current CPU load caused by user-space processes.',
   })
   currentLoadUser?: number;
   /** Current CPU system load */
   @ApiProperty({
     example: 0.3662335725322716,
-    description: 'Current system load',
+    description: 'Current CPU load caused by kernel or system processes.',
   })
   currentLoadSystem?: number;
 }

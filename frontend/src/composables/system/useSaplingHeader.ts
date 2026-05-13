@@ -1,8 +1,14 @@
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import ApiService from '@/services/api.service'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
-import { useVisibilityAwarePolling } from '@/composables/system/useVisibilityAwarePolling'
+import {
+  useOpenTaskCountEvents,
+  type OpenTaskStreamItem,
+} from '@/composables/system/useOpenTaskCountEvents'
+
+export interface SaplingHeaderInboxPreview extends OpenTaskStreamItem {
+  sequence: number
+}
 
 /**
  * Provides the state and interaction handlers for the shared application header.
@@ -13,29 +19,41 @@ export function useSaplingHeader() {
   const showInbox = ref(false)
   const showAccount = ref(false)
   const inboxCount = ref(0)
+  const inboxNotificationCount = ref(0)
+  const incomingInboxPreview = ref<SaplingHeaderInboxPreview | null>(null)
   const currentPersonStore = useCurrentPersonStore()
+  let incomingInboxPreviewSequence = 0
   //#endregion
+
+  const inboxBadgeColor = computed(() =>
+    inboxNotificationCount.value > 0 ? 'error' : 'primary',
+  )
+
+  useOpenTaskCountEvents((snapshot, context) => {
+    inboxCount.value = snapshot.count
+    inboxNotificationCount.value = snapshot.notifications.length
+
+    if (!context || context.source !== 'stream' || context.newItems.length === 0) {
+      return
+    }
+
+    incomingInboxPreviewSequence += 1
+    incomingInboxPreview.value = {
+      ...context.newItems[0],
+      sequence: incomingInboxPreviewSequence,
+    }
+  })
 
   //#region Lifecycle Hooks
   /**
-   * Initializes the header state and starts the refresh timer.
+   * Initializes the header state and starts the backend event stream.
    */
   onMounted(async () => {
-    await Promise.all([currentPersonStore.fetchCurrentPerson(), countInboxItems()])
+    await currentPersonStore.fetchCurrentPerson()
   })
-
-  // Refresh the inbox badge once per minute while the tab is visible.
-  useVisibilityAwarePolling(countInboxItems, 60000)
   //#endregion
 
   //#region Methods
-  /**
-   * Fetches the current number of open inbox items.
-   */
-  async function countInboxItems() {
-    const result = await ApiService.findOne<{ count: number }>('current/countOpenTasks')
-    inboxCount.value = result.count
-  }
 
   /**
    * Opens the inbox dialog.
@@ -78,13 +96,14 @@ export function useSaplingHeader() {
     showInbox,
     showAccount,
     inboxCount,
+    inboxBadgeColor,
+    incomingInboxPreview,
     currentPersonStore,
     openInbox,
     closeInbox,
     openAccount,
     closeAccount,
     goHome,
-    countInboxItems,
   }
   //#endregion
 }

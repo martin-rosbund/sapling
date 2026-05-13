@@ -26,6 +26,40 @@
     </div>
 
     <template #append>
+      <!-- Inbox button with badge -->
+      <div class="sapling-header__inbox-slot">
+        <Transition name="sapling-header-inbox-preview">
+          <div
+            v-if="visibleIncomingInboxPreview"
+            class="sapling-header__inbox-preview glass-panel"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <div class="sapling-header__inbox-preview-icon">
+              <v-icon :icon="visibleIncomingInboxPreview.icon" size="18" />
+            </div>
+            <div class="sapling-header__inbox-preview-copy">
+              <div class="sapling-header__inbox-preview-label">{{ $t('navigation.inbox') }}</div>
+              <div class="sapling-header__inbox-preview-title">
+                {{ visibleIncomingInboxPreview.title }}
+              </div>
+            </div>
+          </div>
+        </Transition>
+
+        <v-btn class="sapling-header__desktop-action text-none" stacked @click="openInbox">
+          <v-badge
+            location="top right"
+            :color="inboxBadgeColor"
+            :content="inboxCount"
+            :model-value="true"
+          >
+            <v-icon icon="mdi-email"></v-icon>
+          </v-badge>
+        </v-btn>
+      </div>
+
       <!-- Message center button with badge -->
       <v-btn class="sapling-header__desktop-action text-none" stacked @click="openMessageCenter">
         <v-badge
@@ -35,13 +69,6 @@
           :value="messageCount > 0"
         >
           <v-icon icon="mdi-cloud-alert"></v-icon>
-        </v-badge>
-      </v-btn>
-
-      <!-- Inbox button with badge -->
-      <v-btn class="sapling-header__desktop-action text-none" stacked @click="openInbox">
-        <v-badge location="top right" color="primary" :content="inboxCount">
-          <v-icon icon="mdi-email"></v-icon>
         </v-badge>
       </v-btn>
 
@@ -57,6 +84,20 @@
         </template>
 
         <v-list class="sapling-header__mobile-overflow-menu glass-panel" density="comfortable" nav>
+          <v-list-item :title="$t('global.inbox')" @click="openInbox">
+            <template #prepend>
+              <v-icon icon="mdi-email" />
+            </template>
+            <template #append>
+              <v-badge
+                :color="inboxBadgeColor"
+                inline
+                :content="inboxCount"
+                :model-value="true"
+              />
+            </template>
+          </v-list-item>
+
           <v-list-item :title="$t('global.messageCenter')" @click="openMessageCenter">
             <template #prepend>
               <v-icon icon="mdi-cloud-alert" />
@@ -68,15 +109,6 @@
                 :content="messageCount"
                 :model-value="messageCount > 0"
               />
-            </template>
-          </v-list-item>
-
-          <v-list-item :title="$t('global.inbox')" @click="openInbox">
-            <template #prepend>
-              <v-icon icon="mdi-email" />
-            </template>
-            <template #append>
-              <v-badge color="primary" inline :content="inboxCount" :model-value="inboxCount > 0" />
             </template>
           </v-list-item>
         </v-list>
@@ -227,9 +259,12 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { useSaplingHeader } from '@/composables/system/useSaplingHeader'
+import {
+  useSaplingHeader,
+  type SaplingHeaderInboxPreview,
+} from '@/composables/system/useSaplingHeader'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useSaplingPreferences } from '@/composables/system/useSaplingPreferences'
 import { useSaplingVectorization } from '@/composables/system/useSaplingVectorization'
@@ -313,6 +348,8 @@ const {
   showInbox,
   showAccount,
   inboxCount,
+  inboxBadgeColor,
+  incomingInboxPreview,
   currentPersonStore,
   openInbox,
   closeInbox,
@@ -321,6 +358,88 @@ const {
   goHome,
 } = useSaplingHeader()
 // #endregion
+
+const visibleIncomingInboxPreview = ref<SaplingHeaderInboxPreview | null>(null)
+let incomingInboxPreviewTimeout: number | null = null
+let inboxPreviewAudioContext: AudioContext | null = null
+
+watch(
+  () => incomingInboxPreview.value?.sequence,
+  (sequence) => {
+    if (!sequence || !incomingInboxPreview.value) {
+      return
+    }
+
+    visibleIncomingInboxPreview.value = incomingInboxPreview.value
+
+    if (incomingInboxPreviewTimeout != null) {
+      window.clearTimeout(incomingInboxPreviewTimeout)
+    }
+
+    incomingInboxPreviewTimeout = window.setTimeout(() => {
+      visibleIncomingInboxPreview.value = null
+      incomingInboxPreviewTimeout = null
+    }, 5000)
+
+    void playInboxPing()
+  },
+)
+
+async function playInboxPing() {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  const webkitWindow = window as Window & { webkitAudioContext?: typeof AudioContext }
+  const audioContextConstructor = window.AudioContext ?? webkitWindow.webkitAudioContext
+
+  if (!audioContextConstructor) {
+    return
+  }
+
+  try {
+    inboxPreviewAudioContext ??= new audioContextConstructor()
+
+    if (inboxPreviewAudioContext.state === 'suspended') {
+      await inboxPreviewAudioContext.resume()
+    }
+
+    const currentTime = inboxPreviewAudioContext.currentTime
+    const oscillator = inboxPreviewAudioContext.createOscillator()
+    const gainNode = inboxPreviewAudioContext.createGain()
+
+    oscillator.type = 'sine'
+    oscillator.frequency.setValueAtTime(1046.5, currentTime)
+    oscillator.frequency.exponentialRampToValueAtTime(783.99, currentTime + 0.2)
+
+    gainNode.gain.setValueAtTime(0.0001, currentTime)
+    gainNode.gain.exponentialRampToValueAtTime(0.07, currentTime + 0.01)
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, currentTime + 0.24)
+
+    oscillator.connect(gainNode)
+    gainNode.connect(inboxPreviewAudioContext.destination)
+
+    oscillator.start(currentTime)
+    oscillator.stop(currentTime + 0.25)
+    oscillator.onended = () => {
+      oscillator.disconnect()
+      gainNode.disconnect()
+    }
+  } catch {
+    // Ignore blocked browser audio playback and keep the visual notification.
+  }
+}
+
+onBeforeUnmount(() => {
+  if (incomingInboxPreviewTimeout != null) {
+    window.clearTimeout(incomingInboxPreviewTimeout)
+  }
+
+  if (inboxPreviewAudioContext) {
+    void inboxPreviewAudioContext.close()
+    inboxPreviewAudioContext = null
+  }
+})
 
 const profileName = computed(() => {
   const person = currentPersonStore.person

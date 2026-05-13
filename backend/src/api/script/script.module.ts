@@ -14,11 +14,19 @@ import { CalendarModule } from '../../calendar/calendar.module';
 import { AuthModule } from '../../auth/auth.module';
 import { MailModule } from '../mail/mail.module';
 import { TeamsModule } from '../teams/teams.module';
+import { InboxModule } from '../inbox/inbox.module';
 
 import { ScriptController } from './script.controller';
 
 @Module({
-  imports: [AuthModule, WebhookModule, CalendarModule, MailModule, TeamsModule],
+  imports: [
+    AuthModule,
+    WebhookModule,
+    CalendarModule,
+    MailModule,
+    TeamsModule,
+    InboxModule,
+  ],
   controllers: [ScriptController],
   providers: [ScriptService],
   exports: [ScriptService],
