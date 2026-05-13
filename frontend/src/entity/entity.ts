@@ -428,6 +428,8 @@ export interface EventTypeItem extends SaplingGenericItem {
   icon: string | null
   /** Color used for displaying the event type */
   color: string
+  /** Indicates whether events of this type belong in the standard calendar view */
+  isStandardCalendar?: boolean
   /** Indicates whether events of this type are shown in the default calendar view and synchronized externally */
   showInDefaultCalendar?: boolean
   /** Events belonging to this event type */

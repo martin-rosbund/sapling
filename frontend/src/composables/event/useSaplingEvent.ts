@@ -793,7 +793,12 @@ export function useSaplingEvent() {
 
     events.value = filterWorkweekEvents(
       filterByCalendarMode([
-        ...response.data.flatMap((event) => expandRecurringEvent(event, startDate, endDate)),
+        ...response.data.flatMap((event) =>
+          expandRecurringEvent(event, startDate, endDate).map((calendarEvent) => ({
+            ...calendarEvent,
+            saplingSource: 'event' as const,
+          })),
+        ),
         ...holidayResponse.data.map((holiday) => toHolidayCalendarEvent(holiday)),
       ]),
     )
@@ -1291,7 +1296,11 @@ export function useSaplingEvent() {
       }
 
       const typeRecord = (event.event as EventItem | undefined)?.type
-      return typeRecord?.showInDefaultCalendar !== false
+      if (typeRecord?.showInDefaultCalendar === false) {
+        return false
+      }
+
+      return typeRecord?.isStandardCalendar !== false
     })
   }
 
