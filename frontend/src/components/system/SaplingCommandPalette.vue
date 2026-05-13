@@ -96,6 +96,8 @@ import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
 import { buildFavoritePath } from '@/utils/saplingFavoriteNavigation'
 import { useSaplingPreferences } from '@/composables/system/useSaplingPreferences'
 import { useSaplingAccount } from '@/composables/account/useSaplingAccount'
+import { useSaplingAiChat } from '@/composables/system/useSaplingAiChat'
+import { useSaplingHelp } from '@/composables/system/useSaplingHelp'
 import type { EntityItem, EntityRouteItem, FavoriteItem, PersonItem } from '@/entity/entity'
 import type { AccumulatedPermission } from '@/entity/structure'
 
@@ -122,8 +124,11 @@ const router = useRouter()
 const { t, te } = useI18n()
 const currentPersonStore = useCurrentPersonStore()
 const currentPermissionStore = useCurrentPermissionStore()
-const { toggleTheme, setLanguage, currentLanguage, isDarkTheme } = useSaplingPreferences()
+const { toggleTheme, setLanguage, currentLanguage, isDarkTheme, isGlassEnabled, isTiltEnabled, toggleGlass, toggleTilt, openIssue } =
+  useSaplingPreferences()
 const { logout } = useSaplingAccount()
+const { hasSaplingAiChatAccess, openSaplingAiChat } = useSaplingAiChat()
+const { openSaplingHelp } = useSaplingHelp()
 
 const isOpen = ref(false)
 const isLoaded = ref(false)
@@ -342,44 +347,129 @@ const actionItems = computed<Omit<CommandPaletteItem, 'flatIndex'>[]>(() => {
   const logoutLabel = t('login.logout')
   const logoutHint = t('global.commandPalette.actionLogoutHint')
 
-  return [
-    {
-      id: 'action:theme',
+  const items: Omit<CommandPaletteItem, 'flatIndex'>[] = []
+
+  if (hasSaplingAiChatAccess.value) {
+    const aiChatLabel = t('global.commandPalette.actionAiChat')
+    const aiChatHint = t('global.commandPalette.actionAiChatHint')
+    items.push({
+      id: 'action:ai-chat',
       group: 'action',
-      label: themeLabel,
-      hint: themeHint,
-      icon: isDarkTheme.value ? 'mdi-white-balance-sunny' : 'mdi-weather-night',
-      haystack: `${themeLabel} ${themeHint} theme design`.toLowerCase(),
-      path: '',
-      run: () => {
-        toggleTheme()
-      },
-    },
-    {
-      id: 'action:language',
-      group: 'action',
-      label: languageLabel,
-      hint: languageHint,
-      icon: 'mdi-translate',
-      haystack: `${languageLabel} ${languageHint} language sprache`.toLowerCase(),
-      path: '',
-      run: () => {
-        setLanguage(targetLanguage)
-      },
-    },
-    {
-      id: 'action:logout',
-      group: 'action',
-      label: logoutLabel,
-      hint: logoutHint,
-      icon: 'mdi-logout',
-      haystack: `${logoutLabel} ${logoutHint} logout abmelden`.toLowerCase(),
+      label: aiChatLabel,
+      hint: aiChatHint,
+      icon: 'mdi-robot-outline',
+      haystack: `${aiChatLabel} ${aiChatHint} ai chat assistent`.toLowerCase(),
       path: '',
       run: async () => {
-        await logout()
+        await openSaplingAiChat()
       },
+    })
+  }
+
+  const issueLabel = t('global.commandPalette.actionIssue')
+  const issueHint = t('global.commandPalette.actionIssueHint')
+  items.push({
+    id: 'action:issue',
+    group: 'action',
+    label: issueLabel,
+    hint: issueHint,
+    icon: 'mdi-bug-outline',
+    haystack: `${issueLabel} ${issueHint} issue bug feedback fehler melden report`.toLowerCase(),
+    path: '',
+    run: async () => {
+      await openIssue()
     },
-  ]
+  })
+
+  const helpLabel = t('global.commandPalette.actionHelp')
+  const helpHint = t('global.commandPalette.actionHelpHint')
+  items.push({
+    id: 'action:help',
+    group: 'action',
+    label: helpLabel,
+    hint: helpHint,
+    icon: 'mdi-help-circle-outline',
+    haystack: `${helpLabel} ${helpHint} help hilfe shortcuts tastenkürzel f1`.toLowerCase(),
+    path: '',
+    run: () => {
+      openSaplingHelp()
+    },
+  })
+
+  items.push({
+    id: 'action:theme',
+    group: 'action',
+    label: themeLabel,
+    hint: themeHint,
+    icon: isDarkTheme.value ? 'mdi-white-balance-sunny' : 'mdi-weather-night',
+    haystack: `${themeLabel} ${themeHint} theme design`.toLowerCase(),
+    path: '',
+    run: () => {
+      toggleTheme()
+    },
+  })
+
+  const glassLabel = isGlassEnabled.value
+    ? t('global.disableGlassDesign')
+    : t('global.enableGlassDesign')
+  const glassHint = t('global.commandPalette.actionGlassHint')
+  items.push({
+    id: 'action:glass',
+    group: 'action',
+    label: glassLabel,
+    hint: glassHint,
+    icon: isGlassEnabled.value ? 'mdi-blur-off' : 'mdi-blur',
+    haystack: `${glassLabel} ${glassHint} glass design glas blur`.toLowerCase(),
+    path: '',
+    run: () => {
+      toggleGlass()
+    },
+  })
+
+  const tiltLabel = isTiltEnabled.value
+    ? t('global.disableTiltEffect')
+    : t('global.enableTiltEffect')
+  const tiltHint = t('global.commandPalette.actionTiltHint')
+  items.push({
+    id: 'action:tilt',
+    group: 'action',
+    label: tiltLabel,
+    hint: tiltHint,
+    icon: 'mdi-image-filter-tilt-shift',
+    haystack: `${tiltLabel} ${tiltHint} tilt effect effekt`.toLowerCase(),
+    path: '',
+    run: () => {
+      toggleTilt()
+    },
+  })
+
+  items.push({
+    id: 'action:language',
+    group: 'action',
+    label: languageLabel,
+    hint: languageHint,
+    icon: 'mdi-translate',
+    haystack: `${languageLabel} ${languageHint} language sprache`.toLowerCase(),
+    path: '',
+    run: () => {
+      setLanguage(targetLanguage)
+    },
+  })
+
+  items.push({
+    id: 'action:logout',
+    group: 'action',
+    label: logoutLabel,
+    hint: logoutHint,
+    icon: 'mdi-logout',
+    haystack: `${logoutLabel} ${logoutHint} logout abmelden`.toLowerCase(),
+    path: '',
+    run: async () => {
+      await logout()
+    },
+  })
+
+  return items
 })
 
 const filteredResults = computed<CommandPaletteItem[]>(() => {

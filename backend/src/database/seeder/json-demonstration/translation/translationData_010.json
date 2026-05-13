@@ -72,5 +72,30 @@
   { "entity": "inboxNotification", "property": "groupConfiguration", "de": "Konfiguration", "en": "Configuration" },
   { "entity": "inboxNotification", "property": "groupReference", "de": "Referenz", "en": "Reference" },
 
-  { "entity": "event", "property": "allDoneToday", "de": "Heute ist alles erledigt", "en": "All done for today" }
+  { "entity": "event", "property": "allDoneToday", "de": "Heute ist alles erledigt", "en": "All done for today" },
+
+  { "entity": "global", "property": "commandPalette.actionAiChat", "de": "KI-Chat öffnen", "en": "Open AI chat" },
+  { "entity": "global", "property": "commandPalette.actionAiChatHint", "de": "Mit dem KI-Assistenten sprechen", "en": "Talk to the AI assistant" },
+  { "entity": "global", "property": "commandPalette.actionIssue", "de": "Problem melden", "en": "Report an issue" },
+  { "entity": "global", "property": "commandPalette.actionIssueHint", "de": "Fehler oder Wunsch direkt melden", "en": "Report a bug or request directly" },
+  { "entity": "global", "property": "commandPalette.actionHelp", "de": "Hilfe anzeigen", "en": "Show help" },
+  { "entity": "global", "property": "commandPalette.actionHelpHint", "de": "Tastenkürzel und Befehlsübersicht (F1)", "en": "Shortcuts and command overview (F1)" },
+  { "entity": "global", "property": "commandPalette.actionGlassHint", "de": "Glas-Design umschalten", "en": "Toggle glass design" },
+  { "entity": "global", "property": "commandPalette.actionTiltHint", "de": "Tilt-Effekt umschalten", "en": "Toggle tilt effect" },  
+  { "entity": "global", "property": "help.commandAiChatHint", "de": "KI-Chat-Dialog direkt aus der Palette öffnen", "en": "Open the AI chat dialog straight from the palette" },
+  { "entity": "global", "property": "help.commandIssueHint", "de": "Fehler, Probleme oder Wünsche an das Team melden", "en": "Report bugs, issues or requests to the team" },
+  { "entity": "global", "property": "help.commandHelpHint", "de": "Diesen Hilfedialog jederzeit erneut anzeigen", "en": "Show this help dialog at any time" },
+  { "entity": "global", "property": "help.commandGlassHint", "de": "Glas-Optik der Oberfläche an- oder ausschalten", "en": "Enable or disable the glass-style surfaces" },
+  { "entity": "global", "property": "help.commandTiltHint", "de": "Subtile Tilt-Animation an- oder ausschalten", "en": "Enable or disable the subtle tilt animation" },
+  { "entity": "global", "property": "help.syntaxTitle", "de": "Suchsyntax", "en": "Search syntax" },
+  { "entity": "global", "property": "help.syntaxIntro", "de": "Verfeinere die Suche in der Command Palette mit dem Doppelpunkt-Präfix.", "en": "Refine the command palette search with the colon prefix." },
+  { "entity": "global", "property": "help.syntaxEntitySearchExample", "de": "ticket:rechnung", "en": "ticket:invoice" },
+  { "entity": "global", "property": "help.syntaxEntitySearchLabel", "de": "Bereich gezielt durchsuchen", "en": "Search inside a specific area" },
+  { "entity": "global", "property": "help.syntaxEntitySearchHint", "de": "Öffnet die Liste des Bereichs vor dem Doppelpunkt und übergibt den Text dahinter als Suche.", "en": "Opens the area before the colon and passes the text after it as a search query." },
+  { "entity": "global", "property": "help.syntaxEntityPrefixExample", "de": "person:", "en": "person:" },
+  { "entity": "global", "property": "help.syntaxEntityPrefixLabel", "de": "Bereich vorfiltern", "en": "Pre-filter by area" },
+  { "entity": "global", "property": "help.syntaxEntityPrefixHint", "de": "Mit Doppelpunkt am Ende werden nur Treffer angezeigt, die zu diesem Bereich passen.", "en": "A trailing colon limits results to matches for that area." },
+  { "entity": "global", "property": "help.syntaxFreeTextExample", "de": "design", "en": "theme" },
+  { "entity": "global", "property": "help.syntaxFreeTextLabel", "de": "Freitext", "en": "Free text" },
+  { "entity": "global", "property": "help.syntaxFreeTextHint", "de": "Ohne Doppelpunkt wird in Favoriten, Bereichen und Aktionen gleichzeitig gesucht.", "en": "Without a colon, favorites, areas and actions are searched at once." }
 ]
