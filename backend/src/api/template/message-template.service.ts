@@ -14,6 +14,23 @@ type MessageContextOptions = {
   relations?: string[];
 };
 
+type MessageTemplateRenderOptions = {
+  entityHandle?: string;
+  locale?: string;
+  timeZone?: string;
+  currentUser?: PersonItem;
+};
+
+type PlaceholderFormatter = {
+  name: string;
+  args: string[];
+};
+
+type ParsedPlaceholderExpression = {
+  path: string;
+  formatters: PlaceholderFormatter[];
+};
+
 function isRecord(value: unknown): value is JsonRecord {
   return typeof value === 'object' && value !== null;
 }
@@ -266,6 +283,30 @@ export class MessageTemplateService {
     string,
     Map<string, ReturnType<TemplateService['getEntityTemplate']>[number]>
   >();
+  private readonly placeholderFormatters = new Map<
+    string,
+    (
+      value: unknown,
+      formatter: PlaceholderFormatter,
+      renderOptions: MessageTemplateRenderOptions,
+    ) => unknown
+  >([
+    [
+      'date',
+      (value, _formatter, renderOptions) =>
+        this.formatTemporalValue(value, 'date', renderOptions),
+    ],
+    [
+      'datetime',
+      (value, _formatter, renderOptions) =>
+        this.formatTemporalValue(value, 'datetime', renderOptions),
+    ],
+    [
+      'dateTime',
+      (value, _formatter, renderOptions) =>
+        this.formatTemporalValue(value, 'datetime', renderOptions),
+    ],
+  ]);
 
   constructor(
     private readonly em: EntityManager,
@@ -332,37 +373,37 @@ export class MessageTemplateService {
     );
   }
 
-  replacePlaceholders(template: string, context: JsonRecord): string {
+  replacePlaceholders(
+    template: string,
+    context: JsonRecord,
+    renderOptions: MessageTemplateRenderOptions = {},
+  ): string {
     return template.replace(/\{\{\s*([^}]+?)\s*\}\}/g, (_match, expression) => {
-      const value = this.getContextValue(context, String(expression).trim());
-      if (Array.isArray(value)) {
-        return value
-          .map((entry) =>
-            typeof entry === 'string' || typeof entry === 'number'
-              ? String(entry)
-              : '',
-          )
-          .filter(Boolean)
-          .join(', ');
-      }
-
-      if (value === null || value === undefined) {
+      const parsedExpression = this.parsePlaceholderExpression(
+        String(expression).trim(),
+      );
+      if (!parsedExpression) {
         return '';
       }
 
-      if (value instanceof Date) {
-        return value.toISOString();
-      }
+      const value = this.getContextValue(context, parsedExpression.path);
+      const field =
+        renderOptions.entityHandle &&
+        this.resolveExpressionField(
+          renderOptions.entityHandle,
+          parsedExpression.path,
+        );
+      const fieldType = this.extractTemplateFieldType(field);
 
-      if (
-        typeof value === 'string' ||
-        typeof value === 'number' ||
-        typeof value === 'boolean'
-      ) {
-        return String(value);
-      }
-
-      return '';
+      return this.stringifyPlaceholderValue(
+        value,
+        parsedExpression.formatters,
+        {
+          ...renderOptions,
+          currentUser: renderOptions.currentUser,
+        },
+        fieldType,
+      );
     });
   }
 
@@ -465,6 +506,323 @@ export class MessageTemplateService {
     }
 
     return value;
+  }
+
+  private parsePlaceholderExpression(
+    expression: string,
+  ): ParsedPlaceholderExpression | null {
+    const segments = expression
+      .split('|')
+      .map((segment) => segment.trim())
+      .filter(Boolean);
+
+    const path = segments.shift();
+    if (!path) {
+      return null;
+    }
+
+    return {
+      path,
+      formatters: segments
+        .map((segment) => this.parsePlaceholderFormatter(segment))
+        .filter((formatter): formatter is PlaceholderFormatter =>
+          Boolean(formatter),
+        ),
+    };
+  }
+
+  private parsePlaceholderFormatter(
+    value: string,
+  ): PlaceholderFormatter | null {
+    const match = value.match(/^([a-zA-Z][\w-]*)(?:\((.*)\))?$/);
+    if (!match) {
+      return null;
+    }
+
+    const args = (match[2] ?? '')
+      .split(',')
+      .map((entry) => entry.trim())
+      .filter(Boolean);
+
+    return {
+      name: match[1],
+      args,
+    };
+  }
+
+  private stringifyPlaceholderValue(
+    value: unknown,
+    formatters: PlaceholderFormatter[],
+    renderOptions: MessageTemplateRenderOptions,
+    fieldType?: string,
+  ): string {
+    const entries = this.flattenPlaceholderValues(value);
+    if (entries.length === 0) {
+      return '';
+    }
+
+    return entries
+      .map((entry) =>
+        this.stringifySinglePlaceholderValue(
+          entry,
+          formatters,
+          renderOptions,
+          fieldType,
+        ),
+      )
+      .filter(Boolean)
+      .join(', ');
+  }
+
+  private stringifySinglePlaceholderValue(
+    value: unknown,
+    formatters: PlaceholderFormatter[],
+    renderOptions: MessageTemplateRenderOptions,
+    fieldType?: string,
+  ): string {
+    const normalizedRenderOptions = this.normalizeRenderOptions(renderOptions);
+
+    if (formatters.length === 0) {
+      return this.stringifyDefaultPlaceholderValue(
+        value,
+        normalizedRenderOptions,
+        fieldType,
+      );
+    }
+
+    let formattedValue = value;
+    for (const formatter of formatters) {
+      formattedValue = this.applyPlaceholderFormatter(
+        formattedValue,
+        formatter,
+        normalizedRenderOptions,
+      );
+    }
+
+    return this.stringifyPrimitivePlaceholderValue(formattedValue);
+  }
+
+  private stringifyDefaultPlaceholderValue(
+    value: unknown,
+    renderOptions: MessageTemplateRenderOptions,
+    fieldType?: string,
+  ): string {
+    if (fieldType === 'date' || fieldType === 'datetime') {
+      const formattedValue = this.formatTemporalValue(value, fieldType, {
+        ...renderOptions,
+      });
+      if (typeof formattedValue === 'string') {
+        return formattedValue;
+      }
+    }
+
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+
+    return this.stringifyPrimitivePlaceholderValue(value);
+  }
+
+  private applyPlaceholderFormatter(
+    value: unknown,
+    formatter: PlaceholderFormatter,
+    renderOptions: MessageTemplateRenderOptions,
+  ): unknown {
+    const formatHandler = this.placeholderFormatters.get(formatter.name);
+    if (!formatHandler) {
+      return value;
+    }
+
+    return formatHandler(value, formatter, renderOptions);
+  }
+
+  private formatTemporalValue(
+    value: unknown,
+    mode: 'date' | 'datetime',
+    renderOptions: MessageTemplateRenderOptions,
+  ): string | undefined {
+    const dateValue = this.coerceDateValue(value);
+    if (!dateValue) {
+      return undefined;
+    }
+
+    const locale = renderOptions.locale;
+    const timeZone =
+      mode === 'date' ? 'UTC' : this.normalizeTimeZone(renderOptions.timeZone);
+
+    return new Intl.DateTimeFormat(locale, {
+      dateStyle: 'medium',
+      ...(mode === 'datetime' ? { timeStyle: 'short' } : {}),
+      ...(timeZone ? { timeZone } : {}),
+    }).format(dateValue);
+  }
+
+  private coerceDateValue(value: unknown): Date | null {
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? null : value;
+    }
+
+    if (typeof value === 'string' || typeof value === 'number') {
+      const dateValue = new Date(value);
+      return Number.isNaN(dateValue.getTime()) ? null : dateValue;
+    }
+
+    return null;
+  }
+
+  private normalizeRenderOptions(
+    renderOptions: MessageTemplateRenderOptions,
+  ): MessageTemplateRenderOptions {
+    return {
+      ...renderOptions,
+      locale: this.normalizeLocale(
+        renderOptions.locale,
+        renderOptions.currentUser,
+      ),
+      timeZone: this.normalizeTimeZone(renderOptions.timeZone),
+    };
+  }
+
+  private normalizeLocale(
+    locale: string | undefined,
+    currentUser?: PersonItem,
+  ): string | undefined {
+    const candidates = [
+      locale,
+      this.extractCurrentUserLocale(currentUser),
+    ].filter((entry): entry is string => typeof entry === 'string');
+
+    for (const candidate of candidates) {
+      const normalized = candidate.trim();
+      if (!normalized) {
+        continue;
+      }
+
+      try {
+        return Intl.getCanonicalLocales(normalized)[0];
+      } catch {
+        continue;
+      }
+    }
+
+    return undefined;
+  }
+
+  private normalizeTimeZone(timeZone: string | undefined): string | undefined {
+    const normalized = timeZone?.trim();
+    if (!normalized) {
+      return undefined;
+    }
+
+    try {
+      new Intl.DateTimeFormat('en-US', { timeZone: normalized });
+      return normalized;
+    } catch {
+      return undefined;
+    }
+  }
+
+  private extractCurrentUserLocale(
+    currentUser?: PersonItem,
+  ): string | undefined {
+    const languageValue = currentUser?.language;
+
+    if (typeof languageValue === 'string') {
+      return languageValue;
+    }
+
+    if (
+      languageValue &&
+      typeof languageValue === 'object' &&
+      'handle' in languageValue &&
+      typeof languageValue.handle === 'string'
+    ) {
+      return languageValue.handle;
+    }
+
+    return undefined;
+  }
+
+  private flattenPlaceholderValues(value: unknown): unknown[] {
+    if (value === null || value === undefined) {
+      return [];
+    }
+
+    if (Array.isArray(value)) {
+      return value.flatMap((entry) => this.flattenPlaceholderValues(entry));
+    }
+
+    return [value];
+  }
+
+  private stringifyPrimitivePlaceholderValue(value: unknown): string {
+    if (
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      typeof value === 'boolean'
+    ) {
+      return String(value);
+    }
+
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+
+    return '';
+  }
+
+  private resolveExpressionField(
+    entityHandle: string,
+    expression: string,
+  ): ReturnType<TemplateService['getEntityTemplate']>[number] | undefined {
+    const segments = expression
+      .split('.')
+      .map((segment) => segment.trim())
+      .filter(Boolean);
+
+    if (segments.length === 0) {
+      return undefined;
+    }
+
+    let currentEntityHandle = entityHandle;
+    let currentIndex = 0;
+
+    if (segments[0] === 'currentUser') {
+      currentEntityHandle = 'person';
+      currentIndex = 1;
+    }
+
+    let field:
+      | ReturnType<TemplateService['getEntityTemplate']>[number]
+      | undefined;
+
+    for (; currentIndex < segments.length; currentIndex += 1) {
+      field = this.getTemplateField(
+        currentEntityHandle,
+        segments[currentIndex],
+      );
+      if (!field) {
+        return undefined;
+      }
+
+      if (currentIndex < segments.length - 1) {
+        if (!field.isReference || !field.referenceName) {
+          return undefined;
+        }
+
+        currentEntityHandle = field.referenceName;
+      }
+    }
+
+    return field;
+  }
+
+  private extractTemplateFieldType(field: unknown): string | undefined {
+    if (!isRecord(field)) {
+      return undefined;
+    }
+
+    return typeof field.type === 'string' ? field.type : undefined;
   }
 
   private collectPopulateRelations(

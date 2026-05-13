@@ -320,7 +320,7 @@ const SaplingFieldGenericReference = defineAsyncComponent(
   () => import('@/components/dialog/fields/SaplingFieldGenericReference.vue'),
 )
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   template: EntityTemplate
   entityHandle: string
   itemHandle?: string | number
@@ -334,7 +334,10 @@ const props = defineProps<{
   fieldDisabled: boolean
   referenceFieldDisabled: boolean
   referenceParentFilter?: FilterQuery
-}>()
+  showLabel?: boolean
+}>(), {
+  showLabel: true,
+})
 
 const emit = defineEmits<{
   (event: 'update-field', key: string, value: unknown): void
@@ -343,8 +346,20 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const plainLabel = computed(() => t(`${props.entityHandle}.${props.template.name}`))
-const requiredLabel = computed(() => `${plainLabel.value}${props.template.isRequired ? '*' : ''}`)
+const plainLabel = computed(() => {
+  if (!props.showLabel) {
+    return ''
+  }
+
+  return t(`${props.entityHandle}.${props.template.name}`)
+})
+const requiredLabel = computed(() => {
+  if (!props.showLabel) {
+    return ''
+  }
+
+  return `${plainLabel.value}${props.template.isRequired ? '*' : ''}`
+})
 const defaultPlaceholder = computed(() =>
   props.template.default != null ? String(props.template.default) : '',
 )

@@ -29,8 +29,8 @@
   {
     "name": "Ticket Eingang bestaetigen",
     "description": "Automatische Bestaetigung für ein neu angelegtes Ticket.",
-    "subjectTemplate": "Ticket {{handle}} wurde erfasst: {{title}}",
-    "bodyMarkdown": "Hallo,\n\nIhr Anliegen **{{title}}** wurde unter der Ticketnummer **{{handle}}** erfasst.\n\n**Aktueller Status**: {{status.description}}\n**Prioritaet**: {{priority.description}}\n**Startdatum**: {{startDate}}\n\nWir melden uns, sobald die naechste Bearbeitungsstufe erreicht ist.\n\nBeste Grüße\nIhr Support-Team",
+    "subjectTemplate": "Ticket {{number}} wurde erfasst: {{title}}",
+    "bodyMarkdown": "Hallo,\n\nIhr Anliegen **{{title}}** wurde unter der Ticketnummer **{{number}}** erfasst.\n\n**Aktueller Status**: {{status.description}}\n**Prioritaet**: {{priority.description}}\n**Startdatum**: {{startDate}}\n\nWir melden uns, sobald die naechste Bearbeitungsstufe erreicht ist.\n\nBeste Grüße\nIhr Support-Team",
     "isDefault": true,
     "isActive": true,
     "entity": "ticket"
@@ -38,7 +38,7 @@
   {
     "name": "Ticket in Bearbeitung",
     "description": "Zwischeninfo, sobald ein Ticket aktiv bearbeitet wird.",
-    "subjectTemplate": "Update zu Ticket {{handle}}: {{title}}",
+    "subjectTemplate": "Update zu Ticket {{number}}: {{title}}",
     "bodyMarkdown": "Guten Tag,\n\nzu Ihrem Ticket **{{title}}** gibt es ein Update.\n\n- Status: {{status.description}}\n- Prioritaet: {{priority.description}}\n- Deadline: {{deadlineDate}}\n\nUnsere Bearbeitung laeuft bereits. Falls Sie zusaetzliche Informationen haben, antworten Sie bitte direkt auf diese E-Mail.\n\nFreundliche Grüße\nIhr Support-Team",
     "isDefault": false,
     "isActive": true,
@@ -47,7 +47,7 @@
   {
     "name": "Ticket geloest",
     "description": "Abschlussmail nach erfolgreicher Ticketbearbeitung.",
-    "subjectTemplate": "Ticket {{handle}} wurde abgeschlossen",
+    "subjectTemplate": "Ticket {{number}} wurde abgeschlossen",
     "bodyMarkdown": "Hallo,\n\nIhr Ticket **{{title}}** wurde erfolgreich abgeschlossen.\n\n**Lösungsbeschreibung**\n{{solutionDescription}}\n\nFalls noch Rueckfragen offen sind, koennen Sie jederzeit antworten oder ein Folgeticket erstellen.\n\nViele Grüße\nIhr Support-Team",
     "isDefault": false,
     "isActive": true,

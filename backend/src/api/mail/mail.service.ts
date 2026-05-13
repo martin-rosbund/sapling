@@ -207,9 +207,23 @@ export class MailService {
     const context = await this.resolveContext(previewDto, currentUser);
     const subjectSource = previewDto.subject ?? template?.subjectTemplate ?? '';
     const bodySource = previewDto.bodyMarkdown ?? template?.bodyMarkdown ?? '';
+    const renderOptions = {
+      entityHandle: previewDto.entityHandle,
+      locale: previewDto.clientLocale,
+      timeZone: previewDto.clientTimeZone,
+      currentUser,
+    };
 
-    const subject = this.replacePlaceholders(subjectSource, context);
-    const bodyMarkdown = this.replacePlaceholders(bodySource, context);
+    const subject = this.replacePlaceholders(
+      subjectSource,
+      context,
+      renderOptions,
+    );
+    const bodyMarkdown = this.replacePlaceholders(
+      bodySource,
+      context,
+      renderOptions,
+    );
 
     return {
       entityHandle: previewDto.entityHandle,
@@ -422,8 +436,21 @@ export class MailService {
     return values.map((value) => value.trim()).filter(Boolean);
   }
 
-  private replacePlaceholders(template: string, context: JsonRecord): string {
-    return this.messageTemplateService.replacePlaceholders(template, context);
+  private replacePlaceholders(
+    template: string,
+    context: JsonRecord,
+    renderOptions?: {
+      entityHandle?: string;
+      locale?: string;
+      timeZone?: string;
+      currentUser?: PersonItem;
+    },
+  ): string {
+    return this.messageTemplateService.replacePlaceholders(
+      template,
+      context,
+      renderOptions,
+    );
   }
 
   private getContextValue(context: JsonRecord, expression: string): unknown {

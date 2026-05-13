@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-large">
-    <SaplingDialogCard class="sapling-inbox-dialog">
+    <SaplingDialogCard class="sapling-inbox-dialog" :tilt="false">
       <SaplingDialogShell fill-shell body-class="sapling-inbox-dialog__body" :show-divider="false">
         <template #hero>
           <SaplingDialogHero

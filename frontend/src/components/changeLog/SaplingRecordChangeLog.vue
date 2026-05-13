@@ -86,8 +86,18 @@
                     role="row"
                   >
                     <strong>{{ getPropertyLabel(detail.property) }}</strong>
-                    <pre>{{ formatDetailValue(detail.oldValue) }}</pre>
-                    <pre>{{ formatDetailValue(detail.newValue) }}</pre>
+                    <SaplingChangeLogDetailValue
+                      :entity-handle="entity?.handle ?? ''"
+                      :template="getPropertyTemplate(detail.property)"
+                      :value="detail.oldValue"
+                      :payload="entry.oldPayload"
+                    />
+                    <SaplingChangeLogDetailValue
+                      :entity-handle="entity?.handle ?? ''"
+                      :template="getPropertyTemplate(detail.property)"
+                      :value="detail.newValue"
+                      :payload="entry.newPayload"
+                    />
                   </div>
                 </div>
 
@@ -111,8 +121,9 @@
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
-import type { ChangeLogAction, ChangeLogEntry } from '@/entity/structure'
+import type { ChangeLogAction, ChangeLogEntry, EntityTemplate } from '@/entity/structure'
 import SaplingActionClose from '@/components/actions/SaplingActionClose.vue'
+import SaplingChangeLogDetailValue from '@/components/changeLog/SaplingChangeLogDetailValue.vue'
 import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue'
@@ -172,6 +183,10 @@ const visibleEntries = computed(() =>
   })),
 )
 
+const templateByName = computed(
+  () => new Map(entityTemplates.value.map((template) => [template.name, template])),
+)
+
 function closeDialog() {
   changeLogDialogStore.closeChangeLog()
 }
@@ -224,19 +239,11 @@ function getPropertyLabel(property: string): string {
     .trim()
 }
 
-function formatTimestamp(value?: string | null): string {
-  return value ? formatDateTimeValue(value) : ''
+function getPropertyTemplate(property: string): EntityTemplate | null {
+  return templateByName.value.get(property) ?? null
 }
 
-function formatDetailValue(value: unknown): string {
-  if (value == null) {
-    return '-'
-  }
-
-  if (typeof value === 'string') {
-    return value
-  }
-
-  return JSON.stringify(value, null, 2)
+function formatTimestamp(value?: string | null): string {
+  return value ? formatDateTimeValue(value) : ''
 }
 </script>

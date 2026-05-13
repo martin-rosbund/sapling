@@ -141,6 +141,24 @@ export class MailPreviewDto {
   senderEmail?: string;
 
   @ApiPropertyOptional({
+    description:
+      'Optional client locale used to format localized placeholder values.',
+  })
+  @IsOptional()
+  @Transform(({ value }) => normalizeOptionalString(value))
+  @IsString()
+  clientLocale?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Optional client time zone used to format date and time placeholders.',
+  })
+  @IsOptional()
+  @Transform(({ value }) => normalizeOptionalString(value))
+  @IsString()
+  clientTimeZone?: string;
+
+  @ApiPropertyOptional({
     type: [String],
     description: 'Optional primary recipient list.',
   })

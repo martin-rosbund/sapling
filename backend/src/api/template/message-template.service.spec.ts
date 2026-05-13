@@ -52,6 +52,70 @@ describe('MessageTemplateService', () => {
     );
   });
 
+  it('formats datetime placeholders with locale and time zone awareness', () => {
+    const dateValue = new Date('2026-05-13T10:00:00.000Z');
+    const templateService = {
+      getEntityTemplate: jest.fn((entityHandle: string) => {
+        switch (entityHandle) {
+          case 'ticket':
+            return [
+              {
+                name: 'startDate',
+                type: 'datetime',
+                isReference: false,
+                referenceName: '',
+              },
+            ];
+          default:
+            return [];
+        }
+      }),
+    };
+    const localService = new MessageTemplateService(
+      {} as never,
+      templateService as never,
+    );
+
+    const result = localService.replacePlaceholders(
+      'Start {{startDate}}',
+      { startDate: dateValue },
+      {
+        entityHandle: 'ticket',
+        locale: 'de-DE',
+        timeZone: 'Europe/Berlin',
+      },
+    );
+
+    const expected = new Intl.DateTimeFormat('de-DE', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+      timeZone: 'Europe/Berlin',
+    }).format(dateValue);
+
+    expect(result).toBe(`Start ${expected}`);
+  });
+
+  it('supports explicit date formatters in placeholder expressions', () => {
+    const localService = new MessageTemplateService({} as never, {} as never);
+    const dateValue = '2026-05-13';
+
+    const result = localService.replacePlaceholders(
+      'Geburtstag {{birthDay | date}}',
+      { birthDay: dateValue },
+      {
+        locale: 'de-DE',
+        timeZone: 'Europe/Berlin',
+      },
+    );
+
+    const expected = new Intl.DateTimeFormat('de-DE', {
+      dateStyle: 'medium',
+      timeZone: 'UTC',
+    }).format(new Date(dateValue));
+
+    expect(result).toBe(`Geburtstag ${expected}`);
+  });
+
   it('renders markdown and strips it back to readable text', () => {
     const html = service.renderMarkdown('**Hello**\n\n- World');
     const text = service.stripMarkdown('**Hello**\n\n- World');

@@ -1,13 +1,12 @@
 <template>
   <v-dialog
     :model-value="modelValue"
-    class="sapling-dialog-edit-dialog"
     @update:model-value="handleDialogUpdate"
     :max-width="SAPLING_DIALOG_MAX_WIDTH['3xl']"
     :height="SAPLING_DIALOG_HEIGHT.xl"
     persistent
   >
-    <SaplingDialogCard class="sapling-dialog-edit-card" :tilt="false">
+    <SaplingDialogCard :tilt="false">
       <div class="sapling-dialog-edit-shell" @keydown="onShellKeydown">
         <v-card-title class="sapling-dialog-edit-header">
           <SaplingDialogEditHero :loading="isLoading" :eyebrow="entityLabel" :title="dialogTitle">

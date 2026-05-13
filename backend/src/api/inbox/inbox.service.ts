@@ -203,10 +203,18 @@ export class InboxService {
     const title = this.messageTemplateService.replacePlaceholders(
       template?.titleTemplate ?? template?.name ?? '',
       context,
+      {
+        entityHandle,
+        currentUser: options.currentUser,
+      },
     );
     const bodyMarkdown = this.messageTemplateService.replacePlaceholders(
       template?.bodyMarkdown ?? '',
       context,
+      {
+        entityHandle,
+        currentUser: options.currentUser,
+      },
     );
 
     return {

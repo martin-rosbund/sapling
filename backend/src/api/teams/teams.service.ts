@@ -355,6 +355,10 @@ export class TeamsService {
     const bodyMarkdown = this.messageTemplateService.replacePlaceholders(
       bodySource,
       context,
+      {
+        entityHandle,
+        currentUser: options.currentUser,
+      },
     );
     const bodyHtml = this.messageTemplateService.renderMarkdown(bodyMarkdown);
 

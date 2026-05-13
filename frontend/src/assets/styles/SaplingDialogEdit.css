@@ -1,12 +1,3 @@
-.sapling-dialog-edit-card {
-  height: var(--sapling-dialog-card-height);
-  max-height: var(--sapling-dialog-card-height);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border-radius: var(--sapling-file-panel-radius-compact);
-}
-
 .sapling-dialog-edit-shell,
 .sapling-dialog-edit-skeleton,
 .sapling-dialog-edit-loading,
@@ -295,12 +286,6 @@
 }
 
 @media (max-width: 720px) {
-  .sapling-dialog-edit-card {
-    height: 94vh;
-    max-height: 94vh;
-    border-radius: var(--sapling-file-panel-radius-compact);
-  }
-
   .sapling-dialog-edit-relation-header,
   .sapling-dialog-edit-relation-actions {
     flex-direction: column;

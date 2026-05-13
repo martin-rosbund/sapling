@@ -39,7 +39,7 @@
     "name": "Termin Anlage Inbox",
     "description": "Inbox-Benachrichtigung für neu angelegte Termine.",
     "titleTemplate": "Neuer Termin: {{title}}",
-    "bodyMarkdown": "Ein neuer Termin wurde geplant.\n\n- Start: {{startDate}}\n- Ende: {{endDate}}\n- Status: {{status.description}}\n- Typ: {{type.title}}\n\nBitte prüfe den Termin in Sapling.",
+    "bodyMarkdown": "Ein neuer Termin wurde geplant.\n\n- Start: {{startDate | dateTime}}\n- Ende: {{endDate | dateTime}}\n- Status: {{status.description}}\n- Typ: {{type.title}}\n\nBitte prüfe den Termin in Sapling.",
     "isDefault": true,
     "isActive": true,
     "entity": "event"
@@ -48,7 +48,7 @@
     "name": "Termin Update Inbox",
     "description": "Inbox-Benachrichtigung für geänderte Termine.",
     "titleTemplate": "Termin {{title}} wurde aktualisiert",
-    "bodyMarkdown": "Der Termin **{{title}}** wurde aktualisiert.\n\n- Start: {{startDate}}\n- Ende: {{endDate}}\n- Status: {{status.description}}\n- Typ: {{type.title}}\n\nBitte prüfe die Aenderungen direkt in Sapling.",
+    "bodyMarkdown": "Der Termin **{{title}}** wurde aktualisiert.\n\n- Start: {{startDate | dateTime}}\n- Ende: {{endDate | dateTime}}\n- Status: {{status.description}}\n- Typ: {{type.title}}\n\nBitte prüfe die Aenderungen direkt in Sapling.",
     "isDefault": true,
     "isActive": true,
     "entity": "event"

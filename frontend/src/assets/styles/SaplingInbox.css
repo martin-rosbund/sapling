@@ -357,17 +357,26 @@
 }
 
 .sapling-inbox-entry {
+  --sapling-inbox-entry-accent-color: rgb(var(--v-theme-primary));
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   gap: var(--sapling-gap-md);
   padding: var(--sapling-gap-lg);
   border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
   border-radius: 20px;
-  background: linear-gradient(
-    180deg,
-    rgba(var(--v-theme-surface), 0.94),
-    rgba(var(--v-theme-surface), 0.9)
-  );
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--sapling-inbox-entry-accent-color) 9%, transparent) 0%,
+      transparent 58%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(var(--v-theme-surface), 0.96),
+      rgba(var(--v-theme-surface), 0.9)
+    );
   cursor: pointer;
   transition:
     transform 0.2s ease,
@@ -376,10 +385,35 @@
     background 0.2s ease;
 }
 
+.sapling-inbox-entry::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(
+      circle at top right,
+      color-mix(in srgb, var(--sapling-inbox-entry-accent-color) 12%, transparent) 0%,
+      transparent 48%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--sapling-inbox-entry-accent-color) 5%, transparent),
+      transparent 34%
+    );
+  opacity: 0.95;
+  pointer-events: none;
+  z-index: -1;
+}
+
 .sapling-inbox-entry:hover,
 .sapling-inbox-entry:focus-visible {
   transform: translateY(-2px);
-  border-color: rgba(var(--v-theme-primary), 0.22);
+  border-color: color-mix(
+    in srgb,
+    var(--sapling-inbox-entry-accent-color) 22%,
+    rgba(var(--v-theme-on-surface), 0.08)
+  );
   box-shadow: 0 18px 32px rgba(15, 23, 42, 0.08);
   outline: none;
 }
@@ -404,8 +438,8 @@
   width: 10px;
   height: 10px;
   border-radius: var(--sapling-radius-pill);
-  background: rgba(var(--v-theme-primary), 0.9);
-  box-shadow: 0 0 0 4px rgba(var(--v-theme-primary), 0.12);
+  background: var(--sapling-inbox-entry-accent-color);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--sapling-inbox-entry-accent-color) 14%, transparent);
 }
 
 .sapling-inbox-entry__date {
