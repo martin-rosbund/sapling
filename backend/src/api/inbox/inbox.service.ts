@@ -24,6 +24,7 @@ export class InboxService {
     handle: number,
     payload: object | object[],
     currentUser: PersonItem,
+    relationExpressions: string[] = [],
   ): Promise<InboxNotificationItem[]> {
     const subscription = await this.em.findOne(
       InboxSubscriptionItem,
@@ -61,6 +62,7 @@ export class InboxService {
         subscription,
         item,
         currentUser,
+        relationExpressions,
       });
 
       for (const recipient of prepared.recipients) {
@@ -160,6 +162,7 @@ export class InboxService {
     subscription: InboxSubscriptionItem;
     item: object;
     currentUser: PersonItem;
+    relationExpressions: string[];
   }): Promise<{
     recipients: PersonItem[];
     referenceHandle?: string;
@@ -184,6 +187,7 @@ export class InboxService {
         ? await this.messageTemplateService.loadEntityContext(
             entityHandle,
             referenceHandle,
+            options.relationExpressions,
           )
         : (options.item as JsonRecord);
 

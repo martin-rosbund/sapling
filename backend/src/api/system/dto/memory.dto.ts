@@ -34,7 +34,8 @@ export class MemoryDto {
   /** Active memory (bytes) */
   @ApiProperty({
     example: 17243783168,
-    description: 'Memory actively in use by processes and the operating system in bytes.',
+    description:
+      'Memory actively in use by processes and the operating system in bytes.',
   })
   active?: number;
   /** Available memory (bytes) */

@@ -51,7 +51,8 @@ export class TemplateController {
   @ApiParam({
     name: 'entityHandle',
     type: String,
-    description: 'Registered Sapling entity handle whose template should be returned.',
+    description:
+      'Registered Sapling entity handle whose template should be returned.',
   })
   @ApiGenericEntityOperation('Returns the properties (columns) of an entity')
   @ApiResponse({

@@ -190,8 +190,7 @@ export class AiController {
   })
   @ApiResponse({
     status: 200,
-    description:
-      'Active transcription models available to the current user.',
+    description: 'Active transcription models available to the current user.',
     type: AiProviderModelItem,
     isArray: true,
   })
@@ -317,8 +316,7 @@ export class AiController {
         },
         clientLocale: {
           type: 'string',
-          description:
-            'Optional client locale, such as en-US or de-DE.',
+          description: 'Optional client locale, such as en-US or de-DE.',
           nullable: true,
         },
         clientUtcOffsetMinutes: {
@@ -422,7 +420,7 @@ export class AiController {
   @ApiOperation({
     summary: 'List chat sessions',
     description:
-      'Returns the authenticated user\'s persisted chat sessions. Archived sessions can be included on demand.',
+      "Returns the authenticated user's persisted chat sessions. Archived sessions can be included on demand.",
   })
   @ApiQuery({
     name: 'includeArchived',
@@ -500,7 +498,8 @@ export class AiController {
   @ApiParam({
     name: 'handle',
     type: Number,
-    description: 'Numeric handle of the chat session whose messages should be listed.',
+    description:
+      'Numeric handle of the chat session whose messages should be listed.',
   })
   @ApiQuery({
     name: 'limit',

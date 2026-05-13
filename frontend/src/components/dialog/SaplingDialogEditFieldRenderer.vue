@@ -65,6 +65,7 @@
       :disabled="fieldDisabled"
       :rules="rules"
       :entity-reference="formValues.entity"
+      :allow-collection-recipients="entityHandle === 'inboxSubscription'"
       @update:model-value="(val: string | null) => updateField(template.name, val)"
     />
     <SaplingColorField

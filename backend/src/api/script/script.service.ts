@@ -491,6 +491,15 @@ export class ScriptService {
             },
           },
         );
+        const subscriptionPayloadItems = Array.isArray(items) ? items : [items];
+        await this.populateRecipientRelations(subscriptionPayloadItems, [
+          ...teamsSubscriptions.map(
+            (subscription) => subscription.recipientField,
+          ),
+          ...inboxSubscriptions.map(
+            (subscription) => subscription.recipientField,
+          ),
+        ]);
 
         if (webhookSubscriptions.length > 0) {
           for (const subscription of webhookSubscriptions) {
@@ -514,8 +523,9 @@ export class ScriptService {
               );
               await this.teamsService.querySubscription(
                 subscription.handle,
-                Array.isArray(items) ? items : [items],
+                subscriptionPayloadItems,
                 user,
+                [subscription.recipientField],
               );
             }
           }
@@ -529,8 +539,9 @@ export class ScriptService {
               );
               await this.inboxService.querySubscription(
                 subscription.handle,
-                Array.isArray(items) ? items : [items],
+                subscriptionPayloadItems,
                 user,
+                [subscription.recipientField],
               );
             }
           }
@@ -555,6 +566,55 @@ export class ScriptService {
     }
 
     return result;
+  }
+
+  private async populateRecipientRelations(
+    items: object[],
+    relationExpressions: string[],
+  ): Promise<void> {
+    const populate = [
+      ...new Set(
+        relationExpressions.flatMap((expression) =>
+          this.expandRelationExpression(expression),
+        ),
+      ),
+    ];
+
+    if (populate.length === 0) {
+      return;
+    }
+
+    for (const item of items) {
+      if (
+        !item ||
+        typeof item !== 'object' ||
+        Array.isArray(item) ||
+        item.constructor === Object
+      ) {
+        continue;
+      }
+
+      try {
+        await this.em.populate(item, populate as never[]);
+      } catch (error) {
+        global.log.warn(
+          `scriptService - populateRecipientRelations failed: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+      }
+    }
+  }
+
+  private expandRelationExpression(expression: string): string[] {
+    const segments = expression
+      .split('.')
+      .map((segment) => segment.trim())
+      .filter(Boolean);
+
+    return segments.map((_segment, index) =>
+      segments.slice(0, index + 1).join('.'),
+    );
   }
   // #endregion
 }

@@ -68,12 +68,17 @@
                     </span>
                     <span class="sapling-inbox-view-switch__count">{{ overviewCount }}</span>
                   </v-btn>
-                  <v-btn value="notifications" class="sapling-inbox-view-switch__button glass-panel">
+                  <v-btn
+                    value="notifications"
+                    class="sapling-inbox-view-switch__button glass-panel"
+                  >
                     <span class="sapling-inbox-view-switch__button-label">
                       <v-icon icon="mdi-bell-outline" size="18" />
                       <span>{{ $t('navigation.inboxNotification') }}</span>
                     </span>
-                    <span class="sapling-inbox-view-switch__count">{{ notificationEntries.length }}</span>
+                    <span class="sapling-inbox-view-switch__count">{{
+                      notificationEntries.length
+                    }}</span>
                   </v-btn>
                 </v-btn-toggle>
               </section>
@@ -83,7 +88,9 @@
                   <div class="sapling-inbox-empty-state__icon">
                     <v-icon icon="mdi-check-circle-outline" size="42" />
                   </div>
-                  <h3 class="sapling-inbox-empty-state__title">{{ $t('inbox.allCaughtUpTitle') }}</h3>
+                  <h3 class="sapling-inbox-empty-state__title">
+                    {{ $t('inbox.allCaughtUpTitle') }}
+                  </h3>
                   <p class="sapling-inbox-empty-state__copy">{{ $t('inbox.allCaughtUp') }}</p>
                 </section>
 
@@ -103,7 +110,9 @@
                   <div class="sapling-inbox-empty-state__icon">
                     <v-icon icon="mdi-check-circle-outline" size="42" />
                   </div>
-                  <h3 class="sapling-inbox-empty-state__title">{{ $t('inbox.allCaughtUpTitle') }}</h3>
+                  <h3 class="sapling-inbox-empty-state__title">
+                    {{ $t('inbox.allCaughtUpTitle') }}
+                  </h3>
                   <p class="sapling-inbox-empty-state__copy">{{ $t('inbox.allCaughtUp') }}</p>
                 </section>
 
@@ -183,7 +192,8 @@ const {
 } = useSaplingInbox(emit)
 
 const overviewCount = computed(
-  () => ticketEntries.value.length + taskEntries.value.length + salesOpportunityEntries.value.length,
+  () =>
+    ticketEntries.value.length + taskEntries.value.length + salesOpportunityEntries.value.length,
 )
 const hasOverviewItems = computed(() => overviewCount.value > 0)
 const sortedNotificationEntries = computed<InboxEntry[]>(() =>

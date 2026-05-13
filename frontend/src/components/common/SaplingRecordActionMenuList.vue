@@ -8,10 +8,7 @@
         :title="resolveMenuItemTitle(menuItem)"
         @click="onSelect($event, menuItem)"
       />
-      <v-divider
-        v-if="groupIdx < visibleMenuItems.length - 1"
-        :key="`divider-${groupIdx}`"
-      />
+      <v-divider v-if="groupIdx < visibleMenuItems.length - 1" :key="`divider-${groupIdx}`" />
     </template>
 
     <v-list-item

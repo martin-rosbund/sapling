@@ -137,7 +137,8 @@ export class WebhookController {
   })
   @ApiResponse({
     status: 202,
-    description: 'Accepted delivery job information for the queued webhook call.',
+    description:
+      'Accepted delivery job information for the queued webhook call.',
     schema: {
       type: 'object',
       properties: {
@@ -186,7 +187,8 @@ export class WebhookController {
   @ApiParam({
     name: 'handle',
     type: Number,
-    description: 'Numeric handle of the webhook delivery that should be retried.',
+    description:
+      'Numeric handle of the webhook delivery that should be retried.',
   })
   @ApiResponse({
     status: 202,
@@ -198,7 +200,8 @@ export class WebhookController {
         message: { type: 'string', example: 'Webhook retry queued' },
         deliveryId: {
           type: 'number',
-          description: 'Handle of the webhook delivery record that was retried.',
+          description:
+            'Handle of the webhook delivery record that was retried.',
         },
         attempt: {
           type: 'number',

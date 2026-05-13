@@ -109,7 +109,8 @@ export class AiChatTranscriptionResponseDto {
 
   @ApiPropertyOptional({
     nullable: true,
-    description: 'Transcribed text, when the transcription has already finished.',
+    description:
+      'Transcribed text, when the transcription has already finished.',
   })
   transcript!: string | null;
 
@@ -144,7 +145,8 @@ export class AiChatTranscriptionResponseDto {
 
   @ApiPropertyOptional({
     nullable: true,
-    description: 'Linked document handle for the stored audio asset, when available.',
+    description:
+      'Linked document handle for the stored audio asset, when available.',
   })
   documentHandle!: number | null;
 }

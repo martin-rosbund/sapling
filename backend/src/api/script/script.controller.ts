@@ -135,7 +135,10 @@ export class ScriptController {
         items: {
           description:
             'Selected record payload passed to the script. This may be a single object or an array of objects.',
-          oneOf: [{ type: 'object' }, { type: 'array', items: { type: 'object' } }],
+          oneOf: [
+            { type: 'object' },
+            { type: 'array', items: { type: 'object' } },
+          ],
         },
         entity: {
           type: 'object',
@@ -160,8 +163,7 @@ export class ScriptController {
   })
   @ApiResponse({
     status: 200,
-    description:
-      'Return value produced by the client-side script action.',
+    description: 'Return value produced by the client-side script action.',
     schema: { type: 'object' },
   })
   @UseGuards(GenericPermissionGuard)
@@ -210,7 +212,10 @@ export class ScriptController {
         items: {
           description:
             'Selected record payload passed to the script. This may be a single object or an array of objects.',
-          oneOf: [{ type: 'object' }, { type: 'array', items: { type: 'object' } }],
+          oneOf: [
+            { type: 'object' },
+            { type: 'array', items: { type: 'object' } },
+          ],
         },
         entity: {
           type: 'object',

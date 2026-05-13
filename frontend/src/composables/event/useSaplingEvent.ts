@@ -926,9 +926,7 @@ export function useSaplingEvent() {
     } else if (wasDragged || wasResized) {
       editEvent.value = dragEvent.value ?? createEvent.value
       applyCalendarEventDateParts(editEvent.value)
-      forceEditDialogDirtyFields.value = wasResized
-        ? ['endDate']
-        : ['startDate', 'endDate']
+      forceEditDialogDirtyFields.value = wasResized ? ['endDate'] : ['startDate', 'endDate']
       showEditDialog.value = editEvent.value != null
       suppressNextEventClick.value = true
     }

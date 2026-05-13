@@ -67,12 +67,14 @@ export class MailSenderOptionDto {
   provider!: string;
 
   @ApiProperty({
-    description: 'Origin of the sender option, for example configuration or provider discovery.',
+    description:
+      'Origin of the sender option, for example configuration or provider discovery.',
   })
   source!: string;
 
   @ApiProperty({
-    description: 'Indicates whether this sender should be preselected by default.',
+    description:
+      'Indicates whether this sender should be preselected by default.',
   })
   isDefault!: boolean;
 }
@@ -99,13 +101,15 @@ export class MailPreviewDto {
   entityHandle!: string;
 
   @ApiPropertyOptional({
-    description: 'Optional record handle that provides the entity context for the email.',
+    description:
+      'Optional record handle that provides the entity context for the email.',
   })
   @IsOptional()
   itemHandle?: string | number;
 
   @ApiPropertyOptional({
-    description: 'Optional mail template handle that should be used to render the message.',
+    description:
+      'Optional mail template handle that should be used to render the message.',
   })
   @IsOptional()
   @Type(() => Number)
@@ -120,14 +124,16 @@ export class MailPreviewDto {
   subject?: string;
 
   @ApiPropertyOptional({
-    description: 'Optional Markdown body override applied after template resolution.',
+    description:
+      'Optional Markdown body override applied after template resolution.',
   })
   @IsOptional()
   @IsString()
   bodyMarkdown?: string;
 
   @ApiPropertyOptional({
-    description: 'Optional sender email address that should be used for the message.',
+    description:
+      'Optional sender email address that should be used for the message.',
   })
   @IsOptional()
   @Transform(({ value }) => normalizeOptionalString(value))
@@ -166,7 +172,8 @@ export class MailPreviewDto {
 
   @ApiPropertyOptional({
     type: Object,
-    description: 'Optional ad-hoc values that should be available during template rendering.',
+    description:
+      'Optional ad-hoc values that should be available during template rendering.',
   })
   @IsOptional()
   @IsObject()
@@ -174,7 +181,8 @@ export class MailPreviewDto {
 
   @ApiPropertyOptional({
     type: [Number],
-    description: 'Optional list of document handles that should be attached to the message.',
+    description:
+      'Optional list of document handles that should be attached to the message.',
   })
   @IsOptional()
   @Transform(({ value }) => normalizeNumberArray(value))
@@ -192,12 +200,14 @@ export class MailPreviewResponseDto {
   entityHandle!: string;
 
   @ApiPropertyOptional({
-    description: 'Record handle that was used as the entity context, when provided.',
+    description:
+      'Record handle that was used as the entity context, when provided.',
   })
   itemHandle?: string | number;
 
   @ApiPropertyOptional({
-    description: 'Mail template handle that contributed to the rendered preview, when applicable.',
+    description:
+      'Mail template handle that contributed to the rendered preview, when applicable.',
   })
   templateHandle?: number;
 

@@ -150,7 +150,7 @@ export class CurrentController {
   @ApiOperation({
     summary: 'Subscribe to open task count updates',
     description:
-      'Opens a server-sent event stream that emits the current open-task snapshot whenever the authenticated user\'s task count changes.',
+      "Opens a server-sent event stream that emits the current open-task snapshot whenever the authenticated user's task count changes.",
   })
   @ApiProduces('text/event-stream')
   @ApiResponse({

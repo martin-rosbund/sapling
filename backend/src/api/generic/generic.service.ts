@@ -40,7 +40,11 @@ type ChangeLogPayload = Record<string, unknown> | null;
 type ChangeLogAction = 'create' | 'update' | 'delete';
 
 const CHANGE_LOG_DETAIL_IGNORED_FIELDS = new Set(['updatedAt']);
-const OPEN_TASK_ENTITY_HANDLES = new Set(['ticket', 'event', 'salesOpportunity']);
+const OPEN_TASK_ENTITY_HANDLES = new Set([
+  'ticket',
+  'event',
+  'salesOpportunity',
+]);
 
 /**
  * @class
@@ -1009,8 +1013,9 @@ export class GenericService {
       event.participants
         .getItems()
         .map((participant) => participant.handle)
-        .filter((participantHandle): participantHandle is number =>
-          typeof participantHandle === 'number',
+        .filter(
+          (participantHandle): participantHandle is number =>
+            typeof participantHandle === 'number',
         ),
     );
   }

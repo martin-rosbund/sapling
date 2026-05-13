@@ -270,8 +270,7 @@ export class GenericController {
   })
   @ApiResponse({
     status: 200,
-    description:
-      'JSON file download containing the matching entity records.',
+    description: 'JSON file download containing the matching entity records.',
     type: String,
   })
   async download(
@@ -369,7 +368,8 @@ export class GenericController {
     type: String,
   })
   @ApiBody({
-    description: 'Entity-specific JSON payload containing the fields to update.',
+    description:
+      'Entity-specific JSON payload containing the fields to update.',
     required: true,
     schema: { type: 'object', additionalProperties: true },
   })

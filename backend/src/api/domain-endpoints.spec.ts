@@ -299,7 +299,11 @@ describe('CurrentController', () => {
   });
 
   it('rejects password changes when fields are missing', async () => {
-    const controller = new CurrentController({} as never, {} as never, {} as never);
+    const controller = new CurrentController(
+      {} as never,
+      {} as never,
+      {} as never,
+    );
 
     await expect(
       controller.changePassword({ user: createMockUser() } as never, '', ''),
@@ -307,7 +311,11 @@ describe('CurrentController', () => {
   });
 
   it('rejects password changes when passwords do not match', async () => {
-    const controller = new CurrentController({} as never, {} as never, {} as never);
+    const controller = new CurrentController(
+      {} as never,
+      {} as never,
+      {} as never,
+    );
 
     await expect(
       controller.changePassword({ user: createMockUser() } as never, 'a', 'b'),
@@ -392,7 +400,11 @@ describe('CurrentController', () => {
   });
 
   it('rejects entity permission lookups without an entity handle', () => {
-    const controller = new CurrentController({} as never, {} as never, {} as never);
+    const controller = new CurrentController(
+      {} as never,
+      {} as never,
+      {} as never,
+    );
 
     expect(() =>
       controller.getEntityPermission({ user: createMockUser() } as never, ''),

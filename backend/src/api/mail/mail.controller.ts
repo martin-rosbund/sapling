@@ -83,7 +83,8 @@ export class MailController {
   })
   @ApiResponse({
     status: 201,
-    description: 'Resolved email preview with recipients, subject, and rendered body.',
+    description:
+      'Resolved email preview with recipients, subject, and rendered body.',
     type: MailPreviewResponseDto,
   })
   @UseGuards(GenericPermissionGuard)
@@ -109,7 +110,8 @@ export class MailController {
   })
   @ApiResponse({
     status: 201,
-    description: 'Persisted email delivery record for the queued or sent message.',
+    description:
+      'Persisted email delivery record for the queued or sent message.',
     type: EmailDeliveryItem,
   })
   @UseGuards(GenericPermissionGuard)

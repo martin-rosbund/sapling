@@ -108,7 +108,8 @@ export class SystemController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Measured CPU speed information for the current Sapling server.',
+    description:
+      'Measured CPU speed information for the current Sapling server.',
     type: CpuSpeedDto,
   })
   async getCpuSpeed(): Promise<CpuSpeedDto> {
@@ -148,7 +149,8 @@ export class SystemController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Filesystem information for all mounted volumes visible to the server.',
+    description:
+      'Filesystem information for all mounted volumes visible to the server.',
     type: FilesystemDto,
     isArray: true,
   })
@@ -169,7 +171,8 @@ export class SystemController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Network interface information for the current Sapling server.',
+    description:
+      'Network interface information for the current Sapling server.',
     type: NetworkInterfaceDto,
     isArray: true,
   })

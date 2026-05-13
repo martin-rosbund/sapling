@@ -381,17 +381,12 @@ export function useSaplingInbox(emit: CloseEmitter) {
   )
   const notificationEntries = computed(() => notifications.value.map(createNotificationEntry))
   const actionableEntries = computed(() =>
-    [
-      ...ticketEntries.value,
-      ...taskEntries.value,
-      ...salesOpportunityEntries.value,
-    ].sort(compareEntriesByDate),
+    [...ticketEntries.value, ...taskEntries.value, ...salesOpportunityEntries.value].sort(
+      compareEntriesByDate,
+    ),
   )
   const allEntries = computed(() =>
-    [
-      ...notificationEntries.value,
-      ...actionableEntries.value,
-    ].sort(compareEntriesByDate),
+    [...notificationEntries.value, ...actionableEntries.value].sort(compareEntriesByDate),
   )
 
   function getSectionItems(sectionKey: InboxSectionKey) {

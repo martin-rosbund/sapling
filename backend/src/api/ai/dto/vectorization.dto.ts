@@ -27,7 +27,8 @@ export class VectorizeEntityDto {
 
 export class VectorizeEntityResponseDto {
   @ApiProperty({
-    description: 'Entity handle that was processed during the vectorization run.',
+    description:
+      'Entity handle that was processed during the vectorization run.',
   })
   entityHandle!: string;
 
@@ -57,7 +58,8 @@ export class VectorizeEntityResponseDto {
   embeddedDocuments!: number;
 
   @ApiProperty({
-    description: 'Number of source documents skipped because no update was required.',
+    description:
+      'Number of source documents skipped because no update was required.',
   })
   skippedDocuments!: number;
 

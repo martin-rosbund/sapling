@@ -11,6 +11,7 @@ type MessageContextOptions = {
   itemHandle?: string | number;
   currentUser?: PersonItem;
   draftValues?: Record<string, unknown>;
+  relations?: string[];
 };
 
 function isRecord(value: unknown): value is JsonRecord {
@@ -261,6 +262,11 @@ function renderMarkdownBlocks(markdown: string): string {
 
 @Injectable()
 export class MessageTemplateService {
+  private readonly templateFieldCache = new Map<
+    string,
+    Map<string, ReturnType<TemplateService['getEntityTemplate']>[number]>
+  >();
+
   constructor(
     private readonly em: EntityManager,
     private readonly templateService: TemplateService,
@@ -268,7 +274,11 @@ export class MessageTemplateService {
 
   async buildContext(options: MessageContextOptions): Promise<JsonRecord> {
     const base = options.itemHandle
-      ? await this.loadEntityContext(options.entityHandle, options.itemHandle)
+      ? await this.loadEntityContext(
+          options.entityHandle,
+          options.itemHandle,
+          options.relations,
+        )
       : {};
 
     return {
@@ -281,6 +291,7 @@ export class MessageTemplateService {
   async loadEntityContext(
     entityHandle: string,
     itemHandle: string | number,
+    relationExpressions: string[] = [],
   ): Promise<JsonRecord> {
     const entityClass = ENTITY_MAP[entityHandle] as
       | EntityName<object>
@@ -290,9 +301,14 @@ export class MessageTemplateService {
     }
 
     const template = this.templateService.getEntityTemplate(entityHandle);
-    const populate = template
-      .filter((entry) => entry.isReference)
-      .map((entry) => entry.name);
+    const populate = [
+      ...new Set([
+        ...template
+          .filter((entry) => entry.isReference)
+          .map((entry) => entry.name),
+        ...this.collectPopulateRelations(entityHandle, relationExpressions),
+      ]),
+    ];
     const normalizedHandle = this.normalizeHandleValue(itemHandle);
     const item = await this.em.findOne(
       entityClass,
@@ -396,8 +412,10 @@ export class MessageTemplateService {
   }
 
   private resolveContextSegment(current: unknown, key: string): unknown {
-    if (Array.isArray(current)) {
-      const entries = current as unknown[];
+    const normalizedCurrent = this.normalizeContextValue(current);
+
+    if (Array.isArray(normalizedCurrent)) {
+      const entries = normalizedCurrent as unknown[];
 
       return entries.flatMap((entry) => {
         const value = this.resolveContextSegment(entry, key);
@@ -410,11 +428,124 @@ export class MessageTemplateService {
       });
     }
 
-    if (!isRecord(current)) {
+    if (!isRecord(normalizedCurrent)) {
       return undefined;
     }
 
-    return current[key];
+    return this.normalizeContextValue(normalizedCurrent[key]);
+  }
+
+  private normalizeContextValue(value: unknown): unknown {
+    if (this.isCollectionLike(value)) {
+      return this.isInitializedCollectionLike(value) ? value.toArray() : [];
+    }
+
+    if (!value || typeof value !== 'object') {
+      return value;
+    }
+
+    if (
+      'unwrap' in value &&
+      typeof (value as { unwrap?: unknown }).unwrap === 'function'
+    ) {
+      const unwrappedValue = (value as { unwrap: () => unknown }).unwrap();
+      return unwrappedValue === value
+        ? value
+        : this.normalizeContextValue(unwrappedValue);
+    }
+
+    if (
+      'getEntity' in value &&
+      typeof (value as { getEntity?: unknown }).getEntity === 'function'
+    ) {
+      const entityValue = (value as { getEntity: () => unknown }).getEntity();
+      return entityValue === value
+        ? value
+        : this.normalizeContextValue(entityValue);
+    }
+
+    return value;
+  }
+
+  private collectPopulateRelations(
+    entityHandle: string,
+    relationExpressions: string[],
+  ): string[] {
+    return [
+      ...new Set(
+        relationExpressions.flatMap((expression) =>
+          this.collectPopulateRelationsFromExpression(entityHandle, expression),
+        ),
+      ),
+    ];
+  }
+
+  private collectPopulateRelationsFromExpression(
+    entityHandle: string,
+    expression: string,
+  ): string[] {
+    const segments = expression
+      .split('.')
+      .map((segment) => segment.trim())
+      .filter(Boolean);
+
+    if (segments.length === 0) {
+      return [];
+    }
+
+    const populatePaths: string[] = [];
+    const currentPath: string[] = [];
+    let currentEntityHandle = entityHandle;
+
+    for (const segment of segments) {
+      const field = this.getTemplateField(currentEntityHandle, segment);
+
+      if (!field?.isReference || !field.referenceName) {
+        break;
+      }
+
+      currentPath.push(segment);
+      populatePaths.push(currentPath.join('.'));
+      currentEntityHandle = field.referenceName;
+    }
+
+    return populatePaths;
+  }
+
+  private getTemplateField(
+    entityHandle: string,
+    fieldName: string,
+  ): ReturnType<TemplateService['getEntityTemplate']>[number] | undefined {
+    let fieldMap = this.templateFieldCache.get(entityHandle);
+
+    if (!fieldMap) {
+      fieldMap = new Map(
+        this.templateService
+          .getEntityTemplate(entityHandle)
+          .map((field) => [field.name, field] as const),
+      );
+      this.templateFieldCache.set(entityHandle, fieldMap);
+    }
+
+    return fieldMap.get(fieldName);
+  }
+
+  private isCollectionLike(value: unknown): value is {
+    toArray: () => unknown[];
+    isInitialized?: () => boolean;
+  } {
+    return (
+      typeof value === 'object' &&
+      value !== null &&
+      'toArray' in value &&
+      typeof (value as { toArray?: unknown }).toArray === 'function'
+    );
+  }
+
+  private isInitializedCollectionLike(value: {
+    isInitialized?: () => boolean;
+  }): boolean {
+    return typeof value.isInitialized !== 'function' || value.isInitialized();
   }
 
   private htmlToPlainText(html: string): string {

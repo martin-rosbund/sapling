@@ -29,7 +29,10 @@ export class TrendResultDto {
         items: { type: 'object', additionalProperties: true },
         description: 'Grouped KPI rows for the current period.',
       },
-      { type: 'null', description: 'No value is available for the current period.' },
+      {
+        type: 'null',
+        description: 'No value is available for the current period.',
+      },
     ],
   })
   current: number | object | Array<Record<string, unknown>> | null;
@@ -53,7 +56,10 @@ export class TrendResultDto {
         items: { type: 'object', additionalProperties: true },
         description: 'Grouped KPI rows for the previous period.',
       },
-      { type: 'null', description: 'No value is available for the previous period.' },
+      {
+        type: 'null',
+        description: 'No value is available for the previous period.',
+      },
     ],
   })
   previous: number | object | Array<Record<string, unknown>> | null;
