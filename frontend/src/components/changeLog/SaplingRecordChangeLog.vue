@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-if="dialog" v-model="dialogModel" persistent class="sapling-dialog-large">
-    <SaplingDialogCard class="sapling-inbox-dialog sapling-record-change-log-dialog">
+    <SaplingDialogCard class="sapling-inbox-dialog sapling-record-change-log-dialog" :tilt="false">
       <SaplingDialogShell
         fill-shell
         body-class="sapling-inbox-dialog__body sapling-record-change-log-dialog__body"
@@ -10,8 +10,8 @@
           <SaplingDialogHero
             v-if="isLoading"
             loading
-            :loading-stats-count="3"
-            :stats-columns="3"
+            :loading-stats-count="2"
+            :stats-columns="2"
             stats-layout="compact"
           />
           <SaplingDialogHero
@@ -19,7 +19,7 @@
             :eyebrow="t('changeLog.title')"
             :title="heroTitle"
             :stats="heroStats"
-            :stats-columns="3"
+            :stats-columns="2"
             stats-layout="compact"
           />
         </template>
@@ -121,6 +121,7 @@
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
+import type { SaplingGenericItem } from '@/entity/entity'
 import type { ChangeLogAction, ChangeLogEntry, EntityTemplate } from '@/entity/structure'
 import SaplingActionClose from '@/components/actions/SaplingActionClose.vue'
 import SaplingChangeLogDetailValue from '@/components/changeLog/SaplingChangeLogDetailValue.vue'
@@ -130,6 +131,7 @@ import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue'
 import { useSaplingRecordChangeLog } from '@/composables/changeLog/useSaplingRecordChangeLog'
 import { useChangeLogDialogStore } from '@/stores/changeLogDialogStore'
 import { formatDateTimeValue } from '@/utils/saplingFormatUtil'
+import { getEntityValueLabel } from '@/utils/saplingTableUtil'
 
 const { t } = useI18n()
 const changeLogDialogStore = useChangeLogDialogStore()
@@ -150,14 +152,32 @@ const { entity, entries, error, isLoading, entityTemplates } = useSaplingRecordC
   active: dialog,
 })
 
-const heroTitle = computed(() => {
+const entityLabel = computed(() => {
   const translationKey = `navigation.${entity.value?.handle ?? ''}`
   const translated = entity.value?.handle ? t(translationKey) : ''
-  return `${translated}`
+  if (translated && translated !== translationKey) {
+    return translated
+  }
+
+  return entity.value?.title ?? entity.value?.handle ?? t('changeLog.record')
+})
+
+const recordSnapshot = computed<SaplingGenericItem | null>(() => {
+  for (const entry of entries.value) {
+    const snapshot = entry.newPayload ?? entry.oldPayload
+    if (snapshot) {
+      return snapshot as SaplingGenericItem
+    }
+  }
+
+  return null
+})
+
+const heroTitle = computed(() => {
+  return getEntityValueLabel(recordSnapshot.value, entityTemplates.value) || entityLabel.value
 })
 
 const heroStats = computed(() => [
-  { label: t('changeLog.record'), value: `#${recordHandle.value}` },
   { label: t('changeLog.entries'), value: visibleEntries.value.length },
   {
     label: t('changeLog.latest'),

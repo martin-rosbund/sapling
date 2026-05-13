@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-if="dialog" v-model="dialogModel" persistent class="sapling-dialog-large">
-    <SaplingDialogCard class="sapling-inbox-dialog sapling-record-timeline-dialog">
+    <SaplingDialogCard class="sapling-inbox-dialog sapling-record-timeline-dialog" :tilt="false">
       <SaplingDialogShell
         fill-shell
         body-class="sapling-inbox-dialog__body sapling-record-timeline-dialog__body"
@@ -10,8 +10,8 @@
           <SaplingDialogHero
             v-if="isLoading"
             loading
-            :loading-stats-count="3"
-            :stats-columns="3"
+            :loading-stats-count="2"
+            :stats-columns="2"
             stats-layout="compact"
           />
           <SaplingDialogHero
@@ -19,7 +19,7 @@
             :eyebrow="t('timeline.title')"
             :title="anchor?.label"
             :stats="heroStats"
-            :stats-columns="3"
+            :stats-columns="2"
             stats-layout="compact"
           >
           </SaplingDialogHero>
@@ -236,7 +236,6 @@ const timelineSectionCount = computed(() =>
 )
 
 const heroStats = computed(() => [
-  { label: t('timeline.record'), value: anchor.value ? `#${anchor.value.handle}` : '-' },
   { label: t('timeline.month'), value: months.value.length },
   { label: t('timeline.sections'), value: timelineSectionCount.value },
 ])
@@ -252,12 +251,6 @@ const summaryCards = computed(() => {
       label: entityLabel.value,
       value: anchor.value.entityHandle,
       icon: entity.value?.icon || 'mdi-shape-outline',
-    },
-    {
-      key: 'record',
-      label: t('timeline.record'),
-      value: `#${anchor.value.handle}`,
-      icon: 'mdi-pound',
     },
   ]
 
