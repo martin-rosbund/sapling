@@ -1,5 +1,5 @@
 <template>
-  <v-container class="sapling-partner-container pa-0" density="compact" fluid>
+  <v-container class="sapling-partner-container sapling-fill-shell pa-0" density="compact" fluid>
     <section
       class="sapling-partner-layout"
       :class="{ 'sapling-partner-layout--panel-hidden': !showDesktopFilterPanel }"
