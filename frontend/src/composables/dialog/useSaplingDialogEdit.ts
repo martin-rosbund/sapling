@@ -73,7 +73,7 @@ interface UseSaplingDialogEditProps {
 export function useSaplingDialogEdit(
   props: UseSaplingDialogEditProps,
   emit: SaplingDialogEditEmit,
-  options?: { forceDirty?: ComputedRef<boolean> },
+  options?: { forceDirty?: ComputedRef<boolean>; forceDirtyFields?: ComputedRef<string[]> },
 ) {
   // #region State
   const { t, te } = useI18n()
@@ -244,6 +244,7 @@ export function useSaplingDialogEdit(
     templates,
     initialFormSnapshot,
     forceDirty: options?.forceDirty,
+    forceDirtyFields: options?.forceDirtyFields,
     extractDependencyIdentifier,
     formatLocalDate,
     formatLocalTime,
@@ -784,6 +785,11 @@ export function useSaplingDialogEdit(
   }
 
   function discardChanges(): void {
+    // Roll the form back to its original snapshot before closing so callers
+    // that re-open the same record (without remounting the dialog) don't see
+    // the abandoned edits resurface. `resetForm` no-ops when nothing is
+    // dirty, so the extra call is safe for all paths.
+    resetForm()
     closeDialog()
   }
 

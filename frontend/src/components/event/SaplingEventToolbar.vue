@@ -20,6 +20,7 @@
               class="sapling-event-toolbar__picker-trigger"
               prepend-icon="mdi-calendar-search"
               variant="outlined"
+              density="comfortable"
             >
               {{ selectDateLabel }}
             </v-btn>

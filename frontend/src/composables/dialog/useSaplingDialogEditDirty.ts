@@ -7,6 +7,11 @@ interface UseSaplingDialogEditDirtyOptions {
   templates: ComputedRef<EntityTemplate[]>
   initialFormSnapshot: Ref<Record<string, string>>
   forceDirty?: ComputedRef<boolean>
+  // Callers can mark individual template names as dirty without changing the
+  // form value (e.g. after an external drag/drop update where the snapshot
+  // already reflects the new values). Listed names are highlighted exactly
+  // like real edits and contribute to the dirty field count.
+  forceDirtyFields?: ComputedRef<string[]>
   extractDependencyIdentifier: (
     value: unknown,
     template?: EntityTemplate,
@@ -185,11 +190,15 @@ export function useSaplingDialogEditDirty(options: UseSaplingDialogEditDirtyOpti
   const currentFormSnapshot = computed(() => createFormComparisonSnapshot(options.form.value))
 
   const dirtyTemplateNames = computed(() => {
+    const forcedNames = options.forceDirtyFields?.value ?? []
     if (Object.keys(options.initialFormSnapshot.value).length === 0) {
-      return []
+      // Snapshot not yet available — only the forced names are known to be
+      // dirty. Without this fallback an early forceDirtyFields update would
+      // be discarded by the snapshot-empty short-circuit below.
+      return forcedNames.length > 0 ? Array.from(new Set(forcedNames)) : []
     }
 
-    return options.templates.value
+    const realDirty = options.templates.value
       .filter(isTrackableTemplate)
       .filter(
         (template) =>
@@ -197,11 +206,19 @@ export function useSaplingDialogEditDirty(options: UseSaplingDialogEditDirtyOpti
           currentFormSnapshot.value[template.name],
       )
       .map((template) => template.name)
+
+    if (forcedNames.length === 0) {
+      return realDirty
+    }
+
+    return Array.from(new Set([...realDirty, ...forcedNames]))
   })
 
   const dirtyTemplateNameSet = computed(() => new Set(dirtyTemplateNames.value))
   const dirtyFieldCount = computed(() => dirtyTemplateNames.value.length)
-  const isDirty = computed(() => (options.forceDirty?.value ? true : dirtyFieldCount.value > 0))
+  const isDirty = computed(() =>
+    options.forceDirty?.value ? true : dirtyFieldCount.value > 0,
+  )
 
   function isTemplateDirty(template: EntityTemplate): boolean {
     return dirtyTemplateNameSet.value.has(template.name)

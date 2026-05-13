@@ -436,6 +436,7 @@ const props = defineProps<{
   entity: EntityItem | null
   showReference?: boolean
   forceDirty?: boolean
+  forceDirtyFields?: string[]
 }>()
 
 const emit = defineEmits<{
@@ -507,7 +508,12 @@ const {
   onRelationTableSort,
   onRelationTableColumnFilters,
   onRelationTableReload,
-} = useSaplingDialogEdit(props, emit, { forceDirty: computed(() => props.forceDirty === true) })
+} = useSaplingDialogEdit(props, emit, {
+  forceDirty: computed(() => props.forceDirty === true),
+  forceDirtyFields: computed(() =>
+    Array.isArray(props.forceDirtyFields) ? props.forceDirtyFields : [],
+  ),
+})
 
 function onShellKeydown(event: KeyboardEvent) {
   // Keyboard shortcuts inside the edit dialog:

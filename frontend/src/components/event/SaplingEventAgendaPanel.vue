@@ -63,9 +63,8 @@
     </div>
 
     <div v-else class="sapling-event-panel__empty-state">
-      <v-icon size="26">mdi-calendar-clock-outline</v-icon>
-      <strong>{{ currentCalendarViewLabel }}</strong>
-      <span>{{ currentCalendarLayoutLabel }}</span>
+      <v-icon size="26">mdi-calendar-check-outline</v-icon>
+      <strong>{{ $t('event.allDoneToday') }}</strong>
     </div>
   </section>
 </template>
@@ -77,8 +76,6 @@ import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs'
 
 defineProps<{
   upcomingEvents: EventAgendaItem[]
-  currentCalendarViewLabel: string
-  currentCalendarLayoutLabel: string
 }>()
 
 const emit = defineEmits<{
