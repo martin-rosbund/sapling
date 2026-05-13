@@ -66,7 +66,11 @@
                       <v-icon icon="mdi-view-dashboard-outline" size="18" />
                       <span>{{ $t('navigation.inbox') }}</span>
                     </span>
-                    <span class="sapling-inbox-view-switch__count">{{ overviewCount }}</span>
+                    <span
+                      class="sapling-inbox-view-switch__count sapling-inbox-view-switch__count--idle"
+                    >
+                      {{ overviewCount }}
+                    </span>
                   </v-btn>
                   <v-btn
                     value="notifications"
@@ -76,9 +80,16 @@
                       <v-icon icon="mdi-bell-outline" size="18" />
                       <span>{{ $t('navigation.inboxNotification') }}</span>
                     </span>
-                    <span class="sapling-inbox-view-switch__count">{{
-                      notificationEntries.length
-                    }}</span>
+                    <span
+                      :class="[
+                        'sapling-inbox-view-switch__count',
+                        hasUnreadNotifications
+                          ? 'sapling-inbox-view-switch__count--alert'
+                          : 'sapling-inbox-view-switch__count--idle',
+                      ]"
+                    >
+                      {{ notificationEntries.length }}
+                    </span>
                   </v-btn>
                 </v-btn-toggle>
               </section>
@@ -196,6 +207,7 @@ const overviewCount = computed(
     ticketEntries.value.length + taskEntries.value.length + salesOpportunityEntries.value.length,
 )
 const hasOverviewItems = computed(() => overviewCount.value > 0)
+const hasUnreadNotifications = computed(() => notificationEntries.value.length > 0)
 const sortedNotificationEntries = computed<InboxEntry[]>(() =>
   [...notificationEntries.value].sort((left, right) => {
     const leftTime = left.dateValue?.getTime() ?? Number.MIN_SAFE_INTEGER

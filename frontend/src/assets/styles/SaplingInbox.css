@@ -71,9 +71,19 @@
   height: 2rem;
   padding: 0 var(--sapling-gap-sm);
   border-radius: var(--sapling-radius-pill);
-  background: rgba(var(--v-theme-primary), 0.12);
   font-size: 0.86rem;
   font-weight: 700;
+}
+
+.sapling-inbox-view-switch__count--idle {
+  color: rgb(var(--v-theme-primary));
+  background: rgba(var(--v-theme-primary), 0.12);
+}
+
+.sapling-inbox-view-switch__count--alert {
+  color: rgb(var(--v-theme-error));
+  background: rgba(var(--v-theme-error), 0.14);
+  box-shadow: inset 0 0 0 1px rgba(var(--v-theme-error), 0.16);
 }
 
 .sapling-inbox-loading-summary {

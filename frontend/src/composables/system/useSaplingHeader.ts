@@ -1,7 +1,14 @@
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
-import { useOpenTaskCountEvents } from '@/composables/system/useOpenTaskCountEvents'
+import {
+  useOpenTaskCountEvents,
+  type OpenTaskStreamItem,
+} from '@/composables/system/useOpenTaskCountEvents'
+
+export interface SaplingHeaderInboxPreview extends OpenTaskStreamItem {
+  sequence: number
+}
 
 /**
  * Provides the state and interaction handlers for the shared application header.
@@ -12,11 +19,25 @@ export function useSaplingHeader() {
   const showInbox = ref(false)
   const showAccount = ref(false)
   const inboxCount = ref(0)
+  const incomingInboxPreview = ref<SaplingHeaderInboxPreview | null>(null)
   const currentPersonStore = useCurrentPersonStore()
+  let incomingInboxPreviewSequence = 0
   //#endregion
 
-  useOpenTaskCountEvents((snapshot) => {
+  const inboxBadgeColor = computed(() => (inboxCount.value > 0 ? 'error' : 'primary'))
+
+  useOpenTaskCountEvents((snapshot, context) => {
     inboxCount.value = snapshot.count
+
+    if (!context || context.source !== 'stream' || context.newItems.length === 0) {
+      return
+    }
+
+    incomingInboxPreviewSequence += 1
+    incomingInboxPreview.value = {
+      ...context.newItems[0],
+      sequence: incomingInboxPreviewSequence,
+    }
   })
 
   //#region Lifecycle Hooks
@@ -71,6 +92,8 @@ export function useSaplingHeader() {
     showInbox,
     showAccount,
     inboxCount,
+    inboxBadgeColor,
+    incomingInboxPreview,
     currentPersonStore,
     openInbox,
     closeInbox,
