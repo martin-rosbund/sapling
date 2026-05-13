@@ -26,18 +26,6 @@
     </div>
 
     <template #append>
-      <!-- Message center button with badge -->
-      <v-btn class="sapling-header__desktop-action text-none" stacked @click="openMessageCenter">
-        <v-badge
-          location="top right"
-          :color="messageBadgeColor"
-          :content="messageCount"
-          :value="messageCount > 0"
-        >
-          <v-icon icon="mdi-cloud-alert"></v-icon>
-        </v-badge>
-      </v-btn>
-
       <!-- Inbox button with badge -->
       <div class="sapling-header__inbox-slot">
         <Transition name="sapling-header-inbox-preview">
@@ -72,6 +60,18 @@
         </v-btn>
       </div>
 
+      <!-- Message center button with badge -->
+      <v-btn class="sapling-header__desktop-action text-none" stacked @click="openMessageCenter">
+        <v-badge
+          location="top right"
+          :color="messageBadgeColor"
+          :content="messageCount"
+          :value="messageCount > 0"
+        >
+          <v-icon icon="mdi-cloud-alert"></v-icon>
+        </v-badge>
+      </v-btn>
+
       <v-menu location="bottom end" :offset="12">
         <template #activator="{ props: menuProps }">
           <v-btn
@@ -84,20 +84,6 @@
         </template>
 
         <v-list class="sapling-header__mobile-overflow-menu glass-panel" density="comfortable" nav>
-          <v-list-item :title="$t('global.messageCenter')" @click="openMessageCenter">
-            <template #prepend>
-              <v-icon icon="mdi-cloud-alert" />
-            </template>
-            <template #append>
-              <v-badge
-                :color="messageBadgeColor"
-                inline
-                :content="messageCount"
-                :model-value="messageCount > 0"
-              />
-            </template>
-          </v-list-item>
-
           <v-list-item :title="$t('global.inbox')" @click="openInbox">
             <template #prepend>
               <v-icon icon="mdi-email" />
@@ -108,6 +94,20 @@
                 inline
                 :content="inboxCount"
                 :model-value="true"
+              />
+            </template>
+          </v-list-item>
+
+          <v-list-item :title="$t('global.messageCenter')" @click="openMessageCenter">
+            <template #prepend>
+              <v-icon icon="mdi-cloud-alert" />
+            </template>
+            <template #append>
+              <v-badge
+                :color="messageBadgeColor"
+                inline
+                :content="messageCount"
+                :model-value="messageCount > 0"
               />
             </template>
           </v-list-item>

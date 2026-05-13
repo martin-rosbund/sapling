@@ -19,15 +19,19 @@ export function useSaplingHeader() {
   const showInbox = ref(false)
   const showAccount = ref(false)
   const inboxCount = ref(0)
+  const inboxNotificationCount = ref(0)
   const incomingInboxPreview = ref<SaplingHeaderInboxPreview | null>(null)
   const currentPersonStore = useCurrentPersonStore()
   let incomingInboxPreviewSequence = 0
   //#endregion
 
-  const inboxBadgeColor = computed(() => (inboxCount.value > 0 ? 'error' : 'primary'))
+  const inboxBadgeColor = computed(() =>
+    inboxNotificationCount.value > 0 ? 'error' : 'primary',
+  )
 
   useOpenTaskCountEvents((snapshot, context) => {
     inboxCount.value = snapshot.count
+    inboxNotificationCount.value = snapshot.notifications.length
 
     if (!context || context.source !== 'stream' || context.newItems.length === 0) {
       return
