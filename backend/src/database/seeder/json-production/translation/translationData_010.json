@@ -70,5 +70,7 @@
   { "entity": "inboxNotification", "property": "updatedAt", "de": "Geändert am", "en": "Updated at" },
   { "entity": "inboxNotification", "property": "groupContent", "de": "Inhalt", "en": "Content" },
   { "entity": "inboxNotification", "property": "groupConfiguration", "de": "Konfiguration", "en": "Configuration" },
-  { "entity": "inboxNotification", "property": "groupReference", "de": "Referenz", "en": "Reference" }
+  { "entity": "inboxNotification", "property": "groupReference", "de": "Referenz", "en": "Reference" },
+
+  { "entity": "event", "property": "allDoneToday", "de": "Heute ist alles erledigt", "en": "All done for today" }
 ]
