@@ -96,7 +96,9 @@ class ApiMailService {
     const resolvedOptions = Intl.DateTimeFormat().resolvedOptions()
     const timeZone = resolvedOptions.timeZone?.trim()
     const locale =
-      typeof navigator !== 'undefined' ? navigator.language || resolvedOptions.locale : resolvedOptions.locale
+      typeof navigator !== 'undefined'
+        ? navigator.language || resolvedOptions.locale
+        : resolvedOptions.locale
 
     return {
       ...payload,

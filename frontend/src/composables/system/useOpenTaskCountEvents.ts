@@ -32,10 +32,7 @@ export interface OpenTaskUpdateContext {
   newItems: OpenTaskStreamItem[]
 }
 
-type OpenTaskCountListener = (
-  snapshot: OpenTaskSnapshot,
-  context?: OpenTaskUpdateContext,
-) => void
+type OpenTaskCountListener = (snapshot: OpenTaskSnapshot, context?: OpenTaskUpdateContext) => void
 
 const listeners = new Set<OpenTaskCountListener>()
 let eventSource: EventSource | null = null
@@ -61,7 +58,10 @@ function toTitle(value: unknown) {
   return trimmedValue
 }
 
-function createItemId(kind: OpenTaskStreamItemKind, parts: Array<string | number | null | undefined>) {
+function createItemId(
+  kind: OpenTaskStreamItemKind,
+  parts: Array<string | number | Date | null | undefined>,
+) {
   const normalizedParts = parts
     .map((part) => String(part ?? '').trim())
     .filter((part) => part.length > 0)
@@ -158,7 +158,8 @@ function applySnapshot(snapshot: OpenTaskSnapshot, source: OpenTaskUpdateContext
   latestSnapshot = snapshot
   notifyListeners(snapshot, {
     source,
-    newItems: source === 'stream' && previousSnapshot ? findNewItems(previousSnapshot, snapshot) : [],
+    newItems:
+      source === 'stream' && previousSnapshot ? findNewItems(previousSnapshot, snapshot) : [],
   })
 }
 

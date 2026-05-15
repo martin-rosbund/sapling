@@ -7,6 +7,7 @@ jest.mock('../../entity/global/entity.decorator', () => ({
   Sapling: jest.fn(() => () => undefined),
   SaplingForm: jest.fn(() => () => undefined),
   SaplingDependsOn: jest.fn(() => () => undefined),
+  SaplingGenericReference: jest.fn(() => () => undefined),
   hasSaplingOption: jest.fn(() => false),
 }));
 jest.mock('../../entity/global/entity.registry', () => ({
@@ -86,16 +87,43 @@ const createTemplateField = (
   ...overrides,
 });
 
+const createDeferred = <T>() => {
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  return { promise, resolve, reject };
+};
+
+const waitForBackgroundTasks = async () => {
+  await new Promise<void>((resolve) => {
+    setImmediate(resolve);
+  });
+  await Promise.resolve();
+};
+
+const toScriptItems = (items: object | object[]): object[] =>
+  Array.isArray(items) ? (items as object[]) : [items];
+
 const createGenericService = ({
   em,
   templateService,
   currentService,
   scriptService = {},
+  openTaskEventsService = {
+    notifyUsers: jest.fn(),
+  },
 }: {
   em: object;
   templateService: object;
   currentService: object;
   scriptService?: object;
+  openTaskEventsService?: {
+    notifyUsers: jest.Mock;
+  };
 }) =>
   (() => {
     const queryService = new GenericQueryService(templateService as never);
@@ -150,6 +178,7 @@ const createGenericService = ({
       referenceService,
       sanitizerService,
       timelineService,
+      openTaskEventsService as never,
     );
   })();
 
@@ -601,6 +630,7 @@ describe('GenericService', () => {
     const item = { handle: 7, title: 'Existing ticket' };
     const findOne = jest
       .fn<() => Promise<object | null>>()
+      .mockResolvedValueOnce(null)
       .mockResolvedValueOnce({ handle: 'ticket' })
       .mockResolvedValueOnce(item);
     const assign = jest.fn((_item: object, data: object) => ({
@@ -690,7 +720,7 @@ describe('GenericService', () => {
   it('does not auto-populate all relations during update when none were requested', async () => {
     const item = { handle: 7, phone: '+49 1111111111' };
     const findOne = jest
-      .fn<() => Promise<object | null>>()
+      .fn<(...args: unknown[]) => Promise<object | null>>()
       .mockResolvedValueOnce({ handle: 'person' })
       .mockResolvedValueOnce(item);
     const assign = jest.fn((_item: object, data: object) => ({
@@ -725,9 +755,7 @@ describe('GenericService', () => {
     };
     const scriptService = {
       runServer: jest.fn((_method: unknown, items: object | object[]) =>
-        Promise.resolve(
-          new ScriptResultServer(Array.isArray(items) ? items : [items]),
-        ),
+        Promise.resolve(new ScriptResultServer(toScriptItems(items))),
       ),
     };
     const currentService = {
@@ -796,9 +824,7 @@ describe('GenericService', () => {
     };
     const scriptService = {
       runServer: jest.fn((_method: unknown, items: object | object[]) =>
-        Promise.resolve(
-          new ScriptResultServer(Array.isArray(items) ? items : [items]),
-        ),
+        Promise.resolve(new ScriptResultServer(toScriptItems(items))),
       ),
     };
     const currentService = {
@@ -865,6 +891,7 @@ describe('GenericService', () => {
     }));
     const flush = jest.fn<() => Promise<void>>().mockResolvedValue(undefined);
     const logEm = {
+      findOne: jest.fn(() => Promise.resolve({ handle: 'update' })),
       create: jest.fn((cls: unknown, data: Record<string, unknown>) => {
         if ('action' in data) {
           logCreateCalls.push(data);
@@ -921,9 +948,7 @@ describe('GenericService', () => {
     };
     const scriptService = {
       runServer: jest.fn((_method: unknown, items: object | object[]) =>
-        Promise.resolve(
-          new ScriptResultServer(Array.isArray(items) ? items : [items]),
-        ),
+        Promise.resolve(new ScriptResultServer(toScriptItems(items))),
       ),
     };
     const currentService = {
@@ -949,6 +974,8 @@ describe('GenericService', () => {
       { handle: 1 } as never,
       [],
     );
+
+    await waitForBackgroundTasks();
 
     expect(logCreateCalls).toHaveLength(1);
     expect(logCreateCalls[0]).toMatchObject({
@@ -1018,6 +1045,7 @@ describe('GenericService', () => {
     }));
     const flush = jest.fn<() => Promise<void>>().mockResolvedValue(undefined);
     const logEm = {
+      findOne: jest.fn(() => Promise.resolve({ handle: 'update' })),
       create: jest.fn((cls: unknown, data: Record<string, unknown>) => {
         if ('action' in data) {
           logCreateCalls.push(data);
@@ -1195,9 +1223,7 @@ describe('GenericService', () => {
     };
     const scriptService = {
       runServer: jest.fn((_method: unknown, items: object | object[]) =>
-        Promise.resolve(
-          new ScriptResultServer(Array.isArray(items) ? items : [items]),
-        ),
+        Promise.resolve(new ScriptResultServer(toScriptItems(items))),
       ),
     };
     const currentService = {
@@ -1233,13 +1259,13 @@ describe('GenericService', () => {
         lastName: 'Mustermann',
         workWeek: 1,
         apiTokens: [],
-        createdAt: '2026-05-12T08:38:00.000Z',
+        createdAt: new Date('2026-05-12T08:38:00.000Z'),
         documents: [],
         favorites: [],
         firstName: 'Max',
         loginName: 'max-mustermann',
         mailLists: [],
-        updatedAt: '2026-05-12T08:38:00.000Z',
+        updatedAt: new Date('2026-05-12T08:38:00.000Z'),
         dashboards: [],
         department: null,
         holidayGroup: 2,
@@ -1254,6 +1280,8 @@ describe('GenericService', () => {
       { handle: 1 } as never,
       [],
     );
+
+    await waitForBackgroundTasks();
 
     expect(logCreateCalls[0]?.oldPayload).toMatchObject({
       type: 'sapling',
@@ -1321,9 +1349,7 @@ describe('GenericService', () => {
     };
     const scriptService = {
       runServer: jest.fn((_method: unknown, items: object | object[]) =>
-        Promise.resolve(
-          new ScriptResultServer(Array.isArray(items) ? items : [items]),
-        ),
+        Promise.resolve(new ScriptResultServer(toScriptItems(items))),
       ),
     };
     const currentService = {
@@ -1597,11 +1623,93 @@ describe('GenericService', () => {
     });
   });
 
+  it('returns create responses before detached change log and open-task work completes', async () => {
+    (hasSaplingOption as jest.Mock).mockImplementation(() => false);
+
+    const openTaskDeferred = createDeferred<object | null>();
+    const changeLogDeferred = createDeferred<object | null>();
+    const createdRecord = {
+      handle: 42,
+      title: 'Neuer Datensatz',
+    };
+    const openTaskEventsService = {
+      notifyUsers: jest.fn(),
+    };
+    const findOne = jest
+      .fn<(...args: unknown[]) => Promise<object | null>>()
+      .mockResolvedValueOnce({ handle: 'ticket' })
+      .mockImplementation((...args: unknown[]) => {
+        const where = args[1] as { handle?: unknown } | undefined;
+        if (where?.handle === 42) {
+          return openTaskDeferred.promise;
+        }
+
+        return Promise.resolve(null);
+      });
+    const logEm = {
+      findOne: jest.fn(() => changeLogDeferred.promise),
+      create: jest.fn(),
+      flush: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
+    };
+    const em = {
+      findOne,
+      create: jest.fn(() => createdRecord),
+      flush: jest.fn(() => Promise.resolve(undefined)),
+      fork: jest.fn(() => logEm),
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn(() => [
+        createTemplateField({ name: 'handle', type: 'number' }),
+        createTemplateField({ name: 'title', type: 'string' }),
+      ]),
+    };
+    const currentService = {
+      getEntityPermissions: jest.fn(() => ({
+        allowInsertStage: 'global',
+      })),
+      getAllEntityPermissions: jest.fn(() => []),
+    };
+    const scriptService = {
+      runServer: jest.fn((_method: unknown, items: object | object[]) =>
+        Promise.resolve(new ScriptResultServer(toScriptItems(items))),
+      ),
+    };
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+      scriptService,
+      openTaskEventsService,
+    });
+
+    const createPromise = service.create(
+      'ticket',
+      { title: 'Neuer Datensatz' },
+      { handle: 1 } as never,
+    );
+    const raceResult = await Promise.race([
+      createPromise.then(() => 'resolved'),
+      new Promise<'timeout'>((resolve) => {
+        setImmediate(() => resolve('timeout'));
+      }),
+    ]);
+
+    expect(raceResult).toBe('resolved');
+    await expect(createPromise).resolves.toEqual(createdRecord);
+    expect(openTaskEventsService.notifyUsers).not.toHaveBeenCalled();
+
+    changeLogDeferred.resolve(null);
+    openTaskDeferred.resolve(null);
+    await Promise.resolve();
+    await Promise.resolve();
+  });
+
   it('does not reload deleted records before the after-delete handoff', async () => {
     (hasSaplingOption as jest.Mock).mockImplementation(() => false);
 
     const findOne = jest
       .fn<() => Promise<object | null>>()
+      .mockResolvedValueOnce(null)
       .mockResolvedValueOnce({
         handle: 9,
         title: 'Zu loeschender Datensatz',
@@ -1634,7 +1742,7 @@ describe('GenericService', () => {
 
     await service.delete('ticket', 9, { handle: 1 } as never);
 
-    expect(findOne).toHaveBeenCalledTimes(2);
+    expect(findOne).toHaveBeenCalledTimes(3);
     expect(nativeDelete).toHaveBeenCalledWith(expect.any(Function), {
       handle: 9,
     });
@@ -1727,7 +1835,7 @@ describe('GenericService', () => {
             referenceName: 'tags',
             referenceItems: [referenceItem],
           });
-          const scriptItems = Array.isArray(items) ? items : [items];
+          const scriptItems = toScriptItems(items);
           return Promise.resolve(
             new ScriptResultServer(
               [

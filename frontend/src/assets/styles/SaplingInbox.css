@@ -372,11 +372,7 @@
       color-mix(in srgb, var(--sapling-inbox-entry-accent-color) 9%, transparent) 0%,
       transparent 58%
     ),
-    linear-gradient(
-      180deg,
-      rgba(var(--v-theme-surface), 0.96),
-      rgba(var(--v-theme-surface), 0.9)
-    );
+    linear-gradient(180deg, rgba(var(--v-theme-surface), 0.96), rgba(var(--v-theme-surface), 0.9));
   cursor: pointer;
   transition:
     transform 0.2s ease,

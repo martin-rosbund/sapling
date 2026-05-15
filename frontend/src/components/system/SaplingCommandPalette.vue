@@ -124,8 +124,17 @@ const router = useRouter()
 const { t, te } = useI18n()
 const currentPersonStore = useCurrentPersonStore()
 const currentPermissionStore = useCurrentPermissionStore()
-const { toggleTheme, setLanguage, currentLanguage, isDarkTheme, isGlassEnabled, isTiltEnabled, toggleGlass, toggleTilt, openIssue } =
-  useSaplingPreferences()
+const {
+  toggleTheme,
+  setLanguage,
+  currentLanguage,
+  isDarkTheme,
+  isGlassEnabled,
+  isTiltEnabled,
+  toggleGlass,
+  toggleTilt,
+  openIssue,
+} = useSaplingPreferences()
 const { logout } = useSaplingAccount()
 const { hasSaplingAiChatAccess, openSaplingAiChat } = useSaplingAiChat()
 const { openSaplingHelp } = useSaplingHelp()

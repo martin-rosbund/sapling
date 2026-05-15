@@ -346,6 +346,8 @@ export class ScriptService {
     user: PersonItem,
     context?: ScriptServerContext,
   ): Promise<ScriptResultServer> {
+    this.scheduleWebhookSubscriptions(method, items, entity, user);
+
     if (!(await this.runSubscription(method, items, entity, user))) {
       global.log.warn(
         `scriptService - runServer - ${entity.handle} - ${ScriptMethods[method]} - subscription failed`,
@@ -461,16 +463,6 @@ export class ScriptService {
     let result: boolean = true;
     try {
       if (method > ScriptMethods.afterRead) {
-        const webhookSubscriptions = await this.em.findAll(
-          WebhookSubscriptionItem,
-          {
-            where: {
-              entity: { handle: entity.handle },
-              type: { handle: ScriptMethods[method] },
-              isActive: true,
-            },
-          },
-        );
         const teamsSubscriptions = await this.em.findAll(
           TeamsSubscriptionItem,
           {
@@ -491,7 +483,9 @@ export class ScriptService {
             },
           },
         );
-        const subscriptionPayloadItems = Array.isArray(items) ? items : [items];
+        const subscriptionPayloadItems = Array.isArray(items)
+          ? (items as object[])
+          : [items];
         await this.populateRecipientRelations(subscriptionPayloadItems, [
           ...teamsSubscriptions.map(
             (subscription) => subscription.recipientField,
@@ -500,20 +494,6 @@ export class ScriptService {
             (subscription) => subscription.recipientField,
           ),
         ]);
-
-        if (webhookSubscriptions.length > 0) {
-          for (const subscription of webhookSubscriptions) {
-            if (subscription?.handle) {
-              global.log.info(
-                `Processing webhook subscription: ${subscription.handle}`,
-              );
-              await this.webhookService.querySubscription(
-                subscription.handle,
-                Array.isArray(items) ? items : [items],
-              );
-            }
-          }
-        }
 
         if (teamsSubscriptions.length > 0) {
           for (const subscription of teamsSubscriptions) {
@@ -547,11 +527,7 @@ export class ScriptService {
           }
         }
 
-        if (
-          webhookSubscriptions.length > 0 ||
-          teamsSubscriptions.length > 0 ||
-          inboxSubscriptions.length > 0
-        ) {
+        if (teamsSubscriptions.length > 0 || inboxSubscriptions.length > 0) {
           if (user) {
             const executionTime = (performance.now() - startTime) / 1000;
             global.log.debug(
@@ -559,6 +535,85 @@ export class ScriptService {
             );
           }
         }
+      }
+    } catch (e) {
+      global.log.error(e);
+      result = false;
+    }
+
+    return result;
+  }
+
+  private scheduleWebhookSubscriptions(
+    method: ScriptMethods,
+    items: object | object[],
+    entity: EntityItem,
+    user: PersonItem,
+  ): void {
+    if (method <= ScriptMethods.afterRead) {
+      return;
+    }
+
+    const snapshot = this.cloneSubscriptionPayload(items);
+
+    this.scheduleBackgroundTask(
+      `scriptService - runServer - ${entity.handle} - ${ScriptMethods[method]} - webhook subscription failed`,
+      async () => {
+        if (
+          !(await this.runWebhookSubscriptions(method, snapshot, entity, user))
+        ) {
+          global.log.warn(
+            `scriptService - runServer - ${entity.handle} - ${ScriptMethods[method]} - webhook subscription failed`,
+          );
+        }
+      },
+    );
+  }
+
+  private async runWebhookSubscriptions(
+    method: ScriptMethods,
+    items: object | object[],
+    entity: EntityItem,
+    user: PersonItem,
+  ): Promise<boolean> {
+    const startTime = performance.now();
+    let result = true;
+
+    try {
+      const webhookSubscriptions = await this.em.findAll(
+        WebhookSubscriptionItem,
+        {
+          where: {
+            entity: { handle: entity.handle },
+            type: { handle: ScriptMethods[method] },
+            isActive: true,
+          },
+        },
+      );
+
+      if (webhookSubscriptions.length === 0) {
+        return true;
+      }
+
+      const subscriptionPayloadItems = Array.isArray(items) ? items : [items];
+
+      for (const subscription of webhookSubscriptions) {
+        if (subscription?.handle) {
+          global.log.info(
+            `Processing webhook subscription: ${subscription.handle}`,
+          );
+          await this.webhookService.querySubscription(
+            subscription.handle,
+            subscriptionPayloadItems,
+          );
+        }
+      }
+
+      if (user) {
+        const executionTime = (performance.now() - startTime) / 1000;
+        global.log.debug(
+          `execution time: ${executionTime.toFixed(6)}s (webhook subscription ${ScriptMethods[method]} for entity ${entity.handle})`,
+        );
       }
     } catch (e) {
       global.log.error(e);
@@ -604,6 +659,46 @@ export class ScriptService {
         );
       }
     }
+  }
+
+  private cloneSubscriptionPayload<T extends object | object[]>(items: T): T {
+    if (typeof structuredClone === 'function') {
+      try {
+        return structuredClone(items);
+      } catch (error) {
+        global.log?.debug?.('scriptService - structuredClone fallback', error);
+      }
+    }
+
+    if (Array.isArray(items)) {
+      const itemArray = items as object[];
+      return itemArray.map((item) => this.shallowCloneItem(item)) as T;
+    }
+
+    return this.shallowCloneItem(items);
+  }
+
+  private shallowCloneItem<T extends object>(item: T): T {
+    if (!item || typeof item !== 'object') {
+      return item;
+    }
+
+    if (Array.isArray(item)) {
+      return [...item] as T;
+    }
+
+    return { ...(item as Record<string, unknown>) } as T;
+  }
+
+  private scheduleBackgroundTask(
+    label: string,
+    operation: () => Promise<void>,
+  ): void {
+    setImmediate(() => {
+      void operation().catch((error) => {
+        global.log?.error?.(label, error);
+      });
+    });
   }
 
   private expandRelationExpression(expression: string): string[] {

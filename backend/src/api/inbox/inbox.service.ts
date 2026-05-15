@@ -53,7 +53,7 @@ export class InboxService {
       throw new Error('global.notActive');
     }
 
-    const items = Array.isArray(payload) ? payload : [payload];
+    const items = Array.isArray(payload) ? (payload as object[]) : [payload];
     const notifications: InboxNotificationItem[] = [];
     const affectedUserHandles = new Set<number>();
 

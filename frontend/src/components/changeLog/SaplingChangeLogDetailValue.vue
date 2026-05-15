@@ -1,10 +1,15 @@
 <template>
   <div class="sapling-change-log-detail-value">
     <span v-if="isEmpty" class="sapling-change-log-detail-value__empty">-</span>
-    <div v-else-if="isMarkdownTemplate" class="sapling-change-log-detail-value__markdown glass-panel">
+    <div
+      v-else-if="isMarkdownTemplate"
+      class="sapling-change-log-detail-value__markdown glass-panel"
+    >
       <SaplingMarkdownContent :source="markdownSource" />
     </div>
-    <pre v-else-if="isJsonTemplate" class="sapling-change-log-detail-value__json">{{ jsonValue }}</pre>
+    <pre v-else-if="isJsonTemplate" class="sapling-change-log-detail-value__json">{{
+      jsonValue
+    }}</pre>
     <div v-else-if="canRenderField" class="sapling-change-log-detail-value__field">
       <SaplingDialogEditFieldRenderer
         :template="template!"

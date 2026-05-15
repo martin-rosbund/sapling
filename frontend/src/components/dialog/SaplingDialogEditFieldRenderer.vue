@@ -320,24 +320,27 @@ const SaplingFieldGenericReference = defineAsyncComponent(
   () => import('@/components/dialog/fields/SaplingFieldGenericReference.vue'),
 )
 
-const props = withDefaults(defineProps<{
-  template: EntityTemplate
-  entityHandle: string
-  itemHandle?: string | number
-  mode: DialogState
-  formValues: SaplingGenericItem
-  visibleTemplates: EntityTemplate[]
-  permissions: AccumulatedPermission[] | null
-  iconNames: Array<{ name: string; unicode?: string }>
-  isReferenceVisible: boolean
-  rules: Array<(v: unknown) => true | string>
-  fieldDisabled: boolean
-  referenceFieldDisabled: boolean
-  referenceParentFilter?: FilterQuery
-  showLabel?: boolean
-}>(), {
-  showLabel: true,
-})
+const props = withDefaults(
+  defineProps<{
+    template: EntityTemplate
+    entityHandle: string
+    itemHandle?: string | number
+    mode: DialogState
+    formValues: SaplingGenericItem
+    visibleTemplates: EntityTemplate[]
+    permissions: AccumulatedPermission[] | null
+    iconNames: Array<{ name: string; unicode?: string }>
+    isReferenceVisible: boolean
+    rules: Array<(v: unknown) => true | string>
+    fieldDisabled: boolean
+    referenceFieldDisabled: boolean
+    referenceParentFilter?: FilterQuery
+    showLabel?: boolean
+  }>(),
+  {
+    showLabel: true,
+  },
+)
 
 const emit = defineEmits<{
   (event: 'update-field', key: string, value: unknown): void

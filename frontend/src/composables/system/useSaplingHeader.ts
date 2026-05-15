@@ -25,9 +25,7 @@ export function useSaplingHeader() {
   let incomingInboxPreviewSequence = 0
   //#endregion
 
-  const inboxBadgeColor = computed(() =>
-    inboxNotificationCount.value > 0 ? 'error' : 'primary',
-  )
+  const inboxBadgeColor = computed(() => (inboxNotificationCount.value > 0 ? 'error' : 'primary'))
 
   useOpenTaskCountEvents((snapshot, context) => {
     inboxCount.value = snapshot.count

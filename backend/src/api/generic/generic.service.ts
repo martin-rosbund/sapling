@@ -381,6 +381,8 @@ export class GenericService {
     handle: string | number,
     _currentUser: PersonItem,
   ): Promise<ChangeLogResponseDto[]> {
+    void _currentUser;
+
     const normalizedHandle = this.genericReferenceService.normalizeHandleValue(
       entityHandle,
       handle,
@@ -501,17 +503,21 @@ export class GenericService {
       }
     }
 
-    await this.safeStoreChangeLog(
-      'create',
-      entity,
-      currentUser,
-      null,
-      submittedSnapshot,
+    this.scheduleBackgroundTask('changeLog', () =>
+      this.safeStoreChangeLog(
+        'create',
+        entity,
+        currentUser,
+        null,
+        submittedSnapshot,
+      ),
     );
 
-    await this.emitOpenTaskCountChangesForHandle(
-      entityHandle,
-      this.extractEntityHandle(newData),
+    this.scheduleBackgroundTask('openTaskCountChanges', () =>
+      this.emitOpenTaskCountChangesForHandle(
+        entityHandle,
+        this.extractEntityHandle(newData),
+      ),
     );
 
     return this.genericSanitizerService.sanitizeEntityResult(
@@ -627,18 +633,22 @@ export class GenericService {
       }
     }
 
-    await this.safeStoreChangeLog(
-      'update',
-      entity,
-      currentUser,
-      oldSnapshot,
-      submittedSnapshot,
+    this.scheduleBackgroundTask('changeLog', () =>
+      this.safeStoreChangeLog(
+        'update',
+        entity,
+        currentUser,
+        oldSnapshot,
+        submittedSnapshot,
+      ),
     );
 
-    await this.emitOpenTaskCountChangesForHandle(
-      entityHandle,
-      handle,
-      previousOpenTaskUserHandles,
+    this.scheduleBackgroundTask('openTaskCountChanges', () =>
+      this.emitOpenTaskCountChangesForHandle(
+        entityHandle,
+        handle,
+        previousOpenTaskUserHandles,
+      ),
     );
 
     return this.genericSanitizerService.sanitizeEntityResult(
@@ -720,15 +730,14 @@ export class GenericService {
       );
     }
 
-    await this.safeStoreChangeLog(
-      'delete',
-      entity,
-      currentUser,
-      oldSnapshot,
-      null,
+    this.scheduleBackgroundTask('changeLog', () =>
+      this.safeStoreChangeLog('delete', entity, currentUser, oldSnapshot, null),
     );
 
-    this.openTaskEventsService.notifyUsers(previousOpenTaskUserHandles);
+    this.scheduleBackgroundTask('openTaskCountChanges', () => {
+      this.openTaskEventsService.notifyUsers(previousOpenTaskUserHandles);
+      return Promise.resolve();
+    });
   }
 
   // #endregion
@@ -1077,6 +1086,17 @@ export class GenericService {
     }
 
     return null;
+  }
+
+  private scheduleBackgroundTask(
+    label: string,
+    operation: () => Promise<void>,
+  ): void {
+    setImmediate(() => {
+      void operation().catch((error) => {
+        global.log?.error?.(`${label}:`, error);
+      });
+    });
   }
 
   private normalizeNumericOpenTaskHandle(
@@ -1497,7 +1517,7 @@ export class GenericService {
     const normalizedRecord: Record<string, unknown> = {};
     visited.set(value, normalizedRecord);
 
-    Object.keys(value as Record<string, unknown>)
+    Object.keys(value)
       .sort((left, right) => left.localeCompare(right))
       .forEach((key) => {
         normalizedRecord[key] = this.normalizeChangeLogValue(

@@ -127,7 +127,9 @@ describe('MessageTemplateService', () => {
   });
 
   it('adds relation paths from recipient expressions to the entity populate list', async () => {
-    const findOne = jest.fn().mockResolvedValue({ handle: 7 });
+    const findOne = jest
+      .fn<(...args: unknown[]) => Promise<object | null>>()
+      .mockResolvedValue({ handle: 7 });
     const templateService = {
       getEntityTemplate: jest.fn((entityHandle: string) => {
         switch (entityHandle) {

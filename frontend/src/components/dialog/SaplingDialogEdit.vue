@@ -351,9 +351,7 @@
                     :disabled="!isDirty || isSaving"
                     @click="resetForm"
                   />
-                  <v-divider
-                    v-if="canDeleteRecord || mobileRecordActionMenuGroups.length > 0"
-                  />
+                  <v-divider v-if="canDeleteRecord || mobileRecordActionMenuGroups.length > 0" />
                   <v-list-item
                     v-if="canDeleteRecord"
                     prepend-icon="mdi-delete-outline"
@@ -361,9 +359,7 @@
                     :disabled="recordActionButtonsDisabled"
                     @click="openRecordDeleteDialog"
                   />
-                  <v-divider
-                    v-if="canDeleteRecord && mobileRecordActionMenuGroups.length > 0"
-                  />
+                  <v-divider v-if="canDeleteRecord && mobileRecordActionMenuGroups.length > 0" />
                   <template
                     v-for="(group, groupIdx) in mobileRecordActionMenuGroups"
                     :key="`edit-group-${groupIdx}`"

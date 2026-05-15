@@ -69,12 +69,7 @@
               <v-icon icon="mdi-email" />
             </template>
             <template #append>
-              <v-badge
-                :color="inboxBadgeColor"
-                inline
-                :content="inboxCount"
-                :model-value="true"
-              />
+              <v-badge :color="inboxBadgeColor" inline :content="inboxCount" :model-value="true" />
             </template>
           </v-list-item>
 

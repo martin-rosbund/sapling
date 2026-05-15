@@ -60,16 +60,8 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(
-      135deg,
-      rgba(var(--sapling-header-preview-rgb), 0.1),
-      transparent 42%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.1),
-      transparent 34%
-    ),
+    linear-gradient(135deg, rgba(var(--sapling-header-preview-rgb), 0.1), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 34%),
     radial-gradient(
       circle at top right,
       rgba(var(--sapling-header-preview-rgb), 0.08),
