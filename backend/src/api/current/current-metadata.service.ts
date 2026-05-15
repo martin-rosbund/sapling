@@ -3,16 +3,8 @@ import { EntityManager } from '@mikro-orm/core';
 import { EntityItem } from '../../entity/EntityItem';
 import { PersonItem } from '../../entity/PersonItem';
 import { TemplateService } from '../template/template.service';
-import { EntityTemplateDto } from '../template/dto/entity-template.dto';
-import { AccumulatedPermissionDto } from './dto/accumulated-permission.dto';
 import { CurrentService } from './current.service';
-
-export interface CurrentEntityMetadataDto {
-  entityHandle: string;
-  entity: EntityItem | null;
-  entityPermission: AccumulatedPermissionDto;
-  entityTemplates: EntityTemplateDto[];
-}
+import { CurrentEntityMetadataDto } from './dto/current-entity-metadata.dto';
 
 /**
  * Loads batched entity metadata required by generic frontend workspaces.

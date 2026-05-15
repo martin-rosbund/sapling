@@ -100,6 +100,7 @@ import { useSaplingAiChat } from '@/composables/system/useSaplingAiChat'
 import { useSaplingHelp } from '@/composables/system/useSaplingHelp'
 import type { EntityItem, EntityRouteItem, FavoriteItem, PersonItem } from '@/entity/entity'
 import type { AccumulatedPermission } from '@/entity/structure'
+import { canAccessEntityWorkspace } from '@/utils/entityAccess'
 
 type CommandPaletteGroupKey = 'favorite' | 'entity' | 'action'
 
@@ -219,7 +220,9 @@ async function loadEntities(accumulated: AccumulatedPermission[]) {
     relations: ['routes'],
   })
   const allowedHandles = new Set(
-    accumulated.filter((permission) => permission.allowShow).map((p) => p.entityHandle),
+    accumulated
+      .filter((permission) => canAccessEntityWorkspace(permission))
+      .map((permission) => permission.entityHandle),
   )
   entities.value = (response.data ?? []).filter((entity) => allowedHandles.has(entity.handle))
 }

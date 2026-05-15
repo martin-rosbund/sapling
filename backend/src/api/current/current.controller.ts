@@ -33,6 +33,7 @@ import { AccumulatedPermissionDto } from './dto/accumulated-permission.dto';
 import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
 import { UseGuards } from '@nestjs/common';
 import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth.guard';
+import { CurrentEntityMetadataDto } from './dto/current-entity-metadata.dto';
 
 /**
  * @class
@@ -235,13 +236,15 @@ export class CurrentController {
     required: true,
     description:
       'Comma-separated list of entity handles to resolve in one metadata request.',
-    example: 'ticket,person,project',
+    example: 'ticket,person,company',
     type: String,
   })
   @ApiResponse({
     status: 200,
     description:
       'Metadata bundle containing entity definitions, templates, and permission snapshots for the requested entities.',
+    type: CurrentEntityMetadataDto,
+    isArray: true,
   })
   async getEntityMetadata(
     @Req() req: Request,

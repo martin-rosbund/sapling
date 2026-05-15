@@ -1,4 +1,8 @@
-import { BadRequestException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { describe, expect, it, jest } from '@jest/globals';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 import { GenericFilterService } from './generic-filter.service';
@@ -185,10 +189,68 @@ describe('GenericReadService', () => {
     expect(result.entity).toEqual({ handle: 'ticket' });
   });
 
-  it('maps read failures to bad requests', async () => {
+  it('preserves existing http exceptions', async () => {
+    const em = {
+      findOne: jest.fn(() => Promise.resolve(null)),
+      findAndCount: jest.fn(() =>
+        Promise.reject(new ForbiddenException('global.permissionDenied')),
+      ),
+    };
+    const permissionService = {
+      setTopLevelFilter: jest.fn((where: object) => where),
+    };
+    const service = new GenericReadService(
+      em as never,
+      {} as never,
+      new GenericFilterService(),
+      permissionService as never,
+    );
+
+    await expect(
+      service.findAndCount(
+        'ticket',
+        () => undefined,
+        {},
+        { handle: 1 } as never,
+        [],
+        {},
+      ),
+    ).rejects.toThrow(ForbiddenException);
+  });
+
+  it('maps unexpected read failures to internal server errors', async () => {
     const em = {
       findOne: jest.fn(() => Promise.resolve(null)),
       findAndCount: jest.fn(() => Promise.reject(new TypeError('broken read'))),
+    };
+    const permissionService = {
+      setTopLevelFilter: jest.fn((where: object) => where),
+    };
+    const service = new GenericReadService(
+      em as never,
+      {} as never,
+      new GenericFilterService(),
+      permissionService as never,
+    );
+
+    await expect(
+      service.findAndCount(
+        'ticket',
+        () => undefined,
+        {},
+        { handle: 1 } as never,
+        [],
+        {},
+      ),
+    ).rejects.toThrow(InternalServerErrorException);
+  });
+
+  it('keeps explicit bad request errors intact', async () => {
+    const em = {
+      findOne: jest.fn(() => Promise.resolve(null)),
+      findAndCount: jest.fn(() =>
+        Promise.reject(new BadRequestException('exception.badRequest')),
+      ),
     };
     const permissionService = {
       setTopLevelFilter: jest.fn((where: object) => where),

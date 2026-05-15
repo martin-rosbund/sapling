@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { EntityManager } from '@mikro-orm/core';
 import { EntityItem } from '../../entity/EntityItem';
 import { PersonItem } from '../../entity/PersonItem';
@@ -183,14 +188,19 @@ export class GenericReadService {
     } catch (error) {
       global.log.error(`entity ${entityHandle}:`, error);
 
-      if (error instanceof Error) {
-        throw new BadRequestException(
-          `global.${error.name.charAt(0).toLowerCase() + error.name.slice(1)}`,
-          error.message,
-        );
+      if (error instanceof HttpException) {
+        throw error;
       }
 
-      throw error;
+      if (
+        error instanceof Error &&
+        error.message.startsWith('global.') &&
+        error.name === 'BadRequestException'
+      ) {
+        throw new BadRequestException(error.message);
+      }
+
+      throw new InternalServerErrorException('exception.serverException');
     }
   }
 

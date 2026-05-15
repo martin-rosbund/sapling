@@ -203,7 +203,7 @@ export class GenericController {
   @ApiQuery({
     name: 'limit',
     required: false,
-    description: 'Number of results per page (default: 100, maximum: 100)',
+    description: 'Number of results per page (default: 200, maximum: 200)',
     type: Number,
   })
   @ApiResponse({

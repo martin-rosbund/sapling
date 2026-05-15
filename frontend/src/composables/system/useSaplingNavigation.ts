@@ -6,6 +6,7 @@ import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
+import { canAccessEntityWorkspace } from '@/utils/entityAccess'
 
 interface SaplingNavigationProps {
   modelValue: boolean
@@ -275,9 +276,10 @@ export function useSaplingNavigation(props: SaplingNavigationProps, emit: Saplin
 
     if (entitiesPermissions.value) {
       entities.value = entities.value.filter((entity) => {
-        return entitiesPermissions.value?.some((permission) => {
-          return permission.entityHandle === entity.handle && permission.allowShow
-        })
+        return entitiesPermissions.value?.some(
+          (permission) =>
+            permission.entityHandle === entity.handle && canAccessEntityWorkspace(permission),
+        )
       })
     }
 
