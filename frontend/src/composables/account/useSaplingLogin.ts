@@ -20,7 +20,6 @@ export function useSaplingLogin() {
   const email = ref(CookieService.get('username') || DEBUG_USERNAME)
   const password = ref(DEBUG_PASSWORD)
   const rememberMe = ref(CookieService.get('rememberMe') === 'true')
-  CookieService.delete('password')
 
   // Load translations for the login module
   const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoader('login', {

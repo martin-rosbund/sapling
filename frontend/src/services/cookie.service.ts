@@ -10,7 +10,7 @@ class CookieService {
    */
   static set(name: string, value: string, days = 365) {
     const expires = new Date(Date.now() + days * 864e5).toUTCString()
-    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`
+    document.cookie = `sapling-${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`
   }
 
   /**
@@ -22,7 +22,7 @@ class CookieService {
     const value =
       document.cookie
         .split('; ')
-        .find((row) => row.startsWith(name + '='))
+        .find((row) => row.startsWith(`sapling-${name}=`))
         ?.split('=')[1] || null
 
     return value ? decodeURIComponent(value) : null
@@ -33,7 +33,7 @@ class CookieService {
    * @param name Name of the cookie to delete.
    */
   static delete(name: string) {
-    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
+    document.cookie = `sapling-${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
   }
 }
 

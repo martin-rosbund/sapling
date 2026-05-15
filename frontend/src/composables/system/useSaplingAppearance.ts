@@ -8,8 +8,8 @@ import CookieService from '@/services/cookie.service'
 type SaplingThemeName = 'light' | 'dark'
 
 const SAPLING_THEME_COOKIE = 'theme'
-const SAPLING_GLASS_COOKIE = 'sapling-glass'
-const SAPLING_TILT_COOKIE = 'sapling-tilt'
+const SAPLING_GLASS_COOKIE = 'glass'
+const SAPLING_TILT_COOKIE = 'tilt'
 const SAPLING_THEME_LINK_ATTRIBUTE = 'data-sapling-theme'
 
 const glassEnabled = ref(true)
