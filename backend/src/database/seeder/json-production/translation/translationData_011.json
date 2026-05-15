@@ -1,0 +1,8 @@
+[
+    { "entity": "permission", "property": "impersonationViewAs", "de": "Sapling als diesen Benutzer ansehen", "en": "View Sapling as this user" },
+    { "entity": "permission", "property": "impersonationActive", "de": "Sicht eines anderen Benutzers aktiv", "en": "Viewing as another user" },
+    { "entity": "permission", "property": "impersonationViewingAs", "de": "Du siehst Sapling aktuell als {target}.", "en": "You are viewing Sapling as {target}." },
+    { "entity": "permission", "property": "impersonationActor", "de": "Echter Benutzer: {actor}", "en": "Real user: {actor}" },
+    { "entity": "permission", "property": "impersonationReturn", "de": "Zurück zu eigenem Benutzer", "en": "Return to my account" },
+    { "entity": "permission", "property": "readOnlyDuringImpersonation", "de": "Während der Fremdsicht ist nur Lesezugriff erlaubt.", "en": "Only read access is allowed while viewing as another user." }
+]

@@ -96,19 +96,36 @@
         :close-on-content-click="false"
       >
         <template #activator="{ props: menuProps }">
-          <v-btn v-bind="menuProps" class="sapling-profile-trigger text-none" variant="text">
+          <v-btn
+            v-bind="menuProps"
+            class="sapling-profile-trigger text-none"
+            :class="{ 'sapling-profile-trigger--impersonating': isImpersonating }"
+            variant="text"
+          >
             <div class="sapling-header__account">
-              <div class="sapling-header__account-avatar">{{ profileInitials }}</div>
+              <div class="sapling-header__account-avatar">
+                <v-icon v-if="isImpersonating" icon="mdi-eye-outline" size="18" />
+                <template v-else>{{ profileInitials }}</template>
+              </div>
               <div class="sapling-header__account-copy">
                 <div class="sapling-header__account-name">{{ profileName }}</div>
-                <div class="sapling-header__account-meta">{{ profileMeta }}</div>
+                <div class="sapling-header__account-meta">
+                  <template v-if="isImpersonating && impersonationActorName">
+                    {{ $t('permission.impersonationActor', { actor: impersonationActorName }) }}
+                  </template>
+                  <template v-else>{{ profileMeta }}</template>
+                </div>
               </div>
               <v-icon icon="mdi-chevron-down" size="18" />
             </div>
           </v-btn>
         </template>
 
-        <v-card class="glass-panel sapling-profile-menu" elevation="12">
+        <v-card
+          class="glass-panel sapling-profile-menu"
+          :class="{ 'sapling-profile-menu--impersonating': isImpersonating }"
+          elevation="12"
+        >
           <div class="sapling-profile-menu__hero">
             <div class="sapling-profile-menu__avatar">{{ profileInitials }}</div>
             <div class="sapling-profile-menu__identity">
@@ -128,6 +145,18 @@
 
           <div class="sapling-profile-menu__body">
             <div class="sapling-profile-menu__section sapling-profile-menu__section--primary">
+              <v-btn
+                v-if="isImpersonating"
+                block
+                color="error"
+                variant="tonal"
+                prepend-icon="mdi-account-arrow-left-outline"
+                :loading="impersonationReturning"
+                @click="returnToOwnAccount"
+              >
+                {{ $t('permission.impersonationReturn') }}
+              </v-btn>
+
               <v-btn
                 block
                 color="primary"
@@ -565,4 +594,28 @@ function openSwagger() {
 function openGit() {
   window.open(GIT_URL, '_blank')
 }
+
+// #region Impersonation
+const impersonationReturning = ref(false)
+const isImpersonating = computed(() => currentPersonStore.isImpersonating)
+const impersonationActorName = computed(() => {
+  const actor = currentPersonStore.impersonator
+  if (!actor) {
+    return ''
+  }
+  return `${actor.firstName ?? ''} ${actor.lastName ?? ''}`.trim()
+})
+
+async function returnToOwnAccount() {
+  if (impersonationReturning.value) {
+    return
+  }
+  impersonationReturning.value = true
+  try {
+    await currentPersonStore.stopImpersonation()
+  } finally {
+    impersonationReturning.value = false
+  }
+}
+// #endregion
 </script>

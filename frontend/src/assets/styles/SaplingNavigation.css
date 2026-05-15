@@ -943,3 +943,24 @@
     border-radius: var(--sapling-radius-sm);
   }
 }
+
+/* Impersonation: tint the profile trigger reddish while viewing as another user */
+.sapling-profile-trigger--impersonating {
+  background: rgba(220, 38, 38, 0.16) !important;
+  border: 1px solid rgba(220, 38, 38, 0.55);
+  color: rgb(var(--v-theme-on-surface));
+}
+.sapling-profile-trigger--impersonating:hover {
+  background: rgba(220, 38, 38, 0.24) !important;
+}
+.sapling-profile-trigger--impersonating .sapling-header__account-avatar {
+  background: rgba(220, 38, 38, 0.85);
+  color: #fff;
+}
+.sapling-profile-trigger--impersonating .sapling-header__account-name,
+.sapling-profile-trigger--impersonating .sapling-header__account-meta {
+  color: rgb(180, 30, 30);
+}
+.sapling-profile-menu--impersonating {
+  border: 1px solid rgba(220, 38, 38, 0.45);
+}

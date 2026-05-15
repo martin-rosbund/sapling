@@ -351,6 +351,19 @@
   background: var(--sapling-surface-fill);
 }
 
+.sapling-permission-member-card__copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.sapling-permission-member-card__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sapling-gap-xs);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
 .sapling-permission-member-card p,
 .sapling-permission-summary-note {
   margin: var(--sapling-gap-sm) 0 0;
