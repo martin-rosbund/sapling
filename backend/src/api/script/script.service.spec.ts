@@ -37,7 +37,9 @@ describe('ScriptService', () => {
       handle: 1,
       title: 'Initial payload',
     };
-    type FindAllMock = (...args: unknown[]) => Promise<Array<{ handle: number }>>;
+    type FindAllMock = (
+      ...args: unknown[]
+    ) => Promise<Array<{ handle: number }>>;
     type QuerySubscriptionMock = (
       handle: number,
       payload: object[],

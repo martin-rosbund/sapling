@@ -145,8 +145,8 @@ describe('CurrentService', () => {
       find,
     };
     const inboxService = {
-      getUnreadNotifications: jest.fn(
-        (_user: { handle: number }) => Promise.resolve([notification]),
+      getUnreadNotifications: jest.fn((_user: { handle: number }) =>
+        Promise.resolve([notification]),
       ),
     };
     const service = new CurrentService(em as never, inboxService as never);
