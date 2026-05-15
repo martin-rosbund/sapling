@@ -440,6 +440,7 @@ export class GenericService {
     entityHandle: string,
     data: { createdAt?: Date; updatedAt?: Date; [key: string]: any },
     currentUser: PersonItem,
+    scriptContext: ScriptServerContext = {},
   ): Promise<object> {
     const template = this.templateService.getEntityTemplate(entityHandle);
     const submittedSnapshot = this.captureSubmittedChangeLogPayload(
@@ -456,8 +457,6 @@ export class GenericService {
 
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
     let newData: object;
-    const scriptContext: ScriptServerContext = {};
-
     data = this.genericPayloadService.prepareCreatePayload(template, data);
 
     data = await this.genericMutationService.applyBeforeScript(
@@ -491,6 +490,7 @@ export class GenericService {
           newData,
           entity,
           currentUser,
+          scriptContext,
         );
 
       if (overwrittenData !== newData) {
@@ -545,6 +545,7 @@ export class GenericService {
     data: { createdAt?: Date; updatedAt?: Date; [key: string]: any },
     currentUser: PersonItem,
     relations: string[] = [],
+    scriptContext: ScriptServerContext = {},
   ): Promise<object> {
     const previousOpenTaskUserHandles = await this.loadOpenTaskUserHandles(
       entityHandle,
@@ -597,7 +598,7 @@ export class GenericService {
       data,
       entity,
       currentUser,
-      { currentItems: [item] },
+      { ...scriptContext, currentItems: [item] },
     );
 
     await this.genericReferenceService.validateReferenceDependencies(
@@ -621,6 +622,7 @@ export class GenericService {
           newData,
           entity,
           currentUser,
+          scriptContext,
         );
 
       if (overwrittenData !== newData) {
@@ -672,6 +674,7 @@ export class GenericService {
     entityHandle: string,
     handle: string | number,
     currentUser: PersonItem,
+    scriptContext: ScriptServerContext = {},
   ): Promise<void> {
     const previousOpenTaskUserHandles = await this.loadOpenTaskUserHandles(
       entityHandle,
@@ -709,6 +712,7 @@ export class GenericService {
       item,
       entity,
       currentUser,
+      scriptContext,
     );
 
     const affectedRows = await this.genericMutationService.deleteAndFlush(
@@ -727,6 +731,7 @@ export class GenericService {
         item,
         entity,
         currentUser,
+        scriptContext,
       );
     }
 
@@ -758,6 +763,7 @@ export class GenericService {
     entityHandleValue: string | number,
     referenceHandleValue: string | number,
     currentUser: PersonItem,
+    scriptContext: ScriptServerContext = {},
   ): Promise<object> {
     const previousOpenTaskUserHandles =
       await this.loadReferenceOpenTaskUserHandles(
@@ -784,6 +790,7 @@ export class GenericService {
           entity,
           currentUser,
           {
+            ...scriptContext,
             referenceName,
             referenceItems: [mutation.referenceItem],
           },
@@ -828,6 +835,7 @@ export class GenericService {
     entityHandleValue: string | number,
     referenceHandleValue: string | number,
     currentUser: PersonItem,
+    scriptContext: ScriptServerContext = {},
   ): Promise<object> {
     const previousOpenTaskUserHandles =
       await this.loadReferenceOpenTaskUserHandles(
@@ -854,6 +862,7 @@ export class GenericService {
           entity,
           currentUser,
           {
+            ...scriptContext,
             referenceName,
             referenceItems: [mutation.referenceItem],
           },

@@ -5,6 +5,7 @@ import { InboxNotificationItem } from '../../entity/InboxNotificationItem';
 import { InboxSubscriptionItem } from '../../entity/InboxSubscriptionItem';
 import { PersonItem } from '../../entity/PersonItem';
 import { OpenTaskEventsService } from '../current/open-task-events.service';
+import type { ClientFormattingContext } from '../common/client-formatting-context.util';
 
 type JsonRecord = Record<string, unknown>;
 
@@ -25,6 +26,7 @@ export class InboxService {
     payload: object | object[],
     currentUser: PersonItem,
     relationExpressions: string[] = [],
+    clientFormattingContext: ClientFormattingContext = {},
   ): Promise<InboxNotificationItem[]> {
     const subscription = await this.em.findOne(
       InboxSubscriptionItem,
@@ -63,6 +65,7 @@ export class InboxService {
         item,
         currentUser,
         relationExpressions,
+        clientFormattingContext,
       });
 
       for (const recipient of prepared.recipients) {
@@ -163,6 +166,7 @@ export class InboxService {
     item: object;
     currentUser: PersonItem;
     relationExpressions: string[];
+    clientFormattingContext: ClientFormattingContext;
   }): Promise<{
     recipients: PersonItem[];
     referenceHandle?: string;
@@ -205,6 +209,8 @@ export class InboxService {
       context,
       {
         entityHandle,
+        locale: options.clientFormattingContext.clientLocale,
+        timeZone: options.clientFormattingContext.clientTimeZone,
         currentUser: options.currentUser,
       },
     );
@@ -213,6 +219,8 @@ export class InboxService {
       context,
       {
         entityHandle,
+        locale: options.clientFormattingContext.clientLocale,
+        timeZone: options.clientFormattingContext.clientTimeZone,
         currentUser: options.currentUser,
       },
     );

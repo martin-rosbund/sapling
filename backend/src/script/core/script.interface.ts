@@ -7,6 +7,8 @@ export type ScriptServerContext = {
   currentItems?: object[];
   referenceName?: string;
   referenceItems?: object[];
+  clientLocale?: string;
+  clientTimeZone?: string;
 };
 
 /**

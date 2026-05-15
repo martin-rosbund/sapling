@@ -348,7 +348,7 @@ export class ScriptService {
   ): Promise<ScriptResultServer> {
     this.scheduleWebhookSubscriptions(method, items, entity, user);
 
-    if (!(await this.runSubscription(method, items, entity, user))) {
+    if (!(await this.runSubscription(method, items, entity, user, context))) {
       global.log.warn(
         `scriptService - runServer - ${entity.handle} - ${ScriptMethods[method]} - subscription failed`,
       );
@@ -458,6 +458,7 @@ export class ScriptService {
     items: object | object[],
     entity: EntityItem,
     user: PersonItem,
+    context?: ScriptServerContext,
   ): Promise<boolean> {
     const startTime = performance.now();
     let result: boolean = true;
@@ -506,6 +507,10 @@ export class ScriptService {
                 subscriptionPayloadItems,
                 user,
                 [subscription.recipientField],
+                {
+                  clientLocale: context?.clientLocale,
+                  clientTimeZone: context?.clientTimeZone,
+                },
               );
             }
           }
@@ -522,6 +527,10 @@ export class ScriptService {
                 subscriptionPayloadItems,
                 user,
                 [subscription.recipientField],
+                {
+                  clientLocale: context?.clientLocale,
+                  clientTimeZone: context?.clientTimeZone,
+                },
               );
             }
           }

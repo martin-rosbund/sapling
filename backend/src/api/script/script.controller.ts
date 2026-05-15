@@ -26,6 +26,7 @@ import {
   type GenericPermissionAction,
 } from '../generic/generic.decorator';
 import { GenericPermissionGuard } from '../../auth/guard/generic-permission.guard';
+import { extractClientFormattingContextFromRequest } from '../common/client-formatting-context.util';
 
 const SCRIPT_METHOD_PERMISSION_MAP: Record<
   keyof typeof ScriptMethods,
@@ -253,6 +254,7 @@ export class ScriptController {
       items,
       entity,
       req.user,
+      extractClientFormattingContextFromRequest(req),
     );
   }
 }

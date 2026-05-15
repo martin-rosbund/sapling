@@ -22,6 +22,7 @@ import { PersonSessionItem } from '../../entity/PersonSessionItem';
 import { TeamsDeliveryItem } from '../../entity/TeamsDeliveryItem';
 import { TeamsDeliveryStatusItem } from '../../entity/TeamsDeliveryStatusItem';
 import { TeamsSubscriptionItem } from '../../entity/TeamsSubscriptionItem';
+import type { ClientFormattingContext } from '../common/client-formatting-context.util';
 
 type JsonRecord = Record<string, unknown>;
 
@@ -77,6 +78,7 @@ export class TeamsService {
     payload: object | object[],
     currentUser: PersonItem,
     relationExpressions: string[] = [],
+    clientFormattingContext: ClientFormattingContext = {},
   ): Promise<TeamsDeliveryItem[]> {
     const subscription = await this.em.findOne(
       TeamsSubscriptionItem,
@@ -117,6 +119,7 @@ export class TeamsService {
         currentUser,
         sender,
         relationExpressions,
+        clientFormattingContext,
       });
 
       const delivery = new TeamsDeliveryItem();
@@ -311,6 +314,7 @@ export class TeamsService {
     currentUser: PersonItem;
     sender: PersonItem | null;
     relationExpressions: string[];
+    clientFormattingContext: ClientFormattingContext;
   }): Promise<{
     createdBy: PersonItem;
     recipientPerson?: PersonItem;
@@ -357,6 +361,8 @@ export class TeamsService {
       context,
       {
         entityHandle,
+        locale: options.clientFormattingContext.clientLocale,
+        timeZone: options.clientFormattingContext.clientTimeZone,
         currentUser: options.currentUser,
       },
     );

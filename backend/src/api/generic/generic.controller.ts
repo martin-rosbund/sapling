@@ -37,8 +37,9 @@ import {
   GenericPermission,
 } from './generic.decorator';
 import { PersonItem } from '../../entity/PersonItem';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth.guard';
+import { extractClientFormattingContextFromRequest } from '../common/client-formatting-context.util';
 
 /**
  * @class
@@ -327,7 +328,12 @@ export class GenericController {
     @Param('entityHandle') entityHandle: string,
     @Body() createData: object,
   ): Promise<any> {
-    return this.genericService.create(entityHandle, createData, req.user);
+    return this.genericService.create(
+      entityHandle,
+      createData,
+      req.user,
+      extractClientFormattingContextFromRequest(req),
+    );
   }
   // #endregion
 
@@ -386,6 +392,7 @@ export class GenericController {
       updateData,
       req.user,
       relationsQuery.relations,
+      extractClientFormattingContextFromRequest(req),
     );
   }
   // #endregion
@@ -422,7 +429,12 @@ export class GenericController {
     @Param('entityHandle') entityHandle: string,
     @Query('handle') handle: string,
   ): Promise<void> {
-    await this.genericService.delete(entityHandle, handle, req.user);
+    await this.genericService.delete(
+      entityHandle,
+      handle,
+      req.user,
+      extractClientFormattingContextFromRequest(req),
+    );
   }
   // #endregion
 
@@ -484,6 +496,7 @@ export class GenericController {
       body.entityHandle,
       body.referenceHandle,
       req.user,
+      extractClientFormattingContextFromRequest(req),
     );
   }
   // #endregion
@@ -546,6 +559,7 @@ export class GenericController {
       body.entityHandle,
       body.referenceHandle,
       req.user,
+      extractClientFormattingContextFromRequest(req),
     );
   }
   // #endregion

@@ -97,4 +97,80 @@ describe('ScriptService', () => {
 
     webhookDeferred.resolve(undefined);
   });
+
+  it('forwards client formatting context to teams and inbox subscriptions', async () => {
+    type FindAllMock = (...args: unknown[]) => Promise<Array<{ handle: number; recipientField: string }>>;
+    const em = {
+      findAll: jest
+        .fn<FindAllMock>()
+        .mockResolvedValueOnce([{ handle: 5, recipientField: 'assigneePerson' }])
+        .mockResolvedValueOnce([{ handle: 6, recipientField: 'assigneePerson' }]),
+    };
+    const teamsService = {
+      querySubscription: jest.fn<
+        (
+          handle: number,
+          payload: object[],
+          user: object,
+          relations: string[],
+          context: { clientLocale?: string; clientTimeZone?: string },
+        ) => Promise<void>
+      >().mockResolvedValue(undefined),
+    };
+    const inboxService = {
+      querySubscription: jest.fn<
+        (
+          handle: number,
+          payload: object[],
+          user: object,
+          relations: string[],
+          context: { clientLocale?: string; clientTimeZone?: string },
+        ) => Promise<void>
+      >().mockResolvedValue(undefined),
+    };
+    const service = new ScriptService(
+      em as never,
+      { querySubscription: jest.fn() } as never,
+      {} as never,
+      {} as never,
+      {} as never,
+      {} as never,
+      teamsService as never,
+      inboxService as never,
+    );
+
+    await expect(
+      service.runSubscription(
+        ScriptMethods.afterUpdate,
+        { handle: 7 },
+        { handle: 'ticket' } as never,
+        { handle: 9 } as never,
+        {
+          clientLocale: 'de-DE',
+          clientTimeZone: 'Europe/Berlin',
+        },
+      ),
+    ).resolves.toBe(true);
+
+    expect(teamsService.querySubscription).toHaveBeenCalledWith(
+      5,
+      [{ handle: 7 }],
+      { handle: 9 },
+      ['assigneePerson'],
+      {
+        clientLocale: 'de-DE',
+        clientTimeZone: 'Europe/Berlin',
+      },
+    );
+    expect(inboxService.querySubscription).toHaveBeenCalledWith(
+      6,
+      [{ handle: 7 }],
+      { handle: 9 },
+      ['assigneePerson'],
+      {
+        clientLocale: 'de-DE',
+        clientTimeZone: 'Europe/Berlin',
+      },
+    );
+  });
 });
