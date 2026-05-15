@@ -7,46 +7,48 @@
           <v-btn prepend-icon="mdi-calendar-today" variant="tonal" @click="emit('today')">
             <template v-if="$vuetify.display.mdAndUp"> {{ $t('event.today') }}</template>
           </v-btn>
-            <v-menu
-              v-model="pickerMenuOpen"
-              :close-on-content-click="false"
-              location="bottom start"
-              offset="12"
-            >
-              <template #activator="{ props: activatorProps }">
-                <v-btn
-                  v-bind="activatorProps"
-                  class="sapling-event-toolbar__picker-trigger"
-                  prepend-icon="mdi-calendar-search"
-                  variant="tonal"
+          <v-menu
+            v-model="pickerMenuOpen"
+            :close-on-content-click="false"
+            location="bottom start"
+            offset="12"
+          >
+            <template #activator="{ props: activatorProps }">
+              <v-btn
+                v-bind="activatorProps"
+                class="sapling-event-toolbar__picker-trigger"
+                prepend-icon="mdi-calendar-search"
+                variant="tonal"
+              >
+                <template v-if="$vuetify.display.mdAndUp">
+                  {{ $t('calendar.selectDate') }}</template
                 >
-                <template v-if="$vuetify.display.mdAndUp"> {{ $t('calendar.selectDate') }}</template>
-                </v-btn>
-              </template>
+              </v-btn>
+            </template>
 
-              <div class="sapling-event-toolbar__picker-panel glass-panel">
-                <v-date-picker
-                  v-if="isMonthPicker"
-                  :model-value="pickerDateModel"
-                  :month="pickerMonth"
-                  :year="pickerYear"
-                  first-day-of-week="1"
-                  hide-title
-                  view-mode="months"
-                  @update:month="onMonthPicked"
-                  @update:year="onPickerYearUpdated"
-                />
+            <div class="sapling-event-toolbar__picker-panel glass-panel">
+              <v-date-picker
+                v-if="isMonthPicker"
+                :model-value="pickerDateModel"
+                :month="pickerMonth"
+                :year="pickerYear"
+                first-day-of-week="1"
+                hide-title
+                view-mode="months"
+                @update:month="onMonthPicked"
+                @update:year="onPickerYearUpdated"
+              />
 
-                <v-date-picker
-                  v-else
-                  :model-value="pickerDateModel"
-                  first-day-of-week="1"
-                  hide-title
-                  :show-week="isWeekPicker"
-                  @update:model-value="onDatePicked"
-                />
-              </div>
-            </v-menu>
+              <v-date-picker
+                v-else
+                :model-value="pickerDateModel"
+                first-day-of-week="1"
+                hide-title
+                :show-week="isWeekPicker"
+                @update:model-value="onDatePicked"
+              />
+            </div>
+          </v-menu>
           <v-btn variant="outlined" icon="mdi-chevron-right" @click="emit('next')" />
         </v-btn-group>
       </div>
@@ -77,7 +79,7 @@
         <v-btn prepend-icon="mdi-call-merge" variant="outlined" value="single">
           <template v-if="$vuetify.display.mdAndUp"> {{ $t('calendar.combined') }}</template>
         </v-btn>
-        <v-btn prepend-icon="mdi-call-split"  variant="outlined" value="sidebyside">
+        <v-btn prepend-icon="mdi-call-split" variant="outlined" value="sidebyside">
           <template v-if="$vuetify.display.mdAndUp"> {{ $t('calendar.sideBySide') }}</template>
         </v-btn>
       </v-btn-toggle>

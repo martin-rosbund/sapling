@@ -113,9 +113,8 @@ export class SessionSerializer extends PassportSerializer {
         })();
 
         if (realIsAdmin) {
-          const target = await this.authService.getSecurityUserByHandle(
-            impersonatedHandle,
-          );
+          const target =
+            await this.authService.getSecurityUserByHandle(impersonatedHandle);
 
           if (target && target.isActive !== false) {
             const impersonator: ImpersonatorInfo = {

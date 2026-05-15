@@ -48,12 +48,7 @@ export class ImpersonationReadOnlyGuard implements CanActivate {
       return true;
     }
 
-    const path = (
-      req.path ??
-      req.originalUrl ??
-      req.url ??
-      ''
-    ).split('?')[0];
+    const path = (req.path ?? req.originalUrl ?? req.url ?? '').split('?')[0];
 
     // All auth endpoints (login, logout, impersonate/stop, OAuth callbacks)
     // must always be reachable so users can recover from a stale impersonated

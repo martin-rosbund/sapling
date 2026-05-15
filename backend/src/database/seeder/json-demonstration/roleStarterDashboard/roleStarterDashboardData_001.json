@@ -29,7 +29,7 @@
   {
     "role": "Kunde",
     "templates": [
-      "Event Coordination",
+      "Support Operations",
       "Contracts & Products"
     ]
   },
@@ -37,7 +37,6 @@
     "role": "Dienstleister",
     "templates": [
       "Support Operations",
-      "Event Coordination",
       "Contracts & Products"
     ]
   }

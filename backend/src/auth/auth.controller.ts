@@ -335,9 +335,7 @@ export class AuthController {
       'Ends the current impersonation session and returns to the real account.',
   })
   @ApiResponse({ status: 200, description: 'Impersonation stopped' })
-  async stopImpersonation(
-    @Req() req: Request,
-  ): Promise<{ stopped: boolean }> {
+  async stopImpersonation(@Req() req: Request): Promise<{ stopped: boolean }> {
     if (!req.session) {
       return { stopped: false };
     }
