@@ -28,26 +28,6 @@
     <template #append>
       <!-- Inbox button with badge -->
       <div class="sapling-header__inbox-slot">
-        <Transition name="sapling-header-inbox-preview">
-          <div
-            v-if="visibleIncomingInboxPreview"
-            class="sapling-header__inbox-preview glass-panel"
-            role="status"
-            aria-live="polite"
-            aria-atomic="true"
-          >
-            <div class="sapling-header__inbox-preview-icon">
-              <v-icon :icon="visibleIncomingInboxPreview.icon" size="18" />
-            </div>
-            <div class="sapling-header__inbox-preview-copy">
-              <div class="sapling-header__inbox-preview-label">{{ $t('navigation.inbox') }}</div>
-              <div class="sapling-header__inbox-preview-title">
-                {{ visibleIncomingInboxPreview.title }}
-              </div>
-            </div>
-          </div>
-        </Transition>
-
         <v-btn class="sapling-header__desktop-action text-none" stacked @click="openInbox">
           <v-badge
             location="top right"
@@ -250,6 +230,37 @@
     </template>
   </v-app-bar>
 
+  <Teleport to="body">
+    <Transition name="sapling-header-inbox-preview">
+      <div
+        v-if="visibleIncomingInboxPreview"
+        :class="[
+          'sapling-header__inbox-preview',
+          'sapling-header__inbox-preview--' + visibleIncomingInboxPreview.kind,
+          'glass-panel',
+        ]"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        <div class="sapling-header__inbox-preview-icon">
+          <v-icon :icon="visibleIncomingInboxPreview.icon" size="22" />
+        </div>
+        <div class="sapling-header__inbox-preview-copy">
+          <div class="sapling-header__inbox-preview-meta">
+            <div class="sapling-header__inbox-preview-label">{{ $t('navigation.inbox') }}</div>
+            <div class="sapling-header__inbox-preview-kind">
+              {{ $t(getInboxPreviewKindKey(visibleIncomingInboxPreview.kind)) }}
+            </div>
+          </div>
+          <div class="sapling-header__inbox-preview-title">
+            {{ visibleIncomingInboxPreview.title }}
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+
   <!-- Inbox dialog -->
   <SaplingInbox v-if="showInbox" @close="closeInbox" />
 
@@ -315,6 +326,20 @@ const { toggleSaplingAiChat, hasSaplingAiChatAccess } = useSaplingAiChat()
 const { currentLanguage, languageOptions, issueAction, appearanceActions, setLanguage } =
   useSaplingPreferences()
 const { toggleSaplingVectorization } = useSaplingVectorization()
+
+function getInboxPreviewKindKey(kind: SaplingHeaderInboxPreview['kind']) {
+  switch (kind) {
+    case 'ticket':
+      return 'navigation.ticket'
+    case 'event':
+      return 'navigation.event'
+    case 'salesOpportunity':
+      return 'navigation.salesOpportunity'
+    case 'notification':
+    default:
+      return 'navigation.inboxNotification'
+  }
+}
 
 function toggleNavigation() {
   emit('update:modelValue', !props.modelValue)

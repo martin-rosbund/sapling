@@ -52,13 +52,13 @@ function toTimestamp(value: Date | string | null | undefined) {
   return Number.isFinite(timestamp) ? timestamp : 0
 }
 
-function toTitle(value: unknown, fallback: string) {
+function toTitle(value: unknown) {
   if (typeof value !== 'string') {
-    return fallback
+    return ''
   }
 
   const trimmedValue = value.trim()
-  return trimmedValue.length > 0 ? trimmedValue : fallback
+  return trimmedValue
 }
 
 function createItemId(kind: OpenTaskStreamItemKind, parts: Array<string | number | null | undefined>) {
@@ -73,7 +73,7 @@ function createTicketStreamItem(ticket: TicketItem): OpenTaskStreamItem {
   return {
     id: createItemId('ticket', [ticket.handle, ticket.createdAt, ticket.title]),
     kind: 'ticket',
-    title: toTitle(ticket.title, 'Ticket'),
+    title: toTitle(ticket.title),
     icon: 'mdi-ticket-confirmation-outline',
     timestamp: toTimestamp(ticket.createdAt ?? ticket.deadlineDate),
   }
@@ -83,7 +83,7 @@ function createTaskStreamItem(task: EventItem): OpenTaskStreamItem {
   return {
     id: createItemId('event', [task.handle, task.transactionHandle, task.createdAt, task.title]),
     kind: 'event',
-    title: toTitle(task.title, 'Termin'),
+    title: toTitle(task.title),
     icon: task.type?.icon || 'mdi-calendar-clock-outline',
     timestamp: toTimestamp(task.createdAt ?? task.startDate),
   }
@@ -97,7 +97,7 @@ function createSalesOpportunityStreamItem(opportunity: SalesOpportunityItem): Op
       opportunity.title,
     ]),
     kind: 'salesOpportunity',
-    title: toTitle(opportunity.title, 'Verkaufschance'),
+    title: toTitle(opportunity.title),
     icon: opportunity.type?.icon || 'mdi-chart-timeline-variant',
     timestamp: toTimestamp(opportunity.createdAt ?? opportunity.closeDate),
   }
@@ -112,7 +112,7 @@ function createNotificationStreamItem(notification: InboxNotificationItem): Open
       notification.title,
     ]),
     kind: 'notification',
-    title: toTitle(notification.title, 'Inbox'),
+    title: toTitle(notification.title),
     icon:
       typeof notification.entity === 'object'
         ? (notification.entity.icon ?? 'mdi-bell-outline')
