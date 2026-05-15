@@ -1,0 +1,312 @@
+[
+      {
+    "name": "Meine Tickets nach Priorität",
+    "description": "Persönliche Sicht: Verteilung der Tickets nach Prioritätsstufe.",
+    "aggregation": "COUNT",
+    "field": "priority.description",
+    "type": "LIST",
+    "targetEntity": "ticket",
+    "groupBy": [
+      "priority"
+    ],
+    "timeframe": null,
+    "timeframeField": null,
+    "relationField": "handle",
+    "filter": {
+      "assigneePerson": "{{currentUser.handle}}"
+    }
+  },
+  {
+    "name": "Meine neue Tickets pro Monat",
+    "description": "Persönliche Sicht: Monatlicher Eingang neuer Tickets im laufenden Jahr.",
+    "aggregation": "COUNT",
+    "field": "handle",
+    "type": "SPARKLINE",
+    "targetEntity": "ticket",
+    "groupBy": null,
+    "timeframe": "YEAR",
+    "timeframeInterval": "MONTH",
+    "timeframeField": "start_date",
+    "filter": {
+      "assigneePerson": "{{currentUser.handle}}"
+    }
+  },
+  {
+    "name": "Meine ticketbestand nach Status",
+    "description": "Persönliche Sicht: Breakdown des aktuellen Ticketbestands nach Bearbeitungsstatus.",
+    "aggregation": "COUNT",
+    "field": "status.description",
+    "type": "BREAKDOWN",
+    "targetEntity": "ticket",
+    "groupBy": [
+      "status"
+    ],
+    "timeframe": null,
+    "timeframeField": null,
+    "relationField": "handle",
+    "filter": {
+      "assigneePerson": "{{currentUser.handle}}"
+    }
+  },
+  {
+    "name": "Meine ticketeingang Monatsvergleich",
+    "description": "Persönliche Sicht: Neue Tickets im aktuellen versus vorherigen Monat.",
+    "aggregation": "COUNT",
+    "field": "handle",
+    "type": "COMPARISON",
+    "targetEntity": "ticket",
+    "groupBy": null,
+    "timeframe": "MONTH",
+    "timeframeField": "start_date",
+    "filter": {
+      "assigneePerson": "{{currentUser.handle}}"
+    }
+  },
+  {
+    "name": "Meine vertriebschancen nach Forecast",
+    "description": "Persönliche Sicht: Verteilung der Chancen nach Forecast-Kategorie.",
+    "aggregation": "COUNT",
+    "field": "forecast.title",
+    "type": "LIST",
+    "targetEntity": "salesOpportunity",
+    "groupBy": [
+      "forecast"
+    ],
+    "timeframe": null,
+    "timeframeField": null,
+    "relationField": "handle",
+    "filter": {
+      "assigneePerson": "{{currentUser.handle}}"
+    }
+  },
+  {
+    "name": "Meine abschlüsse Jahresvergleich",
+    "description": "Persönliche Sicht: Anzahl der Opportunities mit Abschlussdatum im aktuellen und vorherigen Jahr.",
+    "aggregation": "COUNT",
+    "field": "handle",
+    "type": "TREND",
+    "targetEntity": "salesOpportunity",
+    "groupBy": null,
+    "timeframe": "YEAR",
+    "timeframeField": "close_date",
+    "filter": {
+      "assigneePerson": "{{currentUser.handle}}"
+    }
+  },
+  {
+    "name": "Meine neue Vertriebschancen pro Monat",
+    "description": "Persönliche Sicht: Monatliche Neuanlage von Vertriebschancen.",
+    "aggregation": "COUNT",
+    "field": "handle",
+    "type": "SPARKLINE",
+    "targetEntity": "salesOpportunity",
+    "groupBy": null,
+    "timeframe": "YEAR",
+    "timeframeInterval": "MONTH",
+    "timeframeField": "created_at",
+    "filter": {
+      "assigneePerson": "{{currentUser.handle}}"
+    }
+  },
+  {
+    "name": "Meine neue Chancen Monatsvergleich",
+    "description": "Persönliche Sicht: Neue Vertriebschancen im aktuellen versus vorherigen Monat.",
+    "aggregation": "COUNT",
+    "field": "handle",
+    "type": "COMPARISON",
+    "targetEntity": "salesOpportunity",
+    "groupBy": null,
+    "timeframe": "MONTH",
+    "timeframeField": "created_at",
+    "filter": {
+      "assigneePerson": "{{currentUser.handle}}"
+    }
+  },
+  {
+    "name": "Meine events nach Status",
+    "description": "Persönliche Sicht: Verteilung geplanter Termine nach Eventstatus.",
+    "aggregation": "COUNT",
+    "field": "status.description",
+    "type": "LIST",
+    "targetEntity": "event",
+    "groupBy": [
+      "status"
+    ],
+    "timeframe": null,
+    "timeframeField": null,
+    "relationField": "handle",
+    "filter": {
+      "assigneePerson": "{{currentUser.handle}}"
+    }
+  },
+  {
+    "name": "Meine eventvolumen Jahresvergleich",
+    "description": "Persönliche Sicht: Anzahl geplanter Events im aktuellen und vorherigen Jahr.",
+    "aggregation": "COUNT",
+    "field": "handle",
+    "type": "TREND",
+    "targetEntity": "event",
+    "groupBy": null,
+    "timeframe": "YEAR",
+    "timeframeField": "start_date",
+    "filter": {
+      "assigneePerson": "{{currentUser.handle}}"
+    }
+  },
+  {
+    "name": "Meine events pro Monat",
+    "description": "Persönliche Sicht: Monatliche Entwicklung der geplanten Termine.",
+    "aggregation": "COUNT",
+    "field": "handle",
+    "type": "SPARKLINE",
+    "targetEntity": "event",
+    "groupBy": null,
+    "timeframe": "YEAR",
+    "timeframeInterval": "MONTH",
+    "timeframeField": "start_date",
+    "filter": {
+      "assigneePerson": "{{currentUser.handle}}"
+    }
+  },
+  {
+    "name": "Meine eventmix nach Typ",
+    "description": "Persönliche Sicht: Breakdown der Terminarten für operative Planung.",
+    "aggregation": "COUNT",
+    "field": "type.title",
+    "type": "BREAKDOWN",
+    "targetEntity": "event",
+    "groupBy": [
+      "type"
+    ],
+    "timeframe": null,
+    "timeframeField": null,
+    "relationField": "handle",
+    "filter": {
+      "assigneePerson": "{{currentUser.handle}}"
+    }
+  },
+  {
+    "name": "Meine eventvolumen Monatsvergleich",
+    "description": "Persönliche Sicht: Geplante Termine im aktuellen versus vorherigen Monat.",
+    "aggregation": "COUNT",
+    "field": "handle",
+    "type": "COMPARISON",
+    "targetEntity": "event",
+    "groupBy": null,
+    "timeframe": "MONTH",
+    "timeframeField": "start_date",
+    "filter": {
+      "assigneePerson": "{{currentUser.handle}}"
+    }
+  },
+  {
+    "name": "Meine offene Tickets",
+    "description": "Persönliche Sicht: Anzahl der derzeit offenen Support-Tickets.",
+    "aggregation": "COUNT",
+    "field": "handle",
+    "type": "ITEM",
+    "targetEntity": "ticket",
+    "groupBy": null,
+    "timeframe": null,
+    "filter": {
+      "$and": [
+        {
+          "status": "open"
+        },
+        {
+          "assigneePerson": "{{currentUser.handle}}"
+        }
+      ]
+    },
+    "timeframeField": null
+  },
+  {
+    "name": "Meine gelöste Tickets Jahresvergleich",
+    "description": "Persönliche Sicht: Abgeschlossene Tickets im aktuellen und vorherigen Jahr.",
+    "aggregation": "COUNT",
+    "field": "handle",
+    "type": "TREND",
+    "targetEntity": "ticket",
+    "groupBy": null,
+    "timeframe": "YEAR",
+    "timeframeField": "end_date",
+    "filter": {
+      "$and": [
+        {
+          "end_date": {
+            "$ne": null
+          }
+        },
+        {
+          "assigneePerson": "{{currentUser.handle}}"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Meine pipeline-Umsatz aktiv",
+    "description": "Persönliche Sicht: Summierter erwarteter Umsatz aller aktiven Vertriebschancen.",
+    "aggregation": "SUM",
+    "field": "expected_revenue",
+    "type": "ITEM",
+    "targetEntity": "salesOpportunity",
+    "groupBy": null,
+    "timeframe": null,
+    "filter": {
+      "$and": [
+        {
+          "is_active": true
+        },
+        {
+          "assigneePerson": "{{currentUser.handle}}"
+        }
+      ]
+    },
+    "timeframeField": null
+  },
+  {
+    "name": "Meine pipeline nach Phase",
+    "description": "Persönliche Sicht: Breakdown der offenen Pipeline nach Vertriebsphase.",
+    "aggregation": "COUNT",
+    "field": "type.title",
+    "type": "BREAKDOWN",
+    "targetEntity": "salesOpportunity",
+    "groupBy": [
+      "type"
+    ],
+    "timeframe": null,
+    "timeframeField": null,
+    "filter": {
+      "$and": [
+        {
+          "is_active": true
+        },
+        {
+          "assigneePerson": "{{currentUser.handle}}"
+        }
+      ]
+    },
+    "relationField": "handle"
+  },
+  {
+    "name": "Meine ganztägige Events",
+    "description": "Persönliche Sicht: Anzahl der ganztägig geplanten Termine.",
+    "aggregation": "COUNT",
+    "field": "handle",
+    "type": "ITEM",
+    "targetEntity": "event",
+    "groupBy": null,
+    "timeframe": null,
+    "filter": {
+      "$and": [
+        {
+          "is_all_day": true
+        },
+        {
+          "assigneePerson": "{{currentUser.handle}}"
+        }
+      ]
+    },
+    "timeframeField": null
+  }
+]
