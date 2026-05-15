@@ -311,14 +311,58 @@
 }
 
 .sapling-event-context {
-  align-content: start;
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
   overscroll-behavior: contain;
 }
 
+.sapling-event-context__switcher {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-sm);
+  padding: var(--sapling-gap-md);
+  border-radius: var(--sapling-file-panel-radius-compact);
+  box-shadow: var(--sapling-event-shadow);
+}
+
+.sapling-event-context__toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+}
+
+.sapling-event-context__toggle .v-btn {
+  min-width: 0;
+}
+
+.sapling-event-context__toggle-button {
+  width: 100%;
+}
+
+.sapling-event-context__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sapling-gap-xs) var(--sapling-gap-md);
+  font-size: var(--sapling-text-label-size-sm);
+  opacity: var(--sapling-opacity-secondary);
+}
+
+.sapling-event-context__panel {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.sapling-event-context .sapling-work-filter-panel,
+.sapling-event-context .sapling-event-panel {
+  height: 100%;
+  min-height: 0;
+}
+
 .sapling-event-context .sapling-work-filter-panel {
-  min-height: 280px;
-  max-height: min(520px, 42dvh);
+  max-height: none;
 }
 
 .sapling-event-context-dialog__surface {
@@ -391,8 +435,21 @@
 
 .sapling-event-agenda-list {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   gap: var(--sapling-gap-xs);
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.sapling-event-agenda-panel {
+  overflow: hidden;
+}
+
+.sapling-event-agenda-panel .sapling-event-panel__empty-state {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .sapling-event-agenda-item {
@@ -555,12 +612,6 @@
 }
 
 @media (max-width: 1380px) {
-  .sapling-event-workspace,
-  .sapling-event-skeleton__workspace {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .sapling-event-context,
   .sapling-event-skeleton__context {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -572,7 +623,6 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .sapling-event-context,
   .sapling-event-skeleton__context {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -585,7 +635,7 @@
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1080px) {
   .sapling-event-page {
     min-height: auto;
     height: auto;
@@ -597,19 +647,8 @@
   }
 
   .sapling-event-context {
-    display: contents;
-  }
-
-  .sapling-event-agenda-panel {
-    order: -1;
-  }
-
-  .sapling-event-workspace__main {
-    order: 0;
-  }
-
-  .sapling-event-context .sapling-work-filter-panel {
-    order: 1;
+    min-height: min(620px, 80dvh);
+    overflow: visible;
   }
 
   .sapling-event-workspace__main,
@@ -684,7 +723,6 @@
 
   .sapling-event-skeleton__hero-stats,
   .sapling-event-hero__stats,
-  .sapling-event-context,
   .sapling-event-skeleton__context {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -710,11 +748,14 @@
 
   .sapling-event-skeleton__hero-stats,
   .sapling-event-hero__stats,
-  .sapling-event-context,
   .sapling-event-skeleton__context {
     grid-template-columns: minmax(0, 1fr);
     justify-self: stretch;
     width: 100%;
+  }
+
+  .sapling-event-context__toggle {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .sapling-event-sidebyside-grid {
