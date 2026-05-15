@@ -74,12 +74,15 @@
 
 .sapling-kpi-sparkline__chart-stage {
   position: relative;
-  min-height: 160px;
+  width: 100%;
+  aspect-ratio: 4 / 1;
+  overflow: visible;
 }
 
 .sapling-kpi-sparkline__chart {
   display: block;
   width: 100%;
+  height: 100%;
 }
 
 .sapling-kpi-sparkline__marker {
