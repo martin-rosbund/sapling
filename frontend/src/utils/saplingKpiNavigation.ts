@@ -8,6 +8,40 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
 
+function snakeToCamel(key: string): string {
+  // Preserve operator keys like $and, $or, $in untouched
+  if (key.startsWith('$')) {
+    return key
+  }
+  return key.replace(/_([a-zA-Z0-9])/g, (_match, char: string) => char.toUpperCase())
+}
+
+function normalizeFilterKeys(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map(normalizeFilterKeys)
+  }
+
+  if (isRecord(value)) {
+    const out: Record<string, unknown> = {}
+    for (const [key, entry] of Object.entries(value)) {
+      out[snakeToCamel(key)] = normalizeFilterKeys(entry)
+    }
+    return out
+  }
+
+  return value
+}
+
+function serializeFilterQuery(filter: KpiFilter): string {
+  if (Object.keys(filter).length === 0) {
+    return ''
+  }
+
+  const normalized = normalizeFilterKeys(filter) as KpiFilter
+
+  return `?filter=${encodeURIComponent(JSON.stringify(normalized))}`
+}
+
 function buildKpiBaseFilter(filter: unknown): KpiFilter {
   if (isRecord(filter)) {
     return { ...filter }
@@ -95,8 +129,7 @@ export function buildKpiEntityPath(kpi: KPIItem | null, row?: KpiRow): string | 
   }
 
   const filter = buildKpiEntityFilter(kpi, row)
-  const query =
-    Object.keys(filter).length > 0 ? `?filter=${encodeURIComponent(JSON.stringify(filter))}` : ''
+  const query = serializeFilterQuery(filter)
 
   return `/table/${entityHandle}${query}`
 }
@@ -118,8 +151,7 @@ export function buildKpiDrilldownPath(
     (drilldown?.baseFilter && Object.keys(drilldown.baseFilter).length > 0
       ? drilldown.baseFilter
       : buildKpiEntityFilter(kpi))
-  const query =
-    Object.keys(filter).length > 0 ? `?filter=${encodeURIComponent(JSON.stringify(filter))}` : ''
+  const query = serializeFilterQuery(filter as KpiFilter)
 
   return `/table/${entityHandle}${query}`
 }

@@ -1,19 +1,32 @@
 import { Injectable } from '@nestjs/common';
 import { PassportSerializer } from '@nestjs/passport';
 import { AuthService } from '../auth/auth.service';
+import type { PersonItem } from '../entity/PersonItem';
 
-interface SessionUserPayload {
+export interface SessionUserPayload {
+  /** Real (logged-in) user handle. Never replaced while a session lives. */
   handle: number;
+  /**
+   * Optional impersonation target. When set and the real user is an active
+   * administrator, the deserialized `req.user` is the target person and the
+   * real user is exposed via `req.user._impersonator`.
+   */
+  impersonatedHandle?: number;
+}
+
+export interface ImpersonatorInfo {
+  handle: number;
+  firstName: string;
+  lastName: string;
 }
 
 /**
  * @class SessionSerializer
- * @version         1.0
+ * @version         1.1
  * @author          Martin Rosbund
- * @summary         Handles how user data is stored in and retrieved from the session. Extends PassportSerializer to customize session serialization and deserialization logic.
- *
- * @method          serializeUser(user: Express.User, done: Function): any      Determines which user data is stored in the session
- * @method          deserializeUser(payload: Express.User, done: Function): any  Retrieves the full user data based on session information
+ * @summary         Handles how user data is stored in and retrieved from the
+ *                  session. Supports administrator impersonation by allowing
+ *                  the payload to carry an optional impersonation target.
  */
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
@@ -72,16 +85,53 @@ export class SessionSerializer extends PassportSerializer {
         return;
       }
 
-      const user = await this.authService.getSecurityUserByHandle(
+      const realUser = await this.authService.getSecurityUserByHandle(
         payload.handle,
       );
 
-      if (!user || user.isActive === false) {
+      if (!realUser || realUser.isActive === false) {
         done(null, false);
         return;
       }
 
-      done(null, user);
+      const impersonatedHandle = payload.impersonatedHandle;
+      if (
+        typeof impersonatedHandle === 'number' &&
+        impersonatedHandle !== realUser.handle
+      ) {
+        const realIsAdmin = ((): boolean => {
+          for (const role of realUser.roles ?? []) {
+            if (
+              typeof role === 'object' &&
+              role !== null &&
+              (role as { isAdministrator?: boolean }).isAdministrator === true
+            ) {
+              return true;
+            }
+          }
+          return false;
+        })();
+
+        if (realIsAdmin) {
+          const target =
+            await this.authService.getSecurityUserByHandle(impersonatedHandle);
+
+          if (target && target.isActive !== false) {
+            const impersonator: ImpersonatorInfo = {
+              handle: realUser.handle as number,
+              firstName: realUser.firstName,
+              lastName: realUser.lastName,
+            };
+            (
+              target as PersonItem & { _impersonator?: ImpersonatorInfo }
+            )._impersonator = impersonator;
+            done(null, target);
+            return;
+          }
+        }
+      }
+
+      done(null, realUser);
     } catch (error) {
       done(error as Error, null);
     }

@@ -3,6 +3,7 @@ import {
   Get,
   NotFoundException,
   Param,
+  Req,
   SetMetadata,
   UseGuards,
 } from '@nestjs/common';
@@ -91,7 +92,13 @@ export class KpiController {
   @UseGuards(GenericPermissionGuard)
   @GenericPermission('allowRead')
   @SetMetadata(GENERIC_PERMISSION_RESOLVE_KEY, resolveKpiEntityPermission)
-  async executeKPI(@Param('handle') handle: number): Promise<KpiResponseDto> {
-    return this.kpiService.executeKPIById(Number(handle));
+  async executeKPI(
+    @Param('handle') handle: number,
+    @Req() req: Request,
+  ): Promise<KpiResponseDto> {
+    return this.kpiService.executeKPIById(
+      Number(handle),
+      (req.user as import('../../entity/PersonItem').PersonItem) ?? null,
+    );
   }
 }

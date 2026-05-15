@@ -5,6 +5,7 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
+import { APP_GUARD } from '@nestjs/core';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { SessionSerializer } from '../session/session.serializer';
@@ -18,6 +19,7 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ENTITY_REGISTRY } from '../entity/global/entity.registry';
 import { GenericPermissionGuard } from './guard/generic-permission.guard';
 import { AdminPermissionGuard } from './guard/admin-permission.guard';
+import { ImpersonationReadOnlyGuard } from './guard/impersonation-read-only.guard';
 import { CurrentModule } from '../api/current/current.module';
 
 /**
@@ -58,6 +60,11 @@ const loginLimiter = rateLimit({
     SessionOrBearerAuthGuard,
     AdminPermissionGuard,
     GenericPermissionGuard,
+    ImpersonationReadOnlyGuard,
+    {
+      provide: APP_GUARD,
+      useClass: ImpersonationReadOnlyGuard,
+    },
   ],
   exports: [
     AuthService,

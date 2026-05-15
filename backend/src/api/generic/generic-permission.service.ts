@@ -101,9 +101,10 @@ export class GenericPermissionService {
         );
         break;
       case 'company':
-        nextWhere = this.applyCompanyFields(
+        nextWhere = this.applyCompanyScopedFields(
           nextWhere,
           companyFields,
+          personFields,
           currentUser,
         );
         break;
@@ -304,6 +305,55 @@ export class GenericPermissionService {
 
     const orConditions = companyFields.map((companyField) => ({
       [companyField]: currentUser.company?.handle,
+    }));
+
+    if (where && Object.keys(where).length > 0) {
+      return { $and: [where, { $or: orConditions }] };
+    }
+
+    return { $or: orConditions };
+  }
+
+  private applyCompanyScopedFields(
+    where: object,
+    companyFields: string[],
+    personFields: string[],
+    currentUser: PersonItem,
+  ): object {
+    if (companyFields.length > 0) {
+      return this.applyCompanyFields(where, companyFields, currentUser);
+    }
+
+    return this.applyPersonCompanyFields(where, personFields, currentUser);
+  }
+
+  private applyPersonCompanyFields(
+    where: object,
+    personFields: string[],
+    currentUser: PersonItem,
+  ): object {
+    if (!personFields || personFields.length === 0) {
+      return where;
+    }
+
+    const companyHandle = currentUser.company?.handle;
+
+    if (personFields.length === 1) {
+      const personField = personFields[0];
+      const condition = { [personField]: { company: companyHandle } };
+
+      if (Array.isArray(where)) {
+        return (where as Record<string, any>[]).map((x) => ({
+          ...x,
+          ...condition,
+        }));
+      }
+
+      return { ...where, ...condition };
+    }
+
+    const orConditions = personFields.map((personField) => ({
+      [personField]: { company: companyHandle },
     }));
 
     if (where && Object.keys(where).length > 0) {

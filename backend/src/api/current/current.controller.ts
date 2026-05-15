@@ -91,7 +91,23 @@ export class CurrentController {
   })
   async getPerson(@Req() req: Request): Promise<PersonItem> {
     const user = req.user as PersonItem;
-    return (await this.currentService.getPerson(user)) ?? user;
+    const reloaded = (await this.currentService.getPerson(user)) ?? user;
+
+    // Preserve impersonation context attached by the session serializer so the
+    // frontend can render the "viewing as" banner and stop-button. Dynamic
+    // fields would otherwise be stripped by MikroORM's entity serialization,
+    // so we roundtrip through JSON before merging the marker.
+    const impersonator = (user as PersonItem & { _impersonator?: unknown })
+      ._impersonator;
+    if (!impersonator) {
+      return reloaded;
+    }
+
+    const plain = JSON.parse(JSON.stringify(reloaded)) as PersonItem & {
+      _impersonator?: unknown;
+    };
+    plain._impersonator = impersonator;
+    return plain;
   }
 
   /**

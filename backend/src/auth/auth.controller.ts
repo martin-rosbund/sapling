@@ -1,8 +1,11 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
+  NotFoundException,
   Param,
   Post,
   Query,
@@ -42,6 +45,11 @@ import {
 import { GenericPermissionGuard } from './guard/generic-permission.guard';
 import { PersonItem } from '../entity/PersonItem';
 import { createSessionCookieSecurityOptions } from '../session/session.config';
+import { AdminPermissionGuard } from './guard/admin-permission.guard';
+import type {
+  ImpersonatorInfo,
+  SessionUserPayload,
+} from '../session/session.serializer';
 
 /**
  * @class
@@ -305,6 +313,150 @@ export class AuthController {
     } else {
       return res.status(401).send({ authenticated: false });
     }
+  }
+
+  /**
+   * Ends an impersonation session and returns to the real account.
+   * Allowed for the impersonating administrator only.
+   *
+   * NOTE: This handler MUST be declared before `startImpersonation`,
+   * because NestJS registers routes in declaration order. The dynamic
+   * route `impersonate/:handle` would otherwise swallow `/impersonate/stop`
+   * and trigger the admin guard (which fails while impersonating).
+   *
+   * @route POST /api/auth/impersonate/stop
+   * @access Authenticated
+   */
+  @Post('impersonate/stop')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Stop impersonation',
+    description:
+      'Ends the current impersonation session and returns to the real account.',
+  })
+  @ApiResponse({ status: 200, description: 'Impersonation stopped' })
+  async stopImpersonation(@Req() req: Request): Promise<{ stopped: boolean }> {
+    if (!req.session) {
+      return { stopped: false };
+    }
+
+    const sessionPassport = (
+      req.session as unknown as {
+        passport?: { user?: SessionUserPayload };
+      }
+    ).passport;
+
+    if (!sessionPassport?.user?.impersonatedHandle) {
+      return { stopped: false };
+    }
+
+    const previousTarget = sessionPassport.user.impersonatedHandle;
+    const realHandle = sessionPassport.user.handle;
+
+    sessionPassport.user = { handle: realHandle };
+
+    await new Promise<void>((resolve, reject) =>
+      req.session!.save((error) => (error ? reject(error) : resolve())),
+    );
+
+    global.log?.info?.(
+      `[impersonation] stop: admin handle=${realHandle} (was viewing target handle=${previousTarget})`,
+    );
+
+    return { stopped: true };
+  }
+
+  /**
+   * Starts an "view as user" impersonation session. Administrators only.
+   * Mutates the existing session payload so the next request deserializes
+   * the target user. The original admin remains the session owner.
+   *
+   * @route POST /api/auth/impersonate/:handle
+   * @access Administrator (session-based)
+   */
+  @Post('impersonate/:handle')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Impersonate another user',
+    description:
+      'Administrators only. Switches the current session to view the application as the specified user. The session remains owned by the administrator.',
+  })
+  @ApiParam({ name: 'handle', type: Number })
+  @ApiResponse({ status: 200, description: 'Impersonation started' })
+  @ApiResponse({ status: 400, description: 'Invalid impersonation target' })
+  @ApiResponse({ status: 403, description: 'Not allowed' })
+  @ApiResponse({ status: 404, description: 'Target user not found' })
+  @UseGuards(AdminPermissionGuard)
+  async startImpersonation(
+    @Req() req: Request,
+    @Param('handle') handle: string,
+  ): Promise<{ impersonator: ImpersonatorInfo; targetHandle: number }> {
+    const realUser = req.user as PersonItem | undefined;
+    if (
+      !realUser ||
+      typeof realUser.handle !== 'number' ||
+      !req.session ||
+      !req.isAuthenticated()
+    ) {
+      throw new ForbiddenException('global.permissionDenied');
+    }
+
+    // Prevent nested impersonation – must stop first.
+    if (
+      (realUser as PersonItem & { _impersonator?: ImpersonatorInfo })
+        ._impersonator
+    ) {
+      throw new ForbiddenException('permission.impersonationAlreadyActive');
+    }
+
+    const targetHandle = Number(handle);
+    if (!Number.isFinite(targetHandle) || targetHandle <= 0) {
+      throw new BadRequestException('global.invalidHandle');
+    }
+
+    if (targetHandle === realUser.handle) {
+      throw new BadRequestException('permission.cannotImpersonateSelf');
+    }
+
+    const target = await this.authService.getSecurityUserByHandle(targetHandle);
+    if (!target) {
+      throw new NotFoundException('global.notFound');
+    }
+    if (target.isActive === false) {
+      throw new BadRequestException('permission.targetInactive');
+    }
+
+    const sessionPassport = (
+      req.session as unknown as {
+        passport?: { user?: SessionUserPayload };
+      }
+    ).passport;
+
+    if (!sessionPassport || !sessionPassport.user) {
+      throw new ForbiddenException('global.permissionDenied');
+    }
+
+    sessionPassport.user = {
+      handle: realUser.handle,
+      impersonatedHandle: targetHandle,
+    };
+
+    await new Promise<void>((resolve, reject) =>
+      req.session!.save((error) => (error ? reject(error) : resolve())),
+    );
+
+    global.log?.info?.(
+      `[impersonation] start: admin handle=${realUser.handle} (${realUser.firstName} ${realUser.lastName}) → target handle=${targetHandle} (${target.firstName} ${target.lastName})`,
+    );
+
+    return {
+      impersonator: {
+        handle: realUser.handle,
+        firstName: realUser.firstName,
+        lastName: realUser.lastName,
+      },
+      targetHandle,
+    };
   }
 
   @Get('token')

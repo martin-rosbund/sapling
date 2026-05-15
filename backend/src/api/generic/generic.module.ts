@@ -55,6 +55,6 @@ import { AuthModule } from '../../auth/auth.module';
     GenericSanitizerService,
     GenericTimelineService,
   ],
-  exports: [GenericService],
+  exports: [GenericService, GenericPermissionService, GenericFilterService],
 })
 export class GenericModule {}
