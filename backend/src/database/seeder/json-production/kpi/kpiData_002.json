@@ -1,5 +1,5 @@
 [
-      {
+  {
     "name": "Meine Tickets nach Priorität",
     "description": "Persönliche Sicht: Verteilung der Tickets nach Prioritätsstufe.",
     "aggregation": "COUNT",
@@ -32,7 +32,7 @@
     }
   },
   {
-    "name": "Meine ticketbestand nach Status",
+    "name": "Meine Ticketbestand nach Status",
     "description": "Persönliche Sicht: Breakdown des aktuellen Ticketbestands nach Bearbeitungsstatus.",
     "aggregation": "COUNT",
     "field": "status.description",
@@ -49,7 +49,7 @@
     }
   },
   {
-    "name": "Meine ticketeingang Monatsvergleich",
+    "name": "Meine Ticketeingang Monatsvergleich",
     "description": "Persönliche Sicht: Neue Tickets im aktuellen versus vorherigen Monat.",
     "aggregation": "COUNT",
     "field": "handle",
@@ -63,7 +63,7 @@
     }
   },
   {
-    "name": "Meine vertriebschancen nach Forecast",
+    "name": "Meine Vertriebschancen nach Forecast",
     "description": "Persönliche Sicht: Verteilung der Chancen nach Forecast-Kategorie.",
     "aggregation": "COUNT",
     "field": "forecast.title",
@@ -80,7 +80,7 @@
     }
   },
   {
-    "name": "Meine abschlüsse Jahresvergleich",
+    "name": "Meine Abschlüsse Jahresvergleich",
     "description": "Persönliche Sicht: Anzahl der Opportunities mit Abschlussdatum im aktuellen und vorherigen Jahr.",
     "aggregation": "COUNT",
     "field": "handle",
@@ -123,7 +123,7 @@
     }
   },
   {
-    "name": "Meine events nach Status",
+    "name": "Meine Events nach Status",
     "description": "Persönliche Sicht: Verteilung geplanter Termine nach Eventstatus.",
     "aggregation": "COUNT",
     "field": "status.description",
@@ -140,7 +140,7 @@
     }
   },
   {
-    "name": "Meine eventvolumen Jahresvergleich",
+    "name": "Meine Eventvolumen Jahresvergleich",
     "description": "Persönliche Sicht: Anzahl geplanter Events im aktuellen und vorherigen Jahr.",
     "aggregation": "COUNT",
     "field": "handle",
@@ -154,7 +154,7 @@
     }
   },
   {
-    "name": "Meine events pro Monat",
+    "name": "Meine Events pro Monat",
     "description": "Persönliche Sicht: Monatliche Entwicklung der geplanten Termine.",
     "aggregation": "COUNT",
     "field": "handle",
@@ -169,7 +169,7 @@
     }
   },
   {
-    "name": "Meine eventmix nach Typ",
+    "name": "Meine Eventmix nach Typ",
     "description": "Persönliche Sicht: Breakdown der Terminarten für operative Planung.",
     "aggregation": "COUNT",
     "field": "type.title",
@@ -186,7 +186,7 @@
     }
   },
   {
-    "name": "Meine eventvolumen Monatsvergleich",
+    "name": "Meine Eventvolumen Monatsvergleich",
     "description": "Persönliche Sicht: Geplante Termine im aktuellen versus vorherigen Monat.",
     "aggregation": "COUNT",
     "field": "handle",
@@ -244,7 +244,7 @@
     }
   },
   {
-    "name": "Meine pipeline-Umsatz aktiv",
+    "name": "Mein Pipeline-Umsatz aktiv",
     "description": "Persönliche Sicht: Summierter erwarteter Umsatz aller aktiven Vertriebschancen.",
     "aggregation": "SUM",
     "field": "expected_revenue",
@@ -265,7 +265,7 @@
     "timeframeField": null
   },
   {
-    "name": "Meine pipeline nach Phase",
+    "name": "Meine Pipeline nach Phase",
     "description": "Persönliche Sicht: Breakdown der offenen Pipeline nach Vertriebsphase.",
     "aggregation": "COUNT",
     "field": "type.title",
@@ -289,7 +289,7 @@
     "relationField": "handle"
   },
   {
-    "name": "Meine ganztägige Events",
+    "name": "Meine ganztägigen Events",
     "description": "Persönliche Sicht: Anzahl der ganztägig geplanten Termine.",
     "aggregation": "COUNT",
     "field": "handle",
