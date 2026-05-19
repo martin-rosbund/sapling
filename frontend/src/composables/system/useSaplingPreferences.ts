@@ -14,6 +14,12 @@ export interface SaplingPreferenceAction {
   isActive?: boolean
 }
 
+export interface SaplingLanguageOption {
+  key: SaplingLanguage
+  label: string
+  isActive: boolean
+}
+
 interface SaplingPreferenceActionDefinition {
   key: string
   icon: string
@@ -71,7 +77,7 @@ export function useSaplingPreferences() {
     },
   ])
 
-  const languageOptions = computed(() => [
+  const languageOptions = computed<SaplingLanguageOption[]>(() => [
     {
       key: 'de' as const,
       label: 'DE',
