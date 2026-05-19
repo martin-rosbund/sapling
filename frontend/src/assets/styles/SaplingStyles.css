@@ -1,14 +1,17 @@
 @import './SaplingGlobal.css';
 @import './SaplingDialogs.css';
 @import './SaplingHero.css';
+@import './components/SaplingCodeMirror.css';
 @import './components/SaplingMarkdownContent.css';
 @import './components/SaplingFieldControls.css';
 @import './components/SaplingSelectFields.css';
+@import './components/SaplingShortcutKeys.css';
 @import './SaplingAccountDialogs.css';
 @import './SaplingAccessPending.css';
 @import './SaplingAiChat.css';
 @import './SaplingVectorizationDialog.css';
 @import './SaplingCalendar.css';
+@import './SaplingCommandPalette.css';
 @import './SaplingContextMenu.css';
 @import './SaplingDashboard.css';
 @import './SaplingDashboardRecommendedFavorites.css';
@@ -22,6 +25,7 @@
 @import './SaplingFileDetail.css';
 @import './SaplingFileHeader.css';
 @import './SaplingFileMail.css';
+@import './SaplingHelpDialog.css';
 @import './SaplingInbox.css';
 @import './SaplingIssue.css';
 @import './SaplingIssueList.css';

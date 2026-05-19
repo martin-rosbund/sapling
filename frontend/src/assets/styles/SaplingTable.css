@@ -993,3 +993,103 @@
     transform: translateY(0);
   }
 }
+
+.sapling-table-generic-reference {
+  display: block;
+  width: min(var(--sapling-panel-width-sm), 100%);
+  min-width: 0;
+  max-width: var(--sapling-panel-width-sm);
+  margin-right: auto;
+}
+
+.sapling-table-generic-reference__button {
+  width: min(var(--sapling-panel-width-sm), 100%);
+  min-width: 0;
+  max-width: var(--sapling-panel-width-sm);
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.sapling-table-generic-reference__button .v-btn__content {
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+  gap: var(--sapling-space-2xs);
+  overflow: hidden;
+}
+
+.sapling-table-generic-reference__icon {
+  flex: 0 0 auto;
+}
+
+.sapling-table-generic-reference__button .sapling-button-truncate__label {
+  text-align: left;
+}
+
+.sapling-table-generic-reference__placeholder {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.sapling-upload {
+  display: grid;
+  gap: 1rem;
+}
+
+.sapling-upload-dropzone {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border: 1px dashed rgba(var(--v-theme-primary), 0.45);
+  border-radius: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.sapling-upload-dropzone--active {
+  border-color: rgb(var(--v-theme-primary));
+  background: rgba(var(--v-theme-primary), 0.08);
+  transform: translateY(-1px);
+}
+
+.sapling-upload-dropzone__icon {
+  font-size: 2.25rem;
+  color: rgb(var(--v-theme-primary));
+}
+
+.sapling-upload-dropzone__copy {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.sapling-upload-dropzone__copy span {
+  color: rgba(var(--v-theme-on-surface), 0.78);
+}
+
+.sapling-upload-native-input {
+  display: none;
+}
+
+.sapling-upload-selection {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.sapling-upload-selection__header {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.sapling-upload-selection__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.sapling-upload-selection__chip {
+  max-width: 100%;
+}

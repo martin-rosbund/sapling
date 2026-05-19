@@ -271,6 +271,14 @@
   max-height: none;
 }
 
+.sapling-dialog-edit__mobile-action-list {
+  min-width: min(18rem, calc(100vw - 2rem));
+}
+
+.sapling-dialog-edit__mobile-primary-action {
+  min-width: 0;
+}
+
 @media (max-width: 960px) {
   .sapling-dialog-edit-shell {
     padding: var(--sapling-space-panel-md);

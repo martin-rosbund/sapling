@@ -49,7 +49,7 @@
                    even though the visible primary button lives in the action bar. -->
               <button
                 type="submit"
-                class="sapling-login-hidden-submit"
+                class="sapling-visually-hidden"
                 tabindex="-1"
                 aria-hidden="true"
               />
@@ -108,18 +108,3 @@ const {
 } = useSaplingLogin()
 //#endregion
 </script>
-
-<style scoped>
-.sapling-login-hidden-submit {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  border: 0;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-</style>

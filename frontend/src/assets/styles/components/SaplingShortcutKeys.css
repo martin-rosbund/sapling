@@ -1,0 +1,26 @@
+.sapling-shortcut-keys {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.sapling-shortcut-keys kbd {
+  display: inline-block;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  font-family: inherit;
+  opacity: 0.85;
+}
+
+.sapling-shortcut-keys--md kbd {
+  padding: 2px 8px;
+  font-size: 11px;
+  line-height: 14px;
+}
+
+.sapling-shortcut-keys--sm kbd {
+  padding: 1px 6px;
+  font-size: 10px;
+  line-height: 14px;
+}
