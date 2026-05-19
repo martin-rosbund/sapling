@@ -1,0 +1,25 @@
+.sapling-codemirror {
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.sapling-codemirror .cm-editor {
+  height: 100%;
+}
+
+.sapling-codemirror .cm-tooltip,
+.sapling-codemirror .cm-panel {
+  color: var(--sapling-surface-text);
+  background: var(--sapling-surface-fill);
+  border-color: var(--sapling-surface-border);
+}
+
+.sapling-codemirror--readonly .cm-content {
+  cursor: default;
+}
+
+.sapling-codemirror--no-line-numbers .cm-gutters {
+  display: none;
+}

@@ -99,34 +99,44 @@ describe('ScriptService', () => {
   });
 
   it('forwards client formatting context to teams and inbox subscriptions', async () => {
-    type FindAllMock = (...args: unknown[]) => Promise<Array<{ handle: number; recipientField: string }>>;
+    type FindAllMock = (
+      ...args: unknown[]
+    ) => Promise<Array<{ handle: number; recipientField: string }>>;
     const em = {
       findAll: jest
         .fn<FindAllMock>()
-        .mockResolvedValueOnce([{ handle: 5, recipientField: 'assigneePerson' }])
-        .mockResolvedValueOnce([{ handle: 6, recipientField: 'assigneePerson' }]),
+        .mockResolvedValueOnce([
+          { handle: 5, recipientField: 'assigneePerson' },
+        ])
+        .mockResolvedValueOnce([
+          { handle: 6, recipientField: 'assigneePerson' },
+        ]),
     };
     const teamsService = {
-      querySubscription: jest.fn<
-        (
-          handle: number,
-          payload: object[],
-          user: object,
-          relations: string[],
-          context: { clientLocale?: string; clientTimeZone?: string },
-        ) => Promise<void>
-      >().mockResolvedValue(undefined),
+      querySubscription: jest
+        .fn<
+          (
+            handle: number,
+            payload: object[],
+            user: object,
+            relations: string[],
+            context: { clientLocale?: string; clientTimeZone?: string },
+          ) => Promise<void>
+        >()
+        .mockResolvedValue(undefined),
     };
     const inboxService = {
-      querySubscription: jest.fn<
-        (
-          handle: number,
-          payload: object[],
-          user: object,
-          relations: string[],
-          context: { clientLocale?: string; clientTimeZone?: string },
-        ) => Promise<void>
-      >().mockResolvedValue(undefined),
+      querySubscription: jest
+        .fn<
+          (
+            handle: number,
+            payload: object[],
+            user: object,
+            relations: string[],
+            context: { clientLocale?: string; clientTimeZone?: string },
+          ) => Promise<void>
+        >()
+        .mockResolvedValue(undefined),
     };
     const service = new ScriptService(
       em as never,

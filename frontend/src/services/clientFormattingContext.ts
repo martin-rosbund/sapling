@@ -3,9 +3,9 @@ import type { AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios'
 const CLIENT_LOCALE_HEADER = 'x-sapling-client-locale'
 const CLIENT_TIME_ZONE_HEADER = 'x-sapling-client-time-zone'
 
-export function applyClientFormattingHeaders<T extends AxiosRequestConfig | InternalAxiosRequestConfig>(
-  config: T,
-): T {
+export function applyClientFormattingHeaders<
+  T extends AxiosRequestConfig | InternalAxiosRequestConfig,
+>(config: T): T {
   const headers = {
     ...(config.headers ?? {}),
   }

@@ -1,0 +1,413 @@
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import { EntityManager } from '@mikro-orm/core';
+import axios from 'axios';
+import { google } from 'googleapis';
+import { EventDeliveryItem } from '../entity/EventDeliveryItem';
+import { EventDeliveryStatusItem } from '../entity/EventDeliveryStatusItem';
+import { PersonSessionItem } from '../entity/PersonSessionItem';
+import { GoogleCalendarService } from './google/google.calendar.service';
+import { AzureCalendarService } from './azure/azure.calendar.service';
+import {
+  AZURE_AD_CLIENT_ID,
+  AZURE_AD_CLIENT_SECRET,
+  AZURE_AD_SCOPE,
+  AZURE_AD_TENNANT_ID,
+  GOOGLE_CALLBACK_URL,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+} from '../constants/project.constants';
+import { buildCalendarFallback } from './calendar.fallback';
+import { getErrorMessage } from '../common/error.utils';
+
+type CalendarProvider = 'google' | 'azure';
+
+type CalendarDeliveryPayload = {
+  provider: CalendarProvider;
+  sessionHandle?: number;
+  session?: {
+    accessToken?: string;
+    refreshToken?: string;
+  };
+};
+
+type ResolvedCalendarSession = {
+  accessToken?: string;
+  refreshToken?: string;
+  session?: PersonSessionItem | null;
+};
+
+type HttpResponseLike = {
+  status?: number;
+  data?: unknown;
+  headers?: unknown;
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isCalendarDeliveryPayload(
+  payload: unknown,
+): payload is CalendarDeliveryPayload {
+  return (
+    isRecord(payload) &&
+    (payload.provider === 'google' || payload.provider === 'azure') &&
+    ((typeof payload.sessionHandle === 'number' && payload.sessionHandle > 0) ||
+      (isRecord(payload.session) &&
+        ((typeof payload.session.accessToken === 'string' &&
+          payload.session.accessToken.length > 0) ||
+          (typeof payload.session.refreshToken === 'string' &&
+            payload.session.refreshToken.length > 0))))
+  );
+}
+
+async function resolveSessionTokens(
+  em: EntityManager,
+  payload: CalendarDeliveryPayload,
+): Promise<ResolvedCalendarSession> {
+  if (typeof payload.sessionHandle === 'number') {
+    const session = await em.findOne(PersonSessionItem, {
+      handle: payload.sessionHandle,
+    });
+
+    if (!session) {
+      throw new Error('calendar.sessionNotFound');
+    }
+
+    return {
+      session,
+      accessToken: session.accessToken,
+      refreshToken: session.refreshToken,
+    };
+  }
+
+  if (payload.session?.accessToken || payload.session?.refreshToken) {
+    return {
+      accessToken: payload.session.accessToken,
+      refreshToken: payload.session.refreshToken,
+    };
+  }
+
+  throw new Error('calendar.sessionNotFound');
+}
+
+function toHttpResponseLike(value: unknown): HttpResponseLike | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  return {
+    status: typeof value.status === 'number' ? value.status : undefined,
+    data: value.data,
+    headers: value.headers,
+  };
+}
+
+function getErrorResponse(error: unknown): HttpResponseLike | null {
+  if (!isRecord(error) || !isRecord(error.response)) {
+    return null;
+  }
+
+  return toHttpResponseLike(error.response);
+}
+
+function toPersistedObject(value: unknown): object | undefined {
+  return isRecord(value) ? value : undefined;
+}
+
+@Injectable()
+export class CalendarDeliveryExecutor {
+  private readonly logger = new Logger(CalendarDeliveryExecutor.name);
+
+  constructor(
+    private readonly em: EntityManager,
+    @Inject(forwardRef(() => GoogleCalendarService))
+    private readonly googleCalendarService: GoogleCalendarService,
+    @Inject(forwardRef(() => AzureCalendarService))
+    private readonly azureCalendarService: AzureCalendarService,
+  ) {}
+
+  async execute(deliveryId: number, attemptCount: number): Promise<void> {
+    const em = this.em.fork();
+    this.logger.debug(
+      `Processing calendar delivery #${deliveryId} (Attempt ${attemptCount})`,
+    );
+
+    const delivery = await em.findOne(
+      EventDeliveryItem,
+      { handle: deliveryId },
+      {
+        populate: [
+          'event',
+          'status',
+          'event.participants',
+          'event.creatorPerson',
+        ],
+      },
+    );
+    if (!delivery) {
+      this.logger.error(`Delivery #${deliveryId} not found in DB`);
+      return;
+    }
+
+    delivery.attemptCount = attemptCount;
+
+    if (!isCalendarDeliveryPayload(delivery.payload)) {
+      throw new Error('calendar.invalidPayload');
+    }
+
+    const { provider } = delivery.payload;
+    const sessionContext = await resolveSessionTokens(em, delivery.payload);
+    const eventHandle = delivery.event.handle;
+
+    if (typeof eventHandle !== 'number') {
+      throw new Error('calendar.eventNotFound');
+    }
+
+    const accessToken = await this.resolveAccessToken(provider, sessionContext);
+    if (!accessToken) {
+      const reason =
+        'Es konnte kein gueltiger Access-Token fuer die Kalendersynchronisation ermittelt werden.';
+      this.logger.warn(
+        `Calendar delivery #${deliveryId} uses fallback because no access token is available.`,
+      );
+      await this.persistFailureWithFallback(
+        em,
+        delivery,
+        new Error(reason),
+        reason,
+      );
+      return;
+    }
+
+    try {
+      const providerResponse = await this.executeProviderDelivery(
+        provider,
+        eventHandle,
+        accessToken,
+      );
+
+      if (await this.persistSuccess(em, delivery, providerResponse)) {
+        this.logger.log(`Calendar delivery #${deliveryId} sent successfully.`);
+      }
+    } catch (error: unknown) {
+      const retried = await this.retryWithRefreshedToken(
+        em,
+        delivery,
+        provider,
+        sessionContext,
+        eventHandle,
+        deliveryId,
+      );
+      if (retried) {
+        return;
+      }
+
+      const reason =
+        'Der Kalendereintrag konnte nicht direkt synchronisiert werden. Ein E-Mail-Fallback wurde vorbereitet.';
+      await this.persistFailureWithFallback(em, delivery, error, reason);
+      this.logger.error(`Calendar delivery #${deliveryId} failed.`, error);
+    }
+  }
+
+  private async refreshAccessToken(
+    provider: CalendarProvider,
+    refreshToken: string | undefined,
+  ): Promise<string | null> {
+    if (!refreshToken) {
+      return null;
+    }
+
+    if (provider === 'google') {
+      const auth = new google.auth.OAuth2(
+        GOOGLE_CLIENT_ID || undefined,
+        GOOGLE_CLIENT_SECRET || undefined,
+        GOOGLE_CALLBACK_URL || undefined,
+      );
+
+      auth.setCredentials({ refresh_token: refreshToken });
+      const refreshed = await auth.refreshAccessToken();
+      return refreshed.credentials.access_token ?? null;
+    }
+
+    const tokenEndpoint = `https://login.microsoftonline.com/${AZURE_AD_TENNANT_ID || 'common'}/oauth2/v2.0/token`;
+    const params = new URLSearchParams({
+      client_id: AZURE_AD_CLIENT_ID,
+      client_secret: AZURE_AD_CLIENT_SECRET,
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+    });
+
+    if (AZURE_AD_SCOPE.length > 0) {
+      params.set('scope', AZURE_AD_SCOPE.join(' '));
+    }
+
+    const response = await axios.post<{ access_token?: string }>(
+      tokenEndpoint,
+      params.toString(),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      },
+    );
+
+    return response.data.access_token ?? null;
+  }
+
+  private async resolveAccessToken(
+    provider: CalendarProvider,
+    sessionContext: ResolvedCalendarSession,
+  ): Promise<string | null> {
+    const directToken = sessionContext.accessToken?.trim();
+    if (directToken) {
+      return directToken;
+    }
+
+    const refreshedToken = await this.refreshAccessToken(
+      provider,
+      sessionContext.refreshToken,
+    );
+    if (refreshedToken) {
+      if (sessionContext.session) {
+        sessionContext.session.accessToken = refreshedToken;
+      }
+      sessionContext.accessToken = refreshedToken;
+      return refreshedToken;
+    }
+
+    return null;
+  }
+
+  private async executeProviderDelivery(
+    provider: CalendarProvider,
+    eventHandle: number,
+    accessToken: string,
+  ): Promise<unknown> {
+    if (provider === 'google') {
+      return this.googleCalendarService.setEvent(eventHandle, accessToken);
+    }
+
+    return this.azureCalendarService.setEvent(eventHandle, accessToken);
+  }
+
+  private async persistFailureWithFallback(
+    em: EntityManager,
+    delivery: EventDeliveryItem,
+    error: unknown,
+    fallbackReason: string,
+  ): Promise<void> {
+    const failed = await em.findOne(EventDeliveryStatusItem, {
+      handle: 'failed',
+    });
+
+    if (!failed) {
+      return;
+    }
+
+    delivery.status = failed;
+    delivery.completedAt = new Date();
+
+    const errorResponse = getErrorResponse(error);
+    const fallback = buildCalendarFallback(delivery, fallbackReason);
+
+    delivery.responseStatusCode = errorResponse?.status ?? 202;
+    delivery.responseBody = {
+      ...(errorResponse
+        ? {
+            providerError: {
+              status: errorResponse.status,
+              body: toPersistedObject(errorResponse.data),
+            },
+          }
+        : {
+            providerError: {
+              message: getErrorMessage(error),
+            },
+          }),
+      ...fallback,
+    };
+    delivery.responseHeaders = toPersistedObject(errorResponse?.headers);
+
+    await em.flush();
+  }
+
+  private async persistSuccess(
+    em: EntityManager,
+    delivery: EventDeliveryItem,
+    providerResponse: unknown,
+  ): Promise<boolean> {
+    const success = await em.findOne(EventDeliveryStatusItem, {
+      handle: 'success',
+    });
+
+    if (!success) {
+      return false;
+    }
+
+    const response = toHttpResponseLike(providerResponse);
+    delivery.status = success;
+    delivery.responseStatusCode = response?.status || 200;
+    delivery.responseBody =
+      toPersistedObject(response?.data) ||
+      (isRecord(providerResponse)
+        ? providerResponse
+        : { result: providerResponse });
+    delivery.responseHeaders = toPersistedObject(response?.headers);
+    delivery.completedAt = new Date();
+    await em.flush();
+    return true;
+  }
+
+  private async retryWithRefreshedToken(
+    em: EntityManager,
+    delivery: EventDeliveryItem,
+    provider: CalendarProvider,
+    sessionContext: ResolvedCalendarSession,
+    eventHandle: number,
+    deliveryId: number,
+  ): Promise<boolean> {
+    if (!sessionContext.refreshToken) {
+      return false;
+    }
+
+    try {
+      const refreshedToken = await this.refreshAccessToken(
+        provider,
+        sessionContext.refreshToken,
+      );
+
+      if (!refreshedToken) {
+        return false;
+      }
+
+      if (sessionContext.session) {
+        sessionContext.session.accessToken = refreshedToken;
+      }
+      sessionContext.accessToken = refreshedToken;
+
+      const providerResponse = await this.executeProviderDelivery(
+        provider,
+        eventHandle,
+        refreshedToken,
+      );
+
+      const persisted = await this.persistSuccess(
+        em,
+        delivery,
+        providerResponse,
+      );
+      if (persisted) {
+        this.logger.log(
+          `Calendar delivery #${deliveryId} sent successfully after token refresh.`,
+        );
+      }
+      return persisted;
+    } catch (refreshError) {
+      this.logger.warn(
+        `Calendar delivery #${deliveryId} token refresh failed: ${getErrorMessage(refreshError)}`,
+      );
+      return false;
+    }
+  }
+}

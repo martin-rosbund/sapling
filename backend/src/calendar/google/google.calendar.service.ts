@@ -16,7 +16,7 @@
  * @method          deleteEvent          Deletes an event from Google calendar and removes reference
  * @method          getGoogleEvent       Maps EventItem to Google Calendar event resource
  */
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { google } from 'googleapis';
 import { EventItem } from '../../entity/EventItem';
 import { EventDeliveryService } from '../event.delivery.service';
@@ -39,6 +39,7 @@ export class GoogleCalendarService {
    * @param {EntityManager} em MikroORM EntityManager for database operations
    */
   constructor(
+    @Inject(forwardRef(() => EventDeliveryService))
     private readonly eventDeliveryService: EventDeliveryService,
     private readonly em: EntityManager,
   ) {}

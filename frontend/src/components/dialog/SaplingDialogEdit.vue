@@ -1184,13 +1184,3 @@ watch(
 )
 // #endregion
 </script>
-
-<style scoped>
-.sapling-dialog-edit__mobile-action-list {
-  min-width: min(18rem, calc(100vw - 2rem));
-}
-
-.sapling-dialog-edit__mobile-primary-action {
-  min-width: 0;
-}
-</style>

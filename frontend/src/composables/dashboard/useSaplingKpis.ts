@@ -96,7 +96,7 @@ export function useSaplingKpis(
     }
 
     selectedKpi.value = null
-    const res = await ApiGenericService.find<KPIItem>('kpi', { orderBy : { name: 'asc' } })
+    const res = await ApiGenericService.find<KPIItem>('kpi', { orderBy: { name: 'asc' } })
 
     const assignedKpiHandles = new Set(kpis.value.map((kpi) => kpi.handle))
     availableKpis.value = (res.data || []).filter((kpi) => !assignedKpiHandles.has(kpi.handle))

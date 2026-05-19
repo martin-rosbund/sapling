@@ -16,6 +16,7 @@ import { REDIS_ENABLED } from '../constants/project.constants';
 import { GoogleCalendarService } from './google/google.calendar.service';
 import { AzureCalendarService } from './azure/azure.calendar.service';
 import { EventDeliveryService } from './event.delivery.service';
+import { CalendarDeliveryExecutor } from './calendar-delivery.executor';
 
 // MockQueue analog zu webhook.module.ts
 /**
@@ -41,6 +42,7 @@ const MockQueue = {
   providers: [
     GoogleCalendarService,
     AzureCalendarService,
+    CalendarDeliveryExecutor,
     ...(REDIS_ENABLED ? [CalendarProcessor] : []),
     ...(!REDIS_ENABLED
       ? [
@@ -55,6 +57,7 @@ const MockQueue = {
   exports: [
     GoogleCalendarService,
     AzureCalendarService,
+    CalendarDeliveryExecutor,
     ...(REDIS_ENABLED ? [CalendarProcessor, BullModule] : []),
     EventDeliveryService,
   ],

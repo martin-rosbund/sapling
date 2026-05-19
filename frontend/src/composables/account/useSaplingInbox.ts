@@ -11,6 +11,12 @@ import ApiService from '@/services/api.service'
 import { formatDate, formatDateFromTo, formatDateTimeValue } from '@/utils/saplingFormatUtil'
 import { useRouter, type RouteLocationRaw } from 'vue-router'
 import {
+  getNotificationInboxRoute,
+  getSalesOpportunityInboxRoute,
+  getTaskInboxRoute,
+  getTicketInboxRoute,
+} from '@/utils/inboxRoute.util'
+import {
   useOpenTaskCountEvents,
   updateOpenTaskSnapshot,
   type OpenTaskSnapshot,
@@ -202,57 +208,6 @@ export function useSaplingInbox(emit: CloseEmitter) {
     })
   }
 
-  function getTicketRoute(ticket: TicketItem): RouteLocationRaw {
-    return {
-      path: '/table/ticket',
-      query: {
-        filter: JSON.stringify({ handle: ticket.handle }),
-      },
-    }
-  }
-
-  function getTaskRoute(task: EventItem): RouteLocationRaw {
-    return {
-      path: '/table/event',
-      query: {
-        filter: JSON.stringify({ handle: task.handle }),
-      },
-    }
-  }
-
-  function getSalesOpportunityRoute(opportunity: SalesOpportunityItem): RouteLocationRaw {
-    return {
-      path: '/table/salesOpportunity',
-      query: {
-        filter: JSON.stringify({ handle: opportunity.handle }),
-      },
-    }
-  }
-
-  function getNotificationRoute(notification: InboxNotificationItem): RouteLocationRaw {
-    const entityHandle =
-      typeof notification.entity === 'object'
-        ? String(notification.entity.handle ?? '').trim()
-        : String(notification.entity ?? '').trim()
-    const referenceHandle = notification.referenceHandle?.trim()
-
-    if (entityHandle && referenceHandle) {
-      return {
-        path: `/table/${entityHandle}`,
-        query: {
-          filter: JSON.stringify({ handle: referenceHandle }),
-        },
-      }
-    }
-
-    return {
-      path: '/table/inboxNotification',
-      query: {
-        filter: JSON.stringify({ handle: notification.handle }),
-      },
-    }
-  }
-
   function createTicketEntry(ticket: TicketItem): InboxEntry {
     const dateValue = toDate(ticket.deadlineDate)
 
@@ -271,7 +226,7 @@ export function useSaplingInbox(emit: CloseEmitter) {
       statusLabel: ticket.status?.description,
       statusColor: ticket.status?.color,
       supportLabels: [],
-      route: getTicketRoute(ticket),
+      route: getTicketInboxRoute(ticket),
     }
   }
 
@@ -293,7 +248,7 @@ export function useSaplingInbox(emit: CloseEmitter) {
       statusLabel: task.status?.description,
       statusColor: task.status?.color,
       supportLabels: [],
-      route: getTaskRoute(task),
+      route: getTaskInboxRoute(task),
     }
   }
 
@@ -320,7 +275,7 @@ export function useSaplingInbox(emit: CloseEmitter) {
       statusLabel: opportunity.type?.title,
       statusColor: opportunity.type?.color,
       supportLabels,
-      route: getSalesOpportunityRoute(opportunity),
+      route: getSalesOpportunityInboxRoute(opportunity),
     }
   }
 
@@ -354,7 +309,7 @@ export function useSaplingInbox(emit: CloseEmitter) {
       statusLabel: entityLabel || undefined,
       statusColor: 'primary',
       supportLabels: [],
-      route: getNotificationRoute(notification),
+      route: getNotificationInboxRoute(notification),
       notificationHandle: notification.handle ?? null,
       dismissible: true,
     }

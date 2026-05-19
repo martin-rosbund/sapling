@@ -37,10 +37,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, toRef } from 'vue'
+import { toRef } from 'vue'
 import type { EntityTemplate } from '@/entity/structure'
 import type { SaplingGenericItem } from '@/entity/entity'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
+import { useSaplingGenericReferenceDialog } from '@/composables/reference/useSaplingGenericReferenceDialog'
 import { useSaplingGenericReferenceTarget } from '@/composables/reference/useSaplingGenericReferenceTarget'
 import { useTimelineDialogStore } from '@/stores/timelineDialogStore'
 
@@ -50,7 +51,6 @@ const props = defineProps<{
   label: string
 }>()
 
-const dialogOpen = ref(false)
 const timelineDialogStore = useTimelineDialogStore()
 
 const {
@@ -69,14 +69,10 @@ const {
   template: toRef(props, 'template'),
 })
 
-async function openTargetDialog() {
-  const targetRecord = await ensureTargetResolved()
-  if (!targetRecord || !targetEntity.value) {
-    return
-  }
-
-  dialogOpen.value = true
-}
+const { dialogOpen, openTargetDialog } = useSaplingGenericReferenceDialog({
+  ensureTargetResolved,
+  targetEntity,
+})
 
 function openTimeline() {
   if (!targetEntityHandle.value || targetHandle.value == null || targetHandle.value === '') {
@@ -86,37 +82,3 @@ function openTimeline() {
   timelineDialogStore.openTimeline(targetEntityHandle.value, String(targetHandle.value))
 }
 </script>
-
-<style scoped>
-.sapling-field-generic-reference {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding-top: 0.25rem;
-}
-
-.sapling-field-generic-reference__label {
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-.sapling-field-generic-reference__actions {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.sapling-field-generic-reference__target {
-  justify-content: flex-start;
-  flex: 1 1 auto;
-  min-height: 40px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.sapling-field-generic-reference__hint {
-  font-size: 0.8rem;
-  opacity: 0.72;
-}
-</style>

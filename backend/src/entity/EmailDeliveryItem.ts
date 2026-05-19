@@ -186,6 +186,16 @@ export class EmailDeliveryItem {
 
   @ApiPropertyOptional()
   @SaplingForm({
+    order: 550,
+    group: 'emailDelivery.groupContent',
+    groupOrder: 200,
+    width: 4,
+  })
+  @Property({ type: 'json', nullable: true })
+  responseHeaders?: object;
+
+  @ApiPropertyOptional()
+  @SaplingForm({
     order: 600,
     group: 'emailDelivery.groupContent',
     groupOrder: 200,
