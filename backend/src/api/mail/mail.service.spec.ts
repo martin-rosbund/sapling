@@ -50,7 +50,7 @@ jest.mock('@microsoft/microsoft-graph-client', () => ({
   },
 }));
 
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { MailService } from './mail.service';
 
 function getValue(
@@ -193,7 +193,7 @@ describe('MailService', () => {
     ).rejects.toBeInstanceOf(NotFoundException);
   });
 
-  it('filters technical azure proxy addresses from sender options', async () => {
+  it('does not expose azure aliases and alternate mails as sender options', async () => {
     graphApiGet.mockResolvedValue({
       displayName: 'ISB - Martin Rosbund',
       mail: 'martin.rosbund@example.com',
@@ -236,8 +236,6 @@ describe('MailService', () => {
     expect(result.provider).toBe('azure');
     expect(result.senders.map((sender) => sender.email)).toEqual([
       'martin.rosbund@example.com',
-      'service@example.com',
-      'team@example.com',
       'fallback@example.com',
     ]);
   });
@@ -315,5 +313,130 @@ describe('MailService', () => {
     expect(result.senders.map((sender) => sender.email)).not.toContain(
       'inactive@example.com',
     );
+  });
+
+  it('rejects azure aliases that are not configured shared mailboxes', async () => {
+    graphApiGet.mockResolvedValue({
+      displayName: 'ISB - Martin Rosbund',
+      mail: 'martin.rosbund@example.com',
+      otherMails: ['service@example.com'],
+      proxyAddresses: [
+        'SMTP:martin.rosbund@example.com',
+        'smtp:team@example.com',
+      ],
+    });
+
+    const em = {
+      findOne: jest
+        .fn<(...args: unknown[]) => Promise<unknown>>()
+        .mockResolvedValue({
+          handle: 1,
+          firstName: 'Martin',
+          lastName: 'Rosbund',
+          email: 'fallback@example.com',
+          type: { handle: 'azure' },
+          sharedMailboxGroups: [],
+          session: {
+            accessToken: 'token',
+            refreshToken: 'refresh',
+          },
+        }),
+    };
+
+    const service = new MailService(
+      em as never,
+      { getEntityTemplate: jest.fn(() => []) } as never,
+      createMessageTemplateServiceMock() as never,
+      { add: jest.fn() } as never,
+    );
+
+    await expect(
+      (
+        service as never as {
+          resolveRequestedSender: (
+            user: unknown,
+            sender: string,
+          ) => Promise<unknown>;
+        }
+      ).resolveRequestedSender({ handle: 1 } as never, 'team@example.com'),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it('persists provider diagnostics when dispatch fails', async () => {
+    const flush = jest.fn<() => Promise<void>>().mockResolvedValue();
+    const delivery = {
+      handle: 15,
+      provider: 'azure',
+      attachmentHandles: [],
+      requestPayload: {
+        from: 'support@example.com',
+        senderSource: 'configured',
+      },
+      createdBy: {
+        type: { handle: 'azure' },
+        session: {
+          accessToken: 'token',
+          refreshToken: 'refresh',
+        },
+      },
+    };
+    const fork = {
+      findOne: jest.fn<() => Promise<unknown>>().mockResolvedValue(delivery),
+      flush,
+    };
+    const em = {
+      fork: jest.fn(() => fork),
+    };
+
+    const service = new MailService(
+      em as never,
+      { getEntityTemplate: jest.fn(() => []) } as never,
+      createMessageTemplateServiceMock() as never,
+      { add: jest.fn() } as never,
+    );
+
+    const providerError = {
+      statusCode: 403,
+      body: {
+        error: {
+          code: 'ErrorSendAsDenied',
+        },
+      },
+      headers: {
+        'request-id': 'req-123',
+      },
+      message: 'Send as denied',
+    };
+
+    (service as never as { loadAttachments: jest.Mock }).loadAttachments = jest
+      .fn<() => Promise<unknown[]>>()
+      .mockResolvedValue([]);
+    (service as never as { sendWithProvider: jest.Mock }).sendWithProvider =
+      jest.fn<() => Promise<unknown>>().mockRejectedValue(providerError);
+    (service as never as { ensureStatus: jest.Mock }).ensureStatus = jest
+      .fn<() => Promise<{ handle: string }>>()
+      .mockImplementation(async (_targetEm: unknown, handle: string) => ({
+        handle,
+      }));
+
+    await expect(service.dispatchDelivery(15)).rejects.toEqual(providerError);
+
+    expect(delivery.responseStatusCode).toBe(403);
+    expect(delivery.responseBody).toEqual({
+      message: 'Send as denied',
+      senderEmail: 'support@example.com',
+      senderSource: 'configured',
+      providerError: {
+        error: {
+          code: 'ErrorSendAsDenied',
+        },
+      },
+    });
+    expect(delivery.responseHeaders).toEqual({
+      'request-id': 'req-123',
+    });
+    expect(delivery.status).toEqual({ handle: 'failed' });
+    expect(delivery.completedAt).toBeInstanceOf(Date);
+    expect(flush).toHaveBeenCalled();
   });
 });

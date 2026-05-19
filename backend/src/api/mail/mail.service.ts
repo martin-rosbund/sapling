@@ -60,10 +60,17 @@ type MailAttachment = {
 type SendResult = {
   responseStatusCode?: number;
   responseBody?: object;
+  responseHeaders?: object;
   providerMessageId?: string;
 };
 
 type MailSenderOption = MailSenderOptionDto;
+type ProviderErrorShape = {
+  statusCode?: number;
+  body?: unknown;
+  headers?: unknown;
+  message?: string;
+};
 
 const MAIL_EVENT_DURATION_MINUTES = 5;
 const MAIL_EVENT_TITLE_MAX_LENGTH = 128;
@@ -107,6 +114,29 @@ function isRecord(value: unknown): value is JsonRecord {
 
 function toPersistedObject(value: unknown): object | undefined {
   return isRecord(value) ? value : undefined;
+}
+
+function extractStatusCode(value: unknown): number | undefined {
+  return typeof value === 'number' ? value : undefined;
+}
+
+function getMailProviderErrorShape(error: unknown): ProviderErrorShape {
+  if (isRecord(error)) {
+    const response = isRecord(error.response) ? error.response : undefined;
+
+    return {
+      statusCode:
+        extractStatusCode(error.statusCode) ??
+        extractStatusCode(response?.status),
+      body: error.body ?? response?.data,
+      headers: error.headers ?? response?.headers,
+      message: typeof error.message === 'string' ? error.message : undefined,
+    };
+  }
+
+  return {
+    message: error instanceof Error ? error.message : 'Unknown error',
+  };
 }
 
 function normalizeEmailAddress(
@@ -259,7 +289,7 @@ export class MailService {
       throw new NotFoundException('global.entityNotFound');
     }
 
-    const resolvedSenderEmail = await this.resolveRequestedSender(
+    const resolvedSender = await this.resolveRequestedSender(
       currentUser,
       sendDto.senderEmail,
     );
@@ -285,7 +315,12 @@ export class MailService {
     delivery.bodyHtml = preview.bodyHtml;
     delivery.attachmentHandles = preview.attachmentHandles ?? [];
     delivery.requestPayload = {
-      from: resolvedSenderEmail,
+      from: resolvedSender?.email,
+      requestedFrom: normalizeEmailAddress(sendDto.senderEmail),
+      senderDisplayName: resolvedSender?.displayName,
+      senderProvider: resolvedSender?.provider,
+      senderSource: resolvedSender?.source,
+      usesConfiguredSharedMailbox: resolvedSender?.source === 'configured',
       to: preview.to,
       cc: preview.cc,
       bcc: preview.bcc,
@@ -342,6 +377,7 @@ export class MailService {
       delivery.status = success;
       delivery.responseStatusCode = result.responseStatusCode;
       delivery.responseBody = result.responseBody;
+      delivery.responseHeaders = result.responseHeaders;
       delivery.providerMessageId = result.providerMessageId;
       delivery.completedAt = new Date();
       await em.flush();
@@ -349,11 +385,17 @@ export class MailService {
       return delivery;
     } catch (error) {
       const failed = await this.ensureStatus(em, 'failed');
+      const providerError = getMailProviderErrorShape(error);
+
       delivery.status = failed;
-      delivery.responseStatusCode = 500;
+      delivery.responseStatusCode = providerError.statusCode ?? 500;
       delivery.responseBody = {
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: providerError.message ?? 'Unknown error',
+        senderEmail: this.getRequestedSenderEmail(delivery),
+        senderSource: this.getRequestedSenderSource(delivery),
+        providerError: toPersistedObject(providerError.body),
       };
+      delivery.responseHeaders = toPersistedObject(providerError.headers);
       delivery.completedAt = new Date();
       await em.flush();
       throw error;
@@ -373,6 +415,7 @@ export class MailService {
     delivery.completedAt = undefined;
     delivery.responseStatusCode = undefined;
     delivery.responseBody = undefined;
+    delivery.responseHeaders = undefined;
     delivery.providerMessageId = undefined;
 
     await this.em.flush();
@@ -894,6 +937,8 @@ export class MailService {
       responseStatusCode: 202,
       responseBody: {
         provider: 'azure',
+        senderEmail,
+        saveToSentItems: true,
         recipientCount:
           delivery.toRecipients.length +
           (delivery.ccRecipients?.length ?? 0) +
@@ -940,6 +985,9 @@ export class MailService {
     return {
       responseStatusCode: 200,
       responseBody: toPersistedObject(result.data) ?? { provider: 'google' },
+      responseHeaders: toPersistedObject(
+        isRecord(result) ? result.headers : undefined,
+      ),
       providerMessageId: result.data.id ?? undefined,
     };
   }
@@ -1173,17 +1221,25 @@ export class MailService {
   private async resolveRequestedSender(
     currentUser: PersonItem,
     requestedSenderEmail: string | undefined,
-  ): Promise<string | undefined> {
+  ): Promise<MailSenderOption | undefined> {
     const normalizedRequested = normalizeEmailAddress(requestedSenderEmail);
     const person = await this.loadCurrentMailPerson(currentUser);
 
     if (!person) {
-      return normalizedRequested ?? normalizeEmailAddress(currentUser.email);
+      return this.buildStandaloneSenderOption(
+        normalizedRequested ?? normalizeEmailAddress(currentUser.email),
+        this.extractProviderHandle(currentUser) ?? 'sapling',
+        this.buildPersonDisplayName(currentUser),
+      );
     }
 
     const provider = this.extractProviderHandle(person);
     if (!this.isSupportedMailProvider(provider) || !person.session) {
-      return normalizedRequested ?? normalizeEmailAddress(person.email);
+      return this.buildStandaloneSenderOption(
+        normalizedRequested ?? normalizeEmailAddress(person.email),
+        provider ?? 'sapling',
+        this.buildPersonDisplayName(person),
+      );
     }
 
     const senders = await this.listAvailableSendersForProvider(
@@ -1193,13 +1249,15 @@ export class MailService {
     );
 
     if (senders.length === 0) {
-      return normalizedRequested ?? normalizeEmailAddress(person.email);
+      return this.buildStandaloneSenderOption(
+        normalizedRequested ?? normalizeEmailAddress(person.email),
+        provider,
+        this.buildPersonDisplayName(person),
+      );
     }
 
     if (!normalizedRequested) {
-      return (
-        senders.find((sender) => sender.isDefault)?.email ?? senders[0]?.email
-      );
+      return senders.find((sender) => sender.isDefault) ?? senders[0];
     }
 
     const matchedSender = senders.find(
@@ -1212,7 +1270,7 @@ export class MailService {
       throw new BadRequestException('mail.senderNotAllowed');
     }
 
-    return matchedSender.email;
+    return matchedSender;
   }
 
   private async listAzureSenderOptions(
@@ -1250,31 +1308,6 @@ export class MailService {
       'primary',
       true,
     );
-
-    const otherMails = Array.isArray(profile.otherMails)
-      ? profile.otherMails
-      : [];
-    for (const value of otherMails) {
-      this.pushSenderOption(
-        senders,
-        typeof value === 'string' ? value : undefined,
-        displayName,
-        'azure',
-        'secondary',
-      );
-    }
-
-    const proxyAddresses = Array.isArray(profile.proxyAddresses)
-      ? profile.proxyAddresses
-      : [];
-    for (const value of proxyAddresses) {
-      if (typeof value !== 'string') {
-        continue;
-      }
-
-      const normalized = value.replace(/^(smtp:)/i, '').trim();
-      this.pushSenderOption(senders, normalized, displayName, 'azure', 'alias');
-    }
 
     this.pushSenderOption(
       senders,
@@ -1391,6 +1424,21 @@ export class MailService {
     const merged = [...discoveredSenders];
 
     for (const configuredSender of configuredSenders) {
+      const existing = merged.find(
+        (sender) =>
+          sender.email.trim().toLowerCase() ===
+          configuredSender.email.trim().toLowerCase(),
+      );
+
+      if (existing) {
+        existing.displayName =
+          configuredSender.displayName ?? existing.displayName;
+        existing.provider = configuredSender.provider;
+        existing.source = configuredSender.source;
+        existing.isDefault = existing.isDefault || configuredSender.isDefault;
+        continue;
+      }
+
       this.pushSenderOption(
         merged,
         configuredSender.email,
@@ -1402,6 +1450,31 @@ export class MailService {
     }
 
     return merged;
+  }
+
+  private buildPersonDisplayName(person: PersonItem): string | undefined {
+    return (
+      `${person.firstName ?? ''} ${person.lastName ?? ''}`.trim() || undefined
+    );
+  }
+
+  private buildStandaloneSenderOption(
+    email: string | undefined,
+    provider: string,
+    displayName?: string,
+  ): MailSenderOption | undefined {
+    const normalizedEmail = normalizeEmailAddress(email);
+    if (!normalizedEmail) {
+      return undefined;
+    }
+
+    return {
+      email: normalizedEmail,
+      displayName,
+      provider,
+      source: 'profile',
+      isDefault: true,
+    };
   }
 
   private getAssignedSharedMailboxSenders(
@@ -1548,5 +1621,17 @@ export class MailService {
         ? delivery.requestPayload.from
         : undefined,
     );
+  }
+
+  private getRequestedSenderSource(
+    delivery: EmailDeliveryItem,
+  ): string | undefined {
+    if (!isRecord(delivery.requestPayload)) {
+      return undefined;
+    }
+
+    return typeof delivery.requestPayload.senderSource === 'string'
+      ? delivery.requestPayload.senderSource
+      : undefined;
   }
 }
