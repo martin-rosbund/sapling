@@ -6,6 +6,13 @@ import type {
   SalesOpportunityItem,
   TicketItem,
 } from '@/entity/entity'
+import type { RouteLocationRaw } from 'vue-router'
+import {
+  getNotificationInboxRoute,
+  getSalesOpportunityInboxRoute,
+  getTaskInboxRoute,
+  getTicketInboxRoute,
+} from '@/utils/inboxRoute.util'
 
 const OPEN_TASK_SNAPSHOT_EVENT = 'open-task-snapshot'
 
@@ -23,8 +30,10 @@ export interface OpenTaskStreamItem {
   id: string
   kind: OpenTaskStreamItemKind
   title: string
+  bodyText: string
   icon: string
   timestamp: number
+  route: RouteLocationRaw
 }
 
 export interface OpenTaskUpdateContext {
@@ -74,8 +83,10 @@ function createTicketStreamItem(ticket: TicketItem): OpenTaskStreamItem {
     id: createItemId('ticket', [ticket.handle, ticket.createdAt, ticket.title]),
     kind: 'ticket',
     title: toTitle(ticket.title),
+    bodyText: toTitle(ticket.problemDescription),
     icon: 'mdi-ticket-confirmation-outline',
     timestamp: toTimestamp(ticket.createdAt ?? ticket.deadlineDate),
+    route: getTicketInboxRoute(ticket),
   }
 }
 
@@ -84,8 +95,10 @@ function createTaskStreamItem(task: EventItem): OpenTaskStreamItem {
     id: createItemId('event', [task.handle, task.transactionHandle, task.createdAt, task.title]),
     kind: 'event',
     title: toTitle(task.title),
+    bodyText: toTitle(task.description),
     icon: task.type?.icon || 'mdi-calendar-clock-outline',
     timestamp: toTimestamp(task.createdAt ?? task.startDate),
+    route: getTaskInboxRoute(task),
   }
 }
 
@@ -98,8 +111,10 @@ function createSalesOpportunityStreamItem(opportunity: SalesOpportunityItem): Op
     ]),
     kind: 'salesOpportunity',
     title: toTitle(opportunity.title),
+    bodyText: toTitle(opportunity.nextStep ?? opportunity.description ?? opportunity.painPoints),
     icon: opportunity.type?.icon || 'mdi-chart-timeline-variant',
     timestamp: toTimestamp(opportunity.createdAt ?? opportunity.closeDate),
+    route: getSalesOpportunityInboxRoute(opportunity),
   }
 }
 
@@ -113,11 +128,13 @@ function createNotificationStreamItem(notification: InboxNotificationItem): Open
     ]),
     kind: 'notification',
     title: toTitle(notification.title),
+    bodyText: toTitle(notification.bodyText),
     icon:
       typeof notification.entity === 'object'
         ? (notification.entity.icon ?? 'mdi-bell-outline')
         : 'mdi-bell-outline',
     timestamp: toTimestamp(notification.createdAt),
+    route: getNotificationInboxRoute(notification),
   }
 }
 

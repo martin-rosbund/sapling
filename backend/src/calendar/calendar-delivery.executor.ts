@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { EntityManager } from '@mikro-orm/core';
 import axios from 'axios';
 import { google } from 'googleapis';
@@ -121,7 +121,9 @@ export class CalendarDeliveryExecutor {
 
   constructor(
     private readonly em: EntityManager,
+    @Inject(forwardRef(() => GoogleCalendarService))
     private readonly googleCalendarService: GoogleCalendarService,
+    @Inject(forwardRef(() => AzureCalendarService))
     private readonly azureCalendarService: AzureCalendarService,
   ) {}
 

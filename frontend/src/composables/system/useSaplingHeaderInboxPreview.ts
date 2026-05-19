@@ -1,34 +1,142 @@
-import { onBeforeUnmount, ref, watch, type Ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { SaplingHeaderInboxPreview } from '@/composables/system/useSaplingHeader'
 
 export function useSaplingHeaderInboxPreview(
   incomingInboxPreview: Ref<SaplingHeaderInboxPreview | null>,
 ) {
+  const router = useRouter()
+  const { t } = useI18n()
   const visibleIncomingInboxPreview = ref<SaplingHeaderInboxPreview | null>(null)
   let incomingInboxPreviewTimeout: number | null = null
   let inboxPreviewAudioContext: AudioContext | null = null
+  let activeBrowserNotification: Notification | null = null
+  const notificationPermission = ref<NotificationPermission | 'unsupported'>('unsupported')
 
   watch(
     () => incomingInboxPreview.value?.sequence,
-    (sequence) => {
+    async (sequence) => {
       if (!sequence || !incomingInboxPreview.value) {
         return
       }
 
-      visibleIncomingInboxPreview.value = incomingInboxPreview.value
-
-      if (incomingInboxPreviewTimeout != null) {
-        window.clearTimeout(incomingInboxPreviewTimeout)
+      if (shouldUseBrowserNotifications()) {
+        showBrowserNotification(incomingInboxPreview.value)
+        return
       }
 
-      incomingInboxPreviewTimeout = window.setTimeout(() => {
-        visibleIncomingInboxPreview.value = null
-        incomingInboxPreviewTimeout = null
-      }, 5000)
-
-      void playInboxPing()
+      await showHeaderPreview(incomingInboxPreview.value)
     },
   )
+
+  onMounted(() => {
+    updateNotificationPermission()
+    void ensureNotificationPermission()
+  })
+
+  async function showHeaderPreview(preview: SaplingHeaderInboxPreview) {
+    visibleIncomingInboxPreview.value = preview
+
+    if (incomingInboxPreviewTimeout != null) {
+      window.clearTimeout(incomingInboxPreviewTimeout)
+    }
+
+    incomingInboxPreviewTimeout = window.setTimeout(() => {
+      visibleIncomingInboxPreview.value = null
+      incomingInboxPreviewTimeout = null
+    }, 5000)
+
+    await playInboxPing()
+  }
+
+  function shouldUseBrowserNotifications() {
+    return notificationPermission.value === 'granted'
+  }
+
+  function updateNotificationPermission() {
+    if (typeof window === 'undefined' || typeof Notification === 'undefined') {
+      notificationPermission.value = 'unsupported'
+      return
+    }
+
+    notificationPermission.value = Notification.permission
+  }
+
+  async function ensureNotificationPermission() {
+    if (
+      typeof window === 'undefined' ||
+      typeof Notification === 'undefined' ||
+      Notification.permission !== 'default'
+    ) {
+      return
+    }
+
+    try {
+      notificationPermission.value = await Notification.requestPermission()
+    } catch {
+      updateNotificationPermission()
+    }
+  }
+
+  function showBrowserNotification(preview: SaplingHeaderInboxPreview) {
+    if (typeof window === 'undefined' || typeof Notification === 'undefined') {
+      return
+    }
+
+    activeBrowserNotification?.close()
+
+    const notification = new Notification(preview.title, {
+      body: buildBrowserNotificationBody(preview),
+      tag: preview.id,
+    })
+
+    notification.onclick = () => {
+      notification.close()
+      activeBrowserNotification = null
+
+      try {
+        window.focus()
+      } catch {
+        // Ignore blocked focus calls and still attempt navigation.
+      }
+
+      void router.push(preview.route)
+    }
+
+    notification.onclose = () => {
+      if (activeBrowserNotification === notification) {
+        activeBrowserNotification = null
+      }
+    }
+
+    activeBrowserNotification = notification
+  }
+
+  function buildBrowserNotificationBody(preview: SaplingHeaderInboxPreview) {
+    const kindLabel = getInboxKindLabel(preview.kind)
+    const bodyText = preview.bodyText.trim()
+
+    if (!bodyText) {
+      return kindLabel
+    }
+
+    return `${kindLabel}\n${bodyText}`
+  }
+
+  function getInboxKindLabel(kind: SaplingHeaderInboxPreview['kind']) {
+    switch (kind) {
+      case 'ticket':
+        return t('navigation.ticket')
+      case 'event':
+        return t('navigation.event')
+      case 'salesOpportunity':
+        return t('navigation.salesOpportunity')
+      case 'notification':
+      default:
+        return t('navigation.inboxNotification')
+    }
+  }
 
   async function playInboxPing() {
     if (typeof window === 'undefined') {
@@ -79,6 +187,9 @@ export function useSaplingHeaderInboxPreview(
     if (incomingInboxPreviewTimeout != null) {
       window.clearTimeout(incomingInboxPreviewTimeout)
     }
+
+    activeBrowserNotification?.close()
+    activeBrowserNotification = null
 
     if (inboxPreviewAudioContext) {
       void inboxPreviewAudioContext.close()

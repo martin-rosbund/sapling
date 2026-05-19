@@ -17,7 +17,7 @@
  * @method          deleteEvent          Deletes an event from Azure calendar and removes reference
  * @method          getAzureEvent        Maps EventItem to Azure Calendar event resource
  */
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { EventItem } from '../../entity/EventItem';
 import { EventDeliveryService } from '../event.delivery.service';
@@ -39,6 +39,7 @@ export class AzureCalendarService {
    * @param {EntityManager} em MikroORM EntityManager for database operations
    */
   constructor(
+    @Inject(forwardRef(() => EventDeliveryService))
     private readonly eventDeliveryService: EventDeliveryService,
     private readonly em: EntityManager,
   ) {}

@@ -10,7 +10,7 @@
  * @method          queueEventDelivery           Creates a delivery entry and queues the event for processing
  * @method          retryDelivery                Retries a failed delivery by resetting status and re-queueing
  */
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { EntityManager } from '@mikro-orm/core';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
@@ -30,6 +30,7 @@ export class EventDeliveryService {
   constructor(
     private readonly em: EntityManager,
     @InjectQueue('calendar') private readonly calendarQueue: Queue,
+    @Inject(forwardRef(() => CalendarDeliveryExecutor))
     private readonly calendarDeliveryExecutor: CalendarDeliveryExecutor,
   ) {}
 
