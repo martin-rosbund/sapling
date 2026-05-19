@@ -17,6 +17,8 @@ import { Queue } from 'bullmq';
 import { EventDeliveryItem } from '../entity/EventDeliveryItem';
 import { EventDeliveryStatusItem } from '../entity/EventDeliveryStatusItem';
 import { EventItem } from '../entity/EventItem';
+import { REDIS_ENABLED } from '../constants/project.constants';
+import { CalendarDeliveryExecutor } from './calendar-delivery.executor';
 
 @Injectable()
 export class EventDeliveryService {
@@ -28,6 +30,7 @@ export class EventDeliveryService {
   constructor(
     private readonly em: EntityManager,
     @InjectQueue('calendar') private readonly calendarQueue: Queue,
+    private readonly calendarDeliveryExecutor: CalendarDeliveryExecutor,
   ) {}
 
   /**
@@ -75,10 +78,19 @@ export class EventDeliveryService {
 
     await this.em.persist(delivery).flush();
 
-    // 2. Add job to queue (pass only the delivery ID)
-    await this.calendarQueue.add('deliver-calendar-event', {
-      deliveryId: delivery.handle,
-    });
+    if (REDIS_ENABLED) {
+      await this.calendarQueue.add('deliver-calendar-event', {
+        deliveryId: delivery.handle,
+      });
+      return delivery;
+    }
+
+    if (typeof delivery.handle === 'number') {
+      await this.calendarDeliveryExecutor.execute(delivery.handle, 1);
+      return await this.em.findOneOrFail(EventDeliveryItem, {
+        handle: delivery.handle,
+      });
+    }
 
     return delivery;
   }
@@ -101,9 +113,13 @@ export class EventDeliveryService {
     delivery.nextRetryAt = undefined;
     await this.em.flush();
 
-    await this.calendarQueue.add('deliver-calendar-event', {
-      deliveryId: delivery.handle,
-    });
+    if (REDIS_ENABLED) {
+      await this.calendarQueue.add('deliver-calendar-event', {
+        deliveryId: delivery.handle,
+      });
+    } else if (typeof delivery.handle === 'number') {
+      await this.calendarDeliveryExecutor.execute(delivery.handle, 1);
+    }
 
     return delivery;
   }

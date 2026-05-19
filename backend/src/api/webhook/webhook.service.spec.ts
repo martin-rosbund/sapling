@@ -32,6 +32,7 @@ jest.mock('../template/template.service', () => ({
 }));
 
 import { WebhookService } from './webhook.service';
+import { REDIS_ENABLED } from '../../constants/project.constants';
 
 type TemplateField = {
   name: string;
@@ -141,10 +142,35 @@ describe('WebhookService', () => {
         .fn<(...args: unknown[]) => Promise<undefined>>()
         .mockResolvedValue(undefined),
     };
+    const persistedDelivery = {
+      handle: 99,
+      payload: [
+        {
+          handle: 7,
+          creatorPerson: {
+            handle: 4,
+            email: 'ada@example.com',
+            company: {
+              handle: 11,
+              name: 'Acme GmbH',
+            },
+          },
+        },
+      ],
+    };
+    const webhookDeliveryExecutor = {
+      execute: jest
+        .fn<(...args: unknown[]) => Promise<undefined>>()
+        .mockResolvedValue(undefined),
+    };
+    em.findOneOrFail = jest
+      .fn<(...args: unknown[]) => Promise<unknown>>()
+      .mockResolvedValue(persistedDelivery);
     const service = new WebhookService(
       em as never,
       templateService as never,
       queue as never,
+      webhookDeliveryExecutor as never,
     );
 
     const delivery = await service.querySubscription(5, [{ handle: 7 }]);
@@ -171,9 +197,15 @@ describe('WebhookService', () => {
         },
       },
     ]);
-    expect(queue.add).toHaveBeenCalledWith('deliver-webhook', {
-      deliveryId: 99,
-    });
+    if (REDIS_ENABLED) {
+      expect(queue.add).toHaveBeenCalledWith('deliver-webhook', {
+        deliveryId: 99,
+      });
+      expect(webhookDeliveryExecutor.execute).not.toHaveBeenCalled();
+    } else {
+      expect(webhookDeliveryExecutor.execute).toHaveBeenCalledWith(99, 1);
+      expect(queue.add).not.toHaveBeenCalled();
+    }
     expect(delivery.handle).toBe(99);
     expect(flushPersist).toHaveBeenCalled();
   });

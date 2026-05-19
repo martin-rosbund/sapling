@@ -1,4 +1,3 @@
-// webhook.service.ts
 import { EntityManager } from '@mikro-orm/core';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable } from '@nestjs/common';
@@ -10,39 +9,18 @@ import { WebhookDeliveryItem } from '../../entity/WebhookDeliveryItem';
 import { WebhookDeliveryStatusItem } from '../../entity/WebhookDeliveryStatusItem';
 import { hasSaplingOption } from '../../entity/global/entity.decorator';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
+import { REDIS_ENABLED } from '../../constants/project.constants';
+import { WebhookDeliveryExecutor } from './webhook-delivery.executor';
 
-/**
- * @class
- * @version         1.0
- * @author          Martin Rosbund
- * @summary         Service for handling webhook delivery and retry logic.
- *
- * @property        em                   EntityManager for database access
- * @property        templateService      Service for entity templates
- * @property        webhookQueue         BullMQ queue for webhook jobs
- * @method          querySubscription    Creates delivery entry and queues webhook job
- * @method          retryDelivery        Resets status and re-queues webhook job
- */
 @Injectable()
 export class WebhookService {
-  /**
-   * Initializes the WebhookService with EntityManager and webhook queue.
-   * @param em EntityManager for database access
-   * @param templateService Service for entity templates
-   * @param webhookQueue BullMQ queue for webhook jobs
-   */
   constructor(
     private readonly em: EntityManager,
     private readonly templateService: TemplateService,
     @InjectQueue('webhooks') private readonly webhookQueue: Queue,
+    private readonly webhookDeliveryExecutor: WebhookDeliveryExecutor,
   ) {}
 
-  /**
-   * Creates the delivery entry and adds it to the queue.
-   * @param handle Subscription handle
-   * @param payload Payload object for webhook
-   * @returns WebhookDeliveryItem entity
-   */
   async querySubscription(
     handle: number,
     payload: object,
@@ -66,7 +44,6 @@ export class WebhookService {
 
     const preparedPayload = await this.preparePayload(subscription, payload);
 
-    // 1. DB Eintrag erstellen (Status Pending)
     const delivery = new WebhookDeliveryItem();
     delivery.subscription = subscription;
     delivery.payload = preparedPayload;
@@ -74,19 +51,23 @@ export class WebhookService {
 
     await this.em.persist(delivery).flush();
 
-    // 2. Job in die Queue werfen (wir übergeben nur die ID)
-    await this.webhookQueue.add('deliver-webhook', {
-      deliveryId: delivery.handle,
-    });
+    if (REDIS_ENABLED) {
+      await this.webhookQueue.add('deliver-webhook', {
+        deliveryId: delivery.handle,
+      });
+      return delivery;
+    }
+
+    if (typeof delivery.handle === 'number') {
+      await this.webhookDeliveryExecutor.execute(delivery.handle, 1);
+      return await this.em.findOneOrFail(WebhookDeliveryItem, {
+        handle: delivery.handle,
+      });
+    }
 
     return delivery;
   }
 
-  /**
-   * Resets status and re-queues the webhook job.
-   * @param handle Delivery handle
-   * @returns WebhookDeliveryItem entity
-   */
   async retryDelivery(handle: number): Promise<WebhookDeliveryItem> {
     const pending = await this.em.findOne(WebhookDeliveryStatusItem, {
       handle: 'pending',
@@ -103,10 +84,16 @@ export class WebhookService {
 
     await this.em.flush();
 
-    // Job erneut zur Queue hinzufügen
-    await this.webhookQueue.add('deliver-webhook', {
-      deliveryId: delivery.handle,
-    });
+    if (REDIS_ENABLED) {
+      await this.webhookQueue.add('deliver-webhook', {
+        deliveryId: delivery.handle,
+      });
+      return delivery;
+    }
+
+    if (typeof delivery.handle === 'number') {
+      await this.webhookDeliveryExecutor.execute(delivery.handle, 1);
+    }
 
     return delivery;
   }
