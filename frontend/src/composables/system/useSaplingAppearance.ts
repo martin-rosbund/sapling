@@ -6,6 +6,7 @@ import saplingTiltLightHref from '@/assets/styles/SaplingTiltLight.css?url'
 import CookieService from '@/services/cookie.service'
 
 type SaplingThemeName = 'light' | 'dark'
+type SaplingPerformanceMode = 'full' | 'reduced'
 
 const SAPLING_THEME_COOKIE = 'theme'
 const SAPLING_GLASS_COOKIE = 'glass'
@@ -14,9 +15,27 @@ const SAPLING_THEME_LINK_ATTRIBUTE = 'data-sapling-theme'
 
 const glassEnabled = ref(true)
 const tiltEnabled = ref(true)
+const performanceMode = ref<SaplingPerformanceMode>('full')
 const appearanceInitialized = ref(false)
 
 let themeWatcherBound = false
+let performanceWatchersBound = false
+
+type NavigatorConnection = {
+  saveData?: boolean
+  effectiveType?: string
+  addEventListener?: (type: 'change', listener: () => void) => void
+  removeEventListener?: (type: 'change', listener: () => void) => void
+}
+
+function getNavigatorConnection(): NavigatorConnection | null {
+  if (typeof navigator === 'undefined') {
+    return null
+  }
+
+  const connection = (navigator as Navigator & { connection?: NavigatorConnection }).connection
+  return connection ?? null
+}
 
 function normalizeThemeName(value?: string | null): SaplingThemeName | null {
   if (value === 'light' || value === 'dark') {
@@ -36,6 +55,47 @@ function parseAppearanceToggle(value: string | null, fallback: boolean): boolean
 
 function getCurrentThemeName(isDarkTheme: boolean): SaplingThemeName {
   return isDarkTheme ? 'dark' : 'light'
+}
+
+function detectPerformanceMode(): SaplingPerformanceMode {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+    return 'full'
+  }
+
+  const prefersReducedMotion =
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  const navigatorWithHints = navigator as Navigator & {
+    deviceMemory?: number
+    hardwareConcurrency?: number
+  }
+
+  const deviceMemory = navigatorWithHints.deviceMemory
+  const hardwareConcurrency = navigatorWithHints.hardwareConcurrency
+  const connection = getNavigatorConnection()
+  const saveData = connection?.saveData === true
+  const effectiveType = connection?.effectiveType?.toLowerCase()
+  const slowConnection =
+    effectiveType === 'slow-2g' || effectiveType === '2g' || effectiveType === '3g'
+
+  if (prefersReducedMotion || saveData || slowConnection) {
+    return 'reduced'
+  }
+
+  if (typeof deviceMemory === 'number' && deviceMemory > 0 && deviceMemory <= 4) {
+    return 'reduced'
+  }
+
+  if (
+    typeof hardwareConcurrency === 'number' &&
+    hardwareConcurrency > 0 &&
+    hardwareConcurrency <= 4
+  ) {
+    return 'reduced'
+  }
+
+  return 'full'
 }
 
 function loadThemeStyles(themeName: SaplingThemeName) {
@@ -67,6 +127,7 @@ function dispatchAppearanceChange(themeName: SaplingThemeName) {
         theme: themeName,
         glassEnabled: glassEnabled.value,
         tiltEnabled: tiltEnabled.value,
+        performanceMode: performanceMode.value,
       },
     }),
   )
@@ -77,6 +138,7 @@ function applyAppearanceAttributes(themeName: SaplingThemeName) {
   root.dataset.saplingTheme = themeName
   root.dataset.saplingGlass = glassEnabled.value ? 'on' : 'off'
   root.dataset.saplingTilt = tiltEnabled.value ? 'on' : 'off'
+  root.dataset.saplingPerformance = performanceMode.value
   root.style.colorScheme = themeName
 
   dispatchAppearanceChange(themeName)
@@ -84,6 +146,14 @@ function applyAppearanceAttributes(themeName: SaplingThemeName) {
 
 export function useSaplingAppearance() {
   const theme = useTheme()
+
+  const syncPerformanceMode = () => {
+    performanceMode.value = detectPerformanceMode()
+
+    if (appearanceInitialized.value) {
+      applyAppearanceAttributes(getCurrentThemeName(theme.global.current.value.dark))
+    }
+  }
 
   if (!appearanceInitialized.value) {
     const savedTheme = normalizeThemeName(CookieService.get(SAPLING_THEME_COOKIE))
@@ -93,6 +163,7 @@ export function useSaplingAppearance() {
 
     glassEnabled.value = parseAppearanceToggle(CookieService.get(SAPLING_GLASS_COOKIE), true)
     tiltEnabled.value = parseAppearanceToggle(CookieService.get(SAPLING_TILT_COOKIE), true)
+    performanceMode.value = detectPerformanceMode()
 
     const initialThemeName = getCurrentThemeName(theme.global.current.value.dark)
     loadThemeStyles(initialThemeName)
@@ -113,6 +184,26 @@ export function useSaplingAppearance() {
     )
 
     themeWatcherBound = true
+  }
+
+  if (!performanceWatchersBound && typeof window !== 'undefined') {
+    if (typeof window.matchMedia === 'function') {
+      const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+      const handleReducedMotionChange = () => syncPerformanceMode()
+
+      if (typeof reducedMotionQuery.addEventListener === 'function') {
+        reducedMotionQuery.addEventListener('change', handleReducedMotionChange)
+      } else if (typeof reducedMotionQuery.addListener === 'function') {
+        reducedMotionQuery.addListener(handleReducedMotionChange)
+      }
+    }
+
+    const connection = getNavigatorConnection()
+    if (connection && typeof connection.addEventListener === 'function') {
+      connection.addEventListener('change', syncPerformanceMode)
+    }
+
+    performanceWatchersBound = true
   }
 
   const isDarkTheme = computed(() => theme.global.current.value.dark)
@@ -165,6 +256,7 @@ export function useSaplingAppearance() {
     isDarkTheme,
     isGlassEnabled: computed(() => glassEnabled.value),
     isTiltEnabled: computed(() => tiltEnabled.value),
+    performanceMode: computed(() => performanceMode.value),
     setTheme,
     toggleTheme,
     setGlassEnabled,

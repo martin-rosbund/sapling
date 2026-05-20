@@ -21,7 +21,8 @@ function resetTiltStyles(el: HTMLElement) {
 }
 
 function isTiltEnabled() {
-  return document.documentElement.dataset.saplingTilt !== 'off'
+  const root = document.documentElement.dataset
+  return root.saplingTilt !== 'off' && root.saplingPerformance !== 'reduced'
 }
 
 function shouldEnable(value: TiltBindingValue): boolean {
