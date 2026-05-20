@@ -439,4 +439,143 @@ describe('MailService', () => {
     expect(delivery.completedAt).toBeInstanceOf(Date);
     expect(flush).toHaveBeenCalled();
   });
+
+  it('retries mail delivery only after authentication failures', async () => {
+    const service = new MailService(
+      {} as never,
+      { getEntityTemplate: jest.fn(() => []) } as never,
+      createMessageTemplateServiceMock() as never,
+      { add: jest.fn() } as never,
+    );
+
+    const delivery = {
+      provider: 'azure',
+      createdBy: {
+        session: {
+          accessToken: 'stale-token',
+          refreshToken: 'refresh-token',
+        },
+      },
+    };
+    const authError = {
+      statusCode: 401,
+      body: {
+        error: {
+          code: 'InvalidAuthenticationToken',
+        },
+      },
+      message: 'Expired token',
+    };
+    const sendWithProviderAccessToken = jest
+      .fn<() => Promise<unknown>>()
+      .mockRejectedValueOnce(authError)
+      .mockResolvedValueOnce({ responseStatusCode: 202 });
+    const refreshProviderAccessToken = jest
+      .fn<() => Promise<string | null>>()
+      .mockResolvedValue('fresh-token');
+
+    (
+      service as never as {
+        sendWithProviderAccessToken: typeof sendWithProviderAccessToken;
+        refreshProviderAccessToken: typeof refreshProviderAccessToken;
+      }
+    ).sendWithProviderAccessToken = sendWithProviderAccessToken;
+    (
+      service as never as {
+        refreshProviderAccessToken: typeof refreshProviderAccessToken;
+      }
+    ).refreshProviderAccessToken = refreshProviderAccessToken;
+
+    const result = await (
+      service as never as {
+        sendWithProvider: (
+          delivery: unknown,
+          attachments: unknown[],
+          em: unknown,
+        ) => Promise<unknown>;
+      }
+    ).sendWithProvider(delivery, [], {});
+
+    expect(refreshProviderAccessToken).toHaveBeenCalledTimes(1);
+    expect(sendWithProviderAccessToken).toHaveBeenNthCalledWith(
+      1,
+      'azure',
+      delivery,
+      delivery.createdBy.session,
+      'stale-token',
+      [],
+      undefined,
+    );
+    expect(sendWithProviderAccessToken).toHaveBeenNthCalledWith(
+      2,
+      'azure',
+      delivery,
+      delivery.createdBy.session,
+      'fresh-token',
+      [],
+      undefined,
+    );
+    expect(result).toEqual({ responseStatusCode: 202 });
+  });
+
+  it('does not retry mail delivery for non-authentication provider failures', async () => {
+    const service = new MailService(
+      {} as never,
+      { getEntityTemplate: jest.fn(() => []) } as never,
+      createMessageTemplateServiceMock() as never,
+      { add: jest.fn() } as never,
+    );
+
+    const delivery = {
+      provider: 'azure',
+      createdBy: {
+        session: {
+          accessToken: 'stale-token',
+          refreshToken: 'refresh-token',
+        },
+      },
+    };
+    const providerError = {
+      statusCode: 504,
+      body: {
+        error: {
+          code: 'GatewayTimeout',
+        },
+      },
+      message: 'Gateway timeout',
+    };
+    const sendWithProviderAccessToken = jest
+      .fn<() => Promise<never>>()
+      .mockRejectedValue(providerError);
+    const refreshProviderAccessToken = jest
+      .fn<() => Promise<string | null>>()
+      .mockResolvedValue('fresh-token');
+
+    (
+      service as never as {
+        sendWithProviderAccessToken: typeof sendWithProviderAccessToken;
+        refreshProviderAccessToken: typeof refreshProviderAccessToken;
+      }
+    ).sendWithProviderAccessToken = sendWithProviderAccessToken;
+    (
+      service as never as {
+        refreshProviderAccessToken: typeof refreshProviderAccessToken;
+      }
+    ).refreshProviderAccessToken = refreshProviderAccessToken;
+
+    await expect(
+      (
+        service as never as {
+          sendWithProvider: (
+            delivery: unknown,
+            attachments: unknown[],
+            em: unknown,
+          ) => Promise<unknown>;
+        }
+      ).sendWithProvider(delivery, [], {}),
+    ).rejects.toEqual(providerError);
+
+    expect(refreshProviderAccessToken).not.toHaveBeenCalled();
+    expect(sendWithProviderAccessToken).toHaveBeenCalledTimes(1);
+  });
 });

@@ -96,9 +96,8 @@ describe('generic entity swagger', () => {
   it('collapses nested references to schema-name strings in examples', () => {
     const document = enhanceGenericEntitySwaggerDocument(createDocument());
     const createExamples =
-      document.paths?.['/api/generic/{entityHandle}']?.post?.requestBody?.content?.[
-        'application/json'
-      ]?.examples;
+      document.paths?.['/api/generic/{entityHandle}']?.post?.requestBody
+        ?.content?.['application/json']?.examples;
     const companyExample = createExamples?.company?.value as
       | Record<string, unknown>
       | undefined;

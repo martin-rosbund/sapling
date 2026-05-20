@@ -139,6 +139,49 @@ function getMailProviderErrorShape(error: unknown): ProviderErrorShape {
   };
 }
 
+function extractProviderErrorCode(body: unknown): string | undefined {
+  if (!isRecord(body)) {
+    return undefined;
+  }
+
+  const directCode =
+    typeof body.code === 'string' ? body.code.trim() : undefined;
+  if (directCode) {
+    return directCode;
+  }
+
+  if (isRecord(body.error) && typeof body.error.code === 'string') {
+    const nestedCode = body.error.code.trim();
+    if (nestedCode.length > 0) {
+      return nestedCode;
+    }
+  }
+
+  if (typeof body.error === 'string') {
+    const errorCode = body.error.trim();
+    return errorCode.length > 0 ? errorCode : undefined;
+  }
+
+  return undefined;
+}
+
+function isAuthenticationProviderError(error: unknown): boolean {
+  const providerError = getMailProviderErrorShape(error);
+  if (providerError.statusCode === 401 || providerError.statusCode === 403) {
+    return true;
+  }
+
+  const errorCode = extractProviderErrorCode(providerError.body)?.toLowerCase();
+  return Boolean(
+    errorCode &&
+    (errorCode.includes('token') ||
+      errorCode.includes('auth') ||
+      errorCode.includes('unauthorized') ||
+      errorCode.includes('forbidden') ||
+      errorCode.includes('invalid_grant')),
+  );
+}
+
 function normalizeEmailAddress(
   value: string | null | undefined,
 ): string | undefined {
@@ -839,6 +882,10 @@ export class MailService {
         senderEmail,
       );
     } catch (error) {
+      if (!isAuthenticationProviderError(error)) {
+        throw error;
+      }
+
       const refreshedToken = await this.refreshProviderAccessToken(
         provider,
         session,

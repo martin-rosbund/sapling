@@ -40,6 +40,16 @@ type GraphErrorShape = {
   message?: string;
 };
 
+type TeamsSendResult = {
+  chatId: string;
+  messageId?: string;
+};
+
+type TeamsRetryResult = {
+  delivery: TeamsDeliveryItem | null;
+  finalError?: unknown;
+};
+
 function isRecord(value: unknown): value is JsonRecord {
   return typeof value === 'object' && value !== null;
 }
@@ -61,6 +71,41 @@ function getGraphErrorShape(error: unknown): GraphErrorShape {
   return {
     message: error instanceof Error ? error.message : 'Unknown error',
   };
+}
+
+function extractGraphErrorCode(body: unknown): string | undefined {
+  if (!isRecord(body)) {
+    return undefined;
+  }
+
+  const directCode =
+    typeof body.code === 'string' ? body.code.trim() : undefined;
+  if (directCode) {
+    return directCode;
+  }
+
+  if (isRecord(body.error) && typeof body.error.code === 'string') {
+    const nestedCode = body.error.code.trim();
+    return nestedCode.length > 0 ? nestedCode : undefined;
+  }
+
+  return undefined;
+}
+
+function isGraphAuthenticationError(error: unknown): boolean {
+  const graphError = getGraphErrorShape(error);
+  if (graphError.statusCode === 401 || graphError.statusCode === 403) {
+    return true;
+  }
+
+  const errorCode = extractGraphErrorCode(graphError.body)?.toLowerCase();
+  return Boolean(
+    errorCode &&
+    (errorCode.includes('token') ||
+      errorCode.includes('auth') ||
+      errorCode.includes('unauthorized') ||
+      errorCode.includes('forbidden')),
+  );
 }
 
 @Injectable()
@@ -188,6 +233,20 @@ export class TeamsService {
 
     delivery.attemptCount = (delivery.attemptCount ?? 0) + 1;
 
+    const senderLoginName = delivery.createdBy.loginName?.trim();
+    const recipientLoginName = delivery.recipientPerson?.loginName?.trim();
+
+    if (!senderLoginName || delivery.createdBy.type?.handle !== 'azure') {
+      throw new BadRequestException('teams.senderAzureRequired');
+    }
+
+    if (
+      !recipientLoginName ||
+      delivery.recipientPerson?.type?.handle !== 'azure'
+    ) {
+      throw new BadRequestException('teams.recipientAzureRequired');
+    }
+
     try {
       const accessToken = await this.resolveAzureAccessToken(
         em,
@@ -197,74 +256,40 @@ export class TeamsService {
         throw new BadRequestException('teams.sessionNotFound');
       }
 
-      const senderLoginName = delivery.createdBy.loginName?.trim();
-      const recipientLoginName = delivery.recipientPerson?.loginName?.trim();
-
-      if (!senderLoginName || delivery.createdBy.type?.handle !== 'azure') {
-        throw new BadRequestException('teams.senderAzureRequired');
-      }
-
-      if (
-        !recipientLoginName ||
-        delivery.recipientPerson?.type?.handle !== 'azure'
-      ) {
-        throw new BadRequestException('teams.recipientAzureRequired');
-      }
-
-      const client = Client.init({
-        authProvider: (done) => done(null, accessToken),
-      });
-
-      let chatId: string;
-
-      // Self-Chat vs. 1:1 Chat Behandlung
-      if (this.isSamePerson(delivery.createdBy, delivery.recipientPerson)) {
-        chatId = '48:notes';
-      } else {
-        const chat = (await client.api('/chats').post({
-          chatType: 'oneOnOne',
-          members: [
-            {
-              '@odata.type': '#microsoft.graph.aadUserConversationMember',
-              roles: ['owner'],
-              'user@odata.bind': `https://graph.microsoft.com/v1.0/users('${senderLoginName}')`,
-            },
-            {
-              '@odata.type': '#microsoft.graph.aadUserConversationMember',
-              roles: ['owner'],
-              'user@odata.bind': `https://graph.microsoft.com/v1.0/users('${recipientLoginName}')`,
-            },
-          ],
-        })) as GraphChat;
-
-        if (!chat.id) {
-          throw new BadRequestException('teams.chatCreateFailed');
-        }
-        chatId = chat.id;
-      }
-
-      const message = (await client.api(`/chats/${chatId}/messages`).post({
-        body: {
-          contentType: 'html',
-          content: delivery.bodyHtml,
-        },
-      })) as GraphMessage;
+      const result = await this.sendTeamsMessage(
+        accessToken,
+        delivery,
+        senderLoginName,
+        recipientLoginName,
+      );
 
       const success = await this.ensureStatus(em, 'success');
       delivery.status = success;
       delivery.responseStatusCode = 201;
       delivery.responseBody = {
-        chatId: chatId,
-        messageId: message.id,
+        chatId: result.chatId,
+        messageId: result.messageId,
       };
-      delivery.providerMessageId = message.id;
+      delivery.providerMessageId = result.messageId;
       delivery.completedAt = new Date();
       await em.flush();
 
       return delivery;
     } catch (error) {
+      const retryResult = await this.retryWithRefreshedAccessToken(
+        em,
+        delivery,
+        senderLoginName,
+        recipientLoginName,
+        error,
+      );
+      if (retryResult.delivery) {
+        return retryResult.delivery;
+      }
+
+      const finalError = retryResult.finalError ?? error;
       const failed = await this.ensureStatus(em, 'failed');
-      const graphError = getGraphErrorShape(error);
+      const graphError = getGraphErrorShape(finalError);
 
       delivery.status = failed;
       delivery.responseStatusCode = graphError.statusCode ?? 500;
@@ -274,8 +299,59 @@ export class TeamsService {
       };
       delivery.completedAt = new Date();
       await em.flush();
-      throw error;
+      throw finalError;
     }
+  }
+
+  private async sendTeamsMessage(
+    accessToken: string,
+    delivery: TeamsDeliveryItem,
+    senderLoginName: string,
+    recipientLoginName: string,
+  ): Promise<TeamsSendResult> {
+    const client = Client.init({
+      authProvider: (done) => done(null, accessToken),
+    });
+
+    let chatId: string;
+
+    // Self-Chat vs. 1:1 Chat Behandlung
+    if (this.isSamePerson(delivery.createdBy, delivery.recipientPerson)) {
+      chatId = '48:notes';
+    } else {
+      const chat = (await client.api('/chats').post({
+        chatType: 'oneOnOne',
+        members: [
+          {
+            '@odata.type': '#microsoft.graph.aadUserConversationMember',
+            roles: ['owner'],
+            'user@odata.bind': `https://graph.microsoft.com/v1.0/users('${senderLoginName}')`,
+          },
+          {
+            '@odata.type': '#microsoft.graph.aadUserConversationMember',
+            roles: ['owner'],
+            'user@odata.bind': `https://graph.microsoft.com/v1.0/users('${recipientLoginName}')`,
+          },
+        ],
+      })) as GraphChat;
+
+      if (!chat.id) {
+        throw new BadRequestException('teams.chatCreateFailed');
+      }
+      chatId = chat.id;
+    }
+
+    const message = (await client.api(`/chats/${chatId}/messages`).post({
+      body: {
+        contentType: 'html',
+        content: delivery.bodyHtml,
+      },
+    })) as GraphMessage;
+
+    return {
+      chatId,
+      messageId: message.id,
+    };
   }
 
   async retryDelivery(handle: number): Promise<TeamsDeliveryItem> {
@@ -559,6 +635,18 @@ export class TeamsService {
       return null;
     }
 
+    return this.refreshAzureAccessToken(em, session);
+  }
+
+  private async refreshAzureAccessToken(
+    em: EntityManager,
+    session?: PersonSessionItem,
+  ): Promise<string | null> {
+    const refreshToken = session?.refreshToken?.trim();
+    if (!refreshToken) {
+      return null;
+    }
+
     const tokenEndpoint = `https://login.microsoftonline.com/${AZURE_AD_TENNANT_ID || 'common'}/oauth2/v2.0/token`;
     const params = new URLSearchParams({
       client_id: AZURE_AD_CLIENT_ID,
@@ -590,5 +678,58 @@ export class TeamsService {
     await em.flush();
     this.logger.debug('Refreshed Azure access token for Teams delivery');
     return accessToken;
+  }
+
+  private async retryWithRefreshedAccessToken(
+    em: EntityManager,
+    delivery: TeamsDeliveryItem,
+    senderLoginName: string,
+    recipientLoginName: string,
+    error: unknown,
+  ): Promise<TeamsRetryResult> {
+    if (!isGraphAuthenticationError(error)) {
+      return { delivery: null };
+    }
+
+    const refreshedToken = await this.refreshAzureAccessToken(
+      em,
+      delivery.createdBy.session,
+    );
+    if (!refreshedToken) {
+      return { delivery: null };
+    }
+
+    try {
+      const result = await this.sendTeamsMessage(
+        refreshedToken,
+        delivery,
+        senderLoginName,
+        recipientLoginName,
+      );
+      const success = await this.ensureStatus(em, 'success');
+      delivery.status = success;
+      delivery.responseStatusCode = 201;
+      delivery.responseBody = {
+        chatId: result.chatId,
+        messageId: result.messageId,
+      };
+      delivery.providerMessageId = result.messageId;
+      delivery.completedAt = new Date();
+      await em.flush();
+      this.logger.debug(
+        `Teams delivery #${delivery.handle ?? 'unknown'} succeeded after token refresh.`,
+      );
+      return { delivery };
+    } catch (retryError) {
+      this.logger.warn(
+        `Teams delivery #${delivery.handle ?? 'unknown'} token refresh retry failed: ${
+          retryError instanceof Error ? retryError.message : String(retryError)
+        }`,
+      );
+      return {
+        delivery: null,
+        finalError: retryError,
+      };
+    }
   }
 }
