@@ -1,3 +1,4 @@
+import { describe, expect, it } from '@jest/globals';
 import { enhanceGenericEntitySwaggerDocument } from './generic-entity-swagger';
 
 type TestSwaggerDocument = Parameters<

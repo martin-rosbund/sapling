@@ -356,7 +356,11 @@ export class AuthController {
     sessionPassport.user = { handle: realHandle };
 
     await new Promise<void>((resolve, reject) =>
-      req.session!.save((error) => (error ? reject(error) : resolve())),
+      req.session.save((error) =>
+        error
+          ? reject(error instanceof Error ? error : new Error(String(error)))
+          : resolve(),
+      ),
     );
 
     global.log?.info?.(
@@ -442,7 +446,11 @@ export class AuthController {
     };
 
     await new Promise<void>((resolve, reject) =>
-      req.session!.save((error) => (error ? reject(error) : resolve())),
+      req.session.save((error) =>
+        error
+          ? reject(error instanceof Error ? error : new Error(String(error)))
+          : resolve(),
+      ),
     );
 
     global.log?.info?.(

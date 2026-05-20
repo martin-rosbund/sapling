@@ -72,6 +72,13 @@ type EntitySchemaVariant = {
   responseExample: unknown;
 };
 
+type EntityRegistryEntry = {
+  name: string;
+  class: {
+    name: string;
+  };
+};
+
 const GENERIC_ENTITY_COLLECTION_PATH = '/api/generic/{entityHandle}';
 const GENERIC_ENTITY_DOWNLOAD_PATH = '/api/generic/{entityHandle}/download';
 const JSON_CONTENT_TYPE = 'application/json';
@@ -90,8 +97,9 @@ export function enhanceGenericEntitySwaggerDocument(
   }
 
   const entityVariants: EntitySchemaVariant[] = [];
+  const entityRegistry = ENTITY_REGISTRY as EntityRegistryEntry[];
 
-  for (const entry of ENTITY_REGISTRY) {
+  for (const entry of entityRegistry) {
     const schemaName = entry.class.name;
     const rootSchema = schemas[schemaName];
     if (!rootSchema) {
@@ -133,19 +141,20 @@ export function buildGenericEntitySwaggerUiScript(
     return '';
   }
 
+  const entityRegistry = ENTITY_REGISTRY as EntityRegistryEntry[];
   const entitySchemaMap = Object.fromEntries(
-    ENTITY_REGISTRY.filter((entry) => schemas[entry.class.name]).map(
-      (entry) => [entry.name, entry.class.name],
-    ),
+    entityRegistry
+      .filter((entry) => schemas[entry.class.name])
+      .map((entry) => [entry.name, entry.class.name]),
   );
 
   const requestExamples = Object.fromEntries(
-    ENTITY_REGISTRY.filter((entry) => schemas[entry.class.name]).map(
-      (entry) => [
+    entityRegistry
+      .filter((entry) => schemas[entry.class.name])
+      .map((entry) => [
         entry.name,
         buildRootEntityExample(entry.class.name, schemas, 'request'),
-      ],
-    ),
+      ]),
   );
 
   return `

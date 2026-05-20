@@ -138,6 +138,7 @@ describe('ScriptController', () => {
       body.items,
       body.entity,
       req.user,
+      {},
     );
   });
 

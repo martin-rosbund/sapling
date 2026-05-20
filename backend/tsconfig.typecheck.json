@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "multer", "jest"]
+  },
+  "exclude": ["node_modules", "dist"]
+}

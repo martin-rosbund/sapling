@@ -22,7 +22,7 @@ export function extractClientFormattingContextFromRequest(
 }
 
 function readHeader(req: Request, name: string): string | undefined {
-  const value = req.headers[name];
+  const value = req.headers?.[name];
 
   if (Array.isArray(value)) {
     return value[0];

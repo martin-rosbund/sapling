@@ -4,7 +4,7 @@ import { CalendarProcessor } from './calendar.processor';
 describe('CalendarProcessor', () => {
   it('forwards the delivery to the shared executor with a one-based attempt count', async () => {
     const executor = {
-      execute: jest.fn(() => undefined),
+      execute: jest.fn(),
     };
     const processor = new CalendarProcessor(executor as never);
 

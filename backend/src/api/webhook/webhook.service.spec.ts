@@ -98,6 +98,7 @@ describe('WebhookService', () => {
       populate: jest
         .fn<(...args: unknown[]) => Promise<undefined>>()
         .mockResolvedValue(undefined),
+      findOneOrFail: jest.fn<(...args: unknown[]) => Promise<unknown>>(),
       flush: jest
         .fn<(...args: unknown[]) => Promise<undefined>>()
         .mockResolvedValue(undefined),
@@ -163,9 +164,7 @@ describe('WebhookService', () => {
         .fn<(...args: unknown[]) => Promise<undefined>>()
         .mockResolvedValue(undefined),
     };
-    em.findOneOrFail = jest
-      .fn<(...args: unknown[]) => Promise<unknown>>()
-      .mockResolvedValue(persistedDelivery);
+    em.findOneOrFail.mockResolvedValue(persistedDelivery);
     const service = new WebhookService(
       em as never,
       templateService as never,

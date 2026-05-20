@@ -93,7 +93,7 @@ export class KpiService {
     const baseWhere =
       currentUser && entityHandle
         ? (this.genericPermissionService.setTopLevelFilter(
-            resolvedFilter as object,
+            resolvedFilter,
             currentUser,
             entityHandle,
           ) as Record<string, unknown>)

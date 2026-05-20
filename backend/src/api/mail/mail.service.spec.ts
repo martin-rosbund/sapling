@@ -53,6 +53,32 @@ jest.mock('@microsoft/microsoft-graph-client', () => ({
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { MailService } from './mail.service';
 
+type MailDeliveryTestDouble = {
+  handle?: number;
+  provider: string;
+  attachmentHandles?: number[];
+  requestPayload?: {
+    from?: string;
+    senderSource?: string;
+  };
+  createdBy: {
+    type?: {
+      handle: string;
+    };
+    session: {
+      accessToken: string;
+      refreshToken: string;
+    };
+  };
+  responseStatusCode?: number;
+  responseBody?: unknown;
+  responseHeaders?: Record<string, string>;
+  status?: {
+    handle: string;
+  };
+  completedAt?: Date;
+};
+
 function getValue(
   context: Record<string, unknown>,
   expression: string,
@@ -358,13 +384,13 @@ describe('MailService', () => {
             sender: string,
           ) => Promise<unknown>;
         }
-      ).resolveRequestedSender({ handle: 1 } as never, 'team@example.com'),
+      ).resolveRequestedSender({ handle: 1 }, 'team@example.com'),
     ).rejects.toBeInstanceOf(BadRequestException);
   });
 
   it('persists provider diagnostics when dispatch fails', async () => {
     const flush = jest.fn<() => Promise<void>>().mockResolvedValue();
-    const delivery = {
+    const delivery: MailDeliveryTestDouble = {
       handle: 15,
       provider: 'azure',
       attachmentHandles: [],
@@ -413,11 +439,13 @@ describe('MailService', () => {
       .mockResolvedValue([]);
     (service as never as { sendWithProvider: jest.Mock }).sendWithProvider =
       jest.fn<() => Promise<unknown>>().mockRejectedValue(providerError);
-    (service as never as { ensureStatus: jest.Mock }).ensureStatus = jest
-      .fn<() => Promise<{ handle: string }>>()
-      .mockImplementation(async (_targetEm: unknown, handle: string) => ({
-        handle,
-      }));
+    const ensureStatus =
+      jest.fn<(...args: any[]) => Promise<{ handle: string }>>();
+    ensureStatus.mockImplementation((_targetEm: unknown, handle: string) =>
+      Promise.resolve({ handle }),
+    );
+    (service as never as { ensureStatus: jest.Mock }).ensureStatus =
+      ensureStatus;
 
     await expect(service.dispatchDelivery(15)).rejects.toEqual(providerError);
 
@@ -448,7 +476,7 @@ describe('MailService', () => {
       { add: jest.fn() } as never,
     );
 
-    const delivery = {
+    const delivery: MailDeliveryTestDouble = {
       provider: 'azure',
       createdBy: {
         session: {
@@ -466,13 +494,14 @@ describe('MailService', () => {
       },
       message: 'Expired token',
     };
-    const sendWithProviderAccessToken = jest
-      .fn<() => Promise<unknown>>()
+    const sendWithProviderAccessToken =
+      jest.fn<(...args: any[]) => Promise<unknown>>();
+    sendWithProviderAccessToken
       .mockRejectedValueOnce(authError)
       .mockResolvedValueOnce({ responseStatusCode: 202 });
-    const refreshProviderAccessToken = jest
-      .fn<() => Promise<string | null>>()
-      .mockResolvedValue('fresh-token');
+    const refreshProviderAccessToken =
+      jest.fn<(...args: any[]) => Promise<string | null>>();
+    refreshProviderAccessToken.mockResolvedValue('fresh-token');
 
     (
       service as never as {
@@ -526,7 +555,7 @@ describe('MailService', () => {
       { add: jest.fn() } as never,
     );
 
-    const delivery = {
+    const delivery: MailDeliveryTestDouble = {
       provider: 'azure',
       createdBy: {
         session: {
@@ -544,12 +573,12 @@ describe('MailService', () => {
       },
       message: 'Gateway timeout',
     };
-    const sendWithProviderAccessToken = jest
-      .fn<() => Promise<never>>()
-      .mockRejectedValue(providerError);
-    const refreshProviderAccessToken = jest
-      .fn<() => Promise<string | null>>()
-      .mockResolvedValue('fresh-token');
+    const sendWithProviderAccessToken =
+      jest.fn<(...args: any[]) => Promise<never>>();
+    sendWithProviderAccessToken.mockRejectedValue(providerError);
+    const refreshProviderAccessToken =
+      jest.fn<(...args: any[]) => Promise<string | null>>();
+    refreshProviderAccessToken.mockResolvedValue('fresh-token');
 
     (
       service as never as {

@@ -4,7 +4,7 @@ import { WebhookProcessor } from './webhook.processor';
 describe('WebhookProcessor', () => {
   it('forwards the delivery to the shared executor with a one-based attempt count', async () => {
     const executor = {
-      execute: jest.fn(() => undefined),
+      execute: jest.fn(),
     };
     const processor = new WebhookProcessor(executor as never);
 

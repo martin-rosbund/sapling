@@ -50,7 +50,6 @@ const createTemplateField = (
   length: null,
   nullable: false,
   default: null,
-  defaultRaw: null,
   isPrimaryKey: false,
   isAutoIncrement: false,
   referencedPks: [],

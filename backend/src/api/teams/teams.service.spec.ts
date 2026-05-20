@@ -1,10 +1,37 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { TeamsService } from './teams.service';
 
+type TeamsDeliveryTestDouble = {
+  handle: number;
+  attemptCount: number;
+  bodyHtml: string;
+  createdBy: {
+    loginName: string;
+    type: {
+      handle: string;
+    };
+    session: {
+      accessToken: string;
+      refreshToken: string;
+    };
+  };
+  recipientPerson: {
+    loginName: string;
+    type: {
+      handle: string;
+    };
+  };
+  status?: {
+    handle: string;
+  };
+  responseStatusCode?: number;
+  providerMessageId?: string;
+};
+
 describe('TeamsService', () => {
   it('retries with a refreshed token after a graph authentication error', async () => {
     const flush = jest.fn<() => Promise<void>>().mockResolvedValue();
-    const delivery = {
+    const delivery: TeamsDeliveryTestDouble = {
       handle: 17,
       attemptCount: 0,
       bodyHtml: '<p>Hello</p>',
@@ -35,8 +62,8 @@ describe('TeamsService', () => {
       { add: jest.fn() } as never,
     );
 
-    const sendTeamsMessage = jest
-      .fn<() => Promise<unknown>>()
+    const sendTeamsMessage = jest.fn<(...args: any[]) => Promise<unknown>>();
+    sendTeamsMessage
       .mockRejectedValueOnce({
         statusCode: 401,
         body: {
@@ -50,14 +77,14 @@ describe('TeamsService', () => {
         chatId: 'chat-1',
         messageId: 'message-1',
       });
-    const refreshAzureAccessToken = jest
-      .fn<() => Promise<string | null>>()
-      .mockResolvedValue('fresh-token');
-    const ensureStatus = jest
-      .fn<() => Promise<{ handle: string }>>()
-      .mockImplementation(async (_targetEm: unknown, handle: string) => ({
-        handle,
-      }));
+    const refreshAzureAccessToken =
+      jest.fn<(...args: any[]) => Promise<string | null>>();
+    refreshAzureAccessToken.mockResolvedValue('fresh-token');
+    const ensureStatus =
+      jest.fn<(...args: any[]) => Promise<{ handle: string }>>();
+    ensureStatus.mockImplementation((_targetEm: unknown, handle: string) =>
+      Promise.resolve({ handle }),
+    );
 
     (
       service as never as {
@@ -105,7 +132,7 @@ describe('TeamsService', () => {
 
   it('does not refresh tokens for non-authentication graph errors', async () => {
     const flush = jest.fn<() => Promise<void>>().mockResolvedValue();
-    const delivery = {
+    const delivery: TeamsDeliveryTestDouble = {
       handle: 18,
       attemptCount: 0,
       bodyHtml: '<p>Hello</p>',
@@ -145,17 +172,16 @@ describe('TeamsService', () => {
       },
       message: 'Provider unavailable',
     };
-    const sendTeamsMessage = jest
-      .fn<() => Promise<never>>()
-      .mockRejectedValue(providerError);
-    const refreshAzureAccessToken = jest
-      .fn<() => Promise<string | null>>()
-      .mockResolvedValue('fresh-token');
-    const ensureStatus = jest
-      .fn<() => Promise<{ handle: string }>>()
-      .mockImplementation(async (_targetEm: unknown, handle: string) => ({
-        handle,
-      }));
+    const sendTeamsMessage = jest.fn<(...args: any[]) => Promise<never>>();
+    sendTeamsMessage.mockRejectedValue(providerError);
+    const refreshAzureAccessToken =
+      jest.fn<(...args: any[]) => Promise<string | null>>();
+    refreshAzureAccessToken.mockResolvedValue('fresh-token');
+    const ensureStatus =
+      jest.fn<(...args: any[]) => Promise<{ handle: string }>>();
+    ensureStatus.mockImplementation((_targetEm: unknown, handle: string) =>
+      Promise.resolve({ handle }),
+    );
 
     (
       service as never as {

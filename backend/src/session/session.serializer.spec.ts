@@ -63,8 +63,8 @@ describe('SessionSerializer', () => {
     const authService = {
       getSecurityUserByHandle: jest
         .fn<(handle: number) => Promise<unknown>>()
-        .mockImplementation(async (handle: number) =>
-          handle === 1 ? admin : target,
+        .mockImplementation((handle: number) =>
+          Promise.resolve(handle === 1 ? admin : target),
         ),
     };
     const serializer = new SessionSerializer(authService as never);
@@ -127,8 +127,8 @@ describe('SessionSerializer', () => {
     const authService = {
       getSecurityUserByHandle: jest
         .fn<(handle: number) => Promise<unknown>>()
-        .mockImplementation(async (handle: number) =>
-          handle === 1 ? admin : target,
+        .mockImplementation((handle: number) =>
+          Promise.resolve(handle === 1 ? admin : target),
         ),
     };
     const serializer = new SessionSerializer(authService as never);

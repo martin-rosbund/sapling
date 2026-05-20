@@ -148,6 +148,7 @@ describe('GenericController', () => {
       'ticket',
       payload,
       req.user,
+      {},
     );
   });
 
@@ -175,6 +176,7 @@ describe('GenericController', () => {
       payload,
       req.user,
       ['person'],
+      {},
     );
   });
 
@@ -192,6 +194,7 @@ describe('GenericController', () => {
       'ticket',
       '3',
       req.user,
+      {},
     );
   });
 
@@ -215,6 +218,7 @@ describe('GenericController', () => {
       '3',
       '8',
       req.user,
+      {},
     );
   });
 
@@ -238,6 +242,7 @@ describe('GenericController', () => {
       '3',
       '8',
       req.user,
+      {},
     );
   });
 });
@@ -526,8 +531,13 @@ describe('KpiController', () => {
     };
     const controller = new KpiController(kpiService as never);
 
-    await expect(controller.executeKPI(7)).resolves.toBe(result);
-    expect(asMock(kpiService.executeKPIById)).toHaveBeenCalledWith(7);
+    await expect(
+      controller.executeKPI(7, { user: createMockUser() } as never),
+    ).resolves.toBe(result);
+    expect(asMock(kpiService.executeKPIById)).toHaveBeenCalledWith(
+      7,
+      expect.objectContaining({ handle: 1 }),
+    );
   });
 });
 
