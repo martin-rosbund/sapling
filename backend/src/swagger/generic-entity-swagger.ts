@@ -7,6 +7,7 @@ type SwaggerSchema = {
   oneOf?: SwaggerSchema[];
   type?: string;
   title?: string;
+  description?: string;
   format?: string;
   nullable?: boolean;
   enum?: unknown[];
@@ -67,8 +68,6 @@ type ExampleMode = 'request' | 'response';
 
 type EntitySchemaVariant = {
   handle: string;
-  schemaName: string;
-  schemaRef: { $ref: string };
   requestExample: unknown;
   responseExample: unknown;
 };
@@ -82,10 +81,6 @@ const ROOT_REQUEST_EXCLUDED_FIELDS = new Set([
   'createdAt',
   'updatedAt',
 ]);
-const ENTITY_SCHEMA_NAMES = new Set(
-  ENTITY_REGISTRY.map((entry) => entry.class.name),
-);
-
 export function enhanceGenericEntitySwaggerDocument(
   document: SwaggerDocument,
 ): SwaggerDocument {
@@ -105,8 +100,6 @@ export function enhanceGenericEntitySwaggerDocument(
 
     entityVariants.push({
       handle: entry.name,
-      schemaName,
-      schemaRef: { $ref: `#/components/schemas/${schemaName}` },
       requestExample: buildRootEntityExample(schemaName, schemas, 'request'),
       responseExample: buildRootEntityExample(schemaName, schemas, 'response'),
     });
@@ -358,10 +351,12 @@ function patchEntityListOperation(
   const mediaType = ensureJsonResponse(operation, '200');
   mediaType.schema = {
     type: 'object',
+    description:
+      'Entity-specific list response. Nested references are collapsed to schema names in the examples.',
     properties: {
       data: {
         type: 'array',
-        items: createEntityUnionSchema(entityVariants),
+        items: createGenericEntityResponseSchema(),
       },
       meta: {
         $ref: PAGINATION_META_SCHEMA_REF,
@@ -381,11 +376,11 @@ function patchEntityCreateOperation(
   }
 
   const requestMediaType = ensureJsonRequest(operation);
-  requestMediaType.schema = createEntityUnionSchema(entityVariants);
+  requestMediaType.schema = createGenericEntityRequestSchema();
   requestMediaType.examples = createEntityRequestExamples(entityVariants);
 
   const responseMediaType = ensureJsonResponse(operation, '201');
-  responseMediaType.schema = createEntityUnionSchema(entityVariants);
+  responseMediaType.schema = createGenericEntityResponseSchema();
   responseMediaType.examples = createEntityResponseExamples(entityVariants);
 }
 
@@ -398,11 +393,11 @@ function patchEntityUpdateOperation(
   }
 
   const requestMediaType = ensureJsonRequest(operation);
-  requestMediaType.schema = createEntityUnionSchema(entityVariants);
+  requestMediaType.schema = createGenericEntityRequestSchema();
   requestMediaType.examples = createEntityRequestExamples(entityVariants);
 
   const responseMediaType = ensureJsonResponse(operation, '200');
-  responseMediaType.schema = createEntityUnionSchema(entityVariants);
+  responseMediaType.schema = createGenericEntityResponseSchema();
   responseMediaType.examples = createEntityResponseExamples(entityVariants);
 }
 
@@ -417,7 +412,9 @@ function patchEntityDownloadOperation(
   const mediaType = ensureJsonResponse(operation, '200');
   mediaType.schema = {
     type: 'array',
-    items: createEntityUnionSchema(entityVariants),
+    description:
+      'Entity-specific download response. Nested references are collapsed to schema names in the examples.',
+    items: createGenericEntityResponseSchema(),
   };
   mediaType.examples = Object.fromEntries(
     entityVariants.map((variant) => [
@@ -451,14 +448,26 @@ function ensureJsonResponse(
   return operation.responses[statusCode].content[JSON_CONTENT_TYPE];
 }
 
-function createEntityUnionSchema(
-  entityVariants: EntitySchemaVariant[],
-): SwaggerSchema {
+function createGenericEntityRequestSchema(): SwaggerSchema {
   return {
-    oneOf: entityVariants.map((variant) => ({
-      title: variant.handle,
-      allOf: [cloneSchemaRef(variant.schemaRef)],
-    })),
+    type: 'object',
+    description:
+      'Entity-specific request payload for the selected entityHandle. Nested references are omitted from the schema and shown as schema-name strings in the examples.',
+    additionalProperties: true,
+  };
+}
+
+function createGenericEntityResponseSchema(): SwaggerSchema {
+  return {
+    type: 'object',
+    description:
+      'Entity-specific response payload. Nested references are omitted from the schema and shown as schema-name strings in the examples.',
+    properties: {
+      handle: {
+        type: 'integer',
+      },
+    },
+    additionalProperties: true,
   };
 }
 
@@ -629,12 +638,12 @@ function buildExampleFromReference(
     return {};
   }
 
-  if (context.depth > 0 && ENTITY_SCHEMA_NAMES.has(schemaName)) {
-    return { handle: 1 };
+  if (context.depth > 0) {
+    return schemaName;
   }
 
   if (context.seenRefs.has(reference)) {
-    return { handle: 1 };
+    return schemaName;
   }
 
   const targetSchema = components[schemaName];
@@ -814,10 +823,6 @@ function singularize(value: string): string {
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return value != null && typeof value === 'object' && !Array.isArray(value);
-}
-
-function cloneSchemaRef(schemaRef: SwaggerSchema): SwaggerSchema {
-  return { ...schemaRef };
 }
 
 function cloneExampleValue<T>(value: T): T {
