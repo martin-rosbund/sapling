@@ -89,28 +89,59 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     props.columns.some((column) => column.key === '__actions'),
   )
   const scriptButtons = computed(() => props.scriptButtons ?? [])
-  const mailActions = computed(() => buildMailMenuActions(props.entityTemplates, props.item))
   const mailToLabel = computed(() => t('global.mailTo'))
+  const hasActionMenuItems = computed(() => {
+    if (props.entityPermission?.allowUpdate || props.entityPermission?.allowDelete) {
+      return true
+    }
+
+    if (props.entityPermission?.allowInsert) {
+      return true
+    }
+
+    if (props.canNavigate || props.canShowInformation || props.item?.handle != null) {
+      return true
+    }
+
+    if (scriptButtons.value.length > 0) {
+      return true
+    }
+
+    return props.entityTemplates.some((template) => {
+      const templateName = template.name
+      return (
+        template.options?.includes('isMail') &&
+        typeof templateName === 'string' &&
+        Boolean(props.item[templateName])
+      )
+    })
+  })
   const rowMenuItems = computed<SaplingContextMenuTableMenuEntry[]>(() =>
-    getSaplingContextMenuTableItems({
-      canChangeLog: props.item?.handle != null,
-      canShowInformation: props.canShowInformation,
-      entityPermission: props.entityPermission,
-      canNavigate: props.canNavigate,
-      canTimeline: props.item?.handle != null,
-      scriptButtons: scriptButtons.value,
-      mailActions: mailActions.value,
-      mailToLabel: mailToLabel.value,
-    }),
+    !menuActive.value
+      ? []
+      : getSaplingContextMenuTableItems({
+          canChangeLog: props.item?.handle != null,
+          canShowInformation: props.canShowInformation,
+          entityPermission: props.entityPermission,
+          canNavigate: props.canNavigate,
+          canTimeline: props.item?.handle != null,
+          scriptButtons: scriptButtons.value,
+          mailActions: buildMailMenuActions(props.entityTemplates, props.item),
+          mailToLabel: mailToLabel.value,
+        }),
   )
   const compactPanelTitles = computed<Record<string, string>>(() => {
+    const referenceColumns = props.columns.filter(
+      (column) => Boolean(column.key) && isReferenceColumn(column),
+    )
+    if (referenceColumns.length === 0) {
+      return {}
+    }
+
     const titles: Record<string, string> = {}
 
-    for (const column of props.columns) {
-      const columnKey = column.key
-      if (!columnKey || !isReferenceColumn(column)) {
-        continue
-      }
+    for (const column of referenceColumns) {
+      const columnKey = column.key as string
 
       const referenceValue = props.item[columnKey]
       if (!column.referenceName || !referenceValue || typeof referenceValue !== 'object') {
@@ -364,6 +395,7 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
   return {
     menuActive,
     hasActionsColumn,
+    hasActionMenuItems,
     scriptButtons,
     rowMenuItems,
     openContextMenu,

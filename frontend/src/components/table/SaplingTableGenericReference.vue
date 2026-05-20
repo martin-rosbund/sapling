@@ -50,6 +50,7 @@ const {
 } = useSaplingGenericReferenceTarget({
   item: toRef(props, 'item'),
   template: toRef(props, 'col'),
+  autoResolve: false,
 })
 
 const { dialogOpen, openTargetDialog } = useSaplingGenericReferenceDialog({

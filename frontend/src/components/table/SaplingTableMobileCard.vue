@@ -65,6 +65,7 @@
               </template>
 
               <SaplingRecordActionMenuList
+                v-if="menuActive"
                 class="glass-panel sapling-table-mobile-card__menu-list"
                 :menu-items="rowMenuItems"
                 :show-close-item="true"
@@ -250,6 +251,7 @@ const detailsOpen = ref(false)
 const {
   menuActive,
   rowMenuItems,
+  hasActionMenuItems,
   openDialogForCol,
   closeDialogForCol,
   isDialogOpenForCol,
@@ -296,7 +298,7 @@ const hasExpandableDetails = computed(
   () => displayColumns.value.length > alwaysVisibleFieldCount.value,
 )
 
-const hasRowActions = computed(() => props.showActions && rowMenuItems.value.length > 0)
+const hasRowActions = computed(() => props.showActions && hasActionMenuItems.value)
 
 const hasHeaderControls = computed(() => props.multiSelect || hasRowActions.value)
 

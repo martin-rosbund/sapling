@@ -163,7 +163,10 @@
       </td>
     </template>
     <!-- Actions cell at the end of the row -->
-    <td v-if="showActions && hasActionsColumn" class="actions-cell sapling-table-row__actions-cell">
+    <td
+      v-if="showActions && hasActionsColumn && hasActionMenuItems"
+      class="actions-cell sapling-table-row__actions-cell"
+    >
       <v-menu v-model="menuActive">
         <template #activator="{ props: menuProps }">
           <v-btn
@@ -177,6 +180,7 @@
           ></v-btn>
         </template>
         <SaplingRecordActionMenuList
+          v-if="menuActive"
           class="glass-panel"
           :menu-items="rowMenuItems"
           :show-close-item="true"
@@ -229,6 +233,7 @@ const {
   menuActive,
   rowMenuItems,
   hasActionsColumn,
+  hasActionMenuItems,
   openContextMenu,
   onRowMouseDown,
   onRowDoubleClick,
