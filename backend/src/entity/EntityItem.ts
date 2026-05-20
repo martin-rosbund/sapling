@@ -56,7 +56,7 @@ export class EntityItem {
    * Icon representing the entity (default: square-rounded).
    * @type {string}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'square-rounded' })
   @Sapling(['isIcon'])
   @SaplingForm({
     order: 100,
@@ -235,7 +235,7 @@ export class EntityItem {
    * Date and time when the entity was created.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
@@ -244,7 +244,7 @@ export class EntityItem {
    * Date and time when the entity was last updated.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

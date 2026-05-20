@@ -160,7 +160,7 @@ export class EventDeliveryItem {
    * Number of delivery attempts made.
    * @type {number}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 0 })
   @SaplingForm({
     order: 200,
     group: 'eventDelivery.groupBasics',
@@ -190,7 +190,7 @@ export class EventDeliveryItem {
    * Date and time when the delivery was created.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
@@ -199,7 +199,7 @@ export class EventDeliveryItem {
    * Date and time when the delivery was last updated.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

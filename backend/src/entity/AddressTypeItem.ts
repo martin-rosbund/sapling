@@ -49,7 +49,7 @@ export class AddressTypeItem {
    * Icon representing the address type.
    * @type {string}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'mdi-map-marker-outline' })
   @Sapling(['isIcon'])
   @SaplingForm({
     order: 200,
@@ -64,7 +64,7 @@ export class AddressTypeItem {
    * Color used for displaying the address type.
    * @type {string}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: '#546E7A' })
   @Sapling(['isColor'])
   @SaplingForm({
     order: 300,
@@ -91,7 +91,7 @@ export class AddressTypeItem {
    * Date and time when the address type was created.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
@@ -100,7 +100,7 @@ export class AddressTypeItem {
    * Date and time when the address type was last updated.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

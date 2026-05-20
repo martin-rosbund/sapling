@@ -41,7 +41,7 @@ export class DashboardTemplateItem {
   @Property({ length: 512, nullable: true })
   description?: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: false })
   @SaplingForm({
     order: 200,
     group: 'dashboardTemplate.groupBasics',
@@ -66,12 +66,12 @@ export class DashboardTemplateItem {
   @ManyToMany(() => KpiItem, undefined, { owner: true })
   kpis: Collection<KpiItem> = new Collection<KpiItem>(this);
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

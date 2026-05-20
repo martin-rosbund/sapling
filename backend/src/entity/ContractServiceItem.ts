@@ -1,5 +1,5 @@
 import { Entity, Property } from '@mikro-orm/decorators/legacy';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling, SaplingForm } from './global/entity.decorator';
 
 @Entity()
@@ -34,7 +34,7 @@ export class ContractServiceItem {
   })
   icon?: string = 'mdi-shield-check-outline';
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: '#4CAF50' })
   @Sapling(['isColor'])
   @SaplingForm({
     order: 200,
@@ -45,12 +45,12 @@ export class ContractServiceItem {
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color!: string;
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

@@ -89,7 +89,7 @@ export class WebhookAuthenticationApiKeyItem {
    * Date and time when the API Key item was created.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
@@ -98,7 +98,7 @@ export class WebhookAuthenticationApiKeyItem {
    * Date and time when the API Key item was last updated.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

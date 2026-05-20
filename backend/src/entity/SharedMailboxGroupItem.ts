@@ -37,7 +37,7 @@ export class SharedMailboxGroupItem {
   @Property({ length: 256, nullable: true })
   description?: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'mdi-email-lock-outline' })
   @Sapling(['isIcon'])
   @SaplingForm({
     order: 100,
@@ -48,7 +48,7 @@ export class SharedMailboxGroupItem {
   @Property({ default: 'mdi-email-lock-outline', length: 64, nullable: false })
   icon: string = 'mdi-email-lock-outline';
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: '#1565C0' })
   @Sapling(['isColor'])
   @SaplingForm({
     order: 200,
@@ -59,7 +59,7 @@ export class SharedMailboxGroupItem {
   @Property({ default: '#1565C0', length: 32, nullable: false })
   color: string = '#1565C0';
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @SaplingForm({
     order: 100,
     group: 'sharedMailboxGroup.groupConfiguration',
@@ -79,12 +79,12 @@ export class SharedMailboxGroupItem {
   @ManyToMany(() => PersonItem)
   persons: Collection<PersonItem> = new Collection<PersonItem>(this);
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

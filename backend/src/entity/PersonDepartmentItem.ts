@@ -47,7 +47,7 @@ export class PersonDepartmentItem {
   /**
    * Icon representing the person department (default: mdi-calendar).
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'mdi-calendar' })
   @Sapling(['isIcon'])
   @SaplingForm({
     order: 100,
@@ -61,7 +61,7 @@ export class PersonDepartmentItem {
   /**
    * Color used for displaying the person department (default: #4CAF50).
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: '#4CAF50' })
   @Sapling(['isColor'])
   @SaplingForm({
     order: 200,
@@ -86,7 +86,7 @@ export class PersonDepartmentItem {
   /**
    * Date and time when the person department was created.
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
@@ -94,7 +94,7 @@ export class PersonDepartmentItem {
   /**
    * Date and time when the person department was last updated.
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

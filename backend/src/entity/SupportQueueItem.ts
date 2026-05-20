@@ -53,7 +53,7 @@ export class SupportQueueItem {
   })
   icon: string = 'mdi-inbox-arrow-down-outline';
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: '#00897B' })
   @Sapling(['isColor'])
   @SaplingForm({
     order: 200,
@@ -64,7 +64,7 @@ export class SupportQueueItem {
   @Property({ default: '#00897B', length: 32, nullable: false })
   color: string = '#00897B';
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @SaplingForm({
     order: 100,
     group: 'supportQueue.groupConfiguration',
@@ -100,12 +100,12 @@ export class SupportQueueItem {
   @OneToMany(() => TicketItem, (ticket) => ticket.supportQueue)
   tickets: Collection<TicketItem> = new Collection<TicketItem>(this);
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

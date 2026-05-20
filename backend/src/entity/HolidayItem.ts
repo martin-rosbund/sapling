@@ -65,7 +65,7 @@ export class HolidayItem {
   @Property({ nullable: false, type: 'datetime' })
   endDate!: Date;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @SaplingForm({
     order: 300,
     group: 'holiday.groupSchedule',
@@ -75,7 +75,7 @@ export class HolidayItem {
   @Property({ default: true, nullable: false })
   isAllDay: boolean = true;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'mdi-calendar-alert' })
   @Sapling(['isIcon'])
   @SaplingForm({
     order: 100,
@@ -86,7 +86,7 @@ export class HolidayItem {
   @Property({ default: 'mdi-calendar-alert', length: 64, nullable: false })
   icon?: string = 'mdi-calendar-alert';
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: '#C62828' })
   @Sapling(['isColor'])
   @SaplingForm({
     order: 200,
@@ -97,12 +97,12 @@ export class HolidayItem {
   @Property({ default: '#C62828', length: 32, nullable: false })
   color: string = '#C62828';
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

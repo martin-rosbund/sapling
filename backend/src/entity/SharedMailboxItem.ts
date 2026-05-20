@@ -54,7 +54,7 @@ export class SharedMailboxItem {
   @ManyToOne(() => PersonTypeItem, { default: 'azure', nullable: false })
   provider!: Rel<PersonTypeItem>;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @SaplingForm({
     order: 200,
     group: 'sharedMailbox.groupConfiguration',
@@ -74,12 +74,12 @@ export class SharedMailboxItem {
   @ManyToOne(() => SharedMailboxGroupItem, { nullable: true })
   group?: Rel<SharedMailboxGroupItem>;
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

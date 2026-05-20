@@ -24,9 +24,7 @@ export function getTaskInboxRoute(task: EventItem): RouteLocationRaw {
   }
 }
 
-export function getSalesOpportunityInboxRoute(
-  opportunity: SalesOpportunityItem,
-): RouteLocationRaw {
+export function getSalesOpportunityInboxRoute(opportunity: SalesOpportunityItem): RouteLocationRaw {
   return {
     path: '/table/salesOpportunity',
     query: {
@@ -35,9 +33,7 @@ export function getSalesOpportunityInboxRoute(
   }
 }
 
-export function getNotificationInboxRoute(
-  notification: InboxNotificationItem,
-): RouteLocationRaw {
+export function getNotificationInboxRoute(notification: InboxNotificationItem): RouteLocationRaw {
   const entityHandle =
     typeof notification.entity === 'object'
       ? String(notification.entity.handle ?? '').trim()

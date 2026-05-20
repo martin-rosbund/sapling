@@ -47,7 +47,7 @@ export class ChangeLogActionItem {
   })
   icon: string = 'mdi-pencil-circle-outline';
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: '#546E7A' })
   @Sapling(['isColor'])
   @SaplingForm({
     order: 400,
@@ -62,12 +62,12 @@ export class ChangeLogActionItem {
   @OneToMany(() => ChangeLogItem, (log) => log.action)
   logs: Collection<ChangeLogItem> = new Collection<ChangeLogItem>(this);
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

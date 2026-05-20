@@ -22,7 +22,7 @@ export class SocialMediaTypeItem {
   @Property({ length: 128, nullable: false })
   title!: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'mdi-web' })
   @Sapling(['isIcon'])
   @SaplingForm({
     order: 100,
@@ -33,7 +33,7 @@ export class SocialMediaTypeItem {
   @Property({ default: 'mdi-web', length: 64, nullable: false })
   icon?: string = 'mdi-web';
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: '#1E88E5' })
   @Sapling(['isColor'])
   @SaplingForm({
     order: 200,
@@ -52,12 +52,12 @@ export class SocialMediaTypeItem {
   socialMediaProfiles: Collection<SocialMediaItem> =
     new Collection<SocialMediaItem>(this);
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

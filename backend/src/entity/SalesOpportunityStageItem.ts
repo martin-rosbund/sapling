@@ -64,7 +64,7 @@ export class SalesOpportunityStageItem {
   /**
    * Icon representing the event type (default: mdi-calendar).
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'mdi-calendar' })
   @Sapling(['isIcon'])
   @SaplingForm({
     order: 100,
@@ -78,7 +78,7 @@ export class SalesOpportunityStageItem {
   /**
    * Color used for displaying the event type (default: #4CAF50).
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: '#4CAF50' })
   @Sapling(['isColor'])
   @SaplingForm({
     order: 200,
@@ -92,7 +92,7 @@ export class SalesOpportunityStageItem {
   /**
    * Order of the stage in the sales pipeline.
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 0 })
   @Sapling(['isOrderASC'])
   @SaplingForm({
     order: 100,
@@ -106,7 +106,7 @@ export class SalesOpportunityStageItem {
   /**
    * Suggested close probability for opportunities in this stage.
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 0 })
   @Sapling(['isPercent'])
   @SaplingForm({
     order: 200,
@@ -120,7 +120,7 @@ export class SalesOpportunityStageItem {
   /**
    * Indicates whether this stage closes the opportunity.
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: false })
   @SaplingForm({
     order: 300,
     group: 'salesOpportunityStage.groupConfiguration',
@@ -133,7 +133,7 @@ export class SalesOpportunityStageItem {
   /**
    * Indicates whether this stage represents a successful close.
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: false })
   @SaplingForm({
     order: 400,
     group: 'salesOpportunityStage.groupConfiguration',
@@ -158,7 +158,7 @@ export class SalesOpportunityStageItem {
   /**
    * Date and time when the dashboard was created.
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
@@ -166,7 +166,7 @@ export class SalesOpportunityStageItem {
   /**
    * Date and time when the dashboard was last updated.
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

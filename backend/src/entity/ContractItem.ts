@@ -139,7 +139,7 @@ export class ContractItem {
    * Indicates if the contract is active.
    * @type {boolean}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @SaplingForm({
     order: 100,
     group: 'contract.groupConfiguration',
@@ -153,7 +153,7 @@ export class ContractItem {
    * Annual included hours/contingent (default: 0).
    * @type {number}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 0 })
   @SaplingForm({
     order: 300,
     group: 'contract.groupBasics',
@@ -167,7 +167,7 @@ export class ContractItem {
    * Indicates if the contract includes an update service (default: false).
    * @type {boolean}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: false })
   @SaplingForm({
     order: 500,
     group: 'contract.groupSchedule',
@@ -268,7 +268,7 @@ export class ContractItem {
    * Date and time when the contract was created.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
@@ -277,7 +277,7 @@ export class ContractItem {
    * Date and time when the contract was last updated.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

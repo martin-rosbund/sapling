@@ -52,7 +52,7 @@ export class InboxTemplateItem {
   @Property({ nullable: false, length: 8192 })
   bodyMarkdown!: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: false })
   @SaplingForm({
     order: 100,
     group: 'inboxTemplate.groupConfiguration',
@@ -62,7 +62,7 @@ export class InboxTemplateItem {
   @Property({ default: false, nullable: false })
   isDefault: boolean = false;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @SaplingForm({
     order: 200,
     group: 'inboxTemplate.groupConfiguration',
@@ -83,12 +83,12 @@ export class InboxTemplateItem {
   @ManyToOne(() => EntityItem, { nullable: false })
   entity!: Rel<EntityItem>;
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

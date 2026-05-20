@@ -51,7 +51,7 @@ export class InboxSubscriptionItem {
   @Property({ length: 64, nullable: false })
   recipientField!: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @SaplingForm({
     order: 100,
     group: 'inboxSubscription.groupConfiguration',
@@ -102,12 +102,12 @@ export class InboxSubscriptionItem {
   @ManyToOne(() => InboxTemplateItem, { nullable: false })
   template!: Rel<InboxTemplateItem>;
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

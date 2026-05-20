@@ -153,7 +153,7 @@ export class SalesOpportunityItem {
   /**
    * Indicates whether the sales opportunity is active.
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @SaplingForm({
     order: 100,
     group: 'salesOpportunity.groupConfiguration',
@@ -324,7 +324,7 @@ export class SalesOpportunityItem {
   /**
    * Date and time when the sales opportunity was created.
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
@@ -332,7 +332,7 @@ export class SalesOpportunityItem {
   /**
    * Date and time when the dashboard was last updated.
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

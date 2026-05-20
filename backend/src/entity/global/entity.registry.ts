@@ -128,7 +128,7 @@ import { SharedMailboxItem } from '../SharedMailboxItem';
  *   { name: 'person', class: PersonItem }
  * @type {{ name: string, class: any }[]}
  */
-export const ENTITY_REGISTRY: { name: string; class: any }[] = [
+const ENTITY_REGISTRY_ENTRIES: { name: string; class: any }[] = [
   { name: 'country', class: CountryItem },
   { name: 'money', class: MoneyItem },
   { name: 'addressType', class: AddressTypeItem },
@@ -244,6 +244,11 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'webhookSubscription', class: WebhookSubscriptionItem },
   { name: 'seedScript', class: SeedScriptItem },
 ];
+
+export const ENTITY_REGISTRY: { name: string; class: any }[] =
+  ENTITY_REGISTRY_ENTRIES.toSorted((left, right) =>
+    left.name.localeCompare(right.name),
+  );
 
 /**
  * Array of all entity handles registered in ENTITY_REGISTRY.

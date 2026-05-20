@@ -29,7 +29,7 @@ export class McpServerConfigItem {
   @Property({ length: 512, nullable: true })
   description?: string | null;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'http' })
   @Sapling(['isChip'])
   @SaplingForm({
     order: 100,
@@ -40,7 +40,7 @@ export class McpServerConfigItem {
   @Property({ length: 32, nullable: false, default: 'http' })
   transport = 'http';
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @SaplingForm({
     order: 100,
     group: 'mcpServerConfig.groupConfiguration',
@@ -132,7 +132,7 @@ export class McpServerConfigItem {
   @Property({ nullable: true })
   timeoutMs?: number | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ default: 0 })
   @SaplingForm({
     order: 300,
     group: 'mcpServerConfig.groupConfiguration',
@@ -142,12 +142,12 @@ export class McpServerConfigItem {
   @Property({ nullable: false, default: 0 })
   sortOrder = 0;
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

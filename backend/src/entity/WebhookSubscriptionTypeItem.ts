@@ -48,7 +48,7 @@ export class WebhookSubscriptionTypeItem {
    * Icon representing the webhook subscription type.
    * @type {string}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'mdi-calendar' })
   @Sapling(['isIcon'])
   @SaplingForm({
     order: 100,
@@ -63,7 +63,7 @@ export class WebhookSubscriptionTypeItem {
    * Color associated with the webhook subscription type.
    * @type {string}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: '#4CAF50' })
   @Sapling(['isColor'])
   @SaplingForm({
     order: 200,
@@ -91,7 +91,7 @@ export class WebhookSubscriptionTypeItem {
    * Date and time when the dashboard was created.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
@@ -100,7 +100,7 @@ export class WebhookSubscriptionTypeItem {
    * Date and time when the dashboard was last updated.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

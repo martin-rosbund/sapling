@@ -32,6 +32,10 @@ import {
   getSaplingSecretOrThrow,
 } from './session/session.config';
 import { enforceTrustedRequestOrigin } from './security/request-origin-protection';
+import {
+  buildGenericEntitySwaggerUiScript,
+  enhanceGenericEntitySwaggerDocument,
+} from './swagger/generic-entity-swagger';
 
 type ModelConstructor = abstract new (...args: never[]) => unknown;
 type ProxyConfigurableApp = { set(setting: string, value: unknown): unknown };
@@ -106,7 +110,14 @@ async function bootstrap() {
       (e): ModelConstructor => e.class as ModelConstructor,
     ),
   });
-  SwaggerModule.setup('api/swagger', app, document);
+  enhanceGenericEntitySwaggerDocument(
+    document as Parameters<typeof enhanceGenericEntitySwaggerDocument>[0],
+  );
+  SwaggerModule.setup('api/swagger', app, document, {
+    customJsStr: buildGenericEntitySwaggerUiScript(
+      document as Parameters<typeof buildGenericEntitySwaggerUiScript>[0],
+    ),
+  });
 
   // Enable CORS for the frontend
   app.enableCors({

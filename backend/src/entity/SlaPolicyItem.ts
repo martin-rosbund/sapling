@@ -33,7 +33,7 @@ export class SlaPolicyItem {
   @Property({ length: 256, nullable: true })
   description?: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 8 })
   @SaplingForm({
     order: 100,
     group: 'slaPolicy.groupTargets',
@@ -43,7 +43,7 @@ export class SlaPolicyItem {
   @Property({ default: 8, nullable: false })
   firstResponseHours = 8;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 40 })
   @SaplingForm({
     order: 200,
     group: 'slaPolicy.groupTargets',
@@ -68,7 +68,7 @@ export class SlaPolicyItem {
   })
   icon: string = 'mdi-timer-sand';
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: '#E53935' })
   @Sapling(['isColor'])
   @SaplingForm({
     order: 200,
@@ -79,7 +79,7 @@ export class SlaPolicyItem {
   @Property({ default: '#E53935', length: 32, nullable: false })
   color: string = '#E53935';
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @SaplingForm({
     order: 100,
     group: 'slaPolicy.groupConfiguration',
@@ -101,12 +101,12 @@ export class SlaPolicyItem {
   @OneToMany(() => TicketItem, (ticket) => ticket.slaPolicy)
   tickets: Collection<TicketItem> = new Collection<TicketItem>(this);
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

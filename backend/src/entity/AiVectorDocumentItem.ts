@@ -31,7 +31,7 @@ export class AiVectorDocumentItem {
   @Property({ length: 64, nullable: false })
   sourceSection!: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 0 })
   @Property({ nullable: false, default: 0 })
   chunkIndex = 0;
 
@@ -67,11 +67,11 @@ export class AiVectorDocumentItem {
   @Property({ hidden: true, columnType: 'vector', nullable: false })
   embedding!: string;
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
 }

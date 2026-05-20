@@ -77,7 +77,7 @@ export class AiChatTranscriptionItem {
   @ManyToOne(() => AiProviderModelItem, { nullable: true })
   model?: Rel<AiProviderModelItem> | null;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'processing' })
   @Sapling(['isChip'])
   @SaplingForm({
     order: 100,
@@ -169,12 +169,12 @@ export class AiChatTranscriptionItem {
   @Property({ type: 'json', nullable: true })
   failurePayload?: object | null;
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

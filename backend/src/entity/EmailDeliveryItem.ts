@@ -214,7 +214,7 @@ export class EmailDeliveryItem {
   @Property({ nullable: true, type: 'datetime' })
   completedAt?: Date;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 0 })
   @SaplingForm({
     order: 800,
     group: 'emailDelivery.groupBasics',
@@ -234,12 +234,12 @@ export class EmailDeliveryItem {
   @Property({ nullable: true, type: 'datetime' })
   nextRetryAt?: Date;
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

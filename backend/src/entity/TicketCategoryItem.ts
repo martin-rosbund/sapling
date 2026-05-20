@@ -42,7 +42,7 @@ export class TicketCategoryItem {
   })
   icon: string = 'mdi-shape-outline';
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: '#5C6BC0' })
   @Sapling(['isColor'])
   @SaplingForm({
     order: 200,
@@ -68,12 +68,12 @@ export class TicketCategoryItem {
   @OneToMany(() => TicketItem, (ticket) => ticket.category)
   tickets: Collection<TicketItem> = new Collection<TicketItem>(this);
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

@@ -69,7 +69,7 @@ export class ScriptButtonItem {
    * Indicates whether the button acts on multiple selected rows.
    * @type {boolean}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: false })
   @SaplingForm({
     order: 100,
     group: 'scriptButton.groupConfiguration',
@@ -102,7 +102,7 @@ export class ScriptButtonItem {
    * Date and time when the script button was created.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
@@ -111,7 +111,7 @@ export class ScriptButtonItem {
    * Date and time when the script button was last updated.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

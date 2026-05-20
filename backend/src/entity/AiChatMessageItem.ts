@@ -43,7 +43,7 @@ export class AiChatMessageItem {
   @Property({ length: 32, nullable: false })
   role!: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'completed' })
   @Sapling(['isChip'])
   @SaplingForm({
     order: 200,
@@ -167,12 +167,12 @@ export class AiChatMessageItem {
   @Property({ length: 256, nullable: true })
   pageTitle?: string | null;
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

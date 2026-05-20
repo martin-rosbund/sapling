@@ -48,7 +48,7 @@ export class EventTypeItem {
    * Icon representing the event type (default: mdi-calendar).
    * @type {string}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'mdi-calendar' })
   @Sapling(['isIcon'])
   @SaplingForm({
     order: 100,
@@ -63,7 +63,7 @@ export class EventTypeItem {
    * Color used for displaying the event type (default: #4CAF50).
    * @type {string}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: '#4CAF50' })
   @Sapling(['isColor'])
   @SaplingForm({
     order: 200,
@@ -79,7 +79,7 @@ export class EventTypeItem {
    * view and synchronized with external calendars (Outlook/Google).
    * @type {boolean}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @SaplingForm({
     order: 200,
     group: 'eventType.groupBasics',
@@ -105,7 +105,7 @@ export class EventTypeItem {
    * Date and time when the event type was created.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
@@ -114,7 +114,7 @@ export class EventTypeItem {
    * Date and time when the event type was last updated.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

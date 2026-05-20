@@ -1,5 +1,5 @@
 import { Entity, Property } from '@mikro-orm/decorators/legacy';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling, SaplingForm } from './global/entity.decorator';
 
 /**
@@ -45,7 +45,7 @@ export class DocumentTypeItem {
    * Icon representing the document type (default: mdi-calendar).
    * @type {string}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'mdi-calendar' })
   @Sapling(['isIcon'])
   @SaplingForm({
     order: 100,
@@ -60,7 +60,7 @@ export class DocumentTypeItem {
    * Color used for displaying the document type (default: #4CAF50).
    * @type {string}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: '#4CAF50' })
   @Sapling(['isColor'])
   @SaplingForm({
     order: 200,
@@ -77,7 +77,7 @@ export class DocumentTypeItem {
    * Date and time when the document type was created.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
@@ -86,7 +86,7 @@ export class DocumentTypeItem {
    * Date and time when the document type was last updated.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

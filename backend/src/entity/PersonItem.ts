@@ -207,7 +207,7 @@ export class PersonItem {
   /**
    * Indicates if the person is required to change their password on next login.
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: false })
   @SaplingForm({
     order: 300,
     group: 'person.groupSecurity',
@@ -220,7 +220,7 @@ export class PersonItem {
   /**
    * Indicates if the person is active.
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @SaplingForm({
     order: 100,
     group: 'person.groupConfiguration',
@@ -233,7 +233,7 @@ export class PersonItem {
   /**
    * Indicates if the person should receive newsletters.
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @SaplingForm({
     order: 200,
     group: 'person.groupSchedule',
@@ -246,7 +246,7 @@ export class PersonItem {
   /**
    * Color used for displaying the event type (default: #4CAF50).
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: '#4CAF50' })
   @Sapling(['isColor'])
   @SaplingForm({
     order: 100,
@@ -495,7 +495,7 @@ export class PersonItem {
   /**
    * Date and time when the person was created.
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
@@ -503,7 +503,7 @@ export class PersonItem {
   /**
    * Date and time when the person was last updated.
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

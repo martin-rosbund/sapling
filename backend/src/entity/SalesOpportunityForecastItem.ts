@@ -46,7 +46,7 @@ export class SalesOpportunityForecastItem {
   /**
    * Icon representing the event type (default: mdi-calendar).
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'mdi-calendar' })
   @Sapling(['isIcon'])
   @SaplingForm({
     order: 100,
@@ -60,7 +60,7 @@ export class SalesOpportunityForecastItem {
   /**
    * Color used for displaying the event type (default: #4CAF50).
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: '#4CAF50' })
   @Sapling(['isColor'])
   @SaplingForm({
     order: 200,
@@ -86,7 +86,7 @@ export class SalesOpportunityForecastItem {
   /**
    * Date and time when the dashboard was created.
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
@@ -94,7 +94,7 @@ export class SalesOpportunityForecastItem {
   /**
    * Date and time when the dashboard was last updated.
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

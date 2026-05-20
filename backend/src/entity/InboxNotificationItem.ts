@@ -128,7 +128,7 @@ export class InboxNotificationItem {
   @Property({ type: 'json', nullable: true })
   requestPayload?: object | null;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: false })
   @SaplingForm({
     order: 100,
     group: 'inboxNotification.groupConfiguration',
@@ -148,12 +148,12 @@ export class InboxNotificationItem {
   @Property({ nullable: true, type: 'datetime' })
   readAt?: Date | null;
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

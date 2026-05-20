@@ -22,7 +22,7 @@ export class AiProviderTypeItem {
   @Property({ length: 128, nullable: false })
   title!: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'mdi-robot-outline' })
   @Sapling(['isIcon'])
   @SaplingForm({
     order: 100,
@@ -33,7 +33,7 @@ export class AiProviderTypeItem {
   @Property({ default: 'mdi-robot-outline', length: 64, nullable: false })
   icon = 'mdi-robot-outline';
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: '#546E7A' })
   @Sapling(['isColor'])
   @SaplingForm({
     order: 200,
@@ -65,7 +65,7 @@ export class AiProviderTypeItem {
   @Property({ type: 'json', nullable: true, hidden: true })
   credentials?: Record<string, string> | null;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @SaplingForm({
     order: 100,
     group: 'aiProviderType.groupConfiguration',
@@ -81,12 +81,12 @@ export class AiProviderTypeItem {
     this,
   );
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

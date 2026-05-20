@@ -63,7 +63,7 @@ export class TicketStatusItem {
    * Icon representing the status (default: mdi-new-box).
    * @type {string}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'mdi-new-box' })
   @Sapling(['isIcon'])
   @SaplingForm({
     order: 200,
@@ -90,7 +90,7 @@ export class TicketStatusItem {
    * Date and time when the ticket status was created.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
@@ -99,7 +99,7 @@ export class TicketStatusItem {
    * Date and time when the ticket status was last updated.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

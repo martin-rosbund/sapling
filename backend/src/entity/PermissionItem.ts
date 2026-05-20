@@ -40,7 +40,7 @@ export class PermissionItem {
   /**
    * Permission to read the entity.
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @Sapling(['isValue'])
   @SaplingForm({
     order: 100,
@@ -54,7 +54,7 @@ export class PermissionItem {
   /**
    * Permission to insert new records for the entity.
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @Sapling(['isValue'])
   @SaplingForm({
     order: 200,
@@ -68,7 +68,7 @@ export class PermissionItem {
   /**
    * Permission to update records for the entity.
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @Sapling(['isValue'])
   @SaplingForm({
     order: 100,
@@ -82,7 +82,7 @@ export class PermissionItem {
   /**
    * Permission to delete records for the entity.
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @Sapling(['isValue'])
   @SaplingForm({
     order: 300,
@@ -96,7 +96,7 @@ export class PermissionItem {
   /**
    * Permission to show the entity in the UI.
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @SaplingForm({
     order: 400,
     group: 'permission.groupConfiguration',
@@ -140,7 +140,7 @@ export class PermissionItem {
   /**
    * Date and time when the dashboard was created.
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
@@ -148,7 +148,7 @@ export class PermissionItem {
   /**
    * Date and time when the dashboard was last updated.
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

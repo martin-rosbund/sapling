@@ -54,7 +54,7 @@ export class SocialMediaItem {
   @Property({ length: 128, nullable: true, name: 'external_id' })
   externalId?: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: false })
   @SaplingForm({
     order: 100,
     group: 'socialMedia.groupConfiguration',
@@ -64,7 +64,7 @@ export class SocialMediaItem {
   @Property({ default: false, nullable: false, name: 'is_primary' })
   isPrimary?: boolean = false;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @SaplingForm({
     order: 200,
     group: 'socialMedia.groupConfiguration',
@@ -106,12 +106,12 @@ export class SocialMediaItem {
   @ManyToOne(() => SocialMediaTypeItem, { nullable: false })
   type!: Rel<SocialMediaTypeItem>;
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

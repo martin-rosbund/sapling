@@ -67,7 +67,7 @@ export class ServerLandscapeItem {
    * Indicates if remote access is possible.
    * @type {boolean}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: false })
   @SaplingForm({
     order: 100,
     group: 'serverLandscape.groupConfiguration',
@@ -81,7 +81,7 @@ export class ServerLandscapeItem {
    * Indicates if internet access is available.
    * @type {boolean}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @SaplingForm({
     order: 200,
     group: 'serverLandscape.groupConfiguration',
@@ -144,7 +144,7 @@ export class ServerLandscapeItem {
    * Date and time when the item was created.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
@@ -153,7 +153,7 @@ export class ServerLandscapeItem {
    * Date and time when the item was last updated.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

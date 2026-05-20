@@ -59,7 +59,7 @@ export class AiProviderModelItem {
   @Property({ length: 128, nullable: false })
   providerModel!: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @SaplingForm({
     order: 200,
     group: 'aiProviderModel.groupIntegration',
@@ -69,7 +69,7 @@ export class AiProviderModelItem {
   @Property({ nullable: false, default: true })
   supportsStreaming = true;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: false })
   @SaplingForm({
     order: 300,
     group: 'aiProviderModel.groupIntegration',
@@ -79,7 +79,7 @@ export class AiProviderModelItem {
   @Property({ nullable: false, default: false })
   supportsTools = false;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: false })
   @SaplingForm({
     order: 400,
     group: 'aiProviderModel.groupIntegration',
@@ -89,7 +89,7 @@ export class AiProviderModelItem {
   @Property({ nullable: false, default: false })
   supportsEmbeddings = false;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: false })
   @SaplingForm({
     order: 500,
     group: 'aiProviderModel.groupIntegration',
@@ -99,7 +99,7 @@ export class AiProviderModelItem {
   @Property({ nullable: false, default: false })
   supportsTranscription = false;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 32 })
   @SaplingForm({
     order: 525,
     group: 'aiProviderModel.groupIntegration',
@@ -109,7 +109,7 @@ export class AiProviderModelItem {
   @Property({ nullable: false, default: 32 })
   embeddingBatchSize = 32;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 1200 })
   @SaplingForm({
     order: 530,
     group: 'aiProviderModel.groupIntegration',
@@ -119,7 +119,7 @@ export class AiProviderModelItem {
   @Property({ nullable: false, default: 1200 })
   vectorChunkLength = 1200;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 200 })
   @SaplingForm({
     order: 535,
     group: 'aiProviderModel.groupIntegration',
@@ -129,7 +129,7 @@ export class AiProviderModelItem {
   @Property({ nullable: false, default: 200 })
   vectorChunkOverlap = 200;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 6 })
   @SaplingForm({
     order: 540,
     group: 'aiProviderModel.groupIntegration',
@@ -139,7 +139,7 @@ export class AiProviderModelItem {
   @Property({ nullable: false, default: 6 })
   vectorSearchCandidateMultiplier = 6;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 60 })
   @SaplingForm({
     order: 545,
     group: 'aiProviderModel.groupIntegration',
@@ -149,7 +149,7 @@ export class AiProviderModelItem {
   @Property({ nullable: false, default: 60 })
   vectorSearchMaxCandidateLimit = 60;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 10 })
   @SaplingForm({
     order: 548,
     group: 'aiProviderModel.groupIntegration',
@@ -159,7 +159,7 @@ export class AiProviderModelItem {
   @Property({ nullable: false, default: 10 })
   vectorSearchMaxResults = 10;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: false })
   @SaplingForm({
     order: 550,
     group: 'aiProviderModel.groupIntegration',
@@ -169,7 +169,7 @@ export class AiProviderModelItem {
   @Property({ nullable: false, default: false })
   supportsSpeech = false;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'nova' })
   @SaplingForm({
     order: 650,
     group: 'aiProviderModel.groupIntegration',
@@ -179,7 +179,7 @@ export class AiProviderModelItem {
   @Property({ length: 64, nullable: false, default: 'nova' })
   speechVoice = 'nova';
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 1 })
   @SaplingForm({
     order: 750,
     group: 'aiProviderModel.groupIntegration',
@@ -189,7 +189,7 @@ export class AiProviderModelItem {
   @Property({ nullable: false, default: 1, type: 'float' })
   speechSpeed = 1;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'audio/mpeg' })
   @SaplingForm({
     order: 850,
     group: 'aiProviderModel.groupIntegration',
@@ -199,7 +199,7 @@ export class AiProviderModelItem {
   @Property({ length: 128, nullable: false, default: 'audio/mpeg' })
   speechMimeType = 'audio/mpeg';
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'mp3' })
   @SaplingForm({
     order: 950,
     group: 'aiProviderModel.groupIntegration',
@@ -209,7 +209,7 @@ export class AiProviderModelItem {
   @Property({ length: 16, nullable: false, default: 'mp3' })
   speechFileExtension = 'mp3';
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 4000 })
   @SaplingForm({
     order: 1050,
     group: 'aiProviderModel.groupIntegration',
@@ -219,7 +219,7 @@ export class AiProviderModelItem {
   @Property({ nullable: false, default: 4000 })
   speechMaxInputLength = 4000;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 8 })
   @SaplingForm({
     order: 200,
     group: 'aiProviderModel.groupBasics',
@@ -229,7 +229,7 @@ export class AiProviderModelItem {
   @Property({ nullable: false, default: 8 })
   maxToolCallIterations = 8;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: false })
   @SaplingForm({
     order: 100,
     group: 'aiProviderModel.groupConfiguration',
@@ -239,7 +239,7 @@ export class AiProviderModelItem {
   @Property({ nullable: false, default: false })
   isDefault = false;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @SaplingForm({
     order: 200,
     group: 'aiProviderModel.groupConfiguration',
@@ -265,12 +265,12 @@ export class AiProviderModelItem {
     this,
   );
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

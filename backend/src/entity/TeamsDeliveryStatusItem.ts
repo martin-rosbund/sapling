@@ -21,7 +21,7 @@ export class TeamsDeliveryStatusItem {
   @Property({ length: 64, nullable: false })
   description!: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'mdi-microsoft-teams' })
   @Sapling(['isIcon'])
   @SaplingForm({
     order: 100,
@@ -32,7 +32,7 @@ export class TeamsDeliveryStatusItem {
   @Property({ default: 'mdi-microsoft-teams', length: 64, nullable: false })
   icon?: string = 'mdi-microsoft-teams';
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: '#4CAF50' })
   @Sapling(['isColor'])
   @SaplingForm({
     order: 200,
@@ -49,12 +49,12 @@ export class TeamsDeliveryStatusItem {
     this,
   );
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

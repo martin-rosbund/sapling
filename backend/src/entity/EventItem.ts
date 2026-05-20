@@ -124,7 +124,7 @@ export class EventItem {
    * Indicates if the event lasts all day.
    * @type {boolean}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: false })
   @SaplingForm({
     order: 300,
     group: 'event.groupSchedule',
@@ -152,7 +152,7 @@ export class EventItem {
    * URL for the online meeting (optional).
    * @type {string}
    */
-  @ApiProperty()
+  @ApiPropertyOptional()
   @Sapling(['isLink'])
   @SaplingForm({
     order: 100,
@@ -161,7 +161,7 @@ export class EventItem {
     width: 4,
   })
   @Property({ nullable: true, length: 512 })
-  onlineMeetingURL!: string;
+  onlineMeetingURL?: string;
   // #endregion
 
   // #region Properties: Relation
@@ -361,7 +361,7 @@ export class EventItem {
    * Date and time when the event was created.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
@@ -370,7 +370,7 @@ export class EventItem {
    * Date and time when the event was last updated.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

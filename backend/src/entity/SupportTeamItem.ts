@@ -47,7 +47,7 @@ export class SupportTeamItem {
   })
   icon: string = 'mdi-account-group-outline';
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: '#3949AB' })
   @Sapling(['isColor'])
   @SaplingForm({
     order: 200,
@@ -58,7 +58,7 @@ export class SupportTeamItem {
   @Property({ default: '#3949AB', length: 32, nullable: false })
   color: string = '#3949AB';
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: true })
   @SaplingForm({
     order: 100,
     group: 'supportTeam.groupConfiguration',
@@ -76,12 +76,12 @@ export class SupportTeamItem {
   @OneToMany(() => TicketItem, (ticket) => ticket.supportTeam)
   tickets: Collection<TicketItem> = new Collection<TicketItem>(this);
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

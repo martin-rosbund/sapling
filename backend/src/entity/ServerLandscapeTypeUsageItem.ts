@@ -48,7 +48,7 @@ export class ServerLandscapeTypeUsageItem {
    * Icon representing the usage type.
    * @type {string}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'mdi-console-network' })
   @Sapling(['isIcon'])
   @SaplingForm({
     order: 100,
@@ -63,7 +63,7 @@ export class ServerLandscapeTypeUsageItem {
    * Color used for displaying the usage type.
    * @type {string}
    */
-  @ApiProperty()
+  @ApiPropertyOptional({ default: '#2E7D32' })
   @Sapling(['isColor'])
   @SaplingForm({
     order: 200,
@@ -94,7 +94,7 @@ export class ServerLandscapeTypeUsageItem {
    * Date and time when the usage type was created.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
@@ -103,7 +103,7 @@ export class ServerLandscapeTypeUsageItem {
    * Date and time when the usage type was last updated.
    * @type {Date}
    */
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();

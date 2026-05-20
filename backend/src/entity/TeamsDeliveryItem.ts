@@ -94,7 +94,7 @@ export class TeamsDeliveryItem {
   @Property({ nullable: true, length: 64 })
   referenceHandle?: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 'azure' })
   @Sapling(['isChip'])
   @SaplingForm({
     order: 200,
@@ -176,7 +176,7 @@ export class TeamsDeliveryItem {
   @Property({ nullable: true, type: 'datetime' })
   completedAt?: Date;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ default: 0 })
   @SaplingForm({
     order: 400,
     group: 'teamsDelivery.groupBasics',
@@ -196,12 +196,12 @@ export class TeamsDeliveryItem {
   @Property({ nullable: true, type: 'datetime' })
   nextRetryAt?: Date;
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
-  @ApiProperty({ type: 'string', format: 'date-time' })
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
