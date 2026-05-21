@@ -258,8 +258,7 @@
   backdrop-filter: blur(var(--sapling-blur-panel));
 }
 
-:root[data-sapling-glass='off'] .sapling-profile-trigger,
-:root[data-sapling-performance='reduced'] .sapling-profile-trigger {
+:root[data-sapling-glass='off'] .sapling-profile-trigger {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }

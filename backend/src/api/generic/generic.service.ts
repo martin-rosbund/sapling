@@ -38,6 +38,9 @@ import { GENERIC_DOWNLOAD_LIMIT } from '../../constants/project.constants';
 
 type ChangeLogPayload = Record<string, unknown> | null;
 type ChangeLogAction = 'create' | 'update' | 'delete';
+type RelationMutationContext = Awaited<
+  ReturnType<GenericRelationService['addReferenceAndFlush']>
+>;
 
 const CHANGE_LOG_DETAIL_IGNORED_FIELDS = new Set(['updatedAt']);
 const OPEN_TASK_ENTITY_HANDLES = new Set([
@@ -806,6 +809,17 @@ export class GenericService {
       }
     }
 
+    const ownerUpdate = await this.triggerOwningRelationAfterUpdate(
+      entityHandle,
+      entity,
+      mutation,
+      currentUser,
+      scriptContext,
+    );
+    if (ownerUpdate?.entityHandle === entityHandle) {
+      newData = ownerUpdate.item;
+    }
+
     await this.emitReferenceOpenTaskCountChanges(
       entityHandle,
       referenceName,
@@ -878,6 +892,17 @@ export class GenericService {
       }
     }
 
+    const ownerUpdate = await this.triggerOwningRelationAfterUpdate(
+      entityHandle,
+      entity,
+      mutation,
+      currentUser,
+      scriptContext,
+    );
+    if (ownerUpdate?.entityHandle === entityHandle) {
+      newData = ownerUpdate.item;
+    }
+
     await this.emitReferenceOpenTaskCountChanges(
       entityHandle,
       referenceName,
@@ -892,6 +917,107 @@ export class GenericService {
     );
   }
   // #endregion
+
+  private async triggerOwningRelationAfterUpdate(
+    entityHandle: string,
+    entity: EntityItem | null,
+    mutation: RelationMutationContext,
+    currentUser: PersonItem,
+    scriptContext: ScriptServerContext,
+  ): Promise<{ entityHandle: string; item: Record<string, unknown> } | null> {
+    const ownerContext = await this.resolveOwningRelationUpdateContext(
+      entityHandle,
+      entity,
+      mutation,
+    );
+    if (!ownerContext?.entity) {
+      return null;
+    }
+
+    // Touch the owning record so relation-only changes also advance updatedAt.
+    ownerContext.item.updatedAt = new Date();
+    await this.em.flush();
+
+    const overwrittenData = await this.genericMutationService.applyAfterScript(
+      ScriptMethods.afterUpdate,
+      ownerContext.item,
+      ownerContext.entity,
+      currentUser,
+      {
+        ...scriptContext,
+        referenceName: ownerContext.referenceName,
+        referenceItems: ownerContext.referenceItems,
+        currentItems: [ownerContext.item],
+      },
+    );
+
+    let persistedItem = ownerContext.item;
+    if (overwrittenData !== ownerContext.item) {
+      persistedItem = (await this.genericMutationService.assignAndFlush(
+        ownerContext.entityHandle,
+        ownerContext.item,
+        overwrittenData as Record<string, unknown>,
+        ownerContext.template,
+      )) as Record<string, unknown>;
+    }
+
+    return {
+      entityHandle: ownerContext.entityHandle,
+      item: persistedItem,
+    };
+  }
+
+  private async resolveOwningRelationUpdateContext(
+    entityHandle: string,
+    entity: EntityItem | null,
+    mutation: RelationMutationContext,
+  ): Promise<{
+    entity: EntityItem | null;
+    entityHandle: string;
+    item: Record<string, unknown>;
+    referenceItems: object[];
+    referenceName: string;
+    template: EntityTemplateDto[];
+  } | null> {
+    const field = mutation.field;
+
+    if (!field.isReference) {
+      return null;
+    }
+
+    if (field.kind === '1:m' || field.kind === 'm:n') {
+      return {
+        entity,
+        entityHandle,
+        item: mutation.item,
+        referenceItems: [mutation.referenceItem],
+        referenceName: field.name,
+        template: mutation.template,
+      };
+    }
+
+    if (field.kind !== 'n:m') {
+      return null;
+    }
+
+    const ownerReferenceName = field.mappedBy ?? field.inversedBy ?? null;
+    if (!ownerReferenceName) {
+      return null;
+    }
+
+    return {
+      entity: await this.em.findOne(EntityItem, {
+        handle: mutation.referenceEntityHandle,
+      }),
+      entityHandle: mutation.referenceEntityHandle,
+      item: mutation.referenceItem as Record<string, unknown>,
+      referenceItems: [mutation.item],
+      referenceName: ownerReferenceName,
+      template: this.templateService.getEntityTemplate(
+        mutation.referenceEntityHandle,
+      ),
+    };
+  }
 
   private async emitOpenTaskCountChangesForHandle(
     entityHandle: string,

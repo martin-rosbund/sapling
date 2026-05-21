@@ -179,9 +179,7 @@ body {
 }
 
 :root[data-sapling-glass='off'] .v-sheet,
-:root[data-sapling-performance='reduced'] .v-sheet,
-:root[data-sapling-glass='off'] .glass-panel,
-:root[data-sapling-performance='reduced'] .glass-panel {
+:root[data-sapling-glass='off'] .glass-panel {
   background: rgb(var(--v-theme-surface)) !important;
   border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)) !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22) !important;
@@ -274,17 +272,11 @@ body {
 }
 
 :root[data-sapling-tilt='off'] .tilt-element,
-:root[data-sapling-performance='reduced'] .tilt-element,
 :root[data-sapling-tilt='off'] .tilt-content {
   transform: none !important;
 }
 
-:root[data-sapling-performance='reduced'] .tilt-content {
-  transform: none !important;
-}
-
-:root[data-sapling-tilt='off'] .tilt-element,
-:root[data-sapling-performance='reduced'] .tilt-element {
+:root[data-sapling-tilt='off'] .tilt-element {
   perspective: none;
 }
 
@@ -307,11 +299,8 @@ body {
 }
 
 :root[data-sapling-glass='off'] .v-navigation-drawer,
-:root[data-sapling-performance='reduced'] .v-navigation-drawer,
 :root[data-sapling-glass='off'] .v-app-bar,
-:root[data-sapling-performance='reduced'] .v-app-bar,
-:root[data-sapling-glass='off'] .sapling-navigation-drawer,
-:root[data-sapling-performance='reduced'] .sapling-navigation-drawer {
+:root[data-sapling-glass='off'] .sapling-navigation-drawer {
   background: rgb(var(--v-theme-surface)) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;

@@ -72,8 +72,7 @@
   -webkit-backdrop-filter: blur(var(--sapling-blur-soft));
 }
 
-:root[data-sapling-glass='off'] .sapling-table-toolbar,
-:root[data-sapling-performance='reduced'] .sapling-table-toolbar {
+:root[data-sapling-glass='off'] .sapling-table-toolbar {
   background: var(--sapling-surface-fill);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -259,9 +258,7 @@
 }
 
 :root[data-sapling-glass='off'] .sapling-table-row__select-cell,
-:root[data-sapling-glass='off'] .sapling-table-row__actions-cell,
-:root[data-sapling-performance='reduced'] .sapling-table-row__select-cell,
-:root[data-sapling-performance='reduced'] .sapling-table-row__actions-cell {
+:root[data-sapling-glass='off'] .sapling-table-row__actions-cell {
   background: rgb(var(--v-theme-surface));
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -293,8 +290,7 @@
   -webkit-backdrop-filter: blur(var(--sapling-blur-strong));
 }
 
-:root[data-sapling-glass='off'] .sapling-table thead th,
-:root[data-sapling-performance='reduced'] .sapling-table thead th {
+:root[data-sapling-glass='off'] .sapling-table thead th {
   background: rgb(var(--v-theme-surface));
   backdrop-filter: none;
   -webkit-backdrop-filter: none;

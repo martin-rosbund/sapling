@@ -83,14 +83,14 @@ function detectPerformanceMode(): SaplingPerformanceMode {
     return 'reduced'
   }
 
-  if (typeof deviceMemory === 'number' && deviceMemory > 0 && deviceMemory <= 4) {
+  if (typeof deviceMemory === 'number' && deviceMemory > 0 && deviceMemory <= 2) {
     return 'reduced'
   }
 
   if (
     typeof hardwareConcurrency === 'number' &&
     hardwareConcurrency > 0 &&
-    hardwareConcurrency <= 4
+    hardwareConcurrency <= 2
   ) {
     return 'reduced'
   }

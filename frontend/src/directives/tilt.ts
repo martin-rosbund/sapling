@@ -21,8 +21,11 @@ function resetTiltStyles(el: HTMLElement) {
 }
 
 function isTiltEnabled() {
-  const root = document.documentElement.dataset
-  return root.saplingTilt !== 'off' && root.saplingPerformance !== 'reduced'
+  return document.documentElement.dataset.saplingTilt !== 'off'
+}
+
+function isReducedPerformance() {
+  return document.documentElement.dataset.saplingPerformance === 'reduced'
 }
 
 function shouldEnable(value: TiltBindingValue): boolean {
@@ -53,23 +56,25 @@ function attachTilt(el: TiltElement, value: TiltBindingValue) {
     const rect = el.getBoundingClientRect()
     const x = event.clientX - rect.left
     const y = event.clientY - rect.top
+    const performanceFactor = isReducedPerformance() ? 0.55 : 1
 
     const centerX = rect.width / 2
     const centerY = rect.height / 2
 
-    const rotateX = ((y - centerY) / centerY) * -settings.max
-    const rotateY = ((x - centerX) / centerX) * settings.max
+    const rotateX = ((y - centerY) / centerY) * -(settings.max * performanceFactor)
+    const rotateY = ((x - centerX) / centerX) * (settings.max * performanceFactor)
+    const scale = 1 + (settings.scale - 1) * performanceFactor
 
     el.style.transform = `
             perspective(${settings.perspective}px)
             rotateX(${rotateX}deg)
             rotateY(${rotateY}deg)
-            scale(${settings.scale})
+            scale(${scale})
         `
 
     el.style.boxShadow = `
-            ${-rotateY}px ${rotateX}px 20px rgba(255,255,255,0.1),
-            0 8px 32px 0 rgba(0, 0, 0, 0.37)
+            ${-rotateY}px ${rotateX}px ${isReducedPerformance() ? 14 : 20}px rgba(255,255,255,0.1),
+            0 8px ${isReducedPerformance() ? 22 : 32}px 0 rgba(0, 0, 0, 0.37)
         `
   }
 

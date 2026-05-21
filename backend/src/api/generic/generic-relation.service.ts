@@ -69,8 +69,12 @@ export class GenericRelationService {
     referenceHandleValue: string | number,
     currentUser: PersonItem,
   ): Promise<{
+    field: NonNullable<
+      ReturnType<TemplateService['getEntityTemplate']>[number]
+    >;
     item: Record<string, unknown>;
     referenceItem: object;
+    referenceEntityHandle: string;
     template: ReturnType<TemplateService['getEntityTemplate']>;
   }> {
     const context = await this.resolveReferenceContext(
@@ -91,8 +95,10 @@ export class GenericRelationService {
     await this.em.flush();
 
     return {
+      field: context.field,
       item: context.item,
       referenceItem: context.referenceItem,
+      referenceEntityHandle: context.referenceEntityHandle,
       template: context.template,
     };
   }
@@ -104,8 +110,12 @@ export class GenericRelationService {
     referenceHandleValue: string | number,
     currentUser: PersonItem,
   ): Promise<{
+    field: NonNullable<
+      ReturnType<TemplateService['getEntityTemplate']>[number]
+    >;
     item: Record<string, unknown>;
     referenceItem: object;
+    referenceEntityHandle: string;
     template: ReturnType<TemplateService['getEntityTemplate']>;
   }> {
     const context = await this.resolveReferenceContext(
@@ -126,8 +136,10 @@ export class GenericRelationService {
     await this.em.flush();
 
     return {
+      field: context.field,
       item: context.item,
       referenceItem: context.referenceItem,
+      referenceEntityHandle: context.referenceEntityHandle,
       template: context.template,
     };
   }
@@ -139,6 +151,9 @@ export class GenericRelationService {
     referenceHandleValue: string | number,
     currentUser: PersonItem,
   ): Promise<{
+    field: NonNullable<
+      ReturnType<TemplateService['getEntityTemplate']>[number]
+    >;
     item: Record<string, unknown>;
     relation: {
       init: (options: {
@@ -205,6 +220,7 @@ export class GenericRelationService {
     );
 
     return {
+      field,
       item: item,
       relation,
       referenceEntityHandle,
