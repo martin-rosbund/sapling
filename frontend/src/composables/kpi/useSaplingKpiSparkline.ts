@@ -9,8 +9,9 @@ import type {
 import { computed, ref, toValue, type MaybeRefOrGetter } from 'vue'
 import { useSaplingKpiLoader } from '@/composables/kpi/useSaplingKpiLoader'
 import { normalizeKpiNumericValue } from '@/utils/saplingKpiValue'
-import { navigateToKpiDrilldown } from '@/utils/saplingKpiNavigation'
+import { buildKpiDrilldownPath } from '@/utils/saplingKpiNavigation'
 import { useRouter } from 'vue-router'
+import { pushAppRoute } from '@/utils/routerNavigation'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -150,16 +151,19 @@ export function useSaplingKpiSparkline(kpi: MaybeRefOrGetter<KPIItem | null | un
   })
   const visibleDrilldownItems = computed(() => drilldownItems.value.slice(-6))
 
-  function openDrilldown(index: number) {
+  async function openDrilldown(index: number) {
     const entry = drilldownItems.value[index]?.entry
 
     if (!entry) {
       return
     }
 
-    navigateToKpiDrilldown(toValue(kpi) ?? null, drilldown.value, entry, (path) => {
-      void router.push(path)
-    })
+    const path = buildKpiDrilldownPath(toValue(kpi) ?? null, drilldown.value, entry)
+    if (!path) {
+      return
+    }
+
+    await pushAppRoute(router, path)
   }
   //#endregion
 

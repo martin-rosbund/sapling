@@ -99,6 +99,7 @@
               :now-y="nowY"
               :get-events="getEvents"
               :open-event="openEventEditor"
+              :open-context-menu="openEventContextMenu"
               :start-drag="startDrag"
               :start-time="startTime"
               :cancel-drag="cancelDrag"
@@ -158,6 +159,43 @@
     @save="onEditDialogSave"
     @cancel="onEditDialogCancel"
   />
+
+  <v-menu
+    v-model="eventContextMenu.visible"
+    :style="eventContextMenuStyle"
+    absolute
+    content-class="sapling-context-menu__content"
+    transition="slide-y-transition"
+  >
+    <SaplingRecordActionMenuList
+      class="glass-panel"
+      density="compact"
+      elevation="8"
+      min-width="200"
+      :menu-items="eventContextMenuItems"
+      :show-edit="false"
+      @select="handleEventContextMenuAction"
+      @close="closeEventContextMenu"
+    />
+  </v-menu>
+
+  <SaplingTableRowUpload
+    v-if="showUploadDialog"
+    :show="showUploadDialog"
+    :item="uploadDialogItem"
+    entityHandle="event"
+    @close="closeUploadDialog"
+    @uploaded="closeUploadDialog"
+  />
+
+  <SaplingTableRowInformation
+    v-if="showInformationDialog"
+    :show="showInformationDialog"
+    :item="informationDialogItem"
+    entityHandle="event"
+    @close="closeInformationDialog"
+    @saved="closeInformationDialog"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -170,6 +208,9 @@ import SaplingEventCalendarWorkspace from '@/components/event/SaplingEventCalend
 import SaplingEventContextPanels from '@/components/event/SaplingEventContextPanels.vue'
 import SaplingEventToolbar from '@/components/event/SaplingEventToolbar.vue'
 import SaplingWorkFilterPanel from '@/components/filter/SaplingWorkFilterPanel.vue'
+import SaplingRecordActionMenuList from '@/components/common/SaplingRecordActionMenuList.vue'
+import SaplingTableRowInformation from '@/components/table/SaplingTableRowInformation.vue'
+import SaplingTableRowUpload from '@/components/table/SaplingTableRowUpload.vue'
 import SaplingDialogEdit from '../dialog/SaplingDialogEdit.vue'
 import { SAPLING_DIALOG_MAX_WIDTH } from '@/constants/dialog.constants'
 
@@ -208,6 +249,9 @@ const {
   calendarViewMode,
   calendarWeekdays,
   currentMonthLabel,
+  eventContextMenu,
+  eventContextMenuItems,
+  eventContextMenuStyle,
   entityEvent,
   events,
   getEventColor,
@@ -222,6 +266,8 @@ const {
   isLoading,
   isNarrowScreen,
   nowY,
+  openEventContextMenu,
+  handleEventContextMenuAction,
   onEditDialogCancel,
   onEditDialogItemUpdate,
   onEditDialogModeUpdate,
@@ -231,8 +277,13 @@ const {
   selectedPeoples,
   selectedPeopleOverflowCount,
   selectedPeoplePreview,
+  closeEventContextMenu,
+  closeInformationDialog,
+  closeUploadDialog,
   showEditDialog,
+  showInformationDialog,
   showWorkHourBackground,
+  showUploadDialog,
   sideBySideGridStyle,
   startDrag,
   startTime,
@@ -241,7 +292,9 @@ const {
   endDrag,
   cancelDrag,
   heroStats,
+  informationDialogItem,
   templates,
+  uploadDialogItem,
   editEvent,
   upcomingEvents,
   value,

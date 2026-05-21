@@ -14,6 +14,7 @@
       :now-y="nowY"
       :get-events="getEvents"
       :open-event="openEvent"
+      :open-context-menu="openContextMenu"
       :start-drag="startDrag"
       :start-time="startTime"
       :cancel-drag="cancelDrag"
@@ -49,6 +50,7 @@
               :now-y="nowY"
               :get-events="getEvents"
               :open-event="openEvent"
+              :open-context-menu="openContextMenu"
               :start-drag="startDrag"
               :start-time="startTime"
               :cancel-drag="cancelDrag"
@@ -102,6 +104,7 @@ const props = defineProps<{
   nowY: () => string
   getEvents: (value: CalendarDatePair) => void | Promise<void>
   openEvent: (event: CalendarEvent) => void
+  openContextMenu: (nativeEvent: MouseEvent, event: CalendarEvent) => void
   startDrag: (nativeEvent: Event, payload: { event: CalendarEvent; timed: boolean }) => void
   startTime: (nativeEvent: Event, timeSlot: CalendarDateItem) => void
   cancelDrag: () => void

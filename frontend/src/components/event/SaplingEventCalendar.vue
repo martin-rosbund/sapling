@@ -10,11 +10,11 @@
     :type="props.calendarDisplayType"
     :weekdays="props.calendarWeekdays"
     @change="props.getEvents"
-    @mousedown:event="props.startDrag"
-    @mousedown:time="props.startTime"
+    @mousedown:event="onEventMouseDown"
+    @mousedown:time="onTimeMouseDown"
     @mouseleave="props.cancelDrag"
-    @mousemove:time="props.mouseMove"
-    @mouseup:time="props.endDrag"
+    @mousemove:time="onTimeMouseMove"
+    @mouseup:time="onTimeMouseUp"
   >
     <template v-slot:day-body="{ date, week }">
       <div
@@ -36,7 +36,8 @@
         :style="getEventCardStyle(event)"
         :role="isInteractiveEvent(event) ? 'button' : undefined"
         :tabindex="isInteractiveEvent(event) ? 0 : undefined"
-        @click.stop="onEventActivate(event)"
+        @click.left.stop="onEventActivate(event)"
+        @contextmenu.stop="onEventContextMenu($event, event)"
         @keydown.enter.stop.prevent="onEventActivate(event)"
         @keydown.space.stop.prevent="onEventActivate(event)"
       >
@@ -78,7 +79,7 @@
           v-if="props.showResizeHandle && isInteractiveEvent(event)"
           class="sapling-calendar-event-card__resize v-event-drag-bottom"
           type="button"
-          @mousedown.stop="props.extendBottom(event)"
+          @mousedown.left.stop="props.extendBottom(event)"
         >
           <v-icon :size="getResizeHandleIconSize(event)">mdi-resize-bottom-right</v-icon>
         </button>
@@ -129,6 +130,7 @@ const props = withDefaults(
     nowY: () => string
     getEvents: (value: CalendarDatePair) => void | Promise<void>
     openEvent: (event: CalendarEvent) => void
+    openContextMenu: (nativeEvent: MouseEvent, event: CalendarEvent) => void
     startDrag: (nativeEvent: Event, payload: { event: CalendarEvent; timed: boolean }) => void
     startTime: (nativeEvent: Event, timeSlot: CalendarDateItem) => void
     cancelDrag: () => void
@@ -259,6 +261,54 @@ function onEventActivate(event: CalendarEvent) {
   }
 
   props.openEvent(event)
+}
+
+function onEventContextMenu(nativeEvent: MouseEvent, event: CalendarEvent) {
+  if (!isInteractiveEvent(event)) {
+    return
+  }
+
+  nativeEvent.preventDefault()
+  props.openContextMenu(nativeEvent, event)
+}
+
+function isPrimaryMouseButton(event: Event) {
+  return !(event instanceof MouseEvent) || event.button === 0
+}
+
+function onEventMouseDown(
+  nativeEvent: Event,
+  payload: { event: CalendarEvent; timed: boolean },
+) {
+  if (!isPrimaryMouseButton(nativeEvent)) {
+    return
+  }
+
+  props.startDrag(nativeEvent, payload)
+}
+
+function onTimeMouseDown(nativeEvent: Event, timeSlot: CalendarDateItem) {
+  if (!isPrimaryMouseButton(nativeEvent)) {
+    return
+  }
+
+  props.startTime(nativeEvent, timeSlot)
+}
+
+function onTimeMouseMove(nativeEvent: Event, timeSlot: CalendarDateItem) {
+  if (nativeEvent instanceof MouseEvent && (nativeEvent.buttons & 1) !== 1) {
+    return
+  }
+
+  props.mouseMove(nativeEvent, timeSlot)
+}
+
+function onTimeMouseUp(nativeEvent: Event) {
+  if (!isPrimaryMouseButton(nativeEvent)) {
+    return
+  }
+
+  props.endDrag()
 }
 
 function isRecurringOccurrence(event: CalendarEvent) {

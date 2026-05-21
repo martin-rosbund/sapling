@@ -13,6 +13,7 @@ import { useGenericStore } from '@/stores/genericStore'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import { buildFavoritePath } from '@/utils/saplingFavoriteNavigation'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
+import { pushAppRoute } from '@/utils/routerNavigation'
 
 const FAVORITE_ENTITY_HANDLE = 'favorite'
 const FAVORITE_TEMPLATE_ENTITY_HANDLE = 'favoriteTemplate'
@@ -281,35 +282,35 @@ export function useSaplingFavorites() {
     favorites.value.splice(favoriteIndex, 1)
   }
 
-  function navigateToFavoriteTarget(target: FavoriteItem | FavoriteTemplateItem) {
+  async function navigateToFavoriteTarget(target: FavoriteItem | FavoriteTemplateItem) {
     const path = buildFavoritePath(target, entities.value)
     if (!path) {
-      return
+      return false
     }
 
-    router.push(path)
+    return pushAppRoute(router, path)
   }
 
   /**
    * Navigates to the table route behind a stored favorite, including an optional serialized filter.
    */
-  function goToFavorite(favorite: FavoriteItem) {
+  async function goToFavorite(favorite: FavoriteItem) {
     if (!hasFavoritesAccess.value) {
-      return
+      return false
     }
 
-    navigateToFavoriteTarget(favorite)
+    return navigateToFavoriteTarget(favorite)
   }
 
   /**
    * Navigates directly to a saved template without creating a personal favorite first.
    */
-  function goToFavoriteTemplate(template: FavoriteTemplateItem) {
+  async function goToFavoriteTemplate(template: FavoriteTemplateItem) {
     if (!hasFavoriteTemplateAccess.value) {
-      return
+      return false
     }
 
-    navigateToFavoriteTarget(template)
+    return navigateToFavoriteTarget(template)
   }
   // #endregion
 

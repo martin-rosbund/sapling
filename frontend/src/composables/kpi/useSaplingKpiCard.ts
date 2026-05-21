@@ -1,6 +1,7 @@
 import type { SaplingKpiCardProps } from '@/components/kpi/SaplingKpiCard.vue'
 import type { KPIItem } from '@/entity/entity'
-import { getKpiTargetEntityHandle, navigateToKpiEntity } from '@/utils/saplingKpiNavigation'
+import { buildKpiEntityPath, getKpiTargetEntityHandle } from '@/utils/saplingKpiNavigation'
+import { pushAppRoute } from '@/utils/routerNavigation'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { computed, ref, type ComponentPublicInstance } from 'vue'
@@ -143,10 +144,13 @@ export function useSaplingKpiCard(props: SaplingKpiCardProps) {
   /**
    * Navigates to the configured target entity of the KPI.
    */
-  function openEntity() {
-    navigateToKpiEntity(props.kpi, undefined, (path) => {
-      void router.push(path)
-    })
+  async function openEntity() {
+    const path = buildKpiEntityPath(props.kpi)
+    if (!path) {
+      return
+    }
+
+    await pushAppRoute(router, path)
   }
   //#endregion
 

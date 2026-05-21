@@ -207,9 +207,11 @@ async function confirmFavoriteDelete() {
   cancelFavoriteDelete()
 }
 
-function openFavorite(favorite: FavoriteItem) {
-  void goToFavorite(favorite)
-  emit('navigate')
+async function openFavorite(favorite: FavoriteItem) {
+  const navigated = await goToFavorite(favorite)
+  if (navigated) {
+    emit('navigate')
+  }
 }
 // #endregion
 </script>

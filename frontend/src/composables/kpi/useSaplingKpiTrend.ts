@@ -9,9 +9,10 @@ import type {
 import { computed, ref, toValue, type MaybeRefOrGetter } from 'vue'
 import { useSaplingKpiLoader } from '@/composables/kpi/useSaplingKpiLoader'
 import { normalizeKpiNumericValue } from '@/utils/saplingKpiValue'
-import { navigateToKpiDrilldown } from '@/utils/saplingKpiNavigation'
+import { buildKpiDrilldownPath } from '@/utils/saplingKpiNavigation'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import { pushAppRoute } from '@/utils/routerNavigation'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -194,26 +195,30 @@ export function useSaplingKpiTrend(kpi: MaybeRefOrGetter<KPIItem | null | undefi
     return t('kpi.trendMomentumStable')
   })
 
-  function openCurrentDrilldown() {
-    navigateToKpiDrilldown(
+  async function openCurrentDrilldown() {
+    const path = buildKpiDrilldownPath(
       toValue(kpi) ?? null,
       drilldown.value,
       currentDrilldown.value,
-      (path) => {
-        void router.push(path)
-      },
     )
+    if (!path) {
+      return
+    }
+
+    await pushAppRoute(router, path)
   }
 
-  function openPreviousDrilldown() {
-    navigateToKpiDrilldown(
+  async function openPreviousDrilldown() {
+    const path = buildKpiDrilldownPath(
       toValue(kpi) ?? null,
       drilldown.value,
       previousDrilldown.value,
-      (path) => {
-        void router.push(path)
-      },
     )
+    if (!path) {
+      return
+    }
+
+    await pushAppRoute(router, path)
   }
   //#endregion
 

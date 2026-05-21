@@ -9,24 +9,39 @@ import type {
   HolidayItem,
   PersonItem,
   SaplingGenericItem,
+  ScriptButtonItem,
   WorkHourItem,
   WorkHourWeekItem,
 } from '@/entity/entity'
 import type {
+  AccumulatedPermission,
   DialogSaveAction,
   DialogSaveContext,
   DialogState,
   EntityTemplate,
 } from '@/entity/structure'
+import { DEFAULT_ENTITY_ITEMS_COUNT, NAVIGATION_URL } from '@/constants/project.constants'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import ApiService from '@/services/api.service'
+import ApiScriptService from '@/services/api.script.service'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
+import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
+import { useTimelineDialogStore } from '@/stores/timelineDialogStore'
+import { useChangeLogDialogStore } from '@/stores/changeLogDialogStore'
 import { useSaplingFilterWork } from '@/composables/filter/useSaplingFilterWork'
+import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog'
+import {
+  getSaplingContextMenuTableItems,
+  type SaplingContextMenuTableMenuEntry,
+  type SaplingContextMenuTableMenuItem,
+} from '@/composables/context/useSaplingContextMenuTable'
 import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs'
 import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher'
 import { i18n } from '@/i18n'
 import { formatDateFromTo, formatDateValue, formatTimeValue } from '@/utils/saplingFormatUtil'
 import { expandRecurringEvent, isRecurringCalendarEvent } from '@/utils/eventRecurrence'
+import { buildMailMenuActions } from '@/utils/saplingMailMenuUtil'
+import { buildTableOrderBy } from '@/utils/saplingTableUtil'
 
 interface CalendarDatePair {
   start: CalendarDateItem
@@ -53,6 +68,13 @@ interface EventHeroStat {
   label: string
   value: string
   icon: string
+}
+
+interface EventContextMenuState {
+  visible: boolean
+  item: EventItem | null
+  x: number
+  y: number
 }
 
 export interface EventAgendaItem {
@@ -138,6 +160,10 @@ export function useSaplingEvent() {
     'holiday',
   )
   const currentPersonStore = useCurrentPersonStore()
+  const currentPermissionStore = useCurrentPermissionStore()
+  const timelineDialogStore = useTimelineDialogStore()
+  const changeLogDialogStore = useChangeLogDialogStore()
+  const { openMailDialog } = useSaplingMailDialog()
   const windowWatcher = new SaplingWindowWatcher()
   const { peopleMap } = useSaplingFilterWork()
 
@@ -185,9 +211,21 @@ export function useSaplingEvent() {
   const value = ref(formatLocalDate(new Date()))
   const calendarScrollContainer = ref<CalendarScrollContainerRef>(null)
   const workHours = ref<WorkHourWeekItem | null>(null)
+  const eventContextMenu = ref<EventContextMenuState>({
+    visible: false,
+    item: null,
+    x: 0,
+    y: 0,
+  })
+  const showUploadDialog = ref(false)
+  const uploadDialogItem = ref<SaplingGenericItem | null>(null)
+  const showInformationDialog = ref(false)
+  const informationDialogItem = ref<SaplingGenericItem | null>(null)
+  const loadedScriptButtons = ref<ScriptButtonItem[]>([])
 
   let stopWindowWatcher: (() => void) | null = null
   let scrollTimeoutId: number | null = null
+  let scriptButtonsRequestId = 0
 
   const calendarDisplayType = computed(() =>
     calendarType.value === 'workweek' ? 'week' : calendarType.value,
@@ -198,6 +236,59 @@ export function useSaplingEvent() {
   const showWorkHourBackground = computed(() =>
     ['day', 'week', 'workweek'].includes(calendarType.value),
   )
+  const eventEntityPermission = computed<AccumulatedPermission | null>(() => {
+    if (!entityEvent.value?.handle) {
+      return null
+    }
+
+    return {
+      entityHandle: entityEvent.value.handle,
+      allowRead: entityEvent.value.canRead === true,
+      allowInsert: entityEvent.value.canInsert === true,
+      allowUpdate: entityEvent.value.canUpdate === true,
+      allowDelete: entityEvent.value.canDelete === true,
+      allowShow: entityEvent.value.canShow === true,
+    }
+  })
+  const canNavigate = computed(() =>
+    templates.value.some((template) => template.options?.includes('isNavigation')),
+  )
+  const canShowInformation = computed(
+    () =>
+      currentPermissionStore.accumulatedPermission?.some(
+        (permission) => permission.entityHandle === 'information' && permission.allowRead,
+      ) ?? false,
+  )
+  const eventContextMenuStyle = computed<CSSProperties>(() => ({
+    top: `${eventContextMenu.value.y}px`,
+    left: `${eventContextMenu.value.x}px`,
+  }))
+  const eventContextMenuMailActions = computed(() =>
+    buildMailMenuActions(templates.value, eventContextMenu.value.item),
+  )
+  const eventContextMenuItems = computed<SaplingContextMenuTableMenuEntry[]>(() => {
+    if (!eventContextMenu.value.item) {
+      return []
+    }
+
+    return getSaplingContextMenuTableItems({
+      canChangeLog: true,
+      canShowInformation: canShowInformation.value,
+      entityPermission: eventEntityPermission.value,
+      canNavigate: canNavigate.value,
+      canTimeline: true,
+      scriptButtons: loadedScriptButtons.value,
+      mailActions: eventContextMenuMailActions.value,
+      mailToLabel: i18n.global.t('global.mailTo'),
+      showEdit: false,
+    })
+      .map((group) =>
+        (Array.isArray(group) ? group : [group]).filter(
+          (menuItem) => !['edit', 'show', 'delete'].includes(menuItem.type),
+        ),
+      )
+      .filter((group) => group.length > 0)
+  })
   const currentCalendarViewLabel = computed(() => i18n.global.t(`calendar.${calendarType.value}`))
   const currentCalendarLayoutLabel = computed(() =>
     i18n.global.t(
@@ -366,8 +457,10 @@ export function useSaplingEvent() {
   onMounted(async () => {
     await Promise.all([
       loadTranslations(),
+      currentPermissionStore.fetchCurrentPermission(),
       loadOwnPerson(),
       loadEventEntity(),
+      loadEventScriptButtons(),
       loadTemplates(),
       loadWorkHours(),
     ])
@@ -438,6 +531,25 @@ export function useSaplingEvent() {
           page: 1,
         })
       ).data[0] || null
+  }
+
+  /**
+   * Loads script buttons for the event entity so the calendar context menu can mirror dialog actions.
+   */
+  async function loadEventScriptButtons() {
+    const currentRequestId = ++scriptButtonsRequestId
+    const result = await ApiGenericService.find<ScriptButtonItem>('scriptButton', {
+      filter: { entity: { handle: 'event' } },
+      orderBy: buildTableOrderBy([{ key: 'title', order: 'asc' }]),
+      limit: DEFAULT_ENTITY_ITEMS_COUNT,
+      relations: ['m:1'],
+    })
+
+    if (currentRequestId !== scriptButtonsRequestId) {
+      return
+    }
+
+    loadedScriptButtons.value = result.data
   }
 
   /**
@@ -1139,6 +1251,188 @@ export function useSaplingEvent() {
     editEvent.value = item ? toCalendarEvent(item as EventItem) : null
   }
 
+  function closeEventContextMenu() {
+    eventContextMenu.value.visible = false
+  }
+
+  function openEventContextMenu(mouseEvent: MouseEvent, calendarEvent: CalendarEvent) {
+    const targetItem = toPersistedEventItem(calendarEvent)
+    if (!targetItem) {
+      return
+    }
+
+    eventContextMenu.value.visible = false
+    eventContextMenu.value.item = targetItem
+    eventContextMenu.value.x = mouseEvent.clientX
+    eventContextMenu.value.y = mouseEvent.clientY
+
+    void nextTick(() => {
+      eventContextMenu.value.visible = true
+    })
+  }
+
+  function closeUploadDialog() {
+    showUploadDialog.value = false
+    uploadDialogItem.value = null
+  }
+
+  function closeInformationDialog() {
+    showInformationDialog.value = false
+    informationDialogItem.value = null
+  }
+
+  function openCopyDialogFromContextMenu() {
+    const item = eventContextMenu.value.item
+    if (!item) {
+      return
+    }
+
+    const copiedItem = { ...item } as Record<string, unknown>
+    templates.value
+      .filter((template) => template.name === 'handle' || template.isUnique)
+      .forEach((template) => {
+        delete copiedItem[template.name]
+      })
+
+    editEvent.value = toCalendarEvent(copiedItem as EventItem)
+    applyCalendarEventDateParts(editEvent.value)
+    forceEditDialogDirtyFields.value = []
+    dragSnapshot.value = null
+    showEditDialog.value = true
+  }
+
+  function openTimelineFromContextMenu() {
+    const itemHandle = eventContextMenu.value.item?.handle
+    if (itemHandle == null) {
+      return
+    }
+
+    timelineDialogStore.openTimeline('event', itemHandle)
+  }
+
+  function openChangeLogFromContextMenu() {
+    const itemHandle = eventContextMenu.value.item?.handle
+    if (itemHandle == null) {
+      return
+    }
+
+    changeLogDialogStore.openChangeLog('event', itemHandle)
+  }
+
+  function navigateToAddressFromContextMenu() {
+    const item = eventContextMenu.value.item
+    if (!item || !canNavigate.value) {
+      return
+    }
+
+    const address = templates.value
+      .filter((template) => template.options?.includes('isNavigation'))
+      .map((template) => item[template.name || ''])
+      .filter(Boolean)
+      .join(' ')
+
+    if (!address) {
+      return
+    }
+
+    window.open(`${NAVIGATION_URL}${encodeURIComponent(address)}`, '_blank')
+  }
+
+  function openUploadDialogFromContextMenu() {
+    if (!eventContextMenu.value.item || eventEntityPermission.value?.allowInsert !== true) {
+      return
+    }
+
+    uploadDialogItem.value = eventContextMenu.value.item
+    showUploadDialog.value = true
+  }
+
+  function navigateToDocumentsFromContextMenu() {
+    const itemHandle = eventContextMenu.value.item?.handle
+    if (itemHandle == null) {
+      return
+    }
+
+    window.open(`/file/document?filter={"reference":"${String(itemHandle)}","entity":"event"}`, '_blank')
+  }
+
+  function openInformationDialogFromContextMenu() {
+    if (!eventContextMenu.value.item || !canShowInformation.value) {
+      return
+    }
+
+    informationDialogItem.value = eventContextMenu.value.item
+    showInformationDialog.value = true
+  }
+
+  async function runScriptButtonFromContextMenu(scriptButton: ScriptButtonItem) {
+    if (!entityEvent.value || !eventContextMenu.value.item) {
+      return
+    }
+
+    await currentPersonStore.fetchCurrentPerson()
+    if (!currentPersonStore.person) {
+      return
+    }
+
+    const result = await ApiScriptService.runClient(
+      [eventContextMenu.value.item],
+      entityEvent.value,
+      currentPersonStore.person,
+      scriptButton.name,
+      scriptButton.parameter,
+    )
+
+    if (result.isSuccess !== false) {
+      await refreshVisibleEvents()
+    }
+  }
+
+  async function handleEventContextMenuAction(menuItem: SaplingContextMenuTableMenuItem) {
+    closeEventContextMenu()
+
+    switch (menuItem.type) {
+      case 'copy':
+        openCopyDialogFromContextMenu()
+        break
+      case 'changeLog':
+        openChangeLogFromContextMenu()
+        break
+      case 'timeline':
+        openTimelineFromContextMenu()
+        break
+      case 'navigate':
+        navigateToAddressFromContextMenu()
+        break
+      case 'uploadDocument':
+        openUploadDialogFromContextMenu()
+        break
+      case 'showDocuments':
+        navigateToDocumentsFromContextMenu()
+        break
+      case 'showInformation':
+        openInformationDialogFromContextMenu()
+        break
+      case 'mail':
+        if (menuItem.mailAction?.email) {
+          openMailDialog({
+            entityHandle: entityEvent.value?.handle ?? 'event',
+            itemHandle: eventContextMenu.value.item?.handle ?? undefined,
+            draftValues: eventContextMenu.value.item ?? undefined,
+            initialTo: [menuItem.mailAction.email],
+          })
+        }
+        break
+      case 'script':
+        if (menuItem.scriptButton) {
+          await runScriptButtonFromContextMenu(menuItem.scriptButton)
+        }
+        break
+      default:
+        break
+    }
+  }
+
   /**
    * Returns only the events that belong to the requested person.
    */
@@ -1220,6 +1514,18 @@ export function useSaplingEvent() {
    */
   function isReadonlyCalendarEvent(event: CalendarEvent | null | undefined): boolean {
     return (event as SaplingCalendarEvent | null | undefined)?.saplingSource === 'holiday'
+  }
+
+  /**
+   * Resolves the persisted event record behind a calendar entry for context menu actions.
+   */
+  function toPersistedEventItem(event: CalendarEvent | null | undefined): EventItem | null {
+    if (!event || isReadonlyCalendarEvent(event)) {
+      return null
+    }
+
+    const item = event.event as EventItem | undefined
+    return item?.handle == null ? null : item
   }
 
   /**
@@ -1751,9 +2057,16 @@ export function useSaplingEvent() {
     currentDateRangeLabel,
     currentCalendarViewLabel,
     currentMonthLabel,
+    eventContextMenu,
+    eventContextMenuItems,
+    eventContextMenuStyle,
     editEvent,
     entityEvent,
     events,
+    eventContextMenuMailActions,
+    eventEntityPermission,
+    canNavigate,
+    canShowInformation,
     getEventColor,
     getEvents,
     getEventsForPerson,
@@ -1767,7 +2080,9 @@ export function useSaplingEvent() {
     isLoading,
     isNarrowScreen,
     nowY,
+    openEventContextMenu,
     onEditDialogCancel,
+    handleEventContextMenuAction,
     onEditDialogItemUpdate,
     onEditDialogModeUpdate,
     onEditDialogSave,
@@ -1777,8 +2092,13 @@ export function useSaplingEvent() {
     selectedPeoples,
     selectedPeopleOverflowCount,
     selectedPeoplePreview,
+    closeEventContextMenu,
+    closeInformationDialog,
+    closeUploadDialog,
     showEditDialog,
+    showInformationDialog,
     showWorkHourBackground,
+    showUploadDialog,
     sideBySideGridStyle,
     startDrag,
     startTime,
@@ -1789,6 +2109,8 @@ export function useSaplingEvent() {
     heroStats,
     templates,
     todayEventsCount,
+    informationDialogItem,
+    uploadDialogItem,
     upcomingEvents,
     value,
     workHours,

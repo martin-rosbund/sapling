@@ -7,6 +7,7 @@ import { useTranslationLoader } from '@/composables/generic/useTranslationLoader
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { canAccessEntityWorkspace } from '@/utils/entityAccess'
+import { pushAppRoute } from '@/utils/routerNavigation'
 
 interface SaplingNavigationProps {
   modelValue: boolean
@@ -324,8 +325,10 @@ export function useSaplingNavigation(props: SaplingNavigationProps, emit: Saplin
       return
     }
 
-    await router.push(`/${route.route}`)
-    drawer.value = false
+    const navigated = await pushAppRoute(router, `/${route.route}`)
+    if (navigated) {
+      drawer.value = false
+    }
   }
 
   function onDrawerUpdate(value: boolean) {

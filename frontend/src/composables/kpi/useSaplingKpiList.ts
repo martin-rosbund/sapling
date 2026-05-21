@@ -1,10 +1,11 @@
 import type { KPIItem } from '@/entity/entity'
-import { getKpiTargetEntityHandle, navigateToKpiEntity } from '@/utils/saplingKpiNavigation'
+import { buildKpiEntityPath, getKpiTargetEntityHandle } from '@/utils/saplingKpiNavigation'
 import { computed, ref, toValue, type MaybeRefOrGetter } from 'vue'
 import ApiService from '@/services/api.service'
 import type { KpiResponse } from '@/entity/structure'
 import { useSaplingKpiLoader } from '@/composables/kpi/useSaplingKpiLoader'
 import { useRouter } from 'vue-router'
+import { pushAppRoute } from '@/utils/routerNavigation'
 
 function isKpiListRow(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -43,10 +44,13 @@ export function useSaplingKpiList(kpi: MaybeRefOrGetter<KPIItem | null | undefin
     reset: resetRows,
   })
 
-  function openEntity(row: Record<string, unknown>) {
-    navigateToKpiEntity(toValue(kpi) ?? null, row, (path) => {
-      void router.push(path)
-    })
+  async function openEntity(row: Record<string, unknown>) {
+    const path = buildKpiEntityPath(toValue(kpi) ?? null, row)
+    if (!path) {
+      return
+    }
+
+    await pushAppRoute(router, path)
   }
   //#endregion
 
