@@ -1,3 +1,7 @@
+.sapling-field-select__activator {
+  width: 100%;
+}
+
 .sapling-field-select__chip,
 .sapling-field-single-select__chip {
   margin: 0;

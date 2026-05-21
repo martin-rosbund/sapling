@@ -3,34 +3,35 @@
     v-model="menuOpen"
     max-width="600px"
     :close-on-content-click="false"
+    :open-on-click="false"
     scroll-strategy="block"
   >
     <template #activator="{ props: activatorProps }">
-      <v-select
-        :disabled="props.disabled"
-        v-bind="activatorProps"
-        :label="props.label"
-        :items="items.map((item) => getEntityValueLabel(item, entityTemplates))"
-        :rules="props.rules"
-        :model-value="selectedItem ? getEntityValueLabel(selectedItem, entityTemplates) : null"
-        readonly
-        @click:append-inner="menuOpen = !menuOpen"
-        hide-details="auto"
-        autocomplete="off"
-      >
-        <template #selection="{}">
-          <v-chip
-            class="sapling-field-single-select__chip"
-            :closable="!props.disabled"
-            size="small"
-            @click:close="!props.disabled && removeChip()"
-          >
-            {{ getEntityValueLabel(selectedItem, entityTemplates) }}
-          </v-chip>
-        </template>
-      </v-select>
+      <div v-bind="activatorProps" class="sapling-field-select__activator">
+        <v-autocomplete
+          :disabled="props.disabled"
+          :label="props.label"
+          :items="autocompleteItems"
+          :rules="props.rules"
+          :model-value="selectedItem"
+          :item-title="getAutocompleteItemTitle"
+          :search="fieldSearch"
+          return-object
+          clearable
+          hide-details="auto"
+          hide-no-data
+          no-filter
+          :menu="false"
+          autocomplete="off"
+          @focus="openMenu"
+          @mousedown:control="openMenu"
+          @click:clear="clearSelection"
+          @update:model-value="onActivatorModelUpdate"
+          @update:search="onActivatorSearchUpdate"
+        />
+      </div>
     </template>
-    <div class="glass-panel sapling-menu-surface">
+    <div class="glass-panel sapling-menu-surface sapling-menu-surface--field-table">
       <sapling-table
         v-if="menuOpen"
         :entity-handle="entityHandle"
@@ -47,6 +48,7 @@
         :entity="entity"
         :entity-permission="entityPermission"
         :show-actions="false"
+        :show-search="false"
         :multi-select="false"
         :table-key="entityHandle"
         :selected="selectedItem ? [selectedItem] : []"
@@ -67,7 +69,7 @@
 import SaplingTable from '@/components/table/SaplingTable.vue'
 import type { SaplingGenericItem } from '@/entity/entity'
 import { useSaplingTable } from '@/composables/table/useSaplingTable'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { getEntityValueLabel } from '@/utils/saplingTableUtil'
 import { useSaplingSingleSelectField } from '@/composables/fields/useSaplingSingleSelectField'
 import { useSaplingReferenceFilter } from '@/composables/fields/useSaplingReferenceFilter'
@@ -86,23 +88,6 @@ const props = defineProps<{
   parentFilter?: FilterQuery
 }>()
 const emit = defineEmits(['update:modelValue'])
-// #endregion
-
-// #region Selection State
-function onTableSelect(newSelected: SaplingGenericItem[]) {
-  selectedItem.value = newSelected[0] ?? null
-
-  if (newSelected[0]) {
-    menuOpen.value = false
-  }
-}
-
-// Entfernt das ausgewählte Item, wenn der Chip geschlossen wird und synchronisiert die Tabelle
-function removeChip() {
-  selectedItem.value = null
-  // Trigger table selection update
-  onTableSelect([])
-}
 // #endregion
 
 // #region Composable
@@ -132,6 +117,68 @@ const {
 
 const { selectedItem, menuOpen } = useSaplingSingleSelectField(props)
 const { combineFilters, normalizeFilter, areFiltersEqual } = useSaplingReferenceFilter()
+const fieldSearch = ref('')
+const autocompleteItems = computed(() => (selectedItem.value ? [selectedItem.value] : []))
+// #endregion
+
+// #region Selection State
+function onTableSelect(newSelected: SaplingGenericItem[]) {
+  selectedItem.value = newSelected[0] ?? null
+  clearSearch()
+
+  if (newSelected[0]) {
+    menuOpen.value = false
+  }
+}
+
+function onActivatorModelUpdate(value: SaplingGenericItem | null) {
+  if (value == null) {
+    clearSelection()
+    return
+  }
+
+  const resolvedItem = resolveSaplingItem(value)
+  if (resolvedItem) {
+    selectedItem.value = resolvedItem
+  }
+}
+
+function onActivatorSearchUpdate(value: string) {
+  fieldSearch.value = value ?? ''
+  openMenu()
+
+  if (!isInitialized.value) {
+    return
+  }
+
+  onSearchUpdate(fieldSearch.value)
+}
+
+function clearSelection() {
+  selectedItem.value = null
+  clearSearch()
+}
+
+function openMenu() {
+  if (!props.disabled) {
+    menuOpen.value = true
+  }
+}
+
+function clearSearch() {
+  if (fieldSearch.value === '' && search.value === '') {
+    return
+  }
+
+  fieldSearch.value = ''
+  if (isInitialized.value) {
+    onSearchUpdate('')
+  }
+}
+
+function getAutocompleteItemTitle(item: unknown) {
+  return getEntityValueLabel(resolveSaplingItem(item), entityTemplates.value)
+}
 // #endregion
 
 watch(
@@ -150,17 +197,24 @@ watch(
   { immediate: true, deep: true },
 )
 
-watch(menuOpen, (isOpen) => {
+watch(menuOpen, async (isOpen) => {
   if (!isOpen) {
     return
   }
 
   if (!isInitialized.value) {
-    void initializeEntityState()
+    await initializeEntityState()
+    if (!menuOpen.value) {
+      return
+    }
+  }
+
+  if (search.value !== fieldSearch.value) {
+    onSearchUpdate(fieldSearch.value)
     return
   }
 
-  void loadData()
+  await loadData()
 })
 
 watch(
@@ -178,9 +232,20 @@ watch(
   },
   { immediate: true },
 )
-// #endregion
 
 watch(selectedItem, (val) => {
   emit('update:modelValue', val)
 })
+
+function resolveSaplingItem(item: unknown): SaplingGenericItem | null {
+  if (!item || typeof item !== 'object') {
+    return null
+  }
+
+  if ('raw' in item && item.raw && typeof item.raw === 'object') {
+    return item.raw as SaplingGenericItem
+  }
+
+  return item as SaplingGenericItem
+}
 </script>

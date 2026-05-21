@@ -34,8 +34,8 @@
 
 .v-overlay__content .sapling-menu-surface.glass-panel.sapling-menu-surface--field-table {
   background: color-mix(in srgb, var(--sapling-surface-fill) 92%, var(--glass-bg)) !important;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  backdrop-filter: blur(var(--sapling-blur-strong));
+  -webkit-backdrop-filter: blur(var(--sapling-blur-strong));
 }
 
 .v-overlay__content
