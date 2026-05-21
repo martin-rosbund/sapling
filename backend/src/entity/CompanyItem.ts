@@ -284,6 +284,7 @@ export class CompanyItem {
    * Tickets assigned to this company.
    */
   @ApiPropertyOptional({ type: () => TicketItem, isArray: true })
+  @Sapling(['isHideAsReference'])
   @OneToMany(() => TicketItem, (x) => x.assigneeCompany)
   assignedTickets: Collection<TicketItem> = new Collection<TicketItem>(this);
 
@@ -291,7 +292,6 @@ export class CompanyItem {
    * Tickets created by this company.
    */
   @ApiPropertyOptional({ type: () => TicketItem, isArray: true })
-  @Sapling(['isHideAsReference'])
   @OneToMany(() => TicketItem, (x) => x.creatorCompany)
   createdTickets: Collection<TicketItem> = new Collection<TicketItem>(this);
 
@@ -300,13 +300,13 @@ export class CompanyItem {
    */
   @ApiPropertyOptional({ type: () => EventItem, isArray: true })
   @OneToMany(() => EventItem, (x) => x.assigneeCompany)
+  @Sapling(['isHideAsReference'])
   assignedEvents: Collection<EventItem> = new Collection<EventItem>(this);
 
   /**
    * Tickets created by this company.
    */
   @ApiPropertyOptional({ type: () => EventItem, isArray: true })
-  @Sapling(['isHideAsReference'])
   @OneToMany(() => EventItem, (x) => x.creatorCompany)
   createdEvents: Collection<EventItem> = new Collection<EventItem>(this);
 
@@ -316,6 +316,7 @@ export class CompanyItem {
    */
   @ApiPropertyOptional({ type: () => SalesOpportunityItem, isArray: true })
   @OneToMany(() => SalesOpportunityItem, (x) => x.assigneeCompany)
+  @Sapling(['isHideAsReference'])
   assignedSalesOpportunities: Collection<SalesOpportunityItem> =
     new Collection<SalesOpportunityItem>(this);
 
@@ -324,7 +325,6 @@ export class CompanyItem {
    * @type {Collection<SalesOpportunityItem>}
    */
   @ApiPropertyOptional({ type: () => SalesOpportunityItem, isArray: true })
-  @Sapling(['isHideAsReference'])
   @OneToMany(() => SalesOpportunityItem, (x) => x.creatorCompany)
   createdSalesOpportunities: Collection<SalesOpportunityItem> =
     new Collection<SalesOpportunityItem>(this);
