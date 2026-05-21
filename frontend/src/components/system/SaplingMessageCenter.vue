@@ -1,23 +1,25 @@
 <template>
   <div class="messageCenter">
-    <!-- Floating Meldungen -->
-    <transition-group name="messages-fade" tag="div" class="messages-float">
-      <div v-for="message in visibleMessages" :key="message.id" class="message">
-        <v-alert :type="message.type" density="comfortable" border="start" class="ma-2">
-          <template v-if="isTranslationLoading">
-            <v-skeleton-loader type="text, text" />
-          </template>
-          <template v-else>
-            <div>
-              {{ formatMessageLabel(message) }}
-            </div>
-            <div v-if="message.description" class="message__description">
-              {{ formatMessageDescription(message.description) }}
-            </div>
-          </template>
-        </v-alert>
-      </div>
-    </transition-group>
+    <Teleport to="body">
+      <!-- Floating Meldungen -->
+      <transition-group name="messages-fade" tag="div" class="messages-float">
+        <div v-for="message in visibleMessages" :key="message.id" class="message">
+          <v-alert :type="message.type" density="comfortable" border="start" class="ma-2">
+            <template v-if="isTranslationLoading">
+              <v-skeleton-loader type="text, text" />
+            </template>
+            <template v-else>
+              <div>
+                {{ formatMessageLabel(message) }}
+              </div>
+              <div v-if="message.description" class="message__description">
+                {{ formatMessageDescription(message.description) }}
+              </div>
+            </template>
+          </v-alert>
+        </div>
+      </transition-group>
+    </Teleport>
     <!-- Dialog for all Meldungen -->
     <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-large">
       <template v-slot:activator="{ props }">

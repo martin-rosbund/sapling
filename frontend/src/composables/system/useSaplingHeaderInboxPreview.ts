@@ -21,9 +21,14 @@ export function useSaplingHeaderInboxPreview(
         return
       }
 
+      updateNotificationPermission()
+
       if (shouldUseBrowserNotifications()) {
-        showBrowserNotification(incomingInboxPreview.value)
-        return
+        const wasBrowserNotificationShown = showBrowserNotification(incomingInboxPreview.value)
+
+        if (wasBrowserNotificationShown) {
+          return
+        }
       }
 
       await showHeaderPreview(incomingInboxPreview.value)
@@ -51,7 +56,11 @@ export function useSaplingHeaderInboxPreview(
   }
 
   function shouldUseBrowserNotifications() {
-    return notificationPermission.value === 'granted'
+    return (
+      notificationPermission.value === 'granted' &&
+      typeof window !== 'undefined' &&
+      typeof Notification !== 'undefined'
+    )
   }
 
   function updateNotificationPermission() {
@@ -80,37 +89,54 @@ export function useSaplingHeaderInboxPreview(
   }
 
   function showBrowserNotification(preview: SaplingHeaderInboxPreview) {
-    if (typeof window === 'undefined' || typeof Notification === 'undefined') {
-      return
+    if (
+      typeof window === 'undefined' ||
+      typeof Notification === 'undefined' ||
+      Notification.permission !== 'granted'
+    ) {
+      return false
     }
 
     activeBrowserNotification?.close()
 
-    const notification = new Notification(preview.title, {
-      body: buildBrowserNotificationBody(preview),
-      tag: preview.id,
-    })
+    try {
+      const notification = new Notification(
+        preview.title.trim() || getInboxKindLabel(preview.kind),
+        {
+          body: buildBrowserNotificationBody(preview),
+          tag: preview.id,
+          icon: `${window.location.origin}/icons/icon-192x192.png`,
+          badge: `${window.location.origin}/icons/icon-192x192.png`,
+          data: {
+            route: router.resolve(preview.route).href,
+          },
+        },
+      )
 
-    notification.onclick = () => {
-      notification.close()
-      activeBrowserNotification = null
-
-      try {
-        window.focus()
-      } catch {
-        // Ignore blocked focus calls and still attempt navigation.
+      notification.onclick = () => {
+        void openIncomingInboxPreview(preview)
       }
 
-      void router.push(preview.route)
-    }
+      notification.onerror = () => {
+        if (activeBrowserNotification === notification) {
+          activeBrowserNotification = null
+        }
 
-    notification.onclose = () => {
-      if (activeBrowserNotification === notification) {
-        activeBrowserNotification = null
+        void showHeaderPreview(preview)
       }
-    }
 
-    activeBrowserNotification = notification
+      notification.onclose = () => {
+        if (activeBrowserNotification === notification) {
+          activeBrowserNotification = null
+        }
+      }
+
+      activeBrowserNotification = notification
+      return true
+    } catch {
+      updateNotificationPermission()
+      return false
+    }
   }
 
   function buildBrowserNotificationBody(preview: SaplingHeaderInboxPreview) {
@@ -183,10 +209,31 @@ export function useSaplingHeaderInboxPreview(
     }
   }
 
-  onBeforeUnmount(() => {
+  async function openIncomingInboxPreview(preview: SaplingHeaderInboxPreview) {
+    hideHeaderPreview()
+    activeBrowserNotification?.close()
+    activeBrowserNotification = null
+
+    try {
+      window.focus()
+    } catch {
+      // Ignore blocked focus calls and still attempt navigation.
+    }
+
+    await router.push(preview.route)
+  }
+
+  function hideHeaderPreview() {
+    visibleIncomingInboxPreview.value = null
+
     if (incomingInboxPreviewTimeout != null) {
       window.clearTimeout(incomingInboxPreviewTimeout)
+      incomingInboxPreviewTimeout = null
     }
+  }
+
+  onBeforeUnmount(() => {
+    hideHeaderPreview()
 
     activeBrowserNotification?.close()
     activeBrowserNotification = null
@@ -199,5 +246,6 @@ export function useSaplingHeaderInboxPreview(
 
   return {
     visibleIncomingInboxPreview,
+    openIncomingInboxPreview,
   }
 }

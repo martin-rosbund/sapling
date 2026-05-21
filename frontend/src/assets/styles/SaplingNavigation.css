@@ -43,16 +43,34 @@
   gap: var(--sapling-gap-md);
   width: min(26rem, calc(100vw - var(--sapling-space-3xl)));
   padding: var(--sapling-space-md-plus) var(--sapling-space-lg-plus);
+  appearance: none;
   border: 1px solid rgba(var(--sapling-header-preview-rgb), 0.26);
   border-radius: 24px;
+  background: var(--glass-bg);
+  color: inherit;
+  font: inherit;
+  text-align: left;
   overflow: hidden;
   box-shadow:
     0 24px 48px rgba(15, 23, 42, 0.24),
     0 8px 20px rgba(var(--sapling-header-preview-rgb), 0.12);
-  pointer-events: none;
+  cursor: pointer;
+  pointer-events: auto;
   transform: translate3d(0, 0, 0);
   transform-origin: top right;
-  z-index: 120;
+  z-index: 11000;
+}
+
+.sapling-header__inbox-preview:hover {
+  border-color: rgba(var(--sapling-header-preview-rgb), 0.42);
+  box-shadow:
+    0 28px 56px rgba(15, 23, 42, 0.28),
+    0 10px 24px rgba(var(--sapling-header-preview-rgb), 0.18);
+}
+
+.sapling-header__inbox-preview:focus-visible {
+  outline: 2px solid rgba(var(--sapling-header-preview-rgb), 0.82);
+  outline-offset: 3px;
 }
 
 .sapling-header__inbox-preview::before {

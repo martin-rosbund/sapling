@@ -1,16 +1,18 @@
 <template>
   <Teleport to="body">
     <Transition name="sapling-header-inbox-preview">
-      <div
+      <button
         v-if="preview"
         :class="[
           'sapling-header__inbox-preview',
           `sapling-header__inbox-preview--${preview.kind}`,
           'glass-panel',
         ]"
-        role="status"
+        type="button"
         aria-live="polite"
         aria-atomic="true"
+        :aria-label="openLabel"
+        @click="emit('open', preview)"
       >
         <div class="sapling-header__inbox-preview-icon">
           <v-icon :icon="preview.icon" size="22" />
@@ -26,7 +28,7 @@
             {{ preview.title }}
           </div>
         </div>
-      </div>
+      </button>
     </Transition>
   </Teleport>
 </template>
@@ -40,9 +42,20 @@ const props = defineProps<{
   preview: SaplingHeaderInboxPreview | null
 }>()
 
+const emit = defineEmits<{
+  (event: 'open', preview: SaplingHeaderInboxPreview): void
+}>()
+
 const { t } = useI18n()
 
 const inboxLabel = computed(() => t('navigation.inbox'))
+const openLabel = computed(() => {
+  if (!props.preview) {
+    return t('navigation.inbox')
+  }
+
+  return `${t('navigation.inbox')}: ${props.preview.title}`
+})
 const kindLabel = computed(() => {
   if (!props.preview) {
     return ''

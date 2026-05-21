@@ -57,7 +57,10 @@
     </template>
   </v-app-bar>
 
-  <SaplingHeaderInboxPreview :preview="visibleIncomingInboxPreview" />
+  <SaplingHeaderInboxPreview
+    :preview="visibleIncomingInboxPreview"
+    @open="openIncomingInboxPreview"
+  />
 
   <SaplingInbox v-if="showInbox" @close="closeInbox" />
   <SaplingAccount v-if="showAccount" @close="closeAccount" />
@@ -126,7 +129,8 @@ const {
   closeAccount,
   goHome,
 } = useSaplingHeader()
-const { visibleIncomingInboxPreview } = useSaplingHeaderInboxPreview(incomingInboxPreview)
+const { visibleIncomingInboxPreview, openIncomingInboxPreview } =
+  useSaplingHeaderInboxPreview(incomingInboxPreview)
 
 function toggleNavigation() {
   emit('update:modelValue', !props.modelValue)
