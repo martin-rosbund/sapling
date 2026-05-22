@@ -16788,19 +16788,19 @@
         },
         "problem_description": {
           "name": "problem_description",
-          "type": "varchar(1024)",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "unique": false,
-          "length": 1024,
+          "length": null,
           "precision": null,
           "scale": null,
           "default": null,
           "comment": null,
           "enumItems": [],
-          "mappedType": "string"
+          "mappedType": "text"
         },
         "resolution_due_at": {
           "name": "resolution_due_at",
@@ -16868,19 +16868,19 @@
         },
         "solution_description": {
           "name": "solution_description",
-          "type": "varchar(1024)",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "unique": false,
-          "length": 1024,
+          "length": null,
           "precision": null,
           "scale": null,
           "default": null,
           "comment": null,
           "enumItems": [],
-          "mappedType": "string"
+          "mappedType": "text"
         },
         "source_handle": {
           "name": "source_handle",

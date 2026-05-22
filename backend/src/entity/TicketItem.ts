@@ -144,7 +144,7 @@ export class TicketItem {
     groupOrder: 200,
     width: 4,
   })
-  @Property({ nullable: true, length: 1024 })
+  @Property({ nullable: true, type: 'text' })
   problemDescription?: string;
 
   /**
@@ -159,7 +159,7 @@ export class TicketItem {
     groupOrder: 200,
     width: 4,
   })
-  @Property({ nullable: true, length: 1024 })
+  @Property({ nullable: true, type: 'text' })
   solutionDescription?: string;
   // #endregion
 
