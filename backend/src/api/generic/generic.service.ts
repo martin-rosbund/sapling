@@ -956,7 +956,7 @@ export class GenericService {
       persistedItem = (await this.genericMutationService.assignAndFlush(
         ownerContext.entityHandle,
         ownerContext.item,
-        overwrittenData as Record<string, unknown>,
+        overwrittenData,
         ownerContext.template,
       )) as Record<string, unknown>;
     }
@@ -1110,12 +1110,10 @@ export class GenericService {
       return new Set<number>();
     }
 
-    const assigneeHandle =
-      typeof ticket.assigneePerson === 'object'
-        ? ticket.assigneePerson.handle
-        : undefined;
-    const statusHandle =
-      typeof ticket.status === 'object' ? ticket.status.handle : undefined;
+    const assigneeHandle = this.extractOpenTaskReferenceHandle(
+      ticket.assigneePerson,
+    );
+    const statusHandle = this.extractOpenTaskReferenceHandle(ticket.status);
 
     if (typeof assigneeHandle !== 'number' || statusHandle === 'closed') {
       return new Set<number>();
@@ -1147,8 +1145,7 @@ export class GenericService {
       return new Set<number>();
     }
 
-    const statusHandle =
-      typeof event.status === 'object' ? event.status.handle : undefined;
+    const statusHandle = this.extractOpenTaskReferenceHandle(event.status);
     if (statusHandle === 'canceled' || statusHandle === 'completed') {
       return new Set<number>();
     }
@@ -1187,10 +1184,9 @@ export class GenericService {
       return new Set<number>();
     }
 
-    const assigneeHandle =
-      typeof salesOpportunity.assigneePerson === 'object'
-        ? salesOpportunity.assigneePerson.handle
-        : undefined;
+    const assigneeHandle = this.extractOpenTaskReferenceHandle(
+      salesOpportunity.assigneePerson,
+    );
 
     if (typeof assigneeHandle !== 'number') {
       return new Set<number>();
@@ -1211,6 +1207,21 @@ export class GenericService {
     }
 
     return mergedUserHandles;
+  }
+
+  private extractOpenTaskReferenceHandle(
+    reference: unknown,
+  ): string | number | undefined {
+    if (!reference || typeof reference !== 'object') {
+      return undefined;
+    }
+
+    const handle = (reference as { handle?: unknown }).handle;
+    if (typeof handle === 'string' || typeof handle === 'number') {
+      return handle;
+    }
+
+    return undefined;
   }
 
   private extractEntityHandle(item: object): string | number | null {

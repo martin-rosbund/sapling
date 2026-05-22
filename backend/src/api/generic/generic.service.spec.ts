@@ -718,6 +718,93 @@ describe('GenericService', () => {
     expect(result).toMatchObject({ handle: 7, title: 'Changed' });
   });
 
+  it('updates open tickets without an assigned person', async () => {
+    const item = {
+      handle: 101,
+      title: 'Old title',
+      assigneePerson: null,
+      status: { handle: 'open' },
+    };
+    const findOne = jest
+      .fn<(...args: unknown[]) => Promise<object | null>>()
+      .mockImplementation((_entity, where, options) => {
+        const handle = (where as { handle?: unknown } | undefined)?.handle;
+        const populate = (options as { populate?: string[] } | undefined)
+          ?.populate;
+
+        if (handle === 'ticket') {
+          return Promise.resolve({ handle: 'ticket' });
+        }
+
+        if (
+          handle === 101 &&
+          populate?.includes('assigneePerson') &&
+          populate.includes('status')
+        ) {
+          return Promise.resolve({
+            handle: 101,
+            assigneePerson: null,
+            status: { handle: 'open' },
+          });
+        }
+
+        if (handle === 101) {
+          return Promise.resolve(item);
+        }
+
+        return Promise.resolve(null);
+      });
+    const assign = jest.fn((target: object, data: object) =>
+      Object.assign(target as Record<string, unknown>, data),
+    );
+    const flush = jest.fn<() => Promise<void>>().mockResolvedValue(undefined);
+    const em = {
+      findOne,
+      assign,
+      flush,
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn(() => [
+        createTemplateField({ name: 'handle', type: 'number' }),
+        createTemplateField({ name: 'title' }),
+      ]),
+    };
+    const scriptService = {
+      runServer: jest.fn((_method: unknown, items: object | object[]) =>
+        Promise.resolve(new ScriptResultServer(toScriptItems(items))),
+      ),
+    };
+    const currentService = {
+      getEntityPermissions: jest.fn(() => ({
+        allowUpdateStage: 'global',
+      })),
+      getAllEntityPermissions: jest.fn(() => []),
+    };
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+      scriptService,
+    });
+
+    const result = await service.update(
+      'ticket',
+      '101',
+      { title: 'Sapling 112233LL' },
+      { handle: 1 } as never,
+      [],
+    );
+
+    expect(assign).toHaveBeenCalledWith(item, {
+      title: 'Sapling 112233LL',
+    });
+    expect(result).toMatchObject({
+      handle: 101,
+      title: 'Sapling 112233LL',
+      assigneePerson: null,
+    });
+  });
+
   it('does not auto-populate all relations during update when none were requested', async () => {
     const item = { handle: 7, phone: '+49 1111111111' };
     const findOne = jest
