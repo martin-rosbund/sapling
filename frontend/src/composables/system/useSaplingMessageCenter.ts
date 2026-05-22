@@ -8,6 +8,7 @@ export interface Message {
   entity: string
   timestamp: Date
   hidden: boolean
+  technical?: unknown
 }
 
 const MAX_VISIBLE_MESSAGES = 3
@@ -35,6 +36,7 @@ export function useSaplingMessageCenter() {
     message: string,
     description: string,
     entity: string,
+    technical?: unknown,
   ) {
     const messageItem: Message = {
       id: nextId++,
@@ -44,6 +46,7 @@ export function useSaplingMessageCenter() {
       entity,
       timestamp: new Date(),
       hidden: false,
+      technical,
     }
 
     messages.value.unshift(messageItem)

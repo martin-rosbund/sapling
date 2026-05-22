@@ -26,6 +26,7 @@ import {
 } from './constants/project.constants';
 import { ENTITY_REGISTRY } from './entity/global/entity.registry';
 import { initializeLogger } from './logging/initialize-logger';
+import { ApiExceptionFilter } from './api/common/api-exception.filter';
 import {
   applySessionTrustProxy,
   createSessionOptions,
@@ -83,6 +84,7 @@ async function bootstrap() {
   app.use(morgan('combined', { stream: accessLogStream }));
 
   initializeLogger();
+  app.useGlobalFilters(new ApiExceptionFilter());
 
   // Initialize Passport authentication
   app.use(passport.initialize());

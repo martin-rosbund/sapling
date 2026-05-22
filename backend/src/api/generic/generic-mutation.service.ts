@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { EntityManager, RequiredEntityData } from '@mikro-orm/core';
 import { EntityItem } from '../../entity/EntityItem';
 import { EntityRouteItem } from '../../entity/EntityRouteItem';
@@ -8,6 +8,10 @@ import { ScriptResultServerMethods } from '../../script/core/script.result.serve
 import { ScriptMethods, ScriptService } from '../script/script.service';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 import { GenericFilterService } from './generic-filter.service';
+import {
+  buildErrorDiagnostics,
+  buildForeignKeyViolationDiagnostics,
+} from '../common/error-diagnostics.util';
 
 @Injectable()
 export class GenericMutationService {
@@ -83,7 +87,7 @@ export class GenericMutationService {
     data: T,
     template: EntityTemplateDto[] = [],
   ): Promise<object> {
-    return this.runPersistence(entityHandle, async () => {
+    return this.runPersistence(entityHandle, 'create', async () => {
       const normalizedData = this.genericFilterService.normalizeDatePayload(
         await this.applyDefaultFavoriteRoute(entityHandle, data),
         template,
@@ -103,7 +107,7 @@ export class GenericMutationService {
     data: T,
     template: EntityTemplateDto[] = [],
   ): Promise<object> {
-    return this.runPersistence(entityHandle, async () => {
+    return this.runPersistence(entityHandle, 'update', async () => {
       const normalizedData = this.genericFilterService.normalizeDatePayload(
         await this.applyDefaultFavoriteRoute(entityHandle, data),
         template,
@@ -119,28 +123,82 @@ export class GenericMutationService {
     entityClass: unknown,
     where: object,
   ): Promise<number> {
-    return this.runPersistence(entityHandle, async () =>
+    return this.runPersistence(entityHandle, 'delete', async () =>
       this.em.nativeDelete(entityClass as never, where as never),
     );
   }
 
   private async runPersistence<T>(
     entityHandle: string,
+    operationName: 'create' | 'update' | 'delete',
     operation: () => Promise<T>,
   ): Promise<T> {
     try {
       return await operation();
     } catch (error) {
-      global.log.error(`entity ${entityHandle}:`, error);
+      const diagnostics = buildErrorDiagnostics(error);
+      global.log.error(`entity ${entityHandle}:`, diagnostics);
+
+      const foreignKeyViolation =
+        buildForeignKeyViolationDiagnostics(error);
+      if (foreignKeyViolation) {
+        const referencingTable =
+          foreignKeyViolation.referencingTable ?? foreignKeyViolation.table;
+        const actionLabel =
+          operationName === 'delete' ? 'geloescht' : 'gespeichert';
+        const summary = referencingTable
+          ? `Der Datensatz kann nicht ${actionLabel} werden, weil er noch von "${referencingTable}" verwendet wird.`
+          : `Der Datensatz kann nicht ${actionLabel} werden, weil er noch von anderen Daten verwendet wird.`;
+
+        throw new ConflictException({
+          message: this.getPersistenceErrorMessage(operationName),
+          error: summary,
+          details: {
+            summary,
+            entityHandle,
+            referencingTable,
+            referencedColumn: foreignKeyViolation.referencedColumn,
+            referencedValue: foreignKeyViolation.referencedValue,
+            constraint: foreignKeyViolation.constraint,
+          },
+          technical: {
+            operation: `generic.${operationName}`,
+            entityHandle,
+            exception: foreignKeyViolation,
+          },
+        });
+      }
 
       if (error instanceof Error) {
-        throw new BadRequestException(
-          `global.${error.name.charAt(0).toLowerCase() + error.name.slice(1)}`,
-          error.message,
-        );
+        throw new BadRequestException({
+          message: `global.${error.name.charAt(0).toLowerCase() + error.name.slice(1)}`,
+          error: error.message,
+          details: {
+            summary: error.message,
+            entityHandle,
+          },
+          technical: {
+            operation: `generic.${operationName}`,
+            entityHandle,
+            exception: diagnostics,
+          },
+        });
       }
 
       throw error;
+    }
+  }
+
+  private getPersistenceErrorMessage(
+    operationName: 'create' | 'update' | 'delete',
+  ): string {
+    switch (operationName) {
+      case 'create':
+        return 'global.createError';
+      case 'update':
+        return 'global.updateError';
+      case 'delete':
+        return 'global.deleteError';
     }
   }
 

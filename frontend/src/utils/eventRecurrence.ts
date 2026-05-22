@@ -36,6 +36,7 @@ export type RecurringCalendarEvent = CalendarEvent & {
 }
 
 const DEFAULT_EVENT_COLOR = '#2196F3'
+export const RECURRENCE_MAX_OCCURRENCES = 100
 const RECURRENCE_FREQUENCIES = new Set<RecurrenceFrequency>([
   'DAILY',
   'WEEKLY',
@@ -101,12 +102,17 @@ export function parseRecurrenceRule(recurrenceRule?: string | null): ParsedRecur
       (item, index, items) => RECURRENCE_WEEKDAY_CODES.has(item) && items.indexOf(item) === index,
     )
 
+  const normalizedCount =
+    Number.isFinite(countValue) && countValue > 0
+      ? Math.min(RECURRENCE_MAX_OCCURRENCES, countValue)
+      : null
+
   return {
     raw: normalizeRecurrenceRule(normalizedRule),
     frequency,
     interval,
     byDay,
-    ...(Number.isFinite(countValue) && countValue > 0 ? { count: countValue } : {}),
+    ...(normalizedCount ? { count: normalizedCount } : {}),
     ...(until ? { until } : {}),
   }
 }
@@ -142,7 +148,7 @@ export function buildRecurrenceRule(input: RecurrenceRuleInput): string | null {
   if (input.endMode === 'count') {
     const count =
       typeof input.count === 'number' && Number.isFinite(input.count)
-        ? Math.max(1, Math.trunc(input.count))
+        ? Math.max(1, Math.min(RECURRENCE_MAX_OCCURRENCES, Math.trunc(input.count)))
         : 1
 
     parts.push(`COUNT=${count}`)
@@ -167,7 +173,7 @@ export function expandRecurringEvent(
   event: EventItem,
   rangeStart: Date,
   rangeEnd: Date,
-  maxOccurrences = 4000,
+  maxOccurrences = RECURRENCE_MAX_OCCURRENCES,
 ): RecurringCalendarEvent[] {
   const parsedRule = parseRecurrenceRule(event.recurrenceRule)
   if (!parsedRule) {
@@ -187,7 +193,9 @@ export function expandRecurringEvent(
   let occurrenceIndex = 0
   let iterationCount = 0
 
-  while (iterationCount < maxOccurrences) {
+  const occurrenceLimit = Math.max(1, Math.min(RECURRENCE_MAX_OCCURRENCES, maxOccurrences))
+
+  while (iterationCount < occurrenceLimit) {
     iterationCount += 1
     occurrenceIndex += 1
 
@@ -219,6 +227,43 @@ export function expandRecurringEvent(
   }
 
   return occurrences
+}
+
+export function getRecurrenceEndDate({
+  recurrenceRule,
+  startDate,
+  startTime,
+  isAllDay,
+}: {
+  recurrenceRule?: string | null
+  startDate?: string | Date | null
+  startTime?: string | null
+  isAllDay?: boolean
+}): Date | null {
+  const parsedRule = parseRecurrenceRule(recurrenceRule)
+  const baseStart = parseRecurrenceStart(startDate, startTime, isAllDay)
+
+  if (!parsedRule || !baseStart) {
+    return null
+  }
+
+  if (parsedRule.count) {
+    const count = Math.min(parsedRule.count, RECURRENCE_MAX_OCCURRENCES)
+    let currentStart = new Date(baseStart)
+
+    for (let index = 1; index < count; index += 1) {
+      const nextOccurrence = getNextOccurrence(currentStart, parsedRule, baseStart, 0)
+      if (!nextOccurrence) {
+        return currentStart
+      }
+
+      currentStart = nextOccurrence.start
+    }
+
+    return currentStart
+  }
+
+  return parsedRule.until ?? null
 }
 
 export function isRecurringCalendarEvent(event: CalendarEvent | null | undefined): boolean {
@@ -266,6 +311,40 @@ function buildRecurringCalendarEvent(
 
 function eventOverlapsRange(event: EventItem, rangeStart: Date, rangeEnd: Date): boolean {
   return rangesOverlap(new Date(event.startDate), new Date(event.endDate), rangeStart, rangeEnd)
+}
+
+function parseRecurrenceStart(
+  startDate?: string | Date | null,
+  startTime?: string | null,
+  isAllDay?: boolean,
+): Date | null {
+  if (startDate instanceof Date) {
+    return isValidDate(startDate) ? new Date(startDate) : null
+  }
+
+  if (!startDate) {
+    return null
+  }
+
+  const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(startDate.trim())
+  if (dateOnlyMatch) {
+    const [, year, month, day] = dateOnlyMatch
+    const timeMatch =
+      !isAllDay && startTime ? /^(\d{2}):(\d{2})/.exec(startTime.trim()) : null
+
+    return new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day),
+      timeMatch ? Number(timeMatch[1]) : 0,
+      timeMatch ? Number(timeMatch[2]) : 0,
+      0,
+      0,
+    )
+  }
+
+  const parsedDate = new Date(startDate)
+  return isValidDate(parsedDate) ? parsedDate : null
 }
 
 function rangesOverlap(start: Date, end: Date, rangeStart: Date, rangeEnd: Date): boolean {

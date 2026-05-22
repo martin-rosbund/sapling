@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { buildRecurrenceRule, expandRecurringEvent, parseRecurrenceRule } from '../eventRecurrence'
+import {
+  buildRecurrenceRule,
+  expandRecurringEvent,
+  getRecurrenceEndDate,
+  parseRecurrenceRule,
+  RECURRENCE_MAX_OCCURRENCES,
+} from '../eventRecurrence'
 
 describe('eventRecurrence', () => {
   it('builds weekly RRULE strings with weekdays and count', () => {
@@ -39,6 +45,22 @@ describe('eventRecurrence', () => {
     ).toBe('FREQ=MONTHLY;INTERVAL=1;COUNT=1')
   })
 
+  it('caps count based recurrences at the product limit', () => {
+    expect(
+      buildRecurrenceRule({
+        frequency: 'DAILY',
+        interval: 1,
+        endMode: 'count',
+        count: RECURRENCE_MAX_OCCURRENCES + 1,
+        startDate: '2026-05-04',
+      }),
+    ).toBe(`FREQ=DAILY;INTERVAL=1;COUNT=${RECURRENCE_MAX_OCCURRENCES}`)
+
+    expect(parseRecurrenceRule('FREQ=DAILY;INTERVAL=1;COUNT=4000')?.count).toBe(
+      RECURRENCE_MAX_OCCURRENCES,
+    )
+  })
+
   it('parses stored RRULE strings', () => {
     expect(parseRecurrenceRule('RRULE:FREQ=MONTHLY;INTERVAL=1;COUNT=6')).toEqual({
       raw: 'FREQ=MONTHLY;INTERVAL=1;COUNT=6',
@@ -75,5 +97,22 @@ describe('eventRecurrence', () => {
       '2026-05-18T09:30:00.000Z',
     ])
     expect(occurrences.every((item) => item.isRecurringOccurrence === true)).toBe(true)
+  })
+
+  it('estimates the last recurrence date for count based series', () => {
+    const endDate = getRecurrenceEndDate({
+      recurrenceRule: 'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,WE;COUNT=5',
+      startDate: '2026-05-04',
+      startTime: '09:30',
+      isAllDay: false,
+    })
+
+    expect(endDate && [
+      endDate.getFullYear(),
+      endDate.getMonth() + 1,
+      endDate.getDate(),
+      endDate.getHours(),
+      endDate.getMinutes(),
+    ]).toEqual([2026, 5, 18, 9, 30])
   })
 })

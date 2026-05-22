@@ -123,6 +123,7 @@
                           :label="t('event.recurrenceCount')"
                           :model-value="draftCount"
                           :min="1"
+                          :max="RECURRENCE_MAX_OCCURRENCES"
                           :step="1"
                           @update:model-value="onCountChange"
                         />
@@ -185,7 +186,9 @@ import SaplingDateTypeField from '@/components/dialog/fields/SaplingFieldDateTyp
 import SaplingTimeField from '@/components/dialog/fields/SaplingFieldTime.vue'
 import {
   buildRecurrenceRule,
+  getRecurrenceEndDate,
   parseRecurrenceRule,
+  RECURRENCE_MAX_OCCURRENCES,
   type RecurrenceEndMode,
   type RecurrenceFrequency,
   type RecurrenceWeekdayCode,
@@ -380,11 +383,31 @@ function buildSummaryParts(state: RecurrenceDraftState): string[] {
   }
 
   if (state.endMode === 'count' && state.count) {
-    parts.push(`${t('event.recurrenceEndsAfter')} ${state.count}`)
+    const count = Math.min(state.count, RECURRENCE_MAX_OCCURRENCES)
+    const endDate = getRecurrenceEndDate({
+      recurrenceRule: buildRecurrenceRule({
+        frequency: state.frequency,
+        interval: state.interval,
+        weekdays: state.weekdays,
+        endMode: state.endMode,
+        count,
+        untilDate: state.untilDate,
+        untilTime: state.untilTime,
+        startDate: props.startDateValue,
+        startTime: props.startTimeValue,
+        isAllDay: props.isAllDay,
+      }),
+      startDate: props.startDateValue,
+      startTime: props.startTimeValue,
+      isAllDay: props.isAllDay,
+    })
+    const endLabel = endDate ? ` (${formatDateTimeSummary(endDate)})` : ''
+    parts.push(`${t('event.recurrenceEndsAfter')} ${count}${endLabel}`)
   }
 
   if (state.endMode === 'until' && state.untilDate) {
-    parts.push(`${t('event.recurrenceEndsOn')} ${state.untilDate}`)
+    const untilLabel = state.untilTime ? `${state.untilDate} ${state.untilTime}` : state.untilDate
+    parts.push(`${t('event.recurrenceEndsOn')} ${untilLabel}`)
   }
 
   return parts
@@ -444,7 +467,10 @@ function onIntervalChange(value: unknown) {
 
 function onCountChange(value: unknown) {
   const nextValue = toPositiveInteger(value)
-  draftCount.value = Number.isFinite(nextValue) && nextValue >= 0 ? nextValue : 0
+  draftCount.value =
+    Number.isFinite(nextValue) && nextValue >= 0
+      ? Math.min(nextValue, RECURRENCE_MAX_OCCURRENCES)
+      : 0
 }
 
 function resolveDefaultWeekdays(
@@ -499,6 +525,16 @@ function formatLocalTime(date: Date) {
     String(date.getHours()).padStart(2, '0'),
     String(date.getMinutes()).padStart(2, '0'),
   ].join(':')
+}
+
+function formatDateTimeSummary(date: Date) {
+  const dateLabel = formatLocalDate(date)
+
+  if (props.isAllDay) {
+    return dateLabel
+  }
+
+  return `${dateLabel} ${formatLocalTime(date)}`
 }
 
 function stringifyValue(value: unknown) {

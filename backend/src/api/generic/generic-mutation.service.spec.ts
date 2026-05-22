@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ConflictException } from '@nestjs/common';
 import { describe, expect, it, jest } from '@jest/globals';
 import {
   ScriptResultServer,
@@ -168,5 +168,44 @@ describe('GenericMutationService', () => {
     await expect(
       service.deleteAndFlush('ticket', () => undefined, { handle: 7 }),
     ).rejects.toThrow(BadRequestException);
+  });
+
+  it('maps foreign key violations to actionable conflict errors', async () => {
+    const em = {
+      nativeDelete: jest.fn(() =>
+        Promise.reject({
+          name: 'ForeignKeyConstraintViolationException',
+          message:
+            'update or delete on table "person_item" violates foreign key constraint',
+          code: '23503',
+          detail:
+            'Key (handle)=(113) is still referenced from table "favorite_item".',
+          constraint: 'favorite_item_person_handle_foreign',
+        }),
+      ),
+    };
+    const service = new GenericMutationService(
+      em as never,
+      {} as never,
+      new GenericFilterService(),
+    );
+
+    await expect(
+      service.deleteAndFlush('person', () => undefined, { handle: 113 }),
+    ).rejects.toThrow(ConflictException);
+
+    await expect(
+      service.deleteAndFlush('person', () => undefined, { handle: 113 }),
+    ).rejects.toMatchObject({
+      response: expect.objectContaining({
+        message: 'global.deleteError',
+        details: expect.objectContaining({
+          referencingTable: 'favorite_item',
+          referencedColumn: 'handle',
+          referencedValue: '113',
+          constraint: 'favorite_item_person_handle_foreign',
+        }),
+      }),
+    });
   });
 });
