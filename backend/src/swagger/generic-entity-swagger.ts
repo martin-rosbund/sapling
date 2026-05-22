@@ -163,6 +163,7 @@ export function buildGenericEntitySwaggerUiScript(
   const GENERIC_ENTITY_DOWNLOAD_PATH = '${GENERIC_ENTITY_DOWNLOAD_PATH}';
   const ENTITY_SCHEMA_MAP = ${JSON.stringify(entitySchemaMap)};
   const REQUEST_EXAMPLES = ${JSON.stringify(requestExamples)};
+  const REQUEST_EXAMPLE_KEYS = Object.keys(REQUEST_EXAMPLES);
 
   function normalize(value) {
     return String(value ?? '').trim();
@@ -210,6 +211,19 @@ export function buildGenericEntitySwaggerUiScript(
     control.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
+  function findRequestExampleKey(value) {
+    const normalized = normalize(value);
+    if (REQUEST_EXAMPLES[normalized]) {
+      return normalized;
+    }
+
+    return (
+      REQUEST_EXAMPLE_KEYS.find(
+        (key) => normalized === normalize(key + ' request example'),
+      ) || ''
+    );
+  }
+
   function syncMatchingSelects(block, entityHandle) {
     const selects = block.querySelectorAll('select');
 
@@ -225,6 +239,79 @@ export function buildGenericEntitySwaggerUiScript(
         dispatchControlChange(select);
       }
     }
+  }
+
+  function syncRequestExampleSelects(block, entityControl, entityHandle) {
+    const selectors = block.querySelectorAll('select');
+
+    for (const selector of selectors) {
+      if (!isRequestExampleSelector(selector, entityControl)) {
+        continue;
+      }
+
+      const matchingOption = Array.from(selector.options).find(
+        (option) =>
+          findRequestExampleKey(option.value) === entityHandle ||
+          findRequestExampleKey(option.textContent) === entityHandle,
+      );
+
+      if (matchingOption && selector.value !== matchingOption.value) {
+        selector.value = matchingOption.value;
+        dispatchControlChange(selector);
+      }
+    }
+  }
+
+  function isRequestExampleSelector(selector, entityControl) {
+    if (selector === entityControl) {
+      return false;
+    }
+
+    return Array.from(selector.options).some(
+      (option) =>
+        findRequestExampleKey(option.value) ||
+        findRequestExampleKey(option.textContent),
+    );
+  }
+
+  function getSelectedRequestExampleKey(selector) {
+    const selectedOption =
+      selector.selectedOptions && selector.selectedOptions[0];
+    const candidates = [
+      selector.value,
+      selectedOption && selectedOption.value,
+      selectedOption && selectedOption.textContent,
+    ];
+
+    for (const candidate of candidates) {
+      const exampleKey = findRequestExampleKey(candidate);
+      if (exampleKey) {
+        return exampleKey;
+      }
+    }
+
+    return '';
+  }
+
+  function getRequestExampleKey(block, entityHandle, entityControl) {
+    const selectors = block.querySelectorAll('select');
+
+    for (const selector of selectors) {
+      if (!isRequestExampleSelector(selector, entityControl)) {
+        continue;
+      }
+
+      const selectedExampleKey = getSelectedRequestExampleKey(selector);
+      if (selectedExampleKey) {
+        return selectedExampleKey;
+      }
+    }
+
+    return entityHandle;
+  }
+
+  function getRequestEditor(block) {
+    return block.querySelector('.body-param textarea, textarea');
   }
 
   function syncModelSelectors(block, entityHandle) {
@@ -253,14 +340,21 @@ export function buildGenericEntitySwaggerUiScript(
     }
   }
 
-  function syncRequestEditor(block, entityHandle) {
-    const requestExample = REQUEST_EXAMPLES[entityHandle];
+  function syncRequestEditor(block, exampleKey) {
+    const requestExample = REQUEST_EXAMPLES[exampleKey];
     if (!requestExample) {
       return;
     }
 
-    const requestEditor = block.querySelector('textarea');
+    const requestEditor = getRequestEditor(block);
     if (!requestEditor) {
+      return;
+    }
+
+    if (
+      block.dataset.saplingRequestExampleLoaded === exampleKey &&
+      requestEditor.dataset.saplingRequestExampleLoaded === exampleKey
+    ) {
       return;
     }
 
@@ -269,6 +363,9 @@ export function buildGenericEntitySwaggerUiScript(
       requestEditor.value = serialized;
       dispatchControlChange(requestEditor);
     }
+
+    block.dataset.saplingRequestExampleLoaded = exampleKey;
+    requestEditor.dataset.saplingRequestExampleLoaded = exampleKey;
   }
 
   function syncGenericOperation(block) {
@@ -282,22 +379,71 @@ export function buildGenericEntitySwaggerUiScript(
       return;
     }
 
-    syncMatchingSelects(block, entityHandle);
-    syncModelSelectors(block, entityHandle);
+    const entityChanged =
+      block.dataset.saplingCurrentEntityHandle !== entityHandle;
+
+    if (entityChanged) {
+      syncMatchingSelects(block, entityHandle);
+      syncRequestExampleSelects(block, entityControl, entityHandle);
+      syncModelSelectors(block, entityHandle);
+    }
+
+    block.dataset.saplingCurrentEntityHandle = entityHandle;
 
     if (getOperationPath(block) === GENERIC_ENTITY_COLLECTION_PATH) {
-      syncRequestEditor(block, entityHandle);
+      const exampleKey = getRequestExampleKey(block, entityHandle, entityControl);
+      syncRequestEditor(block, exampleKey);
+    }
+  }
+
+  function bindRequestExampleSelectors(block, entityControl, entityHandle) {
+    const selectors = block.querySelectorAll('select');
+
+    for (const selector of selectors) {
+      if (
+        !isRequestExampleSelector(selector, entityControl) ||
+        selector.dataset.saplingRequestExampleBound === 'true'
+      ) {
+        continue;
+      }
+
+      const matchingOption = Array.from(selector.options).find(
+        (option) =>
+          findRequestExampleKey(option.value) === entityHandle ||
+          findRequestExampleKey(option.textContent) === entityHandle,
+      );
+
+      if (matchingOption && selector.value !== matchingOption.value) {
+        selector.value = matchingOption.value;
+        dispatchControlChange(selector);
+      }
+
+      const onRequestExampleChange = function () {
+        window.setTimeout(function () {
+          syncGenericOperation(block);
+        }, 0);
+      };
+
+      selector.addEventListener('change', onRequestExampleChange);
+      selector.dataset.saplingRequestExampleBound = 'true';
     }
   }
 
   function bindGenericOperation(block) {
-    if (block.dataset.saplingEntitySwaggerBound === 'true') {
-      syncGenericOperation(block);
+    const entityControl = getParameterControl(block, 'entityHandle');
+    if (!entityControl) {
       return;
     }
 
-    const entityControl = getParameterControl(block, 'entityHandle');
-    if (!entityControl) {
+    const entityHandle = normalize(entityControl.value);
+    if (!entityHandle) {
+      return;
+    }
+
+    bindRequestExampleSelectors(block, entityControl, entityHandle);
+
+    if (block.dataset.saplingEntitySwaggerBound === 'true') {
+      syncGenericOperation(block);
       return;
     }
 

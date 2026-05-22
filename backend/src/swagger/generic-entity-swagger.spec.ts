@@ -1,5 +1,8 @@
 import { describe, expect, it } from '@jest/globals';
-import { enhanceGenericEntitySwaggerDocument } from './generic-entity-swagger';
+import {
+  buildGenericEntitySwaggerUiScript,
+  enhanceGenericEntitySwaggerDocument,
+} from './generic-entity-swagger';
 
 type TestSwaggerDocument = Parameters<
   typeof enhanceGenericEntitySwaggerDocument
@@ -106,5 +109,15 @@ describe('generic entity swagger', () => {
     expect(companyExample).toBeDefined();
     expect(companyExample?.address).toBe('AddressItem');
     expect(companyExample?.addresses).toEqual(['AddressItem']);
+  });
+
+  it('only reloads request examples when entity or example selection changes', () => {
+    const script = buildGenericEntitySwaggerUiScript(createDocument());
+
+    expect(script).toContain('saplingRequestExampleLoaded');
+    expect(script).toContain('if (entityChanged)');
+    expect(script).toContain(
+      "selector.addEventListener('change', onRequestExampleChange);",
+    );
   });
 });
