@@ -17,7 +17,11 @@ import type {
   ScriptButtonItem,
 } from '@/entity/entity'
 import { DEFAULT_ENTITY_ITEMS_COUNT, NAVIGATION_URL } from '@/constants/project.constants'
-import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service'
+import ApiGenericService, {
+  getGenericUpdateConflict,
+  type FilterQuery,
+  type GenericUpdateConflictDetails,
+} from '@/services/api.generic.service'
 import ApiScriptService from '@/services/api.script.service'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
@@ -46,6 +50,14 @@ interface BulkDeleteDialogState {
   items: SaplingGenericItem[]
 }
 
+export interface UpdateConflictDialogState {
+  visible: boolean
+  conflict: GenericUpdateConflictDetails | null
+  draftItem: SaplingGenericItem | null
+  action: DialogSaveAction
+  isSaving: boolean
+}
+
 interface TableContextMenuState {
   visible: boolean
   item: SaplingGenericItem | null
@@ -54,6 +66,7 @@ interface TableContextMenuState {
 }
 
 interface UseSaplingTableActionsProps {
+  items: SaplingGenericItem[]
   search: string
   sortBy: SortItem[]
   entityHandle: string
@@ -103,6 +116,13 @@ export function useSaplingTableActions({
   const editDialog = ref<EditDialogOptions>({ visible: false, mode: 'create', item: null })
   const deleteDialog = ref<DeleteDialogState>({ visible: false, item: null })
   const bulkDeleteDialog = ref<BulkDeleteDialogState>({ visible: false, items: [] })
+  const updateConflictDialog = ref<UpdateConflictDialogState>({
+    visible: false,
+    conflict: null,
+    draftItem: null,
+    action: 'save',
+    isSaving: false,
+  })
   const showUploadDialog = ref(false)
   const uploadDialogItem = ref<SaplingGenericItem | null>(null)
   const showInformationDialog = ref(false)
@@ -478,6 +498,89 @@ export function useSaplingTableActions({
     return result.data[0] ?? item
   }
 
+  function patchVisibleTableItem(item: SaplingGenericItem | null | undefined): void {
+    const handle = getItemHandle(item)
+    if (handle == null) {
+      return
+    }
+
+    const itemIndex = props.items.findIndex((entry) => getItemHandle(entry) === handle)
+    if (itemIndex === -1) {
+      return
+    }
+
+    props.items.splice(itemIndex, 1, {
+      ...props.items[itemIndex],
+      ...item,
+    })
+  }
+
+  function normalizeConcurrencyTimestamp(value: unknown): string | null {
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? null : value.toISOString()
+    }
+
+    if (typeof value !== 'string' && typeof value !== 'number') {
+      return null
+    }
+
+    const rawValue = String(value).trim()
+    if (!rawValue) {
+      return null
+    }
+
+    const parsedDate = new Date(rawValue)
+    return Number.isNaN(parsedDate.getTime()) ? rawValue : parsedDate.toISOString()
+  }
+
+  function buildConcurrencyPayload(source: SaplingGenericItem | null): Record<string, unknown> | null {
+    if (!source) {
+      return null
+    }
+
+    const payload: Record<string, unknown> = {}
+
+    props.entityTemplates
+      .filter(isConcurrencyComparableTemplate)
+      .forEach((template) => {
+        if (!template.name || !Object.prototype.hasOwnProperty.call(source, template.name)) {
+          return
+        }
+
+        payload[template.name] = normalizeConcurrencyPayloadValue(source[template.name], template)
+      })
+
+    return payload
+  }
+
+  function normalizeConcurrencyPayloadValue(value: unknown, template: EntityTemplate): unknown {
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? null : value.toISOString()
+    }
+
+    if (template.type === 'datetime' && typeof value === 'string') {
+      return normalizeConcurrencyTimestamp(value) ?? value
+    }
+
+    return value ?? null
+  }
+
+  function isConcurrencyComparableTemplate(template: EntityTemplate): boolean {
+    if (!template.name || template.isPersistent === false || template.isReference) {
+      return false
+    }
+
+    return !['1:m', 'm:n', 'n:m', '1:1', 'm:1'].includes(template.kind ?? '')
+  }
+
+  function buildConcurrencyOptions(source: SaplingGenericItem | null) {
+    return {
+      expectedUpdatedAt: normalizeConcurrencyTimestamp(source?.updatedAt),
+      basePayload: buildConcurrencyPayload(source),
+      resolution: 'detect' as const,
+    }
+  }
+
   async function saveDialog(
     item: SaplingGenericItem,
     action: DialogSaveAction,
@@ -497,8 +600,12 @@ export function useSaplingTableActions({
         }
 
         nextDialogItem = await loadDialogItem(
-          await ApiGenericService.update(props.entityHandle, handle, item),
+          await ApiGenericService.update(props.entityHandle, handle, item, {
+            concurrency: buildConcurrencyOptions(editDialog.value.item),
+            suppressConflictMessage: true,
+          }),
         )
+        patchVisibleTableItem(nextDialogItem)
       } else if (editDialog.value.mode === 'create') {
         nextDialogItem = await loadDialogItem(
           await ApiGenericService.create(props.entityHandle, item),
@@ -523,10 +630,125 @@ export function useSaplingTableActions({
         mode: 'edit',
         item: nextDialogItem ?? item,
       }
-    } catch {
-      // API errors are already routed through the shared message center.
+    } catch (error) {
+      const conflict = getGenericUpdateConflict(error)
+      if (conflict) {
+        updateConflictDialog.value = {
+          visible: true,
+          conflict,
+          draftItem: item,
+          action,
+          isSaving: false,
+        }
+      }
     } finally {
       context?.complete()
+    }
+  }
+
+  function closeUpdateConflictDialog() {
+    updateConflictDialog.value = {
+      visible: false,
+      conflict: null,
+      draftItem: null,
+      action: 'save',
+      isSaving: false,
+    }
+  }
+
+  function openUpdateConflictChangeLog() {
+    const conflict = updateConflictDialog.value.conflict
+    if (!conflict) {
+      return
+    }
+
+    changeLogDialogStore.openChangeLog(conflict.entityHandle, String(conflict.handle))
+  }
+
+  async function reloadUpdateConflictRecord() {
+    const conflict = updateConflictDialog.value.conflict
+    if (!conflict?.current) {
+      closeUpdateConflictDialog()
+      return
+    }
+
+    const currentItem = await loadDialogItem(conflict.current)
+    editDialog.value = {
+      visible: true,
+      mode: 'edit',
+      item: currentItem,
+    }
+    closeUpdateConflictDialog()
+    emit('reload')
+  }
+
+  async function mergeUpdateConflict(mergedItem: SaplingGenericItem) {
+    const conflictState = updateConflictDialog.value
+    const conflict = conflictState.conflict
+    if (!conflict || !props.entityHandle || conflictState.isSaving) {
+      return
+    }
+
+    const handle = getItemHandle(conflict.current) ?? conflict.handle
+    if (handle == null) {
+      return
+    }
+
+    updateConflictDialog.value = {
+      ...conflictState,
+      isSaving: true,
+    }
+
+    try {
+      const savedItem = await ApiGenericService.update(props.entityHandle, handle, mergedItem, {
+        concurrency: {
+          expectedUpdatedAt:
+            conflict.currentUpdatedAt ?? normalizeConcurrencyTimestamp(conflict.current?.updatedAt),
+          basePayload: buildConcurrencyPayload(conflict.current ?? null),
+          resolution: 'detect',
+        },
+        suppressConflictMessage: true,
+      })
+      const nextDialogItem = await loadDialogItem(savedItem)
+      patchVisibleTableItem(nextDialogItem)
+
+      emit('reload')
+      pushMessage(
+        'success',
+        t('global.recordSaved'),
+        t('global.recordSavedDescription'),
+        props.entityHandle,
+      )
+
+      closeUpdateConflictDialog()
+
+      if (conflictState.action === 'saveAndClose') {
+        closeDialog()
+        return
+      }
+
+      editDialog.value = {
+        visible: true,
+        mode: 'edit',
+        item: nextDialogItem ?? mergedItem,
+      }
+    } catch (error) {
+      const nextConflict = getGenericUpdateConflict(error)
+      if (nextConflict) {
+        updateConflictDialog.value = {
+          ...conflictState,
+          visible: true,
+          conflict: nextConflict,
+          draftItem: mergedItem,
+          isSaving: false,
+        }
+        return
+      }
+
+      updateConflictDialog.value = {
+        ...conflictState,
+        isSaving: false,
+      }
     }
   }
 
@@ -767,6 +989,7 @@ export function useSaplingTableActions({
     editDialog,
     deleteDialog,
     bulkDeleteDialog,
+    updateConflictDialog,
     showUploadDialog,
     uploadDialogItem,
     showInformationDialog,
@@ -802,6 +1025,10 @@ export function useSaplingTableActions({
     openCopyDialog,
     closeDialog,
     saveDialog,
+    closeUpdateConflictDialog,
+    openUpdateConflictChangeLog,
+    reloadUpdateConflictRecord,
+    mergeUpdateConflict,
     confirmDelete,
     openDeleteDialog,
     closeDeleteDialog,

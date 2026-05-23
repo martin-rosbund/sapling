@@ -29,6 +29,7 @@ import { MailModule } from './api/mail/mail.module';
 import { AiModule } from './api/ai/ai.module';
 import { TeamsModule } from './api/teams/teams.module';
 import { InboxModule } from './api/inbox/inbox.module';
+import { FormConfigModule } from './api/form-config/form-config.module';
 
 /**
  * @class AppModule
@@ -88,6 +89,7 @@ import { InboxModule } from './api/inbox/inbox.module';
     TeamsModule,
     InboxModule,
     AiModule,
+    FormConfigModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -34,6 +34,18 @@
     @deleted="emit('record-deleted', $event)"
   />
 
+  <SaplingDialogUpdateConflict
+    :model-value="updateConflictDialog.visible"
+    :conflict="updateConflictDialog.conflict"
+    :entity-handle="entityHandle"
+    :entity-templates="entityTemplates"
+    :is-saving="updateConflictDialog.isSaving"
+    @update:model-value="handleUpdateConflictVisibility"
+    @merge="emit('merge-update-conflict', $event)"
+    @reload="emit('reload-update-conflict')"
+    @open-change-log="emit('open-update-conflict-change-log')"
+  />
+
   <SaplingContextMenuTable
     :show="contextMenu.visible"
     :x="contextMenu.x"
@@ -76,6 +88,7 @@ import type {
   EntityTemplate,
 } from '@/entity/structure'
 import type { EntityItem, SaplingGenericItem, ScriptButtonItem } from '@/entity/entity'
+import type { UpdateConflictDialogState } from '@/composables/table/useSaplingTableActions'
 import type {
   SaplingContextMenuTableActionPayload,
   SaplingMailMenuAction,
@@ -83,6 +96,7 @@ import type {
 import SaplingContextMenuTable from '@/components/context/SaplingContextMenuTable.vue'
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
+import SaplingDialogUpdateConflict from '@/components/dialog/SaplingDialogUpdateConflict.vue'
 import SaplingTableRowInformation from './SaplingTableRowInformation.vue'
 import SaplingTableRowUpload from './SaplingTableRowUpload.vue'
 
@@ -116,6 +130,7 @@ defineProps<{
   editDialog: EditDialogOptions
   deleteDialog: DeleteDialogState
   bulkDeleteDialog: BulkDeleteDialogState
+  updateConflictDialog: UpdateConflictDialogState
   contextMenu: TableContextMenuState
   showUploadDialog: boolean
   uploadDialogItem: SaplingGenericItem | null
@@ -142,9 +157,19 @@ const emit = defineEmits<{
   (event: 'update:edit-mode', value: EditDialogOptions['mode']): void
   (event: 'update:edit-item', value: SaplingGenericItem | null): void
   (event: 'record-deleted', value: SaplingGenericItem | null): void
+  (event: 'close-update-conflict'): void
+  (event: 'merge-update-conflict', value: SaplingGenericItem): void
+  (event: 'reload-update-conflict'): void
+  (event: 'open-update-conflict-change-log'): void
   (event: 'context-action', value: SaplingContextMenuTableActionPayload): void
   (event: 'update:context-visible', value: boolean): void
   (event: 'close-upload'): void
   (event: 'close-information'): void
 }>()
+
+function handleUpdateConflictVisibility(value: boolean): void {
+  if (!value) {
+    emit('close-update-conflict')
+  }
+}
 </script>

@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { Type, Transform } from 'class-transformer';
-import { IsInt, IsOptional, Max, Min } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, Max, Min } from 'class-validator';
 
 function parseJsonObjectQuery(
   value: unknown,
@@ -87,6 +87,18 @@ function parseStringArrayQuery(value: unknown, fieldName: string): string[] {
     .filter((item) => item.length > 0);
 }
 
+function parseBooleanQuery(value: unknown): boolean {
+  if (typeof value === 'boolean') {
+    return value;
+  }
+
+  if (typeof value !== 'string') {
+    return false;
+  }
+
+  return ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase());
+}
+
 /**
  * @class
  * @version         1.0
@@ -99,6 +111,14 @@ export class UpdateQueryDto {
   @IsOptional()
   @Transform(({ value }) => parseStringArrayQuery(value, 'relations'))
   relations: string[] = []; // relations to load
+
+  @IsOptional()
+  expectedUpdatedAt?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => parseBooleanQuery(value))
+  @IsBoolean()
+  merge: boolean = false;
 }
 
 /**

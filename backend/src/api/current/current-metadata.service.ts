@@ -5,6 +5,7 @@ import { PersonItem } from '../../entity/PersonItem';
 import { TemplateService } from '../template/template.service';
 import { CurrentService } from './current.service';
 import { CurrentEntityMetadataDto } from './dto/current-entity-metadata.dto';
+import { FormConfigService } from '../form-config/form-config.service';
 
 /**
  * Loads batched entity metadata required by generic frontend workspaces.
@@ -16,6 +17,7 @@ export class CurrentMetadataService {
     private readonly em: EntityManager,
     private readonly templateService: TemplateService,
     private readonly currentService: CurrentService,
+    private readonly formConfigService: FormConfigService,
   ) {}
   //#endregion
 
@@ -42,10 +44,15 @@ export class CurrentMetadataService {
     person: PersonItem,
     entityHandle: string,
   ): Promise<CurrentEntityMetadataDto> {
-    const [entity, entityTemplates] = await Promise.all([
+    const [entity, baseTemplates] = await Promise.all([
       this.em.findOne(EntityItem, { handle: entityHandle }),
       Promise.resolve(this.templateService.getEntityTemplate(entityHandle)),
     ]);
+    const entityTemplates = await this.formConfigService.getEffectiveTemplate(
+      entityHandle,
+      baseTemplates,
+      person,
+    );
 
     return {
       entityHandle,

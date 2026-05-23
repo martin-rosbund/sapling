@@ -17,12 +17,12 @@
   </template>
   <template v-else>
     <SaplingPhoneField
-      v-if="template.options?.includes('isPhone')"
+      v-if="template.options?.includes('isPhone') || isRenderer('phone')"
       :label="requiredLabel"
       :model-value="stringValue(template.name)"
       :maxlength="template.length"
       :disabled="fieldDisabled"
-      :required="template.isRequired"
+      :required="isRequired"
       :placeholder="defaultPlaceholder"
       :entity-handle="entityHandle"
       :item-handle="itemHandle"
@@ -31,12 +31,12 @@
       @update:model-value="(val: string) => updateField(template.name, val)"
     />
     <SaplingMailField
-      v-else-if="template.options?.includes('isMail')"
+      v-else-if="template.options?.includes('isMail') || isRenderer('mail')"
       :label="requiredLabel"
       :model-value="stringValue(template.name)"
       :maxlength="template.length"
       :disabled="fieldDisabled"
-      :required="template.isRequired"
+      :required="isRequired"
       :placeholder="defaultPlaceholder"
       :entity-handle="entityHandle"
       :item-handle="itemHandle"
@@ -45,7 +45,7 @@
       @update:model-value="(val: string) => updateField(template.name, val)"
     />
     <SaplingLinkField
-      v-else-if="template.options?.includes('isLink')"
+      v-else-if="template.options?.includes('isLink') || isRenderer('link')"
       :label="requiredLabel"
       :model-value="stringValue(template.name)"
       :maxlength="template.length"
@@ -69,26 +69,26 @@
       @update:model-value="(val: string | null) => updateField(template.name, val)"
     />
     <SaplingColorField
-      v-else-if="template.options?.includes('isColor')"
+      v-else-if="template.options?.includes('isColor') || isRenderer('color')"
       :label="plainLabel"
       :model-value="stringValue(template.name)"
       :disabled="fieldDisabled"
       :rules="rules"
-      :required="template.isRequired"
+      :required="isRequired"
       @update:model-value="(val: string) => updateField(template.name, val)"
     />
     <SaplingIconField
-      v-else-if="template.options?.includes('isIcon')"
+      v-else-if="template.options?.includes('isIcon') || isRenderer('icon')"
       :items="iconNames"
       :model-value="stringValue(template.name)"
       :label="plainLabel"
       :disabled="fieldDisabled"
       :rules="rules"
-      :required="template.isRequired"
+      :required="isRequired"
       @update:model-value="(val: string) => updateField(template.name, val)"
     />
     <SaplingFieldPercent
-      v-else-if="template.options?.includes('isPercent')"
+      v-else-if="template.options?.includes('isPercent') || isRenderer('percent')"
       :label="requiredLabel"
       :model-value="numberValue(template.name)"
       :disabled="fieldDisabled"
@@ -98,7 +98,7 @@
       @update:model-value="(val: unknown) => updateField(template.name, val)"
     />
     <SaplingFieldMoney
-      v-else-if="template.options?.includes('isMoney')"
+      v-else-if="template.options?.includes('isMoney') || isRenderer('money')"
       :label="requiredLabel"
       :model-value="numberValue(template.name)"
       :disabled="fieldDisabled"
@@ -122,7 +122,7 @@
       @select-record="(record: SaplingGenericItem) => emit('select-record', record)"
     />
     <SaplingNumberField
-      v-else-if="template.type === 'number'"
+      v-else-if="template.type === 'number' || isRenderer('number')"
       :label="requiredLabel"
       :model-value="numberValue(template.name)"
       :disabled="fieldDisabled"
@@ -132,20 +132,20 @@
       @update:model-value="(val: unknown) => updateField(template.name, val)"
     />
     <SaplingBooleanField
-      v-else-if="template.type === 'boolean'"
+      v-else-if="template.type === 'boolean' || isRenderer('boolean')"
       :label="requiredLabel"
       :model-value="booleanValue(template.name)"
       :disabled="fieldDisabled"
       @update:model-value="(val: boolean) => updateField(template.name, val)"
     />
     <SaplingDateTimeField
-      v-else-if="template.type === 'datetime'"
+      v-else-if="template.type === 'datetime' || isRenderer('dateTime')"
       :label="plainLabel"
       :date-value="stringValue(`${template.name}_date`)"
       :time-value="stringValue(`${template.name}_time`)"
       :disabled="fieldDisabled"
       :rules="rules"
-      :required="template.isRequired"
+      :required="isRequired"
       @update:dateValue="(val: string) => updateField(`${template.name}_date`, val)"
       @update:timeValue="(val: string) => updateField(`${template.name}_time`, val)"
     />
@@ -160,7 +160,7 @@
       @update:model-value="(val: string | null) => updateField(template.name, val)"
     />
     <SaplingDateTypeField
-      v-else-if="template.type === 'DateType'"
+      v-else-if="template.type === 'DateType' || isRenderer('date')"
       :label="requiredLabel"
       :model-value="stringValue(template.name)"
       :disabled="fieldDisabled"
@@ -168,7 +168,7 @@
       @update:model-value="(val: string) => updateField(template.name, val)"
     />
     <SaplingTimeField
-      v-else-if="template.type === 'time'"
+      v-else-if="template.type === 'time' || isRenderer('time')"
       :label="requiredLabel"
       :model-value="stringValue(template.name)"
       :disabled="fieldDisabled"
@@ -176,7 +176,7 @@
       @update:model-value="(val: string) => updateField(template.name, val)"
     />
     <SaplingMarkdownField
-      v-else-if="template.options?.includes('isMarkdown')"
+      v-else-if="template.options?.includes('isMarkdown') || isRenderer('markdown')"
       :label="requiredLabel"
       :model-value="stringValue(template.name)"
       :rows="8"
@@ -186,7 +186,7 @@
       @update:model-value="(val: string) => updateField(template.name, val)"
     />
     <SaplingJsonField
-      v-else-if="template.type === 'JsonType'"
+      v-else-if="template.type === 'JsonType' || isRenderer('json')"
       :label="requiredLabel"
       :model-value="jsonValue"
       :disabled="fieldDisabled"
@@ -198,24 +198,24 @@
       :model-value="stringValue(template.name)"
       :maxlength="template.length"
       :disabled="fieldDisabled"
-      :required="template.isRequired"
+      :required="isRequired"
       :placeholder="defaultPlaceholder"
       :rules="rules"
       @update:model-value="(val: string) => updateField(template.name, val)"
     />
     <SaplingPasswordField
-      v-else-if="template.options?.includes('isSecurity')"
+      v-else-if="template.options?.includes('isSecurity') || isRenderer('password')"
       :label="requiredLabel"
       :model-value="stringValue(template.name)"
       :maxlength="template.length"
       :disabled="fieldDisabled"
-      :required="template.isRequired"
+      :required="isRequired"
       :placeholder="defaultPlaceholder"
       :rules="rules"
       @update:model-value="(val: string) => updateField(template.name, val)"
     />
     <SaplingShortTextField
-      v-else-if="(template.length ?? 0) <= 128"
+      v-else-if="isRenderer('shortText') || ((template.length ?? 0) <= 128 && !isRenderer('longText'))"
       :label="requiredLabel"
       :model-value="stringValue(template.name)"
       :maxlength="template.length"
@@ -349,9 +349,26 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
+const configuredRenderer = computed(() => props.template.formConfig?.renderer ?? null)
+const isRequired = computed(() => {
+  if (props.template.formConfig?.required === true) {
+    return true
+  }
+
+  if (props.template.formConfig?.required === false && props.template.nullable !== false) {
+    return false
+  }
+
+  return props.template.isRequired === true
+})
 const plainLabel = computed(() => {
   if (!props.showLabel) {
     return ''
+  }
+
+  const configuredLabel = props.template.formConfig?.label?.trim()
+  if (configuredLabel) {
+    return configuredLabel
   }
 
   return t(`${props.entityHandle}.${props.template.name}`)
@@ -361,10 +378,14 @@ const requiredLabel = computed(() => {
     return ''
   }
 
-  return `${plainLabel.value}${props.template.isRequired ? '*' : ''}`
+  return `${plainLabel.value}${isRequired.value ? '*' : ''}`
 })
 const defaultPlaceholder = computed(() =>
-  props.template.default != null ? String(props.template.default) : '',
+  props.template.formConfig?.placeholder != null
+    ? String(props.template.formConfig.placeholder)
+    : props.template.default != null
+      ? String(props.template.default)
+      : '',
 )
 const defaultRawPlaceholder = computed(() =>
   props.template.defaultRaw != null ? String(props.template.defaultRaw) : '',
@@ -387,6 +408,10 @@ function numberValue(fieldName: string): number {
 
 function booleanValue(fieldName: string): boolean {
   return Boolean(props.formValues[fieldName])
+}
+
+function isRenderer(renderer: string): boolean {
+  return configuredRenderer.value === renderer
 }
 
 function updateField(key: string, value: unknown): void {

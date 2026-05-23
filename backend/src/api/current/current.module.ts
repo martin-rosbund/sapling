@@ -8,6 +8,7 @@ import { AuthModule } from '../../auth/auth.module';
 import { TemplateService } from '../template/template.service';
 import { InboxModule } from '../inbox/inbox.module';
 import { OpenTaskEventsModule } from './open-task-events.module';
+import { FormConfigService } from '../form-config/form-config.service';
 
 /**
  * @class
@@ -29,7 +30,12 @@ import { OpenTaskEventsModule } from './open-task-events.module';
     ),
   ],
   controllers: [CurrentController],
-  providers: [CurrentService, CurrentMetadataService, TemplateService],
+  providers: [
+    CurrentService,
+    CurrentMetadataService,
+    TemplateService,
+    FormConfigService,
+  ],
   exports: [CurrentService, OpenTaskEventsModule],
 })
 /**

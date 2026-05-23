@@ -15,8 +15,12 @@ import type {
   DialogSaveContext,
   DialogState,
   EntityTemplate,
+  SaplingFormConfigPayload,
+  SaplingFormFieldConfig,
 } from '@/entity/structure'
 import ApiGenericService from '@/services/api.generic.service'
+import ApiFormConfigService, { type SaplingFormConfigItem } from '@/services/api.form-config.service'
+import ApiService from '@/services/api.service'
 import { useI18n } from 'vue-i18n'
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity'
 import { getEditDialogHeaders } from '@/utils/saplingTableUtil'
@@ -35,6 +39,14 @@ import { useSaplingDialogEditReferences } from './useSaplingDialogEditReferences
 
 // #region Types
 type VuetifyFormValidationResult = boolean | { valid: boolean } | undefined
+type FormConfigSelectionHandle = number | null
+
+interface FormConfigMenuItem {
+  handle: FormConfigSelectionHandle
+  title: string
+  icon: string
+  active: boolean
+}
 
 type VuetifyFormRef = {
   validate: () => Promise<VuetifyFormValidationResult>
@@ -77,7 +89,23 @@ export function useSaplingDialogEdit(
 ) {
   // #region State
   const { t, te } = useI18n()
-  const templates = computed(() => props.templates ?? [])
+  const systemTemplates = ref<EntityTemplate[]>([])
+  const baseTemplates = computed(() =>
+    systemTemplates.value.length > 0 ? systemTemplates.value : (props.templates ?? []),
+  )
+  const formConfigs = ref<SaplingFormConfigItem[]>([])
+  const selectedFormConfigHandle = ref<FormConfigSelectionHandle>(null)
+  const isLoadingFormConfigs = ref(false)
+  const selectedFormConfig = computed(
+    () =>
+      formConfigs.value.find(
+        (config) =>
+          typeof config.handle === 'number' && config.handle === selectedFormConfigHandle.value,
+      ) ?? null,
+  )
+  const templates = computed(() =>
+    applyFormConfigOverlay(baseTemplates.value, selectedFormConfig.value?.config ?? null),
+  )
   const showReference = computed(() => props.showReference !== false)
   const isLoading = ref(true)
   const form: Ref<SaplingGenericItem> = ref({})
@@ -138,6 +166,125 @@ export function useSaplingDialogEdit(
     }
 
     return value !== null && value !== undefined && value !== ''
+  }
+
+  function getFieldConfig(value: unknown): SaplingFormFieldConfig | null {
+    return value && typeof value === 'object' && !Array.isArray(value)
+      ? (value as SaplingFormFieldConfig)
+      : null
+  }
+
+  function applyFormConfigOverlay(
+    sourceTemplates: EntityTemplate[],
+    config: SaplingFormConfigPayload | null,
+  ): EntityTemplate[] {
+    if (!config?.fields) {
+      return sourceTemplates
+    }
+
+    return sourceTemplates.map((template) => {
+      const fieldConfig = getFieldConfig(config.fields?.[template.name])
+      if (!fieldConfig) {
+        return template
+      }
+
+      return {
+        ...template,
+        formGroup: fieldConfig.group ?? template.formGroup,
+        formGroupOrder: fieldConfig.groupOrder ?? template.formGroupOrder,
+        formOrder: fieldConfig.order ?? template.formOrder,
+        formWidth: fieldConfig.width ?? template.formWidth,
+        isRequired: fieldConfig.required ?? template.isRequired,
+        formConfig: {
+          ...(template.formConfig ?? {}),
+          ...fieldConfig,
+        },
+      }
+    })
+  }
+
+  const formConfigMenuItems = computed<FormConfigMenuItem[]>(() => {
+    const selectableConfigs = formConfigs.value.filter(
+      (config) => config.isActive !== false && typeof config.handle === 'number',
+    )
+
+    if (selectableConfigs.length === 0) {
+      return []
+    }
+
+    return [
+      {
+        handle: null,
+        title: t('formConfig.defaultView'),
+        icon: 'mdi-view-dashboard-outline',
+        active: selectedFormConfigHandle.value === null,
+      },
+      ...selectableConfigs.map((config) => ({
+        handle: config.handle ?? null,
+        title: config.name,
+        icon: config.isDefault ? 'mdi-table-star' : 'mdi-table-cog',
+        active: selectedFormConfigHandle.value === config.handle,
+      })),
+    ]
+  })
+
+  const selectedFormConfigLabel = computed(() => selectedFormConfig.value?.name ?? '')
+
+  function getDefaultFormConfigHandle(
+    configs: SaplingFormConfigItem[] = formConfigs.value,
+  ): FormConfigSelectionHandle {
+    return (
+      configs.find(
+        (config) =>
+          config.isActive !== false &&
+          config.isDefault === true &&
+          typeof config.handle === 'number',
+      )?.handle ?? null
+    )
+  }
+
+  function selectDefaultFormConfig(): void {
+    selectedFormConfigHandle.value = getDefaultFormConfigHandle()
+  }
+
+  async function loadFormConfigs(): Promise<void> {
+    const entityHandle = props.entity?.handle
+    if (!entityHandle) {
+      formConfigs.value = []
+      selectedFormConfigHandle.value = null
+      return
+    }
+
+    isLoadingFormConfigs.value = true
+
+    try {
+      formConfigs.value = await ApiFormConfigService.list(entityHandle)
+      selectDefaultFormConfig()
+    } catch {
+      formConfigs.value = []
+      selectedFormConfigHandle.value = null
+    } finally {
+      isLoadingFormConfigs.value = false
+    }
+  }
+
+  async function loadSystemTemplates(): Promise<void> {
+    const entityHandle = props.entity?.handle?.trim()
+    if (!entityHandle) {
+      systemTemplates.value = []
+      return
+    }
+
+    try {
+      systemTemplates.value = await ApiService.findAll<EntityTemplate[]>(`template/${entityHandle}`)
+    } catch {
+      systemTemplates.value = props.templates ?? []
+    }
+  }
+
+  function selectFormConfig(handle: FormConfigSelectionHandle): void {
+    selectedFormConfigHandle.value = handle
+    activeTab.value = 0
   }
 
   // #region Templates
@@ -282,7 +429,7 @@ export function useSaplingDialogEdit(
 
     try {
       await currentPersonStore.fetchCurrentPerson()
-      await setEntitiesPermissions()
+      await Promise.all([setEntitiesPermissions(), loadFormConfigs(), loadSystemTemplates()])
       await initializeRelationTables()
       await loadActiveRelationTableItems()
     } catch (error) {
@@ -394,9 +541,21 @@ export function useSaplingDialogEdit(
   const requiredRule = (label: string) => (v: unknown) =>
     v !== null && v !== undefined && v !== '' ? true : `${label} ${t('global.isRequired')}`
 
+  function isTemplateRequired(template: EntityTemplate): boolean {
+    if (template.formConfig?.required === true) {
+      return true
+    }
+
+    if (template.formConfig?.required === false && template.nullable !== false) {
+      return false
+    }
+
+    return template.isRequired === true
+  }
+
   function getRules(template: EntityTemplate): Array<(v: unknown) => true | string> {
     const rules: Array<(v: unknown) => true | string> = []
-    if (template.isRequired) {
+    if (isTemplateRequired(template)) {
       rules.push(requiredRule(t(`${props.entity?.handle}.${template.name}`)))
     }
     return rules
@@ -409,6 +568,7 @@ export function useSaplingDialogEdit(
     return (
       (template.name === 'handle' && props.mode === 'edit') ||
       template.options?.includes('isReadOnly') ||
+      template.formConfig?.readonly === true ||
       props.mode === 'readonly'
     )
   }
@@ -545,6 +705,15 @@ export function useSaplingDialogEdit(
     void loadActiveRelationTableItems()
   })
 
+  watch(
+    () => props.entity?.handle ?? '',
+    () => {
+      formConfigs.value = []
+      systemTemplates.value = []
+      selectedFormConfigHandle.value = null
+    },
+  )
+
   watch(templatesSignature, async () => {
     await initialize()
   })
@@ -597,9 +766,12 @@ export function useSaplingDialogEdit(
   watch(
     () => props.modelValue,
     (visible) => {
-      if (!visible) {
-        completeSave()
+      if (visible) {
+        selectDefaultFormConfig()
+        return
       }
+
+      completeSave()
     },
   )
   // #endregion
@@ -826,6 +998,10 @@ export function useSaplingDialogEdit(
     unsavedChangesDialog,
     pendingSaveAction,
     dirtyFieldCount,
+    formConfigMenuItems,
+    selectedFormConfigLabel,
+    isLoadingFormConfigs,
+    selectFormConfig,
     getRules,
     getTemplateColumnProps,
     isTemplateDirty,

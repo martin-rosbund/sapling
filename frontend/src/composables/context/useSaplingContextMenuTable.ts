@@ -7,6 +7,7 @@ export type SaplingContextMenuTableAction =
   | 'copy'
   | 'delete'
   | 'edit'
+  | 'formConfig'
   | 'mail'
   | 'navigate'
   | 'script'
@@ -47,6 +48,7 @@ export interface SaplingContextMenuTableMenuItem {
   icon: string
   titleKey?: string
   title?: string
+  formConfigHandle?: number | null
   scriptButton?: ScriptButtonItem
   mailAction?: SaplingMailMenuAction
 }

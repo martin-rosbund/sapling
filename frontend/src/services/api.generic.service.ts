@@ -6,6 +6,49 @@ import { pushApiErrorMessage } from '@/services/api.error.service'
 export type FilterQuery = { [key: string]: unknown }
 export type OrderByQuery = { [key: string]: 'ASC' | 'DESC' | 1 | -1 | string }
 export type EntityHandleValue = string | number
+export type GenericUpdateConcurrencyResolution = 'detect' | 'merge' | 'overwrite'
+
+export interface GenericUpdateConcurrency {
+  expectedUpdatedAt?: string | Date | null
+  basePayload?: Record<string, unknown> | null
+  resolution?: GenericUpdateConcurrencyResolution
+  merge?: boolean
+  force?: boolean
+}
+
+export interface GenericUpdateConflictField {
+  property: string
+  baseValue?: unknown
+  currentValue?: unknown
+  attemptedValue?: unknown
+  changedInCurrent: boolean
+  changedInAttempt: boolean
+  conflict: boolean
+}
+
+export interface GenericUpdateConflictLatestChange {
+  handle?: string | number | null
+  action?: string | null
+  createdAt?: string | Date | null
+  person?: Record<string, unknown> | null
+}
+
+export interface GenericUpdateConflictDetails {
+  reason: 'staleRecord'
+  entityHandle: string
+  handle: EntityHandleValue
+  expectedUpdatedAt?: string | null
+  currentUpdatedAt?: string | null
+  autoMergeable: boolean
+  conflictingProperties: string[]
+  mergeableProperties: string[]
+  base?: Record<string, unknown> | null
+  current?: Record<string, unknown> | null
+  attempted?: Record<string, unknown> | null
+  fields: GenericUpdateConflictField[]
+  latestChange?: GenericUpdateConflictLatestChange | null
+  summary?: string
+}
 
 interface FindOptions {
   filter?: FilterQuery
@@ -18,6 +61,8 @@ interface FindOptions {
 
 interface UpdateOptions {
   relations?: string[]
+  concurrency?: GenericUpdateConcurrency
+  suppressConflictMessage?: boolean
 }
 
 interface TimelineOptions {
@@ -143,7 +188,7 @@ class ApiGenericService {
     entityHandle: string,
     handle: EntityHandleValue,
     data: Partial<T>,
-    { relations }: UpdateOptions = {},
+    { relations, concurrency, suppressConflictMessage }: UpdateOptions = {},
   ): Promise<T> {
     const params: Record<string, unknown> = {
       handle,
@@ -151,14 +196,36 @@ class ApiGenericService {
     if (relations && relations.length > 0) {
       params.relations = JSON.stringify(relations)
     }
+    if (concurrency?.expectedUpdatedAt) {
+      params.expectedUpdatedAt =
+        concurrency.expectedUpdatedAt instanceof Date
+          ? concurrency.expectedUpdatedAt.toISOString()
+          : concurrency.expectedUpdatedAt
+    }
+    if (concurrency?.merge === true || concurrency?.resolution === 'merge') {
+      params.merge = true
+    }
+
+    const payload =
+      concurrency?.basePayload ||
+      concurrency?.resolution ||
+      concurrency?.merge === true ||
+      concurrency?.force === true
+        ? {
+            ...data,
+            _saplingConcurrency: concurrency,
+          }
+        : data
 
     try {
-      const response = await axios.patch<T>(`${BACKEND_URL}generic/${entityHandle}`, data, {
+      const response = await axios.patch<T>(`${BACKEND_URL}generic/${entityHandle}`, payload, {
         params,
       })
       return response.data
     } catch (error: unknown) {
-      pushApiErrorMessage(error, 'exception.unknownError', entityHandle)
+      if (!(suppressConflictMessage && getGenericUpdateConflict(error))) {
+        pushApiErrorMessage(error, 'exception.unknownError', entityHandle)
+      }
       throw error
     }
   }
@@ -234,3 +301,24 @@ function isRequestCanceled(error: unknown): boolean {
 }
 
 export default ApiGenericService
+
+export function getGenericUpdateConflict(error: unknown): GenericUpdateConflictDetails | null {
+  if (typeof error !== 'object' || error === null) {
+    return null
+  }
+
+  const response = (error as { response?: { status?: number; data?: unknown } }).response
+  if (response?.status !== 409 || typeof response.data !== 'object' || response.data === null) {
+    return null
+  }
+
+  const details = (response.data as { details?: unknown }).details
+  if (typeof details !== 'object' || details === null) {
+    return null
+  }
+
+  const conflict = details as Partial<GenericUpdateConflictDetails>
+  return conflict.reason === 'staleRecord' && Array.isArray(conflict.fields)
+    ? (conflict as GenericUpdateConflictDetails)
+    : null
+}

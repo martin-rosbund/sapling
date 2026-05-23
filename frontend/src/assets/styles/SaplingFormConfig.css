@@ -1,0 +1,279 @@
+.sapling-form-config {
+  --sapling-form-config-border: var(--sapling-surface-border);
+  --sapling-form-config-border-muted: var(--sapling-surface-border-muted);
+  --sapling-form-config-surface: var(--sapling-surface-fill);
+  --sapling-form-config-surface-soft: var(--sapling-surface-fill-soft);
+  --sapling-form-config-surface-strong: var(--sapling-surface-fill-strong);
+}
+
+.sapling-form-config__hero {
+  margin-bottom: 16px;
+}
+
+.sapling-form-config__hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.sapling-form-config__file-input {
+  display: none;
+}
+
+.sapling-form-config__alert {
+  margin-bottom: 16px;
+}
+
+.sapling-form-config__workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.sapling-form-config__panel {
+  min-width: 0;
+  border: 1px solid var(--sapling-form-config-border);
+  border-radius: 8px;
+  background: var(--sapling-form-config-surface);
+  box-shadow: var(--sapling-shadow-sm);
+}
+
+.sapling-form-config__panel--editor,
+.sapling-form-config__panel--preview {
+  padding: 16px;
+  backdrop-filter: blur(var(--sapling-blur-panel));
+  -webkit-backdrop-filter: blur(var(--sapling-blur-panel));
+}
+
+.sapling-form-config__panel--preview {
+  position: sticky;
+  top: 88px;
+}
+
+.sapling-form-config__toolbar,
+.sapling-form-config__field-tools {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.sapling-form-config__settings {
+  display: grid;
+  grid-template-columns: minmax(150px, 1.3fr) minmax(120px, 0.8fr) minmax(140px, 0.8fr) auto;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.sapling-form-config__switches {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.sapling-form-config__field-tools {
+  grid-template-columns: minmax(180px, 1fr) auto auto;
+}
+
+.sapling-form-config__field-list {
+  display: grid;
+  gap: 10px;
+  max-height: min(980px, calc(100vh - 360px));
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.sapling-form-config-field {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--sapling-form-config-border);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(var(--v-theme-primary), 0.08), transparent 55%),
+    var(--sapling-form-config-surface-soft);
+  box-shadow: var(--sapling-inset-highlight);
+  backdrop-filter: blur(var(--sapling-blur-sm));
+  -webkit-backdrop-filter: blur(var(--sapling-blur-sm));
+}
+
+.sapling-form-config-field:focus-within {
+  border-color: var(--sapling-surface-border-accent-strong);
+  box-shadow:
+    var(--sapling-inset-highlight),
+    0 0 0 1px var(--sapling-surface-border-accent);
+}
+
+.sapling-form-config-field__main {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+
+.sapling-form-config-field__main strong,
+.sapling-form-config__preview-header h2 {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.sapling-form-config-field__main span {
+  display: block;
+  color: rgba(var(--v-theme-on-surface), 0.64);
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+}
+
+.sapling-form-config-field__controls {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(120px, 1fr) minmax(76px, 0.45fr) minmax(
+      92px,
+      0.55fr
+    ) minmax(130px, 0.8fr) minmax(120px, 1fr);
+  gap: 8px;
+}
+
+.sapling-form-config-field__toggles {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.sapling-form-config__preview-header,
+.sapling-form-config__json-header {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.sapling-form-config__eyebrow {
+  margin: 0 0 2px;
+  color: rgb(var(--v-theme-primary));
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.sapling-form-config-preview {
+  display: grid;
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid var(--sapling-form-config-border);
+  border-radius: 8px;
+  background: var(--sapling-surface-gradient-panel);
+  backdrop-filter: blur(var(--sapling-blur-panel));
+  -webkit-backdrop-filter: blur(var(--sapling-blur-panel));
+}
+
+.sapling-form-config-preview__group {
+  display: grid;
+  gap: 8px;
+}
+
+.sapling-form-config-preview__group h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.sapling-form-config-preview__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sapling-form-config-preview__field {
+  min-height: 72px;
+  padding: 10px;
+  border: 1px solid var(--sapling-form-config-border-muted);
+  border-radius: 8px;
+  background: var(--sapling-form-config-surface-soft);
+  box-shadow: var(--sapling-inset-highlight);
+}
+
+.sapling-form-config-preview__field--w1 {
+  grid-column: span 1;
+}
+
+.sapling-form-config-preview__field--w2 {
+  grid-column: span 2;
+}
+
+.sapling-form-config-preview__field--w3,
+.sapling-form-config-preview__field--w4 {
+  grid-column: span 4;
+}
+
+.sapling-form-config-preview__field span,
+.sapling-form-config-preview__field small {
+  display: block;
+  color: rgba(var(--v-theme-on-surface), 0.64);
+  overflow-wrap: anywhere;
+}
+
+.sapling-form-config-preview__field strong {
+  display: block;
+  margin: 4px 0;
+  overflow-wrap: anywhere;
+}
+
+.sapling-form-config__json-panel {
+  margin-top: 16px;
+}
+
+.sapling-form-config__json-editor {
+  min-height: 220px;
+  max-height: 360px;
+  overflow: hidden;
+  border: 1px solid var(--sapling-form-config-border);
+  border-radius: 8px;
+  background: var(--sapling-form-config-surface-soft);
+  backdrop-filter: blur(var(--sapling-blur-sm));
+  -webkit-backdrop-filter: blur(var(--sapling-blur-sm));
+}
+
+.sapling-form-config__validation {
+  margin-top: 10px;
+}
+
+@media (max-width: 1180px) {
+  .sapling-form-config__workspace,
+  .sapling-form-config__settings,
+  .sapling-form-config-field__controls {
+    grid-template-columns: 1fr;
+  }
+
+  .sapling-form-config__panel--preview {
+    position: static;
+  }
+
+  .sapling-form-config__switches {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 720px) {
+  .sapling-form-config__toolbar,
+  .sapling-form-config__field-tools {
+    grid-template-columns: 1fr;
+  }
+
+  .sapling-form-config__hero-actions {
+    justify-content: flex-start;
+  }
+
+  .sapling-form-config-preview__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sapling-form-config-preview__field {
+    grid-column: span 1;
+  }
+}
