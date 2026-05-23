@@ -20,6 +20,7 @@ import type {
 } from '@/entity/structure'
 import ApiGenericService from '@/services/api.generic.service'
 import ApiFormConfigService, { type SaplingFormConfigItem } from '@/services/api.form-config.service'
+import ApiService from '@/services/api.service'
 import { useI18n } from 'vue-i18n'
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity'
 import { getEditDialogHeaders } from '@/utils/saplingTableUtil'
@@ -88,7 +89,10 @@ export function useSaplingDialogEdit(
 ) {
   // #region State
   const { t, te } = useI18n()
-  const baseTemplates = computed(() => props.templates ?? [])
+  const systemTemplates = ref<EntityTemplate[]>([])
+  const baseTemplates = computed(() =>
+    systemTemplates.value.length > 0 ? systemTemplates.value : (props.templates ?? []),
+  )
   const formConfigs = ref<SaplingFormConfigItem[]>([])
   const selectedFormConfigHandle = ref<FormConfigSelectionHandle>(null)
   const isLoadingFormConfigs = ref(false)
@@ -226,6 +230,23 @@ export function useSaplingDialogEdit(
 
   const selectedFormConfigLabel = computed(() => selectedFormConfig.value?.name ?? '')
 
+  function getDefaultFormConfigHandle(
+    configs: SaplingFormConfigItem[] = formConfigs.value,
+  ): FormConfigSelectionHandle {
+    return (
+      configs.find(
+        (config) =>
+          config.isActive !== false &&
+          config.isDefault === true &&
+          typeof config.handle === 'number',
+      )?.handle ?? null
+    )
+  }
+
+  function selectDefaultFormConfig(): void {
+    selectedFormConfigHandle.value = getDefaultFormConfigHandle()
+  }
+
   async function loadFormConfigs(): Promise<void> {
     const entityHandle = props.entity?.handle
     if (!entityHandle) {
@@ -238,17 +259,26 @@ export function useSaplingDialogEdit(
 
     try {
       formConfigs.value = await ApiFormConfigService.list(entityHandle)
-      if (
-        selectedFormConfigHandle.value !== null &&
-        !formConfigs.value.some((config) => config.handle === selectedFormConfigHandle.value)
-      ) {
-        selectedFormConfigHandle.value = null
-      }
+      selectDefaultFormConfig()
     } catch {
       formConfigs.value = []
       selectedFormConfigHandle.value = null
     } finally {
       isLoadingFormConfigs.value = false
+    }
+  }
+
+  async function loadSystemTemplates(): Promise<void> {
+    const entityHandle = props.entity?.handle?.trim()
+    if (!entityHandle) {
+      systemTemplates.value = []
+      return
+    }
+
+    try {
+      systemTemplates.value = await ApiService.findAll<EntityTemplate[]>(`template/${entityHandle}`)
+    } catch {
+      systemTemplates.value = props.templates ?? []
     }
   }
 
@@ -399,7 +429,7 @@ export function useSaplingDialogEdit(
 
     try {
       await currentPersonStore.fetchCurrentPerson()
-      await Promise.all([setEntitiesPermissions(), loadFormConfigs()])
+      await Promise.all([setEntitiesPermissions(), loadFormConfigs(), loadSystemTemplates()])
       await initializeRelationTables()
       await loadActiveRelationTableItems()
     } catch (error) {
@@ -679,6 +709,7 @@ export function useSaplingDialogEdit(
     () => props.entity?.handle ?? '',
     () => {
       formConfigs.value = []
+      systemTemplates.value = []
       selectedFormConfigHandle.value = null
     },
   )
@@ -735,9 +766,12 @@ export function useSaplingDialogEdit(
   watch(
     () => props.modelValue,
     (visible) => {
-      if (!visible) {
-        completeSave()
+      if (visible) {
+        selectDefaultFormConfig()
+        return
       }
+
+      completeSave()
     },
   )
   // #endregion
