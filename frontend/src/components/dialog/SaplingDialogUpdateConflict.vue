@@ -62,10 +62,10 @@
               divided
               mandatory
             >
-              <v-btn value="current" prepend-icon="mdi-cloud-outline">
+              <v-btn value="current" prepend-icon="mdi-cloud-outline" class="glass-panel">
                 {{ $t('updateConflict.currentVersion') }}
               </v-btn>
-              <v-btn value="attempted" prepend-icon="mdi-account-edit-outline">
+              <v-btn value="attempted" prepend-icon="mdi-account-edit-outline" class="glass-panel">
                 {{ $t('updateConflict.yourVersion') }}
               </v-btn>
             </v-btn-toggle>

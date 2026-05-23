@@ -11,12 +11,14 @@ const {
   buildSavePayloadMock,
   listFormConfigsMock,
   findAllMock,
+  initializeFormMock,
 } = vi.hoisted(() => ({
   fetchCurrentPersonMock: vi.fn(),
   fetchCurrentPermissionMock: vi.fn(),
   buildSavePayloadMock: vi.fn(),
   listFormConfigsMock: vi.fn(),
   findAllMock: vi.fn(),
+  initializeFormMock: vi.fn(),
 }))
 
 vi.mock('vue-i18n', () => ({
@@ -125,9 +127,9 @@ vi.mock('../useSaplingDialogEditDirty', () => ({
 }))
 
 vi.mock('../useSaplingDialogEditForm', () => ({
-  useSaplingDialogEditForm: () => ({
+  useSaplingDialogEditForm: (options: { item: { value: SaplingGenericItem | null } }) => ({
     applyCurrentDefaults: vi.fn(),
-    initializeForm: vi.fn(),
+    initializeForm: () => initializeFormMock(options.item.value),
     syncParentReferences: vi.fn(),
     buildSavePayload: buildSavePayloadMock,
   }),
@@ -145,6 +147,10 @@ const TestHost = defineComponent({
       type: Array as PropType<EntityTemplate[]>,
       default: () => [{ name: 'title', type: 'string' }],
     },
+    item: {
+      type: Object as PropType<SaplingGenericItem | null>,
+      default: () => ({ handle: 42, title: 'Calendar event' }),
+    },
   },
   emits: ['update:modelValue', 'save', 'cancel', 'update:mode', 'update:item'],
   setup(props, { emit }) {
@@ -159,9 +165,13 @@ const TestHost = defineComponent({
           return props.modelValue
         },
         mode: 'edit' as DialogState,
-        item: { handle: 42, title: 'Calendar event' } as SaplingGenericItem,
+        get item() {
+          return props.item
+        },
         entity: { handle: 'event' } as EntityItem,
-        templates: props.templates,
+        get templates() {
+          return props.templates
+        },
       },
       dialogEmit,
     )
@@ -192,6 +202,7 @@ describe('useSaplingDialogEdit', () => {
     buildSavePayloadMock.mockReset()
     listFormConfigsMock.mockReset()
     findAllMock.mockReset()
+    initializeFormMock.mockReset()
     fetchCurrentPersonMock.mockResolvedValue(undefined)
     fetchCurrentPermissionMock.mockResolvedValue(undefined)
     listFormConfigsMock.mockResolvedValue([])
@@ -434,5 +445,29 @@ describe('useSaplingDialogEdit', () => {
     expect(vm.visibleTemplates[0]?.formGroup).toBe('Entity group')
     expect(vm.visibleTemplates[0]?.formOrder).toBe(1)
     expect(vm.visibleTemplates[0]?.formWidth).toBe(4)
+  })
+
+  it('hydrates the form from the current item every time the dialog opens', async () => {
+    const firstItem = { handle: 42, title: 'Old title' }
+    const currentItem = { handle: 42, title: 'Merged title' }
+    const wrapper = mount(TestHost, {
+      props: {
+        modelValue: false,
+        item: firstItem,
+      },
+    })
+    await flushPromises()
+    initializeFormMock.mockClear()
+
+    await wrapper.setProps({
+      item: currentItem,
+      modelValue: true,
+    })
+    await nextTick()
+
+    expect(initializeFormMock).toHaveBeenCalled()
+    expect(initializeFormMock.mock.calls[initializeFormMock.mock.calls.length - 1]?.[0]).toEqual(
+      currentItem,
+    )
   })
 })

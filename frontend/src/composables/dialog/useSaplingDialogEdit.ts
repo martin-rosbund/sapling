@@ -768,6 +768,7 @@ export function useSaplingDialogEdit(
     (visible) => {
       if (visible) {
         selectDefaultFormConfig()
+        initializeForm()
         return
       }
 
