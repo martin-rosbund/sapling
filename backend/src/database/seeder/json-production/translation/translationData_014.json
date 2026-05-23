@@ -1,0 +1,15 @@
+[
+  { "entity": "global", "property": "changeLog", "de": "Aenderungsprotokoll", "en": "Change log" },
+  { "entity": "exception", "property": "concurrentUpdate", "de": "Gleichzeitige Aenderung", "en": "Concurrent update" },
+  { "entity": "updateConflict", "property": "eyebrow", "de": "Gleichzeitige Aenderung", "en": "Concurrent update" },
+  { "entity": "updateConflict", "property": "title", "de": "Datensatz wurde geaendert", "en": "Record was changed" },
+  { "entity": "updateConflict", "property": "summary", "de": "Eine andere Person hat diesen Datensatz seit dem Oeffnen gespeichert. Vergleiche die Werte und waehle, welche Version uebernommen werden soll.", "en": "Someone else saved this record after you opened it. Compare the values and choose which version should be kept." },
+  { "entity": "updateConflict", "property": "conflict", "de": "Konflikt", "en": "Conflict" },
+  { "entity": "updateConflict", "property": "mergeable", "de": "Zusammenfuehrbar", "en": "Mergeable" },
+  { "entity": "updateConflict", "property": "currentVersion", "de": "Aktuelle Version", "en": "Current version" },
+  { "entity": "updateConflict", "property": "yourVersion", "de": "Ihre Version", "en": "Your version" },
+  { "entity": "updateConflict", "property": "loadCurrent", "de": "Aktuelle laden", "en": "Load current" },
+  { "entity": "updateConflict", "property": "mergeAndSave", "de": "Zusammenfuehren und speichern", "en": "Merge and save" },
+  { "entity": "updateConflict", "property": "conflictCount", "de": "1 Konflikt | {count} Konflikte", "en": "1 conflict | {count} conflicts" },
+  { "entity": "updateConflict", "property": "mergeableCount", "de": "{count} zusammenfuehrbare Aenderungen", "en": "{count} mergeable changes" }
+]

@@ -192,6 +192,7 @@
       :edit-dialog="editDialog"
       :delete-dialog="deleteDialog"
       :bulk-delete-dialog="bulkDeleteDialog"
+      :update-conflict-dialog="updateConflictDialog"
       :context-menu="{ ...contextMenu, visible: showActions && contextMenu.visible }"
       :context-menu-mail-actions="contextMenuMailActions"
       :show-upload-dialog="showUploadDialog"
@@ -210,6 +211,10 @@
       @update:edit-mode="editDialog.mode = $event"
       @update:edit-item="editDialog.item = $event"
       @record-deleted="refreshTable"
+      @close-update-conflict="closeUpdateConflictDialog"
+      @merge-update-conflict="mergeUpdateConflict"
+      @reload-update-conflict="reloadUpdateConflictRecord"
+      @open-update-conflict-change-log="openUpdateConflictChangeLog"
       @context-action="onContextMenuAction"
       @update:context-visible="(value) => (contextMenu.visible = value)"
       @close-upload="closeUploadDialog"
@@ -321,6 +326,7 @@ const {
   editDialog,
   deleteDialog,
   bulkDeleteDialog,
+  updateConflictDialog,
   showUploadDialog,
   uploadDialogItem,
   showInformationDialog,
@@ -378,6 +384,10 @@ const {
   openCopyDialog,
   closeDialog,
   saveDialog,
+  closeUpdateConflictDialog,
+  openUpdateConflictChangeLog,
+  reloadUpdateConflictRecord,
+  mergeUpdateConflict,
   confirmDelete,
   openDeleteDialog,
   closeDeleteDialog,

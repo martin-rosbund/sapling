@@ -373,6 +373,20 @@ export class GenericController {
       'A comma-separated list of references to load, e.g. "person, company, etc."',
     type: String,
   })
+  @ApiQuery({
+    name: 'expectedUpdatedAt',
+    required: false,
+    description:
+      'Optimistic concurrency token from the record version that was loaded before editing. Usually the previous updatedAt value.',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'merge',
+    required: false,
+    description:
+      'When true, non-overlapping stale updates are merged automatically. Overlapping field changes still return 409 with merge details.',
+    type: Boolean,
+  })
   @ApiBody({
     description:
       'Entity-specific JSON payload containing the fields to update.',
@@ -393,6 +407,10 @@ export class GenericController {
       req.user,
       relationsQuery.relations,
       extractClientFormattingContextFromRequest(req),
+      {
+        expectedUpdatedAt: relationsQuery.expectedUpdatedAt,
+        merge: relationsQuery.merge,
+      },
     );
   }
   // #endregion

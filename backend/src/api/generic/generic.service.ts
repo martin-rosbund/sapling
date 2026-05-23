@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -38,11 +39,49 @@ import { GENERIC_DOWNLOAD_LIMIT } from '../../constants/project.constants';
 
 type ChangeLogPayload = Record<string, unknown> | null;
 type ChangeLogAction = 'create' | 'update' | 'delete';
+type GenericUpdateConcurrencyResolution = 'detect' | 'merge' | 'overwrite';
+export type GenericUpdateConcurrencyOptions = {
+  expectedUpdatedAt?: string | Date | null;
+  basePayload?: Record<string, unknown> | null;
+  resolution?: GenericUpdateConcurrencyResolution;
+  merge?: boolean;
+};
+type NormalizedUpdateConcurrencyMetadata = {
+  expectedUpdatedAt?: string | null;
+  basePayload?: ChangeLogPayload;
+  resolution?: GenericUpdateConcurrencyResolution;
+};
+type UpdateConflictField = {
+  property: string;
+  baseValue: unknown;
+  currentValue: unknown;
+  attemptedValue: unknown;
+  changedInCurrent: boolean;
+  changedInAttempt: boolean;
+  conflict: boolean;
+};
+type UpdateConflictEvaluation = {
+  stale: boolean;
+  expectedUpdatedAt: string | null;
+  currentUpdatedAt: string | null;
+  basePayload: ChangeLogPayload;
+  currentPayload: ChangeLogPayload;
+  attemptedPayload: ChangeLogPayload;
+  fields: UpdateConflictField[];
+  conflictingProperties: string[];
+  mergeableProperties: string[];
+};
 type RelationMutationContext = Awaited<
   ReturnType<GenericRelationService['addReferenceAndFlush']>
 >;
 
+const GENERIC_CONCURRENCY_METADATA_KEY = '_saplingConcurrency';
 const CHANGE_LOG_DETAIL_IGNORED_FIELDS = new Set(['updatedAt']);
+const UPDATE_CONFLICT_IGNORED_FIELDS = new Set([
+  'createdAt',
+  'updatedAt',
+  GENERIC_CONCURRENCY_METADATA_KEY,
+]);
 const OPEN_TASK_ENTITY_HANDLES = new Set([
   'ticket',
   'event',
@@ -549,7 +588,14 @@ export class GenericService {
     currentUser: PersonItem,
     relations: string[] = [],
     scriptContext: ScriptServerContext = {},
+    concurrencyOptions: GenericUpdateConcurrencyOptions = {},
   ): Promise<object> {
+    const updatePayload = this.extractUpdateConcurrencyMetadata(
+      data,
+      concurrencyOptions,
+    );
+    data = updatePayload.data;
+    const concurrency = updatePayload.concurrency;
     const previousOpenTaskUserHandles = await this.loadOpenTaskUserHandles(
       entityHandle,
       handle,
@@ -558,7 +604,7 @@ export class GenericService {
     const entityClass = this.genericQueryService.getEntityClass(entityHandle);
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
     const template = this.templateService.getEntityTemplate(entityHandle);
-    const submittedSnapshot = this.captureSubmittedChangeLogPayload(
+    let submittedSnapshot = this.captureSubmittedChangeLogPayload(
       template,
       data,
     );
@@ -593,6 +639,35 @@ export class GenericService {
       currentUser,
       'allowUpdateStage',
     );
+
+    const conflict = this.evaluateUpdateConflict(
+      entityHandle,
+      item,
+      template,
+      submittedSnapshot,
+      concurrency,
+    );
+
+    if (conflict.stale && concurrency.resolution !== 'overwrite') {
+      if (
+        concurrency.resolution === 'merge' &&
+        conflict.conflictingProperties.length === 0
+      ) {
+        data = this.buildAutomaticMergePayload(data, conflict);
+        submittedSnapshot = this.captureSubmittedChangeLogPayload(
+          template,
+          data,
+        );
+      } else {
+        throw new ConflictException(
+          await this.buildUpdateConflictExceptionBody(
+            entityHandle,
+            handle,
+            conflict,
+          ),
+        );
+      }
+    }
 
     data = this.genericPayloadService.prepareUpdatePayload(template, data);
 
@@ -1355,6 +1430,370 @@ export class GenericService {
       records,
       template,
     );
+  }
+
+  private extractUpdateConcurrencyMetadata(
+    data: { createdAt?: Date; updatedAt?: Date; [key: string]: any },
+    options: GenericUpdateConcurrencyOptions = {},
+  ): {
+    data: { createdAt?: Date; updatedAt?: Date; [key: string]: any };
+    concurrency: NormalizedUpdateConcurrencyMetadata;
+  } {
+    const nextData = { ...data };
+    const rawMetadata = this.asUnknownRecord(
+      nextData[GENERIC_CONCURRENCY_METADATA_KEY],
+    );
+    delete nextData[GENERIC_CONCURRENCY_METADATA_KEY];
+
+    const metadata: Record<string, unknown> = {
+      ...(rawMetadata ?? {}),
+    };
+
+    if (metadata.expectedUpdatedAt == null && metadata.baseUpdatedAt != null) {
+      metadata.expectedUpdatedAt = metadata.baseUpdatedAt;
+    }
+
+    if (metadata.expectedUpdatedAt == null && nextData.updatedAt != null) {
+      metadata.expectedUpdatedAt = nextData.updatedAt;
+    }
+    delete nextData.updatedAt;
+
+    if (options.expectedUpdatedAt !== undefined) {
+      metadata.expectedUpdatedAt = options.expectedUpdatedAt;
+    }
+
+    if (options.basePayload !== undefined) {
+      metadata.basePayload = options.basePayload;
+    }
+
+    if (options.resolution) {
+      metadata.resolution = options.resolution;
+    }
+
+    if (options.merge === true) {
+      metadata.resolution = 'merge';
+    }
+
+    const mergeRequested = this.normalizeBoolean(metadata.merge);
+    const forceRequested = this.normalizeBoolean(metadata.force);
+    const resolution =
+      forceRequested === true
+        ? 'overwrite'
+        : mergeRequested === true
+          ? 'merge'
+          : this.normalizeConcurrencyResolution(metadata.resolution);
+
+    return {
+      data: nextData,
+      concurrency: {
+        expectedUpdatedAt: this.normalizeConcurrencyTimestamp(
+          metadata.expectedUpdatedAt,
+        ),
+        basePayload: this.normalizeConcurrencyBasePayload(
+          metadata.basePayload,
+        ),
+        resolution,
+      },
+    };
+  }
+
+  private evaluateUpdateConflict(
+    entityHandle: string,
+    item: object,
+    template: EntityTemplateDto[],
+    attemptedPayload: ChangeLogPayload,
+    concurrency: NormalizedUpdateConcurrencyMetadata,
+  ): UpdateConflictEvaluation {
+    const expectedUpdatedAt = concurrency.expectedUpdatedAt ?? null;
+    const currentUpdatedAt = this.normalizeConcurrencyTimestamp(
+      (item as { updatedAt?: unknown }).updatedAt,
+    );
+    const basePayload = this.projectChangeLogPayload(
+      template,
+      concurrency.basePayload ?? null,
+    );
+    const comparisonShape = this.mergeChangeLogPayloadShape(
+      basePayload,
+      attemptedPayload,
+    );
+    const currentPayload = comparisonShape
+      ? this.captureEntityChangeLogPayload(
+          entityHandle,
+          item,
+          template,
+          comparisonShape,
+        )
+      : null;
+    const stale =
+      expectedUpdatedAt != null &&
+      currentUpdatedAt != null &&
+      expectedUpdatedAt !== currentUpdatedAt;
+    const fields = stale
+      ? this.buildUpdateConflictFields(
+          basePayload,
+          currentPayload,
+          attemptedPayload,
+        )
+      : [];
+    const conflictingProperties = fields
+      .filter((field) => field.conflict)
+      .map((field) => field.property);
+    const mergeableProperties = fields
+      .filter((field) => field.changedInAttempt && !field.conflict)
+      .map((field) => field.property);
+
+    return {
+      stale,
+      expectedUpdatedAt,
+      currentUpdatedAt,
+      basePayload,
+      currentPayload,
+      attemptedPayload,
+      fields,
+      conflictingProperties,
+      mergeableProperties,
+    };
+  }
+
+  private buildUpdateConflictFields(
+    basePayload: ChangeLogPayload,
+    currentPayload: ChangeLogPayload,
+    attemptedPayload: ChangeLogPayload,
+  ): UpdateConflictField[] {
+    const baseRecord = this.asChangeLogRecord(basePayload);
+    const currentRecord = this.asChangeLogRecord(currentPayload);
+    const attemptedRecord = this.asChangeLogRecord(attemptedPayload);
+    const hasBasePayload = basePayload != null;
+    const propertyNames = new Set([
+      ...Object.keys(baseRecord),
+      ...Object.keys(attemptedRecord),
+    ]);
+
+    return [...propertyNames]
+      .filter((property) => !UPDATE_CONFLICT_IGNORED_FIELDS.has(property))
+      .sort((left, right) => left.localeCompare(right))
+      .map((property) => {
+        const attemptedHasProperty = Object.prototype.hasOwnProperty.call(
+          attemptedRecord,
+          property,
+        );
+        const baseValue = this.normalizeChangeLogValue(baseRecord[property]);
+        const currentValue = this.normalizeChangeLogValue(
+          currentRecord[property],
+        );
+        const attemptedValue = attemptedHasProperty
+          ? this.normalizeChangeLogValue(attemptedRecord[property])
+          : baseValue;
+        const changedInAttempt = hasBasePayload
+          ? !this.areChangeLogValuesEqual(baseValue, attemptedValue)
+          : attemptedHasProperty;
+        const changedInCurrent = hasBasePayload
+          ? !this.areChangeLogValuesEqual(baseValue, currentValue)
+          : !this.areChangeLogValuesEqual(currentValue, attemptedValue);
+        const conflict =
+          changedInAttempt &&
+          changedInCurrent &&
+          !this.areChangeLogValuesEqual(currentValue, attemptedValue);
+
+        return {
+          property,
+          baseValue,
+          currentValue,
+          attemptedValue,
+          changedInCurrent,
+          changedInAttempt,
+          conflict,
+        };
+      })
+      .filter(
+        (field) =>
+          field.changedInCurrent || field.changedInAttempt || field.conflict,
+      );
+  }
+
+  private buildAutomaticMergePayload(
+    data: { createdAt?: Date; updatedAt?: Date; [key: string]: any },
+    conflict: UpdateConflictEvaluation,
+  ): { createdAt?: Date; updatedAt?: Date; [key: string]: any } {
+    const mergeableProperties = new Set(conflict.mergeableProperties);
+    const mergedData = Object.fromEntries(
+      Object.entries(data).filter(([key]) => mergeableProperties.has(key)),
+    ) as { createdAt?: Date; updatedAt?: Date; [key: string]: any };
+
+    if (
+      !Object.prototype.hasOwnProperty.call(mergedData, 'handle') &&
+      Object.prototype.hasOwnProperty.call(data, 'handle')
+    ) {
+      mergedData.handle = data.handle;
+    }
+
+    return mergedData;
+  }
+
+  private async buildUpdateConflictExceptionBody(
+    entityHandle: string,
+    handle: string | number,
+    conflict: UpdateConflictEvaluation,
+  ): Promise<Record<string, unknown>> {
+    const normalizedHandle = this.genericReferenceService.normalizeHandleValue(
+      entityHandle,
+      handle,
+    );
+    const current = {
+      ...this.asChangeLogRecord(conflict.currentPayload),
+      handle: normalizedHandle,
+      updatedAt: conflict.currentUpdatedAt,
+    };
+
+    return {
+      message: 'exception.concurrentUpdate',
+      error: 'Der Datensatz wurde seit dem Oeffnen geaendert.',
+      details: {
+        summary:
+          'Der Datensatz wurde inzwischen von einer anderen Person geaendert. Bitte pruefe die Aenderungen und fuehre sie zusammen.',
+        reason: 'staleRecord',
+        entityHandle,
+        handle: normalizedHandle,
+        expectedUpdatedAt: conflict.expectedUpdatedAt,
+        currentUpdatedAt: conflict.currentUpdatedAt,
+        autoMergeable: conflict.conflictingProperties.length === 0,
+        conflictingProperties: conflict.conflictingProperties,
+        mergeableProperties: conflict.mergeableProperties,
+        base: conflict.basePayload,
+        current,
+        attempted: conflict.attemptedPayload,
+        fields: conflict.fields,
+        latestChange: await this.findLatestConflictChange(
+          entityHandle,
+          normalizedHandle,
+        ),
+      },
+      technical: {
+        operation: 'generic.update',
+        entityHandle,
+        handle: normalizedHandle,
+        expectedUpdatedAt: conflict.expectedUpdatedAt,
+        currentUpdatedAt: conflict.currentUpdatedAt,
+      },
+    };
+  }
+
+  private async findLatestConflictChange(
+    entityHandle: string,
+    handle: string | number,
+  ): Promise<Record<string, unknown> | null> {
+    try {
+      const latestChange = await this.em.findOne(
+        ChangeLogItem,
+        {
+          entity: { handle: entityHandle },
+          reference: String(handle),
+        },
+        {
+          populate: ['action', 'entity', 'person'],
+          orderBy: { createdAt: 'DESC', handle: 'DESC' },
+        },
+      );
+
+      if (!latestChange) {
+        return null;
+      }
+
+      return {
+        handle: latestChange.handle ?? null,
+        action: latestChange.action?.handle ?? null,
+        createdAt: latestChange.createdAt ?? null,
+        person: this.genericSanitizerService.sanitizeEntityResult(
+          'person',
+          latestChange.person,
+        ),
+      };
+    } catch (error) {
+      global.log?.warn?.('updateConflict.latestChange:', error);
+      return null;
+    }
+  }
+
+  private mergeChangeLogPayloadShape(
+    ...payloads: ChangeLogPayload[]
+  ): ChangeLogPayload {
+    const shape: Record<string, unknown> = {};
+
+    for (const payload of payloads) {
+      const record = this.asChangeLogRecord(payload);
+      for (const key of Object.keys(record)) {
+        shape[key] = record[key];
+      }
+    }
+
+    return Object.keys(shape).length > 0 ? shape : null;
+  }
+
+  private normalizeConcurrencyBasePayload(value: unknown): ChangeLogPayload {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return null;
+    }
+
+    return this.normalizeChangeLogPayload(value as Record<string, unknown>);
+  }
+
+  private normalizeConcurrencyResolution(
+    value: unknown,
+  ): GenericUpdateConcurrencyResolution | undefined {
+    return value === 'merge' || value === 'overwrite' || value === 'detect'
+      ? value
+      : undefined;
+  }
+
+  private normalizeConcurrencyTimestamp(value: unknown): string | null {
+    if (value == null) {
+      return null;
+    }
+
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? null : value.toISOString();
+    }
+
+    if (typeof value !== 'string' && typeof value !== 'number') {
+      return null;
+    }
+
+    const rawValue = String(value).trim();
+    if (!rawValue) {
+      return null;
+    }
+
+    const parsedDate = new Date(rawValue);
+    return Number.isNaN(parsedDate.getTime())
+      ? rawValue
+      : parsedDate.toISOString();
+  }
+
+  private normalizeBoolean(value: unknown): boolean | null {
+    if (typeof value === 'boolean') {
+      return value;
+    }
+
+    if (typeof value !== 'string') {
+      return null;
+    }
+
+    const normalizedValue = value.trim().toLowerCase();
+    if (['1', 'true', 'yes', 'on'].includes(normalizedValue)) {
+      return true;
+    }
+
+    if (['0', 'false', 'no', 'off'].includes(normalizedValue)) {
+      return false;
+    }
+
+    return null;
+  }
+
+  private asUnknownRecord(value: unknown): Record<string, unknown> | null {
+    return value && typeof value === 'object' && !Array.isArray(value)
+      ? (value as Record<string, unknown>)
+      : null;
   }
 
   private async safeStoreChangeLog(

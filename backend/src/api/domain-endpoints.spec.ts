@@ -166,7 +166,7 @@ describe('GenericController', () => {
         req as never,
         'ticket',
         '3',
-        { relations: ['person'] },
+        { relations: ['person'], merge: false },
         payload,
       ),
     ).resolves.toBe(expected);
@@ -177,6 +177,10 @@ describe('GenericController', () => {
       req.user,
       ['person'],
       {},
+      {
+        expectedUpdatedAt: undefined,
+        merge: false,
+      },
     );
   });
 
