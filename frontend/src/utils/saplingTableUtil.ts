@@ -63,6 +63,7 @@ export function getEditDialogHeaders(
 ) {
   return entityTemplates.filter(
     (x) =>
+      x.formConfig?.visible !== false &&
       (!x.options?.includes('isSystem') || isGenericReferenceTemplate(x)) &&
       !x.isAutoIncrement &&
       !['1:m', 'm:n', 'n:m', '1:1'].includes(x.kind || '') &&

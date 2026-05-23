@@ -394,9 +394,21 @@ export function useSaplingDialogEdit(
   const requiredRule = (label: string) => (v: unknown) =>
     v !== null && v !== undefined && v !== '' ? true : `${label} ${t('global.isRequired')}`
 
+  function isTemplateRequired(template: EntityTemplate): boolean {
+    if (template.formConfig?.required === true) {
+      return true
+    }
+
+    if (template.formConfig?.required === false && template.nullable !== false) {
+      return false
+    }
+
+    return template.isRequired === true
+  }
+
   function getRules(template: EntityTemplate): Array<(v: unknown) => true | string> {
     const rules: Array<(v: unknown) => true | string> = []
-    if (template.isRequired) {
+    if (isTemplateRequired(template)) {
       rules.push(requiredRule(t(`${props.entity?.handle}.${template.name}`)))
     }
     return rules
@@ -409,6 +421,7 @@ export function useSaplingDialogEdit(
     return (
       (template.name === 'handle' && props.mode === 'edit') ||
       template.options?.includes('isReadOnly') ||
+      template.formConfig?.readonly === true ||
       props.mode === 'readonly'
     )
   }

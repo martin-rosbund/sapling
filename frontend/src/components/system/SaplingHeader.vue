@@ -220,6 +220,12 @@ const adminActions = computed<SaplingProfileAction[]>(() => {
       handler: openVectorization,
     },
     {
+      key: 'formConfig',
+      icon: 'mdi-table-cog',
+      label: i18n.global.t('formConfig.title'),
+      handler: openFormConfig,
+    },
+    {
       key: 'playground',
       icon: 'mdi-code-block-braces',
       label: i18n.global.t('global.componentLibrary'),
@@ -250,6 +256,10 @@ async function openSystem() {
 
 async function openPlayground() {
   await router.push('/playground')
+}
+
+async function openFormConfig() {
+  await router.push('/form-config')
 }
 
 async function openVectorization() {

@@ -69,6 +69,7 @@ const SaplingHelpDialog = defineAsyncComponent(
 const navigationDrawer = ref(false)
 const { isLoading: isShellTranslationLoading } = useTranslationLoader(
   'global',
+  'formConfig',
   'login',
   'permission',
 )

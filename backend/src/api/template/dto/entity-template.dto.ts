@@ -5,6 +5,7 @@ import {
   type SaplingGenericReferenceMetadata,
   type SaplingReferenceDependency,
 } from '../../../entity/global/entity.decorator';
+import type { SaplingFormFieldConfig } from '../../form-config/form-config.types';
 
 /**
  * @class
@@ -33,6 +34,7 @@ import {
  * @property        formGroupOrder      Optional display order for the enclosing form group
  * @property        formOrder           Optional form order index for generated edit dialogs
  * @property        formWidth           Optional form width span (1-4) for generated edit dialogs
+ * @property        formConfig          Effective user-configured form overlay for this field
  * @property        referenceDependency Declarative parent-child dependency metadata for reference fields
  * @property        genericReference    Declarative metadata for generic entity+handle record references
  */
@@ -166,6 +168,15 @@ export class EntityTemplateDto {
     enum: [1, 2, 3, 4],
   })
   formWidth: SaplingFormWidthSpan | null = null;
+
+  @ApiProperty({
+    description:
+      'Effective user-configured form overlay for this field, if any.',
+    nullable: true,
+    required: false,
+    type: Object,
+  })
+  formConfig?: SaplingFormFieldConfig | null;
 
   @ApiProperty({
     description:

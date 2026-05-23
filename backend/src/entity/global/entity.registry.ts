@@ -100,6 +100,7 @@ import { HolidayItem } from '../HolidayItem';
 import { HolidayGroupItem } from '../HolidayGroupItem';
 import { SharedMailboxGroupItem } from '../SharedMailboxGroupItem';
 import { SharedMailboxItem } from '../SharedMailboxItem';
+import { SaplingFormConfigItem } from '../SaplingFormConfigItem';
 
 /**
  * @file entity.registry.ts
@@ -145,6 +146,7 @@ const ENTITY_REGISTRY_ENTRIES: { name: string; class: any }[] = [
   { name: 'dashboardTemplate', class: DashboardTemplateItem },
   { name: 'entityGroup', class: EntityGroupItem },
   { name: 'entity', class: EntityItem },
+  { name: 'saplingFormConfig', class: SaplingFormConfigItem },
   { name: 'entityRoute', class: EntityRouteItem },
   { name: 'changeLogAction', class: ChangeLogActionItem },
   { name: 'changeLog', class: ChangeLogItem },

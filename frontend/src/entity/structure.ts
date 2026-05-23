@@ -56,6 +56,53 @@ export type SaplingOption =
 
 export type EntityTemplateFormWidth = 1 | 2 | 3 | 4
 
+export type SaplingFormRenderer =
+  | 'auto'
+  | 'shortText'
+  | 'longText'
+  | 'number'
+  | 'boolean'
+  | 'date'
+  | 'dateTime'
+  | 'time'
+  | 'markdown'
+  | 'json'
+  | 'phone'
+  | 'mail'
+  | 'link'
+  | 'password'
+  | 'money'
+  | 'percent'
+  | 'color'
+  | 'icon'
+
+export interface SaplingFormFieldConfig {
+  visible?: boolean
+  group?: string | null
+  groupOrder?: number | null
+  order?: number | null
+  width?: EntityTemplateFormWidth | null
+  label?: string | null
+  helpText?: string | null
+  placeholder?: string | null
+  required?: boolean | null
+  readonly?: boolean | null
+  renderer?: SaplingFormRenderer | null
+  defaultValue?: unknown
+  validation?: unknown[]
+  condition?: Record<string, unknown> | null
+  referenceFilter?: Record<string, unknown> | null
+}
+
+export interface SaplingFormConfigPayload {
+  schema: 'sapling.form-config.v1'
+  entityHandle: string
+  fields?: Record<string, SaplingFormFieldConfig>
+  groups?: Record<string, Record<string, unknown>>
+  layout?: Record<string, unknown>
+  metadata?: Record<string, unknown>
+}
+
 export interface EntityTemplateReferenceDependency {
   parentField: string
   targetField: string
@@ -131,6 +178,8 @@ export interface EntityTemplate {
   formOrder?: number | null
   /** Optional width span (1-4) for generated edit dialogs */
   formWidth?: EntityTemplateFormWidth | null
+  /** Effective user-configured form overlay for this field */
+  formConfig?: SaplingFormFieldConfig | null
   /** Declarative parent-child dependency metadata for reference fields */
   referenceDependency?: EntityTemplateReferenceDependency | null
   /** Declarative metadata for generic record references backed by entity + handle fields */
