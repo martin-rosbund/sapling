@@ -1,5 +1,4 @@
 [
-  { "entity": "global", "property": "changeLog", "de": "Aenderungsprotokoll", "en": "Change log" },
   { "entity": "exception", "property": "concurrentUpdate", "de": "Gleichzeitige Aenderung", "en": "Concurrent update" },
   { "entity": "updateConflict", "property": "eyebrow", "de": "Gleichzeitige Aenderung", "en": "Concurrent update" },
   { "entity": "updateConflict", "property": "title", "de": "Datensatz wurde geaendert", "en": "Record was changed" },
