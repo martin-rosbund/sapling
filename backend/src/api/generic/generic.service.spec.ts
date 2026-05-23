@@ -880,6 +880,7 @@ describe('GenericService', () => {
       handle: 7,
       title: 'Server title',
       description: 'Original description',
+      company: { handle: 9 },
       updatedAt: new Date('2026-05-12T08:40:00.000Z'),
     };
     const findOne = jest
@@ -897,6 +898,13 @@ describe('GenericService', () => {
         createTemplateField({ name: 'handle', type: 'number' }),
         createTemplateField({ name: 'title' }),
         createTemplateField({ name: 'description' }),
+        createTemplateField({
+          name: 'company',
+          isReference: true,
+          kind: 'm:1',
+          referenceName: 'company',
+          referencedPks: ['handle'],
+        }),
         createTemplateField({ name: 'updatedAt', type: 'date' }),
       ]),
     };
@@ -919,12 +927,14 @@ describe('GenericService', () => {
         7,
         {
           title: 'Client title',
+          company: 5,
           _saplingConcurrency: {
             expectedUpdatedAt: '2026-05-12T08:38:00.000Z',
             basePayload: {
               handle: 7,
               title: 'Original title',
               description: 'Original description',
+              company: 3,
             },
           },
         },
@@ -936,7 +946,15 @@ describe('GenericService', () => {
     }
 
     expect(thrown).toBeInstanceOf(ConflictException);
-    expect((thrown as ConflictException).getResponse()).toMatchObject({
+    const response = (thrown as ConflictException).getResponse() as {
+      details: {
+        current: Record<string, unknown>;
+        attempted: Record<string, unknown>;
+        fields: Array<{ property: string }>;
+      };
+    };
+
+    expect(response).toMatchObject({
       message: 'exception.concurrentUpdate',
       details: {
         reason: 'staleRecord',
@@ -958,7 +976,94 @@ describe('GenericService', () => {
         ],
       },
     });
+    expect(response.details.fields.map((field) => field.property)).toEqual([
+      'title',
+    ]);
+    expect(response.details.current).not.toHaveProperty('company');
+    expect(response.details.attempted).not.toHaveProperty('company');
     expect(assign).not.toHaveBeenCalled();
+  });
+
+  it('ignores stale reference changes and treats null and empty strings as equal', async () => {
+    const item = {
+      handle: 7,
+      nickname: '',
+      company: { handle: 9 },
+      updatedAt: new Date('2026-05-12T08:40:00.000Z'),
+    };
+    const findOne = jest
+      .fn<() => Promise<object | null>>()
+      .mockResolvedValueOnce({ handle: 'person' })
+      .mockResolvedValueOnce(item);
+    const assign = jest.fn((target: object, data: object) =>
+      Object.assign(target as Record<string, unknown>, data),
+    );
+    const flush = jest.fn<() => Promise<void>>().mockResolvedValue(undefined);
+    const em = {
+      findOne,
+      assign,
+      flush,
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn(() => [
+        createTemplateField({ name: 'handle', type: 'number' }),
+        createTemplateField({ name: 'nickname' }),
+        createTemplateField({
+          name: 'company',
+          isReference: true,
+          kind: 'm:1',
+          referenceName: 'company',
+          referencedPks: ['handle'],
+        }),
+        createTemplateField({ name: 'updatedAt', type: 'date' }),
+      ]),
+    };
+    const scriptService = {
+      runServer: jest.fn((_method: unknown, items: object | object[]) =>
+        Promise.resolve(new ScriptResultServer(toScriptItems(items))),
+      ),
+    };
+    const currentService = {
+      getEntityPermissions: jest.fn(() => ({
+        allowUpdateStage: 'global',
+      })),
+      getAllEntityPermissions: jest.fn(() => []),
+    };
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+      scriptService,
+    });
+
+    const result = await service.update(
+      'person',
+      7,
+      {
+        nickname: null,
+        company: 5,
+        _saplingConcurrency: {
+          expectedUpdatedAt: '2026-05-12T08:38:00.000Z',
+          basePayload: {
+            handle: 7,
+            nickname: null,
+            company: 3,
+          },
+        },
+      },
+      { handle: 1 } as never,
+      [],
+    );
+
+    expect(assign).toHaveBeenCalledWith(item, {
+      nickname: null,
+      company: 5,
+    });
+    expect(result).toMatchObject({
+      handle: 7,
+      nickname: null,
+      company: 5,
+    });
   });
 
   it('automatically merges stale updates when fields do not overlap', async () => {

@@ -3,6 +3,8 @@
     :model-value="modelValue && Boolean(conflict)"
     size="large"
     :tilt="false"
+    card-class="sapling-update-conflict-dialog sapling-dialog-card--fullscreen"
+    :loading="isTranslationLoading"
     :eyebrow="$t('updateConflict.eyebrow')"
     :title="$t('updateConflict.title')"
     persistent
@@ -158,6 +160,7 @@ import type {
   GenericUpdateConflictDetails,
   GenericUpdateConflictField,
 } from '@/services/api.generic.service'
+import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import SaplingActionBar from '@/components/actions/SaplingActionBar.vue'
 import SaplingChangeLogDetailValue from '@/components/changeLog/SaplingChangeLogDetailValue.vue'
 import SaplingDialogConfirm from '@/components/dialog/SaplingDialogConfirm.vue'
@@ -185,11 +188,14 @@ const emit = defineEmits<{
 }>()
 
 const { t, d, te } = useI18n()
+const { isLoading: isTranslationLoading } = useTranslationLoader('global', 'updateConflict')
 const selectedSources = ref<Record<string, ConflictSource>>({})
 
 const visibleFields = computed<GenericUpdateConflictField[]>(() =>
   (props.conflict?.fields ?? []).filter(
-    (field) => field.changedInCurrent || field.changedInAttempt || field.conflict,
+    (field) =>
+      (field.changedInCurrent || field.changedInAttempt || field.conflict) &&
+      !areConflictValuesEmptyEquivalent(field),
   ),
 )
 
@@ -239,6 +245,15 @@ function getPropertyLabel(property: string): string {
 
   const globalKey = `global.${property}`
   return te(globalKey) ? t(globalKey) : property
+}
+
+function areConflictValuesEmptyEquivalent(field: GenericUpdateConflictField): boolean {
+  const values = [field.baseValue, field.currentValue, field.attemptedValue]
+  return values.every(isEmptyConflictValue)
+}
+
+function isEmptyConflictValue(value: unknown): boolean {
+  return value == null || (typeof value === 'string' && value.trim().length === 0)
 }
 
 function formatPersonLabel(person: unknown): string {
@@ -318,8 +333,10 @@ function openChangeLog(): void {
 <style scoped>
 .sapling-update-conflict {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   gap: 1rem;
+  min-height: 0;
 }
 
 .sapling-update-conflict__summary {
@@ -329,11 +346,15 @@ function openChangeLog(): void {
 
 .sapling-update-conflict__fields {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   gap: 0.875rem;
-  max-height: min(58vh, 38rem);
+  min-height: 0;
+  max-height: none;
   overflow: auto;
   padding-right: 0.25rem;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 .sapling-update-conflict__field {
@@ -343,7 +364,6 @@ function openChangeLog(): void {
   padding: 1rem;
   border: 1px solid rgba(var(--v-theme-on-surface), 0.1);
   border-radius: 8px;
-  background: rgba(var(--v-theme-surface), 0.56);
 }
 
 .sapling-update-conflict__field--conflict {
@@ -419,6 +439,35 @@ function openChangeLog(): void {
   .sapling-update-conflict__toggle :deep(.v-btn) {
     min-width: 0;
     flex: 1 1 0;
+  }
+}
+
+:global(.sapling-update-conflict-dialog) {
+  height: var(--sapling-dialog-card-height);
+  max-height: var(--sapling-dialog-card-height);
+}
+
+:global(.sapling-update-conflict-dialog .sapling-dialog-shell) {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+:global(.sapling-update-conflict-dialog .sapling-dialog__body) {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+:global(.sapling-update-conflict-dialog .sapling-dialog__footer) {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 640px) {
+  :global(.sapling-update-conflict-dialog) {
+    height: var(--sapling-dialog-panel-mobile-max-height);
+    min-height: var(--sapling-dialog-panel-mobile-max-height);
+    max-height: var(--sapling-dialog-panel-mobile-max-height);
   }
 }
 </style>

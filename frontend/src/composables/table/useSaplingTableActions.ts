@@ -66,6 +66,7 @@ interface TableContextMenuState {
 }
 
 interface UseSaplingTableActionsProps {
+  items: SaplingGenericItem[]
   search: string
   sortBy: SortItem[]
   entityHandle: string
@@ -497,6 +498,23 @@ export function useSaplingTableActions({
     return result.data[0] ?? item
   }
 
+  function patchVisibleTableItem(item: SaplingGenericItem | null | undefined): void {
+    const handle = getItemHandle(item)
+    if (handle == null) {
+      return
+    }
+
+    const itemIndex = props.items.findIndex((entry) => getItemHandle(entry) === handle)
+    if (itemIndex === -1) {
+      return
+    }
+
+    props.items.splice(itemIndex, 1, {
+      ...props.items[itemIndex],
+      ...item,
+    })
+  }
+
   function normalizeConcurrencyTimestamp(value: unknown): string | null {
     if (value instanceof Date) {
       return Number.isNaN(value.getTime()) ? null : value.toISOString()
@@ -523,8 +541,7 @@ export function useSaplingTableActions({
     const payload: Record<string, unknown> = {}
 
     props.entityTemplates
-      .filter((template) => template.isPersistent !== false)
-      .filter((template) => !['1:m', 'm:n', 'n:m', '1:1'].includes(template.kind ?? ''))
+      .filter(isConcurrencyComparableTemplate)
       .forEach((template) => {
         if (!template.name || !Object.prototype.hasOwnProperty.call(source, template.name)) {
           return
@@ -545,29 +562,15 @@ export function useSaplingTableActions({
       return normalizeConcurrencyTimestamp(value) ?? value
     }
 
-    if (template.kind === 'm:1') {
-      return normalizeReferencePayloadValue(value, template)
-    }
-
     return value ?? null
   }
 
-  function normalizeReferencePayloadValue(value: unknown, template: EntityTemplate): unknown {
-    if (!value || typeof value !== 'object') {
-      return value ?? null
+  function isConcurrencyComparableTemplate(template: EntityTemplate): boolean {
+    if (!template.name || template.isPersistent === false || template.isReference) {
+      return false
     }
 
-    const valueObject = value as Record<string, unknown>
-    const pkValues =
-      template.referencedPks
-        ?.map((primaryKey) => valueObject[primaryKey])
-        .filter((entry) => entry !== undefined && entry !== null) ?? []
-
-    if (pkValues.length === 1) {
-      return pkValues[0]
-    }
-
-    return pkValues.length > 1 ? pkValues : null
+    return !['1:m', 'm:n', 'n:m', '1:1', 'm:1'].includes(template.kind ?? '')
   }
 
   function buildConcurrencyOptions(source: SaplingGenericItem | null) {
@@ -602,6 +605,7 @@ export function useSaplingTableActions({
             suppressConflictMessage: true,
           }),
         )
+        patchVisibleTableItem(nextDialogItem)
       } else if (editDialog.value.mode === 'create') {
         nextDialogItem = await loadDialogItem(
           await ApiGenericService.create(props.entityHandle, item),
@@ -706,6 +710,7 @@ export function useSaplingTableActions({
         suppressConflictMessage: true,
       })
       const nextDialogItem = await loadDialogItem(savedItem)
+      patchVisibleTableItem(nextDialogItem)
 
       emit('reload')
       pushMessage(

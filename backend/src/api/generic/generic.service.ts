@@ -648,7 +648,11 @@ export class GenericService {
       concurrency,
     );
 
-    if (conflict.stale && concurrency.resolution !== 'overwrite') {
+    if (
+      conflict.stale &&
+      conflict.fields.length > 0 &&
+      concurrency.resolution !== 'overwrite'
+    ) {
       if (
         concurrency.resolution === 'merge' &&
         conflict.conflictingProperties.length === 0
@@ -1508,13 +1512,17 @@ export class GenericService {
     const currentUpdatedAt = this.normalizeConcurrencyTimestamp(
       (item as { updatedAt?: unknown }).updatedAt,
     );
-    const basePayload = this.projectChangeLogPayload(
+    const basePayload = this.projectUpdateConflictPayload(
       template,
       concurrency.basePayload ?? null,
     );
+    const attemptedConflictPayload = this.projectUpdateConflictPayload(
+      template,
+      attemptedPayload,
+    );
     const comparisonShape = this.mergeChangeLogPayloadShape(
       basePayload,
-      attemptedPayload,
+      attemptedConflictPayload,
     );
     const currentPayload = comparisonShape
       ? this.captureEntityChangeLogPayload(
@@ -1532,7 +1540,7 @@ export class GenericService {
       ? this.buildUpdateConflictFields(
           basePayload,
           currentPayload,
-          attemptedPayload,
+          attemptedConflictPayload,
         )
       : [];
     const conflictingProperties = fields
@@ -1548,7 +1556,7 @@ export class GenericService {
       currentUpdatedAt,
       basePayload,
       currentPayload,
-      attemptedPayload,
+      attemptedPayload: attemptedConflictPayload,
       fields,
       conflictingProperties,
       mergeableProperties,
@@ -1577,23 +1585,25 @@ export class GenericService {
           attemptedRecord,
           property,
         );
-        const baseValue = this.normalizeChangeLogValue(baseRecord[property]);
-        const currentValue = this.normalizeChangeLogValue(
+        const baseValue = this.normalizeUpdateConflictValue(
+          baseRecord[property],
+        );
+        const currentValue = this.normalizeUpdateConflictValue(
           currentRecord[property],
         );
         const attemptedValue = attemptedHasProperty
-          ? this.normalizeChangeLogValue(attemptedRecord[property])
+          ? this.normalizeUpdateConflictValue(attemptedRecord[property])
           : baseValue;
         const changedInAttempt = hasBasePayload
-          ? !this.areChangeLogValuesEqual(baseValue, attemptedValue)
+          ? !this.areUpdateConflictValuesEqual(baseValue, attemptedValue)
           : attemptedHasProperty;
         const changedInCurrent = hasBasePayload
-          ? !this.areChangeLogValuesEqual(baseValue, currentValue)
-          : !this.areChangeLogValuesEqual(currentValue, attemptedValue);
+          ? !this.areUpdateConflictValuesEqual(baseValue, currentValue)
+          : !this.areUpdateConflictValuesEqual(currentValue, attemptedValue);
         const conflict =
           changedInAttempt &&
           changedInCurrent &&
-          !this.areChangeLogValuesEqual(currentValue, attemptedValue);
+          !this.areUpdateConflictValuesEqual(currentValue, attemptedValue);
 
         return {
           property,
@@ -1609,6 +1619,44 @@ export class GenericService {
         (field) =>
           field.changedInCurrent || field.changedInAttempt || field.conflict,
       );
+  }
+
+  private projectUpdateConflictPayload(
+    template: EntityTemplateDto[],
+    payload: ChangeLogPayload,
+  ): ChangeLogPayload {
+    if (!payload) {
+      return null;
+    }
+
+    const comparableTemplate = template.filter((field) =>
+      this.isUpdateConflictComparableField(field),
+    );
+    const comparableFieldNames = new Set(
+      comparableTemplate
+        .map((field) => field.name)
+        .filter((name): name is string => typeof name === 'string'),
+    );
+    const sourceRecord = this.asChangeLogRecord(payload);
+    const comparablePayload = Object.fromEntries(
+      Object.entries(sourceRecord).filter(([key]) =>
+        comparableFieldNames.has(key),
+      ),
+    );
+
+    if (Object.keys(comparablePayload).length === 0) {
+      return null;
+    }
+
+    return this.projectChangeLogPayload(comparableTemplate, comparablePayload);
+  }
+
+  private isUpdateConflictComparableField(field: EntityTemplateDto): boolean {
+    if (!field.name || field.isPersistent === false || field.isReference) {
+      return false;
+    }
+
+    return !['1:m', 'm:n', 'n:m', '1:1', 'm:1'].includes(field.kind ?? '');
   }
 
   private buildAutomaticMergePayload(
@@ -1918,6 +1966,62 @@ export class GenericService {
 
   private areChangeLogValuesEqual(left: unknown, right: unknown): boolean {
     return JSON.stringify(left) === JSON.stringify(right);
+  }
+
+  private areUpdateConflictValuesEqual(
+    left: unknown,
+    right: unknown,
+  ): boolean {
+    return (
+      JSON.stringify(this.normalizeUpdateConflictValue(left)) ===
+      JSON.stringify(this.normalizeUpdateConflictValue(right))
+    );
+  }
+
+  private normalizeUpdateConflictValue(
+    value: unknown,
+    visited = new WeakMap<object, unknown>(),
+  ): unknown {
+    if (value == null) {
+      return null;
+    }
+
+    if (typeof value === 'string') {
+      return value.trim().length === 0 ? null : value;
+    }
+
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+
+    if (Array.isArray(value)) {
+      return value.map((entry) =>
+        this.normalizeUpdateConflictValue(entry, visited),
+      );
+    }
+
+    if (typeof value !== 'object') {
+      return value;
+    }
+
+    const cached = visited.get(value);
+    if (typeof cached !== 'undefined') {
+      return cached;
+    }
+
+    const normalizedRecord: Record<string, unknown> = {};
+    visited.set(value, normalizedRecord);
+
+    Object.keys(value)
+      .sort((leftKey, rightKey) => leftKey.localeCompare(rightKey))
+      .forEach((key) => {
+        normalizedRecord[key] = this.normalizeUpdateConflictValue(
+          (value as Record<string, unknown>)[key],
+          visited,
+        );
+      });
+
+    return normalizedRecord;
   }
 
   private extractChangeLogReference(
