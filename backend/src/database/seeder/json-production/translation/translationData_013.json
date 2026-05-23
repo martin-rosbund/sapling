@@ -14,5 +14,8 @@
   { "entity": "saplingFormConfig", "property": "groupBasics", "de": "Grunddaten", "en": "Basics" },
   { "entity": "saplingFormConfig", "property": "groupScope", "de": "Geltungsbereich", "en": "Scope" },
   { "entity": "saplingFormConfig", "property": "groupContent", "de": "Inhalt", "en": "Content" },
-  { "entity": "saplingFormConfig", "property": "groupReference", "de": "Referenz", "en": "Reference" }
+  { "entity": "saplingFormConfig", "property": "groupReference", "de": "Referenz", "en": "Reference" },
+  { "entity": "formConfig", "property": "defaultView", "de": "Standardansicht", "en": "Default view" },
+  { "entity": "formConfig", "property": "switchView", "de": "Ansicht wechseln", "en": "Switch view" },
+  { "entity": "formConfig", "property": "currentView", "de": "Ansicht", "en": "View" }
 ]

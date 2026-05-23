@@ -118,12 +118,22 @@
             :label="$t('formConfig.scope')"
             prepend-inner-icon="mdi-account-filter-outline"
           />
+          <SaplingFieldSingleSelect
+            v-if="scopeSelectEntityHandle"
+            :key="scopeSelectKey"
+            :model-value="selectedScopeItem"
+            :label="$t('formConfig.scopeHandle')"
+            :entity-handle="scopeSelectEntityHandle"
+            :placeholder="scopeHandle"
+            @update:model-value="onScopeItemUpdate"
+          />
           <v-text-field
+            v-else
             v-model="scopeHandle"
             density="comfortable"
             :label="$t('formConfig.scopeHandle')"
             prepend-inner-icon="mdi-pound"
-            :disabled="configScope === 'global'"
+            disabled
           />
           <div class="sapling-form-config__switches">
             <v-switch
@@ -334,7 +344,7 @@ import ApiFormConfigService, {
 } from '@/services/api.form-config.service'
 import ApiGenericService from '@/services/api.generic.service'
 import ApiService from '@/services/api.service'
-import type { EntityItem } from '@/entity/entity'
+import type { EntityItem, SaplingGenericItem } from '@/entity/entity'
 import type {
   EntityTemplate,
   EntityTemplateFormWidth,
@@ -344,6 +354,7 @@ import type {
 } from '@/entity/structure'
 import SaplingCodeMirror from '@/components/common/SaplingCodeMirror.vue'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
+import SaplingFieldSingleSelect from '@/components/dialog/fields/SaplingFieldSingleSelect.vue'
 import {
   getDialogTemplateWidth,
   groupDialogTemplates,
@@ -376,6 +387,7 @@ const selectedConfigHandle = ref<number | null>(null)
 const configName = ref('')
 const configScope = ref<ScopeValue>('global')
 const scopeHandle = ref('')
+const selectedScopeItem = ref<SaplingGenericItem | null>(null)
 const isActive = ref(true)
 const isDefault = ref(false)
 const fieldSearch = ref('')
@@ -420,6 +432,20 @@ const scopeOptions = computed(() => [
   { title: t('formConfig.scopeRole'), value: 'role' },
   { title: t('formConfig.scopePerson'), value: 'person' },
 ])
+
+const scopeSelectEntityHandle = computed(() => {
+  if (configScope.value === 'role') {
+    return 'role'
+  }
+
+  if (configScope.value === 'person') {
+    return 'person'
+  }
+
+  return ''
+})
+
+const scopeSelectKey = computed(() => `${configScope.value}-${scopeHandle.value || 'empty'}`)
 
 const entityOptions = computed(() =>
   entities.value.map((entity) => ({
@@ -516,6 +542,13 @@ watch(selectedConfigHandle, () => {
   applySelectedConfig()
 })
 
+watch(configScope, (scope) => {
+  selectedScopeItem.value = null
+  if (scope === 'global') {
+    scopeHandle.value = ''
+  }
+})
+
 onMounted(async () => {
   await loadEntities()
 })
@@ -591,6 +624,7 @@ function startNewConfig(): void {
     : t('formConfig.newConfig')
   configScope.value = 'global'
   scopeHandle.value = ''
+  selectedScopeItem.value = null
   isActive.value = true
   isDefault.value = configs.value.length === 0
   buildFieldRows({})
@@ -606,6 +640,7 @@ function applySelectedConfig(): void {
   configName.value = selectedConfig.name
   configScope.value = selectedConfig.scope
   scopeHandle.value = selectedConfig.scopeHandle ?? ''
+  selectedScopeItem.value = null
   isActive.value = selectedConfig.isActive
   isDefault.value = selectedConfig.isDefault
   buildFieldRows(selectedConfig.config.fields ?? {})
@@ -641,6 +676,16 @@ function getFieldConfig(value: unknown): SaplingFormFieldConfig {
   return value && typeof value === 'object' && !Array.isArray(value)
     ? (value as SaplingFormFieldConfig)
     : {}
+}
+
+function getRecordHandle(item?: SaplingGenericItem | null): string {
+  const handle = item?.handle
+  return typeof handle === 'string' || typeof handle === 'number' ? String(handle) : ''
+}
+
+function onScopeItemUpdate(item: SaplingGenericItem | null): void {
+  selectedScopeItem.value = item
+  scopeHandle.value = getRecordHandle(item)
 }
 
 function applyDraftToTemplate(template: EntityTemplate): EntityTemplate {
@@ -681,7 +726,10 @@ async function saveConfig(): Promise<void> {
     const payload = {
       name: configName.value.trim(),
       scope: configScope.value,
-      scopeHandle: configScope.value === 'global' ? null : scopeHandle.value.trim() || null,
+      scopeHandle:
+        configScope.value === 'global'
+          ? null
+          : getRecordHandle(selectedScopeItem.value) || scopeHandle.value.trim() || null,
       isActive: isActive.value,
       isDefault: isDefault.value,
       config: draftConfig.value,

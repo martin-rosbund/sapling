@@ -45,6 +45,15 @@
                 {{ visibleTemplates.length }}
               </v-chip>
               <v-chip
+                v-if="selectedFormConfigChipLabel"
+                size="small"
+                color="primary"
+                variant="tonal"
+                prepend-icon="mdi-table-cog"
+              >
+                {{ selectedFormConfigChipLabel }}
+              </v-chip>
+              <v-chip
                 v-if="mode === 'edit'"
                 size="small"
                 variant="outlined"
@@ -600,6 +609,9 @@ const {
   unsavedChangesDialog,
   pendingSaveAction,
   dirtyFieldCount,
+  formConfigMenuItems,
+  selectedFormConfigLabel,
+  selectFormConfig,
   getRules,
   getTemplateColumnProps,
   isTemplateDirty,
@@ -731,30 +743,39 @@ const formSurfaceRef = ref<HTMLElement | null>(null)
 let scriptButtonsRequestId = 0
 
 const recordActionMenuItems = computed<SaplingContextMenuTableMenuEntry[]>(() => {
-  if (!hasPersistedItem.value || props.mode === 'create') {
-    return []
+  const groups: SaplingContextMenuTableMenuEntry[] =
+    !hasPersistedItem.value || props.mode === 'create'
+      ? []
+      : getSaplingContextMenuTableItems({
+          canChangeLog: hasPersistedItem.value,
+          canShowInformation: canShowInformation.value,
+          entityPermission: entityPermission.value,
+          canNavigate: canNavigate.value,
+          canTimeline: true,
+          scriptButtons: loadedScriptButtons.value,
+          mailActions: buildMailMenuActions(props.templates, form.value),
+          mailToLabel: t('global.mailTo'),
+          showEdit: false,
+        })
+          .map((group) =>
+            (Array.isArray(group) ? group : [group]).filter(
+              (menuItem) => !['edit', 'show', 'delete'].includes(menuItem.type),
+            ),
+          )
+          .filter((group) => group.length > 0)
+
+  if (formConfigMenuItems.value.length > 0) {
+    groups.push(
+      formConfigMenuItems.value.map((item) => ({
+        type: 'formConfig',
+        icon: item.active ? 'mdi-check-circle-outline' : item.icon,
+        title: item.title,
+        formConfigHandle: item.handle,
+      })),
+    )
   }
 
-  const mailToLabel = t('global.mailTo')
-  const mailActions = buildMailMenuActions(props.templates, form.value)
-
-  return getSaplingContextMenuTableItems({
-    canChangeLog: hasPersistedItem.value,
-    canShowInformation: canShowInformation.value,
-    entityPermission: entityPermission.value,
-    canNavigate: canNavigate.value,
-    canTimeline: true,
-    scriptButtons: loadedScriptButtons.value,
-    mailActions,
-    mailToLabel,
-    showEdit: false,
-  })
-    .map((group) =>
-      (Array.isArray(group) ? group : [group]).filter(
-        (menuItem) => !['edit', 'show', 'delete'].includes(menuItem.type),
-      ),
-    )
-    .filter((group) => group.length > 0)
+  return groups
 })
 
 function getTimestampTitle(field: 'createdAt' | 'updatedAt', fallback: string): string {
@@ -781,6 +802,9 @@ const createdAtTitle = computed(() => getTimestampTitle('createdAt', 'global.cre
 const updatedAtTitle = computed(() => getTimestampTitle('updatedAt', 'global.updatedAt'))
 const createdAtLabel = computed(() => formatTimestamp(props.item?.createdAt))
 const updatedAtLabel = computed(() => formatTimestamp(props.item?.updatedAt))
+const selectedFormConfigChipLabel = computed(() =>
+  selectedFormConfigLabel.value ? `${t('formConfig.currentView')}: ${selectedFormConfigLabel.value}` : '',
+)
 
 const resetButtonLabel = computed(() => t('filter.reset'))
 
@@ -1026,6 +1050,9 @@ async function handleRecordAction(menuItem: SaplingContextMenuTableMenuItem): Pr
       if (menuItem.scriptButton) {
         await runScriptButtonFromRecord(menuItem.scriptButton)
       }
+      break
+    case 'formConfig':
+      selectFormConfig(menuItem.formConfigHandle ?? null)
       break
     default:
       break
