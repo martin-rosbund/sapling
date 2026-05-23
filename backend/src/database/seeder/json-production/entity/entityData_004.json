@@ -1,0 +1,13 @@
+[
+  {
+    "handle": "saplingFormConfig",
+    "canShow": true,
+    "icon": "mdi-table-cog",
+    "group": "administration",
+    "order": 95,
+    "canRead": true,
+    "canInsert": true,
+    "canUpdate": true,
+    "canDelete": true
+  }
+]

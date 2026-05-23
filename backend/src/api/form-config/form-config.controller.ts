@@ -29,6 +29,9 @@ import {
   SaveSaplingFormConfigDto,
 } from './dto/form-config.dto';
 import { SaplingFormConfigItem } from '../../entity/SaplingFormConfigItem';
+import { ROLE_HANDLE } from '../../database/seeder/role-handles';
+
+type FormConfigPermissionAction = 'insert' | 'update';
 
 @ApiTags('Form Config')
 @ApiBearerAuth()
@@ -148,7 +151,7 @@ export class FormConfigController {
     @Param('entityHandle') entityHandle: string,
     @Body() payload: SaveSaplingFormConfigDto,
   ): Promise<SaplingFormConfigItem> {
-    this.assertCanManageFormConfigs(req.user as PersonItem);
+    this.assertCanManageFormConfigs(req.user as PersonItem, 'insert');
     const templates = this.templateService.getEntityTemplate(entityHandle);
     return this.formConfigService.saveConfig(entityHandle, payload, templates);
   }
@@ -169,7 +172,7 @@ export class FormConfigController {
     @Param('entityHandle') entityHandle: string,
     @Body() payload: SaveSaplingFormConfigDto,
   ): Promise<SaplingFormConfigItem> {
-    this.assertCanManageFormConfigs(req.user as PersonItem);
+    this.assertCanManageFormConfigs(req.user as PersonItem, 'insert');
     const templates = this.templateService.getEntityTemplate(entityHandle);
     return this.formConfigService.saveConfig(entityHandle, payload, templates);
   }
@@ -192,7 +195,7 @@ export class FormConfigController {
     @Param('handle') handle: string,
     @Body() payload: SaveSaplingFormConfigDto,
   ): Promise<SaplingFormConfigItem> {
-    this.assertCanManageFormConfigs(req.user as PersonItem);
+    this.assertCanManageFormConfigs(req.user as PersonItem, 'update');
     const templates = this.templateService.getEntityTemplate(entityHandle);
     return this.formConfigService.saveConfig(
       entityHandle,
@@ -202,10 +205,38 @@ export class FormConfigController {
     );
   }
 
-  private assertCanManageFormConfigs(user: PersonItem): void {
-    const permission = this.currentService.getEntityPermissions(user, 'entity');
-    if (!permission.allowUpdate) {
+  private assertCanManageFormConfigs(
+    user: PersonItem,
+    action: FormConfigPermissionAction,
+  ): void {
+    const permission = this.currentService.getEntityPermissions(
+      user,
+      'saplingFormConfig',
+    );
+    const isAllowed =
+      action === 'insert' ? permission.allowInsert : permission.allowUpdate;
+
+    if (!isAllowed && !this.hasAdministratorRole(user)) {
       throw new ForbiddenException('exception.forbidden');
     }
+  }
+
+  private hasAdministratorRole(user: PersonItem): boolean {
+    const roles = user.roles;
+    if (!roles) {
+      return false;
+    }
+
+    const roleItems =
+      typeof roles.getItems === 'function'
+        ? roles.getItems()
+        : Array.isArray(roles)
+          ? roles
+          : Array.from(roles);
+
+    return roleItems.some(
+      (role) =>
+        role?.isAdministrator === true || role?.handle === ROLE_HANDLE.ADMIN,
+    );
   }
 }

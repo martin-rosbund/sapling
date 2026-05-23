@@ -1,9 +1,9 @@
 .sapling-form-config {
-  --sapling-form-config-border: color-mix(
-    in srgb,
-    rgb(var(--v-theme-on-surface)) 14%,
-    transparent
-  );
+  --sapling-form-config-border: var(--sapling-surface-border);
+  --sapling-form-config-border-muted: var(--sapling-surface-border-muted);
+  --sapling-form-config-surface: var(--sapling-surface-fill);
+  --sapling-form-config-surface-soft: var(--sapling-surface-fill-soft);
+  --sapling-form-config-surface-strong: var(--sapling-surface-fill-strong);
 }
 
 .sapling-form-config__hero {
@@ -36,13 +36,15 @@
   min-width: 0;
   border: 1px solid var(--sapling-form-config-border);
   border-radius: 8px;
-  background: rgb(var(--v-theme-surface));
+  background: var(--sapling-form-config-surface);
   box-shadow: var(--sapling-shadow-sm);
 }
 
 .sapling-form-config__panel--editor,
 .sapling-form-config__panel--preview {
   padding: 16px;
+  backdrop-filter: blur(var(--sapling-blur-panel));
+  -webkit-backdrop-filter: blur(var(--sapling-blur-panel));
 }
 
 .sapling-form-config__panel--preview {
@@ -92,7 +94,19 @@
   padding: 12px;
   border: 1px solid var(--sapling-form-config-border);
   border-radius: 8px;
-  background: color-mix(in srgb, rgb(var(--v-theme-surface)) 92%, rgb(var(--v-theme-primary)) 8%);
+  background:
+    linear-gradient(135deg, rgba(var(--v-theme-primary), 0.08), transparent 55%),
+    var(--sapling-form-config-surface-soft);
+  box-shadow: var(--sapling-inset-highlight);
+  backdrop-filter: blur(var(--sapling-blur-sm));
+  -webkit-backdrop-filter: blur(var(--sapling-blur-sm));
+}
+
+.sapling-form-config-field:focus-within {
+  border-color: var(--sapling-surface-border-accent-strong);
+  box-shadow:
+    var(--sapling-inset-highlight),
+    0 0 0 1px var(--sapling-surface-border-accent);
 }
 
 .sapling-form-config-field__main {
@@ -154,7 +168,9 @@
   padding: 12px;
   border: 1px solid var(--sapling-form-config-border);
   border-radius: 8px;
-  background: color-mix(in srgb, rgb(var(--v-theme-background)) 60%, rgb(var(--v-theme-surface)));
+  background: var(--sapling-surface-gradient-panel);
+  backdrop-filter: blur(var(--sapling-blur-panel));
+  -webkit-backdrop-filter: blur(var(--sapling-blur-panel));
 }
 
 .sapling-form-config-preview__group {
@@ -176,9 +192,10 @@
 .sapling-form-config-preview__field {
   min-height: 72px;
   padding: 10px;
-  border: 1px solid var(--sapling-form-config-border);
+  border: 1px solid var(--sapling-form-config-border-muted);
   border-radius: 8px;
-  background: rgb(var(--v-theme-surface));
+  background: var(--sapling-form-config-surface-soft);
+  box-shadow: var(--sapling-inset-highlight);
 }
 
 .sapling-form-config-preview__field--w1 {
@@ -217,6 +234,9 @@
   overflow: hidden;
   border: 1px solid var(--sapling-form-config-border);
   border-radius: 8px;
+  background: var(--sapling-form-config-surface-soft);
+  backdrop-filter: blur(var(--sapling-blur-sm));
+  -webkit-backdrop-filter: blur(var(--sapling-blur-sm));
 }
 
 .sapling-form-config__validation {

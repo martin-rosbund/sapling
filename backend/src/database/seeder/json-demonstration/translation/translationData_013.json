@@ -1,0 +1,18 @@
+[
+  { "entity": "navigation", "property": "saplingFormConfig", "de": "Formular-Konfiguration", "en": "Form Configuration" },
+  { "entity": "saplingFormConfig", "property": "name", "de": "Name", "en": "Name" },
+  { "entity": "saplingFormConfig", "property": "entity", "de": "Entitaet", "en": "Entity" },
+  { "entity": "saplingFormConfig", "property": "scope", "de": "Geltungsbereich", "en": "Scope" },
+  { "entity": "saplingFormConfig", "property": "scopeHandle", "de": "Scope-Handle", "en": "Scope handle" },
+  { "entity": "saplingFormConfig", "property": "isActive", "de": "Aktiv", "en": "Active" },
+  { "entity": "saplingFormConfig", "property": "isDefault", "de": "Standard", "en": "Default" },
+  { "entity": "saplingFormConfig", "property": "version", "de": "Version", "en": "Version" },
+  { "entity": "saplingFormConfig", "property": "config", "de": "Konfiguration", "en": "Configuration" },
+  { "entity": "saplingFormConfig", "property": "person", "de": "Person", "en": "Person" },
+  { "entity": "saplingFormConfig", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "saplingFormConfig", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+  { "entity": "saplingFormConfig", "property": "groupBasics", "de": "Grunddaten", "en": "Basics" },
+  { "entity": "saplingFormConfig", "property": "groupScope", "de": "Geltungsbereich", "en": "Scope" },
+  { "entity": "saplingFormConfig", "property": "groupContent", "de": "Inhalt", "en": "Content" },
+  { "entity": "saplingFormConfig", "property": "groupReference", "de": "Referenz", "en": "Reference" }
+]

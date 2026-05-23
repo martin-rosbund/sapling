@@ -92,7 +92,17 @@ export class FormConfigService {
   ): Promise<SaplingFormConfigItem> {
     const validation = this.validateConfig(entityHandle, payload.config, templates);
     if (!validation.isValid) {
-      throw new BadRequestException(validation.errors);
+      throw new BadRequestException({
+        message: 'formConfig.validationFailed',
+        error: 'Bad Request',
+        details: {
+          summary: validation.errors
+            .map((issue) => `${issue.path}: ${issue.message}`)
+            .join(', '),
+          errors: validation.errors,
+          warnings: validation.warnings,
+        },
+      });
     }
 
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });

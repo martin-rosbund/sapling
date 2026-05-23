@@ -67,7 +67,7 @@
     </v-alert>
 
     <section class="sapling-form-config__workspace">
-      <div class="sapling-form-config__panel sapling-form-config__panel--editor">
+      <div class="sapling-form-config__panel sapling-form-config__panel--editor glass-panel">
         <div class="sapling-form-config__toolbar">
           <v-autocomplete
             v-model="selectedEntityHandle"
@@ -173,7 +173,7 @@
           <article
             v-for="field in filteredFieldRows"
             :key="field.name"
-            class="sapling-form-config-field"
+            class="sapling-form-config-field glass-panel"
             role="listitem"
           >
             <div class="sapling-form-config-field__main">
@@ -186,7 +186,7 @@
               />
               <div>
                 <strong>{{ resolveFieldLabel(field.name) }}</strong>
-                <span>{{ field.name }} · {{ field.type }}</span>
+                <span>{{ field.name }} - {{ field.type }}</span>
               </div>
             </div>
 
@@ -253,7 +253,7 @@
         </div>
       </div>
 
-      <aside class="sapling-form-config__panel sapling-form-config__panel--preview">
+      <aside class="sapling-form-config__panel sapling-form-config__panel--preview glass-panel">
         <div class="sapling-form-config__preview-header">
           <div>
             <p class="sapling-form-config__eyebrow">{{ $t('formConfig.livePreview') }}</p>
@@ -268,7 +268,7 @@
           />
         </div>
 
-        <div class="sapling-form-config-preview" aria-live="polite">
+        <div class="sapling-form-config-preview glass-panel" aria-live="polite">
           <section
             v-for="group in previewGroups"
             :key="group.id"
@@ -279,7 +279,7 @@
               <div
                 v-for="field in group.templates"
                 :key="field.name"
-                class="sapling-form-config-preview__field"
+                class="sapling-form-config-preview__field glass-panel"
                 :class="`sapling-form-config-preview__field--w${getPreviewWidth(field)}`"
               >
                 <span>{{ getPreviewFieldLabel(field) }}</span>
@@ -832,6 +832,6 @@ function getPreviewMeta(template: EntityTemplate): string {
   const parts = []
   if (template.isRequired) parts.push(t('formConfig.required'))
   if (template.formConfig?.readonly) parts.push(t('formConfig.readonly'))
-  return parts.join(' · ') || t('formConfig.optional')
+  return parts.join(' - ') || t('formConfig.optional')
 }
 </script>
