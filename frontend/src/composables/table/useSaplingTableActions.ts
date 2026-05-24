@@ -566,11 +566,19 @@ export function useSaplingTableActions({
   }
 
   function isConcurrencyComparableTemplate(template: EntityTemplate): boolean {
-    if (!template.name || template.isPersistent === false || template.isReference) {
+    if (!template.name || template.isPersistent === false) {
       return false
     }
 
-    return !['1:m', 'm:n', 'n:m', '1:1', 'm:1'].includes(template.kind ?? '')
+    if (template.kind === 'm:1') {
+      return true
+    }
+
+    if (template.isReference) {
+      return false
+    }
+
+    return !['1:m', 'm:n', 'n:m', '1:1'].includes(template.kind ?? '')
   }
 
   function buildConcurrencyOptions(source: SaplingGenericItem | null) {
