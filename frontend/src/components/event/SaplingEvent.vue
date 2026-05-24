@@ -167,6 +167,18 @@
     @cancel="onEditDialogCancel"
   />
 
+  <SaplingDialogUpdateConflict
+    :model-value="updateConflictDialog.visible"
+    :conflict="updateConflictDialog.conflict"
+    entity-handle="event"
+    :entity-templates="templates"
+    :is-saving="updateConflictDialog.isSaving"
+    @update:model-value="handleUpdateConflictVisibility"
+    @merge="mergeUpdateConflict"
+    @reload="reloadUpdateConflictRecord"
+    @open-change-log="openUpdateConflictChangeLog"
+  />
+
   <v-menu
     v-model="eventContextMenu.visible"
     :style="eventContextMenuStyle"
@@ -223,6 +235,7 @@ import SaplingRecordActionMenuList from '@/components/common/SaplingRecordAction
 import SaplingTableRowInformation from '@/components/table/SaplingTableRowInformation.vue'
 import SaplingTableRowUpload from '@/components/table/SaplingTableRowUpload.vue'
 import SaplingDialogEdit from '../dialog/SaplingDialogEdit.vue'
+import SaplingDialogUpdateConflict from '@/components/dialog/SaplingDialogUpdateConflict.vue'
 import { SAPLING_DIALOG_MAX_WIDTH } from '@/constants/dialog.constants'
 
 defineOptions({
@@ -274,8 +287,10 @@ const {
   goToNext,
   goToPrevious,
   goToToday,
+  handleUpdateConflictVisibility,
   isLoading,
   isNarrowScreen,
+  mergeUpdateConflict,
   nowY,
   openEventContextMenu,
   handleEventContextMenuAction,
@@ -283,8 +298,10 @@ const {
   onEditDialogItemUpdate,
   onEditDialogModeUpdate,
   onEditDialogSave,
+  openUpdateConflictChangeLog,
   openEventEditor,
   onSelectedPeoplesUpdate,
+  reloadUpdateConflictRecord,
   selectedPeoples,
   selectedPeopleOverflowCount,
   selectedPeoplePreview,
@@ -305,6 +322,7 @@ const {
   heroStats,
   informationDialogItem,
   templates,
+  updateConflictDialog,
   uploadDialogItem,
   editEvent,
   upcomingEvents,

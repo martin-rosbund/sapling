@@ -120,7 +120,7 @@ export type DialogState = 'create' | 'edit' | 'readonly'
 export type DialogSaveAction = 'save' | 'saveAndClose'
 
 export interface DialogSaveContext {
-  complete: () => void
+  complete: (didSave?: boolean) => void
 }
 
 export type EditDialogOptions = {

@@ -587,11 +587,12 @@ export function useSaplingTableActions({
     context?: DialogSaveContext,
   ) {
     if (!props.entityHandle) {
-      context?.complete()
+      context?.complete(false)
       return
     }
 
     let nextDialogItem: SaplingGenericItem | null = null
+    let didSave = false
     try {
       if (editDialog.value.mode === 'edit' && editDialog.value.item) {
         const handle = getItemHandle(editDialog.value.item)
@@ -612,6 +613,7 @@ export function useSaplingTableActions({
         )
       }
 
+      didSave = true
       emit('reload')
       pushMessage(
         'success',
@@ -642,7 +644,7 @@ export function useSaplingTableActions({
         }
       }
     } finally {
-      context?.complete()
+      context?.complete(didSave)
     }
   }
 
