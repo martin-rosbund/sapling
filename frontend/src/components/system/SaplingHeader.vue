@@ -67,6 +67,7 @@
 </template>
 
 <script lang="ts" setup>
+import '@/assets/styles/SaplingHeader.css'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSaplingHeader } from '@/composables/system/useSaplingHeader'

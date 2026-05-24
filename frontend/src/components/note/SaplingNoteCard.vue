@@ -1,5 +1,5 @@
 <template>
-  <v-card class="sapling-note-card glass-panel tilt-content" v-tilt="TILT_DEFAULT_OPTIONS" outlined>
+  <SaplingSurface :as="VCard" class="sapling-note-card" outlined tilt>
     <div class="sapling-note-card__header">
       <div class="sapling-note-card__headline">
         <div class="sapling-note-card__meta-row">
@@ -50,14 +50,16 @@
         <v-icon size="18">mdi-note-text-outline</v-icon>
       </div>
     </div>
-  </v-card>
+  </SaplingSurface>
 </template>
 
 <script setup lang="ts">
 // #region Imports
+import '@/assets/styles/SaplingNoteCard.css'
+import { VCard } from 'vuetify/components'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import type { NoteItem } from '@/entity/entity'
 // #endregion
 

@@ -1,5 +1,3 @@
-@import './SaplingKpiWidget.css';
-
 .sapling-kpi-breakdown__content {
   display: flex;
   flex: 1 1 auto;

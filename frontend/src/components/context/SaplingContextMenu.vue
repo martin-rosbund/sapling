@@ -14,6 +14,7 @@
 </template>
 
 <script lang="ts" setup>
+import '@/assets/styles/SaplingContextMenu.css'
 import { useSaplingContextMenu } from '@/composables/context/useSaplingContextMenu'
 
 const { menuVisible, menuStyle, closeMenu, goHome } = useSaplingContextMenu()

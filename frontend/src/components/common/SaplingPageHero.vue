@@ -1,7 +1,8 @@
 <template>
-  <section
+  <SaplingSurface
     v-bind="$attrs"
-    class="sapling-page-hero glass-panel"
+    as="section"
+    class="sapling-page-hero"
     :class="[`sapling-page-hero--${variant}`, { 'sapling-page-hero--copy-only': !$slots.side }]"
   >
     <div class="sapling-page-hero__copy">
@@ -29,10 +30,12 @@
     <div v-if="$slots.side" class="sapling-page-hero__side">
       <slot name="side" />
     </div>
-  </section>
+  </SaplingSurface>
 </template>
 
 <script setup lang="ts">
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
+
 defineOptions({
   inheritAttrs: false,
 })

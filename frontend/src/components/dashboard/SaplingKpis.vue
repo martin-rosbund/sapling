@@ -55,6 +55,7 @@
 
 <script setup lang="ts">
 // #region Imports
+import '@/assets/styles/SaplingKpis.css'
 import type { DashboardItem } from '@/entity/entity'
 import SaplingKpiCard from '@/components/kpi/SaplingKpiCard.vue'
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'

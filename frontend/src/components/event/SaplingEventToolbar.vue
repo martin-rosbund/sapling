@@ -26,7 +26,7 @@
               </v-btn>
             </template>
 
-            <div class="sapling-event-toolbar__picker-panel glass-panel">
+            <SaplingSurface class="sapling-event-toolbar__picker-panel">
               <v-date-picker
                 v-if="isMonthPicker"
                 :model-value="pickerDateModel"
@@ -47,7 +47,7 @@
                 :show-week="isWeekPicker"
                 @update:model-value="onDatePicked"
               />
-            </div>
+            </SaplingSurface>
           </v-menu>
           <v-btn variant="outlined" icon="mdi-chevron-right" @click="emit('next')" />
         </v-btn-group>
@@ -104,7 +104,7 @@
             <v-btn v-bind="props" icon="mdi-tune" variant="text" />
           </template>
 
-          <v-list class="glass-panel">
+          <SaplingSurface :as="VList">
             <v-list-item
               v-for="type in calendarTypeOptions"
               :key="type"
@@ -112,7 +112,7 @@
             >
               <v-list-item-title>{{ $t(`calendar.${type}`) }}</v-list-item-title>
             </v-list-item>
-          </v-list>
+          </SaplingSurface>
         </v-menu>
       </div>
     </div>
@@ -121,6 +121,8 @@
 
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue'
+import { VList } from 'vuetify/components'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 
 type CalendarType = 'workweek' | 'month' | 'day' | 'week'
 type CalendarViewMode = 'single' | 'sidebyside'

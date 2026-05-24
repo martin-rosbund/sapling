@@ -7,9 +7,10 @@
     ></div>
 
     <transition name="sapling-ai-chat-panel">
-      <section
+      <SaplingSurface
+        as="section"
         v-if="isOpen && hasSaplingAiChatAccess"
-        class="glass-panel sapling-ai-chat"
+        class="sapling-ai-chat"
         @click.stop
       >
         <template v-if="isTranslationLoading">
@@ -124,12 +125,13 @@
             />
           </div>
         </template>
-      </section>
+      </SaplingSurface>
     </transition>
   </div>
 </template>
 
 <script lang="ts" setup>
+import '@/assets/styles/SaplingAiChat.css'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -140,6 +142,7 @@ import type {
   AiProviderModelItem,
   AiProviderTypeItem,
 } from '@/entity/entity'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingAiChatConversation from '@/components/system/ai-chat/SaplingAiChatConversation.vue'
 import SaplingAiChatHeader from '@/components/system/ai-chat/SaplingAiChatHeader.vue'
 import SaplingAiChatSessions from '@/components/system/ai-chat/SaplingAiChatSessions.vue'

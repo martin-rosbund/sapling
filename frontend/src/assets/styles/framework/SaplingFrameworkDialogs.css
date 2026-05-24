@@ -27,6 +27,11 @@
   border-radius: var(--sapling-file-panel-radius-compact);
 }
 
+.sapling-dialog-card--fill {
+  height: 100%;
+  min-height: 0;
+}
+
 .sapling-dialog-form-body,
 .sapling-dialog-delete-body,
 .sapling-dialog-form,

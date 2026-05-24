@@ -12,6 +12,7 @@
 </template>
 
 <script setup lang="ts">
+import '@/assets/styles/components/SaplingFieldControls.css'
 import { useSaplingColorField } from '@/composables/fields/useSaplingColorField'
 
 const props = defineProps<{

@@ -5,11 +5,7 @@
 
 .sapling-account-dialog__body {
   display: flex;
-  flex: 1 1 auto;
   flex-direction: column;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
 }
 
 .sapling-account-dialog__content {
@@ -77,18 +73,4 @@
 
 .sapling-login-dialog__body {
   padding: 0;
-}
-
-@media (max-width: 900px) {
-  .sapling-account-dialog {
-    min-height: min(90vh, 760px);
-    max-height: 90vh;
-  }
-
-  .sapling-account-dialog__body {
-    padding-right: 0;
-  }
-}
-
-@media (max-width: 640px) {
 }

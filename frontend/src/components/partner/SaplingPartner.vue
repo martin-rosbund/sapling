@@ -77,6 +77,7 @@
 
 <script lang="ts" setup>
 // #region Imports
+import '@/assets/styles/SaplingPartner.css'
 import { computed, defineAsyncComponent, ref, toRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'

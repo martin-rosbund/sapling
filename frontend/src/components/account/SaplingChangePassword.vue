@@ -63,6 +63,7 @@
 
 <script setup lang="ts">
 // #region Imports
+import '@/assets/styles/SaplingAccountDialogs.css'
 import { useSaplingChangePassword } from '@/composables/account/useSaplingChangePassword'
 import { SAPLING_DIALOG_MAX_WIDTH } from '@/constants/dialog.constants'
 import SaplingActionChangePassword from '../actions/SaplingActionChangePassword.vue'

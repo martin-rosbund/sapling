@@ -68,14 +68,10 @@
   padding: var(--sapling-gap-sm) var(--sapling-gap-md);
   background: color-mix(in srgb, var(--sapling-surface-fill) 90%, transparent);
   box-shadow: var(--sapling-inset-highlight);
-  backdrop-filter: blur(var(--sapling-blur-soft));
-  -webkit-backdrop-filter: blur(var(--sapling-blur-soft));
 }
 
 :root[data-sapling-glass='off'] .sapling-table-toolbar {
   background: var(--sapling-surface-fill);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
 }
 
 .sapling-table-toolbar-controls {
@@ -244,8 +240,6 @@
   left: 0;
   z-index: 1;
   background: color-mix(in srgb, var(--sapling-surface-fill) 94%, transparent);
-  backdrop-filter: blur(var(--sapling-blur-strong));
-  -webkit-backdrop-filter: blur(var(--sapling-blur-strong));
 }
 
 .sapling-table-row__actions-cell {
@@ -253,15 +247,11 @@
   right: -1px;
   z-index: 1;
   background: color-mix(in srgb, var(--sapling-surface-fill) 94%, transparent);
-  backdrop-filter: blur(var(--sapling-blur-strong));
-  -webkit-backdrop-filter: blur(var(--sapling-blur-strong));
 }
 
 :root[data-sapling-glass='off'] .sapling-table-row__select-cell,
 :root[data-sapling-glass='off'] .sapling-table-row__actions-cell {
   background: rgb(var(--v-theme-surface));
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
 }
 
 .sapling-table tbody {
@@ -286,14 +276,10 @@
   z-index: 13;
   border-bottom-color: var(--sapling-surface-border-muted);
   background: color-mix(in srgb, var(--sapling-surface-fill) 86%, transparent);
-  backdrop-filter: blur(var(--sapling-blur-strong));
-  -webkit-backdrop-filter: blur(var(--sapling-blur-strong));
 }
 
 :root[data-sapling-glass='off'] .sapling-table thead th {
   background: rgb(var(--v-theme-surface));
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
 }
 
 .sapling-table-header-button {
@@ -421,15 +407,6 @@
   gap: var(--sapling-gap-md);
   padding: var(--sapling-gap-md);
   border-radius: var(--sapling-radius-sm);
-  border: 1px solid color-mix(in srgb, var(--sapling-surface-border-muted) 84%, transparent);
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, rgb(var(--v-theme-primary)) 7%, transparent),
-      transparent 55%
-    ),
-    var(--sapling-surface-gradient-panel);
-  box-shadow: var(--sapling-shadow-sm);
 }
 
 .sapling-table-mobile-summary__header {
@@ -536,8 +513,6 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   border-radius: var(--sapling-radius-sm);
-  border: 1px solid var(--sapling-surface-border-muted);
-  background: color-mix(in srgb, var(--sapling-surface-fill-soft) 78%, transparent);
 }
 
 .sapling-table-mobile-controls__section {
@@ -600,20 +575,7 @@
   gap: var(--sapling-gap-md);
   padding: var(--sapling-table-mobile-card-padding);
   border-radius: var(--sapling-radius-md);
-  border: 1px solid color-mix(in srgb, var(--sapling-surface-border-muted) 84%, transparent);
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, rgb(var(--v-theme-primary)) 5%, transparent),
-      transparent 48%
-    ),
-    var(--sapling-surface-gradient-panel);
-  box-shadow: var(--sapling-inset-highlight), var(--sapling-shadow-sm);
   cursor: pointer;
-  transition:
-    transform var(--sapling-motion-fast) ease,
-    border-color var(--sapling-motion-fast) ease,
-    box-shadow var(--sapling-motion-fast) ease;
 }
 
 .sapling-table-mobile-card:hover,
@@ -628,7 +590,7 @@
 :root[data-sapling-performance='reduced'] .sapling-table-mobile-card:hover,
 :root[data-sapling-performance='reduced'] .sapling-table-mobile-card:focus-within {
   transform: none;
-  box-shadow: var(--sapling-inset-highlight), var(--sapling-shadow-sm);
+  box-shadow: none;
 }
 
 .sapling-table-mobile-card--selected {

@@ -168,6 +168,7 @@
 
 <script setup lang="ts">
 //#region Import
+import '@/assets/styles/SaplingInbox.css'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSaplingInbox, type InboxEntry } from '@/composables/account/useSaplingInbox'

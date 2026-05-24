@@ -57,6 +57,7 @@
 </template>
 
 <script setup lang="ts">
+import '@/assets/styles/SaplingDashboardRecommendedFavorites.css'
 import { useSaplingFavorites } from '@/composables/dashboard/useSaplingFavorites'
 import type { FavoriteTemplateItem } from '@/entity/entity'
 import { computed } from 'vue'

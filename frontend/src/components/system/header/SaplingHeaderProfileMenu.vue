@@ -32,10 +32,11 @@
       </v-btn>
     </template>
 
-    <v-card
-      class="glass-panel sapling-profile-menu"
+    <SaplingSurface
+      :as="VCard"
+      class="sapling-profile-menu"
       :class="{ 'sapling-profile-menu--impersonating': isImpersonating }"
-      elevation="12"
+      :elevation="12"
     >
       <div class="sapling-profile-menu__hero">
         <div class="sapling-profile-menu__avatar">{{ profileInitials }}</div>
@@ -160,13 +161,15 @@
           </button>
         </div>
       </div>
-    </v-card>
+    </SaplingSurface>
   </v-menu>
 </template>
 
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { VCard } from 'vuetify/components'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import type {
   SaplingLanguage,
   SaplingLanguageOption,

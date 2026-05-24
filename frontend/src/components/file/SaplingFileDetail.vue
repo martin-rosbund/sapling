@@ -2,11 +2,11 @@
   <section
     class="sapling-document-detail-fullheight sapling-file-preview-fullheight sapling-fill-shell"
   >
-    <div v-if="isLoading" class="sapling-file-stage glass-panel">
+    <SaplingSurface v-if="isLoading" class="sapling-file-stage">
       <v-skeleton-loader class="sapling-file-stage__skeleton" type="image, article" />
-    </div>
+    </SaplingSurface>
 
-    <div v-else-if="!hasSelection" class="sapling-file-stage sapling-file-stage--empty glass-panel">
+    <SaplingSurface v-else-if="!hasSelection" class="sapling-file-stage sapling-file-stage--empty">
       <div class="sapling-file-stage__empty-state">
         <div class="sapling-file-stage__empty-icon">
           <v-icon icon="mdi-file-search-outline" size="34" />
@@ -16,15 +16,18 @@
           {{ $t('document.selectFileForPreviewDescription') }}
         </p>
       </div>
-    </div>
+    </SaplingSurface>
 
-    <div v-else class="sapling-file-stage glass-panel">
+    <SaplingSurface v-else class="sapling-file-stage">
       <component :is="previewComponent" v-bind="previewProps" />
-    </div>
+    </SaplingSurface>
   </section>
 </template>
 
 <script lang="ts" setup>
+import '@/assets/styles/SaplingFileDetail.css'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
+
 defineProps<{
   hasSelection: boolean
   isLoading: boolean

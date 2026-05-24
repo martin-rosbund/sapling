@@ -1,5 +1,5 @@
 <template>
-  <v-card outlined class="sapling-kpi-card glass-panel tilt-content" v-tilt="TILT_DEFAULT_OPTIONS">
+  <SaplingSurface :as="VCard" outlined class="sapling-kpi-card" tilt>
     <div class="sapling-kpi-card__header">
       <div class="sapling-kpi-card__headline">
         <div class="sapling-kpi-card__meta-row">
@@ -77,11 +77,21 @@
         <span>{{ $t('kpi.unsupportedType') }}</span>
       </div>
     </div>
-  </v-card>
+  </SaplingSurface>
 </template>
 
 <script setup lang="ts">
 // #region Imports
+import '@/assets/styles/SaplingKpiWidget.css'
+import '@/assets/styles/SaplingKpiCard.css'
+import '@/assets/styles/SaplingKpiBreakdown.css'
+import '@/assets/styles/SaplingKpiComparison.css'
+import '@/assets/styles/SaplingKpiItem.css'
+import '@/assets/styles/SaplingKpiList.css'
+import '@/assets/styles/SaplingKpiSparkline.css'
+import '@/assets/styles/SaplingKpiTrend.css'
+import { VCard } from 'vuetify/components'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingKpiBreakdown from '@/components/kpi/SaplingKpiBreakdown.vue'
 import SaplingKpiComparison from '@/components/kpi/SaplingKpiComparison.vue'
 import SaplingKpiItem from '@/components/kpi/SaplingKpiItem.vue'
@@ -89,7 +99,6 @@ import SaplingKpiList from '@/components/kpi/SaplingKpiList.vue'
 import SaplingKpiSparkline from '@/components/kpi/SaplingKpiSparkline.vue'
 import SaplingKpiTrend from '@/components/kpi/SaplingKpiTrend.vue'
 import { useSaplingKpiCard } from '@/composables/kpi/useSaplingKpiCard'
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
 import type { KPIItem } from '@/entity/entity'
 // #endregion
 

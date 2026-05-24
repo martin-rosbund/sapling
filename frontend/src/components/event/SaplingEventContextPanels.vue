@@ -1,6 +1,6 @@
 <template>
   <aside class="sapling-event-context">
-    <section class="sapling-event-context__switcher glass-panel">
+    <SaplingSurface as="section" class="sapling-event-context__switcher">
       <v-btn-toggle
         v-model="activePanel"
         class="sapling-event-context__toggle"
@@ -32,7 +32,7 @@
           <span>{{ $t('event.today') }}</span>
         </template>
       </div>
-    </section>
+    </SaplingSurface>
 
     <SaplingWorkFilterPanel
       v-if="activePanel === 'filter' && !isMobileFilterLayout"
@@ -61,6 +61,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingEventAgendaPanel from '@/components/event/SaplingEventAgendaPanel.vue'
 import SaplingEventPeoplePanel from '@/components/event/SaplingEventPeoplePanel.vue'
 import SaplingWorkFilterPanel from '@/components/filter/SaplingWorkFilterPanel.vue'

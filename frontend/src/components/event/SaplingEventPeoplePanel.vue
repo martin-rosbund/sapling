@@ -1,5 +1,5 @@
 <template>
-  <section class="sapling-event-panel glass-panel">
+  <SaplingSurface as="section" class="sapling-event-panel">
     <div class="sapling-event-panel__header">
       <div>
         <p class="sapling-event-panel__eyebrow">{{ $t('navigation.person') }}</p>
@@ -31,10 +31,11 @@
         <span>0 {{ $t('navigation.person') }}</span>
       </div>
     </div>
-  </section>
+  </SaplingSurface>
 </template>
 
 <script lang="ts" setup>
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import type { SelectedPersonPreviewItem } from '@/composables/event/useSaplingEvent'
 
 defineProps<{

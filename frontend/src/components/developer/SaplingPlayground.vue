@@ -521,6 +521,7 @@
 </template>
 
 <script lang="ts" setup>
+import '@/assets/styles/SaplingPlayground.css'
 import { computed, defineAsyncComponent, markRaw, ref, type Component } from 'vue'
 import SaplingActionAccount from '@/components/actions/SaplingActionAccount.vue'
 import SaplingActionChangePassword from '@/components/actions/SaplingActionChangePassword.vue'

@@ -1,5 +1,3 @@
-@import './SaplingKpiWidget.css';
-
 .kpi-table-row--clickable {
   cursor: pointer;
   transition: background-color 0.15s ease;

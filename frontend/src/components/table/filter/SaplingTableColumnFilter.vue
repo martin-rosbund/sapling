@@ -36,7 +36,12 @@
         </button>
       </template>
 
-      <v-card class="sapling-table-filter-menu glass-panel" elevation="10">
+      <SaplingSurface
+        :as="VCard"
+        class="sapling-table-filter-menu"
+        variant="subtle"
+        :elevation="10"
+      >
         <div v-if="isComponentLoading" class="sapling-table-filter-menu__loading">
           <v-skeleton-loader type="heading, text" />
           <v-skeleton-loader type="article" />
@@ -125,7 +130,7 @@
             </v-btn>
           </div>
         </template>
-      </v-card>
+      </SaplingSurface>
     </v-menu>
 
     <v-btn
@@ -141,6 +146,9 @@
 </template>
 
 <script lang="ts" setup>
+import '@/assets/styles/SaplingTableColumnFilter.css'
+import { VCard } from 'vuetify/components'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import { useSaplingTableColumnFilter } from '@/composables/table/useSaplingTableColumnFilter'
 import SaplingTableFilterBooleanValue from './SaplingTableFilterBooleanValue.vue'
 import SaplingTableFilterIconValue from './SaplingTableFilterIconValue.vue'

@@ -5,13 +5,18 @@
   >
     <template v-if="isTranslationLoading">
       <div class="sapling-issue-skeleton">
-        <v-skeleton-loader class="glass-panel" type="article" />
+        <SaplingSurface :as="VSkeletonLoader" type="article" />
         <div class="sapling-issue-skeleton__metrics">
-          <v-skeleton-loader v-for="item in 4" :key="item" class="glass-panel" type="article" />
+          <SaplingSurface
+            v-for="item in 4"
+            :key="item"
+            :as="VSkeletonLoader"
+            type="article"
+          />
         </div>
         <div class="sapling-issue-skeleton__streams">
-          <v-skeleton-loader class="glass-panel" type="article, actions" />
-          <v-skeleton-loader class="glass-panel" type="article, actions" />
+          <SaplingSurface :as="VSkeletonLoader" type="article, actions" />
+          <SaplingSurface :as="VSkeletonLoader" type="article, actions" />
         </div>
       </div>
     </template>
@@ -32,7 +37,7 @@
         </template>
       </SaplingPageHero>
 
-      <section class="sapling-issue-compose glass-panel">
+      <SaplingSurface as="section" class="sapling-issue-compose">
         <div class="sapling-issue-compose__intro">
           <p class="sapling-issue-compose__eyebrow">{{ $t('issue.createEyebrow') }}</p>
           <h2 class="sapling-issue-compose__title">{{ $t('issue.createTitle') }}</h2>
@@ -137,10 +142,10 @@
             </v-btn>
           </div>
         </v-form>
-      </section>
+      </SaplingSurface>
 
       <section class="sapling-issue-metrics">
-        <article class="sapling-issue-metric glass-panel">
+        <SaplingSurface as="article" class="sapling-issue-metric">
           <div class="sapling-issue-metric__icon sapling-issue-metric__icon--open">
             <v-icon icon="mdi-source-branch" />
           </div>
@@ -150,9 +155,9 @@
               isLoading ? '...' : openIssues.length
             }}</strong>
           </div>
-        </article>
+        </SaplingSurface>
 
-        <article class="sapling-issue-metric glass-panel">
+        <SaplingSurface as="article" class="sapling-issue-metric">
           <div class="sapling-issue-metric__icon sapling-issue-metric__icon--closed">
             <v-icon icon="mdi-check-decagram-outline" />
           </div>
@@ -162,9 +167,9 @@
               isLoading ? '...' : closedIssues.length
             }}</strong>
           </div>
-        </article>
+        </SaplingSurface>
 
-        <article class="sapling-issue-metric glass-panel">
+        <SaplingSurface as="article" class="sapling-issue-metric">
           <div class="sapling-issue-metric__icon sapling-issue-metric__icon--label">
             <v-icon icon="mdi-tag-multiple-outline" />
           </div>
@@ -174,9 +179,9 @@
               isLoading ? '...' : labelCount
             }}</strong>
           </div>
-        </article>
+        </SaplingSurface>
 
-        <article class="sapling-issue-metric glass-panel">
+        <SaplingSurface as="article" class="sapling-issue-metric">
           <div class="sapling-issue-metric__icon sapling-issue-metric__icon--assignee">
             <v-icon icon="mdi-account-group-outline" />
           </div>
@@ -186,7 +191,7 @@
               isLoading ? '...' : assigneeCount
             }}</strong>
           </div>
-        </article>
+        </SaplingSurface>
       </section>
 
       <v-row class="sapling-issue-streams">
@@ -199,9 +204,12 @@
 
 <script lang="ts" setup>
 // #region Imports
+import '@/assets/styles/SaplingIssue.css'
 import { computed } from 'vue'
+import { VSkeletonLoader } from 'vuetify/components'
 import { useSaplingIssue } from '@/composables/system/useSaplingIssue'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingIssuesClosed from './SaplingIssuesClosed.vue'
 import SaplingIssuesOpen from './SaplingIssuesOpen.vue'
 // #endregion

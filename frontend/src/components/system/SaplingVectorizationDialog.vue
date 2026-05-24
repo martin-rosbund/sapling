@@ -7,9 +7,10 @@
     ></div>
 
     <transition name="sapling-vectorization-panel">
-      <section
+      <SaplingSurface
+        as="section"
         v-if="isOpen && hasSaplingVectorizationAccess"
-        class="glass-panel sapling-vectorization"
+        class="sapling-vectorization"
         @click.stop
       >
         <template v-if="isTranslationLoading">
@@ -170,15 +171,17 @@
             </v-btn>
           </footer>
         </template>
-      </section>
+      </SaplingSurface>
     </transition>
   </div>
 </template>
 
 <script lang="ts" setup>
+import '@/assets/styles/SaplingVectorizationDialog.css'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { AiProviderModelItem, AiProviderTypeItem } from '@/entity/entity'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import { useSaplingVectorization } from '@/composables/system/useSaplingVectorization'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'

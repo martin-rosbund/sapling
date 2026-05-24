@@ -6,7 +6,7 @@
     :height="SAPLING_DIALOG_HEIGHT.xl"
     persistent
   >
-    <SaplingDialogCard :tilt="false">
+    <SaplingDialogCard class="sapling-dialog-card--fill" :tilt="false">
       <div class="sapling-dialog-edit-shell" @keydown="onShellKeydown">
         <v-card-title class="sapling-dialog-edit-header">
           <SaplingDialogEditHero :loading="isLoading" :eyebrow="entityLabel" :title="dialogTitle">
@@ -503,6 +503,7 @@
 
 <script lang="ts" setup>
 // #region Imports
+import '@/assets/styles/SaplingDialogEdit.css'
 import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'

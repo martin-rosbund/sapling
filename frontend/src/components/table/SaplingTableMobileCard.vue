@@ -1,6 +1,9 @@
 <template>
-  <article
-    class="sapling-table-mobile-card glass-panel"
+  <SaplingSurface
+    as="article"
+    class="sapling-table-mobile-card"
+    variant="subtle"
+    interactive
     :class="{
       'sapling-table-mobile-card--selected': isSelected,
       'sapling-table-mobile-card--with-controls': hasHeaderControls,
@@ -212,11 +215,12 @@
         </div>
       </section>
     </div>
-  </article>
+  </SaplingSurface>
 </template>
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import type { SaplingContextMenuTableMenuItem } from '@/composables/context/useSaplingContextMenuTable'
 import SaplingRecordActionMenuList from '@/components/common/SaplingRecordActionMenuList.vue'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'

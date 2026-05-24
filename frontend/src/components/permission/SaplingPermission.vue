@@ -185,6 +185,7 @@
 </template>
 
 <script lang="ts" setup>
+import '@/assets/styles/SaplingPermission.css'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
 import { useSaplingPermission } from '@/composables/account/useSaplingPermission'

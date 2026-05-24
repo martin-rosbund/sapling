@@ -1,6 +1,6 @@
 <template>
   <div class="sapling-table-mobile-shell">
-    <div class="sapling-table-mobile-summary glass-panel">
+    <SaplingSurface as="div" class="sapling-table-mobile-summary" variant="subtle">
       <div class="sapling-table-mobile-summary__header">
         <div class="sapling-table-mobile-summary__identity">
           <div class="sapling-table-mobile-summary__headline">
@@ -30,11 +30,11 @@
         </div>
       </div>
       <v-progress-linear v-if="isLoading" color="primary" indeterminate rounded />
-    </div>
+    </SaplingSurface>
 
     <v-expand-transition>
       <div v-if="mobileControlsVisible" class="sapling-table-mobile-controls-shell">
-        <div class="sapling-table-mobile-controls glass-panel">
+        <SaplingSurface as="div" class="sapling-table-mobile-controls" variant="subtle">
           <div class="sapling-table-mobile-controls__section">
             <span class="sapling-table-mobile-controls__label">{{ $t('filter.sort') }}</span>
             <div class="sapling-table-mobile-controls__sorts">
@@ -84,7 +84,7 @@
               />
             </div>
           </div>
-        </div>
+        </SaplingSurface>
       </div>
     </v-expand-transition>
 
@@ -159,6 +159,7 @@
 
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, ref } from 'vue'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import type { EntityItem, SaplingGenericItem, ScriptButtonItem } from '@/entity/entity'
 import type {
   AccumulatedPermission,

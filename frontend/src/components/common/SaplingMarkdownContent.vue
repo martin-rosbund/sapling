@@ -9,6 +9,7 @@
 </template>
 
 <script setup lang="ts">
+import '@/assets/styles/components/SaplingMarkdownContent.css'
 import { computed } from 'vue'
 import VueMarkdownRender from 'vue-markdown-render'
 import {

@@ -12,6 +12,7 @@
 </template>
 
 <script setup lang="ts">
+import '@/assets/styles/components/SaplingCodeMirror.css'
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { json } from '@codemirror/lang-json'
 import { markdown } from '@codemirror/lang-markdown'

@@ -240,6 +240,7 @@
 
 <script lang="ts" setup>
 // #region Imports
+import '@/assets/styles/SaplingNavigationDrawer.css'
 import { computed, ref } from 'vue'
 import SaplingFavorites from '@/components/dashboard/SaplingFavorites.vue'
 import { useSaplingNavigation } from '@/composables/system/useSaplingNavigation'

@@ -25,6 +25,7 @@
 </template>
 
 <script setup lang="ts">
+import '@/assets/styles/SaplingHero.css'
 defineOptions({
   inheritAttrs: false,
 })

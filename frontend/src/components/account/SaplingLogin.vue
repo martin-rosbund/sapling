@@ -78,6 +78,7 @@
 
 <script setup lang="ts">
 //#region Import
+import '@/assets/styles/SaplingAccountDialogs.css'
 // Import the composable for handling login logic
 import SaplingInstanceBooting from '@/components/account/SaplingInstanceBooting.vue'
 import { useSaplingLogin } from '@/composables/account/useSaplingLogin'

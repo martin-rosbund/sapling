@@ -1,5 +1,5 @@
 <template>
-  <article class="sapling-system-panel glass-panel">
+  <SaplingSurface as="article" class="sapling-system-panel">
     <div class="sapling-system-panel__header">
       <div>
         <p class="sapling-system-panel__eyebrow">{{ $t('system.performance') }}</p>
@@ -38,10 +38,12 @@
     <v-alert v-if="error" type="error" density="comfortable" variant="tonal">
       {{ error }}
     </v-alert>
-  </article>
+  </SaplingSurface>
 </template>
 
 <script lang="ts" setup>
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
+
 defineProps<{
   title: string
   manufacturer?: string

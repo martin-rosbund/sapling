@@ -89,6 +89,7 @@
 </template>
 
 <script setup lang="ts">
+import '@/assets/styles/SaplingDashboardTemplateLoadDialog.css'
 import SaplingActionClose from '@/components/actions/SaplingActionClose.vue'
 import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'

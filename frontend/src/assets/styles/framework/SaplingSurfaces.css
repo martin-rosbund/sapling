@@ -1,3 +1,30 @@
+.sapling-surface {
+  min-width: 0;
+  color: inherit;
+}
+
+.sapling-surface--plain {
+  background: transparent;
+}
+
+.sapling-surface--solid {
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  background: rgb(var(--v-theme-surface));
+  box-shadow: none;
+}
+
+.sapling-surface--subtle {
+  border: 1px solid var(--sapling-surface-border-muted);
+  background: var(--sapling-surface-fill-subtle);
+}
+
+.sapling-surface--interactive {
+  transition:
+    transform var(--sapling-motion-fast) ease,
+    border-color var(--sapling-motion-fast) ease,
+    box-shadow var(--sapling-motion-fast) ease;
+}
+
 .sapling-stack-lg,
 .sapling-stack-md,
 .sapling-stack-xl {

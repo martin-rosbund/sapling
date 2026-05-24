@@ -5,7 +5,7 @@
   >
     <template v-if="isLoading">
       <div class="sapling-event-skeleton">
-        <section class="sapling-event-skeleton__hero glass-panel">
+        <SaplingSurface as="section" class="sapling-event-skeleton__hero">
           <div class="sapling-event-skeleton__hero-copy">
             <v-skeleton-loader type="text, heading, paragraph" />
           </div>
@@ -17,23 +17,30 @@
               type="article"
             />
           </div>
-        </section>
+        </SaplingSurface>
 
         <section class="sapling-event-skeleton__workspace">
-          <v-skeleton-loader
-            class="sapling-event-skeleton__calendar glass-panel"
+          <SaplingSurface
+            :as="VSkeletonLoader"
+            class="sapling-event-skeleton__calendar"
             type="table-heading, table-thead, table-row-divider@8"
           />
           <div class="sapling-event-skeleton__context">
-            <v-skeleton-loader
-              class="glass-panel sapling-event-skeleton__panel"
+            <SaplingSurface
+              :as="VSkeletonLoader"
+              class="sapling-event-skeleton__panel"
               type="list-item-three-line@3"
             />
-            <v-skeleton-loader
-              class="glass-panel sapling-event-skeleton__panel"
+            <SaplingSurface
+              :as="VSkeletonLoader"
+              class="sapling-event-skeleton__panel"
               type="list-item-three-line@4"
             />
-            <v-skeleton-loader class="glass-panel sapling-event-skeleton__panel" type="article" />
+            <SaplingSurface
+              :as="VSkeletonLoader"
+              class="sapling-event-skeleton__panel"
+              type="article"
+            />
           </div>
         </section>
       </div>
@@ -69,7 +76,7 @@
       </SaplingPageHero>
 
       <section class="sapling-event-workspace">
-        <div class="sapling-event-workspace__main glass-panel">
+        <SaplingSurface class="sapling-event-workspace__main">
           <SaplingEventToolbar
             v-model:calendar-type="calendarType"
             v-model:calendar-view-mode="calendarViewMode"
@@ -110,7 +117,7 @@
               :get-side-by-side-events="getSideBySideEvents"
             />
           </div>
-        </div>
+        </SaplingSurface>
 
         <SaplingEventContextPanels
           :is-mobile-filter-layout="isMobileContextLayout"
@@ -167,8 +174,8 @@
     content-class="sapling-context-menu__content"
     transition="slide-y-transition"
   >
-    <SaplingRecordActionMenuList
-      class="glass-panel"
+    <SaplingSurface
+      :as="SaplingRecordActionMenuList"
       density="compact"
       elevation="8"
       min-width="200"
@@ -199,11 +206,15 @@
 </template>
 
 <script lang="ts" setup>
+import '@/assets/styles/SaplingCalendar.css'
+import '@/assets/styles/SaplingContextMenu.css'
 import { computed, ref, useAttrs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
+import { VSkeletonLoader } from 'vuetify/components'
 import { useSaplingEvent } from '@/composables/event/useSaplingEvent'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingEventCalendarWorkspace from '@/components/event/SaplingEventCalendarWorkspace.vue'
 import SaplingEventContextPanels from '@/components/event/SaplingEventContextPanels.vue'
 import SaplingEventToolbar from '@/components/event/SaplingEventToolbar.vue'

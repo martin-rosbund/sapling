@@ -1,5 +1,5 @@
 <template>
-  <section class="sapling-event-panel sapling-event-agenda-panel glass-panel">
+  <SaplingSurface as="section" class="sapling-event-panel sapling-event-agenda-panel">
     <div class="sapling-event-panel__header">
       <div>
         <p class="sapling-event-panel__eyebrow">{{ $t('navigation.event') }}</p>
@@ -66,11 +66,12 @@
       <v-icon size="26">mdi-calendar-check-outline</v-icon>
       <strong>{{ $t('event.allDoneToday') }}</strong>
     </div>
-  </section>
+  </SaplingSurface>
 </template>
 
 <script lang="ts" setup>
 import { ref } from 'vue'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import type { EventAgendaItem } from '@/composables/event/useSaplingEvent'
 import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs'
 

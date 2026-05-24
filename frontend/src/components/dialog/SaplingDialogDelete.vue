@@ -7,7 +7,7 @@
     :eyebrow="$t('global.confirmDelete')"
     :title="$t('global.confirmDelete')"
     :subtitle="$t('global.confirmDeleteQuestion')"
-    card-class="tilt-content sapling-dialog-delete-card"
+    card-class="sapling-dialog-delete-card"
     persistent
     @update:model-value="handleDialogUpdate"
     @enter="handleConfirm"

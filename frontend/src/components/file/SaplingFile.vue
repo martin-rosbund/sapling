@@ -6,23 +6,26 @@
   >
     <section class="sapling-file-workspace">
       <template v-if="isTranslationLoading">
-        <aside class="sapling-file-workspace__sidebar glass-panel sapling-file-loading-panel">
+        <SaplingSurface
+          as="aside"
+          class="sapling-file-workspace__sidebar sapling-file-loading-panel"
+        >
           <v-skeleton-loader type="heading, table-heading, table-tbody" />
-        </aside>
+        </SaplingSurface>
 
         <section class="sapling-file-workspace__detail">
-          <header class="sapling-document-header glass-panel sapling-file-loading-panel">
+          <SaplingSurface as="header" class="sapling-document-header sapling-file-loading-panel">
             <v-skeleton-loader class="sapling-document-header__skeleton" type="heading, text" />
-          </header>
+          </SaplingSurface>
 
-          <section class="sapling-file-stage glass-panel sapling-file-loading-panel">
+          <SaplingSurface as="section" class="sapling-file-stage sapling-file-loading-panel">
             <v-skeleton-loader class="sapling-file-stage__skeleton" type="image, article" />
-          </section>
+          </SaplingSurface>
         </section>
       </template>
 
       <template v-else>
-        <aside class="sapling-file-workspace__sidebar glass-panel">
+        <SaplingSurface as="aside" class="sapling-file-workspace__sidebar">
           <div class="sapling-file-workspace__table-shell">
             <div class="sapling-document-table-scroll">
               <SaplingTable
@@ -53,7 +56,7 @@
               />
             </div>
           </div>
-        </aside>
+        </SaplingSurface>
 
         <section class="sapling-file-workspace__detail">
           <SaplingFileHeader
@@ -78,11 +81,13 @@
 </template>
 
 <script lang="ts" setup>
+import '@/assets/styles/SaplingFile.css'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import { BACKEND_URL, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants'
 import { useSaplingTable } from '@/composables/table/useSaplingTable'
 import type { SaplingGenericItem } from '@/entity/entity'
 import { defineAsyncComponent, ref, computed, watch } from 'vue'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingFilePDF from './SaplingFilePDF.vue'
 import SaplingFilePNG from './SaplingFilePNG.vue'
 import SaplingFileJPEG from './SaplingFileJPEG.vue'

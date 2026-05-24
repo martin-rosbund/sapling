@@ -5,13 +5,18 @@
   >
     <template v-if="isLoading">
       <div class="sapling-system-skeleton">
-        <v-skeleton-loader class="glass-panel" type="article" />
+        <SaplingSurface :as="VSkeletonLoader" type="article" />
         <div class="sapling-system-skeleton__metrics">
-          <v-skeleton-loader v-for="item in 4" :key="item" class="glass-panel" type="article" />
+          <SaplingSurface
+            v-for="item in 4"
+            :key="item"
+            :as="VSkeletonLoader"
+            type="article"
+          />
         </div>
         <div class="sapling-system-skeleton__sections">
-          <v-skeleton-loader class="glass-panel" type="article" />
-          <v-skeleton-loader class="glass-panel" type="article" />
+          <SaplingSurface :as="VSkeletonLoader" type="article" />
+          <SaplingSurface :as="VSkeletonLoader" type="article" />
         </div>
       </div>
     </template>
@@ -166,11 +171,14 @@
 
 <script lang="ts" setup>
 // #region Imports
+import '@/assets/styles/SaplingSystem.css'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { VSkeletonLoader } from 'vuetify/components'
 import type { NetworkInterface } from '@/entity/system'
 import { useSaplingSystem } from '@/composables/system/useSaplingSystem'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingSystemMetricCard from '@/components/system/SaplingSystemMetricCard.vue'
 import SaplingSystemNetworkPanel from '@/components/system/SaplingSystemNetworkPanel.vue'
 import SaplingSystemOverviewPanel from '@/components/system/SaplingSystemOverviewPanel.vue'

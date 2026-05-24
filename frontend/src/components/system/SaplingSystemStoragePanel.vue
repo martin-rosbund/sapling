@@ -1,5 +1,5 @@
 <template>
-  <section class="sapling-system-panel glass-panel">
+  <SaplingSurface as="section" class="sapling-system-panel">
     <div class="sapling-system-panel__header">
       <div>
         <p class="sapling-system-panel__eyebrow">{{ $t('system.filesystem') }}</p>
@@ -48,10 +48,12 @@
     <v-alert v-if="error" type="error" density="comfortable" variant="tonal">
       {{ error }}
     </v-alert>
-  </section>
+  </SaplingSurface>
 </template>
 
 <script lang="ts" setup>
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
+
 defineProps<{
   count: number
   items: Array<{

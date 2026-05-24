@@ -1,8 +1,9 @@
 <template>
   <!-- Error page with skeleton loader and not found message -->
-  <v-skeleton-loader
+  <SaplingSurface
+    :as="VSkeletonLoader"
     v-if="isLoading"
-    class="mx-auto glass-panel fill-height"
+    class="mx-auto fill-height"
     elevation="12"
     type="article, actions"
   />
@@ -13,6 +14,8 @@
 
 <script setup lang="ts">
 // #region Imports
+import { VSkeletonLoader } from 'vuetify/components'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import { useSaplingError } from '@/composables/system/useSaplingError'
 // #endregion
 

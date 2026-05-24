@@ -1,5 +1,5 @@
 <template>
-  <v-footer class="sapling-footer glass-panel">
+  <SaplingSurface :as="VFooter" class="sapling-footer">
     <v-btn-toggle divided mandatory :model-value="currentLanguage" variant="text">
       <v-btn
         v-for="language in languageOptions"
@@ -40,7 +40,7 @@
           <template #activator="{ props }">
             <v-btn v-bind="props" icon="mdi-dots-vertical" variant="text" />
           </template>
-          <v-list class="glass-panel">
+          <SaplingSurface :as="VList">
             <v-list-item
               v-for="action in externalActions"
               :key="action.key"
@@ -61,7 +61,7 @@
                 <v-icon :color="action.isActive ? 'primary' : undefined">{{ action.icon }}</v-icon>
               </template>
             </v-list-item>
-          </v-list>
+          </SaplingSurface>
         </v-menu>
       </template>
     </template>
@@ -75,15 +75,17 @@
         />
       </div>
     </template>
-  </v-footer>
+  </SaplingSurface>
 </template>
 
 <script lang="ts" setup>
 import { computed, onUnmounted, ref } from 'vue'
+import { VFooter, VList } from 'vuetify/components'
 import { BACKEND_URL, GIT_URL } from '@/constants/project.constants'
 import { i18n } from '@/i18n'
 import { useSaplingPreferences } from '@/composables/system/useSaplingPreferences'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher'
 
 interface FooterAction {

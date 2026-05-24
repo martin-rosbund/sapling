@@ -16,6 +16,7 @@
 </template>
 
 <script lang="ts" setup>
+import '@/assets/styles/components/SaplingFieldControls.css'
 const props = defineProps<{
   label: string
   modelValue: string

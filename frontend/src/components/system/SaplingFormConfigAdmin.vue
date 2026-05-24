@@ -67,7 +67,7 @@
     </v-alert>
 
     <section class="sapling-form-config__workspace">
-      <div class="sapling-form-config__panel sapling-form-config__panel--editor glass-panel">
+      <SaplingSurface class="sapling-form-config__panel sapling-form-config__panel--editor">
         <div class="sapling-form-config__toolbar">
           <v-autocomplete
             v-model="selectedEntityHandle"
@@ -180,10 +180,11 @@
         </div>
 
         <div class="sapling-form-config__field-list" role="list">
-          <article
+          <SaplingSurface
+            as="article"
             v-for="field in filteredFieldRows"
             :key="field.name"
-            class="sapling-form-config-field glass-panel"
+            class="sapling-form-config-field"
             role="listitem"
           >
             <div class="sapling-form-config-field__main">
@@ -259,11 +260,14 @@
                 :label="$t('formConfig.readonly')"
               />
             </div>
-          </article>
+          </SaplingSurface>
         </div>
-      </div>
+      </SaplingSurface>
 
-      <aside class="sapling-form-config__panel sapling-form-config__panel--preview glass-panel">
+      <SaplingSurface
+        as="aside"
+        class="sapling-form-config__panel sapling-form-config__panel--preview"
+      >
         <div class="sapling-form-config__preview-header">
           <div>
             <p class="sapling-form-config__eyebrow">{{ $t('formConfig.livePreview') }}</p>
@@ -278,7 +282,7 @@
           />
         </div>
 
-        <div class="sapling-form-config-preview glass-panel" aria-live="polite">
+        <SaplingSurface class="sapling-form-config-preview" aria-live="polite">
           <section
             v-for="group in previewGroups"
             :key="group.id"
@@ -286,19 +290,19 @@
           >
             <h3 v-if="group.label">{{ group.label }}</h3>
             <div class="sapling-form-config-preview__grid">
-              <div
+              <SaplingSurface
                 v-for="field in group.templates"
                 :key="field.name"
-                class="sapling-form-config-preview__field glass-panel"
+                class="sapling-form-config-preview__field"
                 :class="`sapling-form-config-preview__field--w${getPreviewWidth(field)}`"
               >
                 <span>{{ getPreviewFieldLabel(field) }}</span>
                 <strong>{{ getPreviewRenderer(field) }}</strong>
                 <small>{{ getPreviewMeta(field) }}</small>
-              </div>
+              </SaplingSurface>
             </div>
           </section>
-        </div>
+        </SaplingSurface>
 
         <div class="sapling-form-config__json-panel">
           <div class="sapling-form-config__json-header">
@@ -330,12 +334,13 @@
             {{ validationSummary }}
           </v-alert>
         </div>
-      </aside>
+      </SaplingSurface>
     </section>
   </v-container>
 </template>
 
 <script lang="ts" setup>
+import '@/assets/styles/SaplingFormConfig.css'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ApiFormConfigService, {
@@ -354,6 +359,7 @@ import type {
 } from '@/entity/structure'
 import SaplingCodeMirror from '@/components/common/SaplingCodeMirror.vue'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingFieldSingleSelect from '@/components/dialog/fields/SaplingFieldSingleSelect.vue'
 import {
   getDialogTemplateWidth,

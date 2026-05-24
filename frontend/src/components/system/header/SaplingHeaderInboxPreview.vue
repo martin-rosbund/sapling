@@ -1,12 +1,12 @@
 <template>
   <Teleport to="body">
     <Transition name="sapling-header-inbox-preview">
-      <button
+      <SaplingSurface
+        as="button"
         v-if="preview"
         :class="[
           'sapling-header__inbox-preview',
           `sapling-header__inbox-preview--${preview.kind}`,
-          'glass-panel',
         ]"
         type="button"
         aria-live="polite"
@@ -28,7 +28,7 @@
             {{ preview.title }}
           </div>
         </div>
-      </button>
+      </SaplingSurface>
     </Transition>
   </Teleport>
 </template>
@@ -36,6 +36,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import type { SaplingHeaderInboxPreview } from '@/composables/system/useSaplingHeader'
 
 const props = defineProps<{

@@ -16,6 +16,7 @@
 </template>
 
 <script lang="ts" setup>
+import '@/assets/styles/components/SaplingFieldControls.css'
 import { computed, toRef, watch } from 'vue'
 import { useSaplingPhoneDialog } from '@/composables/dialog/useSaplingPhoneDialog'
 import { useSaplingPhoneNumber } from '@/composables/phone/useSaplingPhoneNumber'

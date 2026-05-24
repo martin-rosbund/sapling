@@ -1,5 +1,5 @@
 <template>
-  <header class="sapling-document-header glass-panel">
+  <SaplingSurface as="header" class="sapling-document-header">
     <v-skeleton-loader
       v-if="isLoading"
       class="sapling-document-header__skeleton"
@@ -41,12 +41,14 @@
         </v-btn>
       </div>
     </template>
-  </header>
+  </SaplingSurface>
 </template>
 
 <script lang="ts" setup>
+import '@/assets/styles/SaplingFileHeader.css'
 import { computed } from 'vue'
 import { i18n } from '@/i18n'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 
 const props = defineProps<{
   selectedHandle: string

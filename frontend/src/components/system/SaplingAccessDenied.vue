@@ -3,7 +3,11 @@
     class="sapling-login-shell sapling-access-pending d-flex flex-column justify-center align-center"
     fluid
   >
-    <v-card class="glass-panel sapling-dialog-small sapling-access-pending__card" elevation="10">
+    <SaplingSurface
+      :as="VCard"
+      class="sapling-dialog-small sapling-access-pending__card"
+      :elevation="10"
+    >
       <div class="sapling-access-pending__icon">
         <v-icon color="warning" size="56">mdi-shield-lock-outline</v-icon>
       </div>
@@ -13,13 +17,16 @@
         <h1 class="sapling-access-pending__title">{{ $t('exception.forbidden') }}</h1>
         <p class="sapling-access-pending__text">{{ description }}</p>
       </div>
-    </v-card>
+    </SaplingSurface>
   </v-container>
 </template>
 
 <script lang="ts" setup>
+import '@/assets/styles/SaplingAccessPending.css'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { VCard } from 'vuetify/components'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 
 const props = defineProps<{
   entityHandle?: string

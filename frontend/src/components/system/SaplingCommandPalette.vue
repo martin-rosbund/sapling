@@ -8,7 +8,7 @@
     content-class="sapling-overlay-content--top"
     @update:model-value="onDialogToggle"
   >
-    <v-card class="sapling-command-palette glass-panel" rounded="lg">
+    <SaplingDialogCard class="sapling-command-palette" rounded="lg" :tilt="false">
       <div class="sapling-command-palette__search">
         <v-text-field
           ref="searchInputRef"
@@ -38,13 +38,15 @@
       <v-divider />
 
       <SaplingCommandPaletteFooter />
-    </v-card>
+    </SaplingDialogCard>
   </v-dialog>
 </template>
 
 <script lang="ts" setup>
+import '@/assets/styles/SaplingCommandPalette.css'
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingCommandPaletteFooter from '@/components/system/command-palette/SaplingCommandPaletteFooter.vue'
 import SaplingCommandPaletteResults from '@/components/system/command-palette/SaplingCommandPaletteResults.vue'
 import { useSaplingCommandPalette } from '@/composables/system/useSaplingCommandPalette'

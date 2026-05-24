@@ -98,6 +98,7 @@
 </template>
 
 <script lang="ts" setup>
+import '@/assets/styles/SaplingDialogMail.css'
 import SaplingActionMail from '@/components/actions/SaplingActionMail.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
 import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'

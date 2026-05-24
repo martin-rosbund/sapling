@@ -1,7 +1,7 @@
 <template>
   <v-col cols="12" md="6">
     <section class="sapling-issue-stream" :class="`sapling-issue-stream--${status}`">
-      <header class="sapling-issue-stream__header glass-panel">
+      <SaplingSurface as="header" class="sapling-issue-stream__header">
         <div class="sapling-issue-stream__header-copy">
           <div class="sapling-issue-stream__eyebrow">
             <v-icon :icon="streamIcon" size="18" />
@@ -13,31 +13,35 @@
         <v-chip :color="statusChipColor" size="small" variant="tonal">
           {{ isLoading ? '...' : issues.length }}
         </v-chip>
-      </header>
+      </SaplingSurface>
 
       <div v-if="isLoading" class="sapling-issue-stream__loading">
-        <v-skeleton-loader
-          class="sapling-issue-stream__skeleton glass-panel"
+        <SaplingSurface
+          :as="VSkeletonLoader"
+          class="sapling-issue-stream__skeleton"
           type="article, actions"
         />
-        <v-skeleton-loader
-          class="sapling-issue-stream__skeleton glass-panel"
+        <SaplingSurface
+          :as="VSkeletonLoader"
+          class="sapling-issue-stream__skeleton"
           type="article, actions"
         />
       </div>
 
-      <div v-else-if="!issues.length" class="sapling-issue-stream__empty glass-panel">
+      <SaplingSurface v-else-if="!issues.length" class="sapling-issue-stream__empty">
         <v-icon :icon="streamIcon" size="34" />
         <p>{{ $t(emptyStateKey) }}</p>
-      </div>
+      </SaplingSurface>
 
       <div v-else class="sapling-issue-stream__list">
-        <v-card
+        <SaplingSurface
           v-for="issue in issues"
           :key="`${cardPrefix}-${issue.id}`"
-          v-tilt="TILT_SOFT_OPTIONS"
-          class="sapling-issue-card glass-panel tilt-content"
-          elevation="8"
+          :as="VCard"
+          class="sapling-issue-card"
+          :elevation="8"
+          tilt
+          :tilt-options="TILT_SOFT_OPTIONS"
         >
           <div class="sapling-issue-card__accent" />
 
@@ -125,7 +129,7 @@
               </div>
             </div>
           </v-card-text>
-        </v-card>
+        </SaplingSurface>
       </div>
     </section>
   </v-col>
@@ -133,9 +137,12 @@
 
 <script lang="ts" setup>
 // #region Imports
+import '@/assets/styles/SaplingIssueList.css'
+import { VCard, VSkeletonLoader } from 'vuetify/components'
 import { computed } from 'vue'
 import type { SaplingIssue, SaplingIssueStatus } from '@/composables/system/useSaplingIssue'
 import { TILT_SOFT_OPTIONS } from '@/constants/tilt.constants'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import VMarkdown from 'vue-markdown-render'
 // #endregion
 

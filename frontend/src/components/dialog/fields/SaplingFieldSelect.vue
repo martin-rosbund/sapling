@@ -68,6 +68,7 @@
 
 <script lang="ts" setup>
 // #region Imports
+import '@/assets/styles/components/SaplingSelectFields.css'
 import SaplingTable from '@/components/table/SaplingTable.vue'
 import type { SaplingGenericItem } from '@/entity/entity'
 import { useSaplingTable } from '@/composables/table/useSaplingTable'

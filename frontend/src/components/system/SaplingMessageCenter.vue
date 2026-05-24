@@ -30,7 +30,7 @@
           <template v-if="isTranslationLoading">
             <SaplingDialogHero loading />
             <div class="sapling-message-center-dialog__body">
-              <v-skeleton-loader class="glass-panel" type="article, article, article" />
+              <SaplingSurface :as="VSkeletonLoader" type="article, article, article" />
             </div>
             <SaplingActionBarSkeleton />
           </template>
@@ -41,9 +41,10 @@
             />
 
             <div class="sapling-message-center-dialog__body">
-              <section
+              <SaplingSurface
+                as="section"
                 v-if="messages.length === 0"
-                class="sapling-message-center-empty-state glass-panel"
+                class="sapling-message-center-empty-state"
               >
                 <div class="sapling-message-center-empty-state__icon">
                   <v-icon icon="mdi-bell-check-outline" size="40" />
@@ -51,7 +52,7 @@
                 <h3 class="sapling-message-center-empty-state__title">
                   {{ $t('global.messageCenter') }}
                 </h3>
-              </section>
+              </SaplingSurface>
 
               <v-list v-else density="comfortable" class="sapling-message-center-list">
                 <v-list-item
@@ -105,12 +106,15 @@
 
 <script lang="ts" setup>
 // #region Imports
+import '@/assets/styles/SaplingMessageCenter.css'
 import { useI18n } from 'vue-i18n'
+import { VSkeletonLoader } from 'vuetify/components'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import type { Message } from '@/composables/system/useSaplingMessageCenter'
 import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
 import SaplingActionMessageCenter from '@/components/actions/SaplingActionMessageCenter.vue'
 // #endregion

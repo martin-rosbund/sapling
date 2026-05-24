@@ -21,6 +21,7 @@
 </template>
 
 <script lang="ts" setup>
+import '@/assets/styles/SaplingContextMenu.css'
 import {
   useSaplingContextMenuTable,
   type SaplingContextMenuTableActionPayload,
