@@ -131,7 +131,6 @@
 </template>
 
 <script lang="ts" setup>
-import '@/assets/styles/SaplingAiChat.css'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'

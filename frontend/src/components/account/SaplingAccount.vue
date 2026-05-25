@@ -137,7 +137,6 @@
 
 <script setup lang="ts">
 // #region Imports
-import '@/assets/styles/SaplingAccountDialogs.css'
 import { computed } from 'vue'
 import { useSaplingAccount } from '@/composables/account/useSaplingAccount'
 import SaplingChangePassword from '@/components/account/SaplingChangePassword.vue'

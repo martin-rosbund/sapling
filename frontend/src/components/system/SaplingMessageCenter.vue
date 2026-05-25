@@ -110,7 +110,6 @@
 
 <script lang="ts" setup>
 // #region Imports
-import '@/assets/styles/SaplingMessageCenter.css'
 import { useI18n } from 'vue-i18n'
 import { VSkeletonLoader } from 'vuetify/components'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'

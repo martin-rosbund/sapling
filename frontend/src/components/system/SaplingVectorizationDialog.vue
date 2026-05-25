@@ -188,7 +188,6 @@
 </template>
 
 <script lang="ts" setup>
-import '@/assets/styles/SaplingVectorizationDialog.css'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { AiProviderModelItem, AiProviderTypeItem } from '@/entity/entity'

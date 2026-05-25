@@ -100,6 +100,76 @@
   padding-right: var(--sapling-gap-xs);
 }
 
+.sapling-account-dialog__body {
+  display: flex;
+  flex-direction: column;
+}
+
+.sapling-account-dialog__body .v-list,
+.sapling-account-dialog__body .v-table {
+  background: transparent;
+}
+
+.sapling-account-dialog__content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sapling-account-dialog__content .v-row {
+  min-height: 0;
+}
+
+.sapling-account-dialog__workhours {
+  min-width: 0;
+}
+
+.sapling-workhours-list {
+  display: grid;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-workhours-card {
+  display: grid;
+  gap: var(--sapling-gap-sm);
+  padding: var(--sapling-gap-md);
+  border: 1px solid var(--sapling-surface-border-muted);
+  border-radius: var(--sapling-radius-md);
+  background: var(--sapling-surface-fill);
+}
+
+.sapling-workhours-card__day,
+.sapling-workhours-card__label {
+  font-size: var(--sapling-text-label-size);
+  font-weight: 700;
+  letter-spacing: var(--sapling-letter-spacing-label);
+  text-transform: uppercase;
+  opacity: var(--sapling-opacity-secondary);
+}
+
+.sapling-workhours-card__times {
+  display: grid;
+  gap: var(--sapling-gap-sm);
+}
+
+.sapling-workhours-card__time-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-change-password-dialog,
+.sapling-login-dialog {
+  width: 100%;
+  overflow: hidden;
+}
+
+.sapling-change-password-dialog__body,
+.sapling-login-dialog__body {
+  padding: 0;
+}
+
 .sapling-message-center-dialog__body {
   display: flex;
   flex-direction: column;
@@ -108,6 +178,121 @@
 .sapling-message-center-dialog__body > .sapling-empty-state-panel {
   flex: 1 1 auto;
   min-height: 100%;
+}
+
+.sapling-help-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: min(640px, 85vh);
+  overflow: hidden;
+}
+
+.sapling-help-dialog__title {
+  display: flex;
+  align-items: center;
+  gap: var(--sapling-gap-sm-plus);
+  padding: var(--sapling-space-md) var(--sapling-space-lg);
+  font-size: var(--sapling-text-body-size-lg);
+  font-weight: 600;
+}
+
+.sapling-help-dialog__title-icon {
+  opacity: 0.85;
+}
+
+.sapling-help-dialog__body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: var(--sapling-space-2xs) 0;
+}
+
+.sapling-help-dialog__section {
+  padding: var(--sapling-space-md) var(--sapling-space-lg);
+}
+
+.sapling-help-dialog__section-title {
+  margin: 0 0 var(--sapling-space-sm);
+  font-size: var(--sapling-text-label-size-sm);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.sapling-help-dialog__section-intro {
+  margin: 0 0 var(--sapling-space-md);
+  font-size: var(--sapling-text-meta-size);
+  opacity: 0.75;
+}
+
+.sapling-help-dialog__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sapling-help-dialog__row {
+  display: flex;
+  align-items: center;
+  gap: var(--sapling-gap-lg);
+  padding: var(--sapling-space-xs) 0;
+  font-size: var(--sapling-text-body-size-md);
+}
+
+.sapling-help-dialog__row--syntax {
+  align-items: flex-start;
+}
+
+.sapling-help-dialog__row-stack {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--sapling-gap-2xs);
+  min-width: 0;
+}
+
+.sapling-help-dialog__row-icon {
+  flex: 0 0 auto;
+  opacity: 0.85;
+}
+
+.sapling-help-dialog__row-label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.sapling-help-dialog__row-hint {
+  font-size: var(--sapling-text-meta-size-sm);
+  opacity: 0.65;
+}
+
+.sapling-help-dialog__keys {
+  min-width: 90px;
+  flex: 0 0 auto;
+}
+
+.sapling-help-dialog__example {
+  flex: 0 0 auto;
+  min-width: 110px;
+  padding: var(--sapling-space-3xs) var(--sapling-space-sm);
+  border: 1px solid currentColor;
+  border-radius: var(--sapling-radius-xs);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--sapling-text-meta-size-sm);
+  line-height: 16px;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.sapling-help-dialog__footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--sapling-space-sm) var(--sapling-space-lg);
+  font-size: var(--sapling-text-label-size-xs);
+  opacity: 0.6;
 }
 
 .sapling-dialog-small {

@@ -58,7 +58,6 @@
 </template>
 
 <script lang="ts" setup>
-import '@/assets/styles/SaplingHelpDialog.css'
 import { onBeforeUnmount, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'

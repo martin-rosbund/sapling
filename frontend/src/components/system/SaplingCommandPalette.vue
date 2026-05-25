@@ -43,7 +43,6 @@
 </template>
 
 <script lang="ts" setup>
-import '@/assets/styles/SaplingCommandPalette.css'
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'

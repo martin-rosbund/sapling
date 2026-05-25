@@ -50,7 +50,6 @@
 </template>
 
 <script lang="ts" setup>
-import '@/assets/styles/SaplingFileHeader.css'
 import { computed } from 'vue'
 import { i18n } from '@/i18n'
 import SaplingSurface from '@/components/common/SaplingSurface.vue'

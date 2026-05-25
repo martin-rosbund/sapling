@@ -77,7 +77,6 @@
 </template>
 
 <script lang="ts" setup>
-import '@/assets/styles/SaplingFileMail.css'
 import DOMPurify from 'dompurify'
 import PostalMime, { type Address, type Email } from 'postal-mime'
 import { computed, ref, watch } from 'vue'

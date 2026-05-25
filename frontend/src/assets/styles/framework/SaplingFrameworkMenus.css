@@ -331,6 +331,11 @@
   opacity: var(--sapling-opacity-soft);
 }
 
+.sapling-context-menu__content {
+  position: fixed !important;
+  margin: 0 !important;
+}
+
 :root[data-sapling-glass='off'] .sapling-menu-option:hover,
 :root[data-sapling-performance='reduced'] .sapling-menu-option:hover {
   transform: none;

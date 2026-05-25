@@ -12,11 +12,14 @@ Application CSS enters through `SaplingFramework.css`, which is imported once by
 
 - `SaplingSurfaces.css`: base surfaces, panels, cards, metrics, and empty states
 - `SaplingFrameworkLists.css`: list cards, stat cards, note cards, chip rows, and interactive list items
-- `SaplingFrameworkMenus.css`: floating previews, identity chips, and menu panels/options
-- `SaplingFrameworkNavigation.css`: drawer, search-panel, and navigation-item patterns
+- `SaplingFrameworkMenus.css`: floating previews, identity chips, context menus, and menu panels/options
+- `SaplingFrameworkNavigation.css`: drawer, favorites, search-panel, and navigation-item patterns
+- `SaplingFrameworkFiles.css`: document headers, file mail summaries, and document body layouts
 - `SaplingFrameworkWorkspaces.css`: dashboard shells, page workspaces, browser/partner layouts, tabs, and board grids
 - `SaplingFrameworkForms.css`: upload controls, markdown fields, field panels, and recurrence form layouts
-- `SaplingFrameworkDialogs.css`: dialog shells, cards, widths, delete/json/template dialogs, and access pending
+- `SaplingFrameworkDialogs.css`: dialog shells, cards, widths, account/help/delete/json/template dialogs, and access pending
+- `SaplingFrameworkOverlays.css`: floating panels, command palette, vectorization overlays, and overlay motion
+- `SaplingFrameworkMessaging.css`: AI chat, message center, transient messages, and message dialog workflows
 - `SaplingFrameworkHistory.css`: change history, record timelines, and history detail cards
 - `SaplingFrameworkOperations.css`: admin, permission, attention, system, and inbox-style workflows
 - `SaplingFrameworkRecordDialog.css`: record edit dialogs, grouped fields, and relation tabs
@@ -41,8 +44,13 @@ Application CSS enters through `SaplingFramework.css`, which is imported once by
 - Compact helpers: `sapling-chip-row`, `sapling-inline-empty`, `sapling-soft-chip`
 - Floating previews: `sapling-floating-preview` with icon, meta, pill, and title parts
 - Menus: `sapling-menu-panel`, `sapling-menu-section`, `sapling-menu-option`
-- Navigation drawers: `sapling-drawer-shell`, `sapling-drawer-hero`, `sapling-nav-card`
+- Context menus: `sapling-context-menu__content`
+- Navigation drawers: `sapling-drawer-shell`, `sapling-drawer-hero`, `sapling-nav-card`, `sapling-favorites-panel`
 - Identity chips: `sapling-identity-chip`, `sapling-identity-avatar`, `sapling-identity-copy`
+- Files: `sapling-document-header`, `sapling-file-mail-layout`, `sapling-file-mail-text`
+- Overlays: `sapling-command-palette`, `sapling-floating-panel`, `sapling-vectorization`
+- Messaging: `sapling-ai-chat`, `sapling-message-center-entry`, `messages-float`
+- Account dialogs: `sapling-account-dialog__content`, `sapling-workhours-card`
 - Actions: `sapling-action-bar`, `sapling-action-stack`, `sapling-action-cluster`
 - Split toolbars: `sapling-split-toolbar`, `sapling-toolbar-group`, `sapling-toolbar-toggle`
 - Toolbars: `sapling-toolbar-shell`, `sapling-toolbar-controls`, `sapling-toolbar-slot`
