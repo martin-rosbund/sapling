@@ -1,9 +1,9 @@
 <template>
-  <aside class="sapling-stack-xl sapling-page-panel sapling-permission-context">
-    <section class="sapling-section-panel sapling-page-panel sapling-permission-members glass-panel">
-      <div class="sapling-stack-md sapling-permission-panel-header">
+  <aside class="sapling-stack-xl sapling-page-panel sapling-admin-context sapling-permission-context">
+    <section class="sapling-section-panel sapling-page-panel sapling-admin-members sapling-permission-members glass-panel">
+      <div class="sapling-stack-md sapling-admin-panel-header sapling-permission-panel-header">
         <div>
-          <p class="sapling-eyebrow sapling-permission-section-eyebrow">
+          <p class="sapling-eyebrow sapling-admin-section-eyebrow sapling-permission-section-eyebrow">
             {{ $t('role.persons') }}
           </p>
           <h2 class="sapling-section-title">{{ $t('role.membersTitle') }}</h2>
@@ -16,24 +16,24 @@
         :modelValue="[]"
         :items="availablePersons"
         :disabled="!selectedRole || membersArePending"
-        class="sapling-permission-member-add"
+        class="sapling-admin-member-add sapling-permission-member-add"
         @add-selected="emit('addPersons', $event)"
       />
 
       <div
         v-if="selectedRoleMembers.length"
-        class="sapling-scroll-list sapling-permission-member-list"
+        class="sapling-scroll-list sapling-admin-member-list sapling-permission-member-list"
       >
         <article
           v-for="person in selectedRoleMembers"
           :key="person.handle ?? `${person.firstName}-${person.lastName}`"
-          class="sapling-panel-shell sapling-row-between-xs sapling-permission-member-card"
+          class="sapling-panel-shell sapling-row-between-xs sapling-admin-member-card sapling-permission-member-card"
         >
-          <div class="sapling-permission-member-card__copy">
+          <div class="sapling-admin-member-card__copy sapling-permission-member-card__copy">
             <strong>{{ person.firstName }} {{ person.lastName }}</strong>
             <p>{{ person.email || person.loginName || $t('role.noContactData') }}</p>
           </div>
-          <div class="sapling-row-xs sapling-permission-member-card__actions">
+          <div class="sapling-row-xs sapling-admin-member-card__actions sapling-permission-member-card__actions">
             <v-tooltip location="bottom">
               <template #activator="{ props: tooltipProps }">
                 <v-btn
@@ -62,7 +62,7 @@
       </div>
       <div
         v-else
-        class="sapling-empty-state-panel sapling-empty-state-panel--compact sapling-permission-empty-block"
+        class="sapling-empty-state-panel sapling-empty-state-panel--compact sapling-admin-empty-block sapling-permission-empty-block"
       >
         {{ $t('role.noMembersAssigned') }}
       </div>

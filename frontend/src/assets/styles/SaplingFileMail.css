@@ -77,7 +77,7 @@
   width: 100%;
   min-height: 0;
   border: 0;
-  border-radius: var(--sapling-file-panel-radius-compact);
+  border-radius: var(--sapling-panel-radius-compact);
 }
 
 .sapling-file-mail-text {
@@ -87,7 +87,7 @@
   padding: var(--sapling-gap-md);
   overflow: auto;
   color: rgb(var(--v-theme-on-surface));
-  font: var(--sapling-file-panel-font);
+  font: var(--sapling-panel-font);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }

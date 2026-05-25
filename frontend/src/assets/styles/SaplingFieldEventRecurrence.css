@@ -11,7 +11,7 @@
   gap: 16px;
   width: 100%;
   padding: 16px 18px;
-  border-radius: var(--sapling-file-panel-radius-compact);
+  border-radius: var(--sapling-panel-radius-compact);
   text-align: left;
   cursor: pointer;
 }
@@ -82,7 +82,7 @@
   box-sizing: border-box;
   gap: 12px;
   border: 1px solid color-mix(in srgb, var(--sapling-surface-border) 85%, transparent);
-  border-radius: var(--sapling-file-panel-radius-compact);
+  border-radius: var(--sapling-panel-radius-compact);
   background: color-mix(in srgb, var(--sapling-surface-fill) 72%, transparent);
 }
 

@@ -86,7 +86,7 @@
 }
 
 .sapling-panel-compact {
-  border-radius: var(--sapling-file-panel-radius-compact);
+  border-radius: var(--sapling-panel-radius-compact);
 }
 
 .sapling-surface-card {

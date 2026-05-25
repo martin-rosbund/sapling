@@ -12,10 +12,13 @@
 @import './SaplingFrameworkOverlays.css';
 @import './SaplingFrameworkMessaging.css';
 @import './SaplingFrameworkHistory.css';
+@import './SaplingFrameworkOperations.css';
+@import './SaplingFrameworkWorkItems.css';
 @import './SaplingFrameworkForms.css';
 @import './SaplingFrameworkConfig.css';
 @import './SaplingFrameworkDialogs.css';
 @import './SaplingFrameworkActions.css';
+@import './SaplingFrameworkRecordDialog.css';
 @import './SaplingFrameworkCalendar.css';
 @import './SaplingFrameworkTables.css';
 @import './SaplingFrameworkTableFilters.css';

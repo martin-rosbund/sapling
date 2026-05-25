@@ -24,7 +24,7 @@
   min-width: 0;
   overflow: hidden;
   border: 1px solid var(--sapling-surface-border);
-  border-radius: var(--sapling-file-panel-radius-compact);
+  border-radius: var(--sapling-panel-radius-compact);
 }
 
 .sapling-dialog-card--fill {

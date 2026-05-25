@@ -1,18 +1,18 @@
 :root {
-  --sapling-file-panel-border: rgba(255, 255, 250, 0.1);
-  --sapling-file-panel-radius: 20px;
-  --sapling-file-panel-radius-compact: 16px;
+  --sapling-panel-border: rgba(255, 255, 250, 0.1);
+  --sapling-panel-radius: 20px;
+  --sapling-panel-radius-compact: 16px;
   --sapling-radius-xs: 8px;
-  --sapling-radius-sm: var(--sapling-file-panel-radius-compact);
-  --sapling-radius-md: var(--sapling-file-panel-radius);
+  --sapling-radius-sm: var(--sapling-panel-radius-compact);
+  --sapling-radius-md: var(--sapling-panel-radius);
   --sapling-radius-lg: 12px;
   --sapling-radius-card: 16px;
   --sapling-radius-card-lg: 20px;
   --sapling-radius-card-xl: 24px;
   --sapling-radius-pill: 999px;
-  --sapling-file-panel-padding: 16px;
-  --sapling-file-panel-padding-compact: 12px;
-  --sapling-file-panel-font: 400 0.95rem/1.6 'Segoe UI', sans-serif;
+  --sapling-panel-padding: 16px;
+  --sapling-panel-padding-compact: 12px;
+  --sapling-panel-font: 400 0.95rem/1.6 'Segoe UI', sans-serif;
   --sapling-kpi-widget-min-height: 170px;
   --sapling-note-card-min-height: 230px;
   --sapling-note-card-min-height-compact: 210px;
@@ -121,7 +121,7 @@
   --sapling-surface-fill-soft: var(--sapling-surface-fill-subtle);
   --sapling-surface-fill-muted: var(--sapling-surface-fill);
   --sapling-surface-fill-strong: rgba(255, 255, 255, 0.1);
-  --sapling-surface-border: var(--sapling-file-panel-border);
+  --sapling-surface-border: var(--sapling-panel-border);
   --sapling-surface-border-muted: rgba(255, 255, 255, 0.07);
   --sapling-surface-border-accent: rgba(0, 140, 149, 0.15);
   --sapling-surface-border-accent-strong: rgba(0, 193, 213, 0.28);

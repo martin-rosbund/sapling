@@ -1,8 +1,8 @@
 <template>
-  <aside class="sapling-section-panel sapling-page-panel sapling-page-panel-stack sapling-permission-sidebar glass-panel">
-    <div class="sapling-stack-md sapling-permission-panel-header">
+  <aside class="sapling-section-panel sapling-page-panel sapling-page-panel-stack sapling-admin-sidebar sapling-admin-panel-stack sapling-permission-sidebar glass-panel">
+    <div class="sapling-stack-md sapling-admin-panel-header sapling-permission-panel-header">
       <div>
-        <p class="sapling-eyebrow sapling-permission-section-eyebrow">
+        <p class="sapling-eyebrow sapling-admin-section-eyebrow sapling-permission-section-eyebrow">
           {{ $t('navigation.role') }}
         </p>
         <h2 class="sapling-section-title">{{ $t('role.directory') }}</h2>
@@ -17,16 +17,16 @@
       />
     </div>
 
-    <v-list class="sapling-scroll-list sapling-permission-role-list" density="comfortable" nav>
+    <v-list class="sapling-scroll-list sapling-admin-list sapling-permission-role-list" density="comfortable" nav>
       <v-list-item
         v-for="role in roles"
         :key="role.handle ?? role.title"
         :active="selectedRoleHandle === role.handle"
-        class="sapling-permission-role-item"
+        class="sapling-admin-list-item sapling-permission-role-item"
         @click="emit('selectRole', role.handle ?? null)"
       >
         <template #prepend>
-          <div class="sapling-permission-role-avatar">
+          <div class="sapling-admin-avatar sapling-permission-role-avatar">
             {{ getRoleInitial(role.title) }}
           </div>
         </template>
@@ -35,7 +35,7 @@
         <v-list-item-subtitle>{{ getStageTitle(role.stage) }}</v-list-item-subtitle>
 
         <template #append>
-          <div class="sapling-row-xs sapling-permission-role-meta">
+          <div class="sapling-row-xs sapling-admin-list-meta sapling-permission-role-meta">
             <v-chip size="x-small" variant="outlined">
               {{ getRoleMemberCount(role) }}
             </v-chip>
@@ -47,7 +47,7 @@
 
     <div
       v-if="!roles.length"
-      class="sapling-empty-state-panel sapling-empty-state-panel--compact sapling-permission-empty-block"
+      class="sapling-empty-state-panel sapling-empty-state-panel--compact sapling-admin-empty-block sapling-permission-empty-block"
     >
       {{ $t('role.noRolesMatchSearch') }}
     </div>

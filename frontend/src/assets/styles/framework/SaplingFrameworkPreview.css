@@ -14,9 +14,9 @@
 }
 
 .sapling-preview-panel {
-  padding: var(--sapling-file-panel-padding);
-  border: 1px solid var(--sapling-file-panel-border);
-  border-radius: var(--sapling-file-panel-radius);
+  padding: var(--sapling-panel-padding);
+  border: 1px solid var(--sapling-panel-border);
+  border-radius: var(--sapling-panel-radius);
 }
 
 .sapling-preview-stage {
@@ -171,7 +171,7 @@
 
 @media (max-width: 960px) {
   .sapling-preview-panel {
-    padding: var(--sapling-file-panel-padding-compact);
+    padding: var(--sapling-panel-padding-compact);
     border-radius: var(--sapling-radius-sm);
   }
 

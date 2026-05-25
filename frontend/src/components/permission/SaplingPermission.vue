@@ -1,29 +1,29 @@
 <template>
   <v-container
-    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--fill sapling-page-shell--uniform-inset sapling-dashboard-page sapling-dashboard-page--flow-xl sapling-permission-dashboard fill-height"
+    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--fill sapling-page-shell--uniform-inset sapling-dashboard-page sapling-dashboard-page--flow-xl sapling-admin-dashboard sapling-permission-dashboard fill-height"
     fluid
   >
     <section
       v-if="permissionIsLoading"
-      class="sapling-page-hero sapling-page-hero--workspace sapling-permission-hero glass-panel"
+      class="sapling-page-hero sapling-page-hero--workspace sapling-admin-hero sapling-permission-hero glass-panel"
     >
-      <div class="sapling-permission-hero-copy">
+      <div class="sapling-admin-hero__copy sapling-permission-hero-copy">
         <v-skeleton-loader type="heading, text" />
       </div>
 
-      <div class="sapling-stack-md sapling-permission-hero-side">
-        <div class="sapling-stat-grid sapling-permission-stat-grid">
+      <div class="sapling-stack-md sapling-admin-hero__side sapling-permission-hero-side">
+        <div class="sapling-stat-grid sapling-admin-stat-grid sapling-permission-stat-grid">
           <v-skeleton-loader v-for="item in 4" :key="item" type="article" />
         </div>
 
-        <div class="sapling-action-cluster sapling-permission-hero-actions">
+        <div class="sapling-action-cluster sapling-admin-hero__actions sapling-permission-hero-actions">
           <v-skeleton-loader v-for="item in 2" :key="item" type="button" />
         </div>
       </div>
     </section>
     <SaplingPageHero
       v-else
-      class="sapling-permission-hero"
+      class="sapling-admin-hero sapling-permission-hero"
       variant="workspace"
       :eyebrow="$t('permission.accessGovernance')"
       :title="
@@ -38,27 +38,27 @@
       </template>
 
       <template #side>
-        <div class="sapling-stack-md sapling-permission-hero-side">
-          <div class="sapling-stat-grid sapling-permission-stat-grid">
-            <article class="sapling-detail-card sapling-permission-stat-card">
+        <div class="sapling-stack-md sapling-admin-hero__side sapling-permission-hero-side">
+          <div class="sapling-stat-grid sapling-admin-stat-grid sapling-permission-stat-grid">
+            <article class="sapling-detail-card sapling-admin-stat-card sapling-permission-stat-card">
               <span>{{ $t('role.roles') }}</span>
               <strong>{{ dashboardStats.roleCount }}</strong>
             </article>
-            <article class="sapling-detail-card sapling-permission-stat-card">
+            <article class="sapling-detail-card sapling-admin-stat-card sapling-permission-stat-card">
               <span>{{ $t('role.members') }}</span>
               <strong>{{ dashboardStats.memberCount }}</strong>
             </article>
-            <article class="sapling-detail-card sapling-permission-stat-card">
+            <article class="sapling-detail-card sapling-admin-stat-card sapling-permission-stat-card">
               <span>{{ $t('right.groups') }}</span>
               <strong>{{ dashboardStats.groupCount }}</strong>
             </article>
-            <article class="sapling-detail-card sapling-permission-stat-card">
+            <article class="sapling-detail-card sapling-admin-stat-card sapling-permission-stat-card">
               <span>{{ $t('right.enabledRights') }}</span>
               <strong>{{ dashboardStats.enabledPermissionCount }}</strong>
             </article>
           </div>
 
-          <div class="sapling-action-cluster sapling-permission-hero-actions">
+          <div class="sapling-action-cluster sapling-admin-hero__actions sapling-permission-hero-actions">
             <v-chip
               v-if="hasUnsavedPermissionChanges"
               color="warning"
@@ -91,33 +91,33 @@
 
     <template v-if="permissionIsLoading">
       <section
-        class="sapling-page-workspace sapling-page-workspace--sidebar-main-context sapling-page-workspace--collapse-xl sapling-permission-layout"
+        class="sapling-page-workspace sapling-page-workspace--sidebar-main-context sapling-page-workspace--collapse-xl sapling-admin-layout sapling-permission-layout"
       >
         <aside
-          class="sapling-section-panel sapling-page-panel sapling-permission-sidebar glass-panel sapling-permission-loading-panel"
+          class="sapling-section-panel sapling-page-panel sapling-admin-sidebar sapling-permission-sidebar glass-panel sapling-permission-loading-panel"
         >
           <v-skeleton-loader
             type="heading, list-item-two-line, list-item-two-line, list-item-two-line"
           />
         </aside>
 
-        <main class="sapling-page-column sapling-permission-main">
+        <main class="sapling-page-column sapling-admin-main sapling-permission-main">
           <section
-            class="sapling-section-panel sapling-page-panel sapling-permission-selection glass-panel sapling-permission-loading-panel"
+            class="sapling-section-panel sapling-page-panel sapling-admin-selection sapling-permission-selection glass-panel sapling-permission-loading-panel"
           >
             <v-skeleton-loader type="heading, text, text" />
           </section>
 
           <section
-            class="sapling-workspace-panel sapling-page-panel sapling-permission-workspace glass-panel sapling-permission-loading-panel"
+            class="sapling-workspace-panel sapling-page-panel sapling-admin-workspace sapling-permission-workspace glass-panel sapling-permission-loading-panel"
           >
             <v-skeleton-loader type="heading, table-heading, table-tbody" />
           </section>
         </main>
 
-        <aside class="sapling-stack-xl sapling-page-panel sapling-permission-context">
+        <aside class="sapling-stack-xl sapling-page-panel sapling-admin-context sapling-permission-context">
           <section
-            class="sapling-section-panel sapling-page-panel sapling-permission-members glass-panel sapling-permission-loading-panel"
+            class="sapling-section-panel sapling-page-panel sapling-admin-members sapling-permission-members glass-panel sapling-permission-loading-panel"
           >
             <v-skeleton-loader type="heading, article, article" />
           </section>
@@ -127,7 +127,7 @@
 
     <section
       v-else
-      class="sapling-page-workspace sapling-page-workspace--sidebar-main-context sapling-page-workspace--collapse-xl sapling-permission-layout"
+      class="sapling-page-workspace sapling-page-workspace--sidebar-main-context sapling-page-workspace--collapse-xl sapling-admin-layout sapling-permission-layout"
     >
       <SaplingPermissionRoleSidebar
         v-model:role-search="roleSearch"
@@ -140,7 +140,7 @@
         @select-role="selectRole"
       />
 
-      <main class="sapling-page-column sapling-permission-main">
+      <main class="sapling-page-column sapling-admin-main sapling-permission-main">
         <SaplingPermissionOverview
           :selected-role="selectedRole"
           :selected-role-stats="selectedRoleStats"
@@ -172,7 +172,7 @@
 
         <section
           v-else
-          class="sapling-empty-state-panel sapling-empty-state-panel--compact sapling-permission-empty-state glass-panel"
+          class="sapling-empty-state-panel sapling-empty-state-panel--compact sapling-admin-empty-state sapling-permission-empty-state glass-panel"
         >
           {{ $t('role.selectRoleToEdit') }}
         </section>
@@ -200,7 +200,6 @@
 </template>
 
 <script lang="ts" setup>
-import '@/assets/styles/SaplingPermission.css'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
 import { useSaplingPermission } from '@/composables/account/useSaplingPermission'

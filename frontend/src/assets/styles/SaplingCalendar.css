@@ -122,7 +122,7 @@
 .sapling-event-context__switcher {
   gap: var(--sapling-gap-sm);
   padding: var(--sapling-gap-md);
-  border-radius: var(--sapling-file-panel-radius-compact);
+  border-radius: var(--sapling-panel-radius-compact);
 }
 
 .sapling-event-context__toggle {

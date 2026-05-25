@@ -8,7 +8,7 @@
   grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--sapling-gap-xl);
   padding: var(--sapling-space-panel-md) var(--sapling-space-panel-xl);
-  border-radius: var(--sapling-file-panel-radius-compact);
+  border-radius: var(--sapling-panel-radius-compact);
   align-items: center;
 }
 

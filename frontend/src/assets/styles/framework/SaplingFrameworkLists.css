@@ -3,7 +3,7 @@
   align-items: center;
   gap: var(--sapling-gap-md);
   min-height: 0;
-  padding: var(--sapling-file-panel-padding-compact);
+  padding: var(--sapling-panel-padding-compact);
 }
 
 .sapling-list-card--loading {

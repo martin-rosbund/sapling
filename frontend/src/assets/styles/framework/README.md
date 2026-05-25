@@ -14,6 +14,9 @@ Application CSS enters through `SaplingFramework.css`, which is imported once by
 - `SaplingFrameworkLists.css`: list cards, stat cards, chip rows, and interactive list items
 - `SaplingFrameworkMenus.css`: floating previews, identity chips, and menu panels/options
 - `SaplingFrameworkNavigation.css`: drawer, search-panel, and navigation-item patterns
+- `SaplingFrameworkOperations.css`: admin, permission, attention, and inbox-style workflows
+- `SaplingFrameworkRecordDialog.css`: record edit dialogs, grouped fields, and relation tabs
+- `SaplingFrameworkWorkItems.css`: work-item dashboards, issue streams, and work cards
 - `SaplingFrameworkCalendar.css`: shared Vuetify calendar chrome
 
 ## Use Shared Patterns First
@@ -38,6 +41,10 @@ Application CSS enters through `SaplingFramework.css`, which is imported once by
 - Toolbars: `sapling-toolbar-shell`, `sapling-toolbar-controls`, `sapling-toolbar-slot`
 - Calendars: `sapling-calendar-frame` for Vuetify calendar chrome and current-time styling
 - Forms: `sapling-upload`, `sapling-upload-dropzone`, `sapling-upload-selection`
+- Admin areas: `sapling-admin-layout`, `sapling-admin-sidebar`, `sapling-admin-workspace`
+- Attention queues: `sapling-attention-content`, `sapling-attention-section`, `sapling-attention-card`
+- Record dialogs: `sapling-record-dialog-shell`, `sapling-record-section`, `sapling-record-field-shell`
+- Work items: `sapling-work-compose`, `sapling-work-stream`, `sapling-work-card`
 
 ## When Feature CSS Is Allowed
 
@@ -52,5 +59,6 @@ cards, or empty-state layout.
 ## Tokens
 
 Use `SaplingTokens.css` for semantic values only. Prefer reusing existing tokens
-over creating one-off variables for a single component. Component-specific
+over creating one-off variables for a single component. Reusable panel defaults
+live behind the neutral `--sapling-panel-*` tokens. Component-specific
 dimensions belong in the component stylesheet until they prove reusable.
