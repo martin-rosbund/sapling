@@ -152,11 +152,15 @@ Use these shared patterns before creating a new class family:
 1. Reuse tokens from `SaplingTokens.css` before adding new values.
 2. Extend an existing framework layer when a pattern is reusable across
    features.
-3. Keep local feature CSS only for behavior or domain-specific layout that
+3. Do not add `<style>` blocks or component-local CSS imports in `.vue` files.
+4. Keep local feature CSS only for behavior or domain-specific layout that
    cannot be expressed by shared patterns.
-4. Allowed local CSS examples: external iframe preview stylesheets, third-party
+5. Allowed local CSS examples: external iframe preview stylesheets, third-party
    rendered content boundaries, and very small behavior-only deltas.
-5. Avoid restating spacing, borders, radii, label typography, detail grids,
+6. Dynamic `:style` bindings are allowed only for runtime values such as menu
+   coordinates, event geometry, chart widths, external label colors, or CSS
+   custom properties that cannot be known in static CSS.
+7. Avoid restating spacing, borders, radii, label typography, detail grids,
    card surfaces, empty states, dialog chrome, and toolbar layout in feature
    CSS.
 
@@ -179,3 +183,5 @@ The active states are:
 The framework migration is complete for app-level CSS. The style tree now has a
 single app entry point, framework-owned partials, and one intentional iframe
 preview stylesheet outside the framework.
+
+Vue components do not contain `<style>` blocks or component-local CSS imports.
