@@ -1,12 +1,12 @@
 <template>
   <div class="sapling-dialog-edit-tab-scroll">
-    <div class="sapling-dialog-edit-relation-shell">
-      <div class="sapling-dialog-edit-relation-header">
+    <div class="sapling-stack-lg sapling-dialog-edit-relation-shell">
+      <div class="sapling-section-header sapling-dialog-edit-relation-header">
         <div class="sapling-dialog-edit-relation-header__copy">
-          <div class="sapling-dialog-edit-relation-header__eyebrow">
+          <div class="sapling-eyebrow sapling-dialog-edit-relation-header__eyebrow">
             {{ entityLabel }}
           </div>
-          <h3 class="sapling-dialog-edit-relation-header__title">
+          <h3 class="sapling-section-title sapling-dialog-edit-relation-header__title">
             {{ $t(`${entityHandle}.${template.name}`) }}
           </h3>
         </div>
@@ -14,9 +14,9 @@
           {{ totalItems }}
         </v-chip>
       </div>
-      <v-card class="sapling-dialog-edit-relation-card">
-        <v-card-text class="sapling-dialog-edit-relation-content">
-          <div class="sapling-dialog-edit-relation-actions">
+      <v-card class="sapling-panel-shell sapling-dialog-edit-relation-card">
+        <v-card-text class="sapling-section-panel sapling-dialog-edit-relation-content">
+          <div class="sapling-toolbar-group sapling-dialog-edit-relation-actions">
             <div class="sapling-dialog-edit-relation-actions__field">
               <SaplingSelectAddField
                 :label="$t('global.add')"

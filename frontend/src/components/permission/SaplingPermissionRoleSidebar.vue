@@ -1,9 +1,11 @@
 <template>
-  <aside class="sapling-permission-sidebar glass-panel">
-    <div class="sapling-permission-panel-header">
+  <aside class="sapling-section-panel sapling-permission-sidebar glass-panel">
+    <div class="sapling-stack-md sapling-permission-panel-header">
       <div>
-        <p class="sapling-permission-section-eyebrow">{{ $t('navigation.role') }}</p>
-        <h2 class="sapling-permission-section-title">{{ $t('role.directory') }}</h2>
+        <p class="sapling-eyebrow sapling-permission-section-eyebrow">
+          {{ $t('navigation.role') }}
+        </p>
+        <h2 class="sapling-section-title">{{ $t('role.directory') }}</h2>
       </div>
       <v-text-field
         v-model="roleSearchModel"
@@ -15,7 +17,7 @@
       />
     </div>
 
-    <v-list class="sapling-permission-role-list" density="comfortable" nav>
+    <v-list class="sapling-scroll-list sapling-permission-role-list" density="comfortable" nav>
       <v-list-item
         v-for="role in roles"
         :key="role.handle ?? role.title"
@@ -33,7 +35,7 @@
         <v-list-item-subtitle>{{ getStageTitle(role.stage) }}</v-list-item-subtitle>
 
         <template #append>
-          <div class="sapling-permission-role-meta">
+          <div class="sapling-row-xs sapling-permission-role-meta">
             <v-chip size="x-small" variant="outlined">
               {{ getRoleMemberCount(role) }}
             </v-chip>
@@ -43,7 +45,10 @@
       </v-list-item>
     </v-list>
 
-    <div v-if="!roles.length" class="sapling-permission-empty-block">
+    <div
+      v-if="!roles.length"
+      class="sapling-empty-state-panel sapling-empty-state-panel--compact sapling-permission-empty-block"
+    >
       {{ $t('role.noRolesMatchSearch') }}
     </div>
   </aside>

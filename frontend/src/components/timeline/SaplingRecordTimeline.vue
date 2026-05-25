@@ -3,7 +3,7 @@
     <SaplingDialogCard class="sapling-inbox-dialog sapling-record-timeline-dialog" :tilt="false">
       <SaplingDialogShell
         fill-shell
-        body-class="sapling-inbox-dialog__body sapling-record-timeline-dialog__body"
+        body-class="sapling-inbox-dialog__body sapling-scroll-region sapling-record-timeline-dialog__body"
         :show-divider="false"
       >
         <template #hero>
@@ -26,9 +26,11 @@
         </template>
 
         <template #body>
-          <div class="sapling-inbox-dialog__content sapling-record-timeline-dialog__content">
+          <div
+            class="sapling-inbox-dialog__content sapling-stack-xl sapling-record-timeline-dialog__content"
+          >
             <template v-if="isLoading">
-              <section class="sapling-record-timeline__summary-grid">
+              <section class="sapling-stat-grid sapling-record-timeline__summary-grid">
                 <v-skeleton-loader
                   v-for="item in 3"
                   :key="item"
@@ -38,7 +40,7 @@
                 />
               </section>
 
-              <section class="sapling-record-timeline__loading">
+              <section class="sapling-stack-lg sapling-record-timeline__loading">
                 <v-skeleton-loader
                   v-for="item in 3"
                   :key="`loading-${item}`"
@@ -50,13 +52,16 @@
             </template>
 
             <template v-else>
-              <section v-if="summaryCards.length > 0" class="sapling-record-timeline__summary-grid">
+              <section
+                v-if="summaryCards.length > 0"
+                class="sapling-stat-grid sapling-record-timeline__summary-grid"
+              >
                 <article
                   v-for="card in summaryCards"
                   :key="card.key"
-                  class="sapling-record-timeline__summary-card glass-panel"
+                  class="sapling-panel-shell sapling-stack-md sapling-record-timeline__summary-card glass-panel"
                 >
-                  <div class="sapling-record-timeline__summary-card-header">
+                  <div class="sapling-row-between-md sapling-record-timeline__summary-card-header">
                     <div>
                       <div class="sapling-record-timeline__summary-card-label">
                         {{ card.label }}
@@ -72,7 +77,7 @@
 
               <section
                 v-if="error"
-                class="sapling-record-timeline__empty glass-panel sapling-empty-state-panel"
+                class="sapling-record-timeline__empty glass-panel sapling-empty-state-panel sapling-empty-state-panel--compact"
               >
                 <v-icon size="42">mdi-alert-circle-outline</v-icon>
                 <p>{{ error }}</p>
@@ -80,13 +85,16 @@
 
               <section
                 v-else-if="months.length === 0"
-                class="sapling-record-timeline__empty glass-panel sapling-empty-state-panel"
+                class="sapling-record-timeline__empty glass-panel sapling-empty-state-panel sapling-empty-state-panel--compact"
               >
                 <v-icon size="42">mdi-timeline-text-outline</v-icon>
                 <p>{{ t('timeline.empty') }}</p>
               </section>
 
-              <div v-else-if="smAndDown" class="sapling-record-timeline__mobile-list">
+              <div
+                v-else-if="smAndDown"
+                class="sapling-stack-lg sapling-record-timeline__mobile-list"
+              >
                 <article
                   v-for="month in months"
                   :key="month.key"
@@ -160,7 +168,10 @@
 
               <div ref="loadMoreTriggerRef" class="sapling-record-timeline__sentinel"></div>
 
-              <div v-if="isLoadingMore" class="sapling-record-timeline__footer-state">
+              <div
+                v-if="isLoadingMore"
+                class="sapling-row-md sapling-record-timeline__footer-state"
+              >
                 <v-progress-circular indeterminate color="primary" size="22" width="3" />
                 <span>{{ t('timeline.loadingMore') }}</span>
               </div>

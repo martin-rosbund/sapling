@@ -395,7 +395,6 @@
   padding: var(--sapling-gap-xs);
 }
 
-.sapling-file-workspace__sidebar-copy,
 .sapling-message-center-entry__description {
   font-size: var(--sapling-text-body-size-sm);
 }

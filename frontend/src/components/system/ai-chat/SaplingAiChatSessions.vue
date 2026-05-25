@@ -1,16 +1,16 @@
 <template>
   <aside
-    class="sapling-ai-chat__sessions"
+    class="sapling-stack-xl sapling-ai-chat__sessions"
     :class="{
       'sapling-ai-chat__sessions--collapsible': isCollapsible,
       'sapling-ai-chat__sessions--collapsed': isCollapsible && isCollapsed,
     }"
   >
-    <div class="sapling-ai-chat__sessions-header">
+    <div class="sapling-stack-md sapling-ai-chat__sessions-header">
       <button
         v-if="isCollapsible"
         type="button"
-        class="sapling-ai-chat__sessions-toggle"
+        class="sapling-row-between-md sapling-ai-chat__sessions-toggle"
         :aria-expanded="!isCollapsed"
         :title="t('aiChat.sessions')"
         @click="emit('toggleCollapse')"
@@ -38,25 +38,31 @@
       </v-switch>
     </div>
 
-    <div v-if="!isCollapsed && sessions.length === 0" class="sapling-ai-chat__empty-state">
+    <div
+      v-if="!isCollapsed && sessions.length === 0"
+      class="sapling-empty-state-panel sapling-empty-state-panel--compact sapling-ai-chat__empty-state"
+    >
       {{ t('aiChat.noSessions') }}
     </div>
 
-    <div v-else-if="!isCollapsed" class="sapling-ai-chat__session-list">
+    <div v-else-if="!isCollapsed" class="sapling-scroll-list sapling-ai-chat__session-list">
       <button
         v-for="session in sessions"
         :key="session.handle ?? session.title"
         type="button"
-        class="sapling-ai-chat__session-item"
-        :class="{ 'sapling-ai-chat__session-item--active': session.handle === activeSessionHandle }"
+        class="sapling-interactive-list-item sapling-ai-chat__session-item"
+        :class="{
+          'sapling-interactive-list-item--active': session.handle === activeSessionHandle,
+          'sapling-ai-chat__session-item--active': session.handle === activeSessionHandle,
+        }"
         @click="emit('select', session)"
       >
-        <div class="sapling-ai-chat__session-top">
+        <div class="sapling-interactive-list-item__row sapling-ai-chat__session-top">
           <div class="sapling-ai-chat__session-meta">
             {{ formatSessionMeta(session) }}
           </div>
 
-          <div class="sapling-ai-chat__session-actions">
+          <div class="sapling-row-xs sapling-ai-chat__session-actions">
             <v-btn
               v-if="editingSessionHandle === session.handle"
               icon="mdi-check"
@@ -93,7 +99,7 @@
             />
           </template>
           <template v-else>
-            <div class="sapling-ai-chat__session-title-row">
+            <div class="sapling-row-xs sapling-ai-chat__session-title-row">
               <div class="sapling-ai-chat__session-title">
                 {{ getTruncatedTitle(session.title) }}
               </div>

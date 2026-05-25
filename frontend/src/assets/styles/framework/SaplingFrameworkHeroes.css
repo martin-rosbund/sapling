@@ -242,7 +242,6 @@
 .sapling-dialog-hero__eyebrow,
 .sapling-page-hero__eyebrow,
 .sapling-dialog-edit-hero__eyebrow,
-.sapling-permission-section-eyebrow,
 .sapling-event-panel__eyebrow,
 .sapling-issue-stream__eyebrow,
 .sapling-dialog-edit-relation-header__eyebrow {
@@ -264,8 +263,7 @@
 
 .sapling-dialog-hero__stat-label,
 .sapling-system-gauge__copy span,
-.sapling-file-mail-label,
-.sapling-file-workspace__eyebrow {
+.sapling-file-mail-label {
   font-size: var(--sapling-text-label-size);
   font-weight: 700;
   letter-spacing: var(--sapling-letter-spacing-label);

@@ -24,7 +24,7 @@
       </template>
 
       <template #side>
-        <div class="sapling-form-config__hero-actions">
+        <div class="sapling-action-cluster sapling-form-config__hero-actions">
           <v-btn
             prepend-icon="mdi-content-save"
             color="primary"
@@ -67,7 +67,9 @@
     </v-alert>
 
     <section class="sapling-form-config__workspace">
-      <SaplingSurface class="sapling-form-config__panel sapling-form-config__panel--editor">
+      <SaplingSurface
+        class="sapling-panel-shell sapling-section-panel sapling-form-config__panel sapling-form-config__panel--editor"
+      >
         <div class="sapling-form-config__toolbar">
           <v-autocomplete
             v-model="selectedEntityHandle"
@@ -135,7 +137,7 @@
             prepend-inner-icon="mdi-pound"
             disabled
           />
-          <div class="sapling-form-config__switches">
+          <div class="sapling-row-md sapling-form-config__switches">
             <v-switch
               v-model="isActive"
               color="primary"
@@ -179,15 +181,15 @@
           </v-btn>
         </div>
 
-        <div class="sapling-form-config__field-list" role="list">
+        <div class="sapling-scroll-list sapling-form-config__field-list" role="list">
           <SaplingSurface
             as="article"
             v-for="field in filteredFieldRows"
             :key="field.name"
-            class="sapling-form-config-field"
+            class="sapling-panel-shell sapling-stack-md sapling-form-config-field"
             role="listitem"
           >
-            <div class="sapling-form-config-field__main">
+            <div class="sapling-row-md sapling-form-config-field__main">
               <v-switch
                 v-model="field.visible"
                 color="primary"
@@ -246,7 +248,7 @@
               />
             </div>
 
-            <div class="sapling-form-config-field__toggles">
+            <div class="sapling-row-md sapling-form-config-field__toggles">
               <v-checkbox
                 v-model="field.required"
                 density="compact"
@@ -266,12 +268,14 @@
 
       <SaplingSurface
         as="aside"
-        class="sapling-form-config__panel sapling-form-config__panel--preview"
+        class="sapling-panel-shell sapling-section-panel sapling-form-config__panel sapling-form-config__panel--preview"
       >
-        <div class="sapling-form-config__preview-header">
+        <div class="sapling-row-between-md sapling-form-config__preview-header">
           <div>
-            <p class="sapling-form-config__eyebrow">{{ $t('formConfig.livePreview') }}</p>
-            <h2>{{ previewTitle }}</h2>
+            <p class="sapling-eyebrow sapling-form-config__eyebrow">
+              {{ $t('formConfig.livePreview') }}
+            </p>
+            <h2 class="sapling-section-title">{{ previewTitle }}</h2>
           </div>
           <v-btn
             icon="mdi-refresh"
@@ -282,18 +286,21 @@
           />
         </div>
 
-        <SaplingSurface class="sapling-form-config-preview" aria-live="polite">
+        <SaplingSurface
+          class="sapling-panel-shell sapling-stack-lg sapling-form-config-preview"
+          aria-live="polite"
+        >
           <section
             v-for="group in previewGroups"
             :key="group.id"
-            class="sapling-form-config-preview__group"
+            class="sapling-stack-md sapling-form-config-preview__group"
           >
             <h3 v-if="group.label">{{ group.label }}</h3>
             <div class="sapling-form-config-preview__grid">
               <SaplingSurface
                 v-for="field in group.templates"
                 :key="field.name"
-                class="sapling-form-config-preview__field"
+                class="sapling-panel-shell sapling-form-config-preview__field"
                 :class="`sapling-form-config-preview__field--w${getPreviewWidth(field)}`"
               >
                 <span>{{ getPreviewFieldLabel(field) }}</span>
@@ -305,8 +312,10 @@
         </SaplingSurface>
 
         <div class="sapling-form-config__json-panel">
-          <div class="sapling-form-config__json-header">
-            <p class="sapling-form-config__eyebrow">{{ $t('formConfig.json') }}</p>
+          <div class="sapling-row-between-md sapling-form-config__json-header">
+            <p class="sapling-eyebrow sapling-form-config__eyebrow">
+              {{ $t('formConfig.json') }}
+            </p>
             <v-btn
               size="small"
               prepend-icon="mdi-check-decagram-outline"
@@ -480,7 +489,9 @@ const filteredFieldRows = computed(() => {
 
   return fieldRows.filter((field) =>
     [field.name, field.label, field.group, field.type].some((value) =>
-      String(value ?? '').toLowerCase().includes(query),
+      String(value ?? '')
+        .toLowerCase()
+        .includes(query),
     ),
   )
 })
@@ -523,7 +534,9 @@ const previewGroups = computed(() =>
 )
 
 const previewTitle = computed(() =>
-  selectedEntityHandle.value ? translateEntity(selectedEntityHandle.value) : t('formConfig.preview'),
+  selectedEntityHandle.value
+    ? translateEntity(selectedEntityHandle.value)
+    : t('formConfig.preview'),
 )
 
 const validationIsValid = computed(() => validationResult.value?.isValid === true)
@@ -637,7 +650,9 @@ function startNewConfig(): void {
 }
 
 function applySelectedConfig(): void {
-  const selectedConfig = configs.value.find((config) => config.handle === selectedConfigHandle.value)
+  const selectedConfig = configs.value.find(
+    (config) => config.handle === selectedConfigHandle.value,
+  )
   if (!selectedConfig) {
     startNewConfig()
     return
@@ -807,10 +822,7 @@ async function onImportFileChange(event: Event): Promise<void> {
     configName.value = file.name.replace(/\.json$/i, '')
     selectedConfigHandle.value = null
     buildFieldRows(parsed.fields ?? {})
-    validationResult.value = await ApiFormConfigService.validate(
-      selectedEntityHandle.value,
-      parsed,
-    )
+    validationResult.value = await ApiFormConfigService.validate(selectedEntityHandle.value, parsed)
   } catch {
     errorMessage.value = t('formConfig.importFailed')
   }

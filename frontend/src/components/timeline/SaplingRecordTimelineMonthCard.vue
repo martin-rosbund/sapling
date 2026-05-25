@@ -1,25 +1,27 @@
 <template>
-  <article class="sapling-record-timeline-month-card glass-panel">
-    <div class="sapling-record-timeline-month-card__header">
+  <article class="sapling-section-panel sapling-record-timeline-month-card glass-panel">
+    <div class="sapling-row-between-md sapling-row-wrap sapling-record-timeline-month-card__header">
       <div>
         <h2>{{ month.label }}</h2>
         <p>{{ month.entities.length }} {{ t('timeline.sections') }}</p>
       </div>
     </div>
 
-    <div class="sapling-record-timeline-month-card__entity-list">
+    <div class="sapling-stack-xl sapling-record-timeline-month-card__entity-list">
       <section
         v-for="summary in month.entities"
         :key="`${month.key}-${summary.entityHandle}-${summary.relationFields.join('-')}`"
-        class="sapling-record-timeline-month-card__entity glass-panel"
+        class="sapling-section-panel sapling-record-timeline-month-card__entity glass-panel"
       >
-        <div class="sapling-record-timeline-month-card__entity-header">
+        <div
+          class="sapling-row-between-md sapling-row-wrap sapling-record-timeline-month-card__entity-header"
+        >
           <div>
             <h3>{{ summaryHeading(summary) }}</h3>
             <p>{{ summaryDescription(summary) }}</p>
           </div>
 
-          <div class="sapling-record-timeline-month-card__entity-actions">
+          <div class="sapling-chip-row sapling-record-timeline-month-card__entity-actions">
             <v-btn
               v-if="summary.startCount > 0"
               variant="text"
@@ -39,11 +41,14 @@
           </div>
         </div>
 
-        <div v-if="summary.groups.length > 0" class="sapling-record-timeline-month-card__groups">
+        <div
+          v-if="summary.groups.length > 0"
+          class="sapling-stack-xl sapling-record-timeline-month-card__groups"
+        >
           <section
             v-for="group in summary.groups"
             :key="`${summary.entityHandle}-${group.field}`"
-            class="sapling-record-timeline-month-card__group"
+            class="sapling-stack-md sapling-record-timeline-month-card__group"
           >
             <div class="sapling-record-timeline-month-card__group-header">
               <span class="sapling-eyebrow">{{
@@ -51,15 +56,15 @@
               }}</span>
             </div>
 
-            <div class="sapling-record-timeline-month-card__chips">
+            <div class="sapling-chip-row sapling-record-timeline-month-card__chips">
               <button
                 v-for="item in group.items"
                 :key="`${group.field}-${item.key}`"
-                class="sapling-record-timeline-month-card__chip-button"
+                class="sapling-soft-chip sapling-soft-chip--button sapling-record-timeline-month-card__chip-button"
                 type="button"
                 @click="emit('drilldown', summary.entityHandle, item.drilldownFilter)"
               >
-                <span class="sapling-record-timeline-month-card__chip-label-row">
+                <span class="sapling-row-xs sapling-record-timeline-month-card__chip-label-row">
                   <v-icon v-if="item.icon" size="14">{{ item.icon }}</v-icon>
                   <span
                     class="sapling-record-timeline-month-card__chip-dot"
@@ -80,7 +85,10 @@
         </div>
       </section>
 
-      <p v-if="month.entities.length === 0" class="sapling-record-timeline-month-card__empty">
+      <p
+        v-if="month.entities.length === 0"
+        class="sapling-inline-empty sapling-record-timeline-month-card__empty"
+      >
         {{ t('timeline.noActivityInMonth') }}
       </p>
     </div>

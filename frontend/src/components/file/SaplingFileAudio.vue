@@ -3,15 +3,17 @@
     class="sapling-file-preview sapling-file-audio sapling-file-viewer sapling-file-preview-fullheight"
   >
     <div class="sapling-file-media-surface sapling-file-media-surface--stacked">
-      <div class="sapling-file-media-card sapling-file-media-card--minimal">
-        <div class="sapling-file-media-card__header">
-          <div class="sapling-file-media-card__icon">
+      <div
+        class="sapling-panel-shell sapling-stack-md sapling-file-media-card sapling-file-media-card--minimal"
+      >
+        <div class="sapling-row-md sapling-file-media-card__header">
+          <div class="sapling-icon-tile sapling-file-media-card__icon">
             <v-icon icon="mdi-music-circle-outline" size="44" />
           </div>
 
           <div class="sapling-file-media-card__copy">
-            <div class="sapling-file-media-card__eyebrow-row">
-              <span class="sapling-file-media-card__pill">{{ formatLabel }}</span>
+            <div class="sapling-chip-row sapling-file-media-card__eyebrow-row">
+              <span class="sapling-soft-chip sapling-file-media-card__pill">{{ formatLabel }}</span>
               <span class="sapling-file-media-card__meta">{{ mimeType || 'audio/mpeg' }}</span>
             </div>
           </div>

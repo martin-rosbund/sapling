@@ -1,9 +1,9 @@
 <template>
-  <section class="sapling-ai-chat__conversation">
+  <section class="sapling-min-size-0 sapling-ai-chat__conversation">
     <div class="sapling-ai-chat__conversation-header">
       <div class="sapling-ai-chat__conversation-heading">
-        <div class="sapling-ai-chat__conversation-title-row">
-          <div class="sapling-ai-chat__conversation-title">
+        <div class="sapling-row-xs sapling-ai-chat__conversation-title-row">
+          <div class="sapling-section-title sapling-ai-chat__conversation-title">
             {{ getTruncatedTitle(activeConversationTitle) }}
           </div>
           <v-tooltip
@@ -68,7 +68,7 @@
       </div>
     </div>
 
-    <div ref="messageContainer" class="sapling-ai-chat__messages">
+    <div ref="messageContainer" class="sapling-scroll-list sapling-ai-chat__messages">
       <div v-if="hasMoreMessages" class="sapling-ai-chat__history-loader">
         <v-btn
           size="small"
@@ -80,7 +80,10 @@
         </v-btn>
       </div>
 
-      <div v-if="messages.length === 0" class="sapling-ai-chat__empty-state">
+      <div
+        v-if="messages.length === 0"
+        class="sapling-empty-state-panel sapling-empty-state-panel--compact sapling-ai-chat__empty-state"
+      >
         {{ hasConfiguredProviders ? t('aiChat.noMessages') : t('aiChat.noConfiguredProviders') }}
       </div>
 
@@ -106,7 +109,10 @@
         <div class="sapling-ai-chat__message-content">
           <SaplingMarkdownContent :source="getMessageDisplayContent(message)" />
         </div>
-        <div v-if="shouldShowMessageActions(message)" class="sapling-ai-chat__message-links">
+        <div
+          v-if="shouldShowMessageActions(message)"
+          class="sapling-chip-row sapling-ai-chat__message-links"
+        >
           <v-btn
             v-if="canPlayMessageSpeech(message)"
             size="small"
@@ -131,7 +137,7 @@
       </div>
     </div>
 
-    <div class="sapling-ai-chat__composer">
+    <div class="sapling-stack-xl sapling-ai-chat__composer">
       <v-textarea
         v-model="draftMessageModel"
         :disabled="!hasConfiguredProviders"
@@ -146,10 +152,10 @@
         @keydown.enter.exact.prevent="emit('send')"
       />
 
-      <div class="sapling-ai-chat__composer-actions">
+      <div class="sapling-row-between-md sapling-ai-chat__composer-actions">
         <div class="sapling-ai-chat__composer-context flex-grow-1">
-          <div class="sapling-ai-chat__voice-select-stack">
-            <div class="sapling-ai-chat__voice-select-row">
+          <div class="sapling-stack-md sapling-ai-chat__voice-select-stack">
+            <div class="sapling-row-md sapling-row-wrap sapling-ai-chat__voice-select-row">
               <v-select
                 v-if="transcriptionProviderOptions.length > 0"
                 :model-value="selectedTranscriptionProviderHandle"
@@ -189,7 +195,7 @@
                 speechProviderOptions.length > 0 ||
                 speechModelOptions.length > 0
               "
-              class="sapling-ai-chat__voice-select-row"
+              class="sapling-row-md sapling-row-wrap sapling-ai-chat__voice-select-row"
             >
               <v-select
                 v-if="speechProviderOptions.length > 0"

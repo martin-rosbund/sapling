@@ -1,5 +1,8 @@
 <template>
-  <SaplingSurface as="header" class="sapling-document-header">
+  <SaplingSurface
+    as="header"
+    class="sapling-panel-shell sapling-section-header sapling-document-header"
+  >
     <v-skeleton-loader
       v-if="isLoading"
       class="sapling-document-header__skeleton"
@@ -7,18 +10,20 @@
     />
 
     <template v-else>
-      <div class="sapling-document-header__copy">
-        <div class="sapling-document-header__icon">
+      <div class="sapling-row-md sapling-document-header__copy">
+        <div class="sapling-icon-tile sapling-document-header__icon">
           <v-icon :icon="headerIcon" size="24" />
         </div>
 
         <div class="sapling-document-header__text">
-          <p class="sapling-document-header__eyebrow">{{ $t('document.preview') }}</p>
-          <h2 class="sapling-document-title">{{ headerTitle }}</h2>
+          <p class="sapling-eyebrow sapling-document-header__eyebrow">
+            {{ $t('document.preview') }}
+          </p>
+          <h2 class="sapling-section-title sapling-document-title">{{ headerTitle }}</h2>
         </div>
       </div>
 
-      <div class="sapling-document-header__actions">
+      <div class="sapling-action-cluster sapling-document-header__actions">
         <v-chip
           v-if="hasSelection"
           class="sapling-document-header__badge"

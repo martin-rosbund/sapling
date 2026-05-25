@@ -8,12 +8,12 @@
         <v-skeleton-loader type="heading, text" />
       </div>
 
-      <div class="sapling-permission-hero-side">
-        <div class="sapling-permission-stat-grid">
+      <div class="sapling-stack-md sapling-permission-hero-side">
+        <div class="sapling-stat-grid sapling-permission-stat-grid">
           <v-skeleton-loader v-for="item in 4" :key="item" type="article" />
         </div>
 
-        <div class="sapling-permission-hero-actions">
+        <div class="sapling-action-cluster sapling-permission-hero-actions">
           <v-skeleton-loader v-for="item in 2" :key="item" type="button" />
         </div>
       </div>
@@ -35,27 +35,27 @@
       </template>
 
       <template #side>
-        <div class="sapling-permission-hero-side">
-          <div class="sapling-permission-stat-grid">
-            <article class="sapling-permission-stat-card">
+        <div class="sapling-stack-md sapling-permission-hero-side">
+          <div class="sapling-stat-grid sapling-permission-stat-grid">
+            <article class="sapling-detail-card sapling-permission-stat-card">
               <span>{{ $t('role.roles') }}</span>
               <strong>{{ dashboardStats.roleCount }}</strong>
             </article>
-            <article class="sapling-permission-stat-card">
+            <article class="sapling-detail-card sapling-permission-stat-card">
               <span>{{ $t('role.members') }}</span>
               <strong>{{ dashboardStats.memberCount }}</strong>
             </article>
-            <article class="sapling-permission-stat-card">
+            <article class="sapling-detail-card sapling-permission-stat-card">
               <span>{{ $t('right.groups') }}</span>
               <strong>{{ dashboardStats.groupCount }}</strong>
             </article>
-            <article class="sapling-permission-stat-card">
+            <article class="sapling-detail-card sapling-permission-stat-card">
               <span>{{ $t('right.enabledRights') }}</span>
               <strong>{{ dashboardStats.enabledPermissionCount }}</strong>
             </article>
           </div>
 
-          <div class="sapling-permission-hero-actions">
+          <div class="sapling-action-cluster sapling-permission-hero-actions">
             <v-chip
               v-if="hasUnsavedPermissionChanges"
               color="warning"
@@ -88,7 +88,9 @@
 
     <template v-if="permissionIsLoading">
       <section class="sapling-permission-layout">
-        <aside class="sapling-permission-sidebar glass-panel sapling-permission-loading-panel">
+        <aside
+          class="sapling-section-panel sapling-permission-sidebar glass-panel sapling-permission-loading-panel"
+        >
           <v-skeleton-loader
             type="heading, list-item-two-line, list-item-two-line, list-item-two-line"
           />
@@ -96,20 +98,22 @@
 
         <main class="sapling-permission-main">
           <section
-            class="sapling-permission-selection glass-panel sapling-permission-loading-panel"
+            class="sapling-section-panel sapling-permission-selection glass-panel sapling-permission-loading-panel"
           >
             <v-skeleton-loader type="heading, text, text" />
           </section>
 
           <section
-            class="sapling-permission-workspace glass-panel sapling-permission-loading-panel"
+            class="sapling-workspace-panel sapling-permission-workspace glass-panel sapling-permission-loading-panel"
           >
             <v-skeleton-loader type="heading, table-heading, table-tbody" />
           </section>
         </main>
 
-        <aside class="sapling-permission-context">
-          <section class="sapling-permission-members glass-panel sapling-permission-loading-panel">
+        <aside class="sapling-stack-xl sapling-permission-context">
+          <section
+            class="sapling-section-panel sapling-permission-members glass-panel sapling-permission-loading-panel"
+          >
             <v-skeleton-loader type="heading, article, article" />
           </section>
         </aside>
@@ -158,7 +162,10 @@
           @clear-entity-access="clearEntityAccess"
         />
 
-        <section v-else class="sapling-permission-empty-state glass-panel">
+        <section
+          v-else
+          class="sapling-empty-state-panel sapling-empty-state-panel--compact sapling-permission-empty-state glass-panel"
+        >
           {{ $t('role.selectRoleToEdit') }}
         </section>
       </main>

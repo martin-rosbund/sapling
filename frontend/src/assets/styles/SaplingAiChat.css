@@ -47,16 +47,17 @@
 }
 
 .sapling-ai-chat__header {
-  display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: var(--sapling-space-xl) var(--sapling-space-2xl) var(--sapling-space-lg);
   gap: var(--sapling-gap-lg);
+  padding: var(--sapling-space-xl) var(--sapling-space-2xl) var(--sapling-space-lg);
+}
+
+.sapling-ai-chat__heading {
+  min-width: 0;
 }
 
 .sapling-ai-chat__eyebrow {
   font-size: var(--sapling-text-label-size-sm);
-  text-transform: uppercase;
   letter-spacing: 0.12em;
   opacity: var(--sapling-opacity-soft);
 }
@@ -67,8 +68,8 @@
 }
 
 .sapling-ai-chat__header-actions {
-  display: flex;
-  align-items: center;
+  width: auto;
+  flex-wrap: nowrap;
   gap: var(--sapling-gap-md);
 }
 
@@ -95,24 +96,15 @@
   border-right: 1px solid var(--sapling-surface-border);
   padding: var(--sapling-space-lg);
   min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--sapling-gap-xl);
   overflow: hidden;
 }
 
 .sapling-ai-chat__sessions-header {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sapling-gap-md);
   font-weight: 600;
   min-width: 0;
 }
 
 .sapling-ai-chat__sessions-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: var(--sapling-gap-xl);
   width: 100%;
   min-width: 0;
@@ -150,24 +142,13 @@
 }
 
 .sapling-ai-chat__session-list {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: auto;
-  overscroll-behavior: contain;
-  display: flex;
-  flex-direction: column;
   gap: var(--sapling-gap-md);
 }
 
 .sapling-ai-chat__session-item {
-  width: 100%;
-  border: 1px solid var(--sapling-surface-border);
   border-radius: var(--sapling-radius-card);
   background: var(--sapling-surface-fill-subtle);
-  color: inherit;
-  text-align: left;
   padding: var(--sapling-space-md);
-  display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: var(--sapling-gap-sm-plus);
@@ -179,9 +160,6 @@
 }
 
 .sapling-ai-chat__session-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
   gap: var(--sapling-gap-md);
 }
 
@@ -192,10 +170,7 @@
 
 .sapling-ai-chat__session-title-row,
 .sapling-ai-chat__conversation-title-row {
-  display: flex;
-  align-items: center;
   gap: var(--sapling-gap-sm);
-  min-width: 0;
 }
 
 .sapling-ai-chat__session-title {
@@ -212,8 +187,6 @@
 }
 
 .sapling-ai-chat__session-actions {
-  display: flex;
-  align-items: center;
   flex: 0 0 auto;
 }
 
@@ -265,25 +238,13 @@
   color: var(--sapling-surface-text-muted);
 }
 
-.sapling-ai-chat__conversation-subtitle {
-  margin-top: var(--sapling-space-2xs);
-  font-size: var(--sapling-text-label-size-lg);
-  opacity: var(--sapling-opacity-soft);
-}
-
 .sapling-ai-chat__provider-select,
 .sapling-ai-chat__model-select {
   width: 100%;
 }
 
 .sapling-ai-chat__messages {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: auto;
-  overscroll-behavior: contain;
   padding: var(--sapling-space-xl);
-  display: flex;
-  flex-direction: column;
   gap: var(--sapling-gap-xl);
 }
 
@@ -324,8 +285,6 @@
 }
 
 .sapling-ai-chat__message-links {
-  display: flex;
-  flex-wrap: wrap;
   gap: var(--sapling-gap-md);
   margin-top: var(--sapling-space-sm-plus);
 }
@@ -333,15 +292,9 @@
 .sapling-ai-chat__composer {
   border-top: 1px solid var(--sapling-surface-border);
   padding: var(--sapling-space-lg);
-  display: flex;
-  flex-direction: column;
-  gap: var(--sapling-gap-xl);
 }
 
 .sapling-ai-chat__composer-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: var(--sapling-gap-xl);
 }
 
@@ -351,17 +304,13 @@
 }
 
 .sapling-ai-chat__voice-select-stack {
-  display: flex;
-  flex-direction: column;
   gap: var(--sapling-gap-sm-plus);
   width: 100%;
   min-width: 0;
 }
 
 .sapling-ai-chat__voice-select-row {
-  display: flex;
   gap: var(--sapling-gap-sm-plus);
-  flex-wrap: wrap;
   width: 100%;
   min-width: 0;
 }
@@ -380,10 +329,6 @@
   flex: 13 1 0;
 }
 
-.sapling-ai-chat__composer-badge {
-  max-width: 100%;
-}
-
 @media (min-width: 1280px) {
   .sapling-ai-chat {
     width: 50vw;
@@ -393,8 +338,8 @@
 
 .sapling-ai-chat__empty-state {
   padding: var(--sapling-space-lg);
-  border: 1px dashed var(--sapling-surface-border);
   border-radius: var(--sapling-radius-card);
+  background: transparent;
   opacity: var(--sapling-opacity-soft);
 }
 

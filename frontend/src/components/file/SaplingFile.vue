@@ -8,7 +8,7 @@
       <template v-if="isTranslationLoading">
         <SaplingSurface
           as="aside"
-          class="sapling-file-workspace__sidebar sapling-file-loading-panel"
+          class="sapling-workspace-panel sapling-file-workspace__sidebar sapling-file-loading-panel"
         >
           <v-skeleton-loader type="heading, table-heading, table-tbody" />
         </SaplingSurface>
@@ -18,15 +18,18 @@
             <v-skeleton-loader class="sapling-document-header__skeleton" type="heading, text" />
           </SaplingSurface>
 
-          <SaplingSurface as="section" class="sapling-file-stage sapling-file-loading-panel">
+          <SaplingSurface
+            as="section"
+            class="sapling-panel-shell sapling-file-stage sapling-file-loading-panel"
+          >
             <v-skeleton-loader class="sapling-file-stage__skeleton" type="image, article" />
           </SaplingSurface>
         </section>
       </template>
 
       <template v-else>
-        <SaplingSurface as="aside" class="sapling-file-workspace__sidebar">
-          <div class="sapling-file-workspace__table-shell">
+        <SaplingSurface as="aside" class="sapling-workspace-panel sapling-file-workspace__sidebar">
+          <div class="sapling-panel-shell sapling-file-workspace__table-shell">
             <div class="sapling-document-table-scroll">
               <SaplingTable
                 :items="items"

@@ -7,7 +7,7 @@
     persistent
   >
     <SaplingDialogCard class="sapling-dialog-card--fill" :tilt="false">
-      <div class="sapling-dialog-edit-shell" @keydown="onShellKeydown">
+      <div class="sapling-stack-xl sapling-dialog-edit-shell" @keydown="onShellKeydown">
         <v-card-title class="sapling-dialog-edit-header">
           <SaplingDialogEditHero :loading="isLoading" :eyebrow="entityLabel" :title="dialogTitle">
             <template #timestamps>
@@ -74,7 +74,7 @@
         </v-card-title>
         <v-card-text class="sapling-dialog-edit-content">
           <template v-if="isLoading">
-            <div class="sapling-dialog-edit-loading">
+            <div class="sapling-stack-xl sapling-dialog-edit-loading">
               <v-skeleton-loader
                 class="sapling-dialog-edit-loading__tabs"
                 elevation="12"
@@ -103,13 +103,16 @@
             <v-window v-model="activeTab" class="sapling-dialog-edit-window">
               <v-window-item :value="0" class="sapling-dialog-edit-window-item">
                 <div class="sapling-dialog-edit-tab-scroll">
-                  <div ref="formSurfaceRef" class="sapling-dialog-edit-form-surface">
+                  <div
+                    ref="formSurfaceRef"
+                    class="sapling-stack-lg sapling-dialog-edit-form-surface"
+                  >
                     <v-form ref="formRef" class="sapling-dialog-edit-form" @submit.prevent="save">
-                      <div class="sapling-dialog-edit-form-layout">
+                      <div class="sapling-stack-lg sapling-dialog-edit-form-layout">
                         <section
                           v-for="group in visibleTemplateGroups"
                           :key="group.id"
-                          class="sapling-dialog-edit-section"
+                          class="sapling-section-panel sapling-dialog-edit-section"
                           :class="{
                             'sapling-dialog-edit-section--collapsed':
                               group.label && !isGroupExpanded(group.id),
@@ -117,14 +120,17 @@
                               mode !== 'readonly' && isGroupDirty(group.templates),
                           }"
                         >
-                          <div v-if="group.label" class="sapling-dialog-edit-section__header">
+                          <div
+                            v-if="group.label"
+                            class="sapling-section-header sapling-dialog-edit-section__header"
+                          >
                             <button
                               type="button"
-                              class="sapling-dialog-edit-section__toggle"
+                              class="sapling-row-between-md sapling-dialog-edit-section__toggle"
                               :aria-expanded="isGroupExpanded(group.id)"
                               @click="toggleGroup(group.id)"
                             >
-                              <h3 class="sapling-dialog-edit-section__title">
+                              <h3 class="sapling-section-title sapling-dialog-edit-section__title">
                                 {{ $t(group.label) }}
                               </h3>
                               <v-icon
@@ -804,7 +810,9 @@ const updatedAtTitle = computed(() => getTimestampTitle('updatedAt', 'global.upd
 const createdAtLabel = computed(() => formatTimestamp(props.item?.createdAt))
 const updatedAtLabel = computed(() => formatTimestamp(props.item?.updatedAt))
 const selectedFormConfigChipLabel = computed(() =>
-  selectedFormConfigLabel.value ? `${t('formConfig.currentView')}: ${selectedFormConfigLabel.value}` : '',
+  selectedFormConfigLabel.value
+    ? `${t('formConfig.currentView')}: ${selectedFormConfigLabel.value}`
+    : '',
 )
 
 const resetButtonLabel = computed(() => t('filter.reset'))

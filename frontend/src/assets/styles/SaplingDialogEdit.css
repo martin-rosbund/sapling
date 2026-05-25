@@ -1,6 +1,4 @@
-.sapling-dialog-edit-shell,
 .sapling-dialog-edit-skeleton,
-.sapling-dialog-edit-loading,
 .sapling-dialog-edit-content,
 .sapling-dialog-edit-window {
   display: flex;
@@ -10,8 +8,9 @@
 }
 
 .sapling-dialog-edit-shell {
-  gap: var(--sapling-gap-xl);
+  flex: 1 1 0;
   width: 100%;
+  min-height: 0;
   padding: var(--sapling-space-panel-xl);
 }
 
@@ -21,7 +20,8 @@
 }
 
 .sapling-dialog-edit-loading {
-  gap: var(--sapling-gap-xl);
+  flex: 1 1 0;
+  min-height: 0;
 }
 
 .sapling-dialog-edit-loading__hero {
@@ -72,8 +72,6 @@
 
 .sapling-dialog-edit-form-surface,
 .sapling-dialog-edit-relation-shell {
-  display: flex;
-  flex-direction: column;
   gap: var(--sapling-gap-lg);
   min-height: 100%;
   padding: 0;
@@ -84,18 +82,12 @@
 }
 
 .sapling-dialog-edit-form-layout {
-  display: flex;
-  flex-direction: column;
   gap: var(--sapling-gap-lg);
 }
 
 .sapling-dialog-edit-section {
-  display: flex;
-  flex-direction: column;
   gap: var(--sapling-gap-md);
-  padding: var(--sapling-space-panel-md);
   border: 1px solid var(--sapling-surface-border);
-  border-radius: var(--sapling-radius-sm);
   background: var(--sapling-surface-fill-soft);
 }
 
@@ -108,16 +100,11 @@
 }
 
 .sapling-dialog-edit-section__header {
-  display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--sapling-gap-sm);
 }
 
 .sapling-dialog-edit-section__toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: var(--sapling-gap-sm);
   width: 100%;
   min-width: 0;
@@ -136,7 +123,6 @@
 }
 
 .sapling-dialog-edit-section__title {
-  margin: 0;
   min-width: 0;
   font-size: var(--sapling-text-body-size-md);
   font-weight: 700;
@@ -205,9 +191,7 @@
 }
 
 .sapling-dialog-edit-relation-header {
-  display: flex;
   align-items: flex-start;
-  justify-content: space-between;
   gap: var(--sapling-gap-md);
 }
 
@@ -220,7 +204,6 @@
 }
 
 .sapling-dialog-edit-relation-header__title {
-  margin: 0;
   font-size: var(--sapling-text-body-size-lg);
 }
 
@@ -233,22 +216,14 @@
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  border: 1px solid var(--sapling-surface-border);
-  border-radius: var(--sapling-radius-sm);
   background: var(--sapling-surface-fill-soft);
 }
 
 .sapling-dialog-edit-relation-content {
-  display: flex;
   flex: 1 1 auto;
-  flex-direction: column;
-  padding: var(--sapling-space-panel-md);
 }
 
 .sapling-dialog-edit-relation-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
   gap: var(--sapling-gap-md);
   margin-bottom: var(--sapling-gap-xl);
 }
