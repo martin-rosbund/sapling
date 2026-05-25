@@ -1,0 +1,505 @@
+:root,
+:root[data-sapling-theme='light'] {
+  --glass-bg: rgba(255, 255, 255, 0.35);
+  --glass-border: rgba(200, 220, 255, 0.3);
+  --glass-shadow: 0 var(--sapling-space-sm) var(--sapling-space-3xl) 0 rgba(180, 200, 255, 0.18);
+  --primary-gradient: linear-gradient(135deg, #b2eaff 0%, #ffe0ec 100%);
+  --secondary-gradient: linear-gradient(135deg, #b2eaff80 0%, #ffe0ec80 100%);
+  --sapling-tilt-body-bg: #f7faff;
+  --sapling-tilt-bg-gradient: linear-gradient(to bottom, #f7faff, #e3f6fd, #ffe0ec);
+  --sapling-tilt-blob-1: #b2eaff;
+  --sapling-tilt-blob-2: #ffe0ec;
+  --sapling-tilt-blob-3: #ffd6e0;
+  --sapling-tilt-text-color: #3a3a3a;
+  --sapling-tilt-footer-border: rgba(200, 220, 255, 0.18);
+  --sapling-tilt-table-header-bg: rgba(200, 220, 255, 0.3);
+  --sapling-tilt-table-header-border: rgba(180, 200, 255, 0.18);
+  --sapling-tilt-table-row-border: rgba(200, 220, 255, 0.08);
+  --sapling-tilt-table-row-hover: rgba(200, 220, 255, 0.18);
+  --sapling-tilt-drawer-bg: rgba(220, 240, 255, 0.6);
+  --sapling-tilt-drawer-border: rgba(200, 220, 255, 0.18);
+  --sapling-tilt-shell-solid-bg: rgba(247, 250, 255, 0.96);
+  --sapling-tilt-outside-bg: rgba(220, 240, 255, 0.5);
+  --sapling-surface-fill: color-mix(in srgb, var(--glass-bg) 72%, rgba(255, 255, 255, 0.18));
+  --sapling-surface-fill-soft: color-mix(in srgb, var(--glass-bg) 58%, rgba(255, 255, 255, 0.14));
+  --sapling-surface-fill-subtle: color-mix(
+    in srgb,
+    var(--sapling-tilt-drawer-bg) 42%,
+    rgba(255, 255, 255, 0.08)
+  );
+  --sapling-surface-fill-muted: color-mix(in srgb, var(--glass-bg) 64%, rgba(255, 255, 255, 0.12));
+  --sapling-surface-fill-strong: color-mix(in srgb, var(--glass-bg) 84%, rgba(255, 255, 255, 0.26));
+  --sapling-surface-border: color-mix(in srgb, var(--glass-border) 88%, rgba(180, 200, 255, 0.12));
+  --sapling-surface-border-muted: color-mix(
+    in srgb,
+    var(--glass-border) 62%,
+    rgba(180, 200, 255, 0.08)
+  );
+  --sapling-surface-border-accent: rgba(91, 184, 214, 0.28);
+  --sapling-surface-border-accent-strong: rgba(64, 168, 214, 0.46);
+  --sapling-surface-text: color-mix(in srgb, var(--sapling-tilt-text-color) 92%, #081523);
+  --sapling-surface-text-muted: color-mix(in srgb, var(--sapling-tilt-text-color) 72%, #4d6176);
+  --sapling-surface-gradient-soft: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--glass-bg) 76%, rgba(255, 255, 255, 0.18)),
+    color-mix(in srgb, var(--sapling-tilt-drawer-bg) 52%, rgba(255, 255, 255, 0.08))
+  );
+  --sapling-surface-gradient-panel: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--glass-bg) 70%, rgba(255, 255, 255, 0.12)),
+    color-mix(in srgb, var(--sapling-tilt-drawer-bg) 54%, rgba(227, 246, 253, 0.16))
+  );
+  --sapling-surface-gradient-muted: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--sapling-tilt-drawer-bg) 48%, rgba(255, 255, 255, 0.1)),
+    color-mix(in srgb, var(--glass-bg) 76%, rgba(255, 255, 255, 0.2))
+  );
+  --sapling-surface-accent-fill: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--glass-bg) 82%, rgba(255, 255, 255, 0.26)),
+    rgba(126, 231, 255, 0.18)
+  );
+  --sapling-surface-fill-primary-soft: rgba(126, 231, 255, 0.14);
+  --sapling-surface-fill-primary-muted: rgba(126, 231, 255, 0.2);
+  --sapling-surface-fill-primary-strong: rgba(126, 231, 255, 0.26);
+  --sapling-ai-fab-gradient: linear-gradient(135deg, #7ee7ff 0%, #8ca7ff 42%, #ff8dc2 100%);
+  --sapling-ai-fab-icon-color: #ffffff;
+  --sapling-ai-fab-shadow:
+    0 var(--sapling-space-md) var(--sapling-space-2xl) rgba(150, 188, 255, 0.24),
+    0 0 0 1px rgba(255, 255, 255, 0.7), 0 0 var(--sapling-space-xl) rgba(126, 231, 255, 0.34),
+    0 0 var(--sapling-control-size-md) rgba(255, 141, 194, 0.24);
+  --sapling-ai-fab-shadow-hover:
+    0 var(--sapling-space-lg-plus) calc(var(--sapling-space-lg) + var(--sapling-space-xl))
+      rgba(150, 188, 255, 0.34),
+    0 0 0 1px rgba(255, 255, 255, 0.9),
+    0 0 var(--sapling-control-size-md) rgba(126, 231, 255, 0.48),
+    0 0 var(--sapling-control-size-2xl) rgba(255, 141, 194, 0.36),
+    0 0 var(--sapling-empty-state-min-height-xs) rgba(140, 167, 255, 0.2);
+}
+
+:root[data-sapling-theme='dark'] {
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 var(--sapling-space-sm) var(--sapling-space-3xl) 0 rgba(0, 0, 0, 0.37);
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --secondary-gradient: linear-gradient(135deg, #667eea80 0%, #764ba280 100%);
+  --sapling-tilt-body-bg: #0f0c29;
+  --sapling-tilt-bg-gradient: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+  --sapling-tilt-blob-1: #764ba2;
+  --sapling-tilt-blob-2: #667eea;
+  --sapling-tilt-blob-3: #ff0055;
+  --sapling-tilt-text-color: white;
+  --sapling-tilt-footer-border: rgba(200, 220, 255, 0.18);
+  --sapling-tilt-table-header-bg: rgba(0, 0, 0, 0.2);
+  --sapling-tilt-table-header-border: rgba(255, 255, 255, 0.1);
+  --sapling-tilt-table-row-border: rgba(255, 255, 255, 0.06);
+  --sapling-tilt-table-row-hover: rgba(255, 255, 255, 0.08);
+  --sapling-tilt-drawer-bg: rgba(15, 12, 41, 0.6);
+  --sapling-tilt-drawer-border: rgba(255, 255, 255, 0.1);
+  --sapling-tilt-shell-solid-bg: rgba(15, 12, 41, 0.94);
+  --sapling-tilt-outside-bg: rgba(255, 255, 255, 0.5);
+  --sapling-surface-fill: color-mix(in srgb, var(--glass-bg) 86%, rgba(15, 12, 41, 0.26));
+  --sapling-surface-fill-soft: color-mix(in srgb, var(--glass-bg) 72%, rgba(15, 12, 41, 0.18));
+  --sapling-surface-fill-subtle: color-mix(
+    in srgb,
+    var(--sapling-tilt-drawer-bg) 58%,
+    rgba(255, 255, 255, 0.04)
+  );
+  --sapling-surface-fill-muted: color-mix(in srgb, var(--glass-bg) 78%, rgba(15, 12, 41, 0.22));
+  --sapling-surface-fill-strong: color-mix(in srgb, var(--glass-bg) 94%, rgba(255, 255, 255, 0.08));
+  --sapling-surface-border: color-mix(in srgb, var(--glass-border) 88%, rgba(255, 255, 255, 0.08));
+  --sapling-surface-border-muted: color-mix(
+    in srgb,
+    var(--glass-border) 66%,
+    rgba(255, 255, 255, 0.04)
+  );
+  --sapling-surface-border-accent: rgba(114, 167, 255, 0.32);
+  --sapling-surface-border-accent-strong: rgba(114, 167, 255, 0.46);
+  --sapling-surface-text: color-mix(in srgb, var(--sapling-tilt-text-color) 90%, #d9e9ff);
+  --sapling-surface-text-muted: color-mix(in srgb, var(--sapling-tilt-text-color) 70%, #afc4e6);
+  --sapling-surface-gradient-soft: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--glass-bg) 88%, rgba(255, 255, 255, 0.06)),
+    color-mix(in srgb, var(--sapling-tilt-drawer-bg) 72%, rgba(118, 75, 162, 0.14))
+  );
+  --sapling-surface-gradient-panel: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--glass-bg) 92%, rgba(255, 255, 255, 0.04)),
+    color-mix(in srgb, var(--sapling-tilt-drawer-bg) 76%, rgba(102, 126, 234, 0.12))
+  );
+  --sapling-surface-gradient-muted: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--sapling-tilt-drawer-bg) 82%, rgba(255, 255, 255, 0.04)),
+    color-mix(in srgb, var(--glass-bg) 84%, rgba(255, 255, 255, 0.06))
+  );
+  --sapling-surface-accent-fill: linear-gradient(
+    160deg,
+    rgba(102, 126, 234, 0.22),
+    rgba(118, 75, 162, 0.18)
+  );
+  --sapling-surface-fill-primary-soft: rgba(114, 167, 255, 0.14);
+  --sapling-surface-fill-primary-muted: rgba(114, 167, 255, 0.2);
+  --sapling-surface-fill-primary-strong: rgba(114, 167, 255, 0.28);
+  --sapling-ai-fab-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --sapling-ai-fab-icon-color: #f7fbff;
+  --sapling-ai-fab-shadow:
+    0 var(--sapling-space-md-plus) calc(var(--sapling-space-xl) + var(--sapling-space-sm-plus))
+      rgba(6, 10, 30, 0.42),
+    0 0 0 1px rgba(164, 219, 255, 0.26),
+    0 0 calc(var(--sapling-space-lg) + var(--sapling-space-xs)) rgba(114, 167, 255, 0.4),
+    0 0 var(--sapling-icon-box-md) rgba(0, 213, 255, 0.22);
+  --sapling-ai-fab-shadow-hover:
+    0 var(--sapling-space-xl) var(--sapling-icon-box-md) rgba(6, 10, 30, 0.54),
+    0 0 0 1px rgba(196, 237, 255, 0.4), 0 0 var(--sapling-icon-box-sm) rgba(122, 92, 255, 0.55),
+    0 0 calc(var(--sapling-control-size-2xl) + var(--sapling-space-lg)) rgba(0, 213, 255, 0.4),
+    0 0 calc(var(--sapling-empty-state-min-height-sm) - var(--sapling-space-md))
+      rgba(114, 167, 255, 0.24);
+}
+
+html {
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--sapling-tilt-body-bg);
+  font-family: 'Inter', sans-serif;
+}
+
+:root[data-sapling-glass='off'] {
+  --glass-bg: rgb(var(--v-theme-surface));
+  --glass-border: rgba(var(--v-border-color), var(--v-border-opacity));
+  --glass-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+  --secondary-gradient: linear-gradient(
+    180deg,
+    rgb(var(--v-theme-surface)),
+    rgb(var(--v-theme-surface))
+  );
+  --sapling-tilt-body-bg: rgb(var(--v-theme-background));
+  --sapling-tilt-drawer-bg: rgb(var(--v-theme-surface));
+  --sapling-tilt-drawer-border: rgba(var(--v-border-color), var(--v-border-opacity));
+  --sapling-tilt-shell-solid-bg: rgb(var(--v-theme-surface));
+  --sapling-tilt-footer-border: rgba(var(--v-border-color), var(--v-border-opacity));
+  --sapling-tilt-table-header-bg: rgb(var(--v-theme-surface));
+  --sapling-tilt-table-header-border: rgba(var(--v-border-color), var(--v-border-opacity));
+  --sapling-tilt-table-row-border: rgba(var(--v-border-color), var(--v-border-opacity));
+  --sapling-tilt-table-row-hover: color-mix(
+    in srgb,
+    rgb(var(--v-theme-primary)) 8%,
+    rgb(var(--v-theme-surface))
+  );
+  --sapling-tilt-outside-bg: rgb(var(--v-theme-background));
+  --sapling-surface-fill: rgb(var(--v-theme-surface));
+  --sapling-surface-fill-soft: rgb(var(--v-theme-surface));
+  --sapling-surface-fill-strong: rgb(var(--v-theme-surface));
+  --sapling-surface-border: rgba(var(--v-border-color), var(--v-border-opacity));
+  --sapling-surface-border-muted: rgba(var(--v-border-color), var(--v-border-opacity));
+  --sapling-surface-border-accent: rgba(var(--v-theme-primary), 0.22);
+  --sapling-surface-border-accent-strong: rgba(var(--v-theme-primary), 0.38);
+  --sapling-surface-text: rgb(var(--v-theme-on-surface));
+  --sapling-surface-accent-fill: color-mix(
+    in srgb,
+    rgb(var(--v-theme-primary)) 10%,
+    rgb(var(--v-theme-surface))
+  );
+  --sapling-surface-gradient-soft: linear-gradient(
+    180deg,
+    rgb(var(--v-theme-surface)),
+    rgb(var(--v-theme-surface))
+  );
+  --sapling-surface-gradient-panel: linear-gradient(
+    180deg,
+    rgb(var(--v-theme-surface)),
+    rgb(var(--v-theme-surface))
+  );
+  --sapling-surface-gradient-muted: linear-gradient(
+    180deg,
+    rgb(var(--v-theme-surface)),
+    rgb(var(--v-theme-surface))
+  );
+  --sapling-interactive-hover-fill: color-mix(
+    in srgb,
+    rgb(var(--v-theme-primary)) 8%,
+    rgb(var(--v-theme-surface))
+  );
+  --sapling-interactive-selected-fill: color-mix(
+    in srgb,
+    rgb(var(--v-theme-primary)) 14%,
+    rgb(var(--v-theme-surface))
+  );
+  --sapling-interactive-selected-fill-strong: color-mix(
+    in srgb,
+    rgb(var(--v-theme-primary)) 18%,
+    rgb(var(--v-theme-surface))
+  );
+  --sapling-inset-highlight: none;
+  --sapling-shadow-lift: 0 1px 3px rgba(0, 0, 0, 0.22);
+}
+
+:root[data-sapling-glass='off'] .bg-wrapper,
+:root[data-sapling-tilt='off'] .bg-wrapper {
+  display: none;
+}
+
+.bg-wrapper {
+  position: fixed;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh;
+  background: var(--sapling-tilt-bg-gradient);
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  animation: float 10s infinite ease-in-out;
+  opacity: 0.6;
+}
+
+:root[data-sapling-tilt='off'] .blob {
+  animation: none;
+}
+
+:root[data-sapling-performance='reduced'] .blob {
+  animation: none;
+  filter: none;
+  opacity: 0.14;
+}
+
+.blob-1 {
+  top: -10%;
+  left: -10%;
+  width: 50vw;
+  height: 50vw;
+  background: var(--sapling-tilt-blob-1);
+  animation-delay: 0s;
+}
+
+.blob-2 {
+  right: -10%;
+  bottom: -10%;
+  width: 40vw;
+  height: 40vw;
+  background: var(--sapling-tilt-blob-2);
+  animation-delay: -2s;
+}
+
+.blob-3 {
+  top: 40%;
+  left: 40%;
+  width: 30vw;
+  height: 30vw;
+  background: var(--sapling-tilt-blob-3);
+  animation-delay: -4s;
+  opacity: 0.3;
+}
+
+.v-list,
+.v-card,
+.v-expansion-panel,
+.v-skeleton-loader,
+.v-menu,
+.transparent {
+  background-color: transparent;
+}
+
+.v-sheet,
+.glass-panel {
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg) !important;
+  box-shadow: var(--glass-shadow);
+  color: var(--sapling-tilt-text-color) !important;
+  backdrop-filter: blur(var(--sapling-blur-md));
+  -webkit-backdrop-filter: blur(var(--sapling-blur-md));
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.3s ease;
+}
+
+:root[data-sapling-glass='off'] .v-sheet,
+:root[data-sapling-glass='off'] .glass-panel {
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)) !important;
+  background: rgb(var(--v-theme-surface)) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22) !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+:root[data-sapling-glass='off'] .v-sheet,
+:root[data-sapling-glass='off'] .glass-panel,
+:root[data-sapling-performance='reduced'] .v-sheet,
+:root[data-sapling-performance='reduced'] .glass-panel {
+  transition: none !important;
+}
+
+.v-footer {
+  border-top: 1px solid var(--sapling-tilt-footer-border) !important;
+}
+
+:root[data-sapling-glass='off'] .v-footer {
+  background: rgb(var(--v-theme-surface)) !important;
+}
+
+.v-table {
+  background: transparent !important;
+  color: var(--sapling-tilt-text-color) !important;
+}
+
+.v-table th {
+  border-bottom: 1px solid var(--sapling-tilt-table-header-border) !important;
+  background: var(--sapling-tilt-table-header-bg) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.v-table td {
+  border-bottom: 1px solid var(--sapling-tilt-table-row-border) !important;
+  background: transparent !important;
+}
+
+.v-table tr:hover td {
+  background: var(--sapling-tilt-table-row-hover) !important;
+}
+
+:root[data-sapling-glass='off'] .v-list,
+:root[data-sapling-glass='off'] .v-card,
+:root[data-sapling-glass='off'] .v-expansion-panel,
+:root[data-sapling-glass='off'] .v-skeleton-loader {
+  background: rgb(var(--v-theme-surface)) !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+:root[data-sapling-glass='off'] .v-table {
+  background: rgb(var(--v-theme-surface)) !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+:root[data-sapling-glass='off'] .v-table th {
+  color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity)) !important;
+  font-weight: 500 !important;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+:root[data-sapling-glass='off'] .v-table td {
+  background: rgb(var(--v-theme-surface)) !important;
+}
+
+:root[data-sapling-glass='off'] .sapling-table tbody tr:hover td {
+  background: var(--sapling-interactive-hover-fill) !important;
+}
+
+:root[data-sapling-glass='off'] .sapling-table tbody tr.selected-row td,
+:root[data-sapling-glass='off'] .sapling-table tbody tr.multi-selected-row td {
+  background: var(--sapling-interactive-selected-fill) !important;
+}
+
+:root[data-sapling-glass='off'] .sapling-table tbody tr.selected-row:hover td,
+:root[data-sapling-glass='off'] .sapling-table tbody tr.multi-selected-row:hover td {
+  background: var(--sapling-interactive-selected-fill-strong) !important;
+}
+
+.tilt-element {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.tilt-content {
+  transform: translateZ(var(--sapling-space-xl));
+}
+
+:root[data-sapling-tilt='off'] .tilt-element,
+:root[data-sapling-tilt='off'] .tilt-content {
+  transform: none !important;
+}
+
+:root[data-sapling-tilt='off'] .tilt-element {
+  perspective: none;
+}
+
+.v-application {
+  background: transparent !important;
+}
+
+:root[data-sapling-glass='off'] .v-application {
+  background: rgb(var(--v-theme-background)) !important;
+  color: rgb(var(--v-theme-on-background)) !important;
+}
+
+.v-navigation-drawer,
+.v-app-bar,
+.sapling-navigation-drawer {
+  border-right: 1px solid var(--sapling-tilt-drawer-border) !important;
+  border-bottom: 1px solid var(--sapling-tilt-drawer-border) !important;
+  background: var(--sapling-tilt-drawer-bg) !important;
+  backdrop-filter: blur(var(--sapling-blur-sm)) !important;
+}
+
+:root[data-sapling-glass='off'] .v-navigation-drawer,
+:root[data-sapling-glass='off'] .v-app-bar,
+:root[data-sapling-glass='off'] .sapling-navigation-drawer {
+  background: rgb(var(--v-theme-surface)) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme--dark.v-card {
+  background: transparent;
+}
+
+:root[data-sapling-glass='off'] .theme--dark.v-card {
+  background: rgb(var(--v-theme-surface)) !important;
+}
+
+.v-outside {
+  background-color: var(--sapling-tilt-outside-bg) !important;
+}
+
+::-webkit-scrollbar {
+  width: var(--sapling-space-md);
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: var(--sapling-radius-md);
+  background: rgba(255, 255, 255, 0.12);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+* {
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+  scrollbar-width: thin;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(calc(var(--sapling-space-xl) * -1), var(--sapling-space-xl)) scale(0.9);
+  }
+
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}

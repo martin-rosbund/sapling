@@ -5,7 +5,6 @@
 </template>
 
 <script lang="ts" setup>
-import '@/assets/styles/components/SaplingShortcutKeys.css'
 withDefaults(
   defineProps<{
     keys: string[]

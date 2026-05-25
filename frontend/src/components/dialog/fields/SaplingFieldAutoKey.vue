@@ -33,7 +33,6 @@
 </template>
 
 <script lang="ts" setup>
-import '@/assets/styles/components/SaplingFieldControls.css'
 import { ref } from 'vue'
 
 const props = defineProps<{

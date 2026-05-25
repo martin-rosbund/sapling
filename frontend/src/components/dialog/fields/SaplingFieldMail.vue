@@ -16,7 +16,6 @@
 </template>
 
 <script lang="ts" setup>
-import '@/assets/styles/components/SaplingFieldControls.css'
 import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog'
 
 const props = defineProps<{

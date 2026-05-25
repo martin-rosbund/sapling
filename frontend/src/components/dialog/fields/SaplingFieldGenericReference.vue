@@ -37,7 +37,6 @@
 </template>
 
 <script lang="ts" setup>
-import '@/assets/styles/components/SaplingFieldControls.css'
 import { toRef } from 'vue'
 import type { EntityTemplate } from '@/entity/structure'
 import type { SaplingGenericItem } from '@/entity/entity'

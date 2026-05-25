@@ -1,10 +1,5 @@
 import { computed, ref, watch } from 'vue'
 import { useTheme } from 'vuetify'
-import saplingTiltBackgroundHref from '@/assets/styles/SaplingTiltBackground.css?url'
-import saplingTiltBaseHref from '@/assets/styles/SaplingTiltBase.css?url'
-import saplingTiltDarkHref from '@/assets/styles/SaplingTiltDark.css?url'
-import saplingTiltLightHref from '@/assets/styles/SaplingTiltLight.css?url'
-import saplingTiltSurfacesHref from '@/assets/styles/SaplingTiltSurfaces.css?url'
 import CookieService from '@/services/cookie.service'
 
 type SaplingThemeName = 'light' | 'dark'
@@ -13,7 +8,6 @@ type SaplingPerformanceMode = 'full' | 'reduced'
 const SAPLING_THEME_COOKIE = 'theme'
 const SAPLING_GLASS_COOKIE = 'glass'
 const SAPLING_TILT_COOKIE = 'tilt'
-const SAPLING_THEME_LINK_ATTRIBUTE = 'data-sapling-theme'
 
 const glassEnabled = ref(true)
 const tiltEnabled = ref(true)
@@ -100,30 +94,6 @@ function detectPerformanceMode(): SaplingPerformanceMode {
   return 'full'
 }
 
-function loadThemeStyles(themeName: SaplingThemeName) {
-  const themeVariantHref = themeName === 'dark' ? saplingTiltDarkHref : saplingTiltLightHref
-
-  document.querySelectorAll(`link[${SAPLING_THEME_LINK_ATTRIBUTE}]`).forEach((element) => {
-    element.remove()
-  })
-
-  const stylesheets = [
-    { key: 'base', href: saplingTiltBaseHref },
-    { key: 'background', href: saplingTiltBackgroundHref },
-    { key: 'surfaces', href: saplingTiltSurfacesHref },
-    { key: 'variant', href: themeVariantHref },
-  ]
-
-  stylesheets.forEach(({ key, href }) => {
-    const link = document.createElement('link')
-    link.rel = 'stylesheet'
-    link.type = 'text/css'
-    link.setAttribute(SAPLING_THEME_LINK_ATTRIBUTE, key)
-    link.href = href
-    document.head.appendChild(link)
-  })
-}
-
 function dispatchAppearanceChange(themeName: SaplingThemeName) {
   window.dispatchEvent(
     new CustomEvent('sapling:appearance-change', {
@@ -170,7 +140,6 @@ export function useSaplingAppearance() {
     performanceMode.value = detectPerformanceMode()
 
     const initialThemeName = getCurrentThemeName(theme.global.current.value.dark)
-    loadThemeStyles(initialThemeName)
     applyAppearanceAttributes(initialThemeName)
     appearanceInitialized.value = true
   }
@@ -181,7 +150,6 @@ export function useSaplingAppearance() {
       () => {
         const nextThemeName = getCurrentThemeName(theme.global.current.value.dark)
         CookieService.set(SAPLING_THEME_COOKIE, nextThemeName)
-        loadThemeStyles(nextThemeName)
         applyAppearanceAttributes(nextThemeName)
       },
       { immediate: true },

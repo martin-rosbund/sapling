@@ -116,3 +116,30 @@
   min-width: var(--sapling-cell-value-min-width);
   text-align: right;
 }
+
+.sapling-shortcut-keys {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sapling-gap-2xs);
+  flex-wrap: wrap;
+}
+
+.sapling-shortcut-keys kbd {
+  display: inline-block;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  font-family: inherit;
+  opacity: 0.85;
+}
+
+.sapling-shortcut-keys--md kbd {
+  padding: var(--sapling-space-3xs) var(--sapling-space-sm);
+  font-size: 11px;
+  line-height: 14px;
+}
+
+.sapling-shortcut-keys--sm kbd {
+  padding: 1px var(--sapling-space-xs);
+  font-size: 10px;
+  line-height: 14px;
+}
