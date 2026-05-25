@@ -310,39 +310,6 @@
             </div>
           </section>
         </SaplingSurface>
-
-        <div class="sapling-form-config__json-panel">
-          <div class="sapling-row-between-md sapling-config-json-header sapling-form-config__json-header">
-            <p class="sapling-eyebrow sapling-config-eyebrow sapling-form-config__eyebrow">
-              {{ $t('formConfig.json') }}
-            </p>
-            <v-btn
-              size="small"
-              prepend-icon="mdi-check-decagram-outline"
-              variant="text"
-              :disabled="!selectedEntityHandle"
-              @click="validateDraft"
-            >
-              {{ $t('formConfig.validate') }}
-            </v-btn>
-          </div>
-          <SaplingCodeMirror
-            class="sapling-config-json-editor sapling-form-config__json-editor"
-            :model-value="draftJson"
-            language="json"
-            :read-only="true"
-            :line-numbers="false"
-          />
-          <v-alert
-            v-if="validationSummary"
-            class="sapling-config-validation sapling-form-config__validation"
-            :type="validationIsValid ? 'success' : 'warning'"
-            variant="tonal"
-            density="compact"
-          >
-            {{ validationSummary }}
-          </v-alert>
-        </div>
       </SaplingSurface>
     </section>
   </v-container>
@@ -353,7 +320,6 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ApiFormConfigService, {
   type SaplingFormConfigItem,
-  type SaplingFormConfigValidationResult,
 } from '@/services/api.form-config.service'
 import ApiGenericService from '@/services/api.generic.service'
 import ApiService from '@/services/api.service'
@@ -365,7 +331,6 @@ import type {
   SaplingFormFieldConfig,
   SaplingFormRenderer,
 } from '@/entity/structure'
-import SaplingCodeMirror from '@/components/common/SaplingCodeMirror.vue'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
 import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingFieldSingleSelect from '@/components/dialog/fields/SaplingFieldSingleSelect.vue'
@@ -409,7 +374,6 @@ const isLoadingEntities = ref(false)
 const isLoadingContext = ref(false)
 const isSaving = ref(false)
 const errorMessage = ref('')
-const validationResult = ref<SaplingFormConfigValidationResult | null>(null)
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const fieldRows = reactive<FieldDraft[]>([])
 
@@ -516,8 +480,6 @@ const draftConfig = computed<SaplingFormConfigPayload>(() => ({
   ),
 }))
 
-const draftJson = computed(() => JSON.stringify(draftConfig.value, null, 2))
-
 const previewTemplates = computed(() =>
   sortDialogTemplates(
     baseTemplates.value
@@ -537,20 +499,6 @@ const previewTitle = computed(() =>
     ? translateEntity(selectedEntityHandle.value)
     : t('formConfig.preview'),
 )
-
-const validationIsValid = computed(() => validationResult.value?.isValid === true)
-
-const validationSummary = computed(() => {
-  const result = validationResult.value
-  if (!result) {
-    return ''
-  }
-
-  return t('formConfig.validationSummary', {
-    errors: result.errors.length,
-    warnings: result.warnings.length,
-  })
-})
 
 watch(selectedEntityHandle, () => {
   void loadEntityContext()
@@ -612,7 +560,6 @@ async function loadEntityContext(): Promise<void> {
 
   isLoadingContext.value = true
   errorMessage.value = ''
-  validationResult.value = null
 
   try {
     const [templates, nextConfigs] = await Promise.all([
@@ -773,21 +720,6 @@ async function saveConfig(): Promise<void> {
   }
 }
 
-async function validateDraft(): Promise<void> {
-  if (!selectedEntityHandle.value) {
-    return
-  }
-
-  try {
-    validationResult.value = await ApiFormConfigService.validate(
-      selectedEntityHandle.value,
-      draftConfig.value,
-    )
-  } catch {
-    errorMessage.value = t('formConfig.validationFailed')
-  }
-}
-
 function resetCurrentConfig(): void {
   buildFieldRows({})
 }
@@ -820,15 +752,25 @@ async function onImportFileChange(event: Event): Promise<void> {
 
     configName.value = file.name.replace(/\.json$/i, '')
     selectedConfigHandle.value = null
-    buildFieldRows(parsed.fields ?? {})
-    validationResult.value = await ApiFormConfigService.validate(selectedEntityHandle.value, parsed)
+    const validation = await ApiFormConfigService.validate(selectedEntityHandle.value, parsed)
+    if (!validation.isValid) {
+      errorMessage.value = t('formConfig.validationSummary', {
+        errors: validation.errors.length,
+        warnings: validation.warnings.length,
+      })
+      return
+    }
+
+    buildFieldRows(validation.normalizedConfig.fields ?? parsed.fields ?? {})
   } catch {
     errorMessage.value = t('formConfig.importFailed')
   }
 }
 
 function exportDraft(): void {
-  const blob = new Blob([draftJson.value], { type: 'application/json' })
+  const blob = new Blob([JSON.stringify(draftConfig.value, null, 2)], {
+    type: 'application/json',
+  })
   const url = URL.createObjectURL(blob)
   const anchor = document.createElement('a')
   anchor.href = url

@@ -112,8 +112,7 @@
   gap: var(--sapling-gap-xl);
 }
 
-.sapling-config-preview-header,
-.sapling-config-json-header {
+.sapling-config-preview-header {
   gap: var(--sapling-gap-md);
 }
 
@@ -178,21 +177,6 @@
   display: block;
   margin: var(--sapling-space-3xs) 0;
   overflow-wrap: anywhere;
-}
-
-.sapling-config-json-editor {
-  min-height: 220px;
-  max-height: 360px;
-  overflow: hidden;
-  border: 1px solid var(--sapling-surface-border);
-  border-radius: var(--sapling-radius-xs);
-  background: var(--sapling-surface-fill-soft);
-  backdrop-filter: blur(var(--sapling-blur-sm));
-  -webkit-backdrop-filter: blur(var(--sapling-blur-sm));
-}
-
-.sapling-config-validation {
-  margin-top: var(--sapling-gap-md);
 }
 
 @media (max-width: 1180px) {
