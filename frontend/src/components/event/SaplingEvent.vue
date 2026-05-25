@@ -1,15 +1,20 @@
 <template>
   <section
     v-bind="attrs"
-    class="sapling-page-shell sapling-page-shell--uniform-inset sapling-event-page"
+    class="sapling-page-shell sapling-page-shell--fill sapling-page-shell--uniform-inset sapling-event-page"
   >
     <template v-if="isLoading">
       <div class="sapling-event-skeleton">
-        <SaplingSurface as="section" class="sapling-event-skeleton__hero">
+        <SaplingSurface
+          as="section"
+          class="sapling-page-hero sapling-page-hero--calendar sapling-event-skeleton__hero"
+        >
           <div class="sapling-event-skeleton__hero-copy">
             <v-skeleton-loader type="text, heading, paragraph" />
           </div>
-          <div class="sapling-event-skeleton__hero-stats">
+          <div
+            class="sapling-stat-grid sapling-stat-grid--three sapling-event-skeleton__hero-stats"
+          >
             <v-skeleton-loader
               v-for="index in 3"
               :key="index"
@@ -55,18 +60,22 @@
         :subtitle="currentDateRangeLabel"
       >
         <template #title-prefix>
-          <div class="sapling-event-hero__icon-wrap">
+          <div class="sapling-icon-tile sapling-event-hero__icon-wrap">
             <v-icon size="28">{{ entityEvent?.icon || 'mdi-calendar-month-outline' }}</v-icon>
           </div>
         </template>
 
         <template #side>
-          <div class="sapling-event-hero__stats">
-            <article v-for="stat in heroStats" :key="stat.key" class="sapling-event-stat-card">
-              <div class="sapling-event-stat-card__icon">
+          <div class="sapling-stat-grid sapling-stat-grid--three sapling-event-hero__stats">
+            <article
+              v-for="stat in heroStats"
+              :key="stat.key"
+              class="sapling-stat-card sapling-event-stat-card"
+            >
+              <div class="sapling-stat-card__icon sapling-event-stat-card__icon">
                 <v-icon>{{ stat.icon }}</v-icon>
               </div>
-              <div class="sapling-event-stat-card__content">
+              <div class="sapling-stat-card__content sapling-event-stat-card__content">
                 <span>{{ stat.label }}</span>
                 <strong>{{ stat.value }}</strong>
               </div>
@@ -76,7 +85,7 @@
       </SaplingPageHero>
 
       <section class="sapling-event-workspace">
-        <SaplingSurface class="sapling-event-workspace__main">
+        <SaplingSurface class="sapling-workspace-panel sapling-event-workspace__main">
           <SaplingEventToolbar
             v-model:calendar-type="calendarType"
             v-model:calendar-view-mode="calendarViewMode"
@@ -90,7 +99,10 @@
             @select-date="goToDate"
           />
 
-          <div ref="calendarScrollContainer" class="sapling-event-calendar-body">
+          <div
+            ref="calendarScrollContainer"
+            class="sapling-calendar-frame sapling-event-calendar-body"
+          >
             <SaplingEventCalendarWorkspace
               v-model="value"
               :calendar-view-mode="calendarViewMode"

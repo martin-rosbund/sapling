@@ -15,13 +15,13 @@
     }"
   >
     <div
-      class="sapling-table-toolbar transparent"
+      class="sapling-toolbar-shell sapling-table-toolbar"
       :class="{ 'sapling-table-toolbar--mobile': isMobileTable }"
     >
-      <div class="sapling-table-toolbar-controls">
+      <div class="sapling-toolbar-controls sapling-table-toolbar-controls">
         <div
           v-if="multiSelect"
-          class="sapling-table-toolbar-slot sapling-table-toolbar-slot--selection"
+          class="sapling-toolbar-slot sapling-table-toolbar-slot sapling-table-toolbar-slot--selection"
         >
           <SaplingTableMultiSelect
             :multiSelect="multiSelect"
@@ -43,7 +43,7 @@
 
         <div
           v-if="showSearchField"
-          class="sapling-table-toolbar-slot sapling-table-toolbar-slot--search"
+          class="sapling-toolbar-slot sapling-toolbar-slot--grow sapling-table-toolbar-slot sapling-table-toolbar-slot--search"
         >
           <SaplingSearch
             class="sapling-table-toolbar-search"
@@ -53,9 +53,11 @@
           />
         </div>
 
-        <div class="sapling-table-toolbar-slot sapling-table-toolbar-slot--actions">
+        <div
+          class="sapling-toolbar-slot sapling-toolbar-slot--trailing sapling-table-toolbar-slot sapling-table-toolbar-slot--actions"
+        >
           <div
-            class="sapling-table-toolbar-actions"
+            class="sapling-action-cluster sapling-table-toolbar-actions"
             :class="{ 'sapling-table-toolbar-actions--compact': !showToolbarActionsInline }"
           >
             <SaplingTableToolbarActions

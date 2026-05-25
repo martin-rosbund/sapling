@@ -81,7 +81,6 @@
 </template>
 
 <script lang="ts" setup>
-import '@/assets/styles/SaplingHero.css'
 import SaplingSelectAddField from '@/components/dialog/fields/SaplingFieldSelectAdd.vue'
 import SaplingTable from '@/components/table/SaplingTable.vue'
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity'

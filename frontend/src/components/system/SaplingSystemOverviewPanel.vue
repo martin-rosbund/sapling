@@ -1,17 +1,17 @@
 <template>
-  <SaplingSurface as="article" class="sapling-system-panel">
-    <div class="sapling-system-panel__header">
+  <SaplingSurface as="article" class="sapling-section-panel">
+    <div class="sapling-section-header">
       <div>
-        <p class="sapling-system-panel__eyebrow">{{ $t('system.overview') }}</p>
-        <h2 class="sapling-system-panel__title">{{ $t('system.system') }}</h2>
+        <p class="sapling-eyebrow">{{ $t('system.overview') }}</p>
+        <h2 class="sapling-section-title">{{ $t('system.system') }}</h2>
       </div>
       <v-chip size="small" variant="outlined">
         {{ hostname }}
       </v-chip>
     </div>
 
-    <div class="sapling-system-details-grid">
-      <div v-for="item in details" :key="item.label" class="sapling-system-detail">
+    <div class="sapling-detail-grid">
+      <div v-for="item in details" :key="item.label" class="sapling-detail-card">
         <span>{{ item.label }}</span>
         <strong>{{ item.value }}</strong>
       </div>

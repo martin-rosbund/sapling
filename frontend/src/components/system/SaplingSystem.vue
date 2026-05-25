@@ -43,9 +43,9 @@
 
         <template #side>
           <div class="sapling-system-hero__side">
-            <article class="sapling-system-hero-card">
-              <div class="sapling-system-hero-card__header">
-                <span>{{ $t('system.health') }}</span>
+            <article class="sapling-system-hero-card sapling-data-card">
+              <div class="sapling-section-header">
+                <span class="sapling-label">{{ $t('system.health') }}</span>
                 <v-chip :color="state?.isReady ? 'success' : 'error'" size="small" variant="tonal">
                   {{ state?.isReady ? $t('system.isReady') : $t('system.isNotReady') }}
                 </v-chip>
@@ -53,12 +53,12 @@
               <strong>{{
                 state?.isReady ? $t('system.operational') : $t('system.requiresAttention')
               }}</strong>
-              <p>{{ $t('system.liveFeedHint') }}</p>
+              <p class="sapling-muted-copy">{{ $t('system.liveFeedHint') }}</p>
             </article>
 
-            <article class="sapling-system-hero-card">
-              <div class="sapling-system-hero-card__header">
-                <span>{{ $t('system.runtime') }}</span>
+            <article class="sapling-system-hero-card sapling-data-card">
+              <div class="sapling-section-header">
+                <span class="sapling-label">{{ $t('system.runtime') }}</span>
                 <v-btn
                   icon="mdi-refresh"
                   size="small"
@@ -69,7 +69,7 @@
                 />
               </div>
               <strong>{{ timeLoading ? t('global.loading') : formattedServerTime }}</strong>
-              <p>{{ $t('system.lastRefresh') }}: {{ lastUpdatedDisplay }}</p>
+              <p class="sapling-muted-copy">{{ $t('system.lastRefresh') }}: {{ lastUpdatedDisplay }}</p>
             </article>
           </div>
         </template>

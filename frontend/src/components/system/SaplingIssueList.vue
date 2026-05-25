@@ -1,13 +1,13 @@
 <template>
   <v-col cols="12" md="6">
     <section class="sapling-issue-stream" :class="`sapling-issue-stream--${status}`">
-      <SaplingSurface as="header" class="sapling-issue-stream__header">
+      <SaplingSurface as="header" class="sapling-section-header sapling-issue-stream__header">
         <div class="sapling-issue-stream__header-copy">
           <div class="sapling-issue-stream__eyebrow">
             <v-icon :icon="streamIcon" size="18" />
             <span>{{ $t(statusLabelKey) }}</span>
           </div>
-          <h2 class="sapling-issue-stream__title">{{ $t(titleKey) }}</h2>
+          <h2 class="sapling-section-title sapling-issue-stream__title">{{ $t(titleKey) }}</h2>
         </div>
 
         <v-chip :color="statusChipColor" size="small" variant="tonal">
@@ -28,7 +28,10 @@
         />
       </div>
 
-      <SaplingSurface v-else-if="!issues.length" class="sapling-issue-stream__empty">
+      <SaplingSurface
+        v-else-if="!issues.length"
+        class="sapling-empty-state-panel sapling-empty-state-panel--large sapling-issue-stream__empty"
+      >
         <v-icon :icon="streamIcon" size="34" />
         <p>{{ $t(emptyStateKey) }}</p>
       </SaplingSurface>
@@ -70,20 +73,20 @@
               {{ issue.title }}
             </a>
 
-            <div class="sapling-issue-card__meta-grid">
-              <div class="sapling-issue-card__meta-item">
+            <div class="sapling-detail-grid">
+              <div class="sapling-detail-card">
                 <span>{{ $t('issue.createdAt') }}</span>
                 <strong>{{ formatDateTime(issue.created_at) }}</strong>
               </div>
-              <div class="sapling-issue-card__meta-item">
+              <div class="sapling-detail-card">
                 <span>{{ $t('issue.updatedAt') }}</span>
                 <strong>{{ formatDateTime(issue.updated_at) }}</strong>
               </div>
-              <div class="sapling-issue-card__meta-item">
+              <div class="sapling-detail-card">
                 <span>{{ $t('issue.labels') }}</span>
                 <strong>{{ issue.labels.length }}</strong>
               </div>
-              <div class="sapling-issue-card__meta-item">
+              <div class="sapling-detail-card">
                 <span>{{ $t('issue.assignedTo') }}</span>
                 <strong>{{ issue.assignees.length || $t('global.notAvailable') }}</strong>
               </div>
@@ -103,7 +106,7 @@
             </div>
 
             <div class="sapling-issue-card__assignees">
-              <div class="sapling-issue-card__section-label">{{ $t('issue.assignedTo') }}</div>
+              <div class="sapling-label">{{ $t('issue.assignedTo') }}</div>
               <div v-if="issue.assignees.length" class="sapling-issue-card__assignee-list">
                 <a
                   v-for="assignee in issue.assignees"
@@ -123,7 +126,7 @@
             </div>
 
             <div class="sapling-issue-card__description">
-              <div class="sapling-issue-card__section-label">{{ $t('issue.description') }}</div>
+              <div class="sapling-label">{{ $t('issue.description') }}</div>
               <div class="sapling-issue-card__markdown">
                 <VMarkdown :source="issue.body || $t('issue.noDescription')" />
               </div>

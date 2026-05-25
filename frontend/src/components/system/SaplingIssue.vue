@@ -23,15 +23,14 @@
 
     <template v-else>
       <SaplingPageHero
-        class="sapling-issue-hero"
         variant="signal"
         eyebrow="GitHub"
         :title="$t('issue.heroTitle')"
         :subtitle="$t('issue.heroSubtitle')"
       >
         <template #side>
-          <div class="sapling-issue-hero__pulse">
-            <div class="sapling-issue-hero__pulse-label">{{ $t('issue.updatedAt') }}</div>
+          <div class="sapling-data-card sapling-issue-hero__pulse">
+            <div class="sapling-label">{{ $t('issue.updatedAt') }}</div>
             <div class="sapling-issue-hero__pulse-value">{{ lastUpdatedDisplay }}</div>
           </div>
         </template>
@@ -39,7 +38,7 @@
 
       <SaplingSurface as="section" class="sapling-issue-compose">
         <div class="sapling-issue-compose__intro">
-          <p class="sapling-issue-compose__eyebrow">{{ $t('issue.createEyebrow') }}</p>
+          <p class="sapling-eyebrow">{{ $t('issue.createEyebrow') }}</p>
           <h2 class="sapling-issue-compose__title">{{ $t('issue.createTitle') }}</h2>
           <p class="sapling-issue-compose__subtitle">{{ $t('issue.createSubtitle') }}</p>
 
@@ -88,7 +87,7 @@
           />
 
           <div class="sapling-issue-compose__type-field">
-            <div class="sapling-issue-compose__type-label">{{ $t('issue.typeFieldLabel') }}</div>
+            <div class="sapling-label">{{ $t('issue.typeFieldLabel') }}</div>
 
             <v-btn-toggle
               v-model="draft.type"
@@ -145,49 +144,49 @@
       </SaplingSurface>
 
       <section class="sapling-issue-metrics">
-        <SaplingSurface as="article" class="sapling-issue-metric">
-          <div class="sapling-issue-metric__icon sapling-issue-metric__icon--open">
+        <SaplingSurface as="article" class="sapling-metric-card">
+          <div class="sapling-icon-tile sapling-issue-metric__icon--open">
             <v-icon icon="mdi-source-branch" />
           </div>
-          <div>
-            <p class="sapling-issue-metric__label">{{ $t('issue.openIssues') }}</p>
-            <strong class="sapling-issue-metric__value">{{
+          <div class="sapling-metric-card__copy">
+            <p>{{ $t('issue.openIssues') }}</p>
+            <strong>{{
               isLoading ? '...' : openIssues.length
             }}</strong>
           </div>
         </SaplingSurface>
 
-        <SaplingSurface as="article" class="sapling-issue-metric">
-          <div class="sapling-issue-metric__icon sapling-issue-metric__icon--closed">
+        <SaplingSurface as="article" class="sapling-metric-card">
+          <div class="sapling-icon-tile sapling-issue-metric__icon--closed">
             <v-icon icon="mdi-check-decagram-outline" />
           </div>
-          <div>
-            <p class="sapling-issue-metric__label">{{ $t('issue.closedIssues') }}</p>
-            <strong class="sapling-issue-metric__value">{{
+          <div class="sapling-metric-card__copy">
+            <p>{{ $t('issue.closedIssues') }}</p>
+            <strong>{{
               isLoading ? '...' : closedIssues.length
             }}</strong>
           </div>
         </SaplingSurface>
 
-        <SaplingSurface as="article" class="sapling-issue-metric">
-          <div class="sapling-issue-metric__icon sapling-issue-metric__icon--label">
+        <SaplingSurface as="article" class="sapling-metric-card">
+          <div class="sapling-icon-tile sapling-issue-metric__icon--label">
             <v-icon icon="mdi-tag-multiple-outline" />
           </div>
-          <div>
-            <p class="sapling-issue-metric__label">{{ $t('issue.labels') }}</p>
-            <strong class="sapling-issue-metric__value">{{
+          <div class="sapling-metric-card__copy">
+            <p>{{ $t('issue.labels') }}</p>
+            <strong>{{
               isLoading ? '...' : labelCount
             }}</strong>
           </div>
         </SaplingSurface>
 
-        <SaplingSurface as="article" class="sapling-issue-metric">
-          <div class="sapling-issue-metric__icon sapling-issue-metric__icon--assignee">
+        <SaplingSurface as="article" class="sapling-metric-card">
+          <div class="sapling-icon-tile sapling-issue-metric__icon--assignee">
             <v-icon icon="mdi-account-group-outline" />
           </div>
-          <div>
-            <p class="sapling-issue-metric__label">{{ $t('issue.assignedTo') }}</p>
-            <strong class="sapling-issue-metric__value">{{
+          <div class="sapling-metric-card__copy">
+            <p>{{ $t('issue.assignedTo') }}</p>
+            <strong>{{
               isLoading ? '...' : assigneeCount
             }}</strong>
           </div>

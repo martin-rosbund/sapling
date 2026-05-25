@@ -5,12 +5,11 @@
         <v-skeleton-loader type="heading, text" />
       </div>
 
-      <div class="sapling-dashboard__actions">
+      <div class="sapling-action-stack">
         <v-skeleton-loader
           v-for="item in 3"
           :key="item"
           type="button"
-          class="sapling-dashboard__action"
         />
       </div>
     </section>
@@ -37,8 +36,8 @@
     <SaplingDashboardRecommendedFavorites v-if="!isLoading" />
 
     <template v-if="isLoading || !currentPersonStore.loaded">
-      <section class="sapling-dashboard__surface">
-        <div class="sapling-dashboard__tabs-shell glass-panel">
+      <section class="sapling-section-stack sapling-section-stack--md">
+        <div class="sapling-tabs-shell glass-panel">
           <v-skeleton-loader type="heading" />
         </div>
 

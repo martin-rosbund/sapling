@@ -112,8 +112,10 @@
   --sapling-text-body-size-sm: var(--sapling-text-body-size-xs);
   --sapling-text-body-size-lg: 1rem;
   --sapling-text-body-size-md: var(--sapling-text-body-size-lg);
-  --sapling-letter-spacing-label: 0.08em;
-  --sapling-letter-spacing-eyebrow: 0.12em;
+  --sapling-text-title-size-sm: 1.1rem;
+  --sapling-text-title-size-md: 1.35rem;
+  --sapling-letter-spacing-label: 0;
+  --sapling-letter-spacing-eyebrow: 0;
   --sapling-surface-fill: rgba(255, 255, 255, 0.06);
   --sapling-surface-fill-subtle: rgba(255, 255, 255, 0.04);
   --sapling-surface-fill-soft: var(--sapling-surface-fill-subtle);

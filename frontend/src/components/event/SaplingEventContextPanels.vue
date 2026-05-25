@@ -1,6 +1,9 @@
 <template>
-  <aside class="sapling-event-context">
-    <SaplingSurface as="section" class="sapling-event-context__switcher">
+  <aside class="sapling-fill-shell sapling-event-context">
+    <SaplingSurface
+      as="section"
+      class="sapling-section-panel sapling-panel-shell sapling-event-context__switcher"
+    >
       <v-btn-toggle
         v-model="activePanel"
         class="sapling-event-context__toggle"
@@ -21,7 +24,7 @@
         </v-btn>
       </v-btn-toggle>
 
-      <div class="sapling-event-context__summary">
+      <div class="sapling-row-xs sapling-row-wrap sapling-event-context__summary">
         <template v-if="activePanel === 'filter'">
           <span>{{ selectedPeoples.length }} {{ $t('global.selected') }}</span>
           <span>{{ $t('navigation.person') }} &amp; {{ $t('navigation.company') }}</span>

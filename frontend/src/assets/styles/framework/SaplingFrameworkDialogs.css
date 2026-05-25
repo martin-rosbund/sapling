@@ -105,7 +105,7 @@
   flex-direction: column;
 }
 
-.sapling-message-center-dialog__body > .sapling-message-center-empty-state {
+.sapling-message-center-dialog__body > .sapling-empty-state-panel {
   flex: 1 1 auto;
   min-height: 100%;
 }

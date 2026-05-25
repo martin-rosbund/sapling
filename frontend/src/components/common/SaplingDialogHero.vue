@@ -50,7 +50,6 @@
 </template>
 
 <script setup lang="ts">
-import '@/assets/styles/SaplingHero.css'
 import { computed, useSlots } from 'vue'
 
 defineOptions({

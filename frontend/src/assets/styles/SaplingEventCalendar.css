@@ -192,23 +192,3 @@
   background: transparent !important;
   border-color: transparent !important;
 }
-
-.sapling-event-vcalendar .v-current-time {
-  height: 2px;
-  background-color: var(--sapling-status-text-danger);
-  position: absolute;
-  left: -1px;
-  right: 0;
-  pointer-events: none;
-}
-
-.sapling-event-vcalendar .v-current-time.first::before {
-  content: '';
-  position: absolute;
-  background-color: var(--sapling-status-text-danger);
-  width: var(--sapling-space-md);
-  height: var(--sapling-space-md);
-  border-radius: 50%;
-  margin-top: -5px;
-  margin-left: -6.5px;
-}

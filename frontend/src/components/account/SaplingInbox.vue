@@ -53,7 +53,7 @@
                 />
               </section>
 
-              <section class="sapling-inbox-view-switch glass-panel">
+              <section class="sapling-inbox-view-switch sapling-panel-shell-muted">
                 <v-btn-toggle
                   v-model="activeView"
                   class="sapling-inbox-view-switch__toggle"
@@ -95,14 +95,19 @@
               </section>
 
               <template v-if="activeView === 'overview'">
-                <section v-if="!hasOverviewItems" class="sapling-inbox-empty-state glass-panel">
-                  <div class="sapling-inbox-empty-state__icon">
+                <section
+                  v-if="!hasOverviewItems"
+                  class="sapling-empty-state-panel sapling-empty-state-panel--large glass-panel"
+                >
+                  <div
+                    class="sapling-empty-state-panel__icon sapling-empty-state-panel__icon--success"
+                  >
                     <v-icon icon="mdi-check-circle-outline" size="42" />
                   </div>
-                  <h3 class="sapling-inbox-empty-state__title">
+                  <h3 class="sapling-empty-state-panel__title">
                     {{ $t('inbox.allCaughtUpTitle') }}
                   </h3>
-                  <p class="sapling-inbox-empty-state__copy">{{ $t('inbox.allCaughtUp') }}</p>
+                  <p class="sapling-empty-state-panel__text">{{ $t('inbox.allCaughtUp') }}</p>
                 </section>
 
                 <section v-else class="sapling-inbox-board">
@@ -117,23 +122,28 @@
               </template>
 
               <template v-else>
-                <section v-if="!hasNotificationItems" class="sapling-inbox-empty-state glass-panel">
-                  <div class="sapling-inbox-empty-state__icon">
+                <section
+                  v-if="!hasNotificationItems"
+                  class="sapling-empty-state-panel sapling-empty-state-panel--large glass-panel"
+                >
+                  <div
+                    class="sapling-empty-state-panel__icon sapling-empty-state-panel__icon--success"
+                  >
                     <v-icon icon="mdi-check-circle-outline" size="42" />
                   </div>
-                  <h3 class="sapling-inbox-empty-state__title">
+                  <h3 class="sapling-empty-state-panel__title">
                     {{ $t('inbox.allCaughtUpTitle') }}
                   </h3>
-                  <p class="sapling-inbox-empty-state__copy">{{ $t('inbox.allCaughtUp') }}</p>
+                  <p class="sapling-empty-state-panel__text">{{ $t('inbox.allCaughtUp') }}</p>
                 </section>
 
-                <section v-else class="sapling-inbox-notification-panel glass-panel">
-                  <div class="sapling-inbox-notification-panel__header">
+                <section v-else class="sapling-section-panel glass-panel">
+                  <div class="sapling-section-header">
                     <div class="sapling-inbox-notification-panel__title-row">
-                      <div class="sapling-inbox-notification-panel__icon-wrap">
+                      <div class="sapling-icon-tile sapling-icon-tile--sm sapling-icon-tile--info-soft">
                         <v-icon icon="mdi-bell-outline" size="18" />
                       </div>
-                      <h3 class="sapling-inbox-notification-panel__title">
+                      <h3 class="sapling-section-title">
                         {{ $t('navigation.inboxNotification') }}
                       </h3>
                     </div>
@@ -142,7 +152,7 @@
                     </v-chip>
                   </div>
 
-                  <div class="sapling-inbox-notification-feed">
+                  <div class="sapling-section-stack sapling-section-stack--md">
                     <SaplingInboxEntryCard
                       v-for="entry in sortedNotificationEntries"
                       :key="entry.id"

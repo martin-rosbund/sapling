@@ -44,24 +44,28 @@
               <SaplingSurface
                 as="section"
                 v-if="messages.length === 0"
-                class="sapling-message-center-empty-state"
+                class="sapling-empty-state-panel sapling-empty-state-panel--large"
               >
-                <div class="sapling-message-center-empty-state__icon">
+                <div class="sapling-empty-state-panel__icon">
                   <v-icon icon="mdi-bell-check-outline" size="40" />
                 </div>
-                <h3 class="sapling-message-center-empty-state__title">
+                <h3 class="sapling-empty-state-panel__title">
                   {{ $t('global.messageCenter') }}
                 </h3>
               </SaplingSurface>
 
-              <v-list v-else density="comfortable" class="sapling-message-center-list">
+              <v-list
+                v-else
+                density="comfortable"
+                class="sapling-section-stack sapling-section-stack--md sapling-message-center-list"
+              >
                 <v-list-item
                   v-for="message in messages"
                   :key="message.id"
-                  class="sapling-message-center-entry"
+                  class="sapling-panel-shell-muted sapling-message-center-entry"
                 >
                   <template #prepend>
-                    <div class="sapling-message-center-entry__icon-wrap">
+                    <div class="sapling-icon-tile sapling-icon-tile--sm">
                       <v-icon :color="getMessageColor(message.type)">{{
                         getMessageIcon(message.type)
                       }}</v-icon>

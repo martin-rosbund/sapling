@@ -1,13 +1,17 @@
 <template>
   <div class="sapling-table-mobile-shell">
-    <SaplingSurface as="div" class="sapling-table-mobile-summary" variant="subtle">
-      <div class="sapling-table-mobile-summary__header">
+    <SaplingSurface
+      as="div"
+      class="sapling-section-panel sapling-section-panel--compact sapling-table-mobile-summary"
+      variant="subtle"
+    >
+      <div class="sapling-section-header sapling-table-mobile-summary__header">
         <div class="sapling-table-mobile-summary__identity">
-          <div class="sapling-table-mobile-summary__headline">
-            <span class="sapling-table-mobile-summary__headline-value">
+          <div class="sapling-counter-line sapling-table-mobile-summary__headline">
+            <span class="sapling-counter-line__value sapling-table-mobile-summary__headline-value">
               {{ totalItems }}
             </span>
-            <span class="sapling-table-mobile-summary__headline-copy">{{
+            <span class="sapling-counter-line__label sapling-table-mobile-summary__headline-copy">{{
               $t('global.items')
             }}</span>
           </div>
@@ -34,8 +38,12 @@
 
     <v-expand-transition>
       <div v-if="mobileControlsVisible" class="sapling-table-mobile-controls-shell">
-        <SaplingSurface as="div" class="sapling-table-mobile-controls" variant="subtle">
-          <div class="sapling-table-mobile-controls__section">
+        <SaplingSurface
+          as="div"
+          class="sapling-section-panel sapling-section-panel--compact sapling-table-mobile-controls"
+          variant="subtle"
+        >
+          <div class="sapling-stack-md sapling-table-mobile-controls__section">
             <span class="sapling-table-mobile-controls__label">{{ $t('filter.sort') }}</span>
             <div class="sapling-table-mobile-controls__sorts">
               <v-btn
@@ -60,7 +68,7 @@
 
           <div
             v-if="filterableMobileHeaders.length > 0"
-            class="sapling-table-mobile-controls__section"
+            class="sapling-stack-md sapling-table-mobile-controls__section"
           >
             <span class="sapling-table-mobile-controls__label">{{ $t('filter.filter') }}</span>
             <div class="sapling-table-mobile-controls__filters">

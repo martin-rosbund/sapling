@@ -23,9 +23,6 @@
 }
 
 .sapling-message-center-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sapling-gap-xs);
   padding: 0;
   background: transparent;
 }
@@ -37,17 +34,6 @@
 
 .sapling-message-center-entry .v-list-item__append {
   align-self: flex-start;
-}
-
-.sapling-message-center-entry__icon-wrap {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--sapling-icon-box-sm);
-  height: var(--sapling-icon-box-sm);
-  margin-top: var(--sapling-space-3xs);
-  border-radius: var(--sapling-radius-sm);
-  background: var(--sapling-surface-fill);
 }
 
 .sapling-message-center-entry__description {

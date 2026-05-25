@@ -1,9 +1,9 @@
 <template>
-  <SaplingSurface as="section" class="sapling-system-panel">
-    <div class="sapling-system-panel__header">
+  <SaplingSurface as="section" class="sapling-section-panel">
+    <div class="sapling-section-header">
       <div>
-        <p class="sapling-system-panel__eyebrow">{{ $t('system.filesystem') }}</p>
-        <h2 class="sapling-system-panel__title">{{ $t('system.storageTitle') }}</h2>
+        <p class="sapling-eyebrow">{{ $t('system.filesystem') }}</p>
+        <h2 class="sapling-section-title">{{ $t('system.storageTitle') }}</h2>
       </div>
       <v-chip size="small" variant="outlined">
         {{ count }}
@@ -11,11 +11,11 @@
     </div>
 
     <div v-if="items.length" class="sapling-system-storage-grid">
-      <article v-for="item in items" :key="item.key" class="sapling-system-storage-card">
-        <div class="sapling-system-storage-card__header">
+      <article v-for="item in items" :key="item.key" class="sapling-data-card">
+        <div class="sapling-section-header">
           <div>
             <h3>{{ item.title }}</h3>
-            <p>{{ item.subtitle }}</p>
+            <p class="sapling-label">{{ item.subtitle }}</p>
           </div>
           <v-chip size="small" variant="tonal" color="primary">
             {{ item.usageLabel }}
@@ -24,16 +24,16 @@
 
         <v-progress-linear :model-value="item.usageProgress" color="amber" height="14" rounded />
 
-        <div class="sapling-system-storage-card__stats">
-          <div>
+        <div class="sapling-detail-grid">
+          <div class="sapling-detail-card">
             <span>{{ $t('system.size') }}</span>
             <strong>{{ item.sizeLabel }}</strong>
           </div>
-          <div>
+          <div class="sapling-detail-card">
             <span>{{ $t('system.used') }}</span>
             <strong>{{ item.usedLabel }}</strong>
           </div>
-          <div>
+          <div class="sapling-detail-card">
             <span>{{ $t('system.diskFree') }}</span>
             <strong>{{ item.freeLabel }}</strong>
           </div>
@@ -41,7 +41,7 @@
       </article>
     </div>
 
-    <div v-else class="sapling-system-empty-state">
+    <div v-else class="sapling-empty-state-panel sapling-empty-state-panel--compact">
       {{ emptyLabel }}
     </div>
 

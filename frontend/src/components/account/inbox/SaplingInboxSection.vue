@@ -1,17 +1,17 @@
 <template>
   <article
-    class="sapling-inbox-section glass-panel"
+    class="sapling-inbox-section sapling-section-panel glass-panel"
     :class="`sapling-inbox-section--${section.tone}`"
   >
-    <div class="sapling-inbox-section__header">
+    <div class="sapling-section-header">
       <div class="sapling-inbox-section__title-wrap">
         <div class="sapling-inbox-section__title-row">
-          <div class="sapling-inbox-section__icon-wrap">
+          <div class="sapling-icon-tile sapling-icon-tile--sm">
             <v-icon :icon="section.icon" size="18" />
           </div>
           <div>
-            <h3 class="sapling-inbox-section__title">{{ $t(section.titleKey) }}</h3>
-            <p class="sapling-inbox-section__subtitle">{{ $t(section.subtitleKey) }}</p>
+            <h3 class="sapling-section-title">{{ $t(section.titleKey) }}</h3>
+            <p class="sapling-section-subtitle">{{ $t(section.subtitleKey) }}</p>
           </div>
         </div>
       </div>
@@ -20,9 +20,9 @@
       </v-chip>
     </div>
 
-    <div v-if="section.empty" class="sapling-inbox-section__empty">
+    <div v-if="section.empty" class="sapling-empty-state-panel sapling-empty-state-panel--compact">
       <v-icon :icon="section.icon" size="28" />
-      <p>{{ $t(section.emptyKey) }}</p>
+      <p class="sapling-empty-state-panel__text">{{ $t(section.emptyKey) }}</p>
     </div>
 
     <div v-else class="sapling-inbox-entry-list">

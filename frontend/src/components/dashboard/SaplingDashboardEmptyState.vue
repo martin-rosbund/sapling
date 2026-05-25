@@ -1,11 +1,11 @@
 <template>
-  <section class="sapling-dashboard__empty glass-panel">
+  <section class="sapling-empty-state-panel sapling-empty-state-panel--large glass-panel">
     <v-icon size="56" color="primary">mdi-view-dashboard-edit-outline</v-icon>
-    <h2 class="sapling-dashboard__empty-title">{{ $t('dashboard.emptyTitle') }}</h2>
-    <p class="sapling-dashboard__empty-text">
+    <h2 class="sapling-empty-state-panel__title">{{ $t('dashboard.emptyTitle') }}</h2>
+    <p class="sapling-empty-state-panel__text">
       {{ $t('dashboard.emptyText') }}
     </p>
-    <div class="sapling-dashboard__empty-actions">
+    <div class="sapling-empty-state-panel__actions">
       <v-btn color="primary" prepend-icon="mdi-plus-circle-outline" @click="emit('openDashboard')">
         {{ $t('global.add') }}
       </v-btn>

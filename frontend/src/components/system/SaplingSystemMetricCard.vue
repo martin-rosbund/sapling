@@ -1,9 +1,9 @@
 <template>
-  <SaplingSurface as="article" class="sapling-system-metric">
-    <div class="sapling-system-metric__icon" :class="iconClass">
+  <SaplingSurface as="article" class="sapling-metric-card">
+    <div class="sapling-icon-tile" :class="iconClass">
       <v-icon :icon="icon" />
     </div>
-    <div class="sapling-system-metric__copy">
+    <div class="sapling-metric-card__copy">
       <p>{{ label }}</p>
       <strong>{{ value }}</strong>
       <span>{{ detail }}</span>

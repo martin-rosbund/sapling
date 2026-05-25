@@ -1309,7 +1309,7 @@ export function useSaplingEvent() {
   async function reloadUpdateConflictRecord() {
     const conflict = updateConflictDialog.value.conflict
     const handle = getItemHandle(conflict?.current) ?? conflict?.handle
-    if (handle == null) {
+    if (typeof handle !== 'number') {
       closeUpdateConflictDialog()
       return
     }

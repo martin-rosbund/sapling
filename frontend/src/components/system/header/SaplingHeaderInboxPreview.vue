@@ -5,6 +5,7 @@
         as="button"
         v-if="preview"
         :class="[
+          'sapling-floating-preview',
           'sapling-header__inbox-preview',
           `sapling-header__inbox-preview--${preview.kind}`,
         ]"
@@ -14,17 +15,19 @@
         :aria-label="openLabel"
         @click="emit('open', preview)"
       >
-        <div class="sapling-header__inbox-preview-icon">
+        <div class="sapling-floating-preview__icon sapling-header__inbox-preview-icon">
           <v-icon :icon="preview.icon" size="22" />
         </div>
-        <div class="sapling-header__inbox-preview-copy">
-          <div class="sapling-header__inbox-preview-meta">
-            <div class="sapling-header__inbox-preview-label">{{ inboxLabel }}</div>
-            <div class="sapling-header__inbox-preview-kind">
+        <div class="sapling-floating-preview__copy sapling-header__inbox-preview-copy">
+          <div class="sapling-floating-preview__meta sapling-header__inbox-preview-meta">
+            <div class="sapling-floating-preview__label sapling-header__inbox-preview-label">
+              {{ inboxLabel }}
+            </div>
+            <div class="sapling-floating-preview__pill sapling-header__inbox-preview-kind">
               {{ kindLabel }}
             </div>
           </div>
-          <div class="sapling-header__inbox-preview-title">
+          <div class="sapling-floating-preview__title sapling-header__inbox-preview-title">
             {{ preview.title }}
           </div>
         </div>

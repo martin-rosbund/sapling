@@ -25,18 +25,18 @@
   </template>
 
   <template v-else>
-    <div class="sapling-event-sidebyside-shell">
+    <div class="sapling-scroll-region sapling-event-sidebyside-shell">
       <div class="sapling-event-sidebyside-grid" :style="sideBySideGridStyle">
         <section
           v-for="personId in selectedPeoples"
           :key="personId"
-          class="sapling-event-sidebyside-column"
+          class="sapling-section-panel sapling-panel-shell sapling-event-sidebyside-column"
         >
-          <header class="sapling-event-sidebyside-column__header">
+          <header class="sapling-section-header sapling-event-sidebyside-column__header">
             <span>{{ getPersonName(personId) }}</span>
           </header>
 
-          <div class="sapling-event-sidebyside-column__calendar">
+          <div class="sapling-fill-shell sapling-event-sidebyside-column__calendar">
             <SaplingEventCalendar
               v-model="calendarValue"
               :events="getSideBySideEvents(personId)"

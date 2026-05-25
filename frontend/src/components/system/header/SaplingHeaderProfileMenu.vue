@@ -13,14 +13,14 @@
         :class="{ 'sapling-profile-trigger--impersonating': isImpersonating }"
         variant="text"
       >
-        <div class="sapling-header__account">
-          <div class="sapling-header__account-avatar">
+        <div class="sapling-identity-chip sapling-header__account">
+          <div class="sapling-identity-avatar sapling-header__account-avatar">
             <v-icon v-if="isImpersonating" icon="mdi-eye-outline" size="18" />
             <template v-else>{{ profileInitials }}</template>
           </div>
-          <div class="sapling-header__account-copy">
-            <div class="sapling-header__account-name">{{ profileName }}</div>
-            <div class="sapling-header__account-meta">
+          <div class="sapling-identity-copy sapling-header__account-copy">
+            <div class="sapling-identity-title sapling-header__account-name">{{ profileName }}</div>
+            <div class="sapling-identity-meta sapling-header__account-meta">
               <template v-if="isImpersonating && impersonationActorName">
                 {{ impersonationActorLabel }}
               </template>
@@ -34,16 +34,18 @@
 
     <SaplingSurface
       :as="VCard"
-      class="sapling-profile-menu"
+      class="sapling-menu-panel sapling-profile-menu"
       :class="{ 'sapling-profile-menu--impersonating': isImpersonating }"
       :elevation="12"
     >
-      <div class="sapling-profile-menu__hero">
-        <div class="sapling-profile-menu__avatar">{{ profileInitials }}</div>
-        <div class="sapling-profile-menu__identity">
-          <div class="sapling-profile-menu__eyebrow">{{ accountLabel }}</div>
-          <div class="sapling-profile-menu__name">{{ profileName }}</div>
-          <div class="sapling-profile-menu__meta">{{ profileMeta }}</div>
+      <div class="sapling-menu-hero sapling-profile-menu__hero">
+        <div class="sapling-menu-avatar sapling-profile-menu__avatar">{{ profileInitials }}</div>
+        <div class="sapling-menu-identity sapling-profile-menu__identity">
+          <div class="sapling-menu-eyebrow sapling-profile-menu__eyebrow">
+            {{ accountLabel }}
+          </div>
+          <div class="sapling-menu-title sapling-profile-menu__name">{{ profileName }}</div>
+          <div class="sapling-menu-meta sapling-profile-menu__meta">{{ profileMeta }}</div>
         </div>
 
         <v-btn
@@ -55,8 +57,10 @@
         />
       </div>
 
-      <div class="sapling-profile-menu__body">
-        <div class="sapling-profile-menu__section sapling-profile-menu__section--primary">
+      <div class="sapling-menu-panel__body sapling-profile-menu__body">
+        <div
+          class="sapling-menu-section sapling-profile-menu__section sapling-profile-menu__section--primary"
+        >
           <v-btn
             v-if="isImpersonating"
             block
@@ -90,20 +94,25 @@
           </v-btn>
         </div>
 
-        <div class="sapling-profile-menu__section">
+        <div class="sapling-menu-section sapling-profile-menu__section">
           <button
             v-for="action in appearanceActions"
             :key="action.key"
             type="button"
-            class="sapling-profile-menu__option"
-            :class="{ 'sapling-profile-menu__option--active': action.isActive }"
+            class="sapling-menu-option sapling-profile-menu__option"
+            :class="{
+              'sapling-menu-option--active': action.isActive,
+              'sapling-profile-menu__option--active': action.isActive,
+            }"
             @click="action.handler()"
           >
-            <span class="sapling-profile-menu__option-icon">
+            <span class="sapling-menu-option__icon sapling-profile-menu__option-icon">
               <v-icon :icon="action.icon" />
             </span>
-            <span class="sapling-profile-menu__option-copy">{{ action.label }}</span>
-            <span class="sapling-profile-menu__option-state">
+            <span class="sapling-menu-option__copy sapling-profile-menu__option-copy">
+              {{ action.label }}
+            </span>
+            <span class="sapling-menu-option__state sapling-profile-menu__option-state">
               <v-icon
                 :icon="action.isActive ? 'mdi-check-circle' : 'mdi-chevron-right'"
                 size="18"
@@ -112,8 +121,10 @@
           </button>
         </div>
 
-        <div class="sapling-profile-menu__section">
-          <div class="sapling-profile-menu__section-label">{{ languageLabel }}</div>
+        <div class="sapling-menu-section sapling-profile-menu__section">
+          <div class="sapling-menu-section-label sapling-profile-menu__section-label">
+            {{ languageLabel }}
+          </div>
           <v-btn-toggle
             divided
             mandatory
@@ -135,10 +146,10 @@
 
         <div
           v-if="adminActions.length"
-          class="sapling-profile-menu__section sapling-profile-menu__section--danger"
+          class="sapling-menu-section sapling-profile-menu__section sapling-profile-menu__section--danger"
         >
           <div
-            class="sapling-profile-menu__section-label sapling-profile-menu__section-label--danger"
+            class="sapling-menu-section-label sapling-profile-menu__section-label sapling-profile-menu__section-label--danger"
           >
             {{ dangerZoneLabel }}
           </div>
@@ -146,16 +157,18 @@
             v-for="action in adminActions"
             :key="action.key"
             type="button"
-            class="sapling-profile-menu__option sapling-profile-menu__option--danger"
+            class="sapling-menu-option sapling-menu-option--danger sapling-profile-menu__option sapling-profile-menu__option--danger"
             @click="emit('runAdminAction', action)"
           >
             <span
-              class="sapling-profile-menu__option-icon sapling-profile-menu__option-icon--danger"
+              class="sapling-menu-option__icon sapling-menu-option__icon--danger sapling-profile-menu__option-icon sapling-profile-menu__option-icon--danger"
             >
               <v-icon :icon="action.icon" />
             </span>
-            <span class="sapling-profile-menu__option-copy">{{ action.label }}</span>
-            <span class="sapling-profile-menu__option-state">
+            <span class="sapling-menu-option__copy sapling-profile-menu__option-copy">
+              {{ action.label }}
+            </span>
+            <span class="sapling-menu-option__state sapling-profile-menu__option-state">
               <v-icon icon="mdi-chevron-right" size="18" />
             </span>
           </button>
