@@ -11,17 +11,24 @@ Application CSS enters through `SaplingFramework.css`, which is imported once by
 ## File Map
 
 - `SaplingSurfaces.css`: base surfaces, panels, cards, metrics, and empty states
-- `SaplingFrameworkLists.css`: list cards, stat cards, chip rows, and interactive list items
+- `SaplingFrameworkLists.css`: list cards, stat cards, note cards, chip rows, and interactive list items
 - `SaplingFrameworkMenus.css`: floating previews, identity chips, and menu panels/options
 - `SaplingFrameworkNavigation.css`: drawer, search-panel, and navigation-item patterns
-- `SaplingFrameworkOperations.css`: admin, permission, attention, and inbox-style workflows
+- `SaplingFrameworkWorkspaces.css`: dashboard shells, page workspaces, browser/partner layouts, tabs, and board grids
+- `SaplingFrameworkForms.css`: upload controls, markdown fields, field panels, and recurrence form layouts
+- `SaplingFrameworkDialogs.css`: dialog shells, cards, widths, delete/json/template dialogs, and access pending
+- `SaplingFrameworkHistory.css`: change history, record timelines, and history detail cards
+- `SaplingFrameworkOperations.css`: admin, permission, attention, system, and inbox-style workflows
 - `SaplingFrameworkRecordDialog.css`: record edit dialogs, grouped fields, and relation tabs
-- `SaplingFrameworkWorkItems.css`: work-item dashboards, issue streams, and work cards
-- `SaplingFrameworkCalendar.css`: shared Vuetify calendar chrome
+- `SaplingFrameworkWorkItems.css`: work-item dashboards, issue streams, work cards, and filter panels
+- `SaplingFrameworkShowcase.css`: component showcase pages, demo frames, and launchpads
+- `SaplingFrameworkCalendar.css`: calendar pages, context panels, Vuetify chrome, and event cards
+- `SaplingFrameworkKpis.css`: KPI dashboard grids, KPI cards, and KPI widget layouts
 
 ## Use Shared Patterns First
 
 - Page layout: `sapling-page-shell`, `sapling-section-stack`, `sapling-fill-shell`
+- Dashboard pages: `sapling-dashboard`, `sapling-dashboard__hero`, `sapling-dashboard__tab`
 - Surfaces: `SaplingSurface`, `sapling-section-panel`, `sapling-data-card`
 - Headers: `sapling-section-header`, `sapling-section-title`, `sapling-eyebrow`
 - Metrics: `sapling-metric-card`, `sapling-icon-tile`, `sapling-metric-card__copy`
@@ -40,11 +47,22 @@ Application CSS enters through `SaplingFramework.css`, which is imported once by
 - Split toolbars: `sapling-split-toolbar`, `sapling-toolbar-group`, `sapling-toolbar-toggle`
 - Toolbars: `sapling-toolbar-shell`, `sapling-toolbar-controls`, `sapling-toolbar-slot`
 - Calendars: `sapling-calendar-frame` for Vuetify calendar chrome and current-time styling
+- Calendar events: `sapling-calendar-event-card` with density, recurring, readonly, and resize states
 - Forms: `sapling-upload`, `sapling-upload-dropzone`, `sapling-upload-selection`
+- Markdown fields: `sapling-markdown-workspace`, `sapling-markdown-pane`, `sapling-markdown-preview`
+- Notes: `sapling-note-tabs`, `sapling-note-card`, `sapling-add-note-card`
+- Recurrence fields: `sapling-field-event-recurrence`, option grids, trigger, and preview
+- History timelines: `sapling-history-card`, `sapling-history-summary-grid`, `sapling-record-timeline__timeline`
+- Change logs: `sapling-record-change-log`, `sapling-history-detail-table`, `sapling-change-log-detail-value`
 - Admin areas: `sapling-admin-layout`, `sapling-admin-sidebar`, `sapling-admin-workspace`
+- Partner workspaces: `sapling-partner-layout`, `sapling-partner-table-scroll`, `sapling-partner-filter-panel`
 - Attention queues: `sapling-attention-content`, `sapling-attention-section`, `sapling-attention-card`
+- System dashboards: `sapling-system-metrics`, `sapling-system-layout`, `sapling-system-gauge`
 - Record dialogs: `sapling-record-dialog-shell`, `sapling-record-section`, `sapling-record-field-shell`
-- Work items: `sapling-work-compose`, `sapling-work-stream`, `sapling-work-card`
+- Template dialogs: `sapling-dashboard-template-dialog`, `sapling-dashboard-template-entry`
+- Work items: `sapling-work-compose`, `sapling-work-stream`, `sapling-work-card`, `sapling-work-filter-panel`
+- Showcases: `sapling-showcase`, `sapling-showcase__section-card`, `sapling-showcase__demo-frame`
+- KPI dashboards: `sapling-kpi-surface`, `sapling-kpi-card`, `sapling-kpi-widget`
 
 ## When Feature CSS Is Allowed
 

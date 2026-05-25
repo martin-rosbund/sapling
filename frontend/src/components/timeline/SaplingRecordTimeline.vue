@@ -188,7 +188,6 @@
 </template>
 
 <script setup lang="ts">
-import '@/assets/styles/SaplingRecordTimeline.css'
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'

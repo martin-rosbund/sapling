@@ -82,13 +82,6 @@
 
 <script setup lang="ts">
 // #region Imports
-import '@/assets/styles/SaplingKpiCard.css'
-import '@/assets/styles/SaplingKpiBreakdown.css'
-import '@/assets/styles/SaplingKpiComparison.css'
-import '@/assets/styles/SaplingKpiItem.css'
-import '@/assets/styles/SaplingKpiList.css'
-import '@/assets/styles/SaplingKpiSparkline.css'
-import '@/assets/styles/SaplingKpiTrend.css'
 import { VCard } from 'vuetify/components'
 import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingKpiBreakdown from '@/components/kpi/SaplingKpiBreakdown.vue'

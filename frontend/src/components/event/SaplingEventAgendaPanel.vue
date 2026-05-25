@@ -27,7 +27,7 @@
       >
         <div
           class="sapling-interactive-list-item__icon sapling-event-agenda-item__icon"
-          :style="{ '--sapling-event-accent': item.accentColor }"
+          :style="{ '--sapling-calendar-accent': item.accentColor }"
         >
           <v-icon size="18">{{ item.icon }}</v-icon>
         </div>

@@ -181,7 +181,6 @@
 </template>
 
 <script lang="ts" setup>
-import '@/assets/styles/SaplingFieldEventRecurrence.css'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SaplingActionRecurrence from '@/components/actions/SaplingActionRecurrence.vue'

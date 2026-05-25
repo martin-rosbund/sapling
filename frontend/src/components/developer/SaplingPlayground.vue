@@ -1,22 +1,29 @@
 <template>
   <v-container
-    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--scroll sapling-page-shell--uniform-inset sapling-playground"
+    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--scroll sapling-page-shell--uniform-inset sapling-showcase sapling-playground"
     fluid
   >
     <v-row>
       <v-col cols="12">
-        <v-card elevation="1" class="glass-panel sapling-playground__hero-card">
-          <v-card-text class="sapling-playground__hero-content">
-            <div class="sapling-playground__hero-copy">
-              <span class="sapling-playground__eyebrow">Component Showcase</span>
-              <h1 class="sapling-playground__hero-title">Sapling Playground</h1>
-              <p class="sapling-playground__hero-description">
+        <v-card
+          elevation="1"
+          class="glass-panel sapling-showcase__hero-card sapling-playground__hero-card"
+        >
+          <v-card-text class="sapling-showcase__hero-content sapling-playground__hero-content">
+            <div class="sapling-showcase__hero-copy sapling-playground__hero-copy">
+              <span class="sapling-showcase__eyebrow sapling-playground__eyebrow">
+                Component Showcase
+              </span>
+              <h1 class="sapling-showcase__hero-title sapling-playground__hero-title">
+                Sapling Playground
+              </h1>
+              <p class="sapling-showcase__hero-description sapling-playground__hero-description">
                 Interaktive Showcase-Flaeche für Actions, Dialoge, Form-Felder, KPI-Karten und
                 Tabellen. Alles hier ist direkt anklickbar und als Referenz für die übrigen
                 Komponenten gedacht.
               </p>
 
-              <div class="sapling-playground__hero-actions">
+              <div class="sapling-showcase__hero-actions sapling-playground__hero-actions">
                 <v-btn
                   color="primary"
                   prepend-icon="mdi-form-select"
@@ -36,14 +43,18 @@
               </div>
             </div>
 
-            <div class="sapling-playground__metric-grid">
+            <div class="sapling-showcase__metric-grid sapling-playground__metric-grid">
               <div
                 v-for="metric in playgroundMetrics"
                 :key="metric.label"
-                class="sapling-playground__metric glass-panel"
+                class="sapling-showcase__metric sapling-playground__metric glass-panel"
               >
-                <span class="sapling-playground__metric-label">{{ metric.label }}</span>
-                <strong class="sapling-playground__metric-value">{{ metric.value }}</strong>
+                <span class="sapling-showcase__metric-label sapling-playground__metric-label">
+                  {{ metric.label }}
+                </span>
+                <strong class="sapling-showcase__metric-value sapling-playground__metric-value">
+                  {{ metric.value }}
+                </strong>
               </div>
             </div>
           </v-card-text>
@@ -55,16 +66,22 @@
       <v-col cols="12" xl="8">
         <v-card
           elevation="1"
-          class="mb-6 glass-panel sapling-playground__showcase-card"
+          class="mb-6 glass-panel sapling-showcase__section-card sapling-playground__showcase-card"
           v-tilt="TILT_SOFT_OPTIONS"
         >
-          <v-card-text class="sapling-playground__showcase-body">
-            <div class="sapling-playground__showcase-header">
+          <v-card-text class="sapling-showcase__section-body sapling-playground__showcase-body">
+            <div class="sapling-showcase__section-header sapling-playground__showcase-header">
               <div>
-                <span class="sapling-playground__eyebrow">Actions</span>
-                <h2 class="sapling-playground__showcase-title">Action Gallery</h2>
+                <span class="sapling-showcase__eyebrow sapling-playground__eyebrow">
+                  Actions
+                </span>
+                <h2 class="sapling-showcase__section-title sapling-playground__showcase-title">
+                  Action Gallery
+                </h2>
               </div>
-              <p class="sapling-playground__showcase-description">
+              <p
+                class="sapling-showcase__section-description sapling-playground__showcase-description"
+              >
                 Alle Footer- und Workflow-Actions direkt im Einsatz. Die Buttons feuern Demo-Handler
                 und zeigen ihre aktuellen Zustaende.
               </p>
@@ -72,13 +89,21 @@
 
             <v-row>
               <v-col v-for="actionCard in actionShowcases" :key="actionCard.key" cols="12" md="6">
-                <div class="sapling-playground__demo-frame glass-panel">
-                  <div class="sapling-playground__demo-copy">
-                    <h3 class="sapling-playground__demo-title">{{ actionCard.title }}</h3>
-                    <p class="sapling-playground__demo-description">{{ actionCard.description }}</p>
+                <div class="sapling-showcase__demo-frame sapling-playground__demo-frame glass-panel">
+                  <div class="sapling-showcase__demo-copy sapling-playground__demo-copy">
+                    <h3 class="sapling-showcase__demo-title sapling-playground__demo-title">
+                      {{ actionCard.title }}
+                    </h3>
+                    <p
+                      class="sapling-showcase__demo-description sapling-playground__demo-description"
+                    >
+                      {{ actionCard.description }}
+                    </p>
                   </div>
 
-                  <div class="sapling-playground__demo-surface glass-panel">
+                  <div
+                    class="sapling-showcase__demo-surface sapling-playground__demo-surface glass-panel"
+                  >
                     <component
                       :is="actionCard.component"
                       v-bind="actionCard.props"
@@ -95,28 +120,34 @@
       <v-col cols="12" xl="4">
         <v-card
           elevation="1"
-          class="mb-6 glass-panel sapling-playground__showcase-card"
+          class="mb-6 glass-panel sapling-showcase__section-card sapling-playground__showcase-card"
           v-tilt="TILT_SOFT_OPTIONS"
         >
-          <v-card-text class="sapling-playground__showcase-body">
+          <v-card-text class="sapling-showcase__section-body sapling-playground__showcase-body">
             <div
-              class="sapling-playground__showcase-header sapling-playground__showcase-header--stacked"
+              class="sapling-showcase__section-header sapling-showcase__section-header--stacked sapling-playground__showcase-header sapling-playground__showcase-header--stacked"
             >
               <div>
-                <span class="sapling-playground__eyebrow">Dialogs</span>
-                <h2 class="sapling-playground__showcase-title">Launchpad</h2>
+                <span class="sapling-showcase__eyebrow sapling-playground__eyebrow">
+                  Dialogs
+                </span>
+                <h2 class="sapling-showcase__section-title sapling-playground__showcase-title">
+                  Launchpad
+                </h2>
               </div>
-              <p class="sapling-playground__showcase-description">
+              <p
+                class="sapling-showcase__section-description sapling-playground__showcase-description"
+              >
                 Jeder Dialog laesst sich ueber einen eigenen Trigger oeffnen. Damit ist der
                 Playground auch eine schnelle QA-Flaeche.
               </p>
             </div>
 
-            <div class="sapling-playground__launchpad-grid">
+            <div class="sapling-showcase__launchpad-grid sapling-playground__launchpad-grid">
               <v-btn
                 v-for="launcher in dialogLaunchers"
                 :key="launcher.key"
-                class="sapling-playground__launchpad-button"
+                class="sapling-showcase__launchpad-button sapling-playground__launchpad-button"
                 :color="launcher.color"
                 :prepend-icon="launcher.icon"
                 :variant="launcher.disabled ? 'outlined' : 'flat'"
@@ -127,11 +158,11 @@
               </v-btn>
             </div>
 
-            <div class="sapling-playground__launchpad-notes">
+            <div class="sapling-showcase__launchpad-notes sapling-playground__launchpad-notes">
               <div
                 v-for="launcher in dialogLaunchers"
                 :key="`${launcher.key}-note`"
-                class="sapling-playground__launchpad-note glass-panel"
+                class="sapling-showcase__launchpad-note sapling-playground__launchpad-note glass-panel"
               >
                 <strong>{{ launcher.title }}</strong>
                 <span>{{ launcher.description }}</span>
@@ -183,7 +214,7 @@
       <v-col cols="12" md="6">
         <v-card
           elevation="1"
-          class="mb-6 glass-panel sapling-playground__content-card"
+          class="mb-6 glass-panel sapling-showcase__content-card sapling-playground__content-card"
           v-tilt="TILT_SOFT_OPTIONS"
         >
           <v-card-title class="text-h6">Text Fields</v-card-title>
@@ -211,7 +242,7 @@
 
         <v-card
           elevation="1"
-          class="mb-6 glass-panel sapling-playground__content-card"
+          class="mb-6 glass-panel sapling-showcase__content-card sapling-playground__content-card"
           v-tilt="TILT_SOFT_OPTIONS"
         >
           <v-card-title class="text-h6">Markdown Field</v-card-title>
@@ -228,7 +259,7 @@
 
         <v-card
           elevation="1"
-          class="mb-6 glass-panel sapling-playground__content-card"
+          class="mb-6 glass-panel sapling-showcase__content-card sapling-playground__content-card"
           v-tilt="TILT_SOFT_OPTIONS"
         >
           <v-card-title class="text-h6">Contact Fields</v-card-title>
@@ -267,7 +298,7 @@
 
         <v-card
           elevation="1"
-          class="mb-6 glass-panel sapling-playground__content-card"
+          class="mb-6 glass-panel sapling-showcase__content-card sapling-playground__content-card"
           v-tilt="TILT_SOFT_OPTIONS"
         >
           <v-card-title class="text-h6">Other Fields</v-card-title>
@@ -297,7 +328,7 @@
       <v-col cols="12" md="6">
         <v-card
           elevation="1"
-          class="mb-6 glass-panel sapling-playground__content-card"
+          class="mb-6 glass-panel sapling-showcase__content-card sapling-playground__content-card"
           v-tilt="TILT_SOFT_OPTIONS"
         >
           <v-card-title class="text-h6">Numbers & Dates</v-card-title>
@@ -361,7 +392,7 @@
 
         <v-card
           elevation="1"
-          class="mb-6 glass-panel sapling-playground__content-card"
+          class="mb-6 glass-panel sapling-showcase__content-card sapling-playground__content-card"
           v-tilt="TILT_SOFT_OPTIONS"
         >
           <v-card-title class="text-h6">Icon Selection</v-card-title>
@@ -378,7 +409,7 @@
 
         <v-card
           elevation="1"
-          class="mb-6 glass-panel sapling-playground__content-card"
+          class="mb-6 glass-panel sapling-showcase__content-card sapling-playground__content-card"
           v-tilt="TILT_SOFT_OPTIONS"
         >
           <v-card-title class="text-h6">Select Field</v-card-title>
@@ -451,7 +482,7 @@
       <v-col cols="12">
         <v-card
           elevation="1"
-          class="mb-6 glass-panel sapling-playground__content-card"
+          class="mb-6 glass-panel sapling-showcase__content-card sapling-playground__content-card"
           id="playground-data-surfaces"
         >
           <v-card-title class="text-h6">Search and Table</v-card-title>
@@ -521,7 +552,6 @@
 </template>
 
 <script lang="ts" setup>
-import '@/assets/styles/SaplingPlayground.css'
 import { computed, defineAsyncComponent, markRaw, ref, type Component } from 'vue'
 import SaplingActionAccount from '@/components/actions/SaplingActionAccount.vue'
 import SaplingActionChangePassword from '@/components/actions/SaplingActionChangePassword.vue'

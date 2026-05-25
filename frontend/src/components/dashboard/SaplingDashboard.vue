@@ -114,7 +114,6 @@
 
 <script setup lang="ts">
 // #region Imports
-import '@/assets/styles/SaplingDashboard.css'
 import { useSaplingDashboard } from '@/composables/dashboard/useSaplingDashboard'
 import SaplingDashboardEmptyState from '@/components/dashboard/SaplingDashboardEmptyState.vue'
 import SaplingDashboardHeroActions from '@/components/dashboard/SaplingDashboardHeroActions.vue'

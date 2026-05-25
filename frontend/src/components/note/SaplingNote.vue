@@ -111,7 +111,6 @@
 
 <script lang="ts" setup>
 // #region Imports
-import '@/assets/styles/SaplingNote.css'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
 import SaplingNoteCard from '@/components/note/SaplingNoteCard.vue'

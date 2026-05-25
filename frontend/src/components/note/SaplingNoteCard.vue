@@ -55,7 +55,6 @@
 
 <script setup lang="ts">
 // #region Imports
-import '@/assets/styles/SaplingNoteCard.css'
 import { VCard } from 'vuetify/components'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

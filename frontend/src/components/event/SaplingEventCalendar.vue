@@ -90,7 +90,6 @@
 </template>
 
 <script lang="ts" setup>
-import '@/assets/styles/SaplingEventCalendar.css'
 import { computed } from 'vue'
 import { VCalendar } from 'vuetify/components'
 import type { CSSProperties } from 'vue'

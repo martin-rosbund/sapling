@@ -33,7 +33,6 @@
 </template>
 
 <script setup lang="ts">
-import '@/assets/styles/SaplingFieldMarkdown.css'
 import SaplingMarkdownEditorPane from '@/components/dialog/fields/markdown/SaplingMarkdownEditorPane.vue'
 import SaplingMarkdownPreviewPane from '@/components/dialog/fields/markdown/SaplingMarkdownPreviewPane.vue'
 import { useSaplingMarkdownField } from '@/composables/fields/useSaplingMarkdownField'
