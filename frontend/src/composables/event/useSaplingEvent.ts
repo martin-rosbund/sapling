@@ -1,6 +1,9 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { ComponentPublicInstance, CSSProperties } from 'vue'
-import ApiGenericService from '@/services/api.generic.service'
+import ApiGenericService, {
+  getGenericUpdateConflict,
+  type GenericUpdateConflictDetails,
+} from '@/services/api.generic.service'
 import type {
   CompanyItem,
   EntityItem,
@@ -75,6 +78,14 @@ interface EventContextMenuState {
   item: EventItem | null
   x: number
   y: number
+}
+
+interface UpdateConflictDialogState {
+  visible: boolean
+  conflict: GenericUpdateConflictDetails | null
+  draftItem: SaplingGenericItem | null
+  action: DialogSaveAction
+  isSaving: boolean
 }
 
 export interface EventAgendaItem {
@@ -179,6 +190,13 @@ export function useSaplingEvent() {
   const isNarrowScreen = ref(windowWatcher.getCurrentSize() === 'small')
   const entityEvent = ref<EntityItem | null>(null)
   const editEvent = ref<CalendarEvent | null>(null)
+  const updateConflictDialog = ref<UpdateConflictDialogState>({
+    visible: false,
+    conflict: null,
+    draftItem: null,
+    action: 'save',
+    isSaving: false,
+  })
   // Names of fields that should be marked dirty in the edit dialog after an
   // external interaction (e.g. drag/resize updated startDate/endDate before
   // the form was hydrated). The dialog highlights these fields exactly like
@@ -1169,6 +1187,7 @@ export function useSaplingEvent() {
     const eventPayload: CalendarEvent = { ...updatedEvent }
     const participantHandles = resolveDraftParticipants(updatedEvent)
     let savedEvent: EventItem
+    let didSave = false
 
     try {
       if (getCalendarEventHandle(eventPayload) == null) {
@@ -1183,10 +1202,14 @@ export function useSaplingEvent() {
         await createEventParticipants(savedEvent.handle, participantHandles)
         replaceLocalEvent(editEvent.value, eventPayload, savedEvent)
       } else {
-        savedEvent = await ApiGenericService.update<EventItem>('event', editingHandle, eventPayload)
+        savedEvent = await ApiGenericService.update<EventItem>('event', editingHandle, eventPayload, {
+          concurrency: buildConcurrencyOptions(toEditableEventItem(editEvent.value)),
+          suppressConflictMessage: true,
+        })
         replaceLocalEvent(editEvent.value, updatedEvent, savedEvent)
       }
 
+      didSave = true
       createEvent.value = null
       // Clear the drag-induced forced-dirty fields once the save succeeded so
       // that the dialog reflects the freshly persisted state (clean cancel,
@@ -1204,8 +1227,19 @@ export function useSaplingEvent() {
       const persistedEvent = await loadPersistedEvent(savedEvent.handle)
       editEvent.value = toCalendarEvent(persistedEvent ?? savedEvent)
       showEditDialog.value = true
+    } catch (error) {
+      const conflict = getGenericUpdateConflict(error)
+      if (conflict) {
+        updateConflictDialog.value = {
+          visible: true,
+          conflict,
+          draftItem: eventPayload as SaplingGenericItem,
+          action,
+          isSaving: false,
+        }
+      }
     } finally {
-      context?.complete()
+      context?.complete(didSave)
     }
   }
 
@@ -1239,6 +1273,124 @@ export function useSaplingEvent() {
     editEvent.value = null
     forceEditDialogDirtyFields.value = []
     await refreshVisibleEvents()
+  }
+
+  function closeUpdateConflictDialog() {
+    updateConflictDialog.value = {
+      visible: false,
+      conflict: null,
+      draftItem: null,
+      action: 'save',
+      isSaving: false,
+    }
+  }
+
+  function handleUpdateConflictVisibility(value: boolean): void {
+    if (!value) {
+      closeUpdateConflictDialog()
+      return
+    }
+
+    updateConflictDialog.value = {
+      ...updateConflictDialog.value,
+      visible: true,
+    }
+  }
+
+  function openUpdateConflictChangeLog() {
+    const conflict = updateConflictDialog.value.conflict
+    if (!conflict) {
+      return
+    }
+
+    changeLogDialogStore.openChangeLog(conflict.entityHandle, String(conflict.handle))
+  }
+
+  async function reloadUpdateConflictRecord() {
+    const conflict = updateConflictDialog.value.conflict
+    const handle = getItemHandle(conflict?.current) ?? conflict?.handle
+    if (typeof handle !== 'number') {
+      closeUpdateConflictDialog()
+      return
+    }
+
+    const currentItem = await loadPersistedEvent(handle)
+    if (currentItem) {
+      editEvent.value = toCalendarEvent(currentItem)
+      applyCalendarEventDateParts(editEvent.value)
+      forceEditDialogDirtyFields.value = []
+      dragSnapshot.value = null
+      showEditDialog.value = true
+      await refreshVisibleEvents()
+    }
+
+    closeUpdateConflictDialog()
+  }
+
+  async function mergeUpdateConflict(mergedItem: SaplingGenericItem) {
+    const conflictState = updateConflictDialog.value
+    const conflict = conflictState.conflict
+    if (!conflict || conflictState.isSaving) {
+      return
+    }
+
+    const handle = getItemHandle(conflict.current) ?? conflict.handle
+    if (handle == null) {
+      return
+    }
+
+    updateConflictDialog.value = {
+      ...conflictState,
+      isSaving: true,
+    }
+
+    try {
+      const savedEvent = await ApiGenericService.update<EventItem>('event', handle, mergedItem, {
+        concurrency: {
+          expectedUpdatedAt:
+            conflict.currentUpdatedAt ?? normalizeConcurrencyTimestamp(conflict.current?.updatedAt),
+          basePayload: buildConcurrencyPayload(conflict.current ?? null),
+          resolution: 'detect',
+        },
+        suppressConflictMessage: true,
+      })
+
+      replaceLocalEvent(editEvent.value, toCalendarEvent(savedEvent), savedEvent)
+      createEvent.value = null
+      forceEditDialogDirtyFields.value = []
+      dragSnapshot.value = null
+      await refreshVisibleEvents()
+
+      closeUpdateConflictDialog()
+
+      if (conflictState.action === 'saveAndClose') {
+        showEditDialog.value = false
+        editEvent.value = null
+        return
+      }
+
+      const persistedEvent = await loadPersistedEvent(savedEvent.handle)
+      editEvent.value = toCalendarEvent(persistedEvent ?? savedEvent)
+      applyCalendarEventDateParts(editEvent.value)
+      showEditDialog.value = true
+    } catch (error) {
+      const nextConflict = getGenericUpdateConflict(error)
+      if (nextConflict) {
+        updateConflictDialog.value = {
+          ...conflictState,
+          visible: true,
+          conflict: nextConflict,
+          draftItem: mergedItem,
+          isSaving: false,
+        }
+        return
+      }
+
+      updateConflictDialog.value = {
+        ...conflictState,
+        isSaving: false,
+      }
+    }
   }
 
   function onEditDialogModeUpdate(mode: DialogState) {
@@ -1479,6 +1631,102 @@ export function useSaplingEvent() {
   //#endregion
 
   //#region Internal Helpers
+  function getItemHandle(item?: SaplingGenericItem | null): string | number | null {
+    if (!item || typeof item !== 'object') {
+      return null
+    }
+
+    const { handle } = item
+    return typeof handle === 'string' || typeof handle === 'number' ? handle : null
+  }
+
+  function toEditableEventItem(event: CalendarEvent | null): SaplingGenericItem | null {
+    if (!event || isReadonlyCalendarEvent(event)) {
+      return null
+    }
+
+    const item = event.event
+    if (item && typeof item === 'object') {
+      return item as SaplingGenericItem
+    }
+
+    return event as SaplingGenericItem
+  }
+
+  function normalizeConcurrencyTimestamp(value: unknown): string | null {
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? null : value.toISOString()
+    }
+
+    if (typeof value !== 'string' && typeof value !== 'number') {
+      return null
+    }
+
+    const rawValue = String(value).trim()
+    if (!rawValue) {
+      return null
+    }
+
+    const parsedDate = new Date(rawValue)
+    return Number.isNaN(parsedDate.getTime()) ? rawValue : parsedDate.toISOString()
+  }
+
+  function buildConcurrencyPayload(source: SaplingGenericItem | null): Record<string, unknown> | null {
+    if (!source) {
+      return null
+    }
+
+    const payload: Record<string, unknown> = {}
+
+    templates.value
+      .filter(isConcurrencyComparableTemplate)
+      .forEach((template) => {
+        if (!template.name || !Object.prototype.hasOwnProperty.call(source, template.name)) {
+          return
+        }
+
+        payload[template.name] = normalizeConcurrencyPayloadValue(source[template.name], template)
+      })
+
+    return payload
+  }
+
+  function normalizeConcurrencyPayloadValue(value: unknown, template: EntityTemplate): unknown {
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? null : value.toISOString()
+    }
+
+    if (template.type === 'datetime' && typeof value === 'string') {
+      return normalizeConcurrencyTimestamp(value) ?? value
+    }
+
+    return value ?? null
+  }
+
+  function isConcurrencyComparableTemplate(template: EntityTemplate): boolean {
+    if (!template.name || template.isPersistent === false) {
+      return false
+    }
+
+    if (template.kind === 'm:1') {
+      return true
+    }
+
+    if (template.isReference) {
+      return false
+    }
+
+    return !['1:m', 'm:n', 'n:m', '1:1'].includes(template.kind ?? '')
+  }
+
+  function buildConcurrencyOptions(source: SaplingGenericItem | null) {
+    return {
+      expectedUpdatedAt: normalizeConcurrencyTimestamp(source?.updatedAt),
+      basePayload: buildConcurrencyPayload(source),
+      resolution: 'detect' as const,
+    }
+  }
+
   /**
    * Creates the calendar event shape used by Vuetify from a persisted backend entity.
    */
@@ -2062,6 +2310,7 @@ export function useSaplingEvent() {
     eventContextMenuStyle,
     editEvent,
     entityEvent,
+    updateConflictDialog,
     events,
     eventContextMenuMailActions,
     eventEntityPermission,
@@ -2082,12 +2331,17 @@ export function useSaplingEvent() {
     nowY,
     openEventContextMenu,
     onEditDialogCancel,
+    closeUpdateConflictDialog,
+    handleUpdateConflictVisibility,
     handleEventContextMenuAction,
+    mergeUpdateConflict,
     onEditDialogItemUpdate,
     onEditDialogModeUpdate,
     onEditDialogSave,
+    openUpdateConflictChangeLog,
     openEventEditor,
     onSelectedPeoplesUpdate,
+    reloadUpdateConflictRecord,
     scrollToCurrentTime,
     selectedPeoples,
     selectedPeopleOverflowCount,

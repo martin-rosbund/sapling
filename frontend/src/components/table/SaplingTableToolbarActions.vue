@@ -1,6 +1,6 @@
 <template>
   <v-btn-group
-    class="sapling-table-toolbar-action-group"
+    class="sapling-action-button-group sapling-table-toolbar-action-group"
     :density="isMobileTable ? 'compact' : 'comfortable'"
     rounded="pill"
     divided

@@ -1,15 +1,20 @@
 <template>
   <section
     v-bind="attrs"
-    class="sapling-page-shell sapling-page-shell--uniform-inset sapling-event-page"
+    class="sapling-page-shell sapling-page-shell--fill sapling-page-shell--uniform-inset sapling-dashboard-page sapling-dashboard-page--flow-lg sapling-event-page"
   >
     <template v-if="isLoading">
-      <div class="sapling-event-skeleton">
-        <section class="sapling-event-skeleton__hero glass-panel">
+      <div class="sapling-page-skeleton sapling-event-skeleton">
+        <SaplingSurface
+          as="section"
+          class="sapling-page-hero sapling-page-hero--calendar sapling-event-skeleton__hero"
+        >
           <div class="sapling-event-skeleton__hero-copy">
             <v-skeleton-loader type="text, heading, paragraph" />
           </div>
-          <div class="sapling-event-skeleton__hero-stats">
+          <div
+            class="sapling-stat-grid sapling-stat-grid--three sapling-event-skeleton__hero-stats"
+          >
             <v-skeleton-loader
               v-for="index in 3"
               :key="index"
@@ -17,23 +22,32 @@
               type="article"
             />
           </div>
-        </section>
+        </SaplingSurface>
 
-        <section class="sapling-event-skeleton__workspace">
-          <v-skeleton-loader
-            class="sapling-event-skeleton__calendar glass-panel"
+        <section
+          class="sapling-page-workspace sapling-page-workspace--main-context sapling-page-workspace--collapse-lg sapling-event-skeleton__workspace"
+        >
+          <SaplingSurface
+            :as="VSkeletonLoader"
+            class="sapling-event-skeleton__calendar"
             type="table-heading, table-thead, table-row-divider@8"
           />
-          <div class="sapling-event-skeleton__context">
-            <v-skeleton-loader
-              class="glass-panel sapling-event-skeleton__panel"
+          <div class="sapling-page-skeleton-grid sapling-event-skeleton__context">
+            <SaplingSurface
+              :as="VSkeletonLoader"
+              class="sapling-event-skeleton__panel"
               type="list-item-three-line@3"
             />
-            <v-skeleton-loader
-              class="glass-panel sapling-event-skeleton__panel"
+            <SaplingSurface
+              :as="VSkeletonLoader"
+              class="sapling-event-skeleton__panel"
               type="list-item-three-line@4"
             />
-            <v-skeleton-loader class="glass-panel sapling-event-skeleton__panel" type="article" />
+            <SaplingSurface
+              :as="VSkeletonLoader"
+              class="sapling-event-skeleton__panel"
+              type="article"
+            />
           </div>
         </section>
       </div>
@@ -48,18 +62,22 @@
         :subtitle="currentDateRangeLabel"
       >
         <template #title-prefix>
-          <div class="sapling-event-hero__icon-wrap">
+          <div class="sapling-icon-tile sapling-event-hero__icon-wrap">
             <v-icon size="28">{{ entityEvent?.icon || 'mdi-calendar-month-outline' }}</v-icon>
           </div>
         </template>
 
         <template #side>
-          <div class="sapling-event-hero__stats">
-            <article v-for="stat in heroStats" :key="stat.key" class="sapling-event-stat-card">
-              <div class="sapling-event-stat-card__icon">
+          <div class="sapling-stat-grid sapling-stat-grid--three sapling-event-hero__stats">
+            <article
+              v-for="stat in heroStats"
+              :key="stat.key"
+              class="sapling-stat-card sapling-event-stat-card"
+            >
+              <div class="sapling-stat-card__icon sapling-event-stat-card__icon">
                 <v-icon>{{ stat.icon }}</v-icon>
               </div>
-              <div class="sapling-event-stat-card__content">
+              <div class="sapling-stat-card__content sapling-event-stat-card__content">
                 <span>{{ stat.label }}</span>
                 <strong>{{ stat.value }}</strong>
               </div>
@@ -68,8 +86,10 @@
         </template>
       </SaplingPageHero>
 
-      <section class="sapling-event-workspace">
-        <div class="sapling-event-workspace__main glass-panel">
+      <section
+        class="sapling-page-workspace sapling-page-workspace--main-context sapling-page-workspace--collapse-lg sapling-event-workspace"
+      >
+        <SaplingSurface class="sapling-workspace-panel sapling-page-panel sapling-event-workspace__main">
           <SaplingEventToolbar
             v-model:calendar-type="calendarType"
             v-model:calendar-view-mode="calendarViewMode"
@@ -83,7 +103,10 @@
             @select-date="goToDate"
           />
 
-          <div ref="calendarScrollContainer" class="sapling-event-calendar-body">
+          <div
+            ref="calendarScrollContainer"
+            class="sapling-calendar-frame sapling-event-calendar-body"
+          >
             <SaplingEventCalendarWorkspace
               v-model="value"
               :calendar-view-mode="calendarViewMode"
@@ -110,7 +133,7 @@
               :get-side-by-side-events="getSideBySideEvents"
             />
           </div>
-        </div>
+        </SaplingSurface>
 
         <SaplingEventContextPanels
           :is-mobile-filter-layout="isMobileContextLayout"
@@ -160,6 +183,18 @@
     @cancel="onEditDialogCancel"
   />
 
+  <SaplingDialogUpdateConflict
+    :model-value="updateConflictDialog.visible"
+    :conflict="updateConflictDialog.conflict"
+    entity-handle="event"
+    :entity-templates="templates"
+    :is-saving="updateConflictDialog.isSaving"
+    @update:model-value="handleUpdateConflictVisibility"
+    @merge="mergeUpdateConflict"
+    @reload="reloadUpdateConflictRecord"
+    @open-change-log="openUpdateConflictChangeLog"
+  />
+
   <v-menu
     v-model="eventContextMenu.visible"
     :style="eventContextMenuStyle"
@@ -167,8 +202,8 @@
     content-class="sapling-context-menu__content"
     transition="slide-y-transition"
   >
-    <SaplingRecordActionMenuList
-      class="glass-panel"
+    <SaplingSurface
+      :as="SaplingRecordActionMenuList"
       density="compact"
       elevation="8"
       min-width="200"
@@ -202,8 +237,10 @@
 import { computed, ref, useAttrs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
+import { VSkeletonLoader } from 'vuetify/components'
 import { useSaplingEvent } from '@/composables/event/useSaplingEvent'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingEventCalendarWorkspace from '@/components/event/SaplingEventCalendarWorkspace.vue'
 import SaplingEventContextPanels from '@/components/event/SaplingEventContextPanels.vue'
 import SaplingEventToolbar from '@/components/event/SaplingEventToolbar.vue'
@@ -212,6 +249,7 @@ import SaplingRecordActionMenuList from '@/components/common/SaplingRecordAction
 import SaplingTableRowInformation from '@/components/table/SaplingTableRowInformation.vue'
 import SaplingTableRowUpload from '@/components/table/SaplingTableRowUpload.vue'
 import SaplingDialogEdit from '../dialog/SaplingDialogEdit.vue'
+import SaplingDialogUpdateConflict from '@/components/dialog/SaplingDialogUpdateConflict.vue'
 import { SAPLING_DIALOG_MAX_WIDTH } from '@/constants/dialog.constants'
 
 defineOptions({
@@ -263,8 +301,10 @@ const {
   goToNext,
   goToPrevious,
   goToToday,
+  handleUpdateConflictVisibility,
   isLoading,
   isNarrowScreen,
+  mergeUpdateConflict,
   nowY,
   openEventContextMenu,
   handleEventContextMenuAction,
@@ -272,8 +312,10 @@ const {
   onEditDialogItemUpdate,
   onEditDialogModeUpdate,
   onEditDialogSave,
+  openUpdateConflictChangeLog,
   openEventEditor,
   onSelectedPeoplesUpdate,
+  reloadUpdateConflictRecord,
   selectedPeoples,
   selectedPeopleOverflowCount,
   selectedPeoplePreview,
@@ -294,6 +336,7 @@ const {
   heroStats,
   informationDialogItem,
   templates,
+  updateConflictDialog,
   uploadDialogItem,
   editEvent,
   upcomingEvents,

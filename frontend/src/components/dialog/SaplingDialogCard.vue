@@ -1,22 +1,22 @@
 <template>
-  <!--
-    Unified card wrapper for every dialog in Sapling. Centralizes the standard
-    glass-panel + tilt-content + TILT_DEFAULT_OPTIONS + elevation pattern so
-    callers can keep their templates focused on layout. Additional classes
-    passed by the parent are merged via Vue's attribute fallthrough.
-  -->
-  <v-card
-    v-tilt="tilt ? TILT_DEFAULT_OPTIONS : null"
-    class="glass-panel sapling-dialog-card"
-    :class="{ 'tilt-content': tilt }"
+  <SaplingSurface
+    v-bind="$attrs"
+    :as="VCard"
+    class="sapling-dialog-card"
+    :tilt="tilt"
     :elevation="elevation"
   >
     <slot />
-  </v-card>
+  </SaplingSurface>
 </template>
 
 <script setup lang="ts">
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
+import { VCard } from 'vuetify/components'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
+
+defineOptions({
+  inheritAttrs: false,
+})
 
 withDefaults(
   defineProps<{

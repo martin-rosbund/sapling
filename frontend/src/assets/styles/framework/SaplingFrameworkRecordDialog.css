@@ -1,0 +1,270 @@
+.sapling-record-dialog-skeleton,
+.sapling-record-dialog-content,
+.sapling-record-dialog-window {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sapling-record-dialog-shell {
+  flex: 1 1 0;
+  width: 100%;
+  min-height: 0;
+  padding: var(--sapling-space-panel-xl);
+}
+
+.sapling-record-dialog-header {
+  flex: 0 0 auto;
+  padding: 0;
+}
+
+.sapling-record-dialog-loading {
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+.sapling-record-dialog-loading__tabs,
+.sapling-record-dialog-tabs {
+  flex: 0 0 auto;
+}
+
+.sapling-record-dialog-content {
+  gap: var(--sapling-gap-lg);
+  overflow: hidden;
+  padding: 0;
+}
+
+.sapling-record-dialog-tabs .v-slide-group__content {
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-record-dialog-tabs .v-tab {
+  min-height: var(--sapling-tab-strip-height);
+  border-radius: var(--sapling-panel-radius-compact);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+
+.sapling-record-dialog-tabs .v-tab--selected {
+  background: var(--sapling-surface-fill-strong);
+}
+
+.sapling-record-dialog-window-item,
+.sapling-record-dialog-tab-scroll,
+.sapling-record-dialog-window .v-window__container,
+.sapling-record-dialog-window .v-window-item {
+  height: 100%;
+  min-height: 0;
+}
+
+.sapling-record-dialog-tab-scroll {
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: var(--sapling-space-3xs);
+}
+
+.sapling-record-dialog-surface,
+.sapling-record-relation-shell {
+  gap: var(--sapling-gap-lg);
+  min-height: 100%;
+  padding: 0;
+}
+
+.sapling-record-dialog-form {
+  min-height: min-content;
+}
+
+.sapling-record-dialog-form-layout {
+  gap: var(--sapling-gap-lg);
+}
+
+.sapling-record-section {
+  gap: var(--sapling-gap-md);
+  border: 1px solid var(--sapling-surface-border);
+  background: var(--sapling-surface-fill-soft);
+}
+
+.sapling-record-section--dirty {
+  border-color: rgba(var(--v-theme-warning), 0.4);
+  background:
+    linear-gradient(135deg, rgba(var(--v-theme-warning), 0.08), transparent 45%),
+    var(--sapling-surface-fill-soft);
+  box-shadow: 0 0 0 1px rgba(var(--v-theme-warning), 0.08);
+}
+
+.sapling-record-section__header {
+  align-items: center;
+  gap: var(--sapling-gap-sm);
+}
+
+.sapling-record-section__toggle {
+  gap: var(--sapling-gap-sm);
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sapling-record-section__toggle:focus-visible {
+  border-radius: var(--sapling-radius-sm);
+  outline: 2px solid rgb(var(--v-theme-primary));
+  outline-offset: var(--sapling-space-3xs);
+}
+
+.sapling-record-section__title {
+  min-width: 0;
+  font-size: var(--sapling-text-body-size-md);
+  font-weight: 700;
+}
+
+.sapling-record-section__body {
+  display: flex;
+  flex-direction: column;
+}
+
+.sapling-record-form-grid {
+  margin: 0;
+  row-gap: var(--sapling-gap-sm);
+}
+
+.sapling-record-form-grid__column {
+  display: flex;
+}
+
+.sapling-record-field-shell {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: flex-start;
+  width: 100%;
+  min-width: 0;
+  padding: var(--sapling-gap-xs);
+  border: 1px solid transparent;
+  border-radius: var(--sapling-radius-sm);
+  transition:
+    border-color var(--sapling-motion-standard) ease,
+    background-color var(--sapling-motion-standard) ease,
+    box-shadow var(--sapling-motion-standard) ease;
+}
+
+.sapling-record-field-shell > * {
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+.sapling-record-field-shell--dirty {
+  border-color: rgba(var(--v-theme-warning), 0.45);
+  background: rgba(var(--v-theme-warning), 0.08);
+  box-shadow: inset 0 0 0 1px rgba(var(--v-theme-warning), 0.08);
+}
+
+.sapling-record-field-shell .v-input,
+.sapling-record-field-shell .v-selection-control {
+  margin-bottom: 0;
+}
+
+.sapling-record-field-shell .v-input__details {
+  min-height: var(--sapling-field-detail-min-height);
+  padding-top: var(--sapling-space-3xs);
+  padding-inline: var(--sapling-space-3xs);
+}
+
+.sapling-record-field-shell .v-messages {
+  min-height: var(--sapling-field-detail-min-height);
+}
+
+.sapling-record-field-shell .v-messages__message {
+  line-height: 1.2;
+}
+
+.sapling-record-relation-header {
+  align-items: flex-start;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-record-relation-header__copy {
+  min-width: 0;
+}
+
+.sapling-record-relation-header__eyebrow {
+  margin-bottom: var(--sapling-gap-xs);
+}
+
+.sapling-record-relation-header__title {
+  font-size: var(--sapling-text-body-size-lg);
+}
+
+.sapling-record-relation-card,
+.sapling-record-relation-content {
+  min-height: var(--sapling-dialog-relation-fill);
+}
+
+.sapling-record-relation-card {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  background: var(--sapling-surface-fill-soft);
+}
+
+.sapling-record-relation-content {
+  flex: 1 1 auto;
+}
+
+.sapling-record-relation-actions {
+  gap: var(--sapling-gap-md);
+  margin-bottom: var(--sapling-gap-xl);
+}
+
+.sapling-record-relation-actions__field {
+  flex: 1 1 var(--sapling-panel-width-sm);
+  min-width: 0;
+}
+
+.sapling-record-relation-table {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sapling-record-relation-table .sapling-table {
+  max-height: none;
+}
+
+.sapling-mobile-action-list {
+  min-width: min(18rem, calc(100vw - 2rem));
+}
+
+.sapling-mobile-primary-action {
+  min-width: 0;
+}
+
+@media (max-width: 960px) {
+  .sapling-record-dialog-shell {
+    padding: var(--sapling-space-panel-md);
+  }
+
+  .sapling-record-dialog-header,
+  .sapling-record-dialog-content {
+    padding: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .sapling-record-relation-header,
+  .sapling-record-relation-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .sapling-record-relation-actions__field {
+    flex-basis: auto;
+  }
+}

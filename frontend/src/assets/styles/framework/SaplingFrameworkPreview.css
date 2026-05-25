@@ -1,0 +1,195 @@
+.sapling-preview-viewer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.sapling-preview-fullheight {
+  display: flex;
+  flex: 1 1 0;
+  height: 100%;
+  min-height: 0;
+}
+
+.sapling-preview-panel {
+  padding: var(--sapling-panel-padding);
+  border: 1px solid var(--sapling-panel-border);
+  border-radius: var(--sapling-panel-radius);
+}
+
+.sapling-preview-stage {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  box-shadow: var(--sapling-shadow-lift);
+}
+
+.sapling-preview-stage--empty {
+  align-items: center;
+  justify-content: center;
+}
+
+.sapling-preview-stage__skeleton {
+  width: 100%;
+  height: 100%;
+}
+
+.sapling-preview-stage__empty-state {
+  width: min(var(--sapling-empty-state-max-width), 100%);
+  margin: auto;
+  padding: var(--sapling-space-panel-xl);
+}
+
+.sapling-preview-stage__empty-state--wide {
+  width: 100%;
+  max-width: var(--sapling-empty-state-max-width-wide);
+}
+
+.sapling-preview-stage__empty-icon {
+  border: 1px solid var(--sapling-surface-border);
+  background: var(--sapling-surface-gradient-soft);
+}
+
+.sapling-preview-stage__empty-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.sapling-preview-stage__empty-copy {
+  max-width: 32ch;
+  color: var(--sapling-surface-text);
+  line-height: 1.55;
+}
+
+.sapling-preview-embed,
+.sapling-preview-editor {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.sapling-preview-media-surface {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: var(--sapling-space-panel-md);
+  background:
+    linear-gradient(180deg, var(--sapling-surface-fill-soft), rgba(255, 255, 255, 0.04)),
+    rgba(8, 15, 24, 0.04);
+}
+
+.sapling-preview-media-surface--stacked {
+  flex-direction: column;
+}
+
+.sapling-preview-media {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  margin: auto;
+  object-fit: contain;
+}
+
+.sapling-preview-media-card {
+  width: min(100%, 42rem);
+  padding: var(--sapling-space-panel-md);
+  box-shadow: var(--sapling-shadow-lift);
+}
+
+.sapling-preview-media-card--compact {
+  width: min(100%, 32rem);
+}
+
+.sapling-preview-media-card__header {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-preview-media-card__icon {
+  width: var(--sapling-preview-media-icon-size, 4.5rem);
+  height: var(--sapling-preview-media-icon-size, 4.5rem);
+  color: rgb(var(--v-theme-on-primary));
+  background: linear-gradient(135deg, rgba(0, 140, 149, 0.9), rgba(0, 193, 213, 0.7));
+}
+
+.sapling-preview-media-card__copy {
+  display: grid;
+  min-width: 0;
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-preview-media-card__eyebrow-row {
+  align-items: center;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-preview-media-card__pill {
+  min-height: 1.7rem;
+  padding: var(--sapling-space-4xs) var(--sapling-space-md);
+  border-color: var(--sapling-surface-border-accent);
+  background: rgba(var(--v-theme-primary), 0.14);
+  color: rgb(var(--v-theme-on-surface));
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  opacity: 1;
+}
+
+.sapling-preview-media-card__meta {
+  margin: 0;
+  color: rgb(var(--v-theme-on-surface));
+  font-size: 0.94rem;
+  opacity: var(--sapling-opacity-secondary);
+}
+
+.sapling-preview-player-shell {
+  padding: var(--sapling-space-md);
+  border: 1px solid var(--sapling-surface-border);
+  border-radius: var(--sapling-radius-sm);
+  background: var(--sapling-surface-fill-soft);
+}
+
+.sapling-preview-player,
+.sapling-preview-video-player {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+
+.sapling-preview-video-player {
+  max-height: 100%;
+  border-radius: var(--sapling-radius-md);
+  background: #000;
+}
+
+@media (max-width: 960px) {
+  .sapling-preview-panel {
+    padding: var(--sapling-panel-padding-compact);
+    border-radius: var(--sapling-radius-sm);
+  }
+
+  .sapling-preview-media-surface {
+    padding: var(--sapling-gap-md);
+  }
+
+  .sapling-preview-media-card {
+    padding: var(--sapling-space-panel-md);
+  }
+
+  .sapling-preview-stage {
+    min-height: 22rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .sapling-preview-stage {
+    min-height: 18rem;
+  }
+}

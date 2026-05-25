@@ -1,7 +1,8 @@
 <template>
-  <v-calendar
+  <SaplingSurface
+    :as="VCalendar"
     v-model="calendarValue"
-    class="sapling-event-vcalendar glass-panel"
+    class="sapling-event-vcalendar"
     :class="props.calendarClass"
     color="primary"
     :event-color="props.getEventColor"
@@ -85,14 +86,16 @@
         </button>
       </div>
     </template>
-  </v-calendar>
+  </SaplingSurface>
 </template>
 
 <script lang="ts" setup>
 import { computed } from 'vue'
+import { VCalendar } from 'vuetify/components'
 import type { CSSProperties } from 'vue'
 import type { WorkHourWeekItem } from '@/entity/entity'
 import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import { formatDateValue, formatTimeValue } from '@/utils/saplingFormatUtil'
 
 interface CalendarDatePair {

@@ -6,7 +6,7 @@
       </div>
 
       <div class="sapling-auth-layout__body">
-        <SaplingNavigation v-model="navigationDrawer" />
+        <SaplingNavigation v-if="navigationDrawerMounted" v-model="navigationDrawer" />
 
         <div
           class="sapling-app-layout__content sapling-content sapling-content--app sapling-auth-layout__content"
@@ -33,14 +33,16 @@
 </template>
 
 <script lang="ts" setup>
-import { defineAsyncComponent, ref } from 'vue'
+import { defineAsyncComponent, ref, watch } from 'vue'
 import { RouterView } from 'vue-router'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import SaplingHeader from '@/components/system/SaplingHeader.vue'
-import SaplingNavigation from '@/components/system/SaplingNavigation.vue'
 
-// Heavy or rarely used shell widgets: load them only when actually mounted/opened.
+// Shell widgets: load them only when actually mounted/opened.
 const SaplingAiChat = defineAsyncComponent(() => import('@/components/system/SaplingAiChat.vue'))
+const SaplingNavigation = defineAsyncComponent(
+  () => import('@/components/system/SaplingNavigation.vue'),
+)
 const SaplingMessageCenter = defineAsyncComponent(
   () => import('@/components/system/SaplingMessageCenter.vue'),
 )
@@ -67,10 +69,21 @@ const SaplingHelpDialog = defineAsyncComponent(
 )
 
 const navigationDrawer = ref(false)
+const navigationDrawerMounted = ref(false)
 const { isLoading: isShellTranslationLoading } = useTranslationLoader(
   'global',
   'formConfig',
   'login',
   'permission',
+)
+
+watch(
+  navigationDrawer,
+  (isOpen) => {
+    if (isOpen) {
+      navigationDrawerMounted.value = true
+    }
+  },
+  { immediate: true },
 )
 </script>

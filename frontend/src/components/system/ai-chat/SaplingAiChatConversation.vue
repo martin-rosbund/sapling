@@ -1,9 +1,9 @@
 <template>
-  <section class="sapling-ai-chat__conversation">
-    <div class="sapling-ai-chat__conversation-header">
-      <div class="sapling-ai-chat__conversation-heading">
-        <div class="sapling-ai-chat__conversation-title-row">
-          <div class="sapling-ai-chat__conversation-title">
+  <section class="sapling-min-size-0 sapling-chat-conversation sapling-ai-chat__conversation">
+    <div class="sapling-chat-conversation__header sapling-ai-chat__conversation-header">
+      <div class="sapling-chat-conversation__heading sapling-ai-chat__conversation-heading">
+        <div class="sapling-row-xs sapling-chat-conversation__title-row sapling-ai-chat__conversation-title-row">
+          <div class="sapling-section-title sapling-chat-conversation__title sapling-ai-chat__conversation-title">
             {{ getTruncatedTitle(activeConversationTitle) }}
           </div>
           <v-tooltip
@@ -15,7 +15,7 @@
               <v-icon
                 v-bind="tooltipProps"
                 icon="mdi-information-outline"
-                class="sapling-ai-chat__title-info"
+                class="sapling-chat-conversation__title-info sapling-ai-chat__title-info"
                 size="small"
               />
             </template>
@@ -24,23 +24,23 @@
           </v-tooltip>
         </div>
       </div>
-      <div class="sapling-ai-chat__selectors">
+      <div class="sapling-chat-runtime-selectors sapling-ai-chat__selectors">
         <v-alert
           v-if="!hasConfiguredProviders"
-          class="sapling-ai-chat__runtime-alert"
+          class="sapling-chat-runtime-selectors__alert sapling-ai-chat__runtime-alert"
           density="comfortable"
           type="info"
           variant="tonal"
         >
           <div>{{ t('aiChat.noConfiguredProviders') }}</div>
-          <div class="sapling-ai-chat__runtime-alert-copy">
+          <div class="sapling-chat-runtime-selectors__alert-copy sapling-ai-chat__runtime-alert-copy">
             {{ t('aiChat.contactAdministrator') }}
           </div>
         </v-alert>
         <v-select
           v-if="providerOptions.length > 0"
           :model-value="selectedProviderHandle"
-          class="sapling-ai-chat__provider-select"
+          class="sapling-chat-runtime-selectors__select sapling-chat-runtime-selectors__select--provider sapling-ai-chat__provider-select"
           density="compact"
           :disabled="isSending || isLoadingProviders || isLoadingModels"
           hide-details
@@ -54,7 +54,7 @@
         <v-select
           v-if="modelOptions.length > 0"
           :model-value="selectedModelHandle"
-          class="sapling-ai-chat__model-select"
+          class="sapling-chat-runtime-selectors__select sapling-chat-runtime-selectors__select--model sapling-ai-chat__model-select"
           density="compact"
           :disabled="isSending || isLoadingModels || !selectedProviderHandle"
           hide-details
@@ -68,7 +68,7 @@
       </div>
     </div>
 
-    <div ref="messageContainer" class="sapling-ai-chat__messages">
+    <div ref="messageContainer" class="sapling-scroll-list sapling-chat-message-list sapling-ai-chat__messages">
       <div v-if="hasMoreMessages" class="sapling-ai-chat__history-loader">
         <v-btn
           size="small"
@@ -80,33 +80,41 @@
         </v-btn>
       </div>
 
-      <div v-if="messages.length === 0" class="sapling-ai-chat__empty-state">
+      <div
+        v-if="messages.length === 0"
+        class="sapling-empty-state-panel sapling-empty-state-panel--compact sapling-chat-empty-state sapling-ai-chat__empty-state"
+      >
         {{ hasConfiguredProviders ? t('aiChat.noMessages') : t('aiChat.noConfiguredProviders') }}
       </div>
 
       <div
         v-for="message in messages"
         :key="message.handle ?? `${message.sequence}-${message.role}`"
-        class="sapling-ai-chat__message"
+        class="sapling-chat-message sapling-ai-chat__message"
         :class="{
           'sapling-ai-chat__message--user': message.role === 'user',
           'sapling-ai-chat__message--assistant': message.role === 'assistant',
           'sapling-ai-chat__message--failed': message.status === 'failed',
+          'sapling-chat-message--user': message.role === 'user',
+          'sapling-chat-message--failed': message.status === 'failed',
         }"
       >
-        <div class="sapling-ai-chat__message-role">
+        <div class="sapling-chat-message__role sapling-ai-chat__message-role">
           {{ getMessageRoleLabel(message) }}
           <span
             v-if="message.status === 'streaming' || message.status === 'failed'"
-            class="sapling-ai-chat__message-status"
+            class="sapling-chat-message__status sapling-ai-chat__message-status"
           >
             {{ getMessageStatusLabel(message) }}
           </span>
         </div>
-        <div class="sapling-ai-chat__message-content">
+        <div class="sapling-chat-message__content sapling-ai-chat__message-content">
           <SaplingMarkdownContent :source="getMessageDisplayContent(message)" />
         </div>
-        <div v-if="shouldShowMessageActions(message)" class="sapling-ai-chat__message-links">
+        <div
+          v-if="shouldShowMessageActions(message)"
+          class="sapling-chip-row sapling-chat-message__actions sapling-ai-chat__message-links"
+        >
           <v-btn
             v-if="canPlayMessageSpeech(message)"
             size="small"
@@ -131,7 +139,7 @@
       </div>
     </div>
 
-    <div class="sapling-ai-chat__composer">
+    <div class="sapling-stack-xl sapling-chat-composer sapling-ai-chat__composer">
       <v-textarea
         v-model="draftMessageModel"
         :disabled="!hasConfiguredProviders"
@@ -146,14 +154,14 @@
         @keydown.enter.exact.prevent="emit('send')"
       />
 
-      <div class="sapling-ai-chat__composer-actions">
-        <div class="sapling-ai-chat__composer-context flex-grow-1">
-          <div class="sapling-ai-chat__voice-select-stack">
-            <div class="sapling-ai-chat__voice-select-row">
+      <div class="sapling-row-between-md sapling-chat-composer__actions sapling-ai-chat__composer-actions">
+        <div class="sapling-chat-composer__context sapling-ai-chat__composer-context flex-grow-1">
+          <div class="sapling-stack-md sapling-chat-composer__select-stack sapling-ai-chat__voice-select-stack">
+            <div class="sapling-row-md sapling-row-wrap sapling-chat-composer__select-row sapling-ai-chat__voice-select-row">
               <v-select
                 v-if="transcriptionProviderOptions.length > 0"
                 :model-value="selectedTranscriptionProviderHandle"
-                class="sapling-ai-chat__provider-select"
+                class="sapling-chat-runtime-selectors__select sapling-chat-runtime-selectors__select--provider sapling-ai-chat__provider-select"
                 density="compact"
                 :disabled="
                   isSending || isLoadingTranscriptionProviders || isLoadingTranscriptionModels
@@ -169,7 +177,7 @@
               <v-select
                 v-if="transcriptionModelOptions.length > 0"
                 :model-value="selectedTranscriptionModelHandle"
-                class="sapling-ai-chat__model-select"
+                class="sapling-chat-runtime-selectors__select sapling-chat-runtime-selectors__select--model sapling-ai-chat__model-select"
                 density="compact"
                 :disabled="
                   isSending || isLoadingTranscriptionModels || !selectedTranscriptionProviderHandle
@@ -189,12 +197,12 @@
                 speechProviderOptions.length > 0 ||
                 speechModelOptions.length > 0
               "
-              class="sapling-ai-chat__voice-select-row"
+              class="sapling-row-md sapling-row-wrap sapling-chat-composer__select-row sapling-ai-chat__voice-select-row"
             >
               <v-select
                 v-if="speechProviderOptions.length > 0"
                 :model-value="selectedSpeechProviderHandle"
-                class="sapling-ai-chat__provider-select"
+                class="sapling-chat-runtime-selectors__select sapling-chat-runtime-selectors__select--provider sapling-ai-chat__provider-select"
                 density="compact"
                 :disabled="isSending || isLoadingSpeechProviders || isLoadingSpeechModels"
                 hide-details
@@ -208,7 +216,7 @@
               <v-select
                 v-if="speechModelOptions.length > 0"
                 :model-value="selectedSpeechModelHandle"
-                class="sapling-ai-chat__model-select"
+                class="sapling-chat-runtime-selectors__select sapling-chat-runtime-selectors__select--model sapling-ai-chat__model-select"
                 density="compact"
                 :disabled="isSending || isLoadingSpeechModels || !selectedSpeechProviderHandle"
                 hide-details

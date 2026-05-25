@@ -1,9 +1,9 @@
 <template>
-  <section class="sapling-system-panel glass-panel">
-    <div class="sapling-system-panel__header">
+  <SaplingSurface as="section" class="sapling-section-panel">
+    <div class="sapling-section-header">
       <div>
-        <p class="sapling-system-panel__eyebrow">{{ $t('system.network') }}</p>
-        <h2 class="sapling-system-panel__title">{{ $t('system.networkTitle') }}</h2>
+        <p class="sapling-eyebrow">{{ $t('system.network') }}</p>
+        <h2 class="sapling-section-title">{{ $t('system.networkTitle') }}</h2>
       </div>
       <v-chip size="small" variant="outlined">
         {{ activeInterfaceCount }} {{ $t('system.activeInterfaces') }}
@@ -11,11 +11,11 @@
     </div>
 
     <div v-if="items.length" class="sapling-system-network-grid">
-      <article v-for="item in items" :key="item.key" class="sapling-system-network-card">
-        <div class="sapling-system-network-card__header">
+      <article v-for="item in items" :key="item.key" class="sapling-data-card">
+        <div class="sapling-section-header">
           <div>
             <h3>{{ item.title }}</h3>
-            <p>{{ item.subtitle }}</p>
+            <p class="sapling-label">{{ item.subtitle }}</p>
           </div>
           <div class="sapling-system-network-card__chips">
             <v-chip
@@ -31,35 +31,35 @@
           </div>
         </div>
 
-        <div class="sapling-system-network-card__stats">
-          <div>
+        <div class="sapling-detail-grid">
+          <div class="sapling-detail-card">
             <span>{{ $t('system.received') }}</span>
             <strong>{{ item.receivedLabel }}</strong>
           </div>
-          <div>
+          <div class="sapling-detail-card">
             <span>{{ $t('system.sent') }}</span>
             <strong>{{ item.sentLabel }}</strong>
           </div>
-          <div>
+          <div class="sapling-detail-card">
             <span>{{ $t('system.receivedPerSec') }}</span>
             <strong>{{ item.receivedRateLabel }}</strong>
           </div>
-          <div>
+          <div class="sapling-detail-card">
             <span>{{ $t('system.sentPerSec') }}</span>
             <strong>{{ item.sentRateLabel }}</strong>
           </div>
         </div>
 
-        <div class="sapling-system-network-health">
-          <div>
+        <div class="sapling-detail-grid">
+          <div class="sapling-detail-card">
             <span>{{ $t('system.ping') }}</span>
             <strong>{{ item.pingLabel }}</strong>
           </div>
-          <div>
+          <div class="sapling-detail-card">
             <span>{{ $t('system.errors') }}</span>
             <strong>{{ item.errorCount }}</strong>
           </div>
-          <div>
+          <div class="sapling-detail-card">
             <span>{{ $t('system.drops') }}</span>
             <strong>{{ item.dropCount }}</strong>
           </div>
@@ -67,17 +67,19 @@
       </article>
     </div>
 
-    <div v-else class="sapling-system-empty-state">
+    <div v-else class="sapling-empty-state-panel sapling-empty-state-panel--compact">
       {{ emptyLabel }}
     </div>
 
     <v-alert v-if="error" type="error" density="comfortable" variant="tonal">
       {{ error }}
     </v-alert>
-  </section>
+  </SaplingSurface>
 </template>
 
 <script lang="ts" setup>
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
+
 defineProps<{
   activeInterfaceCount: number
   items: Array<{

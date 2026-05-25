@@ -1,5 +1,5 @@
 <template>
-  <div class="sapling-table-filter-cell" @click.stop @mousedown.stop @keydown.stop>
+  <div class="sapling-row-xs sapling-table-filter-cell" @click.stop @mousedown.stop @keydown.stop>
     <v-menu v-model="menuOpen" :close-on-content-click="false" location="bottom start" offset="6">
       <template #activator="{ props: menuProps }">
         <button
@@ -9,7 +9,7 @@
           type="button"
           @click.stop
         >
-          <span class="sapling-table-filter-trigger__title">
+          <span class="sapling-row-xs sapling-table-filter-trigger__title">
             <v-icon size="x-small">{{ hasValue ? 'mdi-filter' : 'mdi-filter-outline' }}</v-icon>
             <span v-if="!isComponentLoading">{{ title }}</span>
             <v-skeleton-loader
@@ -24,8 +24,11 @@
           >
             <v-skeleton-loader class="sapling-table-filter-trigger__skeleton" type="text" />
           </span>
-          <span v-else-if="hasValue" class="sapling-table-filter-trigger__summary">
-            <span v-if="isOperatorSelectable" class="sapling-table-filter-trigger__operator">
+          <span v-else-if="hasValue" class="sapling-row-xs sapling-table-filter-trigger__summary">
+            <span
+              v-if="isOperatorSelectable"
+              class="sapling-soft-chip sapling-table-filter-trigger__operator"
+            >
               {{ currentOperatorLabel }}
             </span>
             <span class="sapling-table-filter-trigger__value">{{ filterSummary }}</span>
@@ -36,16 +39,23 @@
         </button>
       </template>
 
-      <v-card class="sapling-table-filter-menu glass-panel" elevation="10">
+      <SaplingSurface
+        :as="VCard"
+        class="sapling-stack-md sapling-table-filter-menu"
+        variant="subtle"
+        :elevation="10"
+      >
         <div v-if="isComponentLoading" class="sapling-table-filter-menu__loading">
           <v-skeleton-loader type="heading, text" />
           <v-skeleton-loader type="article" />
           <v-skeleton-loader type="button, button" />
         </div>
         <template v-else>
-          <div class="sapling-table-filter-menu__header">
+          <div class="sapling-row-between-xs sapling-table-filter-menu__header">
             <div>
-              <div class="sapling-table-filter-menu__eyebrow">{{ $t('filter.filter') }}</div>
+              <div class="sapling-eyebrow sapling-table-filter-menu__eyebrow">
+                {{ $t('filter.filter') }}
+              </div>
               <div class="sapling-table-filter-menu__title">{{ title }}</div>
             </div>
             <v-btn icon variant="text" size="small" @click.stop="clearFilter">
@@ -116,7 +126,7 @@
             @update:model-value="updateSingleValue"
           />
 
-          <div class="sapling-table-filter-menu__footer">
+          <div class="sapling-row-between-xs sapling-table-filter-menu__footer">
             <v-btn variant="text" size="small" @click.stop="clearFilter">
               {{ $t(`filter.reset`) }}
             </v-btn>
@@ -125,7 +135,7 @@
             </v-btn>
           </div>
         </template>
-      </v-card>
+      </SaplingSurface>
     </v-menu>
 
     <v-btn
@@ -141,6 +151,8 @@
 </template>
 
 <script lang="ts" setup>
+import { VCard } from 'vuetify/components'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import { useSaplingTableColumnFilter } from '@/composables/table/useSaplingTableColumnFilter'
 import SaplingTableFilterBooleanValue from './SaplingTableFilterBooleanValue.vue'
 import SaplingTableFilterIconValue from './SaplingTableFilterIconValue.vue'

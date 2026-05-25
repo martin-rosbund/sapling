@@ -166,6 +166,16 @@
   min-height: 0;
 }
 
+.sapling-document-detail-fullheight {
+  height: 100%;
+  min-height: 0;
+}
+
+.sapling-document-detail-fullheight > * {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .sapling-page-shell {
   --sapling-page-shell-padding-inline-current: var(--sapling-page-shell-padding-inline);
   --sapling-page-shell-padding-block-start-current: var(--sapling-space-sm);

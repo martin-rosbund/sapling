@@ -1,10 +1,11 @@
 // Import Vue Router and view components
 import { createRouter, createWebHistory } from 'vue-router'
-import SaplingAuthLayout from '@/layouts/SaplingAuthLayout.vue'
-import SaplingPublicLayout from '@/layouts/SaplingPublicLayout.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { hasAssignedRoles } from '@/utils/authRouting'
+
+const SaplingAuthLayout = () => import('@/layouts/SaplingAuthLayout.vue')
+const SaplingPublicLayout = () => import('@/layouts/SaplingPublicLayout.vue')
 
 /**
  * Vue Router instance for application navigation.

@@ -1,32 +1,32 @@
 <template>
-  <section v-if="showSection" class="sapling-dashboard-recommended glass-panel">
-    <div v-if="isLoading" class="sapling-dashboard-recommended__track">
+  <section v-if="showSection" class="sapling-card-strip glass-panel">
+    <div v-if="isLoading" class="sapling-card-strip__track">
       <article
         v-for="item in 4"
         :key="item"
-        class="sapling-dashboard-recommended__card sapling-dashboard-recommended__card--loading"
+        class="sapling-list-card sapling-list-card--loading"
       >
         <v-skeleton-loader type="list-item" />
       </article>
     </div>
 
-    <div v-else class="sapling-dashboard-recommended__track">
+    <div v-else class="sapling-card-strip__track">
       <article
         v-for="template in recommendedFavoriteTemplates"
         :key="template.handle ?? template.name"
-        class="sapling-dashboard-recommended__card sapling-panel-shell-muted"
+        class="sapling-list-card sapling-panel-shell-muted"
       >
-        <div class="sapling-dashboard-recommended__summary">
-          <div class="sapling-dashboard-recommended__icon-wrap">
+        <div class="sapling-list-card__summary">
+          <div class="sapling-icon-tile sapling-icon-tile--sm sapling-icon-tile--primary-soft">
             <v-icon :icon="getTemplateIcon(template)" size="16" />
           </div>
 
-          <h3 class="sapling-dashboard-recommended__card-title">
+          <h3 class="sapling-list-card__title">
             {{ template.name }}
           </h3>
         </div>
 
-        <div class="sapling-dashboard-recommended__actions">
+        <div class="sapling-list-card__actions">
           <v-btn
             v-if="hasFavoritesAccess"
             icon="mdi-bookmark-plus-outline"

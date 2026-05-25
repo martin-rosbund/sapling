@@ -22,10 +22,10 @@
         </template>
 
         <v-col v-else cols="12">
-          <div class="sapling-kpi-empty glass-panel">
+          <div class="sapling-empty-state-panel sapling-empty-state-panel--large glass-panel">
             <v-icon size="52" color="primary">mdi-chart-box-plus-outline</v-icon>
-            <h3 class="sapling-kpi-empty__title">{{ $t('kpi.emptyTitle') }}</h3>
-            <p class="sapling-kpi-empty__text">
+            <h3 class="sapling-empty-state-panel__title">{{ $t('kpi.emptyTitle') }}</h3>
+            <p class="sapling-empty-state-panel__text">
               {{ $t('kpi.emptyText') }}
             </p>
             <v-btn color="primary" prepend-icon="mdi-plus-circle-outline" @click="openAddKpiDialog">

@@ -14,18 +14,18 @@
 
     <div
       v-else
-      class="sapling-kpi-comparison__content"
+      class="sapling-stack-lg sapling-highlight-panel sapling-kpi-comparison__content"
       :class="`sapling-kpi-comparison__content--${trendText}`"
     >
-      <div class="sapling-kpi-comparison__header">
-        <div class="sapling-kpi-comparison__headline">
-          <span class="sapling-kpi-comparison__eyebrow">{{ trendLeadLabel }}</span>
+      <div class="sapling-section-header sapling-kpi-comparison__header">
+        <div class="sapling-stack-md sapling-kpi-comparison__headline">
+          <span class="sapling-eyebrow sapling-kpi-comparison__eyebrow">{{ trendLeadLabel }}</span>
           <h2 class="sapling-kpi-comparison__delta-value">{{ trendDeltaLabel }}</h2>
           <p class="sapling-kpi-comparison__delta-text">
             {{ trendPercentageLabel }}
           </p>
         </div>
-        <div class="sapling-kpi-comparison__badge">
+        <div class="sapling-row-md sapling-kpi-comparison__badge">
           <v-icon :color="trendIcon.color" size="20">{{ trendIcon.icon }}</v-icon>
           <span>{{ trendLeadCaption }}</span>
         </div>
@@ -35,8 +35,8 @@
         <component
           :is="canOpenCurrentDrilldown ? 'button' : 'div'"
           type="button"
-          class="sapling-kpi-comparison__stat"
-          :class="{ 'sapling-kpi-comparison__stat--clickable': canOpenCurrentDrilldown }"
+          class="sapling-soft-panel sapling-kpi-comparison__stat"
+          :class="{ 'sapling-soft-panel--interactive sapling-kpi-comparison__stat--clickable': canOpenCurrentDrilldown }"
           @click="canOpenCurrentDrilldown ? openCurrentDrilldown() : undefined"
         >
           <span class="sapling-kpi-comparison__label">{{ $t('kpi.current') }}</span>
@@ -52,8 +52,8 @@
         <component
           :is="canOpenPreviousDrilldown ? 'button' : 'div'"
           type="button"
-          class="sapling-kpi-comparison__stat"
-          :class="{ 'sapling-kpi-comparison__stat--clickable': canOpenPreviousDrilldown }"
+          class="sapling-soft-panel sapling-kpi-comparison__stat"
+          :class="{ 'sapling-soft-panel--interactive sapling-kpi-comparison__stat--clickable': canOpenPreviousDrilldown }"
           @click="canOpenPreviousDrilldown ? openPreviousDrilldown() : undefined"
         >
           <span class="sapling-kpi-comparison__label">{{ $t('kpi.previous') }}</span>
@@ -65,13 +65,13 @@
         </component>
       </div>
 
-      <div class="sapling-kpi-comparison__balance">
+      <div class="sapling-progress-track sapling-kpi-comparison__balance">
         <span
-          class="sapling-kpi-comparison__balance-fill sapling-kpi-comparison__balance-fill--current"
+          class="sapling-progress-fill sapling-progress-fill--primary sapling-kpi-comparison__balance-fill sapling-kpi-comparison__balance-fill--current"
           :style="{ width: `${currentShare}%` }"
         />
         <span
-          class="sapling-kpi-comparison__balance-fill sapling-kpi-comparison__balance-fill--previous"
+          class="sapling-progress-fill sapling-progress-fill--secondary sapling-kpi-comparison__balance-fill sapling-kpi-comparison__balance-fill--previous"
           :style="{ width: `${previousShare}%` }"
         />
       </div>

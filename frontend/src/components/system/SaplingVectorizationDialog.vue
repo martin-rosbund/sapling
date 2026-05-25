@@ -1,15 +1,16 @@
 <template>
-  <div class="sapling-vectorization-shell">
+  <div class="sapling-overlay-shell sapling-vectorization-shell">
     <div
       v-if="isOpen && hasSaplingVectorizationAccess"
-      class="sapling-vectorization__backdrop"
+      class="sapling-overlay-backdrop sapling-vectorization__backdrop"
       @click="closePanel"
     ></div>
 
-    <transition name="sapling-vectorization-panel">
-      <section
+    <transition name="sapling-floating-panel">
+      <SaplingSurface
+        as="section"
         v-if="isOpen && hasSaplingVectorizationAccess"
-        class="glass-panel sapling-vectorization"
+        class="sapling-floating-panel sapling-floating-panel--bottom-right sapling-floating-panel--mobile-sheet sapling-vectorization"
         @click.stop
       >
         <template v-if="isTranslationLoading">
@@ -24,18 +25,22 @@
         </template>
 
         <template v-else>
-          <header class="sapling-vectorization__header">
-            <div>
-              <div class="sapling-vectorization__eyebrow">
+          <header
+            class="sapling-section-header sapling-floating-panel__header sapling-floating-panel__header--bordered sapling-vectorization__header"
+          >
+            <div class="sapling-floating-panel__heading">
+              <div class="sapling-eyebrow sapling-floating-panel__eyebrow sapling-vectorization__eyebrow">
                 {{ t('aiVectorization.titleEyebrow') }}
               </div>
-              <div class="sapling-vectorization__title">{{ t('aiVectorization.title') }}</div>
-              <p class="sapling-vectorization__subtitle">
+              <div class="sapling-section-title sapling-floating-panel__title sapling-vectorization__title">
+                {{ t('aiVectorization.title') }}
+              </div>
+              <p class="sapling-section-subtitle sapling-vectorization__subtitle">
                 {{ t('aiVectorization.subtitle') }}
               </p>
             </div>
 
-            <div class="sapling-vectorization__header-actions">
+            <div class="sapling-toolbar-group sapling-floating-panel__actions sapling-vectorization__header-actions">
               <v-btn
                 size="small"
                 variant="text"
@@ -49,8 +54,8 @@
             </div>
           </header>
 
-          <div class="sapling-vectorization__body">
-            <div class="sapling-vectorization__selectors">
+          <div class="sapling-stack-lg sapling-floating-panel__body sapling-vectorization__body">
+            <div class="sapling-responsive-grid sapling-responsive-grid--md sapling-vectorization__selectors">
               <v-select
                 :items="providerOptions"
                 :label="t('aiVectorization.provider')"
@@ -87,12 +92,14 @@
               />
             </div>
 
-            <div class="sapling-vectorization__cards">
-              <section class="sapling-vectorization__card">
-                <div class="sapling-vectorization__card-title">
+            <div class="sapling-stack-md sapling-vectorization__cards">
+              <section
+                class="sapling-section-panel sapling-section-panel--compact sapling-floating-panel__card sapling-vectorization__card"
+              >
+                <div class="sapling-label sapling-vectorization__card-title">
                   {{ t('aiVectorization.indexedFieldsTitle') }}
                 </div>
-                <div class="sapling-vectorization__chip-grid">
+                <div class="sapling-chip-row sapling-vectorization__chip-grid">
                   <v-chip
                     v-for="field in indexedFieldLabels"
                     :key="field"
@@ -104,39 +111,44 @@
                 </div>
               </section>
 
-              <section class="sapling-vectorization__card">
-                <div class="sapling-vectorization__card-title">
+              <section
+                class="sapling-section-panel sapling-section-panel--compact sapling-floating-panel__card sapling-vectorization__card"
+              >
+                <div class="sapling-label sapling-vectorization__card-title">
                   {{ t('aiVectorization.strategyTitle') }}
                 </div>
-                <div class="sapling-vectorization__strategy-list">
+                <div class="sapling-stack-md sapling-vectorization__strategy-list">
                   <div>{{ t('aiVectorization.strategySectionAware') }}</div>
                   <div>{{ t('aiVectorization.strategyHash') }}</div>
                   <div>{{ t('aiVectorization.strategyReplacement') }}</div>
                 </div>
               </section>
 
-              <section v-if="lastResult" class="sapling-vectorization__card">
-                <div class="sapling-vectorization__card-title">
+              <section
+                v-if="lastResult"
+                class="sapling-section-panel sapling-section-panel--compact sapling-floating-panel__card sapling-vectorization__card"
+              >
+                <div class="sapling-label sapling-vectorization__card-title">
                   {{ t('aiVectorization.lastRunTitle') }}
                 </div>
-                <div class="sapling-vectorization__stats">
-                  <div class="sapling-vectorization__stat">
+                <div class="sapling-responsive-grid sapling-vectorization__stats">
+                  <div class="sapling-soft-panel sapling-floating-panel__stat sapling-vectorization__stat">
                     <span>{{ t('aiVectorization.totalSourceRecords') }}</span>
                     <strong>{{ lastResult.totalSourceRecords }}</strong>
                   </div>
-                  <div class="sapling-vectorization__stat">
+                  <div class="sapling-soft-panel sapling-floating-panel__stat sapling-vectorization__stat">
                     <span>{{ t('aiVectorization.totalDocuments') }}</span>
                     <strong>{{ lastResult.totalDocuments }}</strong>
                   </div>
-                  <div class="sapling-vectorization__stat">
+                  <div class="sapling-soft-panel sapling-floating-panel__stat sapling-vectorization__stat">
                     <span>{{ t('aiVectorization.embeddedDocuments') }}</span>
                     <strong>{{ lastResult.embeddedDocuments }}</strong>
                   </div>
-                  <div class="sapling-vectorization__stat">
+                  <div class="sapling-soft-panel sapling-floating-panel__stat sapling-vectorization__stat">
                     <span>{{ t('aiVectorization.skippedDocuments') }}</span>
                     <strong>{{ lastResult.skippedDocuments }}</strong>
                   </div>
-                  <div class="sapling-vectorization__stat">
+                  <div class="sapling-soft-panel sapling-floating-panel__stat sapling-vectorization__stat">
                     <span>{{ t('aiVectorization.deletedDocuments') }}</span>
                     <strong>{{ lastResult.deletedDocuments }}</strong>
                   </div>
@@ -154,7 +166,7 @@
             </v-alert>
           </div>
 
-          <footer class="sapling-vectorization__footer">
+          <footer class="sapling-row-md sapling-floating-panel__footer sapling-vectorization__footer">
             <v-spacer />
             <v-btn variant="text" @click="closePanel">
               {{ t('aiVectorization.close') }}
@@ -170,7 +182,7 @@
             </v-btn>
           </footer>
         </template>
-      </section>
+      </SaplingSurface>
     </transition>
   </div>
 </template>
@@ -179,6 +191,7 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { AiProviderModelItem, AiProviderTypeItem } from '@/entity/entity'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import { useSaplingVectorization } from '@/composables/system/useSaplingVectorization'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'

@@ -30,7 +30,7 @@
           <template v-if="isTranslationLoading">
             <SaplingDialogHero loading />
             <div class="sapling-message-center-dialog__body">
-              <v-skeleton-loader class="glass-panel" type="article, article, article" />
+              <SaplingSurface :as="VSkeletonLoader" type="article, article, article" />
             </div>
             <SaplingActionBarSkeleton />
           </template>
@@ -41,26 +41,31 @@
             />
 
             <div class="sapling-message-center-dialog__body">
-              <section
+              <SaplingSurface
+                as="section"
                 v-if="messages.length === 0"
-                class="sapling-message-center-empty-state glass-panel"
+                class="sapling-empty-state-panel sapling-empty-state-panel--large"
               >
-                <div class="sapling-message-center-empty-state__icon">
+                <div class="sapling-empty-state-panel__icon">
                   <v-icon icon="mdi-bell-check-outline" size="40" />
                 </div>
-                <h3 class="sapling-message-center-empty-state__title">
+                <h3 class="sapling-empty-state-panel__title">
                   {{ $t('global.messageCenter') }}
                 </h3>
-              </section>
+              </SaplingSurface>
 
-              <v-list v-else density="comfortable" class="sapling-message-center-list">
+              <v-list
+                v-else
+                density="comfortable"
+                class="sapling-section-stack sapling-section-stack--md sapling-message-center-list"
+              >
                 <v-list-item
                   v-for="message in messages"
                   :key="message.id"
-                  class="sapling-message-center-entry"
+                  class="sapling-panel-shell-muted sapling-message-center-entry"
                 >
                   <template #prepend>
-                    <div class="sapling-message-center-entry__icon-wrap">
+                    <div class="sapling-icon-tile sapling-icon-tile--sm">
                       <v-icon :color="getMessageColor(message.type)">{{
                         getMessageIcon(message.type)
                       }}</v-icon>
@@ -106,11 +111,13 @@
 <script lang="ts" setup>
 // #region Imports
 import { useI18n } from 'vue-i18n'
+import { VSkeletonLoader } from 'vuetify/components'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import type { Message } from '@/composables/system/useSaplingMessageCenter'
 import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
 import SaplingActionMessageCenter from '@/components/actions/SaplingActionMessageCenter.vue'
 // #endregion

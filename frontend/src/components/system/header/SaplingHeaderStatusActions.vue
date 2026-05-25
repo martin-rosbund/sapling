@@ -38,7 +38,12 @@
       />
     </template>
 
-    <v-list class="sapling-header__mobile-overflow-menu glass-panel" density="comfortable" nav>
+    <SaplingSurface
+      :as="VList"
+      class="sapling-header__mobile-overflow-menu"
+      density="comfortable"
+      nav
+    >
       <v-list-item :title="inboxLabel" @click="emit('openInbox')">
         <template #prepend>
           <v-icon icon="mdi-email" />
@@ -61,11 +66,14 @@
           />
         </template>
       </v-list-item>
-    </v-list>
+    </SaplingSurface>
   </v-menu>
 </template>
 
 <script lang="ts" setup>
+import { VList } from 'vuetify/components'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
+
 defineProps<{
   inboxCount: number
   inboxBadgeColor: string

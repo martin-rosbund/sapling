@@ -1,7 +1,7 @@
 <template>
   <article
-    class="sapling-inbox-entry glass-panel"
-    :class="{ 'sapling-inbox-entry--expanded': expanded }"
+    class="sapling-attention-card sapling-inbox-entry glass-panel"
+    :class="{ 'sapling-attention-card--expanded sapling-inbox-entry--expanded': expanded }"
     :style="entryStyle(entry)"
     role="button"
     tabindex="0"
@@ -9,24 +9,24 @@
     @keyup.enter="emit('open', entry)"
     @keyup.space.prevent="emit('open', entry)"
   >
-    <div class="sapling-inbox-entry__meta-row">
-      <div class="sapling-inbox-entry__kind">
-        <span class="sapling-inbox-entry__kind-indicator"></span>
+    <div class="sapling-row-between-md sapling-attention-card__meta-row sapling-inbox-entry__meta-row">
+      <div class="sapling-row-xs sapling-attention-card__kind sapling-inbox-entry__kind">
+        <span class="sapling-attention-card__indicator sapling-inbox-entry__kind-indicator"></span>
         <v-icon :icon="entry.icon" size="16" />
         <span>{{ $t(entry.kindLabelKey) }}</span>
       </div>
-      <span class="sapling-inbox-entry__date">
+      <span class="sapling-attention-card__date sapling-inbox-entry__date">
         {{ entry.dateText || $t('inbox.unplanned') }}
       </span>
     </div>
 
-    <h4 class="sapling-inbox-entry__title">{{ entry.title }}</h4>
-    <p class="sapling-inbox-entry__description">
+    <h4 class="sapling-attention-card__title sapling-inbox-entry__title">{{ entry.title }}</h4>
+    <p class="sapling-attention-card__description sapling-inbox-entry__description">
       {{ entry.description || $t('inbox.noDescription') }}
     </p>
 
-    <div class="sapling-inbox-entry__footer">
-      <div class="sapling-inbox-entry__chips">
+    <div class="sapling-row-between-md sapling-attention-card__footer sapling-inbox-entry__footer">
+      <div class="sapling-chip-row sapling-attention-card__chips sapling-inbox-entry__chips">
         <v-chip
           v-if="entry.contextLabel"
           size="x-small"
@@ -48,7 +48,7 @@
         </v-chip>
       </div>
 
-      <div class="sapling-inbox-entry__actions">
+      <div class="sapling-action-cluster sapling-attention-card__actions sapling-inbox-entry__actions">
         <v-btn
           v-if="entry.dismissible"
           icon="mdi-close"
@@ -117,6 +117,7 @@ function entryStyle(entry: InboxEntry) {
   const accentColor = entry.accentColor || entry.contextColor || entry.statusColor
 
   return {
+    '--sapling-attention-card-accent-color': resolveCssColor(accentColor),
     '--sapling-inbox-entry-accent-color': resolveCssColor(accentColor),
   }
 }

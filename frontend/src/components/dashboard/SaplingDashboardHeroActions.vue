@@ -1,11 +1,10 @@
 <template>
-  <div class="sapling-dashboard__actions">
-    <div class="sapling-dashboard__primary-actions">
+  <div class="sapling-action-stack">
+    <div class="sapling-action-cluster">
       <v-btn
         color="primary"
         variant="plain"
         prepend-icon="mdi-chart-box-plus-outline"
-        class="sapling-dashboard__action"
         :disabled="!hasDashboards || !currentPersonLoaded"
         @click="emit('addKpi')"
       >
@@ -17,7 +16,6 @@
         color="primary"
         variant="plain"
         prepend-icon="mdi-plus-circle-outline"
-        class="sapling-dashboard__action"
         :disabled="!currentPersonLoaded"
         @click="emit('openDashboard')"
       >
@@ -29,7 +27,6 @@
         color="primary"
         variant="plain"
         prepend-icon="mdi-file-import-outline"
-        class="sapling-dashboard__action"
         :disabled="!currentPersonLoaded"
         @click="emit('openTemplateLoad')"
       >
@@ -41,7 +38,6 @@
         color="primary"
         variant="plain"
         prepend-icon="mdi-content-save-outline"
-        class="sapling-dashboard__action"
         :disabled="!hasDashboards || !currentPersonLoaded"
         @click="emit('openTemplateSave')"
       >

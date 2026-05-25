@@ -1,14 +1,16 @@
 <template>
-  <article class="sapling-inbox-summary-card glass-panel">
+  <article
+    class="sapling-metric-card sapling-metric-card--large sapling-metric-card--interactive glass-panel"
+  >
     <div
-      class="sapling-inbox-summary-card__icon"
-      :class="`sapling-inbox-summary-card__icon--${card.tone}`"
+      class="sapling-icon-tile"
+      :class="[`sapling-icon-tile--${card.tone}-soft`, `sapling-inbox-summary-card__icon--${card.tone}`]"
     >
       <v-icon :icon="card.icon" />
     </div>
-    <div class="sapling-inbox-summary-card__content">
-      <div class="sapling-inbox-summary-card__label">{{ $t(card.labelKey) }}</div>
-      <div class="sapling-inbox-summary-card__count">{{ card.count }}</div>
+    <div class="sapling-metric-card__copy">
+      <p>{{ $t(card.labelKey) }}</p>
+      <strong>{{ card.count }}</strong>
     </div>
   </article>
 </template>

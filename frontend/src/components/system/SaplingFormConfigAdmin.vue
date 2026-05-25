@@ -1,10 +1,10 @@
 <template>
   <v-container
-    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--uniform-inset sapling-form-config"
+    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--uniform-inset sapling-config-page sapling-form-config"
     fluid
   >
     <SaplingPageHero
-      class="sapling-form-config__hero"
+      class="sapling-config-hero sapling-form-config__hero"
       variant="system"
       :eyebrow="$t('formConfig.eyebrow')"
       :title="$t('formConfig.title')"
@@ -24,7 +24,7 @@
       </template>
 
       <template #side>
-        <div class="sapling-form-config__hero-actions">
+        <div class="sapling-action-cluster sapling-config-hero-actions sapling-form-config__hero-actions">
           <v-btn
             prepend-icon="mdi-content-save"
             color="primary"
@@ -47,7 +47,7 @@
           </v-btn>
           <input
             ref="fileInputRef"
-            class="sapling-form-config__file-input"
+            class="sapling-upload-native-input sapling-form-config__file-input"
             type="file"
             accept="application/json,.json"
             @change="onImportFileChange"
@@ -58,7 +58,7 @@
 
     <v-alert
       v-if="errorMessage"
-      class="sapling-form-config__alert"
+      class="sapling-config-alert sapling-form-config__alert"
       type="error"
       variant="tonal"
       density="comfortable"
@@ -66,9 +66,11 @@
       {{ errorMessage }}
     </v-alert>
 
-    <section class="sapling-form-config__workspace">
-      <div class="sapling-form-config__panel sapling-form-config__panel--editor glass-panel">
-        <div class="sapling-form-config__toolbar">
+    <section class="sapling-config-workspace sapling-form-config__workspace">
+      <SaplingSurface
+        class="sapling-panel-shell sapling-section-panel sapling-config-panel sapling-config-panel--blurred sapling-form-config__panel sapling-form-config__panel--editor"
+      >
+        <div class="sapling-config-toolbar sapling-form-config__toolbar">
           <v-autocomplete
             v-model="selectedEntityHandle"
             class="sapling-form-config__entity-select"
@@ -102,7 +104,7 @@
           />
         </div>
 
-        <div class="sapling-form-config__settings">
+        <div class="sapling-config-settings sapling-form-config__settings">
           <v-text-field
             v-model="configName"
             density="comfortable"
@@ -135,7 +137,7 @@
             prepend-inner-icon="mdi-pound"
             disabled
           />
-          <div class="sapling-form-config__switches">
+          <div class="sapling-row-md sapling-config-switches sapling-form-config__switches">
             <v-switch
               v-model="isActive"
               color="primary"
@@ -153,7 +155,7 @@
           </div>
         </div>
 
-        <div class="sapling-form-config__field-tools">
+        <div class="sapling-config-field-tools sapling-form-config__field-tools">
           <v-text-field
             v-model="fieldSearch"
             density="comfortable"
@@ -179,14 +181,15 @@
           </v-btn>
         </div>
 
-        <div class="sapling-form-config__field-list" role="list">
-          <article
+        <div class="sapling-scroll-list sapling-config-field-list sapling-form-config__field-list" role="list">
+          <SaplingSurface
+            as="article"
             v-for="field in filteredFieldRows"
             :key="field.name"
-            class="sapling-form-config-field glass-panel"
+            class="sapling-panel-shell sapling-stack-md sapling-config-field sapling-form-config-field"
             role="listitem"
           >
-            <div class="sapling-form-config-field__main">
+            <div class="sapling-row-md sapling-config-field__main sapling-form-config-field__main">
               <v-switch
                 v-model="field.visible"
                 color="primary"
@@ -200,7 +203,7 @@
               </div>
             </div>
 
-            <div class="sapling-form-config-field__controls">
+            <div class="sapling-config-field__controls sapling-form-config-field__controls">
               <v-text-field
                 v-model="field.label"
                 density="compact"
@@ -245,7 +248,7 @@
               />
             </div>
 
-            <div class="sapling-form-config-field__toggles">
+            <div class="sapling-row-md sapling-config-field__toggles sapling-form-config-field__toggles">
               <v-checkbox
                 v-model="field.required"
                 density="compact"
@@ -259,15 +262,20 @@
                 :label="$t('formConfig.readonly')"
               />
             </div>
-          </article>
+          </SaplingSurface>
         </div>
-      </div>
+      </SaplingSurface>
 
-      <aside class="sapling-form-config__panel sapling-form-config__panel--preview glass-panel">
-        <div class="sapling-form-config__preview-header">
+      <SaplingSurface
+        as="aside"
+        class="sapling-panel-shell sapling-section-panel sapling-config-panel sapling-config-panel--blurred sapling-config-panel--sticky sapling-form-config__panel sapling-form-config__panel--preview"
+      >
+        <div class="sapling-row-between-md sapling-config-preview-header sapling-form-config__preview-header">
           <div>
-            <p class="sapling-form-config__eyebrow">{{ $t('formConfig.livePreview') }}</p>
-            <h2>{{ previewTitle }}</h2>
+            <p class="sapling-eyebrow sapling-config-eyebrow sapling-form-config__eyebrow">
+              {{ $t('formConfig.livePreview') }}
+            </p>
+            <h2 class="sapling-section-title">{{ previewTitle }}</h2>
           </div>
           <v-btn
             icon="mdi-refresh"
@@ -278,59 +286,31 @@
           />
         </div>
 
-        <div class="sapling-form-config-preview glass-panel" aria-live="polite">
+        <SaplingSurface
+          class="sapling-panel-shell sapling-stack-lg sapling-config-preview sapling-form-config-preview"
+          aria-live="polite"
+        >
           <section
             v-for="group in previewGroups"
             :key="group.id"
-            class="sapling-form-config-preview__group"
+            class="sapling-stack-md sapling-config-preview__group sapling-form-config-preview__group"
           >
             <h3 v-if="group.label">{{ group.label }}</h3>
-            <div class="sapling-form-config-preview__grid">
-              <div
+            <div class="sapling-config-preview__grid sapling-form-config-preview__grid">
+              <SaplingSurface
                 v-for="field in group.templates"
                 :key="field.name"
-                class="sapling-form-config-preview__field glass-panel"
-                :class="`sapling-form-config-preview__field--w${getPreviewWidth(field)}`"
+                class="sapling-panel-shell sapling-config-preview__field sapling-form-config-preview__field"
+                :class="`sapling-config-preview__field--w${getPreviewWidth(field)}`"
               >
                 <span>{{ getPreviewFieldLabel(field) }}</span>
                 <strong>{{ getPreviewRenderer(field) }}</strong>
                 <small>{{ getPreviewMeta(field) }}</small>
-              </div>
+              </SaplingSurface>
             </div>
           </section>
-        </div>
-
-        <div class="sapling-form-config__json-panel">
-          <div class="sapling-form-config__json-header">
-            <p class="sapling-form-config__eyebrow">{{ $t('formConfig.json') }}</p>
-            <v-btn
-              size="small"
-              prepend-icon="mdi-check-decagram-outline"
-              variant="text"
-              :disabled="!selectedEntityHandle"
-              @click="validateDraft"
-            >
-              {{ $t('formConfig.validate') }}
-            </v-btn>
-          </div>
-          <SaplingCodeMirror
-            class="sapling-form-config__json-editor"
-            :model-value="draftJson"
-            language="json"
-            :read-only="true"
-            :line-numbers="false"
-          />
-          <v-alert
-            v-if="validationSummary"
-            class="sapling-form-config__validation"
-            :type="validationIsValid ? 'success' : 'warning'"
-            variant="tonal"
-            density="compact"
-          >
-            {{ validationSummary }}
-          </v-alert>
-        </div>
-      </aside>
+        </SaplingSurface>
+      </SaplingSurface>
     </section>
   </v-container>
 </template>
@@ -340,7 +320,6 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ApiFormConfigService, {
   type SaplingFormConfigItem,
-  type SaplingFormConfigValidationResult,
 } from '@/services/api.form-config.service'
 import ApiGenericService from '@/services/api.generic.service'
 import ApiService from '@/services/api.service'
@@ -352,8 +331,8 @@ import type {
   SaplingFormFieldConfig,
   SaplingFormRenderer,
 } from '@/entity/structure'
-import SaplingCodeMirror from '@/components/common/SaplingCodeMirror.vue'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingFieldSingleSelect from '@/components/dialog/fields/SaplingFieldSingleSelect.vue'
 import {
   getDialogTemplateWidth,
@@ -395,7 +374,6 @@ const isLoadingEntities = ref(false)
 const isLoadingContext = ref(false)
 const isSaving = ref(false)
 const errorMessage = ref('')
-const validationResult = ref<SaplingFormConfigValidationResult | null>(null)
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const fieldRows = reactive<FieldDraft[]>([])
 
@@ -474,7 +452,9 @@ const filteredFieldRows = computed(() => {
 
   return fieldRows.filter((field) =>
     [field.name, field.label, field.group, field.type].some((value) =>
-      String(value ?? '').toLowerCase().includes(query),
+      String(value ?? '')
+        .toLowerCase()
+        .includes(query),
     ),
   )
 })
@@ -500,8 +480,6 @@ const draftConfig = computed<SaplingFormConfigPayload>(() => ({
   ),
 }))
 
-const draftJson = computed(() => JSON.stringify(draftConfig.value, null, 2))
-
 const previewTemplates = computed(() =>
   sortDialogTemplates(
     baseTemplates.value
@@ -517,22 +495,10 @@ const previewGroups = computed(() =>
 )
 
 const previewTitle = computed(() =>
-  selectedEntityHandle.value ? translateEntity(selectedEntityHandle.value) : t('formConfig.preview'),
+  selectedEntityHandle.value
+    ? translateEntity(selectedEntityHandle.value)
+    : t('formConfig.preview'),
 )
-
-const validationIsValid = computed(() => validationResult.value?.isValid === true)
-
-const validationSummary = computed(() => {
-  const result = validationResult.value
-  if (!result) {
-    return ''
-  }
-
-  return t('formConfig.validationSummary', {
-    errors: result.errors.length,
-    warnings: result.warnings.length,
-  })
-})
 
 watch(selectedEntityHandle, () => {
   void loadEntityContext()
@@ -594,7 +560,6 @@ async function loadEntityContext(): Promise<void> {
 
   isLoadingContext.value = true
   errorMessage.value = ''
-  validationResult.value = null
 
   try {
     const [templates, nextConfigs] = await Promise.all([
@@ -631,7 +596,9 @@ function startNewConfig(): void {
 }
 
 function applySelectedConfig(): void {
-  const selectedConfig = configs.value.find((config) => config.handle === selectedConfigHandle.value)
+  const selectedConfig = configs.value.find(
+    (config) => config.handle === selectedConfigHandle.value,
+  )
   if (!selectedConfig) {
     startNewConfig()
     return
@@ -753,21 +720,6 @@ async function saveConfig(): Promise<void> {
   }
 }
 
-async function validateDraft(): Promise<void> {
-  if (!selectedEntityHandle.value) {
-    return
-  }
-
-  try {
-    validationResult.value = await ApiFormConfigService.validate(
-      selectedEntityHandle.value,
-      draftConfig.value,
-    )
-  } catch {
-    errorMessage.value = t('formConfig.validationFailed')
-  }
-}
-
 function resetCurrentConfig(): void {
   buildFieldRows({})
 }
@@ -800,18 +752,25 @@ async function onImportFileChange(event: Event): Promise<void> {
 
     configName.value = file.name.replace(/\.json$/i, '')
     selectedConfigHandle.value = null
-    buildFieldRows(parsed.fields ?? {})
-    validationResult.value = await ApiFormConfigService.validate(
-      selectedEntityHandle.value,
-      parsed,
-    )
+    const validation = await ApiFormConfigService.validate(selectedEntityHandle.value, parsed)
+    if (!validation.isValid) {
+      errorMessage.value = t('formConfig.validationSummary', {
+        errors: validation.errors.length,
+        warnings: validation.warnings.length,
+      })
+      return
+    }
+
+    buildFieldRows(validation.normalizedConfig.fields ?? parsed.fields ?? {})
   } catch {
     errorMessage.value = t('formConfig.importFailed')
   }
 }
 
 function exportDraft(): void {
-  const blob = new Blob([draftJson.value], { type: 'application/json' })
+  const blob = new Blob([JSON.stringify(draftConfig.value, null, 2)], {
+    type: 'application/json',
+  })
   const url = URL.createObjectURL(blob)
   const anchor = document.createElement('a')
   anchor.href = url

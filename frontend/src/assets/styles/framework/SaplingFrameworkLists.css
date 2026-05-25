@@ -1,0 +1,355 @@
+.sapling-list-card {
+  display: flex;
+  align-items: center;
+  gap: var(--sapling-gap-md);
+  min-height: 0;
+  padding: var(--sapling-panel-padding-compact);
+}
+
+.sapling-list-card--loading {
+  min-height: 72px;
+}
+
+.sapling-list-card__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--sapling-gap-md);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.sapling-list-card__title {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--sapling-text-body-size-sm);
+  line-height: 1.15;
+}
+
+.sapling-list-card__actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--sapling-gap-3xs);
+  min-height: var(--sapling-control-size-sm);
+  margin-left: auto;
+}
+
+.sapling-stat-grid {
+  display: grid;
+  gap: var(--sapling-gap-xs);
+  justify-self: stretch;
+  width: 100%;
+  max-width: none;
+}
+
+.sapling-stat-grid--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.sapling-stat-card {
+  display: flex;
+  align-items: center;
+  gap: var(--sapling-gap-md);
+  padding: var(--sapling-gap-md) var(--sapling-gap-xl);
+  border-radius: var(--sapling-radius-sm);
+}
+
+.sapling-stat-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: var(--sapling-icon-box-md);
+  height: var(--sapling-icon-box-md);
+  border-radius: var(--sapling-radius-sm);
+  box-shadow: var(--sapling-inset-highlight);
+}
+
+.sapling-stat-card__content {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-stat-card__content strong {
+  font-size: 1.2rem;
+  line-height: 1.1;
+}
+
+.sapling-workspace-panel {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  padding: var(--sapling-space-panel-md);
+  overflow: hidden;
+  box-shadow: var(--sapling-shadow-lift);
+}
+
+.sapling-scroll-region {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.sapling-scroll-list {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--sapling-gap-xs);
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.sapling-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-inline-empty {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--sapling-gap-xs);
+  min-height: auto;
+  padding: var(--sapling-gap-xs) var(--sapling-gap-md);
+  border: 1px solid var(--sapling-surface-border);
+  border-radius: var(--sapling-radius-sm);
+  opacity: var(--sapling-opacity-primary);
+}
+
+.sapling-soft-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 var(--sapling-space-sm-plus);
+  border: 1px solid color-mix(in srgb, var(--sapling-surface-border) 88%, white);
+  border-radius: var(--sapling-radius-pill);
+  background: color-mix(in srgb, var(--sapling-surface-fill) 82%, white);
+  font-size: var(--sapling-text-label-size-sm);
+  line-height: 1.2;
+  opacity: var(--sapling-opacity-secondary);
+}
+
+.sapling-soft-chip--button {
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  opacity: 1;
+  transition:
+    border-color var(--sapling-motion-fast) ease,
+    background-color var(--sapling-motion-fast) ease;
+}
+
+.sapling-interactive-list-item {
+  --sapling-interactive-list-border: var(--sapling-surface-border);
+  --sapling-interactive-list-border-hover: var(--sapling-surface-border-accent-strong);
+  --sapling-interactive-list-focus: var(--sapling-surface-border-accent-strong);
+  --sapling-interactive-list-shadow-hover: var(--sapling-shadow-lift);
+  --sapling-interactive-list-active-shadow: inset 0 0 0 1px var(--sapling-surface-border-accent);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sapling-gap-md);
+  width: 100%;
+  padding: var(--sapling-gap-md);
+  border: 1px solid var(--sapling-interactive-list-border);
+  border-radius: var(--sapling-radius-sm);
+  background: var(--sapling-surface-fill);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--sapling-motion-fast) ease,
+    transform var(--sapling-motion-fast) ease,
+    box-shadow var(--sapling-motion-fast) ease,
+    background-color var(--sapling-motion-fast) ease;
+}
+
+.sapling-interactive-list-item:hover {
+  border-color: var(--sapling-interactive-list-border-hover);
+  box-shadow: var(--sapling-interactive-list-shadow-hover);
+  transform: translateY(var(--sapling-hover-lift-sm));
+}
+
+.sapling-interactive-list-item:focus-visible {
+  outline: 2px solid var(--sapling-interactive-list-focus);
+  outline-offset: 2px;
+}
+
+.sapling-interactive-list-item--active {
+  border-color: var(--sapling-interactive-list-border-hover);
+  box-shadow: var(--sapling-interactive-list-active-shadow);
+}
+
+.sapling-note-tabs {
+  max-height: var(--sapling-tab-strip-height) !important;
+}
+
+.sapling-note-tabs-skeleton {
+  margin-bottom: var(--sapling-gap-xs);
+}
+
+.sapling-add-note-card,
+.sapling-note-card-skeleton {
+  min-height: var(--sapling-note-card-min-height);
+  border-radius: var(--sapling-radius-sm);
+}
+
+.sapling-add-note-card {
+  height: 100% !important;
+  border-style: dashed;
+  cursor: pointer;
+  transition:
+    background-color var(--sapling-motion-standard) ease,
+    transform var(--sapling-motion-standard) ease,
+    box-shadow var(--sapling-motion-standard) ease;
+}
+
+.sapling-add-note-card:hover {
+  background: var(--sapling-surface-fill);
+}
+
+.sapling-note-card {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: var(--sapling-note-card-min-height);
+  padding: var(--sapling-space-panel-md);
+  border-radius: var(--sapling-radius-sm);
+  transition:
+    transform var(--sapling-motion-standard) ease,
+    box-shadow var(--sapling-motion-standard) ease;
+}
+
+.sapling-note-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sapling-gap-xl);
+}
+
+.sapling-note-card__headline {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.sapling-note-card__meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sapling-gap-xs);
+  margin-bottom: var(--sapling-gap-md);
+}
+
+.sapling-note-card__date {
+  font-size: var(--sapling-text-label-size);
+  font-weight: 700;
+  letter-spacing: var(--sapling-letter-spacing-label);
+  text-transform: uppercase;
+  opacity: var(--sapling-opacity-secondary);
+}
+
+.sapling-note-card__title {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+}
+
+.sapling-note-card__actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-self: flex-start;
+  gap: var(--sapling-gap-xs);
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.sapling-note-card__action {
+  min-width: var(--sapling-control-size-xs);
+  padding: 0 var(--sapling-gap-sm);
+}
+
+.sapling-note-card__body {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: stretch;
+  padding-top: var(--sapling-space-panel-md);
+  min-height: 0;
+}
+
+.sapling-note-card__description {
+  margin: 0;
+  width: 100%;
+  font-size: 0.94rem;
+  line-height: 1.55;
+  white-space: pre-line;
+  opacity: var(--sapling-opacity-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-clamp: 6;
+  -webkit-line-clamp: 6;
+}
+
+.sapling-note-card__empty {
+  flex: 1 1 auto;
+}
+
+.sapling-interactive-list-item__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 var(--sapling-icon-box-action);
+  width: var(--sapling-icon-box-action);
+  height: var(--sapling-icon-box-action);
+  border-radius: var(--sapling-radius-sm);
+}
+
+.sapling-interactive-list-item__content {
+  min-width: 0;
+}
+
+.sapling-interactive-list-item__row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sapling-gap-xs);
+}
+
+:root[data-sapling-glass='off'] .sapling-interactive-list-item:hover,
+:root[data-sapling-performance='reduced'] .sapling-interactive-list-item:hover {
+  transform: none;
+}
+
+@media (max-width: 760px) {
+  .sapling-note-card {
+    min-height: var(--sapling-note-card-min-height-compact);
+  }
+
+  .sapling-note-card__header {
+    flex-direction: column;
+  }
+
+  .sapling-note-card__actions {
+    align-self: stretch;
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

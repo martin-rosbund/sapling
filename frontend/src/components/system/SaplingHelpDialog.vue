@@ -6,7 +6,7 @@
     transition="dialog-top-transition"
     content-class="sapling-overlay-content--top"
   >
-    <v-card class="sapling-help-dialog glass-panel" rounded="lg">
+    <SaplingDialogCard class="sapling-help-dialog" rounded="lg" :tilt="false">
       <v-card-title class="sapling-help-dialog__title">
         <v-icon size="22" class="sapling-help-dialog__title-icon">mdi-help-circle-outline</v-icon>
         <span>{{ t('global.help.title') }}</span>
@@ -53,13 +53,14 @@
           {{ t('global.help.footerHint') }}
         </span>
       </div>
-    </v-card>
+    </SaplingDialogCard>
   </v-dialog>
 </template>
 
 <script lang="ts" setup>
 import { onBeforeUnmount, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingHelpEntryList from '@/components/system/help-dialog/SaplingHelpEntryList.vue'
 import SaplingHelpSection from '@/components/system/help-dialog/SaplingHelpSection.vue'
 import SaplingHelpShortcutList from '@/components/system/help-dialog/SaplingHelpShortcutList.vue'

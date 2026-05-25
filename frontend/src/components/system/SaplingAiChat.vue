@@ -1,15 +1,16 @@
 <template>
-  <div class="sapling-ai-chat-shell">
+  <div class="sapling-overlay-shell sapling-ai-chat-shell">
     <div
       v-if="isOpen && hasSaplingAiChatAccess"
-      class="sapling-ai-chat__backdrop"
+      class="sapling-overlay-backdrop sapling-ai-chat__backdrop"
       @click="closePanel"
     ></div>
 
-    <transition name="sapling-ai-chat-panel">
-      <section
+    <transition name="sapling-floating-panel">
+      <SaplingSurface
+        as="section"
         v-if="isOpen && hasSaplingAiChatAccess"
-        class="glass-panel sapling-ai-chat"
+        class="sapling-floating-panel sapling-floating-panel--top-center sapling-floating-panel--mobile-sheet sapling-ai-chat"
         @click.stop
       >
         <template v-if="isTranslationLoading">
@@ -42,16 +43,16 @@
             @refresh="reloadSessions"
           />
 
-          <div class="sapling-ai-chat__progress-slot">
+          <div class="sapling-floating-panel__progress-slot sapling-ai-chat__progress-slot">
             <v-progress-linear
               v-if="isBusy"
               indeterminate
               color="primary"
-              class="sapling-ai-chat__progress"
+              class="sapling-floating-panel__progress sapling-ai-chat__progress"
             />
           </div>
 
-          <div class="sapling-ai-chat__layout">
+          <div class="sapling-chat-layout sapling-ai-chat__layout">
             <SaplingAiChatSessions
               :sessions="sessions"
               :active-session-handle="activeSession?.handle ?? null"
@@ -124,7 +125,7 @@
             />
           </div>
         </template>
-      </section>
+      </SaplingSurface>
     </transition>
   </div>
 </template>
@@ -140,6 +141,7 @@ import type {
   AiProviderModelItem,
   AiProviderTypeItem,
 } from '@/entity/entity'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingAiChatConversation from '@/components/system/ai-chat/SaplingAiChatConversation.vue'
 import SaplingAiChatHeader from '@/components/system/ai-chat/SaplingAiChatHeader.vue'
 import SaplingAiChatSessions from '@/components/system/ai-chat/SaplingAiChatSessions.vue'

@@ -566,11 +566,19 @@ export function useSaplingTableActions({
   }
 
   function isConcurrencyComparableTemplate(template: EntityTemplate): boolean {
-    if (!template.name || template.isPersistent === false || template.isReference) {
+    if (!template.name || template.isPersistent === false) {
       return false
     }
 
-    return !['1:m', 'm:n', 'n:m', '1:1', 'm:1'].includes(template.kind ?? '')
+    if (template.kind === 'm:1') {
+      return true
+    }
+
+    if (template.isReference) {
+      return false
+    }
+
+    return !['1:m', 'm:n', 'n:m', '1:1'].includes(template.kind ?? '')
   }
 
   function buildConcurrencyOptions(source: SaplingGenericItem | null) {
@@ -587,11 +595,12 @@ export function useSaplingTableActions({
     context?: DialogSaveContext,
   ) {
     if (!props.entityHandle) {
-      context?.complete()
+      context?.complete(false)
       return
     }
 
     let nextDialogItem: SaplingGenericItem | null = null
+    let didSave = false
     try {
       if (editDialog.value.mode === 'edit' && editDialog.value.item) {
         const handle = getItemHandle(editDialog.value.item)
@@ -612,6 +621,7 @@ export function useSaplingTableActions({
         )
       }
 
+      didSave = true
       emit('reload')
       pushMessage(
         'success',
@@ -642,7 +652,7 @@ export function useSaplingTableActions({
         }
       }
     } finally {
-      context?.complete()
+      context?.complete(didSave)
     }
   }
 

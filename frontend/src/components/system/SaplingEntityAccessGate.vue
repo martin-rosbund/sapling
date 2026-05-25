@@ -1,7 +1,8 @@
 <template>
-  <v-skeleton-loader
+  <SaplingSurface
+    :as="VSkeletonLoader"
     v-if="isLoading"
-    class="mx-auto fill-height glass-panel"
+    class="mx-auto fill-height"
     elevation="12"
     type="article, actions, table"
     width="100%"
@@ -13,6 +14,8 @@
 
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue'
+import { VSkeletonLoader } from 'vuetify/components'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingAccessDenied from '@/components/system/SaplingAccessDenied.vue'
 import SaplingError from '@/components/system/SaplingError.vue'
 import { useGenericStore } from '@/stores/genericStore'

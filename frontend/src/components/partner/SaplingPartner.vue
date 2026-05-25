@@ -1,13 +1,17 @@
 <template>
-  <v-container class="sapling-partner-container sapling-fill-shell pa-0" density="compact" fluid>
+  <v-container
+    class="sapling-fill-shell sapling-min-size-0 sapling-partner-container pa-0"
+    density="compact"
+    fluid
+  >
     <section
       class="sapling-partner-layout"
       :class="{ 'sapling-partner-layout--panel-hidden': !showDesktopFilterPanel }"
     >
-      <div class="sapling-partner-main-table-col d-flex flex-column pa-0">
-        <v-card flat class="sapling-partner-main-table-card rounded-0 d-flex flex-column">
-          <v-card-text class="sapling-partner-table-text pa-0 flex-grow-1">
-            <div class="sapling-partner-table-scroll">
+      <div class="sapling-stack-md sapling-min-size-0 sapling-partner-main-table-col pa-0">
+        <v-card flat class="sapling-stack-md sapling-partner-main-table-card rounded-0">
+          <v-card-text class="sapling-stack-md sapling-partner-table-text pa-0 flex-grow-1">
+            <div class="sapling-scroll-region sapling-partner-table-scroll">
               <SaplingTable
                 :items="items"
                 :search="search ?? ''"

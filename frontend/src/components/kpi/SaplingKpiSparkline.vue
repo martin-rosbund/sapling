@@ -12,10 +12,12 @@
       <span>{{ $t('global.noData') }}</span>
     </div>
 
-    <div v-else class="sapling-kpi-sparkline__content">
-      <div class="sapling-kpi-sparkline__hero">
-        <div class="sapling-kpi-sparkline__hero-copy">
-          <span class="sapling-kpi-sparkline__eyebrow">{{ $t('kpi.latestPoint') }}</span>
+    <div v-else class="sapling-stack-md sapling-kpi-sparkline__content">
+      <div class="sapling-section-header sapling-kpi-sparkline__hero">
+        <div class="sapling-stack-md sapling-kpi-sparkline__hero-copy">
+          <span class="sapling-eyebrow sapling-kpi-sparkline__eyebrow">
+            {{ $t('kpi.latestPoint') }}
+          </span>
           <h2 class="sapling-kpi-sparkline__headline">{{ lastValue }}</h2>
           <p class="sapling-kpi-sparkline__caption">{{ latestDrilldownLabel || lastLabel }}</p>
         </div>
@@ -30,22 +32,28 @@
         </v-chip>
       </div>
 
-      <div class="sapling-kpi-sparkline__stats">
-        <div class="sapling-kpi-sparkline__stat">
-          <span class="sapling-kpi-sparkline__stat-label">{{ $t('kpi.peak') }}</span>
+      <div class="sapling-stat-grid sapling-stat-grid--three sapling-kpi-sparkline__stats">
+        <div class="sapling-soft-panel sapling-kpi-sparkline__stat">
+          <span class="sapling-eyebrow sapling-kpi-sparkline__stat-label">
+            {{ $t('kpi.peak') }}
+          </span>
           <strong>{{ peakValue }}</strong>
         </div>
-        <div class="sapling-kpi-sparkline__stat">
-          <span class="sapling-kpi-sparkline__stat-label">{{ $t('kpi.low') }}</span>
+        <div class="sapling-soft-panel sapling-kpi-sparkline__stat">
+          <span class="sapling-eyebrow sapling-kpi-sparkline__stat-label">
+            {{ $t('kpi.low') }}
+          </span>
           <strong>{{ lowValue }}</strong>
         </div>
-        <div class="sapling-kpi-sparkline__stat">
-          <span class="sapling-kpi-sparkline__stat-label">{{ $t('kpi.average') }}</span>
+        <div class="sapling-soft-panel sapling-kpi-sparkline__stat">
+          <span class="sapling-eyebrow sapling-kpi-sparkline__stat-label">
+            {{ $t('kpi.average') }}
+          </span>
           <strong>{{ averageValue }}</strong>
         </div>
       </div>
 
-      <div class="sapling-kpi-sparkline__chart-shell">
+      <div class="sapling-highlight-panel sapling-kpi-sparkline__chart-shell">
         <div class="sapling-kpi-sparkline__chart-stage">
           <v-sparkline
             :auto-line-width="autoLineWidth"

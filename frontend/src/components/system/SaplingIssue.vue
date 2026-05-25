@@ -4,46 +4,63 @@
     fluid
   >
     <template v-if="isTranslationLoading">
-      <div class="sapling-issue-skeleton">
-        <v-skeleton-loader class="glass-panel" type="article" />
-        <div class="sapling-issue-skeleton__metrics">
-          <v-skeleton-loader v-for="item in 4" :key="item" class="glass-panel" type="article" />
+      <div class="sapling-stack-xl sapling-work-skeleton sapling-issue-skeleton">
+        <SaplingSurface :as="VSkeletonLoader" type="article" />
+        <div
+          class="sapling-responsive-grid sapling-work-skeleton__metrics sapling-issue-skeleton__metrics"
+        >
+          <SaplingSurface
+            v-for="item in 4"
+            :key="item"
+            :as="VSkeletonLoader"
+            type="article"
+          />
         </div>
-        <div class="sapling-issue-skeleton__streams">
-          <v-skeleton-loader class="glass-panel" type="article, actions" />
-          <v-skeleton-loader class="glass-panel" type="article, actions" />
+        <div
+          class="sapling-two-column-grid sapling-work-skeleton__streams sapling-issue-skeleton__streams"
+        >
+          <SaplingSurface :as="VSkeletonLoader" type="article, actions" />
+          <SaplingSurface :as="VSkeletonLoader" type="article, actions" />
         </div>
       </div>
     </template>
 
     <template v-else>
       <SaplingPageHero
-        class="sapling-issue-hero"
         variant="signal"
         eyebrow="GitHub"
         :title="$t('issue.heroTitle')"
         :subtitle="$t('issue.heroSubtitle')"
       >
         <template #side>
-          <div class="sapling-issue-hero__pulse">
-            <div class="sapling-issue-hero__pulse-label">{{ $t('issue.updatedAt') }}</div>
-            <div class="sapling-issue-hero__pulse-value">{{ lastUpdatedDisplay }}</div>
+          <div class="sapling-data-card sapling-work-hero-pulse sapling-issue-hero__pulse">
+            <div class="sapling-label">{{ $t('issue.updatedAt') }}</div>
+            <div class="sapling-work-hero-pulse__value sapling-issue-hero__pulse-value">
+              {{ lastUpdatedDisplay }}
+            </div>
           </div>
         </template>
       </SaplingPageHero>
 
-      <section class="sapling-issue-compose glass-panel">
-        <div class="sapling-issue-compose__intro">
-          <p class="sapling-issue-compose__eyebrow">{{ $t('issue.createEyebrow') }}</p>
-          <h2 class="sapling-issue-compose__title">{{ $t('issue.createTitle') }}</h2>
-          <p class="sapling-issue-compose__subtitle">{{ $t('issue.createSubtitle') }}</p>
+      <SaplingSurface as="section" class="sapling-work-compose sapling-issue-compose">
+        <div class="sapling-stack-lg sapling-work-compose__intro sapling-issue-compose__intro">
+          <p class="sapling-eyebrow">{{ $t('issue.createEyebrow') }}</p>
+          <h2 class="sapling-work-compose__title sapling-issue-compose__title">
+            {{ $t('issue.createTitle') }}
+          </h2>
+          <p class="sapling-work-compose__subtitle sapling-issue-compose__subtitle">
+            {{ $t('issue.createSubtitle') }}
+          </p>
 
-          <div class="sapling-issue-compose__hint">
+          <div class="sapling-row-md sapling-work-compose__hint sapling-issue-compose__hint">
             <v-icon icon="mdi-label-outline" size="18" />
             <span>{{ $t('issue.submitHint') }}</span>
           </div>
 
-          <div v-if="latestCreatedIssue" class="sapling-issue-compose__latest">
+          <div
+            v-if="latestCreatedIssue"
+            class="sapling-toolbar-group sapling-work-compose__latest sapling-issue-compose__latest"
+          >
             <v-chip color="success" size="small" variant="tonal">
               #{{ latestCreatedIssue.number }}
             </v-chip>
@@ -51,14 +68,17 @@
               :href="latestCreatedIssue.html_url"
               target="_blank"
               rel="noopener"
-              class="sapling-issue-compose__latest-link"
+              class="sapling-work-compose__latest-link sapling-issue-compose__latest-link"
             >
               {{ latestCreatedIssue.title }}
             </a>
           </div>
         </div>
 
-        <v-form class="sapling-issue-compose__form" @submit.prevent="handleCreateIssue">
+        <v-form
+          class="sapling-stack-lg sapling-work-compose__form sapling-issue-compose__form"
+          @submit.prevent="handleCreateIssue"
+        >
           <v-text-field
             v-model="draft.title"
             :label="$t('issue.titleFieldLabel')"
@@ -82,12 +102,12 @@
             counter="10000"
           />
 
-          <div class="sapling-issue-compose__type-field">
-            <div class="sapling-issue-compose__type-label">{{ $t('issue.typeFieldLabel') }}</div>
+          <div class="sapling-stack-md sapling-work-compose__type-field sapling-issue-compose__type-field">
+            <div class="sapling-label">{{ $t('issue.typeFieldLabel') }}</div>
 
             <v-btn-toggle
               v-model="draft.type"
-              class="sapling-issue-compose__type-toggle"
+              class="sapling-work-compose__type-toggle sapling-issue-compose__type-toggle"
               color="primary"
               density="comfortable"
               divided
@@ -102,7 +122,7 @@
             </v-btn-toggle>
           </div>
 
-          <div class="sapling-issue-compose__actions">
+          <div class="sapling-toolbar-group sapling-work-compose__actions sapling-issue-compose__actions">
             <v-btn
               type="button"
               variant="text"
@@ -137,59 +157,67 @@
             </v-btn>
           </div>
         </v-form>
-      </section>
+      </SaplingSurface>
 
-      <section class="sapling-issue-metrics">
-        <article class="sapling-issue-metric glass-panel">
-          <div class="sapling-issue-metric__icon sapling-issue-metric__icon--open">
+      <section class="sapling-responsive-grid sapling-work-metrics sapling-issue-metrics">
+        <SaplingSurface as="article" class="sapling-metric-card">
+          <div
+            class="sapling-icon-tile sapling-icon-tile--success-gradient sapling-issue-metric__icon--open"
+          >
             <v-icon icon="mdi-source-branch" />
           </div>
-          <div>
-            <p class="sapling-issue-metric__label">{{ $t('issue.openIssues') }}</p>
-            <strong class="sapling-issue-metric__value">{{
+          <div class="sapling-metric-card__copy">
+            <p>{{ $t('issue.openIssues') }}</p>
+            <strong>{{
               isLoading ? '...' : openIssues.length
             }}</strong>
           </div>
-        </article>
+        </SaplingSurface>
 
-        <article class="sapling-issue-metric glass-panel">
-          <div class="sapling-issue-metric__icon sapling-issue-metric__icon--closed">
+        <SaplingSurface as="article" class="sapling-metric-card">
+          <div
+            class="sapling-icon-tile sapling-icon-tile--slate-gradient sapling-issue-metric__icon--closed"
+          >
             <v-icon icon="mdi-check-decagram-outline" />
           </div>
-          <div>
-            <p class="sapling-issue-metric__label">{{ $t('issue.closedIssues') }}</p>
-            <strong class="sapling-issue-metric__value">{{
+          <div class="sapling-metric-card__copy">
+            <p>{{ $t('issue.closedIssues') }}</p>
+            <strong>{{
               isLoading ? '...' : closedIssues.length
             }}</strong>
           </div>
-        </article>
+        </SaplingSurface>
 
-        <article class="sapling-issue-metric glass-panel">
-          <div class="sapling-issue-metric__icon sapling-issue-metric__icon--label">
+        <SaplingSurface as="article" class="sapling-metric-card">
+          <div
+            class="sapling-icon-tile sapling-icon-tile--earth-gradient sapling-issue-metric__icon--label"
+          >
             <v-icon icon="mdi-tag-multiple-outline" />
           </div>
-          <div>
-            <p class="sapling-issue-metric__label">{{ $t('issue.labels') }}</p>
-            <strong class="sapling-issue-metric__value">{{
+          <div class="sapling-metric-card__copy">
+            <p>{{ $t('issue.labels') }}</p>
+            <strong>{{
               isLoading ? '...' : labelCount
             }}</strong>
           </div>
-        </article>
+        </SaplingSurface>
 
-        <article class="sapling-issue-metric glass-panel">
-          <div class="sapling-issue-metric__icon sapling-issue-metric__icon--assignee">
+        <SaplingSurface as="article" class="sapling-metric-card">
+          <div
+            class="sapling-icon-tile sapling-icon-tile--info-gradient sapling-issue-metric__icon--assignee"
+          >
             <v-icon icon="mdi-account-group-outline" />
           </div>
-          <div>
-            <p class="sapling-issue-metric__label">{{ $t('issue.assignedTo') }}</p>
-            <strong class="sapling-issue-metric__value">{{
+          <div class="sapling-metric-card__copy">
+            <p>{{ $t('issue.assignedTo') }}</p>
+            <strong>{{
               isLoading ? '...' : assigneeCount
             }}</strong>
           </div>
-        </article>
+        </SaplingSurface>
       </section>
 
-      <v-row class="sapling-issue-streams">
+      <v-row class="sapling-work-streams sapling-issue-streams">
         <SaplingIssuesOpen :issues="openIssues" :is-loading="isLoading" />
         <SaplingIssuesClosed :issues="closedIssues" :is-loading="isLoading" />
       </v-row>
@@ -200,8 +228,10 @@
 <script lang="ts" setup>
 // #region Imports
 import { computed } from 'vue'
+import { VSkeletonLoader } from 'vuetify/components'
 import { useSaplingIssue } from '@/composables/system/useSaplingIssue'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingIssuesClosed from './SaplingIssuesClosed.vue'
 import SaplingIssuesOpen from './SaplingIssuesOpen.vue'
 // #endregion

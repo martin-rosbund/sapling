@@ -32,7 +32,7 @@ export function useSaplingPermission() {
   const genericStore = useGenericStore()
   const messageCenter = useSaplingMessageCenter()
 
-  genericStore.loadGeneric('permission', 'global', 'entity', 'role', 'roleStage', 'right', 'person')
+  genericStore.loadGeneric('permission', 'global', 'entity', 'role', 'roleStage', 'right', 'person', 'navigationGroup')
 
   const permissionEntity = computed(() => genericStore.getState('permission').entity)
 

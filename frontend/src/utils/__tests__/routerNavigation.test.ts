@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMemoryHistory, createRouter } from 'vue-router'
 
-import { pushAppRoute } from '../routerNavigation'
+import { isRecoverableRouteLoadError, pushAppRoute } from '../routerNavigation'
 
 function createTestRouter() {
   return createRouter({
@@ -48,5 +48,17 @@ describe('pushAppRoute', () => {
     resolveNavigation?.()
     await expect(firstNavigation).resolves.toBe(false)
     await expect(secondNavigation).resolves.toBe(false)
+  })
+
+  it('recognizes stale lazy route import errors as recoverable', () => {
+    expect(
+      isRecoverableRouteLoadError(
+        new TypeError(
+          'Failed to fetch dynamically imported module: http://localhost:5173/src/views/EventView.vue?t=1779714736445',
+        ),
+      ),
+    ).toBe(true)
+    expect(isRecoverableRouteLoadError('Outdated Optimize Dep')).toBe(true)
+    expect(isRecoverableRouteLoadError(new Error('backend request failed'))).toBe(false)
   })
 })

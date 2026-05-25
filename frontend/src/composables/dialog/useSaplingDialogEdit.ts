@@ -685,10 +685,26 @@ export function useSaplingDialogEdit(
    * Stable record identity. Relation tables only need to reset when we
    * actually switch to another record (entity handle + item handle) — not
    * every time the parent emits a fresh `props.item` reference with identical
-   * content (e.g. after a save round-trip).
+   * content. The updatedAt segment lets successful saves and merges rehydrate
+   * the form when the server returns a newer version for the same handle.
    */
+  function normalizeRecordVersion(value: unknown): string {
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? '' : value.toISOString()
+    }
+
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      return String(value)
+    }
+
+    return ''
+  }
+
+  const recordVersion = computed(() => normalizeRecordVersion(props.item?.updatedAt))
+
   const recordIdentity = computed(
-    () => `${props.entity?.handle ?? ''}::${getItemHandle(props.item) ?? ''}::${props.mode}`,
+    () =>
+      `${props.entity?.handle ?? ''}::${getItemHandle(props.item) ?? ''}::${props.mode}::${recordVersion.value}`,
   )
 
   watch(recordIdentity, async (next, previous) => {
@@ -805,8 +821,12 @@ export function useSaplingDialogEdit(
 
   function emitSave(output: SaplingGenericItem, action: DialogSaveAction): void {
     emit('save', output, action, {
-      complete: () => {
+      complete: (didSave = true) => {
         completeSave(action)
+        if (!didSave) {
+          return
+        }
+
         // After a successful save the current form values represent the new
         // baseline. Re-sync the snapshot so previously edited fields are no
         // longer reported as dirty.

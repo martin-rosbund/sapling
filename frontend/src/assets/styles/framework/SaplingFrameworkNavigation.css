@@ -1,0 +1,334 @@
+.sapling-drawer-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-lg);
+  height: 100%;
+  padding: var(--sapling-space-panel-md) var(--sapling-space-panel-xs) var(--sapling-space-panel-md)
+    var(--sapling-space-panel-md);
+  background: var(--sapling-surface-gradient-panel);
+}
+
+.sapling-drawer-hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-xs);
+  padding: var(--sapling-space-panel-md);
+  border: 1px solid var(--sapling-surface-border-accent);
+  border-radius: var(--sapling-radius-sm);
+  background: var(--secondary-gradient);
+  box-shadow: var(--sapling-shadow-lift), var(--sapling-inset-highlight);
+}
+
+.sapling-drawer-hero__main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sapling-gap-md);
+  min-width: 0;
+}
+
+.sapling-drawer-hero__headline {
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.sapling-drawer-hero__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sapling-gap-xs) var(--sapling-gap-md);
+  font-size: var(--sapling-text-label-size-lg);
+  color: var(--sapling-surface-text-muted);
+}
+
+.sapling-search-panel {
+  flex: 0 0 auto;
+  padding: var(--sapling-space-panel-md);
+  border: 1px solid var(--sapling-surface-border);
+  border-radius: var(--sapling-radius-sm);
+  background: var(--sapling-surface-fill);
+  box-shadow: var(--sapling-inset-highlight);
+}
+
+.sapling-search-panel .v-field {
+  background: var(--sapling-surface-fill-soft);
+  color: var(--sapling-surface-text);
+}
+
+.sapling-search-panel .v-field__input,
+.sapling-search-panel .v-field__prepend-inner,
+.sapling-search-panel .v-field__clearable {
+  color: var(--sapling-surface-text-muted);
+}
+
+.sapling-search-panel input {
+  color: var(--sapling-surface-text);
+}
+
+.sapling-search-panel input::placeholder {
+  color: var(--sapling-surface-text-muted);
+  opacity: 1;
+}
+
+.sapling-panel-scroll {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--sapling-gap-md);
+  min-height: 0;
+  padding-right: var(--sapling-gap-xs);
+  overflow: auto;
+}
+
+.sapling-nav-card {
+  border: 1px solid var(--sapling-surface-border);
+  border-radius: var(--sapling-radius-sm);
+  background: var(--sapling-surface-fill);
+  box-shadow: var(--sapling-inset-highlight);
+  transition:
+    transform var(--sapling-motion-fast) ease,
+    box-shadow var(--sapling-motion-fast) ease,
+    border-color var(--sapling-motion-fast) ease;
+}
+
+.sapling-nav-card--muted {
+  border-color: var(--sapling-surface-border-muted);
+  background: var(--sapling-surface-fill-soft);
+  box-shadow: none;
+}
+
+.sapling-nav-card--active {
+  border-color: var(--sapling-surface-border-accent-strong);
+  background: var(--sapling-surface-accent-fill);
+  box-shadow: var(--sapling-shadow-lift);
+}
+
+.sapling-nav-card--muted.sapling-nav-card--active {
+  border-color: var(--sapling-surface-border-accent);
+}
+
+.sapling-nav-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sapling-gap-md);
+  padding: var(--sapling-nav-line-padding, var(--sapling-gap-md));
+}
+
+.sapling-nav-trigger,
+.sapling-nav-route {
+  width: 100%;
+  border: 0;
+  border-radius: var(--sapling-radius-sm);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  outline: none;
+}
+
+.sapling-nav-trigger:focus-visible,
+.sapling-nav-route:focus-visible {
+  outline: 2px solid var(--sapling-surface-border-accent-strong);
+  outline-offset: -2px;
+}
+
+.sapling-nav-copy,
+.sapling-nav-text {
+  display: flex;
+  min-width: 0;
+}
+
+.sapling-nav-copy {
+  align-items: center;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-nav-text {
+  flex-direction: column;
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-nav-text--compact {
+  gap: 0;
+}
+
+.sapling-nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: var(--sapling-icon-box-md);
+  height: var(--sapling-icon-box-md);
+  border: 1px solid var(--sapling-surface-border-accent);
+  border-radius: var(--sapling-radius-sm);
+  background: rgba(var(--v-theme-primary), 0.16);
+}
+
+.sapling-nav-icon--sm {
+  width: var(--sapling-icon-box-sm);
+  height: var(--sapling-icon-box-sm);
+}
+
+.sapling-nav-title {
+  font-size: var(--sapling-text-body-size-lg);
+  font-weight: 700;
+}
+
+.sapling-nav-title--truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sapling-nav-caption {
+  font-size: var(--sapling-text-meta-size);
+  color: var(--sapling-surface-text-muted);
+}
+
+.sapling-nav-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-nav-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-md);
+  padding: 0 var(--sapling-gap-md) var(--sapling-gap-md);
+}
+
+.sapling-nav-route {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sapling-gap-md);
+  padding: var(--sapling-gap-md);
+  border: 1px solid transparent;
+  background: var(--sapling-surface-gradient-soft);
+  transition:
+    background-color var(--sapling-motion-fast) ease,
+    transform var(--sapling-motion-fast) ease,
+    border-color var(--sapling-motion-fast) ease;
+}
+
+.sapling-nav-route:hover,
+.sapling-nav-trigger:hover {
+  background: var(--sapling-surface-accent-fill);
+}
+
+.sapling-nav-route:hover {
+  transform: translateX(var(--sapling-hover-lift-sm));
+}
+
+.sapling-nav-route--active {
+  border-color: var(--sapling-surface-border-accent-strong);
+  background: var(--sapling-surface-accent-fill);
+}
+
+.sapling-navigation-drawer {
+  color: var(--sapling-surface-text);
+}
+
+.sapling-navigation-shell__panel-toggle,
+.sapling-navigation-shell__search {
+  flex: 0 0 auto;
+}
+
+.sapling-navigation-section__trigger {
+  --sapling-nav-line-padding: var(--sapling-space-panel-md);
+}
+
+.sapling-navigation-subgroup__trigger {
+  --sapling-nav-line-padding: var(--sapling-gap-xl) var(--sapling-space-panel-md);
+}
+
+.sapling-navigation-subgroup__copy {
+  font-size: var(--sapling-text-body-size-xs);
+  font-weight: 600;
+}
+
+.sapling-navigation-subgroup.sapling-nav-card--active {
+  box-shadow: none;
+}
+
+.sapling-navigation-entity.sapling-nav-card--active {
+  border-color: var(--sapling-surface-border-accent);
+  background: var(--sapling-surface-fill);
+}
+
+.sapling-navigation-entity__multi {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-navigation-entity__routes {
+  display: grid;
+  gap: var(--sapling-gap-xs);
+  padding: 0 var(--sapling-gap-md) var(--sapling-gap-md);
+}
+
+.sapling-favorites-panel {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  border: 1px solid var(--sapling-surface-border);
+  border-radius: var(--sapling-radius-sm);
+  background: var(--sapling-surface-fill);
+  box-shadow: var(--sapling-inset-highlight);
+  overflow: hidden;
+}
+
+.sapling-favorites-panel__footer,
+.sapling-favorites-panel__search {
+  flex: 0 0 auto;
+  padding: var(--sapling-space-panel-md);
+}
+
+.sapling-favorites-panel__search {
+  border-bottom: 1px solid var(--sapling-surface-border-muted);
+}
+
+.sapling-favorites-panel__content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+
+.sapling-favorites-panel__footer {
+  border-top: 1px solid var(--sapling-surface-border-muted);
+}
+
+.sapling-navigation-shell__skeleton {
+  border-radius: var(--sapling-radius-sm);
+}
+
+.sapling-navigation-shell__empty {
+  min-height: var(--sapling-panel-min-height-xs);
+  padding: var(--sapling-space-panel-xl);
+  border: 1px dashed var(--sapling-surface-border);
+  border-radius: var(--sapling-radius-sm);
+  background: var(--sapling-surface-fill-soft);
+  opacity: var(--sapling-opacity-primary);
+}
+
+@media (max-width: 959px) {
+  .sapling-navigation-shell {
+    padding: var(--sapling-space-panel-md) var(--sapling-gap-md);
+  }
+}
+
+:root[data-sapling-glass='off'] .sapling-nav-route:hover,
+:root[data-sapling-performance='reduced'] .sapling-nav-route:hover {
+  transform: none;
+}
+
+:root[data-sapling-glass='off'] .sapling-nav-card,
+:root[data-sapling-glass='off'] .sapling-nav-route,
+:root[data-sapling-performance='reduced'] .sapling-nav-card,
+:root[data-sapling-performance='reduced'] .sapling-nav-route {
+  transition: none !important;
+}

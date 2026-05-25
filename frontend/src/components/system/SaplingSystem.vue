@@ -5,13 +5,18 @@
   >
     <template v-if="isLoading">
       <div class="sapling-system-skeleton">
-        <v-skeleton-loader class="glass-panel" type="article" />
+        <SaplingSurface :as="VSkeletonLoader" type="article" />
         <div class="sapling-system-skeleton__metrics">
-          <v-skeleton-loader v-for="item in 4" :key="item" class="glass-panel" type="article" />
+          <SaplingSurface
+            v-for="item in 4"
+            :key="item"
+            :as="VSkeletonLoader"
+            type="article"
+          />
         </div>
         <div class="sapling-system-skeleton__sections">
-          <v-skeleton-loader class="glass-panel" type="article" />
-          <v-skeleton-loader class="glass-panel" type="article" />
+          <SaplingSurface :as="VSkeletonLoader" type="article" />
+          <SaplingSurface :as="VSkeletonLoader" type="article" />
         </div>
       </div>
     </template>
@@ -38,9 +43,9 @@
 
         <template #side>
           <div class="sapling-system-hero__side">
-            <article class="sapling-system-hero-card">
-              <div class="sapling-system-hero-card__header">
-                <span>{{ $t('system.health') }}</span>
+            <article class="sapling-system-hero-card sapling-data-card">
+              <div class="sapling-section-header">
+                <span class="sapling-label">{{ $t('system.health') }}</span>
                 <v-chip :color="state?.isReady ? 'success' : 'error'" size="small" variant="tonal">
                   {{ state?.isReady ? $t('system.isReady') : $t('system.isNotReady') }}
                 </v-chip>
@@ -48,12 +53,12 @@
               <strong>{{
                 state?.isReady ? $t('system.operational') : $t('system.requiresAttention')
               }}</strong>
-              <p>{{ $t('system.liveFeedHint') }}</p>
+              <p class="sapling-muted-copy">{{ $t('system.liveFeedHint') }}</p>
             </article>
 
-            <article class="sapling-system-hero-card">
-              <div class="sapling-system-hero-card__header">
-                <span>{{ $t('system.runtime') }}</span>
+            <article class="sapling-system-hero-card sapling-data-card">
+              <div class="sapling-section-header">
+                <span class="sapling-label">{{ $t('system.runtime') }}</span>
                 <v-btn
                   icon="mdi-refresh"
                   size="small"
@@ -64,7 +69,7 @@
                 />
               </div>
               <strong>{{ timeLoading ? t('global.loading') : formattedServerTime }}</strong>
-              <p>{{ $t('system.lastRefresh') }}: {{ lastUpdatedDisplay }}</p>
+              <p class="sapling-muted-copy">{{ $t('system.lastRefresh') }}: {{ lastUpdatedDisplay }}</p>
             </article>
           </div>
         </template>
@@ -168,9 +173,11 @@
 // #region Imports
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { VSkeletonLoader } from 'vuetify/components'
 import type { NetworkInterface } from '@/entity/system'
 import { useSaplingSystem } from '@/composables/system/useSaplingSystem'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingSystemMetricCard from '@/components/system/SaplingSystemMetricCard.vue'
 import SaplingSystemNetworkPanel from '@/components/system/SaplingSystemNetworkPanel.vue'
 import SaplingSystemOverviewPanel from '@/components/system/SaplingSystemOverviewPanel.vue'

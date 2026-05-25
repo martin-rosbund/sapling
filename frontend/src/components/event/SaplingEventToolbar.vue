@@ -1,7 +1,7 @@
 <template>
-  <header class="sapling-event-toolbar">
-    <div class="sapling-event-toolbar__primary">
-      <div class="sapling-event-toolbar__nav-group">
+  <header class="sapling-split-toolbar sapling-event-toolbar">
+    <div class="sapling-toolbar-group sapling-event-toolbar__primary">
+      <div class="sapling-toolbar-nav-group sapling-event-toolbar__nav-group">
         <v-btn-group class="sapling-event-toolbar__nav" density="comfortable">
           <v-btn variant="outlined" icon="mdi-chevron-left" @click="emit('previous')" />
           <v-btn prepend-icon="mdi-calendar-today" variant="tonal" @click="emit('today')">
@@ -16,7 +16,7 @@
             <template #activator="{ props: activatorProps }">
               <v-btn
                 v-bind="activatorProps"
-                class="sapling-event-toolbar__picker-trigger"
+                class="sapling-button-truncate sapling-event-toolbar__picker-trigger"
                 prepend-icon="mdi-calendar-search"
                 variant="tonal"
               >
@@ -26,7 +26,7 @@
               </v-btn>
             </template>
 
-            <div class="sapling-event-toolbar__picker-panel glass-panel">
+            <SaplingSurface class="sapling-picker-panel sapling-event-toolbar__picker-panel">
               <v-date-picker
                 v-if="isMonthPicker"
                 :model-value="pickerDateModel"
@@ -47,17 +47,17 @@
                 :show-week="isWeekPicker"
                 @update:model-value="onDatePicked"
               />
-            </div>
+            </SaplingSurface>
           </v-menu>
           <v-btn variant="outlined" icon="mdi-chevron-right" @click="emit('next')" />
         </v-btn-group>
       </div>
     </div>
 
-    <div class="sapling-event-toolbar__secondary">
+    <div class="sapling-toolbar-group sapling-event-toolbar__secondary">
       <v-btn-toggle
         v-model="calendarModeModel"
-        class="sapling-event-toolbar__mode-toggle"
+        class="sapling-toolbar-toggle sapling-event-toolbar__mode-toggle"
         density="comfortable"
         mandatory
       >
@@ -72,7 +72,7 @@
       <v-btn-toggle
         v-if="!isNarrowScreen"
         v-model="calendarViewModeModel"
-        class="sapling-event-toolbar__view-toggle"
+        class="sapling-toolbar-toggle sapling-event-toolbar__view-toggle"
         density="comfortable"
         mandatory
       >
@@ -87,7 +87,7 @@
       <div class="d-none d-md-flex">
         <v-btn-toggle
           v-model="calendarTypeModel"
-          class="sapling-event-toolbar__type-toggle"
+          class="sapling-toolbar-toggle sapling-event-toolbar__type-toggle"
           density="comfortable"
           mandatory
         >
@@ -104,7 +104,7 @@
             <v-btn v-bind="props" icon="mdi-tune" variant="text" />
           </template>
 
-          <v-list class="glass-panel">
+          <SaplingSurface :as="VList">
             <v-list-item
               v-for="type in calendarTypeOptions"
               :key="type"
@@ -112,7 +112,7 @@
             >
               <v-list-item-title>{{ $t(`calendar.${type}`) }}</v-list-item-title>
             </v-list-item>
-          </v-list>
+          </SaplingSurface>
         </v-menu>
       </div>
     </div>
@@ -121,6 +121,8 @@
 
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue'
+import { VList } from 'vuetify/components'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 
 type CalendarType = 'workweek' | 'month' | 'day' | 'week'
 type CalendarViewMode = 'single' | 'sidebyside'

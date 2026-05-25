@@ -1652,11 +1652,19 @@ export class GenericService {
   }
 
   private isUpdateConflictComparableField(field: EntityTemplateDto): boolean {
-    if (!field.name || field.isPersistent === false || field.isReference) {
+    if (!field.name || field.isPersistent === false) {
       return false;
     }
 
-    return !['1:m', 'm:n', 'n:m', '1:1', 'm:1'].includes(field.kind ?? '');
+    if (field.kind === 'm:1') {
+      return true;
+    }
+
+    if (field.isReference) {
+      return false;
+    }
+
+    return !['1:m', 'm:n', 'n:m', '1:1'].includes(field.kind ?? '');
   }
 
   private buildAutomaticMergePayload(

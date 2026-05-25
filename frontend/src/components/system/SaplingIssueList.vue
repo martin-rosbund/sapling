@@ -1,48 +1,66 @@
 <template>
   <v-col cols="12" md="6">
-    <section class="sapling-issue-stream" :class="`sapling-issue-stream--${status}`">
-      <header class="sapling-issue-stream__header glass-panel">
-        <div class="sapling-issue-stream__header-copy">
-          <div class="sapling-issue-stream__eyebrow">
+    <section
+      class="sapling-stack-xl sapling-work-stream sapling-issue-stream"
+      :class="[`sapling-work-stream--${streamTone}`, `sapling-issue-stream--${status}`]"
+    >
+      <SaplingSurface
+        as="header"
+        class="sapling-section-header sapling-work-stream__header sapling-issue-stream__header"
+      >
+        <div class="sapling-work-stream__header-copy sapling-issue-stream__header-copy">
+          <div class="sapling-work-stream__eyebrow sapling-issue-stream__eyebrow">
             <v-icon :icon="streamIcon" size="18" />
             <span>{{ $t(statusLabelKey) }}</span>
           </div>
-          <h2 class="sapling-issue-stream__title">{{ $t(titleKey) }}</h2>
+          <h2 class="sapling-section-title sapling-work-stream__title sapling-issue-stream__title">
+            {{ $t(titleKey) }}
+          </h2>
         </div>
 
         <v-chip :color="statusChipColor" size="small" variant="tonal">
           {{ isLoading ? '...' : issues.length }}
         </v-chip>
-      </header>
+      </SaplingSurface>
 
-      <div v-if="isLoading" class="sapling-issue-stream__loading">
-        <v-skeleton-loader
-          class="sapling-issue-stream__skeleton glass-panel"
+      <div
+        v-if="isLoading"
+        class="sapling-stack-xl sapling-work-stream__loading sapling-issue-stream__loading"
+      >
+        <SaplingSurface
+          :as="VSkeletonLoader"
+          class="sapling-work-stream__skeleton sapling-issue-stream__skeleton"
           type="article, actions"
         />
-        <v-skeleton-loader
-          class="sapling-issue-stream__skeleton glass-panel"
+        <SaplingSurface
+          :as="VSkeletonLoader"
+          class="sapling-work-stream__skeleton sapling-issue-stream__skeleton"
           type="article, actions"
         />
       </div>
 
-      <div v-else-if="!issues.length" class="sapling-issue-stream__empty glass-panel">
+      <SaplingSurface
+        v-else-if="!issues.length"
+        class="sapling-empty-state-panel sapling-empty-state-panel--large sapling-work-stream__empty sapling-issue-stream__empty"
+      >
         <v-icon :icon="streamIcon" size="34" />
         <p>{{ $t(emptyStateKey) }}</p>
-      </div>
+      </SaplingSurface>
 
-      <div v-else class="sapling-issue-stream__list">
-        <v-card
+      <div v-else class="sapling-stack-xl sapling-work-stream__list sapling-issue-stream__list">
+        <SaplingSurface
           v-for="issue in issues"
           :key="`${cardPrefix}-${issue.id}`"
-          v-tilt="TILT_SOFT_OPTIONS"
-          class="sapling-issue-card glass-panel tilt-content"
-          elevation="8"
+          :as="VCard"
+          class="sapling-work-card sapling-issue-card"
+          :elevation="8"
+          tilt
+          :tilt-options="TILT_SOFT_OPTIONS"
         >
-          <div class="sapling-issue-card__accent" />
+          <div class="sapling-work-card__accent sapling-issue-card__accent" />
 
-          <v-card-text class="sapling-issue-card__content">
-            <div class="sapling-issue-card__header-row">
+          <v-card-text class="sapling-stack-xl sapling-work-card__content sapling-issue-card__content">
+            <div class="sapling-row-between-md sapling-work-card__header-row sapling-issue-card__header-row">
               <v-chip :color="statusChipColor" size="small" variant="tonal">
                 {{ $t(statusLabelKey) }}
               </v-chip>
@@ -61,53 +79,59 @@
               :href="issue.html_url"
               target="_blank"
               rel="noopener"
-              class="sapling-issue-card__title"
+              class="sapling-work-card__title sapling-issue-card__title"
             >
               {{ issue.title }}
             </a>
 
-            <div class="sapling-issue-card__meta-grid">
-              <div class="sapling-issue-card__meta-item">
+            <div class="sapling-detail-grid">
+              <div class="sapling-detail-card">
                 <span>{{ $t('issue.createdAt') }}</span>
                 <strong>{{ formatDateTime(issue.created_at) }}</strong>
               </div>
-              <div class="sapling-issue-card__meta-item">
+              <div class="sapling-detail-card">
                 <span>{{ $t('issue.updatedAt') }}</span>
                 <strong>{{ formatDateTime(issue.updated_at) }}</strong>
               </div>
-              <div class="sapling-issue-card__meta-item">
+              <div class="sapling-detail-card">
                 <span>{{ $t('issue.labels') }}</span>
                 <strong>{{ issue.labels.length }}</strong>
               </div>
-              <div class="sapling-issue-card__meta-item">
+              <div class="sapling-detail-card">
                 <span>{{ $t('issue.assignedTo') }}</span>
                 <strong>{{ issue.assignees.length || $t('global.notAvailable') }}</strong>
               </div>
             </div>
 
-            <div v-if="issue.labels.length" class="sapling-issue-card__labels">
+            <div
+              v-if="issue.labels.length"
+              class="sapling-chip-row sapling-work-card__labels sapling-issue-card__labels"
+            >
               <v-chip
                 v-for="label in issue.labels"
                 :key="label.name"
                 size="small"
                 variant="flat"
-                class="sapling-issue-card__label"
+                class="sapling-work-card__label sapling-issue-card__label"
                 :style="resolveLabelStyle(label.color)"
               >
                 {{ label.name }}
               </v-chip>
             </div>
 
-            <div class="sapling-issue-card__assignees">
-              <div class="sapling-issue-card__section-label">{{ $t('issue.assignedTo') }}</div>
-              <div v-if="issue.assignees.length" class="sapling-issue-card__assignee-list">
+            <div class="sapling-stack-md sapling-work-card__assignees sapling-issue-card__assignees">
+              <div class="sapling-label">{{ $t('issue.assignedTo') }}</div>
+              <div
+                v-if="issue.assignees.length"
+                class="sapling-chip-row sapling-work-card__assignee-list sapling-issue-card__assignee-list"
+              >
                 <a
                   v-for="assignee in issue.assignees"
                   :key="assignee.login"
                   :href="assignee.html_url"
                   target="_blank"
                   rel="noopener"
-                  class="sapling-issue-card__assignee"
+                  class="sapling-work-card__assignee sapling-issue-card__assignee"
                 >
                   <v-avatar size="32">
                     <img :src="assignee.avatar_url" :alt="assignee.login" />
@@ -115,17 +139,21 @@
                   <span>{{ assignee.login }}</span>
                 </a>
               </div>
-              <div v-else class="sapling-issue-card__empty-copy">-</div>
+              <div v-else class="sapling-work-card__empty-copy sapling-issue-card__empty-copy">
+                -
+              </div>
             </div>
 
-            <div class="sapling-issue-card__description">
-              <div class="sapling-issue-card__section-label">{{ $t('issue.description') }}</div>
-              <div class="sapling-issue-card__markdown">
+            <div
+              class="sapling-stack-md sapling-work-card__description sapling-issue-card__description"
+            >
+              <div class="sapling-label">{{ $t('issue.description') }}</div>
+              <div class="sapling-work-card__markdown sapling-issue-card__markdown">
                 <VMarkdown :source="issue.body || $t('issue.noDescription')" />
               </div>
             </div>
           </v-card-text>
-        </v-card>
+        </SaplingSurface>
       </div>
     </section>
   </v-col>
@@ -133,9 +161,11 @@
 
 <script lang="ts" setup>
 // #region Imports
+import { VCard, VSkeletonLoader } from 'vuetify/components'
 import { computed } from 'vue'
 import type { SaplingIssue, SaplingIssueStatus } from '@/composables/system/useSaplingIssue'
 import { TILT_SOFT_OPTIONS } from '@/constants/tilt.constants'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import VMarkdown from 'vue-markdown-render'
 // #endregion
 
@@ -158,6 +188,7 @@ const streamIcon = computed(() =>
   props.status === 'open' ? 'mdi-progress-wrench' : 'mdi-check-all',
 )
 const statusChipColor = computed(() => (props.status === 'open' ? 'success' : 'secondary'))
+const streamTone = computed(() => (props.status === 'open' ? 'success' : 'slate'))
 // #endregion
 
 // #region Methods

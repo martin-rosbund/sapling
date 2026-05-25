@@ -6,9 +6,12 @@
     :height="SAPLING_DIALOG_HEIGHT.xl"
     persistent
   >
-    <SaplingDialogCard :tilt="false">
-      <div class="sapling-dialog-edit-shell" @keydown="onShellKeydown">
-        <v-card-title class="sapling-dialog-edit-header">
+    <SaplingDialogCard class="sapling-dialog-card--fill" :tilt="false">
+      <div
+        class="sapling-stack-xl sapling-record-dialog-shell sapling-dialog-edit-shell"
+        @keydown="onShellKeydown"
+      >
+        <v-card-title class="sapling-record-dialog-header sapling-dialog-edit-header">
           <SaplingDialogEditHero :loading="isLoading" :eyebrow="entityLabel" :title="dialogTitle">
             <template #timestamps>
               <v-chip
@@ -72,59 +75,89 @@
             </template>
           </SaplingDialogEditHero>
         </v-card-title>
-        <v-card-text class="sapling-dialog-edit-content">
+        <v-card-text class="sapling-record-dialog-content sapling-dialog-edit-content">
           <template v-if="isLoading">
-            <div class="sapling-dialog-edit-loading">
+            <div class="sapling-stack-xl sapling-record-dialog-loading sapling-dialog-edit-loading">
               <v-skeleton-loader
-                class="sapling-dialog-edit-loading__tabs"
+                class="sapling-record-dialog-loading__tabs sapling-dialog-edit-loading__tabs"
                 elevation="12"
                 type="heading"
               />
-              <v-skeleton-loader class="sapling-dialog-edit-skeleton" elevation="12" type="table" />
+              <v-skeleton-loader
+                class="sapling-record-dialog-skeleton sapling-dialog-edit-skeleton"
+                elevation="12"
+                type="table"
+              />
             </div>
           </template>
           <template v-else>
             <div class="sapling-dialog-edit-tabs-shell">
-              <v-tabs v-model="activeTab" class="sapling-dialog-edit-tabs" grow>
-                <v-tab class="sapling-dialog-edit-tab">
+              <v-tabs
+                v-model="activeTab"
+                class="sapling-record-dialog-tabs sapling-dialog-edit-tabs"
+                grow
+              >
+                <v-tab class="sapling-record-dialog-tab sapling-dialog-edit-tab">
                   {{ entityLabel }}
                 </v-tab>
                 <template v-if="mode === 'edit'">
                   <v-tab
                     v-for="template in relationTemplates"
                     :key="template.name"
-                    class="sapling-dialog-edit-tab"
+                    class="sapling-record-dialog-tab sapling-dialog-edit-tab"
                   >
                     {{ $t(`${entity?.handle}.${template.name}`) }}
                   </v-tab>
                 </template>
               </v-tabs>
             </div>
-            <v-window v-model="activeTab" class="sapling-dialog-edit-window">
-              <v-window-item :value="0" class="sapling-dialog-edit-window-item">
-                <div class="sapling-dialog-edit-tab-scroll">
-                  <div ref="formSurfaceRef" class="sapling-dialog-edit-form-surface">
-                    <v-form ref="formRef" class="sapling-dialog-edit-form" @submit.prevent="save">
-                      <div class="sapling-dialog-edit-form-layout">
+            <v-window
+              v-model="activeTab"
+              class="sapling-record-dialog-window sapling-dialog-edit-window"
+            >
+              <v-window-item
+                :value="0"
+                class="sapling-record-dialog-window-item sapling-dialog-edit-window-item"
+              >
+                <div class="sapling-record-dialog-tab-scroll sapling-dialog-edit-tab-scroll">
+                  <div
+                    ref="formSurfaceRef"
+                    class="sapling-stack-lg sapling-record-dialog-surface sapling-dialog-edit-form-surface"
+                  >
+                    <v-form
+                      ref="formRef"
+                      class="sapling-record-dialog-form sapling-dialog-edit-form"
+                      @submit.prevent="save"
+                    >
+                      <div
+                        class="sapling-stack-lg sapling-record-dialog-form-layout sapling-dialog-edit-form-layout"
+                      >
                         <section
                           v-for="group in visibleTemplateGroups"
                           :key="group.id"
-                          class="sapling-dialog-edit-section"
+                          class="sapling-section-panel sapling-record-section sapling-dialog-edit-section"
                           :class="{
                             'sapling-dialog-edit-section--collapsed':
                               group.label && !isGroupExpanded(group.id),
+                            'sapling-record-section--dirty':
+                              mode !== 'readonly' && isGroupDirty(group.templates),
                             'sapling-dialog-edit-section--dirty':
                               mode !== 'readonly' && isGroupDirty(group.templates),
                           }"
                         >
-                          <div v-if="group.label" class="sapling-dialog-edit-section__header">
+                          <div
+                            v-if="group.label"
+                            class="sapling-section-header sapling-record-section__header sapling-dialog-edit-section__header"
+                          >
                             <button
                               type="button"
-                              class="sapling-dialog-edit-section__toggle"
+                              class="sapling-row-between-md sapling-record-section__toggle sapling-dialog-edit-section__toggle"
                               :aria-expanded="isGroupExpanded(group.id)"
                               @click="toggleGroup(group.id)"
                             >
-                              <h3 class="sapling-dialog-edit-section__title">
+                              <h3
+                                class="sapling-section-title sapling-record-section__title sapling-dialog-edit-section__title"
+                              >
                                 {{ $t(group.label) }}
                               </h3>
                               <v-icon
@@ -138,18 +171,23 @@
                           <v-expand-transition>
                             <div
                               v-show="!group.label || isGroupExpanded(group.id)"
-                              class="sapling-dialog-edit-section__body"
+                              class="sapling-record-section__body sapling-dialog-edit-section__body"
                             >
-                              <v-row density="comfortable" class="sapling-dialog-edit-grid">
+                              <v-row
+                                density="comfortable"
+                                class="sapling-record-form-grid sapling-dialog-edit-grid"
+                              >
                                 <v-col
                                   v-for="template in group.templates"
                                   :key="template.name"
                                   v-bind="getTemplateColumnProps(template)"
-                                  class="sapling-dialog-edit-grid__column"
+                                  class="sapling-record-form-grid__column sapling-dialog-edit-grid__column"
                                 >
                                   <div
-                                    class="sapling-dialog-edit-field-shell"
+                                    class="sapling-record-field-shell sapling-dialog-edit-field-shell"
                                     :class="{
+                                      'sapling-record-field-shell--dirty':
+                                        mode !== 'readonly' && isTemplateDirty(template),
                                       'sapling-dialog-edit-field-shell--dirty':
                                         mode !== 'readonly' && isTemplateDirty(template),
                                     }"
@@ -190,7 +228,7 @@
                 v-for="(template, idx) in relationTemplates"
                 :key="template.name"
                 :value="idx + 1"
-                class="sapling-dialog-edit-window-item"
+                class="sapling-record-dialog-window-item sapling-dialog-edit-window-item"
                 :transition="false"
                 :reverse-transition="false"
               >
@@ -255,7 +293,7 @@
                 </template>
 
                 <v-list
-                  class="glass-panel sapling-dialog-edit__mobile-action-list"
+                  class="glass-panel sapling-mobile-action-list sapling-dialog-edit__mobile-action-list"
                   density="comfortable"
                   min-width="260"
                 >
@@ -344,7 +382,7 @@
                 </template>
 
                 <v-list
-                  class="glass-panel sapling-dialog-edit__mobile-action-list"
+                  class="glass-panel sapling-mobile-action-list sapling-dialog-edit__mobile-action-list"
                   density="comfortable"
                   min-width="260"
                 >
@@ -387,7 +425,7 @@
               </v-menu>
 
               <v-btn
-                class="sapling-dialog-edit__mobile-primary-action"
+                class="sapling-mobile-primary-action sapling-dialog-edit__mobile-primary-action"
                 color="primary"
                 prepend-icon="mdi-content-save"
                 :disabled="!isDirty || isSaving"
@@ -803,7 +841,9 @@ const updatedAtTitle = computed(() => getTimestampTitle('updatedAt', 'global.upd
 const createdAtLabel = computed(() => formatTimestamp(props.item?.createdAt))
 const updatedAtLabel = computed(() => formatTimestamp(props.item?.updatedAt))
 const selectedFormConfigChipLabel = computed(() =>
-  selectedFormConfigLabel.value ? `${t('formConfig.currentView')}: ${selectedFormConfigLabel.value}` : '',
+  selectedFormConfigLabel.value
+    ? `${t('formConfig.currentView')}: ${selectedFormConfigLabel.value}`
+    : '',
 )
 
 const resetButtonLabel = computed(() => t('filter.reset'))

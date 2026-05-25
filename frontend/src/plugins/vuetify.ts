@@ -13,6 +13,35 @@ export default createVuetify({
   components: {
     VDateInput,
   },
+  defaults: {
+    VAutocomplete: {
+      density: 'comfortable',
+      variant: 'outlined',
+    },
+    VCard: {
+      rounded: 'lg',
+    },
+    VCombobox: {
+      density: 'comfortable',
+      variant: 'outlined',
+    },
+    VDateInput: {
+      density: 'comfortable',
+      variant: 'outlined',
+    },
+    VSelect: {
+      density: 'comfortable',
+      variant: 'outlined',
+    },
+    VTextarea: {
+      density: 'comfortable',
+      variant: 'outlined',
+    },
+    VTextField: {
+      density: 'comfortable',
+      variant: 'outlined',
+    },
+  },
   theme: {
     defaultTheme: 'dark', // <-- This line enables dark mode
   },

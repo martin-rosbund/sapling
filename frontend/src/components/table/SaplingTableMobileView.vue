@@ -1,13 +1,17 @@
 <template>
   <div class="sapling-table-mobile-shell">
-    <div class="sapling-table-mobile-summary glass-panel">
-      <div class="sapling-table-mobile-summary__header">
+    <SaplingSurface
+      as="div"
+      class="sapling-section-panel sapling-section-panel--compact sapling-table-mobile-summary"
+      variant="subtle"
+    >
+      <div class="sapling-section-header sapling-table-mobile-summary__header">
         <div class="sapling-table-mobile-summary__identity">
-          <div class="sapling-table-mobile-summary__headline">
-            <span class="sapling-table-mobile-summary__headline-value">
+          <div class="sapling-counter-line sapling-table-mobile-summary__headline">
+            <span class="sapling-counter-line__value sapling-table-mobile-summary__headline-value">
               {{ totalItems }}
             </span>
-            <span class="sapling-table-mobile-summary__headline-copy">{{
+            <span class="sapling-counter-line__label sapling-table-mobile-summary__headline-copy">{{
               $t('global.items')
             }}</span>
           </div>
@@ -30,14 +34,18 @@
         </div>
       </div>
       <v-progress-linear v-if="isLoading" color="primary" indeterminate rounded />
-    </div>
+    </SaplingSurface>
 
     <v-expand-transition>
       <div v-if="mobileControlsVisible" class="sapling-table-mobile-controls-shell">
-        <div class="sapling-table-mobile-controls glass-panel">
-          <div class="sapling-table-mobile-controls__section">
+        <SaplingSurface
+          as="div"
+          class="sapling-section-panel sapling-section-panel--compact sapling-table-mobile-controls"
+          variant="subtle"
+        >
+          <div class="sapling-stack-md sapling-table-mobile-controls__section">
             <span class="sapling-table-mobile-controls__label">{{ $t('filter.sort') }}</span>
-            <div class="sapling-table-mobile-controls__sorts">
+            <div class="sapling-responsive-grid sapling-responsive-grid--sm sapling-table-mobile-controls__sorts">
               <v-btn
                 v-for="column in sortableMobileHeaders"
                 :key="`sort-${String(column.key ?? '')}`"
@@ -60,10 +68,10 @@
 
           <div
             v-if="filterableMobileHeaders.length > 0"
-            class="sapling-table-mobile-controls__section"
+            class="sapling-stack-md sapling-table-mobile-controls__section"
           >
             <span class="sapling-table-mobile-controls__label">{{ $t('filter.filter') }}</span>
-            <div class="sapling-table-mobile-controls__filters">
+            <div class="sapling-stack-md sapling-table-mobile-controls__filters">
               <SaplingTableColumnFilter
                 v-for="column in filterableMobileHeaders"
                 :key="`filter-${String(column.key ?? '')}`"
@@ -84,11 +92,11 @@
               />
             </div>
           </div>
-        </div>
+        </SaplingSurface>
       </div>
     </v-expand-transition>
 
-    <div v-if="items.length > 0" class="sapling-table-mobile-list">
+    <div v-if="items.length > 0" class="sapling-scroll-list sapling-table-mobile-list">
       <SaplingTableMobileCard
         v-for="(item, index) in items"
         :key="String(item.handle ?? index)"
@@ -127,7 +135,7 @@
         @show-information="emit('show-information', $event)"
       />
     </div>
-    <div v-else-if="isLoading" class="sapling-table-mobile-list">
+    <div v-else-if="isLoading" class="sapling-scroll-list sapling-table-mobile-list">
       <v-skeleton-loader
         v-for="skeletonIndex in 3"
         :key="`mobile-card-skeleton-${skeletonIndex}`"
@@ -159,6 +167,7 @@
 
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, ref } from 'vue'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import type { EntityItem, SaplingGenericItem, ScriptButtonItem } from '@/entity/entity'
 import type {
   AccumulatedPermission,

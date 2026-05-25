@@ -1,18 +1,18 @@
 <template>
-  <section class="sapling-permission-workspace glass-panel">
-    <div class="sapling-permission-toolbar">
-      <v-tabs v-model="selectedGroupModel" class="sapling-permission-tabs" show-arrows>
+  <section class="sapling-workspace-panel sapling-page-panel sapling-page-panel-stack sapling-admin-workspace sapling-admin-panel-stack sapling-permission-workspace glass-panel">
+    <div class="sapling-stack-md sapling-admin-toolbar sapling-permission-toolbar">
+      <v-tabs v-model="selectedGroupModel" class="sapling-admin-tabs sapling-permission-tabs" show-arrows>
         <v-tab
           v-for="group in permissionGroups"
           :key="group"
           :value="group"
-          class="sapling-permission-tab"
+          class="sapling-admin-tab sapling-permission-tab"
         >
           {{ $t(`navigationGroup.${group}`) }}
         </v-tab>
       </v-tabs>
 
-      <div class="sapling-permission-toolbar-actions">
+      <div class="sapling-split-toolbar sapling-admin-toolbar-actions sapling-permission-toolbar-actions">
         <v-text-field
           v-model="permissionSearchModel"
           :label="$t('global.search')"
@@ -39,11 +39,11 @@
       v-if="permissionSaveState === 'saving'"
       color="primary"
       indeterminate
-      class="sapling-permission-progress"
+      class="sapling-admin-progress sapling-permission-progress"
     />
 
-    <div v-if="entities.length && lgAndUp" class="sapling-permission-matrix-shell">
-      <v-table class="sapling-permission-matrix" density="comfortable">
+    <div v-if="entities.length && lgAndUp" class="sapling-admin-matrix-shell sapling-permission-matrix-shell">
+      <v-table class="sapling-admin-matrix sapling-permission-matrix" density="comfortable">
         <thead>
           <tr>
             <th>{{ $t('navigation.entity') }}</th>
@@ -54,12 +54,12 @@
         <tbody>
           <tr v-for="item in entities" :key="item.handle" :class="rowClasses(item)">
             <td>
-              <div class="sapling-permission-entity-cell">
-                <div class="sapling-permission-entity-main">
+              <div class="sapling-row-between-xs sapling-admin-item-cell sapling-permission-entity-cell">
+                <div class="sapling-row-xs sapling-admin-item-main sapling-permission-entity-main">
                   <v-icon v-if="item.icon" size="18">{{ item.icon }}</v-icon>
                   <span>{{ $t(`navigation.${item.handle}`) }}</span>
                 </div>
-                <div class="sapling-permission-entity-tags">
+                <div class="sapling-row-md sapling-admin-item-tags sapling-permission-entity-tags">
                   <v-chip
                     v-if="isPermissionDirty(selectedRole, item)"
                     size="x-small"
@@ -91,11 +91,11 @@
                 :ripple="false"
                 @update:model-value="emit('togglePermission', item, column.key, !!$event)"
               />
-              <span v-else class="sapling-permission-unavailable">-</span>
+              <span v-else class="sapling-admin-unavailable sapling-permission-unavailable">-</span>
             </td>
 
             <td class="text-right">
-              <div class="sapling-permission-row-actions">
+              <div class="sapling-row-md sapling-admin-row-actions sapling-permission-row-actions">
                 <v-btn size="x-small" variant="text" @click="emit('grantEntityAccess', item)">{{
                   $t('right.all')
                 }}</v-btn>
@@ -109,19 +109,19 @@
       </v-table>
     </div>
 
-    <div v-else-if="entities.length" class="sapling-permission-mobile-list">
+    <div v-else-if="entities.length" class="sapling-scroll-list sapling-admin-mobile-list sapling-permission-mobile-list">
       <article
         v-for="item in entities"
         :key="`mobile-${item.handle}`"
-        class="sapling-permission-mobile-card glass-panel"
+        class="sapling-section-panel sapling-admin-mobile-card sapling-permission-mobile-card glass-panel"
         :class="rowClasses(item)"
       >
-        <div class="sapling-permission-mobile-card-header">
-          <div class="sapling-permission-entity-main">
+        <div class="sapling-row-between-xs sapling-admin-mobile-card__header sapling-permission-mobile-card-header">
+          <div class="sapling-row-xs sapling-admin-item-main sapling-permission-entity-main">
             <v-icon v-if="item.icon" size="18">{{ item.icon }}</v-icon>
             <span>{{ $t(`navigation.${item.handle}`) }}</span>
           </div>
-          <div class="sapling-permission-row-actions">
+          <div class="sapling-row-md sapling-admin-row-actions sapling-permission-row-actions">
             <v-btn size="x-small" variant="text" @click="emit('grantEntityAccess', item)">{{
               $t('right.all')
             }}</v-btn>
@@ -131,11 +131,11 @@
           </div>
         </div>
 
-        <div class="sapling-permission-mobile-grid">
+        <div class="sapling-admin-mobile-grid sapling-permission-mobile-grid">
           <div
             v-for="column in permissionColumns"
             :key="`mobile-${item.handle}-${column.key}`"
-            class="sapling-permission-mobile-grid-row"
+            class="sapling-row-between-xs sapling-admin-mobile-grid__row sapling-permission-mobile-grid-row"
           >
             <span>{{ $t(column.labelKey) }}</span>
             <v-checkbox
@@ -146,13 +146,16 @@
               :ripple="false"
               @update:model-value="emit('togglePermission', item, column.key, !!$event)"
             />
-            <span v-else class="sapling-permission-unavailable">-</span>
+            <span v-else class="sapling-admin-unavailable sapling-permission-unavailable">-</span>
           </div>
         </div>
       </article>
     </div>
 
-    <div v-else class="sapling-permission-empty-state">
+    <div
+      v-else
+      class="sapling-empty-state-panel sapling-empty-state-panel--compact sapling-admin-empty-state sapling-permission-empty-state"
+    >
       {{ $t('permission.noEntitiesForFilters') }}
     </div>
   </section>
@@ -221,6 +224,8 @@ const permissionFilterModeModel = computed({
 
 function rowClasses(item: EntityItem) {
   return {
+    'sapling-state-row--dirty': props.isPermissionDirty(props.selectedRole, item),
+    'sapling-state-row--pending': props.isPermissionPending(props.selectedRole, item),
     'sapling-permission-row-dirty': props.isPermissionDirty(props.selectedRole, item),
     'sapling-permission-row-pending': props.isPermissionPending(props.selectedRole, item),
   }

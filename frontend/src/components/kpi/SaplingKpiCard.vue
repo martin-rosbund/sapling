@@ -1,19 +1,19 @@
 <template>
-  <v-card outlined class="sapling-kpi-card glass-panel tilt-content" v-tilt="TILT_DEFAULT_OPTIONS">
-    <div class="sapling-kpi-card__header">
+  <SaplingSurface :as="VCard" outlined class="sapling-kpi-card" tilt>
+    <div class="sapling-section-header sapling-kpi-card__header">
       <div class="sapling-kpi-card__headline">
-        <div class="sapling-kpi-card__meta-row">
+        <div class="sapling-chip-row sapling-kpi-card__meta-row">
           <v-chip size="small" variant="tonal" color="primary">{{ kpiTypeLabel }}</v-chip>
         </div>
 
-        <div class="sapling-kpi-card__title-row">
+        <div class="sapling-row-md sapling-kpi-card__title-row">
           <h3 class="sapling-kpi-card__title" :title="hasTruncatedTitle ? title : ''">
             {{ truncatedTitle }}
           </h3>
         </div>
       </div>
 
-      <div class="sapling-kpi-card__header-tools">
+      <div class="sapling-stack-md sapling-kpi-card__header-tools">
         <v-btn-group density="compact" class="sapling-kpi-card__actions">
           <v-btn
             variant="text"
@@ -77,11 +77,13 @@
         <span>{{ $t('kpi.unsupportedType') }}</span>
       </div>
     </div>
-  </v-card>
+  </SaplingSurface>
 </template>
 
 <script setup lang="ts">
 // #region Imports
+import { VCard } from 'vuetify/components'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingKpiBreakdown from '@/components/kpi/SaplingKpiBreakdown.vue'
 import SaplingKpiComparison from '@/components/kpi/SaplingKpiComparison.vue'
 import SaplingKpiItem from '@/components/kpi/SaplingKpiItem.vue'
@@ -89,7 +91,6 @@ import SaplingKpiList from '@/components/kpi/SaplingKpiList.vue'
 import SaplingKpiSparkline from '@/components/kpi/SaplingKpiSparkline.vue'
 import SaplingKpiTrend from '@/components/kpi/SaplingKpiTrend.vue'
 import { useSaplingKpiCard } from '@/composables/kpi/useSaplingKpiCard'
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
 import type { KPIItem } from '@/entity/entity'
 // #endregion
 

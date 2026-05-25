@@ -1,30 +1,36 @@
 <template>
   <v-container
-    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--fill sapling-page-shell--uniform-inset sapling-file-page sapling-fill-shell"
+    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--fill sapling-page-shell--uniform-inset sapling-browser-page sapling-file-page sapling-fill-shell"
     density="compact"
     fluid
   >
-    <section class="sapling-file-workspace">
+    <section class="sapling-browser-workspace sapling-browser-workspace--balanced sapling-file-workspace">
       <template v-if="isTranslationLoading">
-        <aside class="sapling-file-workspace__sidebar glass-panel sapling-file-loading-panel">
+        <SaplingSurface
+          as="aside"
+          class="sapling-workspace-panel sapling-browser-workspace__sidebar sapling-browser-workspace__loading-panel sapling-file-workspace__sidebar sapling-file-loading-panel"
+        >
           <v-skeleton-loader type="heading, table-heading, table-tbody" />
-        </aside>
+        </SaplingSurface>
 
-        <section class="sapling-file-workspace__detail">
-          <header class="sapling-document-header glass-panel sapling-file-loading-panel">
+        <section class="sapling-browser-workspace__detail sapling-file-workspace__detail">
+          <SaplingSurface as="header" class="sapling-document-header sapling-browser-workspace__loading-panel sapling-file-loading-panel">
             <v-skeleton-loader class="sapling-document-header__skeleton" type="heading, text" />
-          </header>
+          </SaplingSurface>
 
-          <section class="sapling-file-stage glass-panel sapling-file-loading-panel">
-            <v-skeleton-loader class="sapling-file-stage__skeleton" type="image, article" />
-          </section>
+          <SaplingSurface
+            as="section"
+            class="sapling-panel-shell sapling-preview-stage sapling-file-stage sapling-browser-workspace__loading-panel sapling-file-loading-panel"
+          >
+            <v-skeleton-loader class="sapling-preview-stage__skeleton sapling-file-stage__skeleton" type="image, article" />
+          </SaplingSurface>
         </section>
       </template>
 
       <template v-else>
-        <aside class="sapling-file-workspace__sidebar glass-panel">
-          <div class="sapling-file-workspace__table-shell">
-            <div class="sapling-document-table-scroll">
+        <SaplingSurface as="aside" class="sapling-workspace-panel sapling-browser-workspace__sidebar sapling-file-workspace__sidebar">
+          <div class="sapling-panel-shell sapling-browser-workspace__table-shell sapling-file-workspace__table-shell">
+            <div class="sapling-browser-scroll sapling-browser-scroll--flush sapling-document-table-scroll">
               <SaplingTable
                 :items="items"
                 :search="search ?? ''"
@@ -53,9 +59,9 @@
               />
             </div>
           </div>
-        </aside>
+        </SaplingSurface>
 
-        <section class="sapling-file-workspace__detail">
+        <section class="sapling-browser-workspace__detail sapling-file-workspace__detail">
           <SaplingFileHeader
             :selected-handle="selectedHandle"
             :selected-filename="selectedFilename"
@@ -83,6 +89,7 @@ import { BACKEND_URL, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.consta
 import { useSaplingTable } from '@/composables/table/useSaplingTable'
 import type { SaplingGenericItem } from '@/entity/entity'
 import { defineAsyncComponent, ref, computed, watch } from 'vue'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingFilePDF from './SaplingFilePDF.vue'
 import SaplingFilePNG from './SaplingFilePNG.vue'
 import SaplingFileJPEG from './SaplingFileJPEG.vue'

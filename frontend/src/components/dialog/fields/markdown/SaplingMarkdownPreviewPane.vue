@@ -1,12 +1,12 @@
 <template>
   <section
     v-if="showPreview"
-    class="sapling-markdown-pane sapling-markdown-pane--preview glass-panel"
+    class="sapling-section-panel sapling-markdown-pane sapling-markdown-pane--preview glass-panel"
   >
-    <header class="sapling-markdown-pane__header">
+    <header class="sapling-section-header sapling-markdown-pane__header">
       <div class="sapling-markdown-pane__copy">
-        <span class="sapling-markdown-pane__eyebrow">{{ liveLabel }}</span>
-        <h3 class="sapling-markdown-pane__title">{{ previewTitle }}</h3>
+        <span class="sapling-eyebrow sapling-markdown-pane__eyebrow">{{ liveLabel }}</span>
+        <h3 class="sapling-section-title sapling-markdown-pane__title">{{ previewTitle }}</h3>
       </div>
       <v-btn
         color="primary"

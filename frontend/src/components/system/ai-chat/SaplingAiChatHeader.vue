@@ -1,11 +1,15 @@
 <template>
-  <div class="sapling-ai-chat__header">
-    <div>
-      <div class="sapling-ai-chat__eyebrow">{{ t('aiChat.titleEyebrow') }}</div>
-      <div class="sapling-ai-chat__title">{{ assistantName }}</div>
+  <div class="sapling-section-header sapling-floating-panel__header sapling-ai-chat__header">
+    <div class="sapling-floating-panel__heading sapling-ai-chat__heading">
+      <div class="sapling-eyebrow sapling-floating-panel__eyebrow sapling-ai-chat__eyebrow">
+        {{ t('aiChat.titleEyebrow') }}
+      </div>
+      <div class="sapling-section-title sapling-floating-panel__title sapling-ai-chat__title">
+        {{ assistantName }}
+      </div>
     </div>
 
-    <div class="sapling-ai-chat__header-actions">
+    <div class="sapling-action-cluster sapling-floating-panel__actions sapling-ai-chat__header-actions">
       <v-btn
         v-if="isCompactHeaderActions"
         icon="mdi-refresh"

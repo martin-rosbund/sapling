@@ -1,13 +1,13 @@
 <template>
   <div
-    class="sapling-file-preview sapling-file-json sapling-file-viewer sapling-file-preview-fullheight"
+    class="sapling-file-preview sapling-file-json sapling-preview-viewer sapling-file-viewer sapling-preview-fullheight sapling-file-preview-fullheight"
   >
     <SaplingCodeMirror
       v-model="jsonString"
       language="json"
       theme="light"
       read-only
-      class="sapling-file-json-editor"
+      class="sapling-preview-editor sapling-file-json-editor"
     />
   </div>
 </template>

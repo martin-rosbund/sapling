@@ -9,6 +9,7 @@ import { useSaplingPreferences } from '@/composables/system/useSaplingPreference
 import { useSaplingAccount } from '@/composables/account/useSaplingAccount'
 import { useSaplingAiChat } from '@/composables/system/useSaplingAiChat'
 import { useSaplingHelp } from '@/composables/system/useSaplingHelp'
+import { pushAppRoute } from '@/utils/routerNavigation'
 import type { EntityItem, EntityRouteItem, FavoriteItem, PersonItem } from '@/entity/entity'
 import type { AccumulatedPermission } from '@/entity/structure'
 import { canAccessEntityWorkspace } from '@/utils/entityAccess'
@@ -444,7 +445,7 @@ export function useSaplingCommandPalette() {
       await item.run()
       return
     }
-    await router.push(item.path)
+    await pushAppRoute(router, item.path)
   }
 
   async function activateCurrent() {

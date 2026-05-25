@@ -1,8 +1,11 @@
 <template>
-  <article
-    class="sapling-table-mobile-card glass-panel"
+  <SaplingSurface
+    as="article"
+    class="sapling-record-card sapling-table-mobile-card"
+    variant="subtle"
+    interactive
     :class="{
-      'sapling-table-mobile-card--selected': isSelected,
+      'sapling-record-card--selected': isSelected,
       'sapling-table-mobile-card--with-controls': hasHeaderControls,
       'sapling-table-mobile-card--with-select': props.multiSelect,
       'sapling-table-mobile-card--with-actions': hasRowActions,
@@ -12,12 +15,15 @@
     @dblclick="onRowDoubleClick($event)"
     @keydown="onRowKeydown($event, index)"
   >
-    <div v-if="displayColumns.length > 0" class="sapling-table-mobile-card__grid">
+    <div
+      v-if="displayColumns.length > 0"
+      class="sapling-detail-grid sapling-table-mobile-card__grid"
+    >
       <section
         v-for="(col, columnIndex) in displayColumns"
         v-show="columnIndex < alwaysVisibleFieldCount || detailsOpen"
         :key="String(col.key ?? '')"
-        class="sapling-table-mobile-card__field"
+        class="sapling-field-card sapling-table-mobile-card__field"
         :class="{
           'sapling-table-mobile-card__field--primary': columnIndex === 0,
           'sapling-table-mobile-card__field--summary': columnIndex < alwaysVisibleFieldCount,
@@ -29,7 +35,9 @@
           class="sapling-table-mobile-card__field-header"
           :class="{ 'sapling-table-mobile-card__field-header--with-controls': hasHeaderControls }"
         >
-          <span class="sapling-table-mobile-card__field-label">{{ col.title }}</span>
+          <span class="sapling-field-label sapling-table-mobile-card__field-label">{{
+            col.title
+          }}</span>
           <div
             v-if="hasHeaderControls || hasExpandableDetails"
             class="sapling-table-mobile-card__controls"
@@ -76,7 +84,9 @@
             </v-menu>
           </div>
         </div>
-        <span v-else class="sapling-table-mobile-card__field-label">{{ col.title }}</span>
+        <span v-else class="sapling-field-label sapling-table-mobile-card__field-label">{{
+          col.title
+        }}</span>
         <div class="sapling-table-mobile-card__field-value">
           <div v-if="'options' in col && col.options?.includes('isChip')">
             <SaplingTableChip
@@ -212,11 +222,12 @@
         </div>
       </section>
     </div>
-  </article>
+  </SaplingSurface>
 </template>
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import type { SaplingContextMenuTableMenuItem } from '@/composables/context/useSaplingContextMenuTable'
 import SaplingRecordActionMenuList from '@/components/common/SaplingRecordActionMenuList.vue'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'

@@ -1,9 +1,9 @@
 <template>
   <v-dialog v-if="dialog" v-model="dialogModel" persistent class="sapling-dialog-large">
-    <SaplingDialogCard class="sapling-inbox-dialog sapling-record-change-log-dialog" :tilt="false">
+    <SaplingDialogCard class="sapling-inbox-dialog sapling-history-dialog sapling-record-change-log-dialog" :tilt="false">
       <SaplingDialogShell
         fill-shell
-        body-class="sapling-inbox-dialog__body sapling-record-change-log-dialog__body"
+        body-class="sapling-dialog-fill-body sapling-inbox-dialog__body sapling-history-dialog__body sapling-record-change-log-dialog__body"
         :show-divider="false"
       >
         <template #hero>
@@ -25,7 +25,9 @@
         </template>
 
         <template #body>
-          <div class="sapling-inbox-dialog__content sapling-record-change-log sapling-scrollable">
+          <div
+            class="sapling-dialog-fill-content sapling-inbox-dialog__content sapling-stack-lg sapling-record-change-log sapling-scrollable"
+          >
             <section
               v-if="error"
               class="sapling-record-change-log__empty glass-panel sapling-empty-state-panel"
@@ -42,14 +44,14 @@
               <p>{{ t('changeLog.empty') }}</p>
             </section>
 
-            <section v-else class="sapling-record-change-log__list">
+            <section v-else class="sapling-stack-lg sapling-record-change-log__list">
               <article
                 v-for="entry in visibleEntries"
                 :key="entry.handle"
-                class="sapling-record-change-log__entry glass-panel"
+                class="sapling-section-panel sapling-section-panel--compact sapling-record-change-log__entry glass-panel"
               >
-                <header class="sapling-record-change-log__entry-header">
-                  <div class="sapling-record-change-log__entry-meta">
+                <header class="sapling-row-between-md sapling-row-wrap sapling-record-change-log__entry-header">
+                  <div class="sapling-chip-row sapling-record-change-log__entry-meta">
                     <v-chip
                       size="small"
                       variant="tonal"
@@ -60,7 +62,7 @@
                     </v-chip>
                   </div>
 
-                  <div class="sapling-record-change-log__entry-caption">
+                  <div class="sapling-chip-row sapling-record-change-log__entry-caption">
                     <span>{{ getPersonLabel(entry) }}</span>
                     <span>{{ formatTimestamp(entry.createdAt) }}</span>
                   </div>
@@ -68,11 +70,11 @@
 
                 <div
                   v-if="entry.details.length > 0"
-                  class="sapling-record-change-log__detail-table"
+                  class="sapling-history-detail-table sapling-record-change-log__detail-table"
                   role="table"
                 >
                   <div
-                    class="sapling-record-change-log__detail-row sapling-record-change-log__detail-row--head"
+                    class="sapling-history-detail-row sapling-history-detail-row--head sapling-record-change-log__detail-row sapling-record-change-log__detail-row--head"
                   >
                     <span>{{ t('changeLog.property') }}</span>
                     <span>{{ t('changeLog.oldValue') }}</span>
@@ -82,7 +84,7 @@
                   <div
                     v-for="detail in entry.details"
                     :key="`${entry.handle}-${detail.property}`"
-                    class="sapling-record-change-log__detail-row"
+                    class="sapling-history-detail-row sapling-record-change-log__detail-row"
                     role="row"
                   >
                     <strong>{{ getPropertyLabel(detail.property) }}</strong>

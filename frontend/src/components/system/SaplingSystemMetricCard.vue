@@ -1,17 +1,19 @@
 <template>
-  <article class="sapling-system-metric glass-panel">
-    <div class="sapling-system-metric__icon" :class="iconClass">
+  <SaplingSurface as="article" class="sapling-metric-card">
+    <div class="sapling-icon-tile" :class="iconClass">
       <v-icon :icon="icon" />
     </div>
-    <div class="sapling-system-metric__copy">
+    <div class="sapling-metric-card__copy">
       <p>{{ label }}</p>
       <strong>{{ value }}</strong>
       <span>{{ detail }}</span>
     </div>
-  </article>
+  </SaplingSurface>
 </template>
 
 <script lang="ts" setup>
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
+
 defineProps<{
   icon: string
   iconClass?: string

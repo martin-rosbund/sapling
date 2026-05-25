@@ -11,7 +11,7 @@ import { loadFonts } from './plugins/webfontloader'
 // Import Vuetify styles
 import 'vuetify/styles'
 // Import the global frontend style framework
-import './assets/styles/SaplingStyles.css'
+import './assets/styles/framework/SaplingFramework.css'
 // Import the i18n instance for internationalization
 import { i18n } from './i18n'
 // Import Pinia for state management

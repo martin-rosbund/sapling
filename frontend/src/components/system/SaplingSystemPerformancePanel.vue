@@ -1,9 +1,9 @@
 <template>
-  <article class="sapling-system-panel glass-panel">
-    <div class="sapling-system-panel__header">
+  <SaplingSurface as="article" class="sapling-section-panel">
+    <div class="sapling-section-header">
       <div>
-        <p class="sapling-system-panel__eyebrow">{{ $t('system.performance') }}</p>
-        <h2 class="sapling-system-panel__title">{{ title }}</h2>
+        <p class="sapling-eyebrow">{{ $t('system.performance') }}</p>
+        <h2 class="sapling-section-title">{{ title }}</h2>
       </div>
       <v-chip v-if="manufacturer" size="small" variant="tonal" color="primary">
         {{ manufacturer }}
@@ -28,8 +28,8 @@
       </div>
     </div>
 
-    <div class="sapling-system-details-grid">
-      <div v-for="item in details" :key="item.label" class="sapling-system-detail">
+    <div class="sapling-detail-grid">
+      <div v-for="item in details" :key="item.label" class="sapling-detail-card">
         <span>{{ item.label }}</span>
         <strong>{{ item.value }}</strong>
       </div>
@@ -38,10 +38,12 @@
     <v-alert v-if="error" type="error" density="comfortable" variant="tonal">
       {{ error }}
     </v-alert>
-  </article>
+  </SaplingSurface>
 </template>
 
 <script lang="ts" setup>
+import SaplingSurface from '@/components/common/SaplingSurface.vue'
+
 defineProps<{
   title: string
   manufacturer?: string

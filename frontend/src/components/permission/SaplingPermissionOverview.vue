@@ -1,10 +1,12 @@
 <template>
-  <div v-if="selectedRole" class="sapling-permission-overview-row">
-    <section class="sapling-permission-selection glass-panel">
+  <div v-if="selectedRole" class="sapling-admin-overview-row sapling-permission-overview-row">
+    <section class="sapling-section-panel sapling-page-panel sapling-admin-selection sapling-permission-selection glass-panel">
       <div>
-        <p class="sapling-permission-section-eyebrow">{{ $t('role.selectedRole') }}</p>
-        <h2 class="sapling-permission-selection-title">{{ selectedRole.title }}</h2>
-        <div class="sapling-permission-selection-meta">
+        <p class="sapling-eyebrow sapling-admin-section-eyebrow sapling-permission-section-eyebrow">
+          {{ $t('role.selectedRole') }}
+        </p>
+        <h2 class="sapling-section-title">{{ selectedRole.title }}</h2>
+        <div class="sapling-chip-row sapling-admin-selection__meta sapling-permission-selection-meta">
           <v-chip size="small" color="primary" variant="tonal">
             {{ getStageTitle(selectedRole.stage) }}
           </v-chip>
@@ -25,7 +27,7 @@
         </div>
       </div>
 
-      <div class="sapling-permission-selection-status">
+      <div class="sapling-admin-selection__status sapling-permission-selection-status">
         <v-alert
           v-if="permissionSaveState === 'error' && permissionSaveError"
           type="error"
@@ -53,34 +55,36 @@
       </div>
     </section>
 
-    <section class="sapling-permission-summary glass-panel">
-      <div class="sapling-permission-summary-header">
-        <p class="sapling-permission-section-eyebrow">{{ $t('permission.workingSet') }}</p>
-        <h2 class="sapling-permission-section-title">{{ $t('permission.changeSummary') }}</h2>
+    <section class="sapling-section-panel sapling-page-panel sapling-page-panel-stack sapling-admin-panel-stack sapling-admin-summary sapling-permission-summary glass-panel">
+      <div class="sapling-stack-md sapling-permission-summary-header">
+        <p class="sapling-eyebrow sapling-admin-section-eyebrow sapling-permission-section-eyebrow">
+          {{ $t('permission.workingSet') }}
+        </p>
+        <h2 class="sapling-section-title">{{ $t('permission.changeSummary') }}</h2>
       </div>
 
-      <div class="sapling-permission-summary-grid">
-        <article>
+      <div class="sapling-admin-summary-grid sapling-permission-summary-grid">
+        <article class="sapling-panel-shell sapling-stack-md sapling-admin-summary-card sapling-permission-summary-card">
           <span>{{ $t('right.currentGroup') }}</span>
           <strong>{{
             selectedGroup ? $t(`navigationGroup.${selectedGroup}`) : $t('roleStage.none')
           }}</strong>
         </article>
-        <article>
+        <article class="sapling-panel-shell sapling-stack-md sapling-admin-summary-card sapling-permission-summary-card">
           <span>{{ $t('permission.visibleEntities') }}</span>
           <strong>{{ visibleEntityCount }}</strong>
         </article>
-        <article>
+        <article class="sapling-panel-shell sapling-stack-md sapling-admin-summary-card sapling-permission-summary-card">
           <span>{{ $t('permission.dirtyEntities') }}</span>
           <strong>{{ selectedRoleStats.dirtyEntityCount }}</strong>
         </article>
-        <article>
+        <article class="sapling-panel-shell sapling-stack-md sapling-admin-summary-card sapling-permission-summary-card">
           <span>{{ $t('permission.saveMode') }}</span>
           <strong>{{ $t('right.manual') }}</strong>
         </article>
       </div>
 
-      <p class="sapling-permission-summary-note">
+      <p class="sapling-admin-summary-note sapling-permission-summary-note">
         {{ $t('permission.summaryNote') }}
       </p>
     </section>
