@@ -1,15 +1,15 @@
 <template>
-  <div class="sapling-field-event-recurrence">
-    <span class="sapling-field-event-recurrence__label">{{ props.label }}</span>
+  <div class="sapling-stack-md sapling-field-event-recurrence">
+    <span class="sapling-label sapling-field-event-recurrence__label">{{ props.label }}</span>
 
     <button
       type="button"
-      class="sapling-field-event-recurrence__trigger glass-panel"
+      class="sapling-row-between-md sapling-panel-shell sapling-field-event-recurrence__trigger glass-panel"
       :class="{ 'sapling-field-event-recurrence__trigger--disabled': props.disabled }"
       :disabled="props.disabled"
       @click="openDialog"
     >
-      <div class="sapling-field-event-recurrence__trigger-copy">
+      <div class="sapling-stack-md sapling-field-event-recurrence__trigger-copy">
         <strong class="sapling-field-event-recurrence__trigger-title">
           {{ fieldSummaryTitle }}
         </strong>
@@ -33,13 +33,15 @@
 
           <template #body>
             <div class="sapling-account-dialog__content sapling-field-event-recurrence__content">
-              <div class="sapling-field-event-recurrence__dialog-content">
-                <section class="sapling-field-event-recurrence__section">
-                  <div class="sapling-field-event-recurrence__section-header">
+              <div class="sapling-stack-md sapling-field-event-recurrence__dialog-content">
+                <section
+                  class="sapling-section-panel sapling-section-panel--compact sapling-field-event-recurrence__section"
+                >
+                  <div class="sapling-label sapling-field-event-recurrence__section-header">
                     {{ props.label }}
                   </div>
 
-                  <div class="sapling-field-event-recurrence__option-grid">
+                  <div class="sapling-responsive-grid sapling-responsive-grid--sm sapling-field-event-recurrence__option-grid">
                     <v-btn
                       v-for="item in frequencyOptions"
                       :key="item.value"
@@ -54,12 +56,14 @@
                 </section>
 
                 <template v-if="draftFrequency !== 'NONE'">
-                  <section class="sapling-field-event-recurrence__section">
-                    <div class="sapling-field-event-recurrence__section-header">
+                  <section
+                    class="sapling-section-panel sapling-section-panel--compact sapling-field-event-recurrence__section"
+                  >
+                    <div class="sapling-label sapling-field-event-recurrence__section-header">
                       {{ t('event.recurrenceEvery') }}
                     </div>
 
-                    <div class="sapling-field-event-recurrence__field-row">
+                    <div class="sapling-toolbar-group sapling-field-event-recurrence__field-row">
                       <div class="sapling-field-event-recurrence__field-box">
                         <SaplingNumberField
                           :label="t('event.recurrenceEvery')"
@@ -74,14 +78,14 @@
 
                   <section
                     v-if="draftFrequency === 'WEEKLY'"
-                    class="sapling-field-event-recurrence__section"
+                    class="sapling-section-panel sapling-section-panel--compact sapling-field-event-recurrence__section"
                   >
-                    <div class="sapling-field-event-recurrence__section-header">
+                    <div class="sapling-label sapling-field-event-recurrence__section-header">
                       {{ t('event.recurrenceWeekdays') }}
                     </div>
 
                     <div
-                      class="sapling-field-event-recurrence__option-grid sapling-field-event-recurrence__option-grid--weekdays"
+                      class="sapling-responsive-grid sapling-responsive-grid--xs sapling-field-event-recurrence__option-grid sapling-field-event-recurrence__option-grid--weekdays"
                     >
                       <v-btn
                         v-for="item in weekdayOptions"
@@ -96,12 +100,14 @@
                     </div>
                   </section>
 
-                  <section class="sapling-field-event-recurrence__section">
-                    <div class="sapling-field-event-recurrence__section-header">
+                  <section
+                    class="sapling-section-panel sapling-section-panel--compact sapling-field-event-recurrence__section"
+                  >
+                    <div class="sapling-label sapling-field-event-recurrence__section-header">
                       {{ t('event.recurrenceEnds') }}
                     </div>
 
-                    <div class="sapling-field-event-recurrence__option-grid">
+                    <div class="sapling-responsive-grid sapling-responsive-grid--sm sapling-field-event-recurrence__option-grid">
                       <v-btn
                         v-for="item in endModeOptions"
                         :key="item.value"
@@ -116,7 +122,7 @@
 
                     <div
                       v-if="draftEndMode === 'count'"
-                      class="sapling-field-event-recurrence__field-row"
+                      class="sapling-toolbar-group sapling-field-event-recurrence__field-row"
                     >
                       <div class="sapling-field-event-recurrence__field-box">
                         <SaplingNumberField
@@ -132,7 +138,7 @@
 
                     <div
                       v-else-if="draftEndMode === 'until'"
-                      class="sapling-field-event-recurrence__field-row"
+                      class="sapling-toolbar-group sapling-field-event-recurrence__field-row"
                     >
                       <div class="sapling-field-event-recurrence__field-box">
                         <SaplingDateTypeField

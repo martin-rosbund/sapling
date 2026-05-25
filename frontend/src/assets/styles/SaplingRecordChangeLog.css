@@ -1,6 +1,4 @@
 .sapling-record-change-log {
-  display: flex;
-  flex-direction: column;
   gap: 1rem;
 }
 
@@ -9,36 +7,24 @@
 }
 
 .sapling-record-change-log__list {
-  display: flex;
-  flex-direction: column;
   gap: 1rem;
 }
 
 .sapling-record-change-log__entry {
-  display: flex;
-  flex-direction: column;
   gap: 1rem;
-  padding: 1rem;
 }
 
 .sapling-record-change-log__entry-header {
-  display: flex;
-  justify-content: space-between;
   gap: 1rem;
   align-items: flex-start;
-  flex-wrap: wrap;
 }
 
 .sapling-record-change-log__entry-meta {
-  display: flex;
   gap: 0.5rem;
-  flex-wrap: wrap;
 }
 
 .sapling-record-change-log__entry-caption {
-  display: flex;
   gap: 0.75rem;
-  flex-wrap: wrap;
   color: rgba(var(--v-theme-on-surface), 0.7);
   font-size: 0.9rem;
 }

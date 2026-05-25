@@ -25,7 +25,9 @@
         </template>
 
         <template #body>
-          <div class="sapling-inbox-dialog__content sapling-record-change-log sapling-scrollable">
+          <div
+            class="sapling-inbox-dialog__content sapling-stack-lg sapling-record-change-log sapling-scrollable"
+          >
             <section
               v-if="error"
               class="sapling-record-change-log__empty glass-panel sapling-empty-state-panel"
@@ -42,14 +44,14 @@
               <p>{{ t('changeLog.empty') }}</p>
             </section>
 
-            <section v-else class="sapling-record-change-log__list">
+            <section v-else class="sapling-stack-lg sapling-record-change-log__list">
               <article
                 v-for="entry in visibleEntries"
                 :key="entry.handle"
-                class="sapling-record-change-log__entry glass-panel"
+                class="sapling-section-panel sapling-section-panel--compact sapling-record-change-log__entry glass-panel"
               >
-                <header class="sapling-record-change-log__entry-header">
-                  <div class="sapling-record-change-log__entry-meta">
+                <header class="sapling-row-between-md sapling-row-wrap sapling-record-change-log__entry-header">
+                  <div class="sapling-chip-row sapling-record-change-log__entry-meta">
                     <v-chip
                       size="small"
                       variant="tonal"
@@ -60,7 +62,7 @@
                     </v-chip>
                   </div>
 
-                  <div class="sapling-record-change-log__entry-caption">
+                  <div class="sapling-chip-row sapling-record-change-log__entry-caption">
                     <span>{{ getPersonLabel(entry) }}</span>
                     <span>{{ formatTimestamp(entry.createdAt) }}</span>
                   </div>

@@ -1,6 +1,6 @@
 <template>
   <v-col cols="12" md="6">
-    <section class="sapling-issue-stream" :class="`sapling-issue-stream--${status}`">
+    <section class="sapling-stack-xl sapling-issue-stream" :class="`sapling-issue-stream--${status}`">
       <SaplingSurface as="header" class="sapling-section-header sapling-issue-stream__header">
         <div class="sapling-issue-stream__header-copy">
           <div class="sapling-issue-stream__eyebrow">
@@ -15,7 +15,7 @@
         </v-chip>
       </SaplingSurface>
 
-      <div v-if="isLoading" class="sapling-issue-stream__loading">
+      <div v-if="isLoading" class="sapling-stack-xl sapling-issue-stream__loading">
         <SaplingSurface
           :as="VSkeletonLoader"
           class="sapling-issue-stream__skeleton"
@@ -36,7 +36,7 @@
         <p>{{ $t(emptyStateKey) }}</p>
       </SaplingSurface>
 
-      <div v-else class="sapling-issue-stream__list">
+      <div v-else class="sapling-stack-xl sapling-issue-stream__list">
         <SaplingSurface
           v-for="issue in issues"
           :key="`${cardPrefix}-${issue.id}`"
@@ -48,8 +48,8 @@
         >
           <div class="sapling-issue-card__accent" />
 
-          <v-card-text class="sapling-issue-card__content">
-            <div class="sapling-issue-card__header-row">
+          <v-card-text class="sapling-stack-xl sapling-issue-card__content">
+            <div class="sapling-row-between-md sapling-issue-card__header-row">
               <v-chip :color="statusChipColor" size="small" variant="tonal">
                 {{ $t(statusLabelKey) }}
               </v-chip>
@@ -92,7 +92,7 @@
               </div>
             </div>
 
-            <div v-if="issue.labels.length" class="sapling-issue-card__labels">
+            <div v-if="issue.labels.length" class="sapling-chip-row sapling-issue-card__labels">
               <v-chip
                 v-for="label in issue.labels"
                 :key="label.name"
@@ -105,9 +105,9 @@
               </v-chip>
             </div>
 
-            <div class="sapling-issue-card__assignees">
+            <div class="sapling-stack-md sapling-issue-card__assignees">
               <div class="sapling-label">{{ $t('issue.assignedTo') }}</div>
-              <div v-if="issue.assignees.length" class="sapling-issue-card__assignee-list">
+              <div v-if="issue.assignees.length" class="sapling-chip-row sapling-issue-card__assignee-list">
                 <a
                   v-for="assignee in issue.assignees"
                   :key="assignee.login"
@@ -125,7 +125,7 @@
               <div v-else class="sapling-issue-card__empty-copy">-</div>
             </div>
 
-            <div class="sapling-issue-card__description">
+            <div class="sapling-stack-md sapling-issue-card__description">
               <div class="sapling-label">{{ $t('issue.description') }}</div>
               <div class="sapling-issue-card__markdown">
                 <VMarkdown :source="issue.body || $t('issue.noDescription')" />

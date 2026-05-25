@@ -1,12 +1,12 @@
 <template>
   <section
-    class="sapling-markdown-pane sapling-markdown-pane--editor glass-panel"
+    class="sapling-section-panel sapling-markdown-pane sapling-markdown-pane--editor glass-panel"
     :class="{ 'sapling-markdown-pane--disabled': disabled }"
   >
-    <header class="sapling-markdown-pane__header">
+    <header class="sapling-section-header sapling-markdown-pane__header">
       <div class="sapling-markdown-pane__copy">
-        <span class="sapling-markdown-pane__eyebrow">{{ markdownLabel }}</span>
-        <h3 class="sapling-markdown-pane__title">{{ resolvedLabel }}</h3>
+        <span class="sapling-eyebrow sapling-markdown-pane__eyebrow">{{ markdownLabel }}</span>
+        <h3 class="sapling-section-title sapling-markdown-pane__title">{{ resolvedLabel }}</h3>
       </div>
     </header>
 
@@ -26,7 +26,7 @@
         class="sapling-markdown-editor-shell"
         :class="{ 'sapling-markdown-editor-shell--disabled': disabled }"
       >
-        <div class="sapling-markdown-toolbar">
+        <div class="sapling-toolbar-group sapling-markdown-toolbar">
           <v-btn
             v-for="action in toolbarActions"
             :key="action.key"

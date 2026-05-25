@@ -15,51 +15,60 @@
       <span>{{ $t('global.noData') }}</span>
     </div>
 
-    <div v-else class="sapling-kpi-breakdown__content">
-      <div v-if="leadItem" class="sapling-kpi-breakdown__hero">
-        <div class="sapling-kpi-breakdown__hero-copy">
-          <span class="sapling-kpi-breakdown__eyebrow">{{ $t('kpi.leadingSegment') }}</span>
+    <div v-else class="sapling-stack-md sapling-kpi-breakdown__content">
+      <div v-if="leadItem" class="sapling-row-between-md sapling-highlight-panel sapling-kpi-breakdown__hero">
+        <div class="sapling-stack-md sapling-kpi-breakdown__hero-copy">
+          <span class="sapling-eyebrow sapling-kpi-breakdown__eyebrow">
+            {{ $t('kpi.leadingSegment') }}
+          </span>
           <h2 class="sapling-kpi-breakdown__hero-title">{{ leadItem.label }}</h2>
           <p class="sapling-kpi-breakdown__hero-meta">
             {{ leadShareLabel }} • {{ categoryCountLabel }}
           </p>
         </div>
 
-        <div class="sapling-kpi-breakdown__hero-stat">
+        <div class="sapling-stack-md sapling-kpi-breakdown__hero-stat">
           <strong class="sapling-kpi-breakdown__hero-value">{{ leadItem.value }}</strong>
           <span class="sapling-kpi-breakdown__hero-caption">{{ spreadLabel }}</span>
         </div>
       </div>
 
-      <div class="sapling-kpi-breakdown__summary">
-        <div class="sapling-kpi-breakdown__summary-item">
-          <span class="sapling-kpi-breakdown__summary-label">{{ $t('kpi.total') }}</span>
+      <div class="sapling-two-column-grid sapling-kpi-breakdown__summary">
+        <div class="sapling-soft-panel sapling-kpi-breakdown__summary-item">
+          <span class="sapling-eyebrow sapling-kpi-breakdown__summary-label">
+            {{ $t('kpi.total') }}
+          </span>
           <strong>{{ totalValue }}</strong>
         </div>
-        <div class="sapling-kpi-breakdown__summary-item">
-          <span class="sapling-kpi-breakdown__summary-label">{{ $t('kpi.segments') }}</span>
+        <div class="sapling-soft-panel sapling-kpi-breakdown__summary-item">
+          <span class="sapling-eyebrow sapling-kpi-breakdown__summary-label">
+            {{ $t('kpi.segments') }}
+          </span>
           <strong>{{ items.length }}</strong>
         </div>
       </div>
 
-      <div class="sapling-kpi-breakdown__items">
+      <div class="sapling-stack-md sapling-kpi-breakdown__items">
         <button
           v-for="item in items"
           :key="item.key"
           type="button"
-          class="sapling-kpi-breakdown__item"
-          :class="{ 'sapling-kpi-breakdown__item--clickable': canOpenEntity }"
+          class="sapling-soft-panel sapling-kpi-breakdown__item"
+          :class="{ 'sapling-soft-panel--interactive sapling-kpi-breakdown__item--clickable': canOpenEntity }"
           @click="canOpenEntity ? openBreakdownItem(item.row) : undefined"
         >
-          <div class="sapling-kpi-breakdown__row">
+          <div class="sapling-row-between-md sapling-kpi-breakdown__row">
             <span class="sapling-kpi-breakdown__label">{{ item.label }}</span>
             <div class="sapling-kpi-breakdown__metric">
               <strong class="sapling-kpi-breakdown__value">{{ item.value }}</strong>
-              <span class="sapling-kpi-breakdown__share">{{ item.share }}%</span>
+              <span class="sapling-eyebrow sapling-kpi-breakdown__share">{{ item.share }}%</span>
             </div>
           </div>
-          <div class="sapling-kpi-breakdown__bar">
-            <span class="sapling-kpi-breakdown__fill" :style="{ width: `${item.share}%` }" />
+          <div class="sapling-progress-track sapling-kpi-breakdown__bar">
+            <span
+              class="sapling-progress-fill sapling-progress-fill--primary sapling-kpi-breakdown__fill"
+              :style="{ width: `${item.share}%` }"
+            />
           </div>
         </button>
       </div>

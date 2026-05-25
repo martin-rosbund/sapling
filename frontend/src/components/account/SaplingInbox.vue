@@ -1,7 +1,11 @@
 <template>
   <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-large">
     <SaplingDialogCard class="sapling-inbox-dialog" :tilt="false">
-      <SaplingDialogShell fill-shell body-class="sapling-inbox-dialog__body" :show-divider="false">
+      <SaplingDialogShell
+        fill-shell
+        body-class="sapling-inbox-dialog__body sapling-scrollable"
+        :show-divider="false"
+      >
         <template #hero>
           <SaplingDialogHero
             v-if="isLoading"
@@ -21,9 +25,9 @@
         </template>
 
         <template #body>
-          <div class="sapling-inbox-dialog__content">
+          <div class="sapling-stack-xl sapling-inbox-dialog__content">
             <template v-if="isLoading">
-              <section class="sapling-inbox-summary-grid">
+              <section class="sapling-responsive-grid sapling-inbox-summary-grid">
                 <v-skeleton-loader
                   v-for="item in 5"
                   :key="item"
@@ -45,7 +49,7 @@
             </template>
 
             <template v-else>
-              <section class="sapling-inbox-summary-grid">
+              <section class="sapling-responsive-grid sapling-inbox-summary-grid">
                 <SaplingInboxSummaryCard
                   v-for="card in summaryCards"
                   :key="card.key"
@@ -56,7 +60,7 @@
               <section class="sapling-inbox-view-switch sapling-panel-shell-muted">
                 <v-btn-toggle
                   v-model="activeView"
-                  class="sapling-inbox-view-switch__toggle"
+                  class="sapling-toolbar-group sapling-inbox-view-switch__toggle"
                   color="primary"
                   divided
                   mandatory
@@ -139,7 +143,7 @@
 
                 <section v-else class="sapling-section-panel glass-panel">
                   <div class="sapling-section-header">
-                    <div class="sapling-inbox-notification-panel__title-row">
+                    <div class="sapling-row-md sapling-inbox-notification-panel__title-row">
                       <div class="sapling-icon-tile sapling-icon-tile--sm sapling-icon-tile--info-soft">
                         <v-icon icon="mdi-bell-outline" size="18" />
                       </div>

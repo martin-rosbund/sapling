@@ -4,9 +4,9 @@
     fluid
   >
     <template v-if="isTranslationLoading">
-      <div class="sapling-issue-skeleton">
+      <div class="sapling-stack-xl sapling-issue-skeleton">
         <SaplingSurface :as="VSkeletonLoader" type="article" />
-        <div class="sapling-issue-skeleton__metrics">
+        <div class="sapling-responsive-grid sapling-issue-skeleton__metrics">
           <SaplingSurface
             v-for="item in 4"
             :key="item"
@@ -14,7 +14,7 @@
             type="article"
           />
         </div>
-        <div class="sapling-issue-skeleton__streams">
+        <div class="sapling-two-column-grid sapling-issue-skeleton__streams">
           <SaplingSurface :as="VSkeletonLoader" type="article, actions" />
           <SaplingSurface :as="VSkeletonLoader" type="article, actions" />
         </div>
@@ -37,17 +37,17 @@
       </SaplingPageHero>
 
       <SaplingSurface as="section" class="sapling-issue-compose">
-        <div class="sapling-issue-compose__intro">
+        <div class="sapling-stack-lg sapling-issue-compose__intro">
           <p class="sapling-eyebrow">{{ $t('issue.createEyebrow') }}</p>
           <h2 class="sapling-issue-compose__title">{{ $t('issue.createTitle') }}</h2>
           <p class="sapling-issue-compose__subtitle">{{ $t('issue.createSubtitle') }}</p>
 
-          <div class="sapling-issue-compose__hint">
+          <div class="sapling-row-md sapling-issue-compose__hint">
             <v-icon icon="mdi-label-outline" size="18" />
             <span>{{ $t('issue.submitHint') }}</span>
           </div>
 
-          <div v-if="latestCreatedIssue" class="sapling-issue-compose__latest">
+          <div v-if="latestCreatedIssue" class="sapling-toolbar-group sapling-issue-compose__latest">
             <v-chip color="success" size="small" variant="tonal">
               #{{ latestCreatedIssue.number }}
             </v-chip>
@@ -62,7 +62,7 @@
           </div>
         </div>
 
-        <v-form class="sapling-issue-compose__form" @submit.prevent="handleCreateIssue">
+        <v-form class="sapling-stack-lg sapling-issue-compose__form" @submit.prevent="handleCreateIssue">
           <v-text-field
             v-model="draft.title"
             :label="$t('issue.titleFieldLabel')"
@@ -86,7 +86,7 @@
             counter="10000"
           />
 
-          <div class="sapling-issue-compose__type-field">
+          <div class="sapling-stack-md sapling-issue-compose__type-field">
             <div class="sapling-label">{{ $t('issue.typeFieldLabel') }}</div>
 
             <v-btn-toggle
@@ -106,7 +106,7 @@
             </v-btn-toggle>
           </div>
 
-          <div class="sapling-issue-compose__actions">
+          <div class="sapling-toolbar-group sapling-issue-compose__actions">
             <v-btn
               type="button"
               variant="text"
@@ -143,7 +143,7 @@
         </v-form>
       </SaplingSurface>
 
-      <section class="sapling-issue-metrics">
+      <section class="sapling-responsive-grid sapling-issue-metrics">
         <SaplingSurface as="article" class="sapling-metric-card">
           <div class="sapling-icon-tile sapling-issue-metric__icon--open">
             <v-icon icon="mdi-source-branch" />

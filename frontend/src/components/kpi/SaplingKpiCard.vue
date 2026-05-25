@@ -1,19 +1,19 @@
 <template>
   <SaplingSurface :as="VCard" outlined class="sapling-kpi-card" tilt>
-    <div class="sapling-kpi-card__header">
+    <div class="sapling-section-header sapling-kpi-card__header">
       <div class="sapling-kpi-card__headline">
-        <div class="sapling-kpi-card__meta-row">
+        <div class="sapling-chip-row sapling-kpi-card__meta-row">
           <v-chip size="small" variant="tonal" color="primary">{{ kpiTypeLabel }}</v-chip>
         </div>
 
-        <div class="sapling-kpi-card__title-row">
+        <div class="sapling-row-md sapling-kpi-card__title-row">
           <h3 class="sapling-kpi-card__title" :title="hasTruncatedTitle ? title : ''">
             {{ truncatedTitle }}
           </h3>
         </div>
       </div>
 
-      <div class="sapling-kpi-card__header-tools">
+      <div class="sapling-stack-md sapling-kpi-card__header-tools">
         <v-btn-group density="compact" class="sapling-kpi-card__actions">
           <v-btn
             variant="text"
@@ -82,7 +82,6 @@
 
 <script setup lang="ts">
 // #region Imports
-import '@/assets/styles/SaplingKpiWidget.css'
 import '@/assets/styles/SaplingKpiCard.css'
 import '@/assets/styles/SaplingKpiBreakdown.css'
 import '@/assets/styles/SaplingKpiComparison.css'

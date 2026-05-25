@@ -1,6 +1,4 @@
 .sapling-issue-stream {
-  display: flex;
-  flex-direction: column;
   gap: var(--sapling-gap-xl);
   height: 100%;
 }
@@ -30,8 +28,6 @@
 
 .sapling-issue-stream__loading,
 .sapling-issue-stream__list {
-  display: flex;
-  flex-direction: column;
   gap: var(--sapling-gap-xl);
 }
 
@@ -63,15 +59,10 @@
 .sapling-issue-card__content {
   padding: var(--sapling-space-panel-xl) var(--sapling-space-panel-xl) var(--sapling-space-panel-xl)
     var(--sapling-space-panel-xl) !important;
-  display: flex;
-  flex-direction: column;
   gap: var(--sapling-gap-xl);
 }
 
 .sapling-issue-card__header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   gap: var(--sapling-gap-md);
 }
 
@@ -91,8 +82,6 @@
 
 .sapling-issue-card__labels,
 .sapling-issue-card__assignee-list {
-  display: flex;
-  flex-wrap: wrap;
   gap: var(--sapling-gap-xs);
 }
 
@@ -102,8 +91,6 @@
 
 .sapling-issue-card__assignees,
 .sapling-issue-card__description {
-  display: flex;
-  flex-direction: column;
   gap: var(--sapling-gap-xs);
 }
 

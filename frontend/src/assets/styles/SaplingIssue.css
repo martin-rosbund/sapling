@@ -1,16 +1,15 @@
 .sapling-issue-skeleton,
 .sapling-issue-skeleton__metrics,
 .sapling-issue-skeleton__streams {
-  display: grid;
   gap: var(--sapling-gap-xl);
 }
 
 .sapling-issue-skeleton__metrics {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  --sapling-responsive-grid-min: 220px;
 }
 
 .sapling-issue-skeleton__streams {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  --sapling-two-column-grid-gap: var(--sapling-gap-xl);
 }
 
 .sapling-issue-skeleton__streams .v-skeleton-loader__bone {
@@ -33,8 +32,7 @@
 }
 
 .sapling-issue-metrics {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  --sapling-responsive-grid-min: 220px;
   gap: var(--sapling-gap-xl);
 }
 
@@ -52,7 +50,6 @@
 
 .sapling-issue-compose__intro,
 .sapling-issue-compose__form {
-  display: grid;
   gap: var(--sapling-gap-lg);
 }
 
@@ -69,8 +66,6 @@
 }
 
 .sapling-issue-compose__hint {
-  display: inline-flex;
-  align-items: center;
   gap: var(--sapling-gap-md);
   padding: var(--sapling-gap-md) var(--sapling-gap-lg);
   border-radius: 999px;
@@ -81,9 +76,6 @@
 }
 
 .sapling-issue-compose__latest {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
   gap: var(--sapling-gap-md);
 }
 
@@ -102,7 +94,6 @@
 }
 
 .sapling-issue-compose__type-field {
-  display: grid;
   gap: var(--sapling-gap-md);
 }
 
@@ -112,9 +103,6 @@
 }
 
 .sapling-issue-compose__actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
   gap: var(--sapling-gap-md);
 }
 
@@ -138,18 +126,7 @@
   margin-top: 0;
 }
 
-@media (max-width: 1260px) {
-  .sapling-issue-skeleton__metrics,
-  .sapling-issue-metrics {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 960px) {
-  .sapling-issue-skeleton__streams {
-    grid-template-columns: 1fr;
-  }
-
   .sapling-issue-compose {
     grid-template-columns: 1fr;
   }
@@ -161,12 +138,5 @@
 
   .sapling-issue-hero__pulse {
     text-align: left;
-  }
-}
-
-@media (max-width: 600px) {
-  .sapling-issue-skeleton__metrics,
-  .sapling-issue-metrics {
-    grid-template-columns: 1fr;
   }
 }

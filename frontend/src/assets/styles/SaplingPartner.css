@@ -1,9 +1,5 @@
 .sapling-partner-container {
-  display: flex;
-  flex-direction: column;
   width: 100%;
-  min-width: 0;
-  min-height: 0;
   height: 100%;
   max-height: none;
   overflow: hidden;
@@ -58,7 +54,6 @@
 
 .sapling-partner-table-text,
 .sapling-partner-sideboard-card {
-  display: flex;
   flex-direction: column;
 }
 
@@ -69,12 +64,9 @@
 }
 
 .sapling-partner-table-scroll {
-  display: flex;
   flex: 1 1 auto;
   width: 100%;
   max-width: 100%;
-  min-width: 0;
-  min-height: 0;
   overflow: hidden;
 }
 

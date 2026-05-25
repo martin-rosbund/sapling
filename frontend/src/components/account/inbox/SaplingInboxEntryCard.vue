@@ -9,8 +9,8 @@
     @keyup.enter="emit('open', entry)"
     @keyup.space.prevent="emit('open', entry)"
   >
-    <div class="sapling-inbox-entry__meta-row">
-      <div class="sapling-inbox-entry__kind">
+    <div class="sapling-row-between-md sapling-inbox-entry__meta-row">
+      <div class="sapling-row-xs sapling-inbox-entry__kind">
         <span class="sapling-inbox-entry__kind-indicator"></span>
         <v-icon :icon="entry.icon" size="16" />
         <span>{{ $t(entry.kindLabelKey) }}</span>
@@ -25,8 +25,8 @@
       {{ entry.description || $t('inbox.noDescription') }}
     </p>
 
-    <div class="sapling-inbox-entry__footer">
-      <div class="sapling-inbox-entry__chips">
+    <div class="sapling-row-between-md sapling-inbox-entry__footer">
+      <div class="sapling-chip-row sapling-inbox-entry__chips">
         <v-chip
           v-if="entry.contextLabel"
           size="x-small"
@@ -48,7 +48,7 @@
         </v-chip>
       </div>
 
-      <div class="sapling-inbox-entry__actions">
+      <div class="sapling-action-cluster sapling-inbox-entry__actions">
         <v-btn
           v-if="entry.dismissible"
           icon="mdi-close"

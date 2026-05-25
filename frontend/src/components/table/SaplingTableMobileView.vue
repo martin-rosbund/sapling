@@ -45,7 +45,7 @@
         >
           <div class="sapling-stack-md sapling-table-mobile-controls__section">
             <span class="sapling-table-mobile-controls__label">{{ $t('filter.sort') }}</span>
-            <div class="sapling-table-mobile-controls__sorts">
+            <div class="sapling-responsive-grid sapling-responsive-grid--sm sapling-table-mobile-controls__sorts">
               <v-btn
                 v-for="column in sortableMobileHeaders"
                 :key="`sort-${String(column.key ?? '')}`"
@@ -71,7 +71,7 @@
             class="sapling-stack-md sapling-table-mobile-controls__section"
           >
             <span class="sapling-table-mobile-controls__label">{{ $t('filter.filter') }}</span>
-            <div class="sapling-table-mobile-controls__filters">
+            <div class="sapling-stack-md sapling-table-mobile-controls__filters">
               <SaplingTableColumnFilter
                 v-for="column in filterableMobileHeaders"
                 :key="`filter-${String(column.key ?? '')}`"
@@ -96,7 +96,7 @@
       </div>
     </v-expand-transition>
 
-    <div v-if="items.length > 0" class="sapling-table-mobile-list">
+    <div v-if="items.length > 0" class="sapling-scroll-list sapling-table-mobile-list">
       <SaplingTableMobileCard
         v-for="(item, index) in items"
         :key="String(item.handle ?? index)"
@@ -135,7 +135,7 @@
         @show-information="emit('show-information', $event)"
       />
     </div>
-    <div v-else-if="isLoading" class="sapling-table-mobile-list">
+    <div v-else-if="isLoading" class="sapling-scroll-list sapling-table-mobile-list">
       <v-skeleton-loader
         v-for="skeletonIndex in 3"
         :key="`mobile-card-skeleton-${skeletonIndex}`"

@@ -236,7 +236,6 @@
 
 <script lang="ts" setup>
 // #region Imports
-import '@/assets/styles/SaplingTable.css'
 import '@/assets/styles/SaplingTableDateCell.css'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'

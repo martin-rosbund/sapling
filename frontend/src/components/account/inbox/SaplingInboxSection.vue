@@ -5,7 +5,7 @@
   >
     <div class="sapling-section-header">
       <div class="sapling-inbox-section__title-wrap">
-        <div class="sapling-inbox-section__title-row">
+        <div class="sapling-row-md sapling-inbox-section__title-row">
           <div class="sapling-icon-tile sapling-icon-tile--sm">
             <v-icon :icon="section.icon" size="18" />
           </div>
@@ -25,7 +25,7 @@
       <p class="sapling-empty-state-panel__text">{{ $t(section.emptyKey) }}</p>
     </div>
 
-    <div v-else class="sapling-inbox-entry-list">
+    <div v-else class="sapling-scroll-list sapling-inbox-entry-list">
       <SaplingInboxEntryCard
         v-for="entry in section.items"
         :key="entry.id"

@@ -3,15 +3,10 @@
   flex: 1 1 auto;
   flex-direction: column;
   min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
   padding-right: var(--sapling-gap-xs);
 }
 
 .sapling-inbox-dialog__content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sapling-gap-xl);
   min-height: 0;
 }
 
@@ -20,8 +15,6 @@
 }
 
 .sapling-inbox-summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: var(--sapling-gap-md);
 }
 
@@ -30,9 +23,7 @@
 }
 
 .sapling-inbox-view-switch__toggle {
-  display: flex;
   width: 100%;
-  flex-wrap: wrap;
   gap: var(--sapling-gap-xs);
 }
 
@@ -118,9 +109,7 @@
 }
 
 .sapling-inbox-notification-panel__title-row {
-  display: flex;
   align-items: center;
-  gap: var(--sapling-gap-md);
 }
 
 .sapling-inbox-section {
@@ -159,19 +148,11 @@
 }
 
 .sapling-inbox-section__title-row {
-  display: flex;
   align-items: flex-start;
-  gap: var(--sapling-gap-md);
 }
 
 .sapling-inbox-entry-list {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
   gap: var(--sapling-gap-md);
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
   padding-right: var(--sapling-gap-xs);
 }
 
@@ -234,16 +215,10 @@
 }
 
 .sapling-inbox-entry__meta-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: var(--sapling-gap-sm);
 }
 
 .sapling-inbox-entry__kind {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sapling-gap-xs);
   min-width: 0;
   font-size: 0.85rem;
   font-weight: 600;
@@ -302,23 +277,17 @@
 }
 
 .sapling-inbox-entry__footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: var(--sapling-gap-md);
   margin-top: auto;
 }
 
 .sapling-inbox-entry__chips {
-  display: flex;
-  flex-wrap: wrap;
   gap: var(--sapling-gap-xs);
 }
 
 .sapling-inbox-entry__actions {
-  display: inline-flex;
-  align-items: center;
   gap: var(--sapling-gap-xs);
+  width: auto;
 }
 
 @media (max-width: 1260px) {

@@ -1,7 +1,4 @@
 .sapling-table-filter-cell {
-  display: flex;
-  align-items: center;
-  gap: var(--sapling-gap-xs);
   min-width: 0;
 }
 
@@ -29,9 +26,6 @@
 }
 
 .sapling-table-filter-trigger__title {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sapling-gap-xs);
   min-width: 0;
   font-size: var(--sapling-text-label-size-lg);
   font-weight: 600;
@@ -55,8 +49,6 @@
 .sapling-table-filter-trigger__summary,
 .sapling-table-filter-trigger__placeholder {
   display: inline-flex;
-  align-items: center;
-  gap: var(--sapling-gap-sm);
   min-width: 0;
   margin-top: var(--sapling-gap-xs);
   font-size: var(--sapling-text-label-size-sm);
@@ -88,8 +80,6 @@
 
 .sapling-table-filter-trigger__operator {
   flex: 0 0 auto;
-  padding: 1px var(--sapling-gap-sm);
-  border-radius: var(--sapling-radius-pill);
   background: color-mix(in srgb, currentColor 12%, transparent);
   font-weight: 700;
 }
@@ -115,16 +105,11 @@
 
 .sapling-table-filter-menu__header,
 .sapling-table-filter-menu__footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: var(--sapling-gap-xs);
 }
 
 .sapling-table-filter-menu__eyebrow {
   font-size: var(--sapling-text-label-size-sm);
-  text-transform: uppercase;
-  letter-spacing: var(--sapling-letter-spacing-label);
   opacity: var(--sapling-opacity-muted);
 }
 
@@ -134,7 +119,7 @@
 }
 
 .sapling-table-filter-menu__field {
-  margin-top: var(--sapling-gap-md);
+  margin-top: 0;
 }
 
 .sapling-table-filter-menu__range {
@@ -144,5 +129,5 @@
 }
 
 .sapling-table-filter-menu__footer {
-  margin-top: var(--sapling-gap-xs);
+  margin-top: 0;
 }

@@ -350,12 +350,7 @@
 }
 
 .sapling-table-mobile-list {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
   gap: var(--sapling-gap-md);
-  min-height: 0;
-  overflow-y: auto;
   padding-top: var(--sapling-space-3xs);
   padding-right: var(--sapling-space-3xs);
 }
@@ -387,8 +382,6 @@
 
 .sapling-table-mobile-controls__sorts,
 .sapling-table-mobile-controls__filters {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
   gap: var(--sapling-gap-sm);
   min-width: 0;
 }

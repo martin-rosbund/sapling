@@ -12,18 +12,18 @@
       <span>{{ $t('global.noData') }}</span>
     </div>
 
-    <div v-else class="sapling-kpi-trend__content">
+    <div v-else class="sapling-stack-lg sapling-kpi-trend__content">
       <div class="sapling-kpi-trend__hero">
-        <div class="sapling-kpi-trend__signal">
+        <div class="sapling-stack-md sapling-highlight-panel sapling-kpi-trend__signal">
           <v-icon :color="trendIcon.color" class="sapling-kpi-trend__signal-icon">{{
             trendIcon.icon
           }}</v-icon>
           <span class="sapling-kpi-trend__signal-text">{{ trendMomentumLabel }}</span>
         </div>
 
-        <div class="sapling-kpi-trend__values">
+        <div class="sapling-stack-md sapling-kpi-trend__values">
           <h1 class="sapling-kpi-trend__current">{{ value.current }}</h1>
-          <div class="sapling-kpi-trend__summary">
+          <div class="sapling-toolbar-group sapling-kpi-trend__summary">
             <v-chip :color="trendIcon.color" variant="tonal" size="small">{{
               trendDeltaLabel
             }}</v-chip>
@@ -37,21 +37,23 @@
         </div>
       </div>
 
-      <div class="sapling-kpi-trend__meter">
+      <div class="sapling-stack-md sapling-kpi-trend__meter">
         <component
           :is="canOpenCurrentDrilldown ? 'button' : 'div'"
           type="button"
-          class="sapling-kpi-trend__meter-row"
-          :class="{ 'sapling-kpi-trend__meter-row--clickable': canOpenCurrentDrilldown }"
+          class="sapling-soft-panel sapling-kpi-trend__meter-row"
+          :class="{ 'sapling-soft-panel--interactive sapling-kpi-trend__meter-row--clickable': canOpenCurrentDrilldown }"
           @click="canOpenCurrentDrilldown ? openCurrentDrilldown() : undefined"
         >
-          <div class="sapling-kpi-trend__meter-head">
-            <span class="sapling-kpi-trend__meter-label">{{ $t('kpi.now') }}</span>
+          <div class="sapling-row-between-xs sapling-kpi-trend__meter-head">
+            <span class="sapling-eyebrow sapling-kpi-trend__meter-label">
+              {{ $t('kpi.now') }}
+            </span>
             <strong>{{ value.current }}</strong>
           </div>
-          <div class="sapling-kpi-trend__meter-track">
+          <div class="sapling-progress-track sapling-kpi-trend__meter-track">
             <span
-              class="sapling-kpi-trend__meter-fill sapling-kpi-trend__meter-fill--current"
+              class="sapling-progress-fill sapling-progress-fill--primary sapling-kpi-trend__meter-fill sapling-kpi-trend__meter-fill--current"
               :style="{ width: `${currentRelativeWidth}%` }"
             />
           </div>
@@ -63,17 +65,19 @@
         <component
           :is="canOpenPreviousDrilldown ? 'button' : 'div'"
           type="button"
-          class="sapling-kpi-trend__meter-row"
-          :class="{ 'sapling-kpi-trend__meter-row--clickable': canOpenPreviousDrilldown }"
+          class="sapling-soft-panel sapling-kpi-trend__meter-row"
+          :class="{ 'sapling-soft-panel--interactive sapling-kpi-trend__meter-row--clickable': canOpenPreviousDrilldown }"
           @click="canOpenPreviousDrilldown ? openPreviousDrilldown() : undefined"
         >
-          <div class="sapling-kpi-trend__meter-head">
-            <span class="sapling-kpi-trend__meter-label">{{ $t('kpi.previous') }}</span>
+          <div class="sapling-row-between-xs sapling-kpi-trend__meter-head">
+            <span class="sapling-eyebrow sapling-kpi-trend__meter-label">
+              {{ $t('kpi.previous') }}
+            </span>
             <strong>{{ value.previous }}</strong>
           </div>
-          <div class="sapling-kpi-trend__meter-track">
+          <div class="sapling-progress-track sapling-kpi-trend__meter-track">
             <span
-              class="sapling-kpi-trend__meter-fill sapling-kpi-trend__meter-fill--previous"
+              class="sapling-progress-fill sapling-progress-fill--secondary sapling-kpi-trend__meter-fill sapling-kpi-trend__meter-fill--previous"
               :style="{ width: `${previousRelativeWidth}%` }"
             />
           </div>

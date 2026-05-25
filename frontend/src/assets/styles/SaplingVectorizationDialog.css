@@ -37,9 +37,6 @@
 }
 
 .sapling-vectorization__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
   gap: var(--sapling-gap-lg);
   padding: var(--sapling-space-xl) var(--sapling-space-2xl) var(--sapling-space-lg);
   border-bottom: 1px solid var(--sapling-surface-border);
@@ -47,8 +44,6 @@
 
 .sapling-vectorization__eyebrow {
   font-size: var(--sapling-text-label-size-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
   opacity: var(--sapling-opacity-soft);
 }
 
@@ -64,16 +59,12 @@
 }
 
 .sapling-vectorization__header-actions {
-  display: flex;
-  align-items: center;
   gap: var(--sapling-gap-md);
 }
 
 .sapling-vectorization__body {
-  display: flex;
   flex: 1 1 auto;
   min-height: 0;
-  flex-direction: column;
   gap: var(--sapling-gap-lg);
   padding: var(--sapling-space-xl) var(--sapling-space-2xl);
   overflow: auto;
@@ -81,21 +72,15 @@
 }
 
 .sapling-vectorization__selectors {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--sapling-gap-xl);
 }
 
 .sapling-vectorization__cards {
-  display: grid;
   gap: var(--sapling-gap-md-plus);
 }
 
 .sapling-vectorization__card {
-  display: flex;
-  flex-direction: column;
   gap: var(--sapling-gap-xl);
-  padding: var(--sapling-space-lg);
   border: 1px solid var(--sapling-surface-border);
   border-radius: var(--sapling-radius-card-lg);
   background: var(--sapling-surface-fill-subtle);
@@ -107,26 +92,19 @@
 }
 
 .sapling-vectorization__chip-grid {
-  display: flex;
-  flex-wrap: wrap;
   gap: var(--sapling-gap-md);
 }
 
 .sapling-vectorization__strategy-list {
-  display: grid;
   gap: var(--sapling-gap-md);
   opacity: var(--sapling-opacity-soft);
 }
 
 .sapling-vectorization__stats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--sapling-gap-xl);
 }
 
 .sapling-vectorization__stat {
-  display: flex;
-  flex-direction: column;
   gap: var(--sapling-gap-2xs);
   padding: var(--sapling-space-md);
   border-radius: var(--sapling-radius-card);
@@ -139,8 +117,6 @@
 }
 
 .sapling-vectorization__footer {
-  display: flex;
-  align-items: center;
   gap: var(--sapling-gap-xl);
   padding: var(--sapling-space-lg) var(--sapling-space-2xl);
   border-top: 1px solid var(--sapling-surface-border);
