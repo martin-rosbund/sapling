@@ -1,9 +1,9 @@
 <template>
   <v-dialog v-if="dialog" v-model="dialogModel" persistent class="sapling-dialog-large">
-    <SaplingDialogCard class="sapling-inbox-dialog sapling-record-timeline-dialog" :tilt="false">
+    <SaplingDialogCard class="sapling-inbox-dialog sapling-history-dialog sapling-record-timeline-dialog" :tilt="false">
       <SaplingDialogShell
         fill-shell
-        body-class="sapling-dialog-fill-body sapling-inbox-dialog__body sapling-scroll-region sapling-record-timeline-dialog__body"
+        body-class="sapling-dialog-fill-body sapling-inbox-dialog__body sapling-scroll-region sapling-history-dialog__body sapling-record-timeline-dialog__body"
         :show-divider="false"
       >
         <template #hero>
@@ -30,11 +30,11 @@
             class="sapling-dialog-fill-content sapling-inbox-dialog__content sapling-stack-xl sapling-record-timeline-dialog__content"
           >
             <template v-if="isLoading">
-              <section class="sapling-stat-grid sapling-record-timeline__summary-grid">
+              <section class="sapling-stat-grid sapling-history-summary-grid sapling-record-timeline__summary-grid">
                 <v-skeleton-loader
                   v-for="item in 3"
                   :key="item"
-                  class="sapling-record-timeline__loading-summary"
+                  class="sapling-history-loading-summary sapling-record-timeline__loading-summary"
                   elevation="12"
                   type="article"
                 />
@@ -44,7 +44,7 @@
                 <v-skeleton-loader
                   v-for="item in 3"
                   :key="`loading-${item}`"
-                  class="sapling-record-timeline__loading-section glass-panel"
+                  class="sapling-history-loading-section sapling-record-timeline__loading-section glass-panel"
                   elevation="12"
                   type="article, article"
                 />
@@ -54,19 +54,19 @@
             <template v-else>
               <section
                 v-if="summaryCards.length > 0"
-                class="sapling-stat-grid sapling-record-timeline__summary-grid"
+                class="sapling-stat-grid sapling-history-summary-grid sapling-record-timeline__summary-grid"
               >
                 <article
                   v-for="card in summaryCards"
                   :key="card.key"
-                  class="sapling-panel-shell sapling-stack-md sapling-record-timeline__summary-card glass-panel"
+                  class="sapling-panel-shell sapling-stack-md sapling-history-summary-card sapling-record-timeline__summary-card glass-panel"
                 >
-                  <div class="sapling-row-between-md sapling-record-timeline__summary-card-header">
+                  <div class="sapling-row-between-md sapling-history-summary-card__header sapling-record-timeline__summary-card-header">
                     <div>
-                      <div class="sapling-record-timeline__summary-card-label">
+                      <div class="sapling-history-summary-card__label sapling-record-timeline__summary-card-label">
                         {{ card.label }}
                       </div>
-                      <strong class="sapling-record-timeline__summary-card-value">{{
+                      <strong class="sapling-history-summary-card__value sapling-record-timeline__summary-card-value">{{
                         card.value
                       }}</strong>
                     </div>

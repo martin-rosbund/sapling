@@ -1,8 +1,10 @@
 import { computed, ref, watch } from 'vue'
 import { useTheme } from 'vuetify'
+import saplingTiltBackgroundHref from '@/assets/styles/SaplingTiltBackground.css?url'
 import saplingTiltBaseHref from '@/assets/styles/SaplingTiltBase.css?url'
 import saplingTiltDarkHref from '@/assets/styles/SaplingTiltDark.css?url'
 import saplingTiltLightHref from '@/assets/styles/SaplingTiltLight.css?url'
+import saplingTiltSurfacesHref from '@/assets/styles/SaplingTiltSurfaces.css?url'
 import CookieService from '@/services/cookie.service'
 
 type SaplingThemeName = 'light' | 'dark'
@@ -107,6 +109,8 @@ function loadThemeStyles(themeName: SaplingThemeName) {
 
   const stylesheets = [
     { key: 'base', href: saplingTiltBaseHref },
+    { key: 'background', href: saplingTiltBackgroundHref },
+    { key: 'surfaces', href: saplingTiltSurfacesHref },
     { key: 'variant', href: themeVariantHref },
   ]
 

@@ -1,10 +1,10 @@
 <template>
   <v-container
-    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--uniform-inset sapling-form-config"
+    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--uniform-inset sapling-config-page sapling-form-config"
     fluid
   >
     <SaplingPageHero
-      class="sapling-form-config__hero"
+      class="sapling-config-hero sapling-form-config__hero"
       variant="system"
       :eyebrow="$t('formConfig.eyebrow')"
       :title="$t('formConfig.title')"
@@ -24,7 +24,7 @@
       </template>
 
       <template #side>
-        <div class="sapling-action-cluster sapling-form-config__hero-actions">
+        <div class="sapling-action-cluster sapling-config-hero-actions sapling-form-config__hero-actions">
           <v-btn
             prepend-icon="mdi-content-save"
             color="primary"
@@ -47,7 +47,7 @@
           </v-btn>
           <input
             ref="fileInputRef"
-            class="sapling-form-config__file-input"
+            class="sapling-upload-native-input sapling-form-config__file-input"
             type="file"
             accept="application/json,.json"
             @change="onImportFileChange"
@@ -58,7 +58,7 @@
 
     <v-alert
       v-if="errorMessage"
-      class="sapling-form-config__alert"
+      class="sapling-config-alert sapling-form-config__alert"
       type="error"
       variant="tonal"
       density="comfortable"
@@ -66,11 +66,11 @@
       {{ errorMessage }}
     </v-alert>
 
-    <section class="sapling-form-config__workspace">
+    <section class="sapling-config-workspace sapling-form-config__workspace">
       <SaplingSurface
-        class="sapling-panel-shell sapling-section-panel sapling-form-config__panel sapling-form-config__panel--editor"
+        class="sapling-panel-shell sapling-section-panel sapling-config-panel sapling-config-panel--blurred sapling-form-config__panel sapling-form-config__panel--editor"
       >
-        <div class="sapling-form-config__toolbar">
+        <div class="sapling-config-toolbar sapling-form-config__toolbar">
           <v-autocomplete
             v-model="selectedEntityHandle"
             class="sapling-form-config__entity-select"
@@ -104,7 +104,7 @@
           />
         </div>
 
-        <div class="sapling-form-config__settings">
+        <div class="sapling-config-settings sapling-form-config__settings">
           <v-text-field
             v-model="configName"
             density="comfortable"
@@ -137,7 +137,7 @@
             prepend-inner-icon="mdi-pound"
             disabled
           />
-          <div class="sapling-row-md sapling-form-config__switches">
+          <div class="sapling-row-md sapling-config-switches sapling-form-config__switches">
             <v-switch
               v-model="isActive"
               color="primary"
@@ -155,7 +155,7 @@
           </div>
         </div>
 
-        <div class="sapling-form-config__field-tools">
+        <div class="sapling-config-field-tools sapling-form-config__field-tools">
           <v-text-field
             v-model="fieldSearch"
             density="comfortable"
@@ -181,15 +181,15 @@
           </v-btn>
         </div>
 
-        <div class="sapling-scroll-list sapling-form-config__field-list" role="list">
+        <div class="sapling-scroll-list sapling-config-field-list sapling-form-config__field-list" role="list">
           <SaplingSurface
             as="article"
             v-for="field in filteredFieldRows"
             :key="field.name"
-            class="sapling-panel-shell sapling-stack-md sapling-form-config-field"
+            class="sapling-panel-shell sapling-stack-md sapling-config-field sapling-form-config-field"
             role="listitem"
           >
-            <div class="sapling-row-md sapling-form-config-field__main">
+            <div class="sapling-row-md sapling-config-field__main sapling-form-config-field__main">
               <v-switch
                 v-model="field.visible"
                 color="primary"
@@ -203,7 +203,7 @@
               </div>
             </div>
 
-            <div class="sapling-form-config-field__controls">
+            <div class="sapling-config-field__controls sapling-form-config-field__controls">
               <v-text-field
                 v-model="field.label"
                 density="compact"
@@ -248,7 +248,7 @@
               />
             </div>
 
-            <div class="sapling-row-md sapling-form-config-field__toggles">
+            <div class="sapling-row-md sapling-config-field__toggles sapling-form-config-field__toggles">
               <v-checkbox
                 v-model="field.required"
                 density="compact"
@@ -268,11 +268,11 @@
 
       <SaplingSurface
         as="aside"
-        class="sapling-panel-shell sapling-section-panel sapling-form-config__panel sapling-form-config__panel--preview"
+        class="sapling-panel-shell sapling-section-panel sapling-config-panel sapling-config-panel--blurred sapling-config-panel--sticky sapling-form-config__panel sapling-form-config__panel--preview"
       >
-        <div class="sapling-row-between-md sapling-form-config__preview-header">
+        <div class="sapling-row-between-md sapling-config-preview-header sapling-form-config__preview-header">
           <div>
-            <p class="sapling-eyebrow sapling-form-config__eyebrow">
+            <p class="sapling-eyebrow sapling-config-eyebrow sapling-form-config__eyebrow">
               {{ $t('formConfig.livePreview') }}
             </p>
             <h2 class="sapling-section-title">{{ previewTitle }}</h2>
@@ -287,21 +287,21 @@
         </div>
 
         <SaplingSurface
-          class="sapling-panel-shell sapling-stack-lg sapling-form-config-preview"
+          class="sapling-panel-shell sapling-stack-lg sapling-config-preview sapling-form-config-preview"
           aria-live="polite"
         >
           <section
             v-for="group in previewGroups"
             :key="group.id"
-            class="sapling-stack-md sapling-form-config-preview__group"
+            class="sapling-stack-md sapling-config-preview__group sapling-form-config-preview__group"
           >
             <h3 v-if="group.label">{{ group.label }}</h3>
-            <div class="sapling-form-config-preview__grid">
+            <div class="sapling-config-preview__grid sapling-form-config-preview__grid">
               <SaplingSurface
                 v-for="field in group.templates"
                 :key="field.name"
-                class="sapling-panel-shell sapling-form-config-preview__field"
-                :class="`sapling-form-config-preview__field--w${getPreviewWidth(field)}`"
+                class="sapling-panel-shell sapling-config-preview__field sapling-form-config-preview__field"
+                :class="`sapling-config-preview__field--w${getPreviewWidth(field)}`"
               >
                 <span>{{ getPreviewFieldLabel(field) }}</span>
                 <strong>{{ getPreviewRenderer(field) }}</strong>
@@ -312,8 +312,8 @@
         </SaplingSurface>
 
         <div class="sapling-form-config__json-panel">
-          <div class="sapling-row-between-md sapling-form-config__json-header">
-            <p class="sapling-eyebrow sapling-form-config__eyebrow">
+          <div class="sapling-row-between-md sapling-config-json-header sapling-form-config__json-header">
+            <p class="sapling-eyebrow sapling-config-eyebrow sapling-form-config__eyebrow">
               {{ $t('formConfig.json') }}
             </p>
             <v-btn
@@ -327,7 +327,7 @@
             </v-btn>
           </div>
           <SaplingCodeMirror
-            class="sapling-form-config__json-editor"
+            class="sapling-config-json-editor sapling-form-config__json-editor"
             :model-value="draftJson"
             language="json"
             :read-only="true"
@@ -335,7 +335,7 @@
           />
           <v-alert
             v-if="validationSummary"
-            class="sapling-form-config__validation"
+            class="sapling-config-validation sapling-form-config__validation"
             :type="validationIsValid ? 'success' : 'warning'"
             variant="tonal"
             density="compact"
@@ -349,7 +349,6 @@
 </template>
 
 <script lang="ts" setup>
-import '@/assets/styles/SaplingFormConfig.css'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ApiFormConfigService, {

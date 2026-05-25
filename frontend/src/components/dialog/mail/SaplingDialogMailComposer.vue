@@ -1,5 +1,5 @@
 <template>
-  <div class="sapling-mail-dialog__form">
+  <div class="sapling-message-dialog__form sapling-mail-dialog__form">
     <v-select
       :model-value="templateHandle"
       :items="templates"
@@ -12,11 +12,11 @@
       @update:model-value="handleTemplateUpdate"
     />
 
-    <div class="sapling-mail-dialog__sender">
-      <span class="sapling-mail-dialog__sender-label">{{ translate('document.from') }}</span>
+    <div class="sapling-message-dialog__sender sapling-mail-dialog__sender">
+      <span class="sapling-message-dialog__sender-label sapling-mail-dialog__sender-label">{{ translate('document.from') }}</span>
       <v-select
         v-if="senderOptions.length > 1"
-        class="sapling-mail-dialog__sender-select"
+        class="sapling-message-dialog__sender-select sapling-mail-dialog__sender-select"
         :model-value="selectedSenderEmail"
         :items="senderItems"
         item-title="title"
@@ -45,7 +45,7 @@
       @update:model-value="handleToUpdate"
     />
 
-    <div class="sapling-mail-dialog__meta-grid">
+    <div class="sapling-message-dialog__meta-grid sapling-mail-dialog__meta-grid">
       <v-combobox
         :model-value="ccRecipients"
         :label="translate('document.cc')"
@@ -96,9 +96,9 @@
     />
 
     <v-card class="sapling-mail-dialog__helper-card glass-panel">
-      <v-card-text class="sapling-mail-dialog__helper-card-text">
-        <div class="sapling-mail-dialog__helper-header">
-          <span class="sapling-mail-dialog__helper-title">{{
+      <v-card-text class="sapling-message-dialog__helper-card-text sapling-mail-dialog__helper-card-text">
+        <div class="sapling-message-dialog__helper-header sapling-mail-dialog__helper-header">
+          <span class="sapling-message-dialog__helper-title sapling-mail-dialog__helper-title">{{
             translate('document.attachments')
           }}</span>
           <v-chip size="small" variant="tonal">{{ attachmentHandles.length }}</v-chip>
@@ -127,7 +127,7 @@
             hide-details="auto"
             @update:model-value="handleAttachmentUpdate"
           />
-          <div v-if="attachmentSelectionSummary" class="sapling-mail-dialog__attachment-summary">
+          <div v-if="attachmentSelectionSummary" class="sapling-message-dialog__attachment-summary sapling-mail-dialog__attachment-summary">
             {{ attachmentSelectionSummary }}
           </div>
         </template>

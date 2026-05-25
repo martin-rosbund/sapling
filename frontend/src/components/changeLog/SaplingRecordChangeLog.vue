@@ -1,9 +1,9 @@
 <template>
   <v-dialog v-if="dialog" v-model="dialogModel" persistent class="sapling-dialog-large">
-    <SaplingDialogCard class="sapling-inbox-dialog sapling-record-change-log-dialog" :tilt="false">
+    <SaplingDialogCard class="sapling-inbox-dialog sapling-history-dialog sapling-record-change-log-dialog" :tilt="false">
       <SaplingDialogShell
         fill-shell
-        body-class="sapling-dialog-fill-body sapling-inbox-dialog__body sapling-record-change-log-dialog__body"
+        body-class="sapling-dialog-fill-body sapling-inbox-dialog__body sapling-history-dialog__body sapling-record-change-log-dialog__body"
         :show-divider="false"
       >
         <template #hero>
@@ -70,11 +70,11 @@
 
                 <div
                   v-if="entry.details.length > 0"
-                  class="sapling-record-change-log__detail-table"
+                  class="sapling-history-detail-table sapling-record-change-log__detail-table"
                   role="table"
                 >
                   <div
-                    class="sapling-record-change-log__detail-row sapling-record-change-log__detail-row--head"
+                    class="sapling-history-detail-row sapling-history-detail-row--head sapling-record-change-log__detail-row sapling-record-change-log__detail-row--head"
                   >
                     <span>{{ t('changeLog.property') }}</span>
                     <span>{{ t('changeLog.oldValue') }}</span>
@@ -84,7 +84,7 @@
                   <div
                     v-for="detail in entry.details"
                     :key="`${entry.handle}-${detail.property}`"
-                    class="sapling-record-change-log__detail-row"
+                    class="sapling-history-detail-row sapling-record-change-log__detail-row"
                     role="row"
                   >
                     <strong>{{ getPropertyLabel(detail.property) }}</strong>

@@ -6,9 +6,9 @@
     persistent
     @update:model-value="handleVisibilityChange"
   >
-    <SaplingDialogCard class="sapling-mail-dialog" :tilt="false">
-      <div class="sapling-mail-dialog__shell">
-        <v-card-title class="sapling-mail-dialog__header">
+    <SaplingDialogCard class="sapling-message-dialog sapling-mail-dialog" :tilt="false">
+      <div class="sapling-message-dialog__shell sapling-mail-dialog__shell">
+        <v-card-title class="sapling-message-dialog__header sapling-mail-dialog__header">
           <SaplingDialogHero
             :loading="isTranslationLoading"
             :eyebrow="translate('mail.title')"
@@ -20,15 +20,15 @@
           />
         </v-card-title>
 
-        <v-card-text class="sapling-mail-dialog__content">
-          <div v-if="isTranslationLoading" class="sapling-mail-dialog__scroll">
-            <div class="sapling-mail-dialog__grid">
+        <v-card-text class="sapling-message-dialog__content sapling-mail-dialog__content">
+          <div v-if="isTranslationLoading" class="sapling-message-dialog__scroll sapling-mail-dialog__scroll">
+            <div class="sapling-message-dialog__grid sapling-mail-dialog__grid">
               <v-skeleton-loader class="glass-panel" type="article, article, article" />
               <v-skeleton-loader class="glass-panel" type="article, article, article" />
             </div>
           </div>
-          <div v-else class="sapling-mail-dialog__scroll">
-            <div class="sapling-mail-dialog__grid">
+          <div v-else class="sapling-message-dialog__scroll sapling-mail-dialog__scroll">
+            <div class="sapling-message-dialog__grid sapling-mail-dialog__grid">
               <SaplingDialogMailComposer
                 ref="composer"
                 :templates="templates"
@@ -98,7 +98,6 @@
 </template>
 
 <script lang="ts" setup>
-import '@/assets/styles/SaplingDialogMail.css'
 import SaplingActionMail from '@/components/actions/SaplingActionMail.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
 import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'

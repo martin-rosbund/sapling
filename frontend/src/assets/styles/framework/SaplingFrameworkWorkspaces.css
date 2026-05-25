@@ -61,6 +61,58 @@
   gap: var(--sapling-page-skeleton-gap, var(--sapling-gap-xl));
 }
 
+.sapling-browser-page {
+  gap: var(--sapling-gap-xl);
+  overflow: hidden;
+}
+
+.sapling-browser-workspace {
+  display: grid;
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+  gap: var(--sapling-gap-xl);
+}
+
+.sapling-browser-workspace--balanced {
+  grid-template-columns: minmax(320px, 1fr) minmax(0, 1fr);
+}
+
+.sapling-browser-workspace__sidebar,
+.sapling-browser-workspace__detail {
+  min-width: 0;
+  min-height: 0;
+}
+
+.sapling-browser-workspace__sidebar {
+  gap: 0;
+}
+
+.sapling-browser-workspace__table-shell {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sapling-browser-workspace__detail {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-browser-workspace__loading-panel {
+  min-height: 0;
+}
+
+.sapling-browser-scroll {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.sapling-browser-scroll--flush {
+  padding: 0;
+}
+
 .sapling-dialog-fill-body {
   display: flex;
   flex: 1 1 auto;
@@ -119,12 +171,54 @@
 }
 
 @media (max-width: 960px) {
+  .sapling-browser-page {
+    height: auto;
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .sapling-browser-workspace {
+    grid-template-columns: 1fr;
+    gap: var(--sapling-gap-md);
+    height: auto;
+    overflow: visible;
+  }
+
+  .sapling-browser-workspace__sidebar,
+  .sapling-browser-workspace__detail {
+    min-height: unset;
+    overflow: visible;
+  }
+
+  .sapling-browser-workspace__sidebar {
+    order: 0;
+    padding: var(--sapling-gap-md);
+  }
+
+  .sapling-browser-workspace__detail {
+    order: 1;
+  }
+
+  .sapling-browser-scroll {
+    height: auto;
+    overflow: visible;
+  }
+
   .sapling-dialog-fill-body {
     padding-right: 0;
   }
 }
 
 @media (max-width: 640px) {
+  .sapling-browser-page {
+    gap: var(--sapling-gap-md);
+  }
+
+  .sapling-browser-workspace__sidebar,
+  .sapling-browser-workspace__loading-panel {
+    padding: var(--sapling-gap-md);
+  }
+
   .sapling-card-board--collapse-lg {
     --sapling-card-board-row-min: 380px;
     --sapling-card-board-row-max: 460px;

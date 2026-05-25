@@ -1,9 +1,9 @@
 <template>
-  <div class="sapling-mail-dialog__preview-shell">
+  <div class="sapling-message-dialog__preview-shell sapling-mail-dialog__preview-shell">
     <v-card class="sapling-mail-dialog__helper-card glass-panel">
-      <v-card-text class="sapling-mail-dialog__helper-card-text">
-        <div class="sapling-mail-dialog__helper-header">
-          <span class="sapling-mail-dialog__helper-title">{{
+      <v-card-text class="sapling-message-dialog__helper-card-text sapling-mail-dialog__helper-card-text">
+        <div class="sapling-message-dialog__helper-header sapling-mail-dialog__helper-header">
+          <span class="sapling-message-dialog__helper-title sapling-mail-dialog__helper-title">{{
             translate('mail.placeholders')
           }}</span>
           <v-btn-toggle
@@ -23,19 +23,19 @@
         </div>
 
         <v-progress-linear v-if="isLoadingPlaceholders" indeterminate color="primary" />
-        <div v-else class="sapling-mail-dialog__placeholder-groups">
+        <div v-else class="sapling-message-dialog__placeholder-groups sapling-mail-dialog__placeholder-groups">
           <div
             v-for="group in placeholderGroups"
             :key="group.name"
-            class="sapling-mail-dialog__placeholder-group"
+            class="sapling-message-dialog__placeholder-group sapling-mail-dialog__placeholder-group"
           >
-            <div class="sapling-mail-dialog__placeholder-group-title">{{ group.name }}</div>
-            <div class="sapling-mail-dialog__placeholder-chip-list">
+            <div class="sapling-message-dialog__placeholder-group-title sapling-mail-dialog__placeholder-group-title">{{ group.name }}</div>
+            <div class="sapling-message-dialog__placeholder-chip-list sapling-mail-dialog__placeholder-chip-list">
               <v-chip
                 v-for="placeholder in group.items"
                 :key="placeholder.token"
                 size="small"
-                class="sapling-mail-dialog__placeholder-chip"
+                class="sapling-message-dialog__placeholder-chip sapling-mail-dialog__placeholder-chip"
                 @click="$emit('insert-placeholder', placeholder.token)"
               >
                 {{ placeholder.label }}
@@ -46,8 +46,8 @@
       </v-card-text>
     </v-card>
 
-    <div class="sapling-mail-dialog__preview-toolbar">
-      <span class="sapling-mail-dialog__preview-title">{{ translate('document.preview') }}</span>
+    <div class="sapling-message-dialog__preview-toolbar sapling-mail-dialog__preview-toolbar">
+      <span class="sapling-message-dialog__preview-title sapling-mail-dialog__preview-title">{{ translate('document.preview') }}</span>
       <v-btn
         color="primary"
         variant="tonal"
@@ -59,9 +59,9 @@
       </v-btn>
     </div>
 
-    <v-card class="sapling-mail-dialog__preview-card glass-panel">
+    <v-card class="sapling-message-dialog__preview-card sapling-mail-dialog__preview-card glass-panel">
       <v-card-text>
-        <div class="sapling-mail-dialog__preview-meta">
+        <div class="sapling-message-dialog__preview-meta sapling-mail-dialog__preview-meta">
           <div v-if="previewFrom">
             <strong>{{ translate('document.from') }}:</strong> {{ previewFrom }}
           </div>
@@ -83,7 +83,7 @@
           </div>
         </div>
         <v-divider class="my-4" />
-        <div class="sapling-mail-dialog__preview-html">
+        <div class="sapling-message-dialog__preview-html sapling-mail-dialog__preview-html">
           <SaplingMarkdownContent :source="previewMarkdown" />
         </div>
       </v-card-text>

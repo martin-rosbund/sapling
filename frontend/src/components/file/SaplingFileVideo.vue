@@ -1,12 +1,12 @@
 <template>
   <div
-    class="sapling-file-preview sapling-file-video sapling-file-viewer sapling-file-preview-fullheight"
+    class="sapling-file-preview sapling-file-video sapling-preview-viewer sapling-file-viewer sapling-preview-fullheight sapling-file-preview-fullheight"
   >
-    <div class="sapling-file-media-surface">
+    <div class="sapling-preview-media-surface sapling-file-media-surface">
       <video
         ref="videoElement"
         :key="videoUrl"
-        class="sapling-file-video-player"
+        class="sapling-preview-video-player sapling-file-video-player"
         controls
         preload="metadata"
       >

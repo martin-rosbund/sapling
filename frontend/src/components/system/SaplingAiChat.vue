@@ -52,7 +52,7 @@
             />
           </div>
 
-          <div class="sapling-ai-chat__layout">
+          <div class="sapling-chat-layout sapling-ai-chat__layout">
             <SaplingAiChatSessions
               :sessions="sessions"
               :active-session-handle="activeSession?.handle ?? null"

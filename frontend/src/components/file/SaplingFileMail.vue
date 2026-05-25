@@ -3,11 +3,11 @@
     class="sapling-file-preview sapling-file-mail sapling-file-viewer sapling-file-preview-fullheight"
   >
     <div v-if="isLoading" class="sapling-file-mail-layout">
-      <div class="sapling-file-mail-summary sapling-file-panel">
+      <div class="sapling-file-mail-summary sapling-preview-panel sapling-file-panel">
         <v-skeleton-loader class="sapling-file-mail-loading-summary" type="heading, text, text" />
       </div>
 
-      <div class="sapling-file-mail-body sapling-file-panel">
+      <div class="sapling-file-mail-body sapling-preview-panel sapling-file-panel">
         <v-skeleton-loader class="sapling-file-mail-loading-body" type="article" />
       </div>
     </div>
@@ -22,7 +22,7 @@
     </div>
 
     <div v-else class="sapling-file-mail-layout">
-      <div class="sapling-file-mail-summary sapling-file-panel">
+      <div class="sapling-file-mail-summary sapling-preview-panel sapling-file-panel">
         <div class="sapling-file-mail-title-row">
           <div>
             <div class="sapling-file-mail-label">{{ $t('document.subject') }}</div>
@@ -59,7 +59,7 @@
         </div>
       </div>
 
-      <div class="sapling-file-mail-body sapling-file-panel">
+      <div class="sapling-file-mail-body sapling-preview-panel sapling-file-panel">
         <div class="sapling-file-mail-label">{{ $t('document.content') }}</div>
         <iframe
           v-if="htmlPreviewDoc"
