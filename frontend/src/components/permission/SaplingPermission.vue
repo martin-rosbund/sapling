@@ -1,9 +1,12 @@
 <template>
   <v-container
-    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--fill sapling-page-shell--uniform-inset sapling-permission-dashboard fill-height"
+    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--fill sapling-page-shell--uniform-inset sapling-dashboard-page sapling-dashboard-page--flow-xl sapling-permission-dashboard fill-height"
     fluid
   >
-    <section v-if="permissionIsLoading" class="sapling-permission-hero glass-panel">
+    <section
+      v-if="permissionIsLoading"
+      class="sapling-page-hero sapling-page-hero--workspace sapling-permission-hero glass-panel"
+    >
       <div class="sapling-permission-hero-copy">
         <v-skeleton-loader type="heading, text" />
       </div>
@@ -87,32 +90,34 @@
     </SaplingPageHero>
 
     <template v-if="permissionIsLoading">
-      <section class="sapling-permission-layout">
+      <section
+        class="sapling-page-workspace sapling-page-workspace--sidebar-main-context sapling-page-workspace--collapse-xl sapling-permission-layout"
+      >
         <aside
-          class="sapling-section-panel sapling-permission-sidebar glass-panel sapling-permission-loading-panel"
+          class="sapling-section-panel sapling-page-panel sapling-permission-sidebar glass-panel sapling-permission-loading-panel"
         >
           <v-skeleton-loader
             type="heading, list-item-two-line, list-item-two-line, list-item-two-line"
           />
         </aside>
 
-        <main class="sapling-permission-main">
+        <main class="sapling-page-column sapling-permission-main">
           <section
-            class="sapling-section-panel sapling-permission-selection glass-panel sapling-permission-loading-panel"
+            class="sapling-section-panel sapling-page-panel sapling-permission-selection glass-panel sapling-permission-loading-panel"
           >
             <v-skeleton-loader type="heading, text, text" />
           </section>
 
           <section
-            class="sapling-workspace-panel sapling-permission-workspace glass-panel sapling-permission-loading-panel"
+            class="sapling-workspace-panel sapling-page-panel sapling-permission-workspace glass-panel sapling-permission-loading-panel"
           >
             <v-skeleton-loader type="heading, table-heading, table-tbody" />
           </section>
         </main>
 
-        <aside class="sapling-stack-xl sapling-permission-context">
+        <aside class="sapling-stack-xl sapling-page-panel sapling-permission-context">
           <section
-            class="sapling-section-panel sapling-permission-members glass-panel sapling-permission-loading-panel"
+            class="sapling-section-panel sapling-page-panel sapling-permission-members glass-panel sapling-permission-loading-panel"
           >
             <v-skeleton-loader type="heading, article, article" />
           </section>
@@ -120,7 +125,10 @@
       </section>
     </template>
 
-    <section v-else class="sapling-permission-layout">
+    <section
+      v-else
+      class="sapling-page-workspace sapling-page-workspace--sidebar-main-context sapling-page-workspace--collapse-xl sapling-permission-layout"
+    >
       <SaplingPermissionRoleSidebar
         v-model:role-search="roleSearch"
         :roles="filteredRoles"
@@ -132,7 +140,7 @@
         @select-role="selectRole"
       />
 
-      <main class="sapling-permission-main">
+      <main class="sapling-page-column sapling-permission-main">
         <SaplingPermissionOverview
           :selected-role="selectedRole"
           :selected-role-stats="selectedRoleStats"

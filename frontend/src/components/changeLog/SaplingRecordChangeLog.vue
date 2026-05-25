@@ -3,7 +3,7 @@
     <SaplingDialogCard class="sapling-inbox-dialog sapling-record-change-log-dialog" :tilt="false">
       <SaplingDialogShell
         fill-shell
-        body-class="sapling-inbox-dialog__body sapling-record-change-log-dialog__body"
+        body-class="sapling-dialog-fill-body sapling-inbox-dialog__body sapling-record-change-log-dialog__body"
         :show-divider="false"
       >
         <template #hero>
@@ -26,7 +26,7 @@
 
         <template #body>
           <div
-            class="sapling-inbox-dialog__content sapling-stack-lg sapling-record-change-log sapling-scrollable"
+            class="sapling-dialog-fill-content sapling-inbox-dialog__content sapling-stack-lg sapling-record-change-log sapling-scrollable"
           >
             <section
               v-if="error"

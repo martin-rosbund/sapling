@@ -1,74 +1,25 @@
 .sapling-vectorization-shell {
-  z-index: 1252;
+  --sapling-overlay-shell-z-index: 1252;
 }
 
 .sapling-vectorization__backdrop {
-  position: fixed;
-  inset: 0;
-  background: transparent;
+  --sapling-overlay-backdrop-z-index: 1252;
 }
 
 .sapling-vectorization {
-  position: fixed;
-  right: var(--sapling-overlay-panel-offset);
-  bottom: var(--sapling-overlay-panel-offset);
-  width: min(var(--sapling-vectorization-panel-width), calc(100vw - var(--sapling-space-3xl)));
-  max-width: calc(100vw - var(--sapling-space-3xl));
-  min-height: var(--sapling-vectorization-panel-min-height);
-  max-height: calc(100dvh - 120px);
-  display: flex;
-  flex-direction: column;
-  border-radius: var(--sapling-radius-card-xl);
-  overflow: hidden;
-  z-index: 1253;
-}
-
-.sapling-vectorization-panel-enter-active,
-.sapling-vectorization-panel-leave-active {
-  transition:
-    opacity var(--sapling-motion-standard) ease,
-    transform var(--sapling-motion-standard) ease;
-}
-
-.sapling-vectorization-panel-enter-from,
-.sapling-vectorization-panel-leave-to {
-  opacity: 0;
-  transform: translateY(var(--sapling-space-lg-plus)) scale(0.98);
-}
-
-.sapling-vectorization__header {
-  gap: var(--sapling-gap-lg);
-  padding: var(--sapling-space-xl) var(--sapling-space-2xl) var(--sapling-space-lg);
-  border-bottom: 1px solid var(--sapling-surface-border);
-}
-
-.sapling-vectorization__eyebrow {
-  font-size: var(--sapling-text-label-size-sm);
-  opacity: var(--sapling-opacity-soft);
-}
-
-.sapling-vectorization__title {
-  font-size: 1.3rem;
-  font-weight: 600;
+  --sapling-floating-panel-z-index: 1253;
+  --sapling-floating-panel-width: var(--sapling-vectorization-panel-width);
+  --sapling-floating-panel-max-width: calc(100vw - var(--sapling-space-3xl));
+  --sapling-floating-panel-min-height: var(--sapling-vectorization-panel-min-height);
+  --sapling-floating-panel-max-height: calc(100dvh - 120px);
+  --sapling-floating-panel-mobile-min-height: min(
+    58vh,
+    calc(100dvh - var(--sapling-overlay-panel-mobile-offset))
+  );
 }
 
 .sapling-vectorization__subtitle {
-  margin-top: var(--sapling-space-xs);
   max-width: 48ch;
-  opacity: var(--sapling-opacity-soft);
-}
-
-.sapling-vectorization__header-actions {
-  gap: var(--sapling-gap-md);
-}
-
-.sapling-vectorization__body {
-  flex: 1 1 auto;
-  min-height: 0;
-  gap: var(--sapling-gap-lg);
-  padding: var(--sapling-space-xl) var(--sapling-space-2xl);
-  overflow: auto;
-  overscroll-behavior: contain;
 }
 
 .sapling-vectorization__selectors {
@@ -77,18 +28,6 @@
 
 .sapling-vectorization__cards {
   gap: var(--sapling-gap-md-plus);
-}
-
-.sapling-vectorization__card {
-  gap: var(--sapling-gap-xl);
-  border: 1px solid var(--sapling-surface-border);
-  border-radius: var(--sapling-radius-card-lg);
-  background: var(--sapling-surface-fill-subtle);
-}
-
-.sapling-vectorization__card-title {
-  font-size: var(--sapling-text-body-size-sm);
-  font-weight: 600;
 }
 
 .sapling-vectorization__chip-grid {
@@ -104,43 +43,7 @@
   gap: var(--sapling-gap-xl);
 }
 
-.sapling-vectorization__stat {
-  gap: var(--sapling-gap-2xs);
-  padding: var(--sapling-space-md);
-  border-radius: var(--sapling-radius-card);
-  background: var(--sapling-surface-fill-primary-soft);
-}
-
-.sapling-vectorization__stat span {
-  font-size: var(--sapling-text-meta-size-sm);
-  opacity: var(--sapling-opacity-soft);
-}
-
-.sapling-vectorization__footer {
-  gap: var(--sapling-gap-xl);
-  padding: var(--sapling-space-lg) var(--sapling-space-2xl);
-  border-top: 1px solid var(--sapling-surface-border);
-}
-
 @media (max-width: 960px) {
-  .sapling-vectorization {
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100vw;
-    max-width: 100vw;
-    min-height: min(58vh, calc(100dvh - var(--sapling-overlay-panel-mobile-offset)));
-    max-height: calc(100dvh - var(--sapling-overlay-panel-mobile-offset));
-    border-radius: var(--sapling-radius-card-xl) var(--sapling-radius-card-xl) 0 0;
-  }
-
-  .sapling-vectorization__header,
-  .sapling-vectorization__body,
-  .sapling-vectorization__footer {
-    padding-left: var(--sapling-space-lg);
-    padding-right: var(--sapling-space-lg);
-  }
-
   .sapling-vectorization__header {
     flex-direction: column;
   }

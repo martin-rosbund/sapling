@@ -2,14 +2,6 @@
   overflow: hidden;
 }
 
-.sapling-record-timeline-dialog__body {
-  flex-direction: column;
-}
-
-.sapling-record-timeline-dialog__content {
-  min-height: 0;
-}
-
 .sapling-record-timeline-dialog__body .v-skeleton-loader {
   background: transparent;
 }

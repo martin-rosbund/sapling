@@ -1,6 +1,6 @@
 <template>
   <div v-if="selectedRole" class="sapling-permission-overview-row">
-    <section class="sapling-section-panel sapling-permission-selection glass-panel">
+    <section class="sapling-section-panel sapling-page-panel sapling-permission-selection glass-panel">
       <div>
         <p class="sapling-eyebrow sapling-permission-section-eyebrow">
           {{ $t('role.selectedRole') }}
@@ -55,7 +55,7 @@
       </div>
     </section>
 
-    <section class="sapling-section-panel sapling-permission-summary glass-panel">
+    <section class="sapling-section-panel sapling-page-panel sapling-page-panel-stack sapling-permission-summary glass-panel">
       <div class="sapling-stack-md sapling-permission-summary-header">
         <p class="sapling-eyebrow sapling-permission-section-eyebrow">
           {{ $t('permission.workingSet') }}

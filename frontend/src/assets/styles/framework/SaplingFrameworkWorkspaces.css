@@ -1,0 +1,132 @@
+.sapling-dashboard-page {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--sapling-dashboard-page-gap, var(--sapling-gap-md));
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sapling-page-workspace {
+  display: grid;
+  flex: 1 1 auto;
+  gap: var(--sapling-page-workspace-gap, var(--sapling-gap-xl));
+  min-height: 0;
+  align-items: stretch;
+}
+
+.sapling-page-workspace--main-context {
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(var(--sapling-page-workspace-context-min, 300px), var(--sapling-panel-width-md));
+}
+
+.sapling-page-workspace--sidebar-main-context {
+  grid-template-columns:
+    minmax(var(--sapling-chat-panel-sidebar-width), 300px)
+    minmax(0, 1fr)
+    minmax(var(--sapling-hero-stats-min-width), var(--sapling-panel-width-md));
+}
+
+.sapling-page-column {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--sapling-page-column-gap, var(--sapling-gap-xl));
+  min-width: 0;
+  min-height: 0;
+}
+
+.sapling-page-panel {
+  min-height: 0;
+  border-radius: var(--sapling-radius-sm);
+  overflow: hidden;
+}
+
+.sapling-page-panel-stack {
+  gap: var(--sapling-page-panel-stack-gap, var(--sapling-gap-md));
+}
+
+.sapling-page-skeleton {
+  display: grid;
+  flex: 1 1 auto;
+  gap: var(--sapling-page-skeleton-gap, var(--sapling-gap-xl));
+}
+
+.sapling-page-skeleton-grid {
+  display: grid;
+  gap: var(--sapling-page-skeleton-gap, var(--sapling-gap-xl));
+}
+
+.sapling-dialog-fill-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  padding-right: var(--sapling-gap-xs);
+}
+
+.sapling-dialog-fill-content {
+  min-height: 0;
+}
+
+.sapling-card-board {
+  display: grid;
+  grid-template-columns: repeat(var(--sapling-card-board-columns, 2), minmax(0, 1fr));
+  grid-auto-rows: minmax(
+    var(--sapling-card-board-row-min, 460px),
+    var(--sapling-card-board-row-max, 540px)
+  );
+  gap: var(--sapling-card-board-gap, var(--sapling-gap-xl));
+  flex: 1 1 auto;
+  min-height: 0;
+  align-content: start;
+}
+
+@media (max-width: 1440px) {
+  .sapling-dashboard-page--flow-xl {
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
+  }
+
+  .sapling-page-workspace--collapse-xl {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 1260px) {
+  .sapling-card-board--collapse-lg {
+    --sapling-card-board-columns: 1;
+    --sapling-card-board-row-min: 420px;
+    --sapling-card-board-row-max: 500px;
+  }
+}
+
+@media (max-width: 1080px) {
+  .sapling-dashboard-page--flow-lg {
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
+  }
+
+  .sapling-page-workspace--collapse-lg {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 960px) {
+  .sapling-dialog-fill-body {
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .sapling-card-board--collapse-lg {
+    --sapling-card-board-row-min: 380px;
+    --sapling-card-board-row-max: 460px;
+  }
+}

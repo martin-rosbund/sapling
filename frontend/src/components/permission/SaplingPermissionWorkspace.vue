@@ -1,5 +1,5 @@
 <template>
-  <section class="sapling-workspace-panel sapling-permission-workspace glass-panel">
+  <section class="sapling-workspace-panel sapling-page-panel sapling-page-panel-stack sapling-permission-workspace glass-panel">
     <div class="sapling-stack-md sapling-permission-toolbar">
       <v-tabs v-model="selectedGroupModel" class="sapling-permission-tabs" show-arrows>
         <v-tab

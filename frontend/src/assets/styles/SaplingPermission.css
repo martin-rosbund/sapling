@@ -1,24 +1,5 @@
-.sapling-permission-loading-panel {
-  min-height: 0;
-}
-
-.sapling-permission-dashboard {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  gap: var(--sapling-gap-md);
-  min-height: 0;
-  height: 100%;
-  overflow: hidden;
-}
-
 .sapling-permission-hero {
-  display: grid;
   grid-template-columns: minmax(0, 1.3fr) minmax(var(--sapling-panel-width-sm), 1fr);
-  gap: var(--sapling-gap-md);
-  align-items: start;
-  padding: var(--sapling-space-panel-md);
-  border-radius: var(--sapling-radius-sm);
 }
 
 .sapling-permission-hero-copy {
@@ -58,44 +39,12 @@
 }
 
 .sapling-permission-layout {
-  display: grid;
-  grid-template-columns:
-    minmax(var(--sapling-chat-panel-sidebar-width), 300px)
-    minmax(0, 1fr)
-    minmax(var(--sapling-hero-stats-min-width), var(--sapling-panel-width-md));
-  flex: 1 1 auto;
-  gap: var(--sapling-gap-xl);
-  min-height: 0;
-  align-items: stretch;
-}
-
-.sapling-permission-sidebar,
-.sapling-permission-selection,
-.sapling-permission-workspace,
-.sapling-permission-members,
-.sapling-permission-summary {
-  border-radius: var(--sapling-radius-sm);
-}
-
-.sapling-permission-sidebar,
-.sapling-permission-members,
-.sapling-permission-summary {
-  min-height: 0;
-  overflow: hidden;
+  --sapling-page-workspace-gap: var(--sapling-gap-xl);
 }
 
 .sapling-permission-sidebar,
 .sapling-permission-summary {
-  gap: var(--sapling-gap-md);
-}
-
-.sapling-permission-main {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  gap: var(--sapling-gap-xl);
-  min-height: 0;
-  min-width: 0;
+  --sapling-page-panel-stack-gap: var(--sapling-gap-md);
 }
 
 .sapling-permission-overview-row {
@@ -323,15 +272,8 @@
 }
 
 @media (max-width: 1440px) {
-  .sapling-permission-dashboard {
-    height: auto;
-    min-height: 100%;
-    overflow: visible;
-  }
-
   .sapling-permission-hero,
-  .sapling-permission-overview-row,
-  .sapling-permission-layout {
+  .sapling-permission-overview-row {
     grid-template-columns: 1fr;
   }
 

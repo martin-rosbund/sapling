@@ -1,7 +1,7 @@
 <template>
   <SaplingSurface
     as="section"
-    class="sapling-section-panel sapling-panel-shell sapling-event-panel"
+    class="sapling-section-panel sapling-panel-shell sapling-page-panel sapling-page-panel-stack sapling-event-panel"
   >
     <div class="sapling-section-header sapling-event-panel__header">
       <div>

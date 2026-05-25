@@ -22,7 +22,6 @@
 </template>
 
 <script lang="ts" setup>
-import '@/assets/styles/SaplingAccessPending.css'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { VCard } from 'vuetify/components'

@@ -1,5 +1,5 @@
 <template>
-  <aside class="sapling-section-panel sapling-permission-sidebar glass-panel">
+  <aside class="sapling-section-panel sapling-page-panel sapling-page-panel-stack sapling-permission-sidebar glass-panel">
     <div class="sapling-stack-md sapling-permission-panel-header">
       <div>
         <p class="sapling-eyebrow sapling-permission-section-eyebrow">

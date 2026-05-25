@@ -30,7 +30,7 @@
         <section
           v-for="personId in selectedPeoples"
           :key="personId"
-          class="sapling-section-panel sapling-panel-shell sapling-event-sidebyside-column"
+          class="sapling-section-panel sapling-panel-shell sapling-page-panel sapling-event-sidebyside-column"
         >
           <header class="sapling-section-header sapling-event-sidebyside-column__header">
             <span>{{ getPersonName(personId) }}</span>

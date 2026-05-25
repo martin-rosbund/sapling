@@ -1,6 +1,6 @@
 <template>
-  <aside class="sapling-stack-xl sapling-permission-context">
-    <section class="sapling-section-panel sapling-permission-members glass-panel">
+  <aside class="sapling-stack-xl sapling-page-panel sapling-permission-context">
+    <section class="sapling-section-panel sapling-page-panel sapling-permission-members glass-panel">
       <div class="sapling-stack-md sapling-permission-panel-header">
         <div>
           <p class="sapling-eyebrow sapling-permission-section-eyebrow">

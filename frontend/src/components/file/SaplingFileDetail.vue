@@ -30,7 +30,6 @@
 </template>
 
 <script lang="ts" setup>
-import '@/assets/styles/SaplingFileDetail.css'
 import SaplingSurface from '@/components/common/SaplingSurface.vue'
 
 defineProps<{

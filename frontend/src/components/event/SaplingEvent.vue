@@ -1,10 +1,10 @@
 <template>
   <section
     v-bind="attrs"
-    class="sapling-page-shell sapling-page-shell--fill sapling-page-shell--uniform-inset sapling-event-page"
+    class="sapling-page-shell sapling-page-shell--fill sapling-page-shell--uniform-inset sapling-dashboard-page sapling-dashboard-page--flow-lg sapling-event-page"
   >
     <template v-if="isLoading">
-      <div class="sapling-event-skeleton">
+      <div class="sapling-page-skeleton sapling-event-skeleton">
         <SaplingSurface
           as="section"
           class="sapling-page-hero sapling-page-hero--calendar sapling-event-skeleton__hero"
@@ -24,13 +24,15 @@
           </div>
         </SaplingSurface>
 
-        <section class="sapling-event-skeleton__workspace">
+        <section
+          class="sapling-page-workspace sapling-page-workspace--main-context sapling-page-workspace--collapse-lg sapling-event-skeleton__workspace"
+        >
           <SaplingSurface
             :as="VSkeletonLoader"
             class="sapling-event-skeleton__calendar"
             type="table-heading, table-thead, table-row-divider@8"
           />
-          <div class="sapling-event-skeleton__context">
+          <div class="sapling-page-skeleton-grid sapling-event-skeleton__context">
             <SaplingSurface
               :as="VSkeletonLoader"
               class="sapling-event-skeleton__panel"
@@ -84,8 +86,10 @@
         </template>
       </SaplingPageHero>
 
-      <section class="sapling-event-workspace">
-        <SaplingSurface class="sapling-workspace-panel sapling-event-workspace__main">
+      <section
+        class="sapling-page-workspace sapling-page-workspace--main-context sapling-page-workspace--collapse-lg sapling-event-workspace"
+      >
+        <SaplingSurface class="sapling-workspace-panel sapling-page-panel sapling-event-workspace__main">
           <SaplingEventToolbar
             v-model:calendar-type="calendarType"
             v-model:calendar-view-mode="calendarViewMode"

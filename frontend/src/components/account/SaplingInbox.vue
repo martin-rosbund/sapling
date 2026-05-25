@@ -3,7 +3,7 @@
     <SaplingDialogCard class="sapling-inbox-dialog" :tilt="false">
       <SaplingDialogShell
         fill-shell
-        body-class="sapling-inbox-dialog__body sapling-scrollable"
+        body-class="sapling-dialog-fill-body sapling-inbox-dialog__body sapling-scrollable"
         :show-divider="false"
       >
         <template #hero>
@@ -25,7 +25,7 @@
         </template>
 
         <template #body>
-          <div class="sapling-stack-xl sapling-inbox-dialog__content">
+          <div class="sapling-stack-xl sapling-dialog-fill-content sapling-inbox-dialog__content">
             <template v-if="isLoading">
               <section class="sapling-responsive-grid sapling-inbox-summary-grid">
                 <v-skeleton-loader
@@ -37,7 +37,7 @@
                 />
               </section>
 
-              <section class="sapling-inbox-board">
+              <section class="sapling-card-board sapling-card-board--collapse-lg sapling-inbox-board">
                 <v-skeleton-loader
                   v-for="item in 5"
                   :key="item"
@@ -114,7 +114,7 @@
                   <p class="sapling-empty-state-panel__text">{{ $t('inbox.allCaughtUp') }}</p>
                 </section>
 
-                <section v-else class="sapling-inbox-board">
+                <section v-else class="sapling-card-board sapling-card-board--collapse-lg sapling-inbox-board">
                   <SaplingInboxSection
                     v-for="section in sections"
                     :key="section.key"

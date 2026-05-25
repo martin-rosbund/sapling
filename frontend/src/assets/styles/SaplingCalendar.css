@@ -3,18 +3,6 @@
   --sapling-event-border-strong: rgba(0, 193, 213, 0.24);
   --sapling-event-shadow: var(--sapling-shadow-lift);
   --sapling-event-accent: #00c1d5;
-  overflow: hidden;
-}
-
-.sapling-event-skeleton,
-.sapling-event-skeleton__workspace,
-.sapling-event-skeleton__context {
-  display: grid;
-  gap: var(--sapling-gap-xl);
-}
-
-.sapling-event-skeleton {
-  flex: 1 1 auto;
 }
 
 .sapling-event-skeleton__hero {
@@ -29,15 +17,6 @@
 .sapling-event-sidebyside-column {
   min-width: 0;
   border-radius: var(--sapling-radius-sm);
-}
-
-.sapling-event-skeleton__workspace,
-.sapling-event-workspace {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, var(--sapling-panel-width-md));
-  flex: 1 1 auto;
-  min-height: 0;
-  align-items: stretch;
 }
 
 .sapling-event-skeleton__calendar,
@@ -289,16 +268,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     justify-self: stretch;
     width: 100%;
-  }
-
-  .sapling-event-page {
-    min-height: auto;
-    height: auto;
-    overflow: visible;
-  }
-
-  .sapling-event-workspace {
-    grid-template-columns: minmax(0, 1fr);
   }
 
   .sapling-event-context {

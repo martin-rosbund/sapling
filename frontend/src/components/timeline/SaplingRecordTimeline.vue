@@ -3,7 +3,7 @@
     <SaplingDialogCard class="sapling-inbox-dialog sapling-record-timeline-dialog" :tilt="false">
       <SaplingDialogShell
         fill-shell
-        body-class="sapling-inbox-dialog__body sapling-scroll-region sapling-record-timeline-dialog__body"
+        body-class="sapling-dialog-fill-body sapling-inbox-dialog__body sapling-scroll-region sapling-record-timeline-dialog__body"
         :show-divider="false"
       >
         <template #hero>
@@ -27,7 +27,7 @@
 
         <template #body>
           <div
-            class="sapling-inbox-dialog__content sapling-stack-xl sapling-record-timeline-dialog__content"
+            class="sapling-dialog-fill-content sapling-inbox-dialog__content sapling-stack-xl sapling-record-timeline-dialog__content"
           >
             <template v-if="isLoading">
               <section class="sapling-stat-grid sapling-record-timeline__summary-grid">
