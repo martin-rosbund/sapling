@@ -16,6 +16,8 @@ type TranslationFileItem = {
   en: string;
 };
 
+type TranslationLanguage = 'de' | 'en';
+
 /**
  * @class
  * @version         1.0
@@ -30,7 +32,10 @@ export class TranslationSeeder extends Seeder {
   /**
    * Runs the translation seeder. If there are no translations for 'login', it creates translations for DE and EN from the JSON data.
    */
-  filterUniqueTranslations(data: TranslationFileItem[], lang: 'de' | 'en') {
+  filterUniqueTranslations(
+    data: TranslationFileItem[],
+    lang: TranslationLanguage,
+  ) {
     const seen = new Set();
     return data.filter((t) => {
       const key = `${t.entity}|${t.property}|${lang}`;
@@ -59,7 +64,8 @@ export class TranslationSeeder extends Seeder {
     }
     const scriptFiles = fs
       .readdirSync(scriptsDir)
-      .filter((f) => f.endsWith('.json'));
+      .filter((f) => f.endsWith('.json'))
+      .sort((left, right) => left.localeCompare(right));
     const de = await em.findOne(LanguageItem, { handle: 'de' });
     const en = await em.findOne(LanguageItem, { handle: 'en' });
     for (const scriptFile of scriptFiles) {
@@ -83,24 +89,10 @@ export class TranslationSeeder extends Seeder {
       );
       try {
         if (de) {
-          for (const t of this.filterUniqueTranslations(data, 'de')) {
-            em.create(TranslationItem, {
-              entity: t.entity,
-              property: t.property,
-              value: t.de,
-              language: de,
-            });
-          }
+          await this.upsertTranslations(em, data, 'de', de);
         }
         if (en) {
-          for (const t of this.filterUniqueTranslations(data, 'en')) {
-            em.create(TranslationItem, {
-              entity: t.entity,
-              property: t.property,
-              value: t.en,
-              language: en,
-            });
-          }
+          await this.upsertTranslations(em, data, 'en', en);
         }
         await em.flush();
         const statusItem = new SeedScriptItem();
@@ -124,5 +116,41 @@ export class TranslationSeeder extends Seeder {
         );
       }
     }
+  }
+
+  private async upsertTranslations(
+    em: EntityManager,
+    data: TranslationFileItem[],
+    lang: TranslationLanguage,
+    language: LanguageItem,
+  ): Promise<void> {
+    const existingTranslations = await em.find(TranslationItem, { language });
+    const existingByKey = new Map(
+      existingTranslations.map((translation) => [
+        this.buildTranslationKey(translation.entity, translation.property),
+        translation,
+      ]),
+    );
+
+    for (const t of this.filterUniqueTranslations(data, lang)) {
+      const existingTranslation = existingByKey.get(
+        this.buildTranslationKey(t.entity, t.property),
+      );
+      if (existingTranslation) {
+        existingTranslation.value = t[lang];
+        continue;
+      }
+
+      em.create(TranslationItem, {
+        entity: t.entity,
+        property: t.property,
+        value: t[lang],
+        language,
+      });
+    }
+  }
+
+  private buildTranslationKey(entity: string, property: string): string {
+    return `${entity}|${property}`;
   }
 }

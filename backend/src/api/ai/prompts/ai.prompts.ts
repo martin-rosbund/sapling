@@ -12,6 +12,9 @@ export const AI_SYSTEM_PROMPT_BASE =
 export const AI_SYSTEM_PROMPT_TOOL_GUIDANCE =
   'Use available tools automatically when they are needed to answer with current Sapling data. For questions about the current user identity, profile, company, department, language, or roles, use the current_person tool. If you only know a partial entity name or a field such as email or assigneePerson, use entity_search before entity_schema. For descriptive ticket, incident, Sage error, or known-solution questions across long text fields, use semantic_search with entityHandle ticket first. Semantic search is especially useful for natural-language symptoms, problem descriptions, and workaround requests because it searches vectorized ticket sections such as overview, problem, and solution. Use ticket_search for exact ticket numbers, external numbers, or strict keyword matching. Prefer ticket_search with searchMode solution when the user explicitly asks for an existing fix, workaround, Lösung, or ticket solution and the wording is already keyword-oriented. Do not invent or infer URLs, deep links, record detail links, or absolute Sapling addresses in the prose answer. Only mention a Sapling link when an exact path is provided by tool results; otherwise rely on the UI navigation action instead of fabricating a URL. For questions about where something is located in the app, navigation, or menu, first inspect the entity_catalog to identify likely candidates, then use entity_schema and generic queries on entity, entityGroup, and entityRoute. Treat entity as the page or feature name, entity.group as the navigation group where it is found, entityGroup.parent as an optional parent group for nested navigation, and entityRoute.route as the final route to open. When you identify the sought destination, prefer the matching entityRoute, return the final route at the end of the answer, and use that route for the navigation link instead of only returning a table view. When you already know the exact record handle, prefer generic_get over generic_list. For history, date span, or record activity questions about one known record, use generic_timeline. Before querying or mutating an unfamiliar Sapling entity, inspect its schema first and only use fields and relation names returned by the schema tool.';
 
+export const AI_SYSTEM_PROMPT_VECTOR_GUIDANCE =
+  'Semantic search also covers indexed long-text fields on event, salesOpportunity, effortEstimate, and effortEstimatePosition, including descriptions, pain points, requirements, and offer texts. Choose the entityHandle that matches the user question before searching.';
+
 export const AI_ASSISTANT_SPEECH_INSTRUCTIONS =
   'Speak as Songbird in a warm, lovely, clear female voice. Speak naturally in the language of the message and do not read Markdown as syntax.';
 
@@ -43,7 +46,7 @@ export function buildSystemInstruction(options?: {
 }): string {
   const referenceDate = options?.referenceDate ?? new Date();
   const toolInstruction = options?.includeToolGuidance
-    ? ` ${AI_SYSTEM_PROMPT_TOOL_GUIDANCE}`
+    ? ` ${AI_SYSTEM_PROMPT_TOOL_GUIDANCE} ${AI_SYSTEM_PROMPT_VECTOR_GUIDANCE}`
     : '';
 
   return `${AI_SYSTEM_PROMPT_BASE}${toolInstruction} ${buildCurrentDateInstruction(

@@ -13547,19 +13547,19 @@
         },
         "description": {
           "name": "description",
-          "type": "varchar(1024)",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "unique": false,
-          "length": 1024,
+          "length": null,
           "precision": null,
           "scale": null,
           "default": null,
           "comment": null,
           "enumItems": [],
-          "mappedType": "string"
+          "mappedType": "text"
         },
         "expected_revenue": {
           "name": "expected_revenue",
@@ -13643,19 +13643,19 @@
         },
         "pain_points": {
           "name": "pain_points",
-          "type": "varchar(512)",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "unique": false,
-          "length": 512,
+          "length": null,
           "precision": null,
           "scale": null,
           "default": null,
           "comment": null,
           "enumItems": [],
-          "mappedType": "string"
+          "mappedType": "text"
         },
         "probability": {
           "name": "probability",

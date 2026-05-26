@@ -75,13 +75,14 @@ export class SalesOpportunityItem {
    * Detailed description of the sales opportunity.
    */
   @ApiPropertyOptional()
+  @Sapling(['isMarkdown'])
   @SaplingForm({
     order: 100,
     group: 'salesOpportunity.groupContent',
     groupOrder: 200,
     width: 4,
   })
-  @Property({ length: 1024, nullable: true })
+  @Property({ nullable: true, type: 'text' })
   description?: string;
 
   /**
@@ -142,13 +143,14 @@ export class SalesOpportunityItem {
    * Pain points related to the sales opportunity.
    */
   @ApiPropertyOptional({ type: 'string' })
+  @Sapling(['isMarkdown'])
   @SaplingForm({
-    order: 500,
-    group: 'salesOpportunity.groupBasics',
-    groupOrder: 100,
+    order: 200,
+    group: 'salesOpportunity.groupContent',
+    groupOrder: 200,
     width: 4,
   })
-  @Property({ length: 512, nullable: true })
+  @Property({ nullable: true, type: 'text' })
   painPoints?: string;
 
   /**

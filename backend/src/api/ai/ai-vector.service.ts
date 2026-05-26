@@ -2,6 +2,10 @@ import { EntityManager } from '@mikro-orm/core';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PersonItem } from '../../entity/PersonItem';
 import { TicketItem } from '../../entity/TicketItem';
+import { EventItem } from '../../entity/EventItem';
+import { SalesOpportunityItem } from '../../entity/SalesOpportunityItem';
+import { EffortEstimateItem } from '../../entity/EffortEstimateItem';
+import { EffortEstimatePositionItem } from '../../entity/EffortEstimatePositionItem';
 import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import { GenericService } from '../generic/generic.service';
 import {
@@ -21,16 +25,21 @@ import { embedOpenAiTexts } from './openai-ai.runtime';
 import {
   assertVectorizableEntity,
   asSimilarityScore,
+  buildPersonLabel,
   buildTicketSectionContent,
   buildTicketVectorMetadata,
   buildVectorDocumentKey,
   buildVectorExcerpt,
   coerceVectorRecordHandle,
-  createTicketVectorSectionDocuments,
+  createVectorSectionDocuments,
+  getVectorSearchableSections,
+  getVectorSearchRelations,
+  getVectorSearchUsageHints,
   resolveEmbeddingBatchSize,
   resolveVectorSearchCandidateMultiplier,
   resolveVectorSearchMaxCandidateLimit,
   resolveVectorSearchMaxResults,
+  summarizeVectorText,
   toVectorLiteral,
 } from './ai-vector.utils';
 import { extractRecordHandle } from './ai-navigation.utils';
@@ -328,12 +337,9 @@ export class AiVectorService {
       providerHandle: embeddingTarget.provider.handle,
       modelHandle: embeddingTarget.model.handle,
       indexedDocumentCount: Number(index.document_count) || 0,
-      searchableSections: ['overview', 'problem', 'solution'],
+      searchableSections: getVectorSearchableSections(normalizedEntityHandle),
       results,
-      usageHints: [
-        'Use semantic search for natural-language problem descriptions, symptoms, and workaround requests.',
-        'Use ticket_search for exact ticket numbers, strict keywords, or external references.',
-      ],
+      usageHints: getVectorSearchUsageHints(normalizedEntityHandle),
     };
   }
 
@@ -346,6 +352,14 @@ export class AiVectorService {
     switch (entityHandle) {
       case 'ticket':
         return this.buildTicketVectorDocuments(embeddingModel);
+      case 'event':
+        return this.buildEventVectorDocuments(embeddingModel);
+      case 'salesOpportunity':
+        return this.buildSalesOpportunityVectorDocuments(embeddingModel);
+      case 'effortEstimate':
+        return this.buildEffortEstimateVectorDocuments(embeddingModel);
+      case 'effortEstimatePosition':
+        return this.buildEffortEstimatePositionVectorDocuments(embeddingModel);
       default:
         throw new BadRequestException('ai.vectorizationUnsupportedEntity');
     }
@@ -381,7 +395,7 @@ export class AiVectorService {
       const metadata = buildTicketVectorMetadata(ticket);
 
       documents.push(
-        ...createTicketVectorSectionDocuments(
+        ...createVectorSectionDocuments(
           sourceRecordHandle,
           'overview',
           buildTicketSectionContent(ticket, 'overview'),
@@ -391,7 +405,7 @@ export class AiVectorService {
         ),
       );
       documents.push(
-        ...createTicketVectorSectionDocuments(
+        ...createVectorSectionDocuments(
           sourceRecordHandle,
           'problem',
           buildTicketSectionContent(ticket, 'problem'),
@@ -401,10 +415,262 @@ export class AiVectorService {
         ),
       );
       documents.push(
-        ...createTicketVectorSectionDocuments(
+        ...createVectorSectionDocuments(
           sourceRecordHandle,
           'solution',
           buildTicketSectionContent(ticket, 'solution'),
+          title,
+          metadata,
+          embeddingModel,
+        ),
+      );
+    }
+
+    return documents;
+  }
+
+  private async buildEventVectorDocuments(
+    embeddingModel: AiProviderModelItem,
+  ): Promise<AiVectorDocumentDraft[]> {
+    const events = await this.em.find(
+      EventItem,
+      {},
+      {
+        populate: getVectorSearchRelations('event') as never[],
+        orderBy: { updatedAt: 'DESC' },
+      },
+    );
+    const documents: AiVectorDocumentDraft[] = [];
+
+    for (const event of events) {
+      if (event.handle == null) {
+        continue;
+      }
+
+      const sourceRecordHandle = String(event.handle);
+      const title = event.title?.trim() || null;
+      const metadata = {
+        eventHandle: event.handle,
+        title,
+        status: relationLabel(event.status, 'description'),
+        type: relationLabel(event.type, 'description', 'title', 'handle'),
+        startDate: formatVectorDate(event.startDate),
+        endDate: formatVectorDate(event.endDate),
+        assigneeCompany: companyLabel(event.assigneeCompany),
+        assigneePerson: personRelationLabel(event.assigneePerson),
+        creatorCompany: companyLabel(event.creatorCompany),
+        creatorPerson: personRelationLabel(event.creatorPerson),
+        ticket: relationLabel(event.ticket, 'number', 'title', 'handle'),
+        salesOpportunity: relationLabel(
+          event.salesOpportunity,
+          'title',
+          'handle',
+        ),
+      };
+
+      documents.push(
+        ...createVectorSectionDocuments(
+          sourceRecordHandle,
+          'overview',
+          buildEventSectionContent(event, 'overview'),
+          title,
+          metadata,
+          embeddingModel,
+        ),
+      );
+      documents.push(
+        ...createVectorSectionDocuments(
+          sourceRecordHandle,
+          'description',
+          buildEventSectionContent(event, 'description'),
+          title,
+          metadata,
+          embeddingModel,
+        ),
+      );
+    }
+
+    return documents;
+  }
+
+  private async buildSalesOpportunityVectorDocuments(
+    embeddingModel: AiProviderModelItem,
+  ): Promise<AiVectorDocumentDraft[]> {
+    const opportunities = await this.em.find(
+      SalesOpportunityItem,
+      {},
+      {
+        populate: getVectorSearchRelations('salesOpportunity') as never[],
+        orderBy: { updatedAt: 'DESC' },
+      },
+    );
+    const documents: AiVectorDocumentDraft[] = [];
+
+    for (const opportunity of opportunities) {
+      if (opportunity.handle == null) {
+        continue;
+      }
+
+      const sourceRecordHandle = String(opportunity.handle);
+      const title = opportunity.title?.trim() || null;
+      const metadata = {
+        salesOpportunityHandle: opportunity.handle,
+        title,
+        stage: relationLabel(opportunity.type, 'description', 'handle'),
+        forecast: relationLabel(opportunity.forecast, 'description', 'handle'),
+        source: relationLabel(opportunity.source, 'description', 'handle'),
+        expectedRevenue: opportunity.expectedRevenue ?? null,
+        probability: opportunity.probability ?? null,
+        closeDate: formatVectorDate(opportunity.closeDate),
+        assigneeCompany: companyLabel(opportunity.assigneeCompany),
+        assigneePerson: personRelationLabel(opportunity.assigneePerson),
+        creatorCompany: companyLabel(opportunity.creatorCompany),
+        creatorPerson: personRelationLabel(opportunity.creatorPerson),
+      };
+
+      documents.push(
+        ...createVectorSectionDocuments(
+          sourceRecordHandle,
+          'overview',
+          buildSalesOpportunitySectionContent(opportunity, 'overview'),
+          title,
+          metadata,
+          embeddingModel,
+        ),
+      );
+      documents.push(
+        ...createVectorSectionDocuments(
+          sourceRecordHandle,
+          'description',
+          buildSalesOpportunitySectionContent(opportunity, 'description'),
+          title,
+          metadata,
+          embeddingModel,
+        ),
+      );
+      documents.push(
+        ...createVectorSectionDocuments(
+          sourceRecordHandle,
+          'painPoints',
+          buildSalesOpportunitySectionContent(opportunity, 'painPoints'),
+          title,
+          metadata,
+          embeddingModel,
+        ),
+      );
+    }
+
+    return documents;
+  }
+
+  private async buildEffortEstimateVectorDocuments(
+    embeddingModel: AiProviderModelItem,
+  ): Promise<AiVectorDocumentDraft[]> {
+    const estimates = await this.em.find(
+      EffortEstimateItem,
+      {},
+      {
+        populate: getVectorSearchRelations('effortEstimate') as never[],
+        orderBy: { updatedAt: 'DESC' },
+      },
+    );
+    const documents: AiVectorDocumentDraft[] = [];
+
+    for (const estimate of estimates) {
+      if (estimate.handle == null) {
+        continue;
+      }
+
+      const sourceRecordHandle = String(estimate.handle);
+      const title = estimate.title?.trim() || null;
+      const metadata = {
+        effortEstimateHandle: estimate.handle,
+        title,
+        status: relationLabel(estimate.status, 'description', 'handle'),
+        expectedCompletionDate: formatVectorDate(
+          estimate.expectedCompletionDate,
+        ),
+        assigneeCompany: companyLabel(estimate.assigneeCompany),
+        assigneePerson: personRelationLabel(estimate.assigneePerson),
+        creatorCompany: companyLabel(estimate.creatorCompany),
+        creatorPerson: personRelationLabel(estimate.creatorPerson),
+        ticket: relationLabel(estimate.ticket, 'number', 'title', 'handle'),
+        salesOpportunity: relationLabel(
+          estimate.salesOpportunity,
+          'title',
+          'handle',
+        ),
+      };
+
+      documents.push(
+        ...createVectorSectionDocuments(
+          sourceRecordHandle,
+          'overview',
+          buildEffortEstimateSectionContent(estimate, 'overview'),
+          title,
+          metadata,
+          embeddingModel,
+        ),
+      );
+      documents.push(
+        ...createVectorSectionDocuments(
+          sourceRecordHandle,
+          'requirements',
+          buildEffortEstimateSectionContent(estimate, 'requirements'),
+          title,
+          metadata,
+          embeddingModel,
+        ),
+      );
+    }
+
+    return documents;
+  }
+
+  private async buildEffortEstimatePositionVectorDocuments(
+    embeddingModel: AiProviderModelItem,
+  ): Promise<AiVectorDocumentDraft[]> {
+    const positions = await this.em.find(
+      EffortEstimatePositionItem,
+      {},
+      {
+        populate: getVectorSearchRelations('effortEstimatePosition') as never[],
+        orderBy: { updatedAt: 'DESC' },
+      },
+    );
+    const documents: AiVectorDocumentDraft[] = [];
+
+    for (const position of positions) {
+      if (position.handle == null) {
+        continue;
+      }
+
+      const sourceRecordHandle = String(position.handle);
+      const title = position.title?.trim() || null;
+      const metadata = {
+        effortEstimatePositionHandle: position.handle,
+        title,
+        estimatedHours: position.estimatedHours ?? null,
+        isOptional: position.isOptional,
+        estimate: relationLabel(position.estimate, 'title', 'handle'),
+        template: relationLabel(position.template, 'title', 'handle'),
+      };
+
+      documents.push(
+        ...createVectorSectionDocuments(
+          sourceRecordHandle,
+          'overview',
+          buildEffortEstimatePositionSectionContent(position, 'overview'),
+          title,
+          metadata,
+          embeddingModel,
+        ),
+      );
+      documents.push(
+        ...createVectorSectionDocuments(
+          sourceRecordHandle,
+          'offerText',
+          buildEffortEstimatePositionSectionContent(position, 'offerText'),
           title,
           metadata,
           embeddingModel,
@@ -500,16 +766,290 @@ export class AiVectorService {
       recordHandles.length,
       {},
       user,
-      [
-        'status',
-        'priority',
-        'creatorCompany',
-        'creatorPerson',
-        'assigneeCompany',
-        'assigneePerson',
-      ],
+      getVectorSearchRelations(entityHandle),
     );
 
     return result.data;
   }
+}
+
+function buildEventSectionContent(
+  event: EventItem,
+  section: 'overview' | 'description',
+): string {
+  const lines = compactVectorLines([
+    `Event: ${event.handle ?? ''}`.trim(),
+    event.title?.trim() ? `Title: ${event.title.trim()}` : null,
+    vectorLine('Status', relationLabel(event.status, 'description')),
+    vectorLine(
+      'Type',
+      relationLabel(event.type, 'description', 'title', 'handle'),
+    ),
+    vectorLine('Start', formatVectorDate(event.startDate)),
+    vectorLine('End', formatVectorDate(event.endDate)),
+    vectorLine('Creator company', companyLabel(event.creatorCompany)),
+    vectorLine('Creator person', personRelationLabel(event.creatorPerson)),
+    vectorLine('Assignee company', companyLabel(event.assigneeCompany)),
+    vectorLine('Assignee person', personRelationLabel(event.assigneePerson)),
+    vectorLine(
+      'Ticket',
+      relationLabel(event.ticket, 'number', 'title', 'handle'),
+    ),
+    vectorLine(
+      'Sales opportunity',
+      relationLabel(event.salesOpportunity, 'title', 'handle'),
+    ),
+  ]);
+
+  if (section === 'overview') {
+    lines.push('Section: Overview');
+    if (event.description?.trim()) {
+      lines.push(
+        `Description summary: ${summarizeVectorText(event.description)}`,
+      );
+    }
+    return lines.join('\n');
+  }
+
+  if (!event.description?.trim()) {
+    return '';
+  }
+
+  lines.push('Section: Description');
+  lines.push(event.description.trim());
+  return lines.join('\n');
+}
+
+function buildSalesOpportunitySectionContent(
+  opportunity: SalesOpportunityItem,
+  section: 'overview' | 'description' | 'painPoints',
+): string {
+  const lines = compactVectorLines([
+    `Sales opportunity: ${opportunity.handle ?? ''}`.trim(),
+    opportunity.title?.trim() ? `Title: ${opportunity.title.trim()}` : null,
+    vectorLine(
+      'Stage',
+      relationLabel(opportunity.type, 'description', 'handle'),
+    ),
+    vectorLine(
+      'Forecast',
+      relationLabel(opportunity.forecast, 'description', 'handle'),
+    ),
+    vectorLine(
+      'Source',
+      relationLabel(opportunity.source, 'description', 'handle'),
+    ),
+    vectorLine('Expected revenue', opportunity.expectedRevenue),
+    vectorLine('Probability', opportunity.probability),
+    vectorLine('Close date', formatVectorDate(opportunity.closeDate)),
+    opportunity.nextStep?.trim()
+      ? `Next step: ${opportunity.nextStep.trim()}`
+      : null,
+    vectorLine('Creator company', companyLabel(opportunity.creatorCompany)),
+    vectorLine(
+      'Creator person',
+      personRelationLabel(opportunity.creatorPerson),
+    ),
+    vectorLine('Assignee company', companyLabel(opportunity.assigneeCompany)),
+    vectorLine(
+      'Assignee person',
+      personRelationLabel(opportunity.assigneePerson),
+    ),
+  ]);
+
+  if (section === 'overview') {
+    lines.push('Section: Overview');
+    if (opportunity.description?.trim()) {
+      lines.push(
+        `Description summary: ${summarizeVectorText(opportunity.description)}`,
+      );
+    }
+    if (opportunity.painPoints?.trim()) {
+      lines.push(
+        `Pain points summary: ${summarizeVectorText(opportunity.painPoints)}`,
+      );
+    }
+    return lines.join('\n');
+  }
+
+  const body =
+    section === 'description'
+      ? (opportunity.description?.trim() ?? '')
+      : (opportunity.painPoints?.trim() ?? '');
+
+  if (!body) {
+    return '';
+  }
+
+  lines.push(
+    `Section: ${section === 'description' ? 'Description' : 'Pain points'}`,
+  );
+  lines.push(body);
+  return lines.join('\n');
+}
+
+function buildEffortEstimateSectionContent(
+  estimate: EffortEstimateItem,
+  section: 'overview' | 'requirements',
+): string {
+  const lines = compactVectorLines([
+    `Effort estimate: ${estimate.handle ?? ''}`.trim(),
+    estimate.title?.trim() ? `Title: ${estimate.title.trim()}` : null,
+    vectorLine(
+      'Status',
+      relationLabel(estimate.status, 'description', 'handle'),
+    ),
+    vectorLine(
+      'Expected completion',
+      formatVectorDate(estimate.expectedCompletionDate),
+    ),
+    vectorLine('Creator company', companyLabel(estimate.creatorCompany)),
+    vectorLine('Creator person', personRelationLabel(estimate.creatorPerson)),
+    vectorLine('Assignee company', companyLabel(estimate.assigneeCompany)),
+    vectorLine('Assignee person', personRelationLabel(estimate.assigneePerson)),
+    vectorLine(
+      'Ticket',
+      relationLabel(estimate.ticket, 'number', 'title', 'handle'),
+    ),
+    vectorLine(
+      'Sales opportunity',
+      relationLabel(estimate.salesOpportunity, 'title', 'handle'),
+    ),
+  ]);
+
+  if (section === 'overview') {
+    lines.push('Section: Overview');
+    if (estimate.requirementsMarkdown?.trim()) {
+      lines.push(
+        `Requirements summary: ${summarizeVectorText(
+          estimate.requirementsMarkdown,
+        )}`,
+      );
+    }
+    return lines.join('\n');
+  }
+
+  if (!estimate.requirementsMarkdown?.trim()) {
+    return '';
+  }
+
+  lines.push('Section: Requirements');
+  lines.push(estimate.requirementsMarkdown.trim());
+  return lines.join('\n');
+}
+
+function buildEffortEstimatePositionSectionContent(
+  position: EffortEstimatePositionItem,
+  section: 'overview' | 'offerText',
+): string {
+  const lines = compactVectorLines([
+    `Effort estimate position: ${position.handle ?? ''}`.trim(),
+    position.title?.trim() ? `Title: ${position.title.trim()}` : null,
+    vectorLine('Estimated hours', position.estimatedHours),
+    vectorLine('Optional', position.isOptional ? 'yes' : 'no'),
+    vectorLine('Estimate', relationLabel(position.estimate, 'title', 'handle')),
+    vectorLine('Template', relationLabel(position.template, 'title', 'handle')),
+  ]);
+
+  if (section === 'overview') {
+    lines.push('Section: Overview');
+    if (position.offerTextMarkdown?.trim()) {
+      lines.push(
+        `Offer text summary: ${summarizeVectorText(position.offerTextMarkdown)}`,
+      );
+    }
+    return lines.join('\n');
+  }
+
+  if (!position.offerTextMarkdown?.trim()) {
+    return '';
+  }
+
+  lines.push('Section: Offer text');
+  lines.push(position.offerTextMarkdown.trim());
+  return lines.join('\n');
+}
+
+function compactVectorLines(
+  lines: Array<string | null | undefined | false>,
+): string[] {
+  return lines.filter(
+    (line): line is string =>
+      typeof line === 'string' && line.trim().length > 0,
+  );
+}
+
+function vectorLine(label: string, value: unknown): string | null {
+  const normalized = normalizeVectorValue(value);
+  return normalized ? `${label}: ${normalized}` : null;
+}
+
+function relationLabel(value: unknown, ...properties: string[]): string | null {
+  if (!value || typeof value === 'string') {
+    return typeof value === 'string' && value.trim() ? value.trim() : null;
+  }
+
+  const record = value as Record<string, unknown>;
+
+  for (const property of properties) {
+    const normalized = normalizeVectorValue(record[property]);
+
+    if (normalized) {
+      return normalized;
+    }
+  }
+
+  return null;
+}
+
+function companyLabel(value: unknown): string | null {
+  return relationLabel(value, 'name', 'title', 'handle');
+}
+
+function personRelationLabel(value: unknown): string | null {
+  if (!value || typeof value === 'string') {
+    return typeof value === 'string' && value.trim() ? value.trim() : null;
+  }
+
+  const record = value as {
+    firstName?: string | null;
+    lastName?: string | null;
+    email?: string | null;
+  };
+  return (
+    buildPersonLabel(record.firstName, record.lastName, record.email) || null
+  );
+}
+
+function normalizeVectorValue(value: unknown): string | null {
+  if (value == null) {
+    return null;
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+
+  if (typeof value === 'string') {
+    const normalized = value.trim();
+    return normalized || null;
+  }
+
+  return null;
+}
+
+function formatVectorDate(value?: Date | string | null): string | null {
+  if (!value) {
+    return null;
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  return value.trim() || null;
 }

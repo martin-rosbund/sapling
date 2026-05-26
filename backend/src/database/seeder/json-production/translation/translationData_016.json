@@ -1,0 +1,10 @@
+[
+  { "entity": "aiVectorization", "property": "subtitle", "de": "Erstellt aktive semantische Suchindizes für lange Sapling-Inhalte. Der gewählte Embedding-Provider und das Modell werden später auch für semantische MCP-Suchen verwendet.", "en": "Creates active semantic search indexes for long Sapling content. The selected embedding provider and model are later reused for semantic MCP searches." },
+  { "entity": "aiVectorization", "property": "entityEvent", "de": "Termin", "en": "Event" },
+  { "entity": "aiVectorization", "property": "entitySalesOpportunity", "de": "Verkaufschance", "en": "Sales opportunity" },
+  { "entity": "aiVectorization", "property": "entityEffortEstimate", "de": "Aufwandsschätzung", "en": "Effort estimate" },
+  { "entity": "aiVectorization", "property": "entityEffortEstimatePosition", "de": "Aufwandsschätzungsposition", "en": "Effort estimate position" },
+  { "entity": "aiVectorization", "property": "indexedFieldsTitle", "de": "Indizierte Felder", "en": "Indexed fields" },
+  { "entity": "aiVectorization", "property": "strategySectionAware", "de": "Die Vektorisierung trennt Übersicht und fachliche Langtexte je Entity in semantisch durchsuchbare Abschnitte.", "en": "Vectorization separates overview and domain-specific long text into semantically searchable sections per entity." },
+  { "entity": "aiVectorization", "property": "entityLocked", "de": "Mehrere Entities aktiviert", "en": "Multiple entities enabled" }
+]

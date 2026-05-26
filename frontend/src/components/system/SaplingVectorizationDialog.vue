@@ -96,7 +96,8 @@
                 item-value="value"
                 variant="outlined"
                 hide-details
-                disabled
+                :disabled="isBusy"
+                @update:model-value="updateSelectedEntity"
               />
             </div>
 
@@ -229,6 +230,10 @@ const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoad
   'aiVectorization',
   'global',
   'ticket',
+  'event',
+  'salesOpportunity',
+  'effortEstimate',
+  'effortEstimatePosition',
 )
 const {
   isOpen,
@@ -272,17 +277,59 @@ const entityOptions = computed<SelectOption[]>(() => [
     label: t('aiVectorization.entityTicket'),
     value: 'ticket',
   },
+  {
+    label: t('aiVectorization.entityEvent'),
+    value: 'event',
+  },
+  {
+    label: t('aiVectorization.entitySalesOpportunity'),
+    value: 'salesOpportunity',
+  },
+  {
+    label: t('aiVectorization.entityEffortEstimate'),
+    value: 'effortEstimate',
+  },
+  {
+    label: t('aiVectorization.entityEffortEstimatePosition'),
+    value: 'effortEstimatePosition',
+  },
 ])
 
-const indexedFieldLabels = computed(() => [
-  t('ticket.number'),
-  t('ticket.externalNumber'),
-  t('ticket.title'),
-  t('ticket.problemDescription'),
-  t('ticket.solutionDescription'),
-  t('ticket.status'),
-  t('ticket.priority'),
-])
+const indexedFieldLabels = computed(() => {
+  const fieldKeysByEntity: Record<string, string[]> = {
+    ticket: [
+      'ticket.number',
+      'ticket.externalNumber',
+      'ticket.title',
+      'ticket.problemDescription',
+      'ticket.solutionDescription',
+      'ticket.status',
+      'ticket.priority',
+    ],
+    event: ['event.title', 'event.description', 'event.status', 'event.type'],
+    salesOpportunity: [
+      'salesOpportunity.title',
+      'salesOpportunity.description',
+      'salesOpportunity.painPoints',
+      'salesOpportunity.nextStep',
+    ],
+    effortEstimate: [
+      'effortEstimate.title',
+      'effortEstimate.requirementsMarkdown',
+      'effortEstimate.expectedCompletionDate',
+      'effortEstimate.status',
+    ],
+    effortEstimatePosition: [
+      'effortEstimatePosition.title',
+      'effortEstimatePosition.offerTextMarkdown',
+      'effortEstimatePosition.estimatedHours',
+    ],
+  }
+
+  return (fieldKeysByEntity[selectedEntityHandle.value] ?? fieldKeysByEntity.ticket).map((key) =>
+    t(key),
+  )
+})
 
 const canRun = computed(
   () =>
@@ -394,6 +441,11 @@ async function updateSelectedProvider(value: unknown) {
 
 function updateSelectedModel(value: unknown) {
   selectedModelHandle.value = normalizeHandle(value)
+}
+
+function updateSelectedEntity(value: unknown) {
+  selectedEntityHandle.value = normalizeHandle(value) ?? 'ticket'
+  lastResult.value = null
 }
 
 function pickDefaultProviderHandle() {

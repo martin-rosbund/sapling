@@ -280,7 +280,7 @@ export const SAPLING_MCP_TOOL_DEFINITIONS: readonly SaplingMcpToolDefinition[] =
           entityHandle: {
             type: 'string',
             description:
-              'Registered Sapling entity handle with an active vector index, for example ticket.',
+              'Registered Sapling entity handle with an active vector index, for example ticket, event, salesOpportunity, effortEstimate, or effortEstimatePosition.',
           },
           query: {
             type: 'string',
@@ -300,7 +300,7 @@ export const SAPLING_MCP_TOOL_DEFINITIONS: readonly SaplingMcpToolDefinition[] =
         entityHandle: z
           .string()
           .describe(
-            'Registered Sapling entity handle with an active vector index, for example ticket.',
+            'Registered Sapling entity handle with an active vector index, for example ticket, event, salesOpportunity, effortEstimate, or effortEstimatePosition.',
           ),
         query: z
           .string()

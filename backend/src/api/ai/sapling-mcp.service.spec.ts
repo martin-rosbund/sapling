@@ -25,7 +25,15 @@ jest.mock('../template/template.service', () => ({
 jest.mock('./ai.service', () => ({ AiService: class {} }));
 jest.mock('../../entity/PersonItem', () => ({ PersonItem: class {} }));
 jest.mock('../../entity/global/entity.registry', () => ({
-  ENTITY_HANDLES: ['person', 'project', 'ticket'],
+  ENTITY_HANDLES: [
+    'person',
+    'project',
+    'ticket',
+    'event',
+    'salesOpportunity',
+    'effortEstimate',
+    'effortEstimatePosition',
+  ],
 }));
 
 import { SaplingMcpService } from './sapling-mcp.service';
@@ -374,7 +382,7 @@ describe('SaplingMcpService', () => {
       searchVectorDocuments: jest
         .fn<(...args: unknown[]) => Promise<unknown>>()
         .mockResolvedValue({
-          entityHandle: 'ticket',
+          entityHandle: 'effortEstimate',
           indexed: true,
           results: [],
         }),
@@ -385,21 +393,21 @@ describe('SaplingMcpService', () => {
     const result = await service.executeTool(
       'semantic_search',
       {
-        entityHandle: 'ticket',
-        query: 'Sage startet nach Update nicht mehr',
+        entityHandle: 'effortEstimate',
+        query: 'Anforderungen fuer Portal-Synchronisation',
         limit: 99,
       },
       user,
     );
 
     expect(aiService.searchVectorDocuments).toHaveBeenCalledWith(
-      'ticket',
-      'Sage startet nach Update nicht mehr',
+      'effortEstimate',
+      'Anforderungen fuer Portal-Synchronisation',
       user,
       20,
     );
     expect(result.rawResult).toMatchObject({
-      entityHandle: 'ticket',
+      entityHandle: 'effortEstimate',
       indexed: true,
       results: [],
     });

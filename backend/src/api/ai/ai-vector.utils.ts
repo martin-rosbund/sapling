@@ -4,15 +4,125 @@ import type { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import type { TicketItem } from '../../entity/TicketItem';
 import type { AiVectorDocumentDraft, AiVectorDocumentRow } from './ai.types';
 
+export const VECTOR_ENTITY_HANDLES = [
+  'ticket',
+  'event',
+  'salesOpportunity',
+  'effortEstimate',
+  'effortEstimatePosition',
+] as const;
+
+export type VectorizableEntityHandle = (typeof VECTOR_ENTITY_HANDLES)[number];
+
+export const VECTOR_SEARCHABLE_SECTIONS: Record<
+  VectorizableEntityHandle,
+  string[]
+> = {
+  ticket: ['overview', 'problem', 'solution'],
+  event: ['overview', 'description'],
+  salesOpportunity: ['overview', 'description', 'painPoints'],
+  effortEstimate: ['overview', 'requirements'],
+  effortEstimatePosition: ['overview', 'offerText'],
+};
+
+export const VECTOR_SEARCH_RELATIONS: Record<
+  VectorizableEntityHandle,
+  string[]
+> = {
+  ticket: [
+    'status',
+    'priority',
+    'creatorCompany',
+    'creatorPerson',
+    'assigneeCompany',
+    'assigneePerson',
+  ],
+  event: [
+    'status',
+    'type',
+    'creatorCompany',
+    'creatorPerson',
+    'assigneeCompany',
+    'assigneePerson',
+    'ticket',
+    'salesOpportunity',
+    'participants',
+  ],
+  salesOpportunity: [
+    'type',
+    'forecast',
+    'source',
+    'creatorCompany',
+    'creatorPerson',
+    'assigneeCompany',
+    'assigneePerson',
+  ],
+  effortEstimate: [
+    'status',
+    'creatorCompany',
+    'creatorPerson',
+    'assigneeCompany',
+    'assigneePerson',
+    'ticket',
+    'salesOpportunity',
+  ],
+  effortEstimatePosition: ['estimate', 'estimate.status', 'template'],
+};
+
+export const VECTOR_SEARCH_USAGE_HINTS: Record<
+  VectorizableEntityHandle,
+  string[]
+> = {
+  ticket: [
+    'Use semantic search for natural-language problem descriptions, symptoms, and workaround requests.',
+    'Use ticket_search for exact ticket numbers, strict keywords, or external references.',
+  ],
+  event: [
+    'Use semantic search for natural-language event descriptions, meeting context, and agenda-like text.',
+  ],
+  salesOpportunity: [
+    'Use semantic search for sales opportunity descriptions, customer pain points, and qualification context.',
+  ],
+  effortEstimate: [
+    'Use semantic search for requirement texts, scope descriptions, and expected implementation outcomes.',
+  ],
+  effortEstimatePosition: [
+    'Use semantic search for offer text, implementation tasks, and estimate position scope.',
+  ],
+};
+
+export function isVectorizableEntity(
+  entityHandle: string,
+): entityHandle is VectorizableEntityHandle {
+  return VECTOR_ENTITY_HANDLES.includes(
+    entityHandle as VectorizableEntityHandle,
+  );
+}
+
 export function assertVectorizableEntity(entityHandle: string): void {
-  if (entityHandle === 'ticket') {
+  if (isVectorizableEntity(entityHandle)) {
     return;
   }
 
   throw new BadRequestException('ai.vectorizationUnsupportedEntity');
 }
 
-export function createTicketVectorSectionDocuments(
+export function getVectorSearchableSections(entityHandle: string): string[] {
+  assertVectorizableEntity(entityHandle);
+  return VECTOR_SEARCHABLE_SECTIONS[entityHandle];
+}
+
+export function getVectorSearchRelations(entityHandle: string): string[] {
+  assertVectorizableEntity(entityHandle);
+  return VECTOR_SEARCH_RELATIONS[entityHandle];
+}
+
+export function getVectorSearchUsageHints(entityHandle: string): string[] {
+  assertVectorizableEntity(entityHandle);
+  return VECTOR_SEARCH_USAGE_HINTS[entityHandle];
+}
+
+export function createVectorSectionDocuments(
   sourceRecordHandle: string,
   sourceSection: string,
   content: string,

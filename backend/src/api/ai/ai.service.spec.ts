@@ -352,6 +352,9 @@ describe('AiService', () => {
     expect(instruction).toContain(
       'Semantic search is especially useful for natural-language symptoms',
     );
+    expect(instruction).toContain(
+      'indexed long-text fields on event, salesOpportunity, effortEstimate, and effortEstimatePosition',
+    );
     expect(instruction).toContain('Use ticket_search for exact ticket numbers');
     expect(instruction).toContain(
       'Prefer ticket_search with searchMode solution',
