@@ -9,6 +9,7 @@ jest.mock('../../entity/global/entity.decorator', () => ({
   SaplingForm: jest.fn(() => () => undefined),
   SaplingDependsOn: jest.fn(() => () => undefined),
   SaplingGenericReference: jest.fn(() => () => undefined),
+  SaplingReferenceTemplate: jest.fn(() => () => undefined),
   hasSaplingOption: jest.fn(() => false),
 }));
 jest.mock('../../entity/global/entity.registry', () => ({
@@ -2260,6 +2261,89 @@ describe('GenericService', () => {
       expect.any(Function),
       { handle: 9 },
     ]);
+  });
+
+  it('imports rows through create/update and normalizes simple CSV values', async () => {
+    const templateService = {
+      getEntityTemplate: jest.fn(() => [
+        createTemplateField({
+          name: 'handle',
+          type: 'number',
+          isAutoIncrement: true,
+        }),
+        createTemplateField({ name: 'title', type: 'string' }),
+        createTemplateField({ name: 'amount', type: 'number' }),
+        createTemplateField({ name: 'isActive', type: 'boolean' }),
+        createTemplateField({ name: 'readonlyNote', options: ['isReadOnly'] }),
+      ]),
+    };
+    const currentService = {
+      getEntityPermissions: jest.fn(() => ({
+        allowInsertStage: 'global',
+        allowUpdateStage: 'global',
+      })),
+      getAllEntityPermissions: jest.fn(() => []),
+    };
+    const service = createGenericService({
+      em: {},
+      templateService,
+      currentService,
+    });
+    const createSpy = jest
+      .spyOn(service, 'create')
+      .mockResolvedValue({ handle: 42 });
+    const updateSpy = jest
+      .spyOn(service, 'update')
+      .mockResolvedValue({ handle: 7 });
+    const currentUser = { handle: 1 } as never;
+
+    const result = await service.importRows(
+      'ticket',
+      [
+        {
+          title: ' Neue Aufgabe ',
+          amount: '12,5',
+          isActive: 'yes',
+          readonlyNote: 'ignored',
+        },
+        {
+          handle: '7',
+          title: 'Bestehend',
+        },
+        {},
+      ],
+      currentUser,
+    );
+
+    expect(createSpy).toHaveBeenCalledWith(
+      'ticket',
+      {
+        title: 'Neue Aufgabe',
+        amount: 12.5,
+        isActive: true,
+      },
+      currentUser,
+      {},
+    );
+    expect(updateSpy).toHaveBeenCalledWith(
+      'ticket',
+      7,
+      {
+        handle: 7,
+        title: 'Bestehend',
+      },
+      currentUser,
+      [],
+      {},
+      { resolution: 'overwrite' },
+    );
+    expect(result).toMatchObject({
+      totalRows: 3,
+      created: 1,
+      updated: 1,
+      skipped: 1,
+      failed: 0,
+    });
   });
 
   it('runs addReference scripts with relation context after the reference flush', async () => {

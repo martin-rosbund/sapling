@@ -63,13 +63,18 @@
             <SaplingTableToolbarActions
               :is-mobile-table="isMobileTable"
               :is-downloading-json="isDownloadingJSON"
+              :is-importing-csv="isImportingCSV"
               :refresh-button-label="refreshButtonLabel"
               :show-favorite="showFavoriteButton"
+              :show-import="showImportButton"
               :show-add="showAddButton"
               :favorite-items="currentEntityFavorites"
               :is-favorites-loading="isCurrentEntityFavoritesLoading"
               :active-favorite-handle="activeFavoriteHandle"
-              @download="downloadJSON"
+              @download-json="downloadJSON"
+              @download-csv="exportCSV"
+              @download-csv-template="exportCSVTemplate"
+              @import-csv="openImportFilePicker"
               @refresh="refreshTable"
               @favorite="openFavoriteDialog"
               @select-favorite="selectFavorite"
@@ -93,6 +98,14 @@
         </div>
       </div>
     </div>
+
+    <input
+      ref="importInputRef"
+      class="sapling-upload-native-input"
+      type="file"
+      accept=".csv,.txt,.tsv,text/csv,text/plain"
+      @change="onImportFileInputChange"
+    />
 
     <div ref="tableContainerRef" class="sapling-table-body">
       <SaplingTableMobileView
@@ -236,7 +249,7 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SaplingSearch from '@/components/system/SaplingSearch.vue'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
@@ -253,6 +266,7 @@ import {
   type UseSaplingTableEmit,
   type UseSaplingTableProps,
 } from '@/composables/table/useSaplingTableComponent'
+import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 // #endregion
 
 // #region Props and Emits
@@ -276,8 +290,10 @@ const props = withDefaults(defineProps<SaplingTableProps>(), {
 const emit = defineEmits<SaplingTableEmit>()
 const { t } = useI18n()
 const { isLoading: isHeaderTranslationLoading } = useTranslationLoader(props.entityHandle)
+const currentPersonStore = useCurrentPersonStore()
 
 const hasCompletedInitialLoad = ref(!props.isLoading)
+const importInputRef = ref<HTMLInputElement | null>(null)
 
 watch(
   () => props.isLoading,
@@ -305,6 +321,11 @@ const showAddButton = computed(
     Boolean(props.entity?.canInsert) &&
     Boolean(props.entityPermission?.allowInsert),
 )
+const showImportButton = computed(
+  () =>
+    currentPersonStore.isAdministrator &&
+    (Boolean(props.entityPermission?.allowInsert) || Boolean(props.entityPermission?.allowUpdate)),
+)
 const showSearchField = computed(() => props.showSearch !== false)
 const showSidePanelToggleButton = computed(() => props.showSidePanelToggle === true)
 const sidePanelVisible = computed(() => props.sidePanelVisible === true)
@@ -314,6 +335,10 @@ const sidePanelToggleLabel = computed(
 const sidePanelToggleIcon = computed(
   () => props.sidePanelToggleIcon?.trim() || 'mdi-account-group-outline',
 )
+
+onMounted(() => {
+  void currentPersonStore.fetchCurrentPerson()
+})
 // #endregion
 
 // #region Composable
@@ -341,6 +366,7 @@ const {
   isCurrentEntityFavoritesLoading,
   activeFavoriteHandle,
   isDownloadingJSON,
+  isImportingCSV,
   multiSelectScriptButtons,
   rowScriptButtons,
   onSearchUpdate,
@@ -356,6 +382,9 @@ const {
   showToolbarActionsInline,
   isMobileTable,
   downloadJSON,
+  exportCSV,
+  exportCSVTemplate,
+  importCSVFile,
   refreshTable,
   exportSelectedJSON,
   openContextMenu,
@@ -406,6 +435,20 @@ function onMailToSelected(action: SaplingBulkMailAction): void {
     entityHandle: props.entityHandle,
     initialTo: action.emails,
   })
+}
+
+function openImportFilePicker(): void {
+  importInputRef.value?.click()
+}
+
+function onImportFileInputChange(event: Event): void {
+  const target = event.target as HTMLInputElement | null
+  const file = target?.files?.[0] ?? null
+  void importCSVFile(file)
+
+  if (target) {
+    target.value = ''
+  }
 }
 // #endregion
 </script>

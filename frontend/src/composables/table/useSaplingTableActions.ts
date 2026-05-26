@@ -32,6 +32,7 @@ import { buildTableFilter, buildTableOrderBy } from '@/utils/saplingTableUtil'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog'
 import { buildMailMenuActions } from '@/utils/saplingMailMenuUtil'
+import { buildCsv, buildCsvTemplate, parseCsv } from '@/utils/saplingCsvUtil'
 import type { SaplingContextMenuTableActionPayload } from '@/composables/context/useSaplingContextMenuTable'
 import type { SaplingTableRowContextMenuOpenPayload } from '@/composables/table/useSaplingTableRow'
 
@@ -128,6 +129,7 @@ export function useSaplingTableActions({
   const showInformationDialog = ref(false)
   const informationDialogItem = ref<SaplingGenericItem | null>(null)
   const isDownloadingJSON = ref(false)
+  const isImportingCSV = ref(false)
   const contextMenu = ref<TableContextMenuState>({
     visible: false,
     item: null,
@@ -280,6 +282,103 @@ export function useSaplingTableActions({
     }
   }
 
+  function exportCSVTemplate() {
+    if (!props.entityHandle) {
+      return
+    }
+
+    downloadTextFile(
+      buildCsvTemplate(props.entityTemplates),
+      `${props.entityHandle}-template.csv`,
+      'text/csv;charset=utf-8',
+    )
+    pushMessage(
+      'success',
+      t('global.csvTemplateExported'),
+      t('global.csvTemplateExportedDescription'),
+      props.entityHandle,
+    )
+  }
+
+  async function exportCSV() {
+    if (!props.entityHandle || isDownloadingJSON.value) {
+      return
+    }
+
+    const filter =
+      props.activeFilter ??
+      buildTableFilter({
+        search: props.search,
+        columnFilters: localColumnFilters.value,
+        entityTemplates: props.entityTemplates,
+        parentFilter: props.parentFilter,
+      })
+
+    try {
+      isDownloadingJSON.value = true
+      const items = await ApiGenericService.downloadJSON<SaplingGenericItem>(props.entityHandle, {
+        filter,
+        orderBy: buildTableOrderBy(props.sortBy),
+        relations: ['m:1'],
+      })
+
+      downloadTextFile(
+        buildCsv(items, props.entityTemplates),
+        `${props.entityHandle}.csv`,
+        'text/csv;charset=utf-8',
+      )
+      pushMessage(
+        'success',
+        t('global.csvExported'),
+        t('global.csvExportedDescription', { count: items.length }),
+        props.entityHandle,
+      )
+    } catch {
+      // API errors are already routed through the shared message center.
+    } finally {
+      isDownloadingJSON.value = false
+    }
+  }
+
+  async function importCSVFile(file: File | null) {
+    if (!file || !props.entityHandle || isImportingCSV.value) {
+      return
+    }
+
+    if (!isSupportedCsvFile(file)) {
+      pushMessage(
+        'warning',
+        t('global.csvImportUnsupportedFile'),
+        t('global.csvImportUnsupportedFileDescription'),
+        props.entityHandle,
+      )
+      return
+    }
+
+    try {
+      isImportingCSV.value = true
+      const rows = parseCsv(await file.text())
+      const result = await ApiGenericService.importRows(props.entityHandle, rows)
+
+      emit('reload')
+      pushMessage(
+        result.failed > 0 ? 'warning' : 'success',
+        t('global.csvImported'),
+        t('global.csvImportedDescription', {
+          created: result.created,
+          updated: result.updated,
+          failed: result.failed,
+          skipped: result.skipped,
+        }),
+        props.entityHandle,
+      )
+    } catch {
+      // API errors are already routed through the shared message center.
+    } finally {
+      isImportingCSV.value = false
+    }
+  }
+
   function refreshTable() {
     emit('reload')
   }
@@ -299,7 +398,11 @@ export function useSaplingTableActions({
   }
 
   function downloadJSONFile(data: unknown, filename: string) {
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    downloadTextFile(JSON.stringify(data, null, 2), filename, 'application/json')
+  }
+
+  function downloadTextFile(data: string, filename: string, type: string) {
+    const blob = new Blob([data], { type })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
@@ -308,6 +411,17 @@ export function useSaplingTableActions({
     link.click()
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
+  }
+
+  function isSupportedCsvFile(file: File): boolean {
+    const normalizedName = file.name.toLowerCase()
+    return (
+      normalizedName.endsWith('.csv') ||
+      normalizedName.endsWith('.txt') ||
+      normalizedName.endsWith('.tsv') ||
+      file.type === 'text/csv' ||
+      file.type === 'text/plain'
+    )
   }
 
   function openContextMenu({ item, x, y }: SaplingTableRowContextMenuOpenPayload) {
@@ -1011,7 +1125,11 @@ export function useSaplingTableActions({
     isCurrentEntityFavoritesLoading,
     activeFavoriteHandle,
     isDownloadingJSON,
+    isImportingCSV,
     downloadJSON,
+    exportCSV,
+    exportCSVTemplate,
+    importCSVFile,
     refreshTable,
     exportSelectedJSON,
     openContextMenu,

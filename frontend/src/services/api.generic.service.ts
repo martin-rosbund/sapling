@@ -7,6 +7,23 @@ export type FilterQuery = { [key: string]: unknown }
 export type OrderByQuery = { [key: string]: 'ASC' | 'DESC' | 1 | -1 | string }
 export type EntityHandleValue = string | number
 export type GenericUpdateConcurrencyResolution = 'detect' | 'merge' | 'overwrite'
+export type GenericImportRowAction = 'created' | 'updated' | 'failed' | 'skipped'
+
+export interface GenericImportRowResult {
+  rowNumber: number
+  action: GenericImportRowAction
+  handle?: EntityHandleValue | null
+  message?: string
+}
+
+export interface GenericImportResponse {
+  totalRows: number
+  created: number
+  updated: number
+  skipped: number
+  failed: number
+  rows: GenericImportRowResult[]
+}
 
 export interface GenericUpdateConcurrency {
   expectedUpdatedAt?: string | Date | null
@@ -177,6 +194,22 @@ class ApiGenericService {
   static async create<T>(entityHandle: string, data: Partial<T>): Promise<T> {
     try {
       const response = await axios.post<T>(`${BACKEND_URL}generic/${entityHandle}`, data)
+      return response.data
+    } catch (error: unknown) {
+      pushApiErrorMessage(error, 'exception.unknownError', entityHandle)
+      throw error
+    }
+  }
+
+  static async importRows(
+    entityHandle: string,
+    rows: Record<string, unknown>[],
+  ): Promise<GenericImportResponse> {
+    try {
+      const response = await axios.post<GenericImportResponse>(
+        `${BACKEND_URL}generic/${entityHandle}/import`,
+        { rows },
+      )
       return response.data
     } catch (error: unknown) {
       pushApiErrorMessage(error, 'exception.unknownError', entityHandle)

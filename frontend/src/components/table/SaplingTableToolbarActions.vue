@@ -31,9 +31,27 @@
           />
           <v-list-item
             prepend-icon="mdi-download"
-            :title="$t('global.download')"
+            :title="$t('global.downloadJson')"
             :disabled="isDownloadingJson"
-            @click="emit('download')"
+            @click="emit('downloadJson')"
+          />
+          <v-list-item
+            prepend-icon="mdi-file-delimited-outline"
+            :title="$t('global.downloadCsv')"
+            :disabled="isDownloadingJson"
+            @click="emit('downloadCsv')"
+          />
+          <v-list-item
+            prepend-icon="mdi-table-arrow-down"
+            :title="$t('global.downloadCsvTemplate')"
+            @click="emit('downloadCsvTemplate')"
+          />
+          <v-list-item
+            v-if="showImport"
+            prepend-icon="mdi-file-import-outline"
+            :title="$t('global.importCsv')"
+            :disabled="isImportingCsv"
+            @click="emit('importCsv')"
           />
         </v-list>
       </v-menu>
@@ -155,18 +173,55 @@
           </template>
         </v-list>
       </v-menu>
+      <v-menu location="bottom end">
+        <template #activator="{ props: downloadMenuProps }">
+          <v-btn
+            class="sapling-table-toolbar-action sapling-table-toolbar-action--download"
+            color="primary"
+            variant="tonal"
+            prepend-icon="mdi-download"
+            append-icon="mdi-menu-down"
+            v-bind="downloadMenuProps"
+            :title="$t('global.download')"
+            :aria-label="$t('global.download')"
+            :loading="isDownloadingJson"
+            :disabled="isDownloadingJson"
+          >
+            {{ $t('global.download') }}
+          </v-btn>
+        </template>
+
+        <v-list density="compact" class="glass-panel" nav>
+          <v-list-item
+            prepend-icon="mdi-code-json"
+            :title="$t('global.downloadJson')"
+            @click="emit('downloadJson')"
+          />
+          <v-list-item
+            prepend-icon="mdi-file-delimited-outline"
+            :title="$t('global.downloadCsv')"
+            @click="emit('downloadCsv')"
+          />
+          <v-list-item
+            prepend-icon="mdi-table-arrow-down"
+            :title="$t('global.downloadCsvTemplate')"
+            @click="emit('downloadCsvTemplate')"
+          />
+        </v-list>
+      </v-menu>
       <v-btn
-        class="sapling-table-toolbar-action sapling-table-toolbar-action--download"
+        v-if="showImport"
+        class="sapling-table-toolbar-action sapling-table-toolbar-action--import"
         color="primary"
         variant="tonal"
-        prepend-icon="mdi-download"
-        :title="$t('global.download')"
-        :aria-label="$t('global.download')"
-        :loading="isDownloadingJson"
-        :disabled="isDownloadingJson"
-        @click="emit('download')"
+        prepend-icon="mdi-file-import-outline"
+        :title="$t('global.importCsv')"
+        :aria-label="$t('global.importCsv')"
+        :loading="isImportingCsv"
+        :disabled="isImportingCsv"
+        @click="emit('importCsv')"
       >
-        {{ $t('global.download') }}
+        {{ $t('global.importCsv') }}
       </v-btn>
       <v-btn
         v-if="showAdd"
@@ -190,8 +245,10 @@ import type { FavoriteItem } from '@/entity/entity'
 defineProps<{
   isMobileTable: boolean
   isDownloadingJson: boolean
+  isImportingCsv: boolean
   refreshButtonLabel: string
   showFavorite: boolean
+  showImport: boolean
   showAdd: boolean
   favoriteItems: FavoriteItem[]
   isFavoritesLoading: boolean
@@ -199,7 +256,10 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
-  download: []
+  downloadJson: []
+  downloadCsv: []
+  downloadCsvTemplate: []
+  importCsv: []
   refresh: []
   favorite: []
   selectFavorite: [favorite: FavoriteItem]

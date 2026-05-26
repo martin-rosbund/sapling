@@ -22,6 +22,16 @@ export const useCurrentPersonStore = defineStore('currentPerson', () => {
   })
 
   const isImpersonating = computed(() => impersonator.value !== null)
+  const isAdministrator = computed(
+    () =>
+      person.value?.roles?.some((role) => {
+        if (!role || typeof role === 'string') {
+          return false
+        }
+
+        return role.isAdministrator === true
+      }) ?? false,
+  )
 
   async function fetchCurrentPerson(force = false): Promise<void> {
     if (loaded.value && person.value && !force) return
@@ -71,6 +81,7 @@ export const useCurrentPersonStore = defineStore('currentPerson', () => {
     loaded,
     impersonator,
     isImpersonating,
+    isAdministrator,
     fetchCurrentPerson,
     startImpersonation,
     stopImpersonation,

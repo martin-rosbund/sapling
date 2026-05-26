@@ -75,6 +75,21 @@ type UpdateConflictEvaluation = {
 type RelationMutationContext = Awaited<
   ReturnType<GenericRelationService['addReferenceAndFlush']>
 >;
+type GenericImportAction = 'created' | 'updated' | 'failed' | 'skipped';
+type GenericImportRowResult = {
+  rowNumber: number;
+  action: GenericImportAction;
+  handle?: string | number | null;
+  message?: string;
+};
+export type GenericImportResponse = {
+  totalRows: number;
+  created: number;
+  updated: number;
+  skipped: number;
+  failed: number;
+  rows: GenericImportRowResult[];
+};
 
 const GENERIC_CONCURRENCY_METADATA_KEY = '_saplingConcurrency';
 const CHANGE_LOG_DETAIL_IGNORED_FIELDS = new Set(['updatedAt']);
@@ -323,6 +338,81 @@ export class GenericService {
 
     // Convert to JSON
     return JSON.stringify(result.items, null, 2);
+  }
+  // #endregion
+
+  // #region Import
+  async importRows(
+    entityHandle: string,
+    rows: Record<string, unknown>[],
+    currentUser: PersonItem,
+    scriptContext: ScriptServerContext = {},
+  ): Promise<GenericImportResponse> {
+    if (!Array.isArray(rows)) {
+      throw new BadRequestException('global.invalidPayload');
+    }
+
+    const template = this.templateService.getEntityTemplate(entityHandle);
+    const results: GenericImportRowResult[] = [];
+
+    for (const [index, row] of rows.entries()) {
+      const rowNumber = index + 2;
+
+      if (!this.hasImportableRowValues(row)) {
+        results.push({ rowNumber, action: 'skipped' });
+        continue;
+      }
+
+      const payload = this.normalizeImportRow(template, row);
+      const handle = this.extractImportHandle(payload);
+
+      try {
+        if (handle == null) {
+          const created = await this.create(
+            entityHandle,
+            payload,
+            currentUser,
+            scriptContext,
+          );
+          results.push({
+            rowNumber,
+            action: 'created',
+            handle: this.extractEntityHandle(created),
+          });
+        } else {
+          const updated = await this.update(
+            entityHandle,
+            handle,
+            payload,
+            currentUser,
+            [],
+            scriptContext,
+            { resolution: 'overwrite' },
+          );
+          results.push({
+            rowNumber,
+            action: 'updated',
+            handle: this.extractEntityHandle(updated) ?? handle,
+          });
+        }
+      } catch (error) {
+        results.push({
+          rowNumber,
+          action: 'failed',
+          handle,
+          message: this.getImportErrorMessage(error),
+        });
+      }
+    }
+
+    return {
+      totalRows: rows.length,
+      created: results.filter((result) => result.action === 'created').length,
+      updated: results.filter((result) => result.action === 'updated').length,
+      skipped: results.filter((result) => result.action === 'skipped').length,
+      failed: results.filter((result) => result.action === 'failed').length,
+      rows: results,
+    };
   }
   // #endregion
 
@@ -1886,6 +1976,129 @@ export class GenericService {
     }
 
     return null;
+  }
+
+  private hasImportableRowValues(row: unknown): row is Record<string, unknown> {
+    if (!row || typeof row !== 'object' || Array.isArray(row)) {
+      return false;
+    }
+
+    return Object.values(row).some(
+      (value) => value != null && String(value).trim().length > 0,
+    );
+  }
+
+  private normalizeImportRow(
+    template: EntityTemplateDto[],
+    row: Record<string, unknown>,
+  ): { createdAt?: Date; updatedAt?: Date; [key: string]: any } {
+    const templateByName = new Map(
+      template.map((field) => [field.name, field]),
+    );
+    const payload: { createdAt?: Date; updatedAt?: Date; [key: string]: any } =
+      {};
+
+    for (const [key, value] of Object.entries(row)) {
+      const field = templateByName.get(key);
+
+      if (!field || this.shouldSkipImportField(field)) {
+        continue;
+      }
+
+      payload[key] = this.normalizeImportValue(field, value);
+    }
+
+    return payload;
+  }
+
+  private shouldSkipImportField(field: EntityTemplateDto): boolean {
+    if (!field.name || field.isPersistent === false) {
+      return true;
+    }
+
+    if (field.options?.includes('isReadOnly')) {
+      return true;
+    }
+
+    if (field.kind && ['1:m', 'm:n', 'n:m', '1:1'].includes(field.kind)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private normalizeImportValue(
+    field: EntityTemplateDto,
+    value: unknown,
+  ): unknown {
+    if (value == null) {
+      return null;
+    }
+
+    if (typeof value !== 'string') {
+      return value;
+    }
+
+    const trimmedValue = value.trim();
+    if (!trimmedValue) {
+      return null;
+    }
+
+    if (field.type === 'boolean') {
+      return this.normalizeBoolean(trimmedValue) ?? trimmedValue;
+    }
+
+    if (this.isImportNumberField(field)) {
+      const normalizedNumber = Number(
+        trimmedValue.includes(',') && !trimmedValue.includes('.')
+          ? trimmedValue.replace(',', '.')
+          : trimmedValue,
+      );
+      return Number.isFinite(normalizedNumber)
+        ? normalizedNumber
+        : trimmedValue;
+    }
+
+    return trimmedValue;
+  }
+
+  private isImportNumberField(field: EntityTemplateDto): boolean {
+    return [
+      'number',
+      'float',
+      'double',
+      'decimal',
+      'real',
+      'int',
+      'integer',
+      'smallint',
+      'bigint',
+    ].includes(field.type);
+  }
+
+  private extractImportHandle(
+    payload: Record<string, unknown>,
+  ): string | number | null {
+    const handle = payload.handle;
+    return typeof handle === 'string' || typeof handle === 'number'
+      ? handle
+      : null;
+  }
+
+  private getImportErrorMessage(error: unknown): string {
+    if (error && typeof error === 'object') {
+      const response = (error as { response?: unknown }).response;
+      if (typeof response === 'string') {
+        return response;
+      }
+
+      const message = (error as { message?: unknown }).message;
+      if (typeof message === 'string' && message.trim()) {
+        return message;
+      }
+    }
+
+    return 'exception.unknownError';
   }
 
   private asUnknownRecord(value: unknown): Record<string, unknown> | null {
