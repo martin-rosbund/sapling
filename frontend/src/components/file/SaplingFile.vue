@@ -36,45 +36,40 @@
       </template>
 
       <template v-else>
-        <SaplingSurface
-          as="aside"
-          class="sapling-workspace-panel sapling-browser-workspace__sidebar sapling-file-workspace__sidebar"
+        <div
+          class="sapling-panel-shell sapling-browser-workspace__table-shell sapling-file-workspace__table-shell"
         >
           <div
-            class="sapling-panel-shell sapling-browser-workspace__table-shell sapling-file-workspace__table-shell"
+            class="sapling-browser-scroll sapling-browser-scroll--flush sapling-document-table-scroll"
           >
-            <div
-              class="sapling-browser-scroll sapling-browser-scroll--flush sapling-document-table-scroll"
-            >
-              <SaplingTable
-                :items="items"
-                :search="search ?? ''"
-                :page="page"
-                :items-per-page="itemsPerPage"
-                :total-items="totalItems"
-                :is-loading="isLoading"
-                :sort-by="sortBy"
-                :column-filters="columnFilters"
-                :active-filter="activeFilter"
-                :entity-handle="entity?.handle || ''"
-                :entity="entity"
-                :entity-permission="entityPermission"
-                :entity-templates="entityTemplates || []"
-                :show-actions="false"
-                :multi-select="false"
-                :show-favorite="false"
-                :parent-filter="parentFilter"
-                :table-key="entityHandleRef + '-table'"
-                @update:selected="onSelectedDocument"
-                @update:search="onSearchUpdate"
-                @update:page="onPageUpdate"
-                @update:items-per-page="onItemsPerPageUpdate"
-                @update:sort-by="onSortByUpdate"
-                @update:column-filters="onColumnFiltersUpdate"
-              />
-            </div>
+            <SaplingTable
+              :items="items"
+              :search="search ?? ''"
+              :page="page"
+              :items-per-page="itemsPerPage"
+              :total-items="totalItems"
+              :is-loading="isLoading"
+              :sort-by="sortBy"
+              :column-filters="columnFilters"
+              :active-filter="activeFilter"
+              :entity-handle="entity?.handle || ''"
+              :entity="entity"
+              :entity-permission="entityPermission"
+              :entity-templates="entityTemplates || []"
+              :show-actions="false"
+              :multi-select="false"
+              :show-favorite="false"
+              :parent-filter="parentFilter"
+              :table-key="entityHandleRef + '-table'"
+              @update:selected="onSelectedDocument"
+              @update:search="onSearchUpdate"
+              @update:page="onPageUpdate"
+              @update:items-per-page="onItemsPerPageUpdate"
+              @update:sort-by="onSortByUpdate"
+              @update:column-filters="onColumnFiltersUpdate"
+            />
           </div>
-        </SaplingSurface>
+        </div>
 
         <section class="sapling-browser-workspace__detail sapling-file-workspace__detail">
           <SaplingFileHeader
