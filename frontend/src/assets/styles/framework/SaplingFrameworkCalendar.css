@@ -188,6 +188,7 @@
   gap: var(--sapling-gap-sm);
   padding: var(--sapling-gap-md);
   border-radius: var(--sapling-panel-radius-compact);
+  margin-bottom: var(--sapling-gap-md);
 }
 
 .sapling-event-context__toggle {
