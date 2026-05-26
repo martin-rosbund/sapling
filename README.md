@@ -181,6 +181,10 @@ npm run orm:deploy --prefix backend
 
 Seed-Daten liegen unter `backend/src/database/seeder/json-${DB_DATA_SEEDER}/...`. Erfolgreich gelaufene Seed-Dateien werden in `seed_script_item` protokolliert und spaeter uebersprungen. Neue Seed-Daten sollten deshalb in neuen JSON-Dateien ausgeliefert werden.
 
+## Integrationsdokumentation
+
+- [Sapling MCP HTTP API](docs/integrations/sapling-mcp-http.md)
+
 ## Projekt starten
 
 Vom Repository-Root:
