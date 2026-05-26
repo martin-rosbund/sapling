@@ -4,6 +4,7 @@ import type { PaginatedResponse } from '@/entity/structure'
 
 export type UseSaplingFilterEmployeeProps = {
   companyPeoples: PaginatedResponse<PersonItem> | undefined
+  employeeSearch?: string
   isPersonSelected: (id: number) => boolean
   getPersonId: (person: PersonItem) => number
   getPersonName: (person: PersonItem) => string
@@ -11,6 +12,8 @@ export type UseSaplingFilterEmployeeProps = {
 
 export type UseSaplingFilterEmployeeEmit = {
   (event: 'togglePerson', id: number, checked?: boolean): void
+  (event: 'searchEmployees', value: string): void
+  (event: 'pageEmployees', value: number): void
 }
 
 export function useSaplingFilterEmployee(
@@ -18,7 +21,7 @@ export function useSaplingFilterEmployee(
   emit: UseSaplingFilterEmployeeEmit,
 ) {
   //#region State
-  const { companyPeoples } = toRefs(props)
+  const { companyPeoples, employeeSearch } = toRefs(props)
   //#endregion
 
   //#region Actions
@@ -29,13 +32,30 @@ export function useSaplingFilterEmployee(
     emit('togglePerson', id, checked ?? undefined)
   }
 
+  /**
+   * Emits the current free-text employee search term.
+   */
+  function onEmployeeSearch(value: string | null) {
+    emit('searchEmployees', value ?? '')
+  }
+
+  /**
+   * Emits the next requested employee page.
+   */
+  function onEmployeePage(value: number) {
+    emit('pageEmployees', value)
+  }
+
   //#region Return
   return {
     companyPeoples,
+    employeeSearch,
     isPersonSelected: props.isPersonSelected,
     getPersonId: props.getPersonId,
     getPersonName: props.getPersonName,
     togglePerson,
+    onEmployeeSearch,
+    onEmployeePage,
   }
   //#endregion
 }

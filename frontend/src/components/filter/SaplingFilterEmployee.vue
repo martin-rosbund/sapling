@@ -1,4 +1,17 @@
 <template>
+  <div class="section-padding-bottom">
+    <v-text-field
+      :model-value="employeeSearch ?? ''"
+      :label="$t('global.search')"
+      prepend-inner-icon="mdi-magnify"
+      variant="outlined"
+      hide-details
+      single-line
+      density="compact"
+      class="margin-bottom-4"
+      @update:model-value="onEmployeeSearch"
+    />
+  </div>
   <div>
     <div
       v-for="person in companyPeoples?.data"
@@ -20,6 +33,16 @@
       />
     </div>
   </div>
+  <div class="section-padding-top">
+    <v-pagination
+      v-if="(companyPeoples?.meta.total ?? 0) > (companyPeoples?.meta.limit ?? 0)"
+      :model-value="companyPeoples?.meta.page ?? 1"
+      :length="Math.ceil((companyPeoples?.meta.total ?? 0) / (companyPeoples?.meta.limit ?? 25))"
+      @update:model-value="onEmployeePage"
+      density="compact"
+      class="margin-4-0"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -36,6 +59,14 @@ const props = defineProps<UseSaplingFilterEmployeeProps>()
 const emit = defineEmits<UseSaplingFilterEmployeeEmit>()
 // #endregion
 
-const { companyPeoples, isPersonSelected, getPersonId, getPersonName, togglePerson } =
-  useSaplingFilterEmployee(props, emit)
+const {
+  companyPeoples,
+  employeeSearch,
+  isPersonSelected,
+  getPersonId,
+  getPersonName,
+  togglePerson,
+  onEmployeeSearch,
+  onEmployeePage,
+} = useSaplingFilterEmployee(props, emit)
 </script>

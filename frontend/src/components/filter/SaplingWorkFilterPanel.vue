@@ -56,17 +56,20 @@
               </v-expansion-panel-text>
             </v-expansion-panel>
 
-            <v-expansion-panel v-if="companyPeoples?.data && companyPeoples.data.length > 0">
+            <v-expansion-panel v-if="companyPeoples">
               <v-expansion-panel-title>
                 <v-list-subheader>{{ $t('global.employee') }}</v-list-subheader>
               </v-expansion-panel-title>
               <v-expansion-panel-text>
                 <SaplingFilterEmployee
                   :companyPeoples="companyPeoples"
+                  :employeeSearch="employeeSearch"
                   :isPersonSelected="isPersonSelected"
                   :getPersonId="getPersonId"
                   :getPersonName="getPersonName"
                   @togglePerson="togglePerson"
+                  @searchEmployees="onEmployeeSearch"
+                  @pageEmployees="onEmployeePage"
                 />
               </v-expansion-panel-text>
             </v-expansion-panel>
@@ -144,14 +147,17 @@ const {
   isCompanySelected,
   togglePerson,
   toggleCompany,
+  onEmployeeSearch,
   onPeopleSearch,
   onCompaniesSearch,
+  onEmployeePage,
   onPeoplePage,
   onCompaniesPage,
   ownPerson,
   peoples,
   companies,
   companyPeoples,
+  employeeSearch,
   peopleSearch,
   companiesSearch,
   expandedPanels,

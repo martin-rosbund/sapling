@@ -24,6 +24,7 @@ export function useSaplingFilterWork(options: UseSaplingFilterWorkOptions = {}) 
   const companyPeoples = ref<PaginatedResponse<PersonItem>>()
   const selectedPeoples = ref<number[]>([])
   const selectedCompanies = ref<number[]>([])
+  const employeeSearch = ref('')
   const peopleSearch = ref('')
   const companiesSearch = ref('')
   const expandedPanels = ref<number[]>([0, 1])
@@ -177,15 +178,36 @@ export function useSaplingFilterWork(options: UseSaplingFilterWorkOptions = {}) 
   /**
    * Loads the colleagues of the current user's company for the employee section.
    */
-  async function loadCompanyPeople(person: PersonItem | null = ownPerson.value) {
+  async function loadCompanyPeople(
+    search = employeeSearch.value,
+    page = 1,
+    person: PersonItem | null = ownPerson.value,
+  ) {
     const companyHandle = getCompanyHandle(person)
     if (companyHandle == null) {
       companyPeoples.value = undefined
       return
     }
 
+    const normalizedSearch = search.trim()
+    const filter = normalizedSearch
+      ? {
+          $and: [
+            { company: companyHandle },
+            {
+              $or: [
+                { firstName: { $ilike: `%${normalizedSearch}%` } },
+                { lastName: { $ilike: `%${normalizedSearch}%` } },
+                { email: { $ilike: `%${normalizedSearch}%` } },
+              ],
+            },
+          ],
+        }
+      : { company: companyHandle }
+
     companyPeoples.value = await ApiGenericService.find<PersonItem>('person', {
-      filter: { company: companyHandle },
+      filter,
+      page,
       limit: DEFAULT_PAGE_SIZE_SMALL,
     })
 
@@ -286,6 +308,18 @@ export function useSaplingFilterWork(options: UseSaplingFilterWorkOptions = {}) 
   }
 
   /**
+   * Applies a new employee search term and restarts the company-people pagination.
+   */
+  function onEmployeeSearch(value: string) {
+    employeeSearch.value = value
+    if (companyPeoples.value) {
+      companyPeoples.value.meta.page = 1
+    }
+
+    void loadCompanyPeople(value, 1)
+  }
+
+  /**
    * Applies a new company search term and restarts the company pagination.
    */
   function onCompaniesSearch(value: string) {
@@ -309,6 +343,17 @@ export function useSaplingFilterWork(options: UseSaplingFilterWorkOptions = {}) 
   }
 
   /**
+   * Loads a different page in the company employee list.
+   */
+  function onEmployeePage(page: number) {
+    if (companyPeoples.value) {
+      companyPeoples.value.meta.page = page
+    }
+
+    void loadCompanyPeople(employeeSearch.value, page)
+  }
+
+  /**
    * Loads a different page in the company list.
    */
   function onCompaniesPage(page: number) {
@@ -329,8 +374,10 @@ export function useSaplingFilterWork(options: UseSaplingFilterWorkOptions = {}) 
     isCompanySelected,
     togglePerson,
     toggleCompany,
+    onEmployeeSearch,
     onPeopleSearch,
     onCompaniesSearch,
+    onEmployeePage,
     onPeoplePage,
     onCompaniesPage,
     ownPerson,
@@ -339,6 +386,7 @@ export function useSaplingFilterWork(options: UseSaplingFilterWorkOptions = {}) 
     companyPeoples,
     selectedPeoples,
     selectedCompanies,
+    employeeSearch,
     peopleSearch,
     companiesSearch,
     expandedPanels,
