@@ -16,7 +16,9 @@
           <v-skeleton-loader v-for="item in 4" :key="item" type="article" />
         </div>
 
-        <div class="sapling-action-cluster sapling-admin-hero__actions sapling-permission-hero-actions">
+        <div
+          class="sapling-action-cluster sapling-admin-hero__actions sapling-permission-hero-actions"
+        >
           <v-skeleton-loader v-for="item in 2" :key="item" type="button" />
         </div>
       </div>
@@ -40,25 +42,35 @@
       <template #side>
         <div class="sapling-stack-md sapling-admin-hero__side sapling-permission-hero-side">
           <div class="sapling-stat-grid sapling-admin-stat-grid sapling-permission-stat-grid">
-            <article class="sapling-detail-card sapling-admin-stat-card sapling-permission-stat-card">
+            <article
+              class="sapling-detail-card sapling-admin-stat-card sapling-permission-stat-card"
+            >
               <span>{{ $t('role.roles') }}</span>
               <strong>{{ dashboardStats.roleCount }}</strong>
             </article>
-            <article class="sapling-detail-card sapling-admin-stat-card sapling-permission-stat-card">
+            <article
+              class="sapling-detail-card sapling-admin-stat-card sapling-permission-stat-card"
+            >
               <span>{{ $t('role.members') }}</span>
               <strong>{{ dashboardStats.memberCount }}</strong>
             </article>
-            <article class="sapling-detail-card sapling-admin-stat-card sapling-permission-stat-card">
+            <article
+              class="sapling-detail-card sapling-admin-stat-card sapling-permission-stat-card"
+            >
               <span>{{ $t('right.groups') }}</span>
               <strong>{{ dashboardStats.groupCount }}</strong>
             </article>
-            <article class="sapling-detail-card sapling-admin-stat-card sapling-permission-stat-card">
+            <article
+              class="sapling-detail-card sapling-admin-stat-card sapling-permission-stat-card"
+            >
               <span>{{ $t('right.enabledRights') }}</span>
               <strong>{{ dashboardStats.enabledPermissionCount }}</strong>
             </article>
           </div>
 
-          <div class="sapling-action-cluster sapling-admin-hero__actions sapling-permission-hero-actions">
+          <div
+            class="sapling-action-cluster sapling-admin-hero__actions sapling-permission-hero-actions"
+          >
             <v-chip
               v-if="hasUnsavedPermissionChanges"
               color="warning"
@@ -115,7 +127,9 @@
           </section>
         </main>
 
-        <aside class="sapling-stack-xl sapling-page-panel sapling-admin-context sapling-permission-context">
+        <aside
+          class="sapling-stack-xl sapling-page-panel sapling-admin-context sapling-permission-context"
+        >
           <section
             class="sapling-section-panel sapling-page-panel sapling-admin-members sapling-permission-members glass-panel sapling-permission-loading-panel"
           >

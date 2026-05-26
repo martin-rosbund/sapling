@@ -158,6 +158,8 @@ export function useSaplingHeaderInboxPreview(
         return t('navigation.event')
       case 'salesOpportunity':
         return t('navigation.salesOpportunity')
+      case 'effortEstimate':
+        return t('navigation.effortEstimate')
       case 'notification':
       default:
         return t('navigation.inboxNotification')

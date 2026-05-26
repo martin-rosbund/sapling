@@ -8,9 +8,7 @@
 
 .sapling-ai-chat {
   --sapling-floating-panel-z-index: 1251;
-  --sapling-floating-panel-top: calc(
-    var(--v-layout-top, 0px) + var(--sapling-space-sm-plus)
-  );
+  --sapling-floating-panel-top: calc(var(--v-layout-top, 0px) + var(--sapling-space-sm-plus));
   --sapling-floating-panel-width: var(--sapling-chat-panel-width);
   --sapling-floating-panel-max-width: calc(100vw - var(--sapling-space-2xl));
   --sapling-floating-panel-height: min(
@@ -29,10 +27,9 @@
 
 .sapling-chat-layout {
   display: grid;
-  grid-template-columns: var(--sapling-chat-rail-width, var(--sapling-chat-panel-sidebar-width)) minmax(
-      0,
-      1fr
-    );
+  grid-template-columns:
+    var(--sapling-chat-rail-width, var(--sapling-chat-panel-sidebar-width))
+    minmax(0, 1fr);
   min-height: 0;
   flex: 1 1 auto;
   overflow: hidden;

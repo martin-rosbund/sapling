@@ -21,7 +21,10 @@
         </v-card-title>
 
         <v-card-text class="sapling-message-dialog__content sapling-mail-dialog__content">
-          <div v-if="isTranslationLoading" class="sapling-message-dialog__scroll sapling-mail-dialog__scroll">
+          <div
+            v-if="isTranslationLoading"
+            class="sapling-message-dialog__scroll sapling-mail-dialog__scroll"
+          >
             <div class="sapling-message-dialog__grid sapling-mail-dialog__grid">
               <v-skeleton-loader class="glass-panel" type="article, article, article" />
               <v-skeleton-loader class="glass-panel" type="article, article, article" />

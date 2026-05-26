@@ -115,6 +115,16 @@ export interface EntityTemplateGenericReference {
   handleField: string
 }
 
+export interface EntityTemplateReferenceTemplateMapping {
+  sourceField: string
+  targetField: string
+  overwrite?: boolean
+}
+
+export interface EntityTemplateReferenceTemplate {
+  mappings: EntityTemplateReferenceTemplateMapping[]
+}
+
 export type DialogState = 'create' | 'edit' | 'readonly'
 
 export type DialogSaveAction = 'save' | 'saveAndClose'
@@ -184,6 +194,8 @@ export interface EntityTemplate {
   referenceDependency?: EntityTemplateReferenceDependency | null
   /** Declarative metadata for generic record references backed by entity + handle fields */
   genericReference?: EntityTemplateGenericReference | null
+  /** Declarative metadata for applying values from selected reference records */
+  referenceTemplate?: EntityTemplateReferenceTemplate | null
 }
 
 export type AccumulatedPermission = {

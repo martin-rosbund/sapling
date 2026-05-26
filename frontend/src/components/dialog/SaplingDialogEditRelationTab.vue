@@ -4,9 +4,7 @@
       <div
         class="sapling-section-header sapling-record-relation-header sapling-dialog-edit-relation-header"
       >
-        <div
-          class="sapling-record-relation-header__copy sapling-dialog-edit-relation-header__copy"
-        >
+        <div class="sapling-record-relation-header__copy sapling-dialog-edit-relation-header__copy">
           <div
             class="sapling-eyebrow sapling-record-relation-header__eyebrow sapling-dialog-edit-relation-header__eyebrow"
           >
@@ -22,7 +20,9 @@
           {{ totalItems }}
         </v-chip>
       </div>
-      <v-card class="sapling-panel-shell sapling-record-relation-card sapling-dialog-edit-relation-card">
+      <v-card
+        class="sapling-panel-shell sapling-record-relation-card sapling-dialog-edit-relation-card"
+      >
         <v-card-text
           class="sapling-section-panel sapling-record-relation-content sapling-dialog-edit-relation-content"
         >

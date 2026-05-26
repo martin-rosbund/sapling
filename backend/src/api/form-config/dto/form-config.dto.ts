@@ -53,10 +53,16 @@ export class SaplingFormConfigValidationResultDto {
   @ApiProperty()
   isValid!: boolean;
 
-  @ApiProperty({ type: () => SaplingFormConfigValidationIssueDto, isArray: true })
+  @ApiProperty({
+    type: () => SaplingFormConfigValidationIssueDto,
+    isArray: true,
+  })
   errors!: SaplingFormConfigValidationIssueDto[];
 
-  @ApiProperty({ type: () => SaplingFormConfigValidationIssueDto, isArray: true })
+  @ApiProperty({
+    type: () => SaplingFormConfigValidationIssueDto,
+    isArray: true,
+  })
   warnings!: SaplingFormConfigValidationIssueDto[];
 
   @ApiProperty({ type: Object })

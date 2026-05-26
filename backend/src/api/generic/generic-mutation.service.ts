@@ -1,4 +1,8 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import { EntityManager, RequiredEntityData } from '@mikro-orm/core';
 import { EntityItem } from '../../entity/EntityItem';
 import { EntityRouteItem } from '../../entity/EntityRouteItem';
@@ -139,8 +143,7 @@ export class GenericMutationService {
       const diagnostics = buildErrorDiagnostics(error);
       global.log.error(`entity ${entityHandle}:`, diagnostics);
 
-      const foreignKeyViolation =
-        buildForeignKeyViolationDiagnostics(error);
+      const foreignKeyViolation = buildForeignKeyViolationDiagnostics(error);
       if (foreignKeyViolation) {
         const referencingTable =
           foreignKeyViolation.referencingTable ?? foreignKeyViolation.table;

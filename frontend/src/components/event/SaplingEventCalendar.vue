@@ -279,10 +279,7 @@ function isPrimaryMouseButton(event: Event) {
   return !(event instanceof MouseEvent) || event.button === 0
 }
 
-function onEventMouseDown(
-  nativeEvent: Event,
-  payload: { event: CalendarEvent; timed: boolean },
-) {
+function onEventMouseDown(nativeEvent: Event, payload: { event: CalendarEvent; timed: boolean }) {
   if (!isPrimaryMouseButton(nativeEvent)) {
     return
   }

@@ -36,7 +36,10 @@
           :is="canOpenCurrentDrilldown ? 'button' : 'div'"
           type="button"
           class="sapling-soft-panel sapling-kpi-comparison__stat"
-          :class="{ 'sapling-soft-panel--interactive sapling-kpi-comparison__stat--clickable': canOpenCurrentDrilldown }"
+          :class="{
+            'sapling-soft-panel--interactive sapling-kpi-comparison__stat--clickable':
+              canOpenCurrentDrilldown,
+          }"
           @click="canOpenCurrentDrilldown ? openCurrentDrilldown() : undefined"
         >
           <span class="sapling-kpi-comparison__label">{{ $t('kpi.current') }}</span>
@@ -53,7 +56,10 @@
           :is="canOpenPreviousDrilldown ? 'button' : 'div'"
           type="button"
           class="sapling-soft-panel sapling-kpi-comparison__stat"
-          :class="{ 'sapling-soft-panel--interactive sapling-kpi-comparison__stat--clickable': canOpenPreviousDrilldown }"
+          :class="{
+            'sapling-soft-panel--interactive sapling-kpi-comparison__stat--clickable':
+              canOpenPreviousDrilldown,
+          }"
           @click="canOpenPreviousDrilldown ? openPreviousDrilldown() : undefined"
         >
           <span class="sapling-kpi-comparison__label">{{ $t('kpi.previous') }}</span>

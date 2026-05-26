@@ -66,12 +66,16 @@
         }"
         @click="emit('select', session)"
       >
-        <div class="sapling-interactive-list-item__row sapling-chat-rail__item-row sapling-ai-chat__session-top">
+        <div
+          class="sapling-interactive-list-item__row sapling-chat-rail__item-row sapling-ai-chat__session-top"
+        >
           <div class="sapling-chat-rail__item-meta sapling-ai-chat__session-meta">
             {{ formatSessionMeta(session) }}
           </div>
 
-          <div class="sapling-row-xs sapling-chat-rail__item-actions sapling-ai-chat__session-actions">
+          <div
+            class="sapling-row-xs sapling-chat-rail__item-actions sapling-ai-chat__session-actions"
+          >
             <v-btn
               v-if="editingSessionHandle === session.handle"
               icon="mdi-check"
@@ -108,7 +112,9 @@
             />
           </template>
           <template v-else>
-            <div class="sapling-row-xs sapling-chat-rail__item-title-row sapling-ai-chat__session-title-row">
+            <div
+              class="sapling-row-xs sapling-chat-rail__item-title-row sapling-ai-chat__session-title-row"
+            >
               <div class="sapling-chat-rail__item-title sapling-ai-chat__session-title">
                 {{ getTruncatedTitle(session.title) }}
               </div>

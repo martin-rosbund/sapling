@@ -6,11 +6,7 @@
       </div>
 
       <div class="sapling-action-stack">
-        <v-skeleton-loader
-          v-for="item in 3"
-          :key="item"
-          type="button"
-        />
+        <v-skeleton-loader v-for="item in 3" :key="item" type="button" />
       </div>
     </section>
     <SaplingPageHero

@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Anforderungsanalyse",
+    "description": "Strukturierte Aufnahme und Bewertung der fachlichen Anforderungen.",
+    "estimatedHours": 6,
+    "offerTextMarkdown": "## Anforderungsanalyse\n\nWir nehmen die Anforderungen gemeinsam auf, klaeren offene Punkte und dokumentieren Annahmen, Schnittstellen sowie Abgrenzungen fuer die Umsetzung."
+  },
+  {
+    "title": "Technisches Konzept",
+    "description": "Technische Loesungsskizze inklusive Risiken und Umsetzungsweg.",
+    "estimatedHours": 8,
+    "offerTextMarkdown": "## Technisches Konzept\n\nWir erstellen ein technisches Konzept mit Datenmodell, betroffenen Komponenten, Integrationspunkten und einer belastbaren Umsetzungsplanung."
+  },
+  {
+    "title": "Implementierung",
+    "description": "Umsetzung der abgestimmten Anforderungen.",
+    "estimatedHours": 16,
+    "offerTextMarkdown": "## Implementierung\n\nWir setzen die abgestimmten Anforderungen im Sapling-System um, inklusive Backend-Logik, generischer Oberflaechenintegration und notwendiger Konfiguration."
+  },
+  {
+    "title": "Test und Abnahme",
+    "description": "Funktionale Pruefung und Begleitung der Abnahme.",
+    "estimatedHours": 5,
+    "offerTextMarkdown": "## Test und Abnahme\n\nWir pruefen die Umsetzung anhand der vereinbarten Szenarien, beheben gefundene Abweichungen und begleiten die fachliche Abnahme."
+  },
+  {
+    "title": "Dokumentation und Uebergabe",
+    "description": "Kurz-Dokumentation und Wissenstransfer.",
+    "estimatedHours": 3,
+    "offerTextMarkdown": "## Dokumentation und Uebergabe\n\nWir dokumentieren die wichtigsten Aenderungen, Konfigurationshinweise und Bedienablaeufe und uebergeben die Umsetzung an die verantwortlichen Ansprechpartner."
+  }
+]

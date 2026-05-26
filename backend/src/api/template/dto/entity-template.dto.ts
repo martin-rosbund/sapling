@@ -3,6 +3,7 @@ import {
   SaplingOption,
   type SaplingFormWidthSpan,
   type SaplingGenericReferenceMetadata,
+  type SaplingReferenceTemplateMetadata,
   type SaplingReferenceDependency,
 } from '../../../entity/global/entity.decorator';
 import type { SaplingFormFieldConfig } from '../../form-config/form-config.types';
@@ -37,6 +38,7 @@ import type { SaplingFormFieldConfig } from '../../form-config/form-config.types
  * @property        formConfig          Effective user-configured form overlay for this field
  * @property        referenceDependency Declarative parent-child dependency metadata for reference fields
  * @property        genericReference    Declarative metadata for generic entity+handle record references
+ * @property        referenceTemplate   Declarative metadata for copying values from a selected reference record
  */
 export class EntityTemplateDto {
   @ApiProperty({
@@ -195,4 +197,13 @@ export class EntityTemplateDto {
     type: Object,
   })
   genericReference?: SaplingGenericReferenceMetadata | null;
+
+  @ApiProperty({
+    description:
+      'Declarative metadata for applying values from a selected reference record into fields on the edited record.',
+    nullable: true,
+    required: false,
+    type: Object,
+  })
+  referenceTemplate?: SaplingReferenceTemplateMetadata | null;
 }

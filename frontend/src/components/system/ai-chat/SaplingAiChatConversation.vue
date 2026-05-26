@@ -2,8 +2,12 @@
   <section class="sapling-min-size-0 sapling-chat-conversation sapling-ai-chat__conversation">
     <div class="sapling-chat-conversation__header sapling-ai-chat__conversation-header">
       <div class="sapling-chat-conversation__heading sapling-ai-chat__conversation-heading">
-        <div class="sapling-row-xs sapling-chat-conversation__title-row sapling-ai-chat__conversation-title-row">
-          <div class="sapling-section-title sapling-chat-conversation__title sapling-ai-chat__conversation-title">
+        <div
+          class="sapling-row-xs sapling-chat-conversation__title-row sapling-ai-chat__conversation-title-row"
+        >
+          <div
+            class="sapling-section-title sapling-chat-conversation__title sapling-ai-chat__conversation-title"
+          >
             {{ getTruncatedTitle(activeConversationTitle) }}
           </div>
           <v-tooltip
@@ -33,7 +37,9 @@
           variant="tonal"
         >
           <div>{{ t('aiChat.noConfiguredProviders') }}</div>
-          <div class="sapling-chat-runtime-selectors__alert-copy sapling-ai-chat__runtime-alert-copy">
+          <div
+            class="sapling-chat-runtime-selectors__alert-copy sapling-ai-chat__runtime-alert-copy"
+          >
             {{ t('aiChat.contactAdministrator') }}
           </div>
         </v-alert>
@@ -68,7 +74,10 @@
       </div>
     </div>
 
-    <div ref="messageContainer" class="sapling-scroll-list sapling-chat-message-list sapling-ai-chat__messages">
+    <div
+      ref="messageContainer"
+      class="sapling-scroll-list sapling-chat-message-list sapling-ai-chat__messages"
+    >
       <div v-if="hasMoreMessages" class="sapling-ai-chat__history-loader">
         <v-btn
           size="small"
@@ -154,10 +163,16 @@
         @keydown.enter.exact.prevent="emit('send')"
       />
 
-      <div class="sapling-row-between-md sapling-chat-composer__actions sapling-ai-chat__composer-actions">
+      <div
+        class="sapling-row-between-md sapling-chat-composer__actions sapling-ai-chat__composer-actions"
+      >
         <div class="sapling-chat-composer__context sapling-ai-chat__composer-context flex-grow-1">
-          <div class="sapling-stack-md sapling-chat-composer__select-stack sapling-ai-chat__voice-select-stack">
-            <div class="sapling-row-md sapling-row-wrap sapling-chat-composer__select-row sapling-ai-chat__voice-select-row">
+          <div
+            class="sapling-stack-md sapling-chat-composer__select-stack sapling-ai-chat__voice-select-stack"
+          >
+            <div
+              class="sapling-row-md sapling-row-wrap sapling-chat-composer__select-row sapling-ai-chat__voice-select-row"
+            >
               <v-select
                 v-if="transcriptionProviderOptions.length > 0"
                 :model-value="selectedTranscriptionProviderHandle"

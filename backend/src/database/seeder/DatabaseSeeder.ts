@@ -80,6 +80,10 @@ import { InboxSubscriptionItem } from '../../entity/InboxSubscriptionItem';
 import { InboxNotificationItem } from '../../entity/InboxNotificationItem';
 import { HolidayItem } from '../../entity/HolidayItem';
 import { HolidayGroupItem } from '../../entity/HolidayGroupItem';
+import { EffortEstimateItem } from '../../entity/EffortEstimateItem';
+import { EffortEstimatePositionItem } from '../../entity/EffortEstimatePositionItem';
+import { EffortEstimatePositionTemplateItem } from '../../entity/EffortEstimatePositionTemplateItem';
+import { EffortEstimateStatusItem } from '../../entity/EffortEstimateStatusItem';
 import { RoleStarterSeeder } from './RoleStarterSeeder';
 import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
 import type { EntityName } from '@mikro-orm/core';
@@ -162,6 +166,10 @@ const SEED_ORDER: Array<EntityName<object> | (new () => Seeder)> = [
   SalesOpportunityForecastItem,
   SalesOpportunitySourceItem,
   SalesOpportunityItem,
+  EffortEstimateStatusItem,
+  EffortEstimatePositionTemplateItem,
+  EffortEstimateItem,
+  EffortEstimatePositionItem,
   DocumentTypeItem,
   EmailTemplateItem,
   EMailListItem,

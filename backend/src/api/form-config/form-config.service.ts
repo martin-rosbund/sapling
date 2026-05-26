@@ -90,7 +90,11 @@ export class FormConfigService {
     templates: EntityTemplateDto[],
     existingHandle?: number,
   ): Promise<SaplingFormConfigItem> {
-    const validation = this.validateConfig(entityHandle, payload.config, templates);
+    const validation = this.validateConfig(
+      entityHandle,
+      payload.config,
+      templates,
+    );
     if (!validation.isValid) {
       throw new BadRequestException({
         message: 'formConfig.validationFailed',
@@ -111,7 +115,9 @@ export class FormConfigService {
     }
 
     const normalizedScope = this.normalizeScope(payload.scope);
-    const normalizedScopeHandle = this.normalizeOptionalString(payload.scopeHandle);
+    const normalizedScopeHandle = this.normalizeOptionalString(
+      payload.scopeHandle,
+    );
     const normalizedName = this.normalizeRequiredString(payload.name, 'name');
 
     let configItem =
@@ -126,7 +132,8 @@ export class FormConfigService {
     configItem.name = normalizedName;
     configItem.entity = entity;
     configItem.scope = normalizedScope;
-    configItem.scopeHandle = normalizedScope === 'global' ? undefined : normalizedScopeHandle;
+    configItem.scopeHandle =
+      normalizedScope === 'global' ? undefined : normalizedScopeHandle;
     configItem.isActive = payload.isActive !== false;
     configItem.isDefault = payload.isDefault === true;
     configItem.version = 1;
@@ -139,7 +146,7 @@ export class FormConfigService {
     configItem.person =
       personHandle != null && Number.isFinite(personHandle)
         ? ((await this.em.findOne(PersonItem, { handle: personHandle })) ??
-            undefined)
+          undefined)
         : undefined;
 
     this.em.persist(configItem);
@@ -218,7 +225,9 @@ export class FormConfigService {
     );
 
     return items
-      .filter((item) => this.isConfigApplicable(item, roleHandles, personHandle))
+      .filter((item) =>
+        this.isConfigApplicable(item, roleHandles, personHandle),
+      )
       .sort((left, right) => {
         const leftOrder = CONFIG_SCOPE_ORDER[left.scope] ?? 0;
         const rightOrder = CONFIG_SCOPE_ORDER[right.scope] ?? 0;
@@ -362,7 +371,9 @@ export class FormConfigService {
     };
   }
 
-  private normalizeFields(value: unknown): Record<string, SaplingFormFieldConfig> {
+  private normalizeFields(
+    value: unknown,
+  ): Record<string, SaplingFormFieldConfig> {
     if (!value || typeof value !== 'object' || Array.isArray(value)) {
       return {};
     }
@@ -410,12 +421,19 @@ export class FormConfigService {
       fieldConfig.validation = record.validation;
     }
     if (this.isPlainRecord(record.condition) || record.condition === null) {
-      fieldConfig.condition = record.condition as Record<string, unknown> | null;
+      fieldConfig.condition = record.condition as Record<
+        string,
+        unknown
+      > | null;
     }
-    if (this.isPlainRecord(record.referenceFilter) || record.referenceFilter === null) {
-      fieldConfig.referenceFilter = record.referenceFilter as
-        | Record<string, unknown>
-        | null;
+    if (
+      this.isPlainRecord(record.referenceFilter) ||
+      record.referenceFilter === null
+    ) {
+      fieldConfig.referenceFilter = record.referenceFilter as Record<
+        string,
+        unknown
+      > | null;
     }
 
     return fieldConfig;
@@ -472,7 +490,10 @@ export class FormConfigService {
 
     target[key] =
       typeof source[key] === 'number' && Number.isFinite(source[key])
-        ? (Math.max(1, Math.min(4, Math.trunc(source[key]))) as SaplingFormFieldWidth)
+        ? (Math.max(
+            1,
+            Math.min(4, Math.trunc(source[key])),
+          ) as SaplingFormFieldWidth)
         : null;
   }
 

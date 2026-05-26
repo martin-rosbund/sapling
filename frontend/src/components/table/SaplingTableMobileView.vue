@@ -45,7 +45,9 @@
         >
           <div class="sapling-stack-md sapling-table-mobile-controls__section">
             <span class="sapling-table-mobile-controls__label">{{ $t('filter.sort') }}</span>
-            <div class="sapling-responsive-grid sapling-responsive-grid--sm sapling-table-mobile-controls__sorts">
+            <div
+              class="sapling-responsive-grid sapling-responsive-grid--sm sapling-table-mobile-controls__sorts"
+            >
               <v-btn
                 v-for="column in sortableMobileHeaders"
                 :key="`sort-${String(column.key ?? '')}`"

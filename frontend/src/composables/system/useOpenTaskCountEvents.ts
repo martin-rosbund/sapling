@@ -1,6 +1,7 @@
 import { onBeforeUnmount, onMounted } from 'vue'
 import { BACKEND_URL } from '@/constants/project.constants'
 import type {
+  EffortEstimateItem,
   EventItem,
   InboxNotificationItem,
   SalesOpportunityItem,
@@ -9,6 +10,7 @@ import type {
 import type { RouteLocationRaw } from 'vue-router'
 import {
   getNotificationInboxRoute,
+  getEffortEstimateInboxRoute,
   getSalesOpportunityInboxRoute,
   getTaskInboxRoute,
   getTicketInboxRoute,
@@ -21,10 +23,16 @@ export interface OpenTaskSnapshot {
   tickets: TicketItem[]
   tasks: EventItem[]
   salesOpportunities: SalesOpportunityItem[]
+  effortEstimates: EffortEstimateItem[]
   notifications: InboxNotificationItem[]
 }
 
-export type OpenTaskStreamItemKind = 'ticket' | 'event' | 'salesOpportunity' | 'notification'
+export type OpenTaskStreamItemKind =
+  | 'ticket'
+  | 'event'
+  | 'salesOpportunity'
+  | 'effortEstimate'
+  | 'notification'
 
 export interface OpenTaskStreamItem {
   id: string
@@ -118,6 +126,18 @@ function createSalesOpportunityStreamItem(opportunity: SalesOpportunityItem): Op
   }
 }
 
+function createEffortEstimateStreamItem(estimate: EffortEstimateItem): OpenTaskStreamItem {
+  return {
+    id: createItemId('effortEstimate', [estimate.handle, estimate.createdAt, estimate.title]),
+    kind: 'effortEstimate',
+    title: toTitle(estimate.title),
+    bodyText: toTitle(estimate.requirementsMarkdown),
+    icon: 'mdi-clipboard-text-clock-outline',
+    timestamp: toTimestamp(estimate.createdAt ?? estimate.expectedCompletionDate),
+    route: getEffortEstimateInboxRoute(estimate),
+  }
+}
+
 function createNotificationStreamItem(notification: InboxNotificationItem): OpenTaskStreamItem {
   return {
     id: createItemId('notification', [
@@ -144,6 +164,7 @@ function collectSnapshotItems(snapshot: OpenTaskSnapshot): OpenTaskStreamItem[] 
     ...snapshot.tickets.map(createTicketStreamItem),
     ...snapshot.tasks.map(createTaskStreamItem),
     ...snapshot.salesOpportunities.map(createSalesOpportunityStreamItem),
+    ...(snapshot.effortEstimates ?? []).map(createEffortEstimateStreamItem),
   ]
 }
 

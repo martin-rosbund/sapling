@@ -13,7 +13,9 @@
     />
 
     <div class="sapling-message-dialog__sender sapling-mail-dialog__sender">
-      <span class="sapling-message-dialog__sender-label sapling-mail-dialog__sender-label">{{ translate('document.from') }}</span>
+      <span class="sapling-message-dialog__sender-label sapling-mail-dialog__sender-label">{{
+        translate('document.from')
+      }}</span>
       <v-select
         v-if="senderOptions.length > 1"
         class="sapling-message-dialog__sender-select sapling-mail-dialog__sender-select"
@@ -96,7 +98,9 @@
     />
 
     <v-card class="sapling-mail-dialog__helper-card glass-panel">
-      <v-card-text class="sapling-message-dialog__helper-card-text sapling-mail-dialog__helper-card-text">
+      <v-card-text
+        class="sapling-message-dialog__helper-card-text sapling-mail-dialog__helper-card-text"
+      >
         <div class="sapling-message-dialog__helper-header sapling-mail-dialog__helper-header">
           <span class="sapling-message-dialog__helper-title sapling-mail-dialog__helper-title">{{
             translate('document.attachments')
@@ -127,7 +131,10 @@
             hide-details="auto"
             @update:model-value="handleAttachmentUpdate"
           />
-          <div v-if="attachmentSelectionSummary" class="sapling-message-dialog__attachment-summary sapling-mail-dialog__attachment-summary">
+          <div
+            v-if="attachmentSelectionSummary"
+            class="sapling-message-dialog__attachment-summary sapling-mail-dialog__attachment-summary"
+          >
             {{ attachmentSelectionSummary }}
           </div>
         </template>

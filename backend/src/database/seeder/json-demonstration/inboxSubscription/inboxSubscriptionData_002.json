@@ -1,0 +1,18 @@
+[
+  {
+    "description": "Benachrichtigt die verantwortliche Person über neue Aufwandsschätzungen.",
+    "recipientField": "assigneePerson",
+    "isActive": true,
+    "entity": "effortEstimate",
+    "type": "afterInsert",
+    "template": 7
+  },
+  {
+    "description": "Benachrichtigt die verantwortliche Person über Änderungen an Aufwandsschätzungen.",
+    "recipientField": "assigneePerson",
+    "isActive": true,
+    "entity": "effortEstimate",
+    "type": "afterUpdate",
+    "template": 8
+  }
+]

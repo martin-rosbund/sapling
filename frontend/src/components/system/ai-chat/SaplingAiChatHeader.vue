@@ -9,7 +9,9 @@
       </div>
     </div>
 
-    <div class="sapling-action-cluster sapling-floating-panel__actions sapling-ai-chat__header-actions">
+    <div
+      class="sapling-action-cluster sapling-floating-panel__actions sapling-ai-chat__header-actions"
+    >
       <v-btn
         v-if="isCompactHeaderActions"
         icon="mdi-refresh"

@@ -1202,10 +1202,15 @@ export function useSaplingEvent() {
         await createEventParticipants(savedEvent.handle, participantHandles)
         replaceLocalEvent(editEvent.value, eventPayload, savedEvent)
       } else {
-        savedEvent = await ApiGenericService.update<EventItem>('event', editingHandle, eventPayload, {
-          concurrency: buildConcurrencyOptions(toEditableEventItem(editEvent.value)),
-          suppressConflictMessage: true,
-        })
+        savedEvent = await ApiGenericService.update<EventItem>(
+          'event',
+          editingHandle,
+          eventPayload,
+          {
+            concurrency: buildConcurrencyOptions(toEditableEventItem(editEvent.value)),
+            suppressConflictMessage: true,
+          },
+        )
         replaceLocalEvent(editEvent.value, updatedEvent, savedEvent)
       }
 
@@ -1505,7 +1510,10 @@ export function useSaplingEvent() {
       return
     }
 
-    window.open(`/file/document?filter={"reference":"${String(itemHandle)}","entity":"event"}`, '_blank')
+    window.open(
+      `/file/document?filter={"reference":"${String(itemHandle)}","entity":"event"}`,
+      '_blank',
+    )
   }
 
   function openInformationDialogFromContextMenu() {
@@ -1671,22 +1679,22 @@ export function useSaplingEvent() {
     return Number.isNaN(parsedDate.getTime()) ? rawValue : parsedDate.toISOString()
   }
 
-  function buildConcurrencyPayload(source: SaplingGenericItem | null): Record<string, unknown> | null {
+  function buildConcurrencyPayload(
+    source: SaplingGenericItem | null,
+  ): Record<string, unknown> | null {
     if (!source) {
       return null
     }
 
     const payload: Record<string, unknown> = {}
 
-    templates.value
-      .filter(isConcurrencyComparableTemplate)
-      .forEach((template) => {
-        if (!template.name || !Object.prototype.hasOwnProperty.call(source, template.name)) {
-          return
-        }
+    templates.value.filter(isConcurrencyComparableTemplate).forEach((template) => {
+      if (!template.name || !Object.prototype.hasOwnProperty.call(source, template.name)) {
+        return
+      }
 
-        payload[template.name] = normalizeConcurrencyPayloadValue(source[template.name], template)
-      })
+      payload[template.name] = normalizeConcurrencyPayloadValue(source[template.name], template)
+    })
 
     return payload
   }

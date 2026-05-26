@@ -94,7 +94,8 @@ export class FormConfigController {
   @Get(':entityHandle/:handle/export')
   @ApiOperation({
     summary: 'Export a form configuration',
-    description: 'Returns the normalized JSON payload for one saved form configuration.',
+    description:
+      'Returns the normalized JSON payload for one saved form configuration.',
   })
   @ApiParam({ name: 'entityHandle', type: String })
   @ApiParam({ name: 'handle', type: Number })

@@ -26,6 +26,7 @@ import { SupportTeamItem } from './SupportTeamItem';
 import { TicketCategoryItem } from './TicketCategoryItem';
 import { TicketSourceItem } from './TicketSourceItem';
 import { TicketTypeItem } from './TicketTypeItem';
+import { EffortEstimateItem } from './EffortEstimateItem';
 
 /**
  * @class
@@ -528,6 +529,15 @@ export class TicketItem {
   @ApiPropertyOptional({ type: () => EventItem, isArray: true })
   @OneToMany(() => EventItem, (x) => x.ticket)
   events: Collection<EventItem> = new Collection<EventItem>(this);
+
+  /**
+   * Effort estimates related to this ticket.
+   * @type {Collection<EffortEstimateItem>}
+   */
+  @ApiPropertyOptional({ type: () => EffortEstimateItem, isArray: true })
+  @OneToMany(() => EffortEstimateItem, (x) => x.ticket)
+  effortEstimates: Collection<EffortEstimateItem> =
+    new Collection<EffortEstimateItem>(this);
 
   /**
    * Date and time when the ticket was created.

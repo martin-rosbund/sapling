@@ -27,6 +27,7 @@ import { GenericSanitizerService } from './generic-sanitizer.service';
 import { ChangeLogActionItem } from '../../entity/ChangeLogActionItem';
 import { EventItem } from '../../entity/EventItem';
 import { OpenTaskEventsService } from '../current/open-task-events.service';
+import { EffortEstimateItem } from '../../entity/EffortEstimateItem';
 import { SalesOpportunityItem } from '../../entity/SalesOpportunityItem';
 import { TicketItem } from '../../entity/TicketItem';
 import {
@@ -86,6 +87,7 @@ const OPEN_TASK_ENTITY_HANDLES = new Set([
   'ticket',
   'event',
   'salesOpportunity',
+  'effortEstimate',
 ]);
 
 /**
@@ -1161,6 +1163,8 @@ export class GenericService {
         return this.loadEventOpenTaskUserHandles(handle);
       case 'salesOpportunity':
         return this.loadSalesOpportunityOpenTaskUserHandles(handle);
+      case 'effortEstimate':
+        return this.loadEffortEstimateOpenTaskUserHandles(handle);
       default:
         return new Set<number>();
     }
@@ -1274,6 +1278,46 @@ export class GenericService {
     return new Set<number>([assigneeHandle]);
   }
 
+  private async loadEffortEstimateOpenTaskUserHandles(
+    handle: string | number,
+  ): Promise<Set<number>> {
+    const normalizedHandle = this.normalizeNumericOpenTaskHandle(
+      'effortEstimate',
+      handle,
+    );
+    if (normalizedHandle == null) {
+      return new Set<number>();
+    }
+
+    const effortEstimate = await this.em.findOne(
+      EffortEstimateItem,
+      { handle: normalizedHandle },
+      {
+        populate: ['assigneePerson', 'status'],
+      },
+    );
+
+    if (!effortEstimate || effortEstimate.isActive !== true) {
+      return new Set<number>();
+    }
+
+    const statusHandle = this.extractOpenTaskReferenceHandle(
+      effortEstimate.status,
+    );
+    if (statusHandle === 'completed' || statusHandle === 'cancelled') {
+      return new Set<number>();
+    }
+
+    const assigneeHandle = this.extractOpenTaskReferenceHandle(
+      effortEstimate.assigneePerson,
+    );
+    if (typeof assigneeHandle !== 'number') {
+      return new Set<number>();
+    }
+
+    return new Set<number>([assigneeHandle]);
+  }
+
   private mergeUserHandles(
     ...userHandleCollections: Iterable<number>[]
   ): Set<number> {
@@ -1325,7 +1369,7 @@ export class GenericService {
   }
 
   private normalizeNumericOpenTaskHandle(
-    entityHandle: 'ticket' | 'event' | 'salesOpportunity',
+    entityHandle: 'ticket' | 'event' | 'salesOpportunity' | 'effortEstimate',
     handle: string | number,
   ): number | null {
     const normalizedHandle = this.genericReferenceService.normalizeHandleValue(
@@ -1493,9 +1537,7 @@ export class GenericService {
         expectedUpdatedAt: this.normalizeConcurrencyTimestamp(
           metadata.expectedUpdatedAt,
         ),
-        basePayload: this.normalizeConcurrencyBasePayload(
-          metadata.basePayload,
-        ),
+        basePayload: this.normalizeConcurrencyBasePayload(metadata.basePayload),
         resolution,
       },
     };
@@ -1976,10 +2018,7 @@ export class GenericService {
     return JSON.stringify(left) === JSON.stringify(right);
   }
 
-  private areUpdateConflictValuesEqual(
-    left: unknown,
-    right: unknown,
-  ): boolean {
+  private areUpdateConflictValuesEqual(left: unknown, right: unknown): boolean {
     return (
       JSON.stringify(this.normalizeUpdateConflictValue(left)) ===
       JSON.stringify(this.normalizeUpdateConflictValue(right))

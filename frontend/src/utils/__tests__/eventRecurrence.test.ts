@@ -107,12 +107,14 @@ describe('eventRecurrence', () => {
       isAllDay: false,
     })
 
-    expect(endDate && [
-      endDate.getFullYear(),
-      endDate.getMonth() + 1,
-      endDate.getDate(),
-      endDate.getHours(),
-      endDate.getMinutes(),
-    ]).toEqual([2026, 5, 18, 9, 30])
+    expect(
+      endDate && [
+        endDate.getFullYear(),
+        endDate.getMonth() + 1,
+        endDate.getDate(),
+        endDate.getHours(),
+        endDate.getMinutes(),
+      ],
+    ).toEqual([2026, 5, 18, 9, 30])
   })
 })

@@ -1,9 +1,15 @@
 <template>
-  <aside class="sapling-stack-xl sapling-page-panel sapling-admin-context sapling-permission-context">
-    <section class="sapling-section-panel sapling-page-panel sapling-admin-members sapling-permission-members glass-panel">
+  <aside
+    class="sapling-stack-xl sapling-page-panel sapling-admin-context sapling-permission-context"
+  >
+    <section
+      class="sapling-section-panel sapling-page-panel sapling-admin-members sapling-permission-members glass-panel"
+    >
       <div class="sapling-stack-md sapling-admin-panel-header sapling-permission-panel-header">
         <div>
-          <p class="sapling-eyebrow sapling-admin-section-eyebrow sapling-permission-section-eyebrow">
+          <p
+            class="sapling-eyebrow sapling-admin-section-eyebrow sapling-permission-section-eyebrow"
+          >
             {{ $t('role.persons') }}
           </p>
           <h2 class="sapling-section-title">{{ $t('role.membersTitle') }}</h2>
@@ -33,7 +39,9 @@
             <strong>{{ person.firstName }} {{ person.lastName }}</strong>
             <p>{{ person.email || person.loginName || $t('role.noContactData') }}</p>
           </div>
-          <div class="sapling-row-xs sapling-admin-member-card__actions sapling-permission-member-card__actions">
+          <div
+            class="sapling-row-xs sapling-admin-member-card__actions sapling-permission-member-card__actions"
+          >
             <v-tooltip location="bottom">
               <template #activator="{ props: tooltipProps }">
                 <v-btn

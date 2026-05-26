@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Aufwandsschätzung Anlage Inbox",
+    "description": "Inbox-Benachrichtigung für neu angelegte Aufwandsschätzungen.",
+    "titleTemplate": "Aufwandsschätzung {{title}} wurde angelegt",
+    "bodyMarkdown": "Die Aufwandsschätzung **{{title}}** wurde neu angelegt.\n\n- Status: {{status.description}}\n- Erwarteter Abschluss: {{expectedCompletionDate | date}}\n- Verantwortlich: {{assigneePerson.firstName}} {{assigneePerson.lastName}}\n- Kunde: {{creatorCompany.name}} / {{creatorPerson.firstName}} {{creatorPerson.lastName}}\n- Ticket: {{ticket.title}}\n- Verkaufschance: {{salesOpportunity.title}}\n\nBitte prüfe Anforderungen und Positionen direkt in Sapling.",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "effortEstimate"
+  },
+  {
+    "name": "Aufwandsschätzung Update Inbox",
+    "description": "Inbox-Benachrichtigung für geänderte Aufwandsschätzungen.",
+    "titleTemplate": "Aufwandsschätzung {{title}} wurde aktualisiert",
+    "bodyMarkdown": "Zur Aufwandsschätzung **{{title}}** gibt es ein Update.\n\n- Status: {{status.description}}\n- Erwarteter Abschluss: {{expectedCompletionDate | date}}\n- Verantwortlich: {{assigneePerson.firstName}} {{assigneePerson.lastName}}\n- Kunde: {{creatorCompany.name}} / {{creatorPerson.firstName}} {{creatorPerson.lastName}}\n- Gesamtschätzung: {{totalEstimatedHours}} h\n\nBitte prüfe die Änderungen direkt in Sapling.",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "effortEstimate"
+  }
+]

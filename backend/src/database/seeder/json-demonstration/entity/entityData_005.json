@@ -1,0 +1,40 @@
+[
+  {
+    "handle": "effortEstimate",
+    "canShow": true,
+    "icon": "mdi-clipboard-text-clock-outline",
+    "group": "effortEstimate",
+    "order": 40,
+    "canInsert": true,
+    "canUpdate": true,
+    "canDelete": true
+  },
+  {
+    "handle": "effortEstimateStatus",
+    "canShow": true,
+    "icon": "mdi-progress-check",
+    "group": "effortEstimate",
+    "order": 42,
+    "canUpdate": true
+  },
+  {
+    "handle": "effortEstimatePosition",
+    "canShow": true,
+    "icon": "mdi-format-list-numbered",
+    "group": "effortEstimate",
+    "order": 45,
+    "canInsert": true,
+    "canUpdate": true,
+    "canDelete": true
+  },
+  {
+    "handle": "effortEstimatePositionTemplate",
+    "canShow": true,
+    "icon": "mdi-file-document-edit-outline",
+    "group": "effortEstimate",
+    "order": 50,
+    "canInsert": true,
+    "canUpdate": true,
+    "canDelete": true
+  }
+]

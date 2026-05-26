@@ -60,7 +60,8 @@ export class GenericSeeder extends Seeder {
     }
     const scriptFiles = fs
       .readdirSync(scriptsDir)
-      .filter((f) => f.endsWith('.json'));
+      .filter((f) => f.endsWith('.json'))
+      .sort((left, right) => left.localeCompare(right));
 
     for (const scriptFile of scriptFiles) {
       const scriptName = scriptFile;

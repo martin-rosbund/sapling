@@ -215,7 +215,9 @@
       @update:model-value="(val: string) => updateField(template.name, val)"
     />
     <SaplingShortTextField
-      v-else-if="isRenderer('shortText') || ((template.length ?? 0) <= 128 && !isRenderer('longText'))"
+      v-else-if="
+        isRenderer('shortText') || ((template.length ?? 0) <= 128 && !isRenderer('longText'))
+      "
       :label="requiredLabel"
       :model-value="stringValue(template.name)"
       :maxlength="template.length"

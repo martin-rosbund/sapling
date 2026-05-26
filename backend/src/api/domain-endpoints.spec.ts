@@ -333,11 +333,12 @@ describe('CurrentController', () => {
 
   it('streams open-task snapshots for the current user', async () => {
     const snapshot = {
-      count: 4,
+      count: 5,
       tickets: [{ handle: 1 }],
       tasks: [{ handle: 2 }],
       salesOpportunities: [{ handle: 3 }],
-      notifications: [{ handle: 4 }],
+      effortEstimates: [{ handle: 4 }],
+      notifications: [{ handle: 5 }],
     };
     const currentService = {
       getOpenTaskSnapshot: jest.fn(async () => snapshot),

@@ -909,6 +909,44 @@ function isGroupDirty(templates: EntityTemplate[]): boolean {
 
 function updateFormField(key: string, value: unknown): void {
   form.value[key] = value
+  applyReferenceTemplate(key, value)
+}
+
+function applyReferenceTemplate(key: string, value: unknown): void {
+  if (!value || typeof value !== 'object') {
+    return
+  }
+
+  const template = visibleTemplates.value.find((entry) => entry.name === key)
+  const mappings = template?.referenceTemplate?.mappings ?? []
+  if (mappings.length === 0) {
+    return
+  }
+
+  const source = value as Record<string, unknown>
+  mappings.forEach((mapping) => {
+    if (!mapping.sourceField || !mapping.targetField) {
+      return
+    }
+
+    const nextValue = source[mapping.sourceField]
+    if (nextValue === undefined || nextValue === null) {
+      return
+    }
+
+    const currentValue = form.value[mapping.targetField]
+    const hasCurrentValue =
+      currentValue !== undefined &&
+      currentValue !== null &&
+      currentValue !== '' &&
+      (!Array.isArray(currentValue) || currentValue.length > 0)
+
+    if (mapping.overwrite === false && hasCurrentValue) {
+      return
+    }
+
+    form.value[mapping.targetField] = nextValue
+  })
 }
 
 function updateSelectedRelationItems(templateName: string, items: SaplingGenericItem[]): void {

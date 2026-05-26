@@ -25,9 +25,13 @@
         </template>
 
         <template #body>
-          <div class="sapling-stack-xl sapling-dialog-fill-content sapling-attention-content sapling-inbox-dialog__content">
+          <div
+            class="sapling-stack-xl sapling-dialog-fill-content sapling-attention-content sapling-inbox-dialog__content"
+          >
             <template v-if="isLoading">
-              <section class="sapling-responsive-grid sapling-attention-summary-grid sapling-inbox-summary-grid">
+              <section
+                class="sapling-responsive-grid sapling-attention-summary-grid sapling-inbox-summary-grid"
+              >
                 <v-skeleton-loader
                   v-for="item in 5"
                   :key="item"
@@ -37,7 +41,9 @@
                 />
               </section>
 
-              <section class="sapling-card-board sapling-card-board--collapse-lg sapling-inbox-board">
+              <section
+                class="sapling-card-board sapling-card-board--collapse-lg sapling-inbox-board"
+              >
                 <v-skeleton-loader
                   v-for="item in 5"
                   :key="item"
@@ -49,7 +55,9 @@
             </template>
 
             <template v-else>
-              <section class="sapling-responsive-grid sapling-attention-summary-grid sapling-inbox-summary-grid">
+              <section
+                class="sapling-responsive-grid sapling-attention-summary-grid sapling-inbox-summary-grid"
+              >
                 <SaplingInboxSummaryCard
                   v-for="card in summaryCards"
                   :key="card.key"
@@ -57,7 +65,9 @@
                 />
               </section>
 
-              <section class="sapling-attention-view-switch sapling-inbox-view-switch sapling-panel-shell-muted">
+              <section
+                class="sapling-attention-view-switch sapling-inbox-view-switch sapling-panel-shell-muted"
+              >
                 <v-btn-toggle
                   v-model="activeView"
                   class="sapling-toolbar-group sapling-attention-view-switch__toggle sapling-inbox-view-switch__toggle"
@@ -65,8 +75,13 @@
                   divided
                   mandatory
                 >
-                  <v-btn value="overview" class="sapling-attention-view-switch__button sapling-inbox-view-switch__button glass-panel">
-                    <span class="sapling-attention-view-switch__label sapling-inbox-view-switch__button-label">
+                  <v-btn
+                    value="overview"
+                    class="sapling-attention-view-switch__button sapling-inbox-view-switch__button glass-panel"
+                  >
+                    <span
+                      class="sapling-attention-view-switch__label sapling-inbox-view-switch__button-label"
+                    >
                       <v-icon icon="mdi-view-dashboard-outline" size="18" />
                       <span>{{ $t('navigation.inbox') }}</span>
                     </span>
@@ -80,7 +95,9 @@
                     value="notifications"
                     class="sapling-attention-view-switch__button sapling-inbox-view-switch__button glass-panel"
                   >
-                    <span class="sapling-attention-view-switch__label sapling-inbox-view-switch__button-label">
+                    <span
+                      class="sapling-attention-view-switch__label sapling-inbox-view-switch__button-label"
+                    >
                       <v-icon icon="mdi-bell-outline" size="18" />
                       <span>{{ $t('navigation.inboxNotification') }}</span>
                     </span>
@@ -115,7 +132,10 @@
                   <p class="sapling-empty-state-panel__text">{{ $t('inbox.allCaughtUp') }}</p>
                 </section>
 
-                <section v-else class="sapling-card-board sapling-card-board--collapse-lg sapling-inbox-board">
+                <section
+                  v-else
+                  class="sapling-card-board sapling-card-board--collapse-lg sapling-inbox-board"
+                >
                   <SaplingInboxSection
                     v-for="section in sections"
                     :key="section.key"
@@ -144,8 +164,12 @@
 
                 <section v-else class="sapling-section-panel glass-panel">
                   <div class="sapling-section-header">
-                    <div class="sapling-row-md sapling-attention-panel__title-row sapling-inbox-notification-panel__title-row">
-                      <div class="sapling-icon-tile sapling-icon-tile--sm sapling-icon-tile--info-soft">
+                    <div
+                      class="sapling-row-md sapling-attention-panel__title-row sapling-inbox-notification-panel__title-row"
+                    >
+                      <div
+                        class="sapling-icon-tile sapling-icon-tile--sm sapling-icon-tile--info-soft"
+                      >
                         <v-icon icon="mdi-bell-outline" size="18" />
                       </div>
                       <h3 class="sapling-section-title">

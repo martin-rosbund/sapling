@@ -89,7 +89,9 @@
       <section
         class="sapling-page-workspace sapling-page-workspace--main-context sapling-page-workspace--collapse-lg sapling-event-workspace"
       >
-        <SaplingSurface class="sapling-workspace-panel sapling-page-panel sapling-event-workspace__main">
+        <SaplingSurface
+          class="sapling-workspace-panel sapling-page-panel sapling-event-workspace__main"
+        >
           <SaplingEventToolbar
             v-model:calendar-type="calendarType"
             v-model:calendar-view-mode="calendarViewMode"

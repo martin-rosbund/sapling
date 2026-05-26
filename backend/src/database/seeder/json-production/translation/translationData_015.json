@@ -1,0 +1,411 @@
+[
+  {
+    "entity": "global",
+    "property": "effortEstimate",
+    "de": "Aufwandsschätzung",
+    "en": "Effort estimate"
+  },
+  {
+    "entity": "global",
+    "property": "effortEstimateStatus",
+    "de": "Aufwandsschätzungsstatus",
+    "en": "Effort estimate status"
+  },
+  {
+    "entity": "global",
+    "property": "effortEstimatePosition",
+    "de": "Aufwandsschätzungsposition",
+    "en": "Effort estimate position"
+  },
+  {
+    "entity": "global",
+    "property": "effortEstimatePositionTemplate",
+    "de": "Aufwandsschätzungspositionsvorlage",
+    "en": "Effort estimate position template"
+  },
+
+  {
+    "entity": "navigation",
+    "property": "effortEstimate",
+    "de": "Aufwandsschätzungen",
+    "en": "Effort estimates"
+  },
+  {
+    "entity": "navigation",
+    "property": "effortEstimateStatus",
+    "de": "Status Aufwandsschätzungen",
+    "en": "Effort estimate statuses"
+  },
+  {
+    "entity": "navigation",
+    "property": "effortEstimatePosition",
+    "de": "Aufwandsschätzungspositionen",
+    "en": "Effort estimate positions"
+  },
+  {
+    "entity": "navigation",
+    "property": "effortEstimatePositionTemplate",
+    "de": "Positionsvorlagen",
+    "en": "Position templates"
+  },
+
+  {
+    "entity": "navigationGroup",
+    "property": "effortEstimate",
+    "de": "Aufwandsschätzungen",
+    "en": "Effort estimates"
+  },
+
+  {
+    "entity": "effortEstimate",
+    "property": "handle",
+    "de": "Nr.",
+    "en": "No."
+  },
+  {
+    "entity": "effortEstimate",
+    "property": "title",
+    "de": "Titel",
+    "en": "Title"
+  },
+  {
+    "entity": "effortEstimate",
+    "property": "status",
+    "de": "Status",
+    "en": "Status"
+  },
+  {
+    "entity": "effortEstimate",
+    "property": "expectedCompletionDate",
+    "de": "Erwartetes Abschlussdatum",
+    "en": "Expected completion date"
+  },
+  {
+    "entity": "effortEstimate",
+    "property": "requirementsMarkdown",
+    "de": "Anforderungen",
+    "en": "Requirements"
+  },
+  {
+    "entity": "effortEstimate",
+    "property": "isActive",
+    "de": "Aktiv",
+    "en": "Active"
+  },
+  {
+    "entity": "effortEstimate",
+    "property": "totalEstimatedHours",
+    "de": "Gesamtschätzung (h)",
+    "en": "Total estimate (h)"
+  },
+  {
+    "entity": "effortEstimate",
+    "property": "assigneeCompany",
+    "de": "Verantwortlich (Firma)",
+    "en": "Responsible (Company)"
+  },
+  {
+    "entity": "effortEstimate",
+    "property": "assigneePerson",
+    "de": "Verantwortlich (Person)",
+    "en": "Responsible (Person)"
+  },
+  {
+    "entity": "effortEstimate",
+    "property": "creatorCompany",
+    "de": "Kunde (Firma)",
+    "en": "Customer (Company)"
+  },
+  {
+    "entity": "effortEstimate",
+    "property": "creatorPerson",
+    "de": "Kunde (Person)",
+    "en": "Customer (Person)"
+  },
+  {
+    "entity": "effortEstimate",
+    "property": "salesOpportunity",
+    "de": "Verkaufschance",
+    "en": "Sales opportunity"
+  },
+  {
+    "entity": "effortEstimate",
+    "property": "ticket",
+    "de": "Ticket",
+    "en": "Ticket"
+  },
+  {
+    "entity": "effortEstimate",
+    "property": "positions",
+    "de": "Positionen",
+    "en": "Positions"
+  },
+  {
+    "entity": "effortEstimate",
+    "property": "createdAt",
+    "de": "Erstellt am",
+    "en": "Created at"
+  },
+  {
+    "entity": "effortEstimate",
+    "property": "updatedAt",
+    "de": "Aktualisiert am",
+    "en": "Updated at"
+  },
+  {
+    "entity": "effortEstimate",
+    "property": "groupBasics",
+    "de": "Basis",
+    "en": "Basics"
+  },
+  {
+    "entity": "effortEstimate",
+    "property": "groupContent",
+    "de": "Inhalt",
+    "en": "Content"
+  },
+  {
+    "entity": "effortEstimate",
+    "property": "groupSchedule",
+    "de": "Zeitplanung",
+    "en": "Schedule"
+  },
+  {
+    "entity": "effortEstimate",
+    "property": "groupReference",
+    "de": "Referenzen",
+    "en": "References"
+  },
+  {
+    "entity": "effortEstimate",
+    "property": "groupConfiguration",
+    "de": "Konfiguration",
+    "en": "Configuration"
+  },
+
+  {
+    "entity": "effortEstimateStatus",
+    "property": "handle",
+    "de": "Schlüssel",
+    "en": "Key"
+  },
+  {
+    "entity": "effortEstimateStatus",
+    "property": "description",
+    "de": "Beschreibung",
+    "en": "Description"
+  },
+  {
+    "entity": "effortEstimateStatus",
+    "property": "color",
+    "de": "Farbe",
+    "en": "Color"
+  },
+  {
+    "entity": "effortEstimateStatus",
+    "property": "icon",
+    "de": "Icon",
+    "en": "Icon"
+  },
+  {
+    "entity": "effortEstimateStatus",
+    "property": "effortEstimates",
+    "de": "Aufwandsschätzungen",
+    "en": "Effort estimates"
+  },
+  {
+    "entity": "effortEstimateStatus",
+    "property": "createdAt",
+    "de": "Erstellt am",
+    "en": "Created at"
+  },
+  {
+    "entity": "effortEstimateStatus",
+    "property": "updatedAt",
+    "de": "Aktualisiert am",
+    "en": "Updated at"
+  },
+  {
+    "entity": "effortEstimateStatus",
+    "property": "groupContent",
+    "de": "Inhalt",
+    "en": "Content"
+  },
+  {
+    "entity": "effortEstimateStatus",
+    "property": "groupAppearance",
+    "de": "Darstellung",
+    "en": "Appearance"
+  },
+
+  {
+    "entity": "effortEstimatePosition",
+    "property": "handle",
+    "de": "Nr.",
+    "en": "No."
+  },
+  {
+    "entity": "effortEstimatePosition",
+    "property": "title",
+    "de": "Titel",
+    "en": "Title"
+  },
+  {
+    "entity": "effortEstimatePosition",
+    "property": "estimatedHours",
+    "de": "Geschätzte Stunden",
+    "en": "Estimated hours"
+  },
+  {
+    "entity": "effortEstimatePosition",
+    "property": "offerTextMarkdown",
+    "de": "Angebotstext",
+    "en": "Offer text"
+  },
+  {
+    "entity": "effortEstimatePosition",
+    "property": "sortOrder",
+    "de": "Sortierung",
+    "en": "Sort order"
+  },
+  {
+    "entity": "effortEstimatePosition",
+    "property": "isOptional",
+    "de": "Optional",
+    "en": "Optional"
+  },
+  {
+    "entity": "effortEstimatePosition",
+    "property": "estimate",
+    "de": "Aufwandsschätzung",
+    "en": "Effort estimate"
+  },
+  {
+    "entity": "effortEstimatePosition",
+    "property": "template",
+    "de": "Vorlage",
+    "en": "Template"
+  },
+  {
+    "entity": "effortEstimatePosition",
+    "property": "createdAt",
+    "de": "Erstellt am",
+    "en": "Created at"
+  },
+  {
+    "entity": "effortEstimatePosition",
+    "property": "updatedAt",
+    "de": "Aktualisiert am",
+    "en": "Updated at"
+  },
+  {
+    "entity": "effortEstimatePosition",
+    "property": "groupBasics",
+    "de": "Basis",
+    "en": "Basics"
+  },
+  {
+    "entity": "effortEstimatePosition",
+    "property": "groupContent",
+    "de": "Inhalt",
+    "en": "Content"
+  },
+  {
+    "entity": "effortEstimatePosition",
+    "property": "groupReference",
+    "de": "Referenzen",
+    "en": "References"
+  },
+  {
+    "entity": "effortEstimatePosition",
+    "property": "groupConfiguration",
+    "de": "Konfiguration",
+    "en": "Configuration"
+  },
+
+  {
+    "entity": "effortEstimatePositionTemplate",
+    "property": "handle",
+    "de": "Nr.",
+    "en": "No."
+  },
+  {
+    "entity": "effortEstimatePositionTemplate",
+    "property": "title",
+    "de": "Titel",
+    "en": "Title"
+  },
+  {
+    "entity": "effortEstimatePositionTemplate",
+    "property": "description",
+    "de": "Beschreibung",
+    "en": "Description"
+  },
+  {
+    "entity": "effortEstimatePositionTemplate",
+    "property": "estimatedHours",
+    "de": "Vorgeschlagene Stunden",
+    "en": "Suggested hours"
+  },
+  {
+    "entity": "effortEstimatePositionTemplate",
+    "property": "offerTextMarkdown",
+    "de": "Angebotstext",
+    "en": "Offer text"
+  },
+  {
+    "entity": "effortEstimatePositionTemplate",
+    "property": "isActive",
+    "de": "Aktiv",
+    "en": "Active"
+  },
+  {
+    "entity": "effortEstimatePositionTemplate",
+    "property": "positions",
+    "de": "Positionen",
+    "en": "Positions"
+  },
+  {
+    "entity": "effortEstimatePositionTemplate",
+    "property": "createdAt",
+    "de": "Erstellt am",
+    "en": "Created at"
+  },
+  {
+    "entity": "effortEstimatePositionTemplate",
+    "property": "updatedAt",
+    "de": "Aktualisiert am",
+    "en": "Updated at"
+  },
+  {
+    "entity": "effortEstimatePositionTemplate",
+    "property": "groupBasics",
+    "de": "Basis",
+    "en": "Basics"
+  },
+  {
+    "entity": "effortEstimatePositionTemplate",
+    "property": "groupContent",
+    "de": "Inhalt",
+    "en": "Content"
+  },
+  {
+    "entity": "effortEstimatePositionTemplate",
+    "property": "groupConfiguration",
+    "de": "Konfiguration",
+    "en": "Configuration"
+  },
+
+  {
+    "entity": "salesOpportunity",
+    "property": "effortEstimates",
+    "de": "Aufwandsschätzungen",
+    "en": "Effort estimates"
+  },
+  {
+    "entity": "ticket",
+    "property": "effortEstimates",
+    "de": "Aufwandsschätzungen",
+    "en": "Effort estimates"
+  }
+]

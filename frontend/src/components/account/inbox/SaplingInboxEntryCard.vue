@@ -9,7 +9,9 @@
     @keyup.enter="emit('open', entry)"
     @keyup.space.prevent="emit('open', entry)"
   >
-    <div class="sapling-row-between-md sapling-attention-card__meta-row sapling-inbox-entry__meta-row">
+    <div
+      class="sapling-row-between-md sapling-attention-card__meta-row sapling-inbox-entry__meta-row"
+    >
       <div class="sapling-row-xs sapling-attention-card__kind sapling-inbox-entry__kind">
         <span class="sapling-attention-card__indicator sapling-inbox-entry__kind-indicator"></span>
         <v-icon :icon="entry.icon" size="16" />
@@ -48,7 +50,9 @@
         </v-chip>
       </div>
 
-      <div class="sapling-action-cluster sapling-attention-card__actions sapling-inbox-entry__actions">
+      <div
+        class="sapling-action-cluster sapling-attention-card__actions sapling-inbox-entry__actions"
+      >
         <v-btn
           v-if="entry.dismissible"
           icon="mdi-close"

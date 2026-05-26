@@ -50,7 +50,9 @@
                 variant="tonal"
                 :prepend-icon="field.conflict ? 'mdi-alert-circle-outline' : 'mdi-merge'"
               >
-                {{ field.conflict ? $t('updateConflict.conflict') : $t('updateConflict.mergeable') }}
+                {{
+                  field.conflict ? $t('updateConflict.conflict') : $t('updateConflict.mergeable')
+                }}
               </v-chip>
             </div>
 

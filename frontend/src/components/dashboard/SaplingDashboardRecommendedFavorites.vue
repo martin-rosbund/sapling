@@ -1,11 +1,7 @@
 <template>
   <section v-if="showSection" class="sapling-card-strip glass-panel">
     <div v-if="isLoading" class="sapling-card-strip__track">
-      <article
-        v-for="item in 4"
-        :key="item"
-        class="sapling-list-card sapling-list-card--loading"
-      >
+      <article v-for="item in 4" :key="item" class="sapling-list-card sapling-list-card--loading">
         <v-skeleton-loader type="list-item" />
       </article>
     </div>

@@ -1,0 +1,9 @@
+[
+  { "entity": "effortEstimate", "route": "partner/effortEstimate" },
+  { "entity": "effortEstimateStatus", "route": "table/effortEstimateStatus" },
+  { "entity": "effortEstimatePosition", "route": "table/effortEstimatePosition" },
+  {
+    "entity": "effortEstimatePositionTemplate",
+    "route": "table/effortEstimatePositionTemplate"
+  }
+]

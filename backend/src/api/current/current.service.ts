@@ -4,6 +4,7 @@ import { PersonItem } from '../../entity/PersonItem';
 import { TicketItem } from '../../entity/TicketItem';
 import { EventItem } from '../../entity/EventItem';
 import { SalesOpportunityItem } from '../../entity/SalesOpportunityItem';
+import { EffortEstimateItem } from '../../entity/EffortEstimateItem';
 import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
 import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
 import { DashboardItem } from '../../entity/DashboardItem';
@@ -24,6 +25,7 @@ export interface OpenTaskSnapshot {
   tickets: TicketItem[];
   tasks: EventItem[];
   salesOpportunities: SalesOpportunityItem[];
+  effortEstimates: EffortEstimateItem[];
   notifications: InboxNotificationItem[];
 }
 
@@ -243,12 +245,34 @@ export class CurrentService {
     return items || [];
   }
 
+  async getOpenEffortEstimates(
+    user: PersonItem,
+  ): Promise<EffortEstimateItem[]> {
+    const items = await this.em.find(
+      EffortEstimateItem,
+      this.buildOpenEffortEstimateWhere(user),
+      {
+        populate: [
+          'status',
+          'assigneeCompany',
+          'assigneePerson',
+          'creatorCompany',
+          'creatorPerson',
+          'salesOpportunity',
+          'ticket',
+        ],
+      },
+    );
+    return items || [];
+  }
+
   async getOpenTaskSnapshot(user: PersonItem): Promise<OpenTaskSnapshot> {
-    const [tickets, tasks, salesOpportunities, notifications] =
+    const [tickets, tasks, salesOpportunities, effortEstimates, notifications] =
       await Promise.all([
         this.getOpenTickets(user),
         this.getOpenEvents(user),
         this.getOpenSalesOpportunities(user),
+        this.getOpenEffortEstimates(user),
         this.inboxService.getUnreadNotifications(user),
       ]);
 
@@ -257,10 +281,12 @@ export class CurrentService {
         tickets.length +
         tasks.length +
         salesOpportunities.length +
+        effortEstimates.length +
         notifications.length,
       tickets,
       tasks,
       salesOpportunities,
+      effortEstimates,
       notifications,
     };
   }
@@ -290,6 +316,14 @@ export class CurrentService {
     return {
       assigneePerson: { handle: user?.handle },
       isActive: true,
+    };
+  }
+
+  private buildOpenEffortEstimateWhere(user: PersonItem): object {
+    return {
+      assigneePerson: { handle: user?.handle },
+      isActive: true,
+      status: { handle: { $nin: ['completed', 'cancelled'] } },
     };
   }
 

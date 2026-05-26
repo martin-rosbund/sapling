@@ -65,6 +65,10 @@
   --sapling-floating-preview-rgb: var(--v-theme-success);
 }
 
+.sapling-header__inbox-preview--effortEstimate {
+  --sapling-floating-preview-rgb: var(--v-theme-info);
+}
+
 .sapling-header__inbox-preview--notification {
   --sapling-floating-preview-rgb: var(--v-theme-primary);
 }

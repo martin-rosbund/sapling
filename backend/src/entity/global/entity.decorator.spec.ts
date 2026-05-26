@@ -4,9 +4,11 @@ import {
   Sapling,
   SaplingForm,
   SaplingGenericReference,
+  SaplingReferenceTemplate,
   getSaplingFormLayout,
   getSaplingGenericReference,
   getSaplingOptions,
+  getSaplingReferenceTemplate,
 } from './entity.decorator';
 
 describe('entity.decorator', () => {
@@ -26,6 +28,19 @@ describe('entity.decorator', () => {
       handleField: ' reference ',
     })
     genericReference!: string;
+
+    @SaplingReferenceTemplate([
+      {
+        sourceField: ' bodyMarkdown ',
+        targetField: ' description ',
+      },
+      {
+        sourceField: ' estimatedHours ',
+        targetField: ' effort ',
+        overwrite: false,
+      },
+    ])
+    template!: string;
   }
 
   it('stores normalized form layout metadata without affecting sapling options', () => {
@@ -78,6 +93,29 @@ describe('entity.decorator', () => {
 
     expect(
       getSaplingGenericReference(ExampleEntity.prototype, 'missing'),
+    ).toBeNull();
+  });
+
+  it('stores normalized reference template mappings', () => {
+    expect(
+      getSaplingReferenceTemplate(ExampleEntity.prototype, 'template'),
+    ).toEqual({
+      mappings: [
+        {
+          sourceField: 'bodyMarkdown',
+          targetField: 'description',
+          overwrite: undefined,
+        },
+        {
+          sourceField: 'estimatedHours',
+          targetField: 'effort',
+          overwrite: false,
+        },
+      ],
+    });
+
+    expect(
+      getSaplingReferenceTemplate(ExampleEntity.prototype, 'missing'),
     ).toBeNull();
   });
 });

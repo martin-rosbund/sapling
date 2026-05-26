@@ -41,7 +41,9 @@
                     {{ props.label }}
                   </div>
 
-                  <div class="sapling-responsive-grid sapling-responsive-grid--sm sapling-field-event-recurrence__option-grid">
+                  <div
+                    class="sapling-responsive-grid sapling-responsive-grid--sm sapling-field-event-recurrence__option-grid"
+                  >
                     <v-btn
                       v-for="item in frequencyOptions"
                       :key="item.value"
@@ -107,7 +109,9 @@
                       {{ t('event.recurrenceEnds') }}
                     </div>
 
-                    <div class="sapling-responsive-grid sapling-responsive-grid--sm sapling-field-event-recurrence__option-grid">
+                    <div
+                      class="sapling-responsive-grid sapling-responsive-grid--sm sapling-field-event-recurrence__option-grid"
+                    >
                       <v-btn
                         v-for="item in endModeOptions"
                         :key="item.value"

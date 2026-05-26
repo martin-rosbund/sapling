@@ -1,6 +1,9 @@
 <template>
   <v-dialog v-if="dialog" v-model="dialogModel" persistent class="sapling-dialog-large">
-    <SaplingDialogCard class="sapling-inbox-dialog sapling-history-dialog sapling-record-change-log-dialog" :tilt="false">
+    <SaplingDialogCard
+      class="sapling-inbox-dialog sapling-history-dialog sapling-record-change-log-dialog"
+      :tilt="false"
+    >
       <SaplingDialogShell
         fill-shell
         body-class="sapling-dialog-fill-body sapling-inbox-dialog__body sapling-history-dialog__body sapling-record-change-log-dialog__body"
@@ -50,7 +53,9 @@
                 :key="entry.handle"
                 class="sapling-section-panel sapling-section-panel--compact sapling-record-change-log__entry glass-panel"
               >
-                <header class="sapling-row-between-md sapling-row-wrap sapling-record-change-log__entry-header">
+                <header
+                  class="sapling-row-between-md sapling-row-wrap sapling-record-change-log__entry-header"
+                >
                   <div class="sapling-chip-row sapling-record-change-log__entry-meta">
                     <v-chip
                       size="small"

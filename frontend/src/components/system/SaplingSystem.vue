@@ -7,12 +7,7 @@
       <div class="sapling-system-skeleton">
         <SaplingSurface :as="VSkeletonLoader" type="article" />
         <div class="sapling-system-skeleton__metrics">
-          <SaplingSurface
-            v-for="item in 4"
-            :key="item"
-            :as="VSkeletonLoader"
-            type="article"
-          />
+          <SaplingSurface v-for="item in 4" :key="item" :as="VSkeletonLoader" type="article" />
         </div>
         <div class="sapling-system-skeleton__sections">
           <SaplingSurface :as="VSkeletonLoader" type="article" />
@@ -69,7 +64,9 @@
                 />
               </div>
               <strong>{{ timeLoading ? t('global.loading') : formattedServerTime }}</strong>
-              <p class="sapling-muted-copy">{{ $t('system.lastRefresh') }}: {{ lastUpdatedDisplay }}</p>
+              <p class="sapling-muted-copy">
+                {{ $t('system.lastRefresh') }}: {{ lastUpdatedDisplay }}
+              </p>
             </article>
           </div>
         </template>

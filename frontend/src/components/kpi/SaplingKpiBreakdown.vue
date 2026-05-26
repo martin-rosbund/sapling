@@ -16,7 +16,10 @@
     </div>
 
     <div v-else class="sapling-stack-md sapling-kpi-breakdown__content">
-      <div v-if="leadItem" class="sapling-row-between-md sapling-highlight-panel sapling-kpi-breakdown__hero">
+      <div
+        v-if="leadItem"
+        class="sapling-row-between-md sapling-highlight-panel sapling-kpi-breakdown__hero"
+      >
         <div class="sapling-stack-md sapling-kpi-breakdown__hero-copy">
           <span class="sapling-eyebrow sapling-kpi-breakdown__eyebrow">
             {{ $t('kpi.leadingSegment') }}
@@ -54,7 +57,9 @@
           :key="item.key"
           type="button"
           class="sapling-soft-panel sapling-kpi-breakdown__item"
-          :class="{ 'sapling-soft-panel--interactive sapling-kpi-breakdown__item--clickable': canOpenEntity }"
+          :class="{
+            'sapling-soft-panel--interactive sapling-kpi-breakdown__item--clickable': canOpenEntity,
+          }"
           @click="canOpenEntity ? openBreakdownItem(item.row) : undefined"
         >
           <div class="sapling-row-between-md sapling-kpi-breakdown__row">

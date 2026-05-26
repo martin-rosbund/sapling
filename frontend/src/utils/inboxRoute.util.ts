@@ -1,4 +1,5 @@
 import type {
+  EffortEstimateItem,
   EventItem,
   InboxNotificationItem,
   SalesOpportunityItem,
@@ -29,6 +30,15 @@ export function getSalesOpportunityInboxRoute(opportunity: SalesOpportunityItem)
     path: '/table/salesOpportunity',
     query: {
       filter: JSON.stringify({ handle: opportunity.handle }),
+    },
+  }
+}
+
+export function getEffortEstimateInboxRoute(estimate: EffortEstimateItem): RouteLocationRaw {
+  return {
+    path: '/table/effortEstimate',
+    query: {
+      filter: JSON.stringify({ handle: estimate.handle }),
     },
   }
 }

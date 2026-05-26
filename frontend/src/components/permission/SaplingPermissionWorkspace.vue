@@ -1,7 +1,13 @@
 <template>
-  <section class="sapling-workspace-panel sapling-page-panel sapling-page-panel-stack sapling-admin-workspace sapling-admin-panel-stack sapling-permission-workspace glass-panel">
+  <section
+    class="sapling-workspace-panel sapling-page-panel sapling-page-panel-stack sapling-admin-workspace sapling-admin-panel-stack sapling-permission-workspace glass-panel"
+  >
     <div class="sapling-stack-md sapling-admin-toolbar sapling-permission-toolbar">
-      <v-tabs v-model="selectedGroupModel" class="sapling-admin-tabs sapling-permission-tabs" show-arrows>
+      <v-tabs
+        v-model="selectedGroupModel"
+        class="sapling-admin-tabs sapling-permission-tabs"
+        show-arrows
+      >
         <v-tab
           v-for="group in permissionGroups"
           :key="group"
@@ -12,7 +18,9 @@
         </v-tab>
       </v-tabs>
 
-      <div class="sapling-split-toolbar sapling-admin-toolbar-actions sapling-permission-toolbar-actions">
+      <div
+        class="sapling-split-toolbar sapling-admin-toolbar-actions sapling-permission-toolbar-actions"
+      >
         <v-text-field
           v-model="permissionSearchModel"
           :label="$t('global.search')"
@@ -42,7 +50,10 @@
       class="sapling-admin-progress sapling-permission-progress"
     />
 
-    <div v-if="entities.length && lgAndUp" class="sapling-admin-matrix-shell sapling-permission-matrix-shell">
+    <div
+      v-if="entities.length && lgAndUp"
+      class="sapling-admin-matrix-shell sapling-permission-matrix-shell"
+    >
       <v-table class="sapling-admin-matrix sapling-permission-matrix" density="comfortable">
         <thead>
           <tr>
@@ -54,7 +65,9 @@
         <tbody>
           <tr v-for="item in entities" :key="item.handle" :class="rowClasses(item)">
             <td>
-              <div class="sapling-row-between-xs sapling-admin-item-cell sapling-permission-entity-cell">
+              <div
+                class="sapling-row-between-xs sapling-admin-item-cell sapling-permission-entity-cell"
+              >
                 <div class="sapling-row-xs sapling-admin-item-main sapling-permission-entity-main">
                   <v-icon v-if="item.icon" size="18">{{ item.icon }}</v-icon>
                   <span>{{ $t(`navigation.${item.handle}`) }}</span>
@@ -109,14 +122,19 @@
       </v-table>
     </div>
 
-    <div v-else-if="entities.length" class="sapling-scroll-list sapling-admin-mobile-list sapling-permission-mobile-list">
+    <div
+      v-else-if="entities.length"
+      class="sapling-scroll-list sapling-admin-mobile-list sapling-permission-mobile-list"
+    >
       <article
         v-for="item in entities"
         :key="`mobile-${item.handle}`"
         class="sapling-section-panel sapling-admin-mobile-card sapling-permission-mobile-card glass-panel"
         :class="rowClasses(item)"
       >
-        <div class="sapling-row-between-xs sapling-admin-mobile-card__header sapling-permission-mobile-card-header">
+        <div
+          class="sapling-row-between-xs sapling-admin-mobile-card__header sapling-permission-mobile-card-header"
+        >
           <div class="sapling-row-xs sapling-admin-item-main sapling-permission-entity-main">
             <v-icon v-if="item.icon" size="18">{{ item.icon }}</v-icon>
             <span>{{ $t(`navigation.${item.handle}`) }}</span>

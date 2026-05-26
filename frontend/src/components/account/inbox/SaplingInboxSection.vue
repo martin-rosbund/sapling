@@ -1,11 +1,16 @@
 <template>
   <article
     class="sapling-attention-section sapling-inbox-section sapling-section-panel glass-panel"
-    :class="[`sapling-attention-section--${section.tone}`, `sapling-inbox-section--${section.tone}`]"
+    :class="[
+      `sapling-attention-section--${section.tone}`,
+      `sapling-inbox-section--${section.tone}`,
+    ]"
   >
     <div class="sapling-section-header">
       <div class="sapling-attention-section__title-wrap sapling-inbox-section__title-wrap">
-        <div class="sapling-row-md sapling-attention-section__title-row sapling-inbox-section__title-row">
+        <div
+          class="sapling-row-md sapling-attention-section__title-row sapling-inbox-section__title-row"
+        >
           <div class="sapling-icon-tile sapling-icon-tile--sm">
             <v-icon :icon="section.icon" size="18" />
           </div>

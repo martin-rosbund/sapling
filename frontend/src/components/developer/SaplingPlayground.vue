@@ -72,9 +72,7 @@
           <v-card-text class="sapling-showcase__section-body sapling-playground__showcase-body">
             <div class="sapling-showcase__section-header sapling-playground__showcase-header">
               <div>
-                <span class="sapling-showcase__eyebrow sapling-playground__eyebrow">
-                  Actions
-                </span>
+                <span class="sapling-showcase__eyebrow sapling-playground__eyebrow"> Actions </span>
                 <h2 class="sapling-showcase__section-title sapling-playground__showcase-title">
                   Action Gallery
                 </h2>
@@ -89,7 +87,9 @@
 
             <v-row>
               <v-col v-for="actionCard in actionShowcases" :key="actionCard.key" cols="12" md="6">
-                <div class="sapling-showcase__demo-frame sapling-playground__demo-frame glass-panel">
+                <div
+                  class="sapling-showcase__demo-frame sapling-playground__demo-frame glass-panel"
+                >
                   <div class="sapling-showcase__demo-copy sapling-playground__demo-copy">
                     <h3 class="sapling-showcase__demo-title sapling-playground__demo-title">
                       {{ actionCard.title }}
@@ -128,9 +128,7 @@
               class="sapling-showcase__section-header sapling-showcase__section-header--stacked sapling-playground__showcase-header sapling-playground__showcase-header--stacked"
             >
               <div>
-                <span class="sapling-showcase__eyebrow sapling-playground__eyebrow">
-                  Dialogs
-                </span>
+                <span class="sapling-showcase__eyebrow sapling-playground__eyebrow"> Dialogs </span>
                 <h2 class="sapling-showcase__section-title sapling-playground__showcase-title">
                   Launchpad
                 </h2>

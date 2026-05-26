@@ -329,8 +329,7 @@ function parseRecurrenceStart(
   const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(startDate.trim())
   if (dateOnlyMatch) {
     const [, year, month, day] = dateOnlyMatch
-    const timeMatch =
-      !isAllDay && startTime ? /^(\d{2}):(\d{2})/.exec(startTime.trim()) : null
+    const timeMatch = !isAllDay && startTime ? /^(\d{2}):(\d{2})/.exec(startTime.trim()) : null
 
     return new Date(
       Number(year),

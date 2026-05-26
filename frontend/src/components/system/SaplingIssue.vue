@@ -9,12 +9,7 @@
         <div
           class="sapling-responsive-grid sapling-work-skeleton__metrics sapling-issue-skeleton__metrics"
         >
-          <SaplingSurface
-            v-for="item in 4"
-            :key="item"
-            :as="VSkeletonLoader"
-            type="article"
-          />
+          <SaplingSurface v-for="item in 4" :key="item" :as="VSkeletonLoader" type="article" />
         </div>
         <div
           class="sapling-two-column-grid sapling-work-skeleton__streams sapling-issue-skeleton__streams"
@@ -102,7 +97,9 @@
             counter="10000"
           />
 
-          <div class="sapling-stack-md sapling-work-compose__type-field sapling-issue-compose__type-field">
+          <div
+            class="sapling-stack-md sapling-work-compose__type-field sapling-issue-compose__type-field"
+          >
             <div class="sapling-label">{{ $t('issue.typeFieldLabel') }}</div>
 
             <v-btn-toggle
@@ -122,7 +119,9 @@
             </v-btn-toggle>
           </div>
 
-          <div class="sapling-toolbar-group sapling-work-compose__actions sapling-issue-compose__actions">
+          <div
+            class="sapling-toolbar-group sapling-work-compose__actions sapling-issue-compose__actions"
+          >
             <v-btn
               type="button"
               variant="text"
@@ -168,9 +167,7 @@
           </div>
           <div class="sapling-metric-card__copy">
             <p>{{ $t('issue.openIssues') }}</p>
-            <strong>{{
-              isLoading ? '...' : openIssues.length
-            }}</strong>
+            <strong>{{ isLoading ? '...' : openIssues.length }}</strong>
           </div>
         </SaplingSurface>
 
@@ -182,9 +179,7 @@
           </div>
           <div class="sapling-metric-card__copy">
             <p>{{ $t('issue.closedIssues') }}</p>
-            <strong>{{
-              isLoading ? '...' : closedIssues.length
-            }}</strong>
+            <strong>{{ isLoading ? '...' : closedIssues.length }}</strong>
           </div>
         </SaplingSurface>
 
@@ -196,9 +191,7 @@
           </div>
           <div class="sapling-metric-card__copy">
             <p>{{ $t('issue.labels') }}</p>
-            <strong>{{
-              isLoading ? '...' : labelCount
-            }}</strong>
+            <strong>{{ isLoading ? '...' : labelCount }}</strong>
           </div>
         </SaplingSurface>
 
@@ -210,9 +203,7 @@
           </div>
           <div class="sapling-metric-card__copy">
             <p>{{ $t('issue.assignedTo') }}</p>
-            <strong>{{
-              isLoading ? '...' : assigneeCount
-            }}</strong>
+            <strong>{{ isLoading ? '...' : assigneeCount }}</strong>
           </div>
         </SaplingSurface>
       </section>

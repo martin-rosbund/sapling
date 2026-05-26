@@ -4,6 +4,7 @@ const SAPLING_OPTIONS_METADATA_KEY = 'sapling:options';
 const SAPLING_REFERENCE_DEPENDENCY_METADATA_KEY = 'sapling:referenceDependency';
 const SAPLING_FORM_LAYOUT_METADATA_KEY = 'sapling:formLayout';
 const SAPLING_GENERIC_REFERENCE_METADATA_KEY = 'sapling:genericReference';
+const SAPLING_REFERENCE_TEMPLATE_METADATA_KEY = 'sapling:referenceTemplate';
 
 /**
  * @file entity.decorator.ts
@@ -106,6 +107,16 @@ export interface SaplingFormOptions {
 export interface SaplingGenericReferenceMetadata {
   entityField: string;
   handleField: string;
+}
+
+export interface SaplingReferenceTemplateMapping {
+  sourceField: string;
+  targetField: string;
+  overwrite?: boolean;
+}
+
+export interface SaplingReferenceTemplateMetadata {
+  mappings: SaplingReferenceTemplateMapping[];
 }
 
 const DEFAULT_SAPLING_FORM_LAYOUT: SaplingFormLayoutMetadata = {
@@ -251,6 +262,36 @@ export function SaplingGenericReference(
   };
 }
 
+export function SaplingReferenceTemplate(
+  metadata:
+    | SaplingReferenceTemplateMapping
+    | SaplingReferenceTemplateMapping[]
+    | SaplingReferenceTemplateMetadata,
+) {
+  return function (target: object, propertyKey: string | symbol) {
+    const mappings = Array.isArray(metadata)
+      ? metadata
+      : 'mappings' in metadata
+        ? metadata.mappings
+        : [metadata];
+
+    Reflect.defineMetadata(
+      SAPLING_REFERENCE_TEMPLATE_METADATA_KEY,
+      {
+        mappings: mappings
+          .map((mapping) => ({
+            sourceField: mapping.sourceField.trim(),
+            targetField: mapping.targetField.trim(),
+            overwrite: mapping.overwrite,
+          }))
+          .filter((mapping) => mapping.sourceField && mapping.targetField),
+      } satisfies SaplingReferenceTemplateMetadata,
+      target,
+      propertyKey,
+    );
+  };
+}
+
 /**
  * Checks if a specific Sapling option is present on a property.
  *
@@ -350,4 +391,35 @@ export function getSaplingGenericReference(
     entityField,
     handleField,
   };
+}
+
+export function getSaplingReferenceTemplate(
+  target: object,
+  propertyKey: string | symbol,
+): SaplingReferenceTemplateMetadata | null {
+  const metadata = Reflect.getMetadata(
+    SAPLING_REFERENCE_TEMPLATE_METADATA_KEY,
+    target,
+    propertyKey,
+  ) as Partial<SaplingReferenceTemplateMetadata> | null;
+
+  if (!metadata || !Array.isArray(metadata.mappings)) {
+    return null;
+  }
+
+  const mappings = metadata.mappings
+    .map((mapping) => ({
+      sourceField:
+        typeof mapping.sourceField === 'string'
+          ? mapping.sourceField.trim()
+          : '',
+      targetField:
+        typeof mapping.targetField === 'string'
+          ? mapping.targetField.trim()
+          : '',
+      overwrite: mapping.overwrite,
+    }))
+    .filter((mapping) => mapping.sourceField && mapping.targetField);
+
+  return mappings.length > 0 ? { mappings } : null;
 }

@@ -11,6 +11,7 @@ import { TicketItem } from './TicketItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { SalesOpportunityStageItem } from './SalesOpportunityStageItem';
 import { EventItem } from './EventItem';
+import { EffortEstimateItem } from './EffortEstimateItem';
 import {
   Sapling,
   SaplingDependsOn,
@@ -204,9 +205,9 @@ export class SalesOpportunityItem {
    */
   @ApiPropertyOptional({ type: () => SalesOpportunitySourceItem })
   @SaplingForm({
-    order: 300,
-    group: 'salesOpportunity.groupReference',
-    groupOrder: 400,
+    order: 750,
+    group: 'salesOpportunity.groupBasics',
+    groupOrder: 100,
     width: 1,
   })
   @ManyToOne(() => SalesOpportunitySourceItem, { nullable: false })
@@ -318,6 +319,17 @@ export class SalesOpportunityItem {
   @ApiPropertyOptional({ type: () => EventItem, isArray: true })
   @OneToMany(() => EventItem, (event) => event.salesOpportunity)
   events: Collection<EventItem> = new Collection<EventItem>(this);
+
+  /**
+   * Effort estimates associated with this sales opportunity.
+   */
+  @ApiPropertyOptional({ type: () => EffortEstimateItem, isArray: true })
+  @OneToMany(
+    () => EffortEstimateItem,
+    (effortEstimate) => effortEstimate.salesOpportunity,
+  )
+  effortEstimates: Collection<EffortEstimateItem> =
+    new Collection<EffortEstimateItem>(this);
   //#endregion
 
   //#region Properties: System

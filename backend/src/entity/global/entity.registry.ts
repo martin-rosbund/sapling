@@ -101,6 +101,10 @@ import { HolidayGroupItem } from '../HolidayGroupItem';
 import { SharedMailboxGroupItem } from '../SharedMailboxGroupItem';
 import { SharedMailboxItem } from '../SharedMailboxItem';
 import { SaplingFormConfigItem } from '../SaplingFormConfigItem';
+import { EffortEstimateItem } from '../EffortEstimateItem';
+import { EffortEstimatePositionItem } from '../EffortEstimatePositionItem';
+import { EffortEstimatePositionTemplateItem } from '../EffortEstimatePositionTemplateItem';
+import { EffortEstimateStatusItem } from '../EffortEstimateStatusItem';
 
 /**
  * @file entity.registry.ts
@@ -148,6 +152,13 @@ const ENTITY_REGISTRY_ENTRIES: { name: string; class: any }[] = [
   { name: 'entity', class: EntityItem },
   { name: 'saplingFormConfig', class: SaplingFormConfigItem },
   { name: 'entityRoute', class: EntityRouteItem },
+  { name: 'effortEstimate', class: EffortEstimateItem },
+  { name: 'effortEstimatePosition', class: EffortEstimatePositionItem },
+  {
+    name: 'effortEstimatePositionTemplate',
+    class: EffortEstimatePositionTemplateItem,
+  },
+  { name: 'effortEstimateStatus', class: EffortEstimateStatusItem },
   { name: 'changeLogAction', class: ChangeLogActionItem },
   { name: 'changeLog', class: ChangeLogItem },
   { name: 'changeLogDetail', class: ChangeLogDetailItem },

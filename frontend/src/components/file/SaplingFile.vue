@@ -4,7 +4,9 @@
     density="compact"
     fluid
   >
-    <section class="sapling-browser-workspace sapling-browser-workspace--balanced sapling-file-workspace">
+    <section
+      class="sapling-browser-workspace sapling-browser-workspace--balanced sapling-file-workspace"
+    >
       <template v-if="isTranslationLoading">
         <SaplingSurface
           as="aside"
@@ -14,7 +16,10 @@
         </SaplingSurface>
 
         <section class="sapling-browser-workspace__detail sapling-file-workspace__detail">
-          <SaplingSurface as="header" class="sapling-document-header sapling-browser-workspace__loading-panel sapling-file-loading-panel">
+          <SaplingSurface
+            as="header"
+            class="sapling-document-header sapling-browser-workspace__loading-panel sapling-file-loading-panel"
+          >
             <v-skeleton-loader class="sapling-document-header__skeleton" type="heading, text" />
           </SaplingSurface>
 
@@ -22,15 +27,25 @@
             as="section"
             class="sapling-panel-shell sapling-preview-stage sapling-file-stage sapling-browser-workspace__loading-panel sapling-file-loading-panel"
           >
-            <v-skeleton-loader class="sapling-preview-stage__skeleton sapling-file-stage__skeleton" type="image, article" />
+            <v-skeleton-loader
+              class="sapling-preview-stage__skeleton sapling-file-stage__skeleton"
+              type="image, article"
+            />
           </SaplingSurface>
         </section>
       </template>
 
       <template v-else>
-        <SaplingSurface as="aside" class="sapling-workspace-panel sapling-browser-workspace__sidebar sapling-file-workspace__sidebar">
-          <div class="sapling-panel-shell sapling-browser-workspace__table-shell sapling-file-workspace__table-shell">
-            <div class="sapling-browser-scroll sapling-browser-scroll--flush sapling-document-table-scroll">
+        <SaplingSurface
+          as="aside"
+          class="sapling-workspace-panel sapling-browser-workspace__sidebar sapling-file-workspace__sidebar"
+        >
+          <div
+            class="sapling-panel-shell sapling-browser-workspace__table-shell sapling-file-workspace__table-shell"
+          >
+            <div
+              class="sapling-browser-scroll sapling-browser-scroll--flush sapling-document-table-scroll"
+            >
               <SaplingTable
                 :items="items"
                 :search="search ?? ''"

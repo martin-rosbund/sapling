@@ -2,6 +2,7 @@ import { computed, ref } from 'vue'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import { useI18n } from 'vue-i18n'
 import type {
+  EffortEstimateItem,
   EventItem,
   InboxNotificationItem,
   SalesOpportunityItem,
@@ -11,6 +12,7 @@ import ApiService from '@/services/api.service'
 import { formatDate, formatDateFromTo, formatDateTimeValue } from '@/utils/saplingFormatUtil'
 import { useRouter, type RouteLocationRaw } from 'vue-router'
 import {
+  getEffortEstimateInboxRoute,
   getNotificationInboxRoute,
   getSalesOpportunityInboxRoute,
   getTaskInboxRoute,
@@ -23,7 +25,12 @@ import {
 } from '@/composables/system/useOpenTaskCountEvents'
 
 type CloseEmitter = (event: 'close') => void
-export type InboxEntryKind = 'ticket' | 'event' | 'salesOpportunity' | 'notification'
+export type InboxEntryKind =
+  | 'ticket'
+  | 'event'
+  | 'salesOpportunity'
+  | 'effortEstimate'
+  | 'notification'
 export type InboxSectionKey = 'overdue' | 'today' | 'upcoming' | 'later' | 'unplanned'
 
 const UPCOMING_DAY_RANGE = 7
@@ -35,6 +42,7 @@ export interface InboxEntry {
     | 'navigation.ticket'
     | 'navigation.event'
     | 'navigation.salesOpportunity'
+    | 'navigation.effortEstimate'
     | 'navigation.inboxNotification'
   title: string
   description: string
@@ -96,6 +104,7 @@ export function useSaplingInbox(emit: CloseEmitter) {
   const tickets = ref<TicketItem[]>([])
   const tasks = ref<EventItem[]>([])
   const salesOpportunities = ref<SalesOpportunityItem[]>([])
+  const effortEstimates = ref<EffortEstimateItem[]>([])
   const notifications = ref<InboxNotificationItem[]>([])
   const router = useRouter()
   const isLoading = computed(() => isTranslationLoading.value || isDataLoading.value)
@@ -190,6 +199,7 @@ export function useSaplingInbox(emit: CloseEmitter) {
     tickets.value = snapshot.tickets
     tasks.value = snapshot.tasks
     salesOpportunities.value = snapshot.salesOpportunities
+    effortEstimates.value = snapshot.effortEstimates ?? []
     notifications.value = snapshot.notifications
     isDataLoading.value = false
   }
@@ -200,10 +210,12 @@ export function useSaplingInbox(emit: CloseEmitter) {
         tickets.value.length +
         tasks.value.length +
         salesOpportunities.value.length +
+        effortEstimates.value.length +
         notifications.value.length,
       tickets: [...tickets.value],
       tasks: [...tasks.value],
       salesOpportunities: [...salesOpportunities.value],
+      effortEstimates: [...effortEstimates.value],
       notifications: [...notifications.value],
     })
   }
@@ -279,6 +291,36 @@ export function useSaplingInbox(emit: CloseEmitter) {
     }
   }
 
+  function createEffortEstimateEntry(estimate: EffortEstimateItem): InboxEntry {
+    const dateValue = toDate(estimate.expectedCompletionDate)
+    const status = typeof estimate.status === 'object' ? estimate.status : null
+    const supportLabels = [
+      estimate.creatorCompany?.name ?? '',
+      estimate.creatorPerson
+        ? `${estimate.creatorPerson.firstName ?? ''} ${estimate.creatorPerson.lastName ?? ''}`.trim()
+        : '',
+      estimate.ticket?.title ?? '',
+    ].filter((label) => label.length > 0)
+
+    return {
+      id: `effort-estimate-${estimate.handle ?? estimate.title}`,
+      kind: 'effortEstimate',
+      kindLabelKey: 'navigation.effortEstimate',
+      title: estimate.title,
+      description: estimate.requirementsMarkdown ?? '',
+      dateText: formatDate(estimate.expectedCompletionDate),
+      dateValue,
+      icon: 'mdi-clipboard-text-clock-outline',
+      accentColor: status?.color,
+      contextLabel: estimate.salesOpportunity?.title,
+      contextColor: 'success',
+      statusLabel: status?.description,
+      statusColor: status?.color,
+      supportLabels,
+      route: getEffortEstimateInboxRoute(estimate),
+    }
+  }
+
   function createNotificationEntry(notification: InboxNotificationItem): InboxEntry {
     const dateValue = toDate(notification.createdAt)
     const entityHandle =
@@ -334,11 +376,15 @@ export function useSaplingInbox(emit: CloseEmitter) {
   const salesOpportunityEntries = computed(() =>
     salesOpportunities.value.map(createSalesOpportunityEntry),
   )
+  const effortEstimateEntries = computed(() => effortEstimates.value.map(createEffortEstimateEntry))
   const notificationEntries = computed(() => notifications.value.map(createNotificationEntry))
   const actionableEntries = computed(() =>
-    [...ticketEntries.value, ...taskEntries.value, ...salesOpportunityEntries.value].sort(
-      compareEntriesByDate,
-    ),
+    [
+      ...ticketEntries.value,
+      ...taskEntries.value,
+      ...salesOpportunityEntries.value,
+      ...effortEstimateEntries.value,
+    ].sort(compareEntriesByDate),
   )
   const allEntries = computed(() =>
     [...notificationEntries.value, ...actionableEntries.value].sort(compareEntriesByDate),
@@ -469,6 +515,7 @@ export function useSaplingInbox(emit: CloseEmitter) {
     ticketEntries,
     taskEntries,
     salesOpportunityEntries,
+    effortEstimateEntries,
     totalEntries,
     hasInboxItems,
     summaryCards,

@@ -3,7 +3,11 @@
     class="sapling-file-preview sapling-file-jpeg sapling-preview-viewer sapling-file-viewer sapling-preview-fullheight sapling-file-preview-fullheight"
   >
     <div class="sapling-preview-media-surface sapling-file-media-surface">
-      <img :src="jpegUrl" :alt="$t('document.preview')" class="sapling-preview-media sapling-file-media" />
+      <img
+        :src="jpegUrl"
+        :alt="$t('document.preview')"
+        class="sapling-preview-media sapling-file-media"
+      />
     </div>
   </div>
 </template>

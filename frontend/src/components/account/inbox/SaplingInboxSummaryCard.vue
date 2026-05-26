@@ -4,7 +4,10 @@
   >
     <div
       class="sapling-icon-tile"
-      :class="[`sapling-icon-tile--${card.tone}-soft`, `sapling-inbox-summary-card__icon--${card.tone}`]"
+      :class="[
+        `sapling-icon-tile--${card.tone}-soft`,
+        `sapling-inbox-summary-card__icon--${card.tone}`,
+      ]"
     >
       <v-icon :icon="card.icon" />
     </div>

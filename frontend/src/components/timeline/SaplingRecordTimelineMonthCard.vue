@@ -1,13 +1,19 @@
 <template>
-  <article class="sapling-section-panel sapling-history-card sapling-record-timeline-month-card glass-panel">
-    <div class="sapling-row-between-md sapling-row-wrap sapling-history-card__header sapling-record-timeline-month-card__header">
+  <article
+    class="sapling-section-panel sapling-history-card sapling-record-timeline-month-card glass-panel"
+  >
+    <div
+      class="sapling-row-between-md sapling-row-wrap sapling-history-card__header sapling-record-timeline-month-card__header"
+    >
       <div>
         <h2>{{ month.label }}</h2>
         <p>{{ month.entities.length }} {{ t('timeline.sections') }}</p>
       </div>
     </div>
 
-    <div class="sapling-stack-xl sapling-history-card__stack sapling-record-timeline-month-card__entity-list">
+    <div
+      class="sapling-stack-xl sapling-history-card__stack sapling-record-timeline-month-card__entity-list"
+    >
       <section
         v-for="summary in month.entities"
         :key="`${month.key}-${summary.entityHandle}-${summary.relationFields.join('-')}`"
@@ -21,7 +27,9 @@
             <p>{{ summaryDescription(summary) }}</p>
           </div>
 
-          <div class="sapling-chip-row sapling-history-card__chips sapling-record-timeline-month-card__entity-actions">
+          <div
+            class="sapling-chip-row sapling-history-card__chips sapling-record-timeline-month-card__entity-actions"
+          >
             <v-btn
               v-if="summary.startCount > 0"
               variant="text"
@@ -56,7 +64,9 @@
               }}</span>
             </div>
 
-            <div class="sapling-chip-row sapling-history-card__chips sapling-record-timeline-month-card__chips">
+            <div
+              class="sapling-chip-row sapling-history-card__chips sapling-record-timeline-month-card__chips"
+            >
               <button
                 v-for="item in group.items"
                 :key="`${group.field}-${item.key}`"
@@ -64,7 +74,9 @@
                 type="button"
                 @click="emit('drilldown', summary.entityHandle, item.drilldownFilter)"
               >
-                <span class="sapling-row-xs sapling-history-card__chip-label sapling-record-timeline-month-card__chip-label-row">
+                <span
+                  class="sapling-row-xs sapling-history-card__chip-label sapling-record-timeline-month-card__chip-label-row"
+                >
                   <v-icon v-if="item.icon" size="14">{{ item.icon }}</v-icon>
                   <span
                     class="sapling-history-card__chip-dot sapling-record-timeline-month-card__chip-dot"

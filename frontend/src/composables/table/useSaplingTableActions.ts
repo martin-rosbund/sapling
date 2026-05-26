@@ -533,22 +533,22 @@ export function useSaplingTableActions({
     return Number.isNaN(parsedDate.getTime()) ? rawValue : parsedDate.toISOString()
   }
 
-  function buildConcurrencyPayload(source: SaplingGenericItem | null): Record<string, unknown> | null {
+  function buildConcurrencyPayload(
+    source: SaplingGenericItem | null,
+  ): Record<string, unknown> | null {
     if (!source) {
       return null
     }
 
     const payload: Record<string, unknown> = {}
 
-    props.entityTemplates
-      .filter(isConcurrencyComparableTemplate)
-      .forEach((template) => {
-        if (!template.name || !Object.prototype.hasOwnProperty.call(source, template.name)) {
-          return
-        }
+    props.entityTemplates.filter(isConcurrencyComparableTemplate).forEach((template) => {
+      if (!template.name || !Object.prototype.hasOwnProperty.call(source, template.name)) {
+        return
+      }
 
-        payload[template.name] = normalizeConcurrencyPayloadValue(source[template.name], template)
-      })
+      payload[template.name] = normalizeConcurrencyPayloadValue(source[template.name], template)
+    })
 
     return payload
   }

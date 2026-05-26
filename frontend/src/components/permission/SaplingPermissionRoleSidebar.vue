@@ -1,5 +1,7 @@
 <template>
-  <aside class="sapling-section-panel sapling-page-panel sapling-page-panel-stack sapling-admin-sidebar sapling-admin-panel-stack sapling-permission-sidebar glass-panel">
+  <aside
+    class="sapling-section-panel sapling-page-panel sapling-page-panel-stack sapling-admin-sidebar sapling-admin-panel-stack sapling-permission-sidebar glass-panel"
+  >
     <div class="sapling-stack-md sapling-admin-panel-header sapling-permission-panel-header">
       <div>
         <p class="sapling-eyebrow sapling-admin-section-eyebrow sapling-permission-section-eyebrow">
@@ -17,7 +19,11 @@
       />
     </div>
 
-    <v-list class="sapling-scroll-list sapling-admin-list sapling-permission-role-list" density="comfortable" nav>
+    <v-list
+      class="sapling-scroll-list sapling-admin-list sapling-permission-role-list"
+      density="comfortable"
+      nav
+    >
       <v-list-item
         v-for="role in roles"
         :key="role.handle ?? role.title"

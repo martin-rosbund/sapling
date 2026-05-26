@@ -1,6 +1,9 @@
 <template>
   <v-dialog v-if="dialog" v-model="dialogModel" persistent class="sapling-dialog-large">
-    <SaplingDialogCard class="sapling-inbox-dialog sapling-history-dialog sapling-record-timeline-dialog" :tilt="false">
+    <SaplingDialogCard
+      class="sapling-inbox-dialog sapling-history-dialog sapling-record-timeline-dialog"
+      :tilt="false"
+    >
       <SaplingDialogShell
         fill-shell
         body-class="sapling-dialog-fill-body sapling-inbox-dialog__body sapling-scroll-region sapling-history-dialog__body sapling-record-timeline-dialog__body"
@@ -30,7 +33,9 @@
             class="sapling-dialog-fill-content sapling-inbox-dialog__content sapling-stack-xl sapling-record-timeline-dialog__content"
           >
             <template v-if="isLoading">
-              <section class="sapling-stat-grid sapling-history-summary-grid sapling-record-timeline__summary-grid">
+              <section
+                class="sapling-stat-grid sapling-history-summary-grid sapling-record-timeline__summary-grid"
+              >
                 <v-skeleton-loader
                   v-for="item in 3"
                   :key="item"
@@ -61,14 +66,19 @@
                   :key="card.key"
                   class="sapling-panel-shell sapling-stack-md sapling-history-summary-card sapling-record-timeline__summary-card glass-panel"
                 >
-                  <div class="sapling-row-between-md sapling-history-summary-card__header sapling-record-timeline__summary-card-header">
+                  <div
+                    class="sapling-row-between-md sapling-history-summary-card__header sapling-record-timeline__summary-card-header"
+                  >
                     <div>
-                      <div class="sapling-history-summary-card__label sapling-record-timeline__summary-card-label">
+                      <div
+                        class="sapling-history-summary-card__label sapling-record-timeline__summary-card-label"
+                      >
                         {{ card.label }}
                       </div>
-                      <strong class="sapling-history-summary-card__value sapling-record-timeline__summary-card-value">{{
-                        card.value
-                      }}</strong>
+                      <strong
+                        class="sapling-history-summary-card__value sapling-record-timeline__summary-card-value"
+                        >{{ card.value }}</strong
+                      >
                     </div>
                     <v-icon :icon="card.icon" size="22" />
                   </div>

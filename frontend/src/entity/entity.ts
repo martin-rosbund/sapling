@@ -996,6 +996,8 @@ export interface SalesOpportunityItem extends SaplingGenericItem {
   tickets?: TicketItem[]
   /** Related events */
   events?: EventItem[]
+  /** Related effort estimates */
+  effortEstimates?: EffortEstimateItem[]
   /** Creation date */
   createdAt?: Date | null
   /** Last update date */
@@ -1071,6 +1073,114 @@ export interface SalesOpportunitySourceItem extends SaplingGenericItem {
 }
 
 /**
+ * Represents an effort estimate.
+ */
+export interface EffortEstimateItem extends SaplingGenericItem {
+  /** Unique identifier for the effort estimate */
+  handle?: number | null
+  /** Title of the estimate */
+  title: string
+  /** Current estimate status */
+  status: EffortEstimateStatusItem | string
+  /** Expected date for finishing the estimate */
+  expectedCompletionDate?: Date | null
+  /** Requirements written in markdown */
+  requirementsMarkdown?: string | null
+  /** Whether the estimate is active */
+  isActive?: boolean
+  /** Calculated total across positions */
+  totalEstimatedHours?: number | null
+  /** Responsible company */
+  assigneeCompany?: CompanyItem | null
+  /** Responsible person */
+  assigneePerson?: PersonItem | null
+  /** Customer company */
+  creatorCompany?: CompanyItem | null
+  /** Customer person */
+  creatorPerson?: PersonItem | null
+  /** Related sales opportunity */
+  salesOpportunity?: SalesOpportunityItem | null
+  /** Related ticket */
+  ticket?: TicketItem | null
+  /** Estimate positions */
+  positions?: EffortEstimatePositionItem[]
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a status for effort estimates.
+ */
+export interface EffortEstimateStatusItem extends SaplingGenericItem {
+  /** Unique status key */
+  handle: string
+  /** Display description */
+  description: string
+  /** UI color */
+  color: string
+  /** UI icon */
+  icon?: string | null
+  /** Estimates in this status */
+  effortEstimates?: EffortEstimateItem[]
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a single effort estimate position.
+ */
+export interface EffortEstimatePositionItem extends SaplingGenericItem {
+  /** Unique identifier for the position */
+  handle?: number | null
+  /** Position title */
+  title: string
+  /** Estimated effort in hours */
+  estimatedHours?: number | null
+  /** Offer text written in markdown */
+  offerTextMarkdown?: string | null
+  /** Sort order within the estimate */
+  sortOrder?: number | null
+  /** Whether the position is optional */
+  isOptional?: boolean
+  /** Parent estimate */
+  estimate: EffortEstimateItem | number
+  /** Optional source template */
+  template?: EffortEstimatePositionTemplateItem | number | null
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a reusable template for effort estimate positions.
+ */
+export interface EffortEstimatePositionTemplateItem extends SaplingGenericItem {
+  /** Unique identifier for the template */
+  handle?: number | null
+  /** Template title */
+  title: string
+  /** Optional description */
+  description?: string | null
+  /** Suggested effort in hours */
+  estimatedHours?: number | null
+  /** Offer text written in markdown */
+  offerTextMarkdown: string
+  /** Whether the template is active */
+  isActive?: boolean
+  /** Positions created from this template */
+  positions?: EffortEstimatePositionItem[]
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
  * Represents a ticket entity.
  */
 export interface TicketItem extends SaplingGenericItem {
@@ -1096,6 +1206,8 @@ export interface TicketItem extends SaplingGenericItem {
   status: TicketStatusItem
   /** Priority of the ticket */
   priority?: TicketPriorityItem
+  /** Related effort estimates */
+  effortEstimates?: EffortEstimateItem[]
   /** Creation date */
   createdAt: Date | null
   /** Last update date */

@@ -135,12 +135,14 @@ describe('CurrentService', () => {
     const ticket = { handle: 1 };
     const event = { handle: 2 };
     const salesOpportunity = { handle: 3 };
-    const notification = { handle: 4 };
+    const effortEstimate = { handle: 4 };
+    const notification = { handle: 5 };
     const find = jest
       .fn<(...args: unknown[]) => Promise<unknown[]>>()
       .mockResolvedValueOnce([ticket])
       .mockResolvedValueOnce([event])
-      .mockResolvedValueOnce([salesOpportunity]);
+      .mockResolvedValueOnce([salesOpportunity])
+      .mockResolvedValueOnce([effortEstimate]);
     const em = {
       find,
     };
@@ -156,13 +158,14 @@ describe('CurrentService', () => {
     } as never);
 
     expect(result).toEqual({
-      count: 4,
+      count: 5,
       tickets: [ticket],
       tasks: [event],
       salesOpportunities: [salesOpportunity],
+      effortEstimates: [effortEstimate],
       notifications: [notification],
     });
-    expect(find).toHaveBeenCalledTimes(3);
+    expect(find).toHaveBeenCalledTimes(4);
     expect(find.mock.calls[0]?.[1]).toEqual(
       expect.objectContaining({
         assigneePerson: { handle: 7 },
@@ -179,6 +182,13 @@ describe('CurrentService', () => {
       expect.objectContaining({
         assigneePerson: { handle: 7 },
         isActive: true,
+      }),
+    );
+    expect(find.mock.calls[3]?.[1]).toEqual(
+      expect.objectContaining({
+        assigneePerson: { handle: 7 },
+        isActive: true,
+        status: { handle: { $nin: ['completed', 'cancelled'] } },
       }),
     );
     expect(inboxService.getUnreadNotifications).toHaveBeenCalledWith({

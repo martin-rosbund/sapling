@@ -13,11 +13,7 @@ const routeLoadErrorMessages = [
 
 export function isRecoverableRouteLoadError(error: unknown): boolean {
   const message =
-    error instanceof Error
-      ? error.message
-      : typeof error === 'string'
-        ? error
-        : String(error ?? '')
+    error instanceof Error ? error.message : typeof error === 'string' ? error : String(error ?? '')
 
   const normalizedMessage = message.toLowerCase()
   return routeLoadErrorMessages.some((fragment) => normalizedMessage.includes(fragment))

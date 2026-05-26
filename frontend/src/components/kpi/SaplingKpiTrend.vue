@@ -42,7 +42,10 @@
           :is="canOpenCurrentDrilldown ? 'button' : 'div'"
           type="button"
           class="sapling-soft-panel sapling-kpi-trend__meter-row"
-          :class="{ 'sapling-soft-panel--interactive sapling-kpi-trend__meter-row--clickable': canOpenCurrentDrilldown }"
+          :class="{
+            'sapling-soft-panel--interactive sapling-kpi-trend__meter-row--clickable':
+              canOpenCurrentDrilldown,
+          }"
           @click="canOpenCurrentDrilldown ? openCurrentDrilldown() : undefined"
         >
           <div class="sapling-row-between-xs sapling-kpi-trend__meter-head">
@@ -66,7 +69,10 @@
           :is="canOpenPreviousDrilldown ? 'button' : 'div'"
           type="button"
           class="sapling-soft-panel sapling-kpi-trend__meter-row"
-          :class="{ 'sapling-soft-panel--interactive sapling-kpi-trend__meter-row--clickable': canOpenPreviousDrilldown }"
+          :class="{
+            'sapling-soft-panel--interactive sapling-kpi-trend__meter-row--clickable':
+              canOpenPreviousDrilldown,
+          }"
           @click="canOpenPreviousDrilldown ? openPreviousDrilldown() : undefined"
         >
           <div class="sapling-row-between-xs sapling-kpi-trend__meter-head">

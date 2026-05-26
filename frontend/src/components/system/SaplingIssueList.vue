@@ -59,8 +59,12 @@
         >
           <div class="sapling-work-card__accent sapling-issue-card__accent" />
 
-          <v-card-text class="sapling-stack-xl sapling-work-card__content sapling-issue-card__content">
-            <div class="sapling-row-between-md sapling-work-card__header-row sapling-issue-card__header-row">
+          <v-card-text
+            class="sapling-stack-xl sapling-work-card__content sapling-issue-card__content"
+          >
+            <div
+              class="sapling-row-between-md sapling-work-card__header-row sapling-issue-card__header-row"
+            >
               <v-chip :color="statusChipColor" size="small" variant="tonal">
                 {{ $t(statusLabelKey) }}
               </v-chip>
@@ -119,7 +123,9 @@
               </v-chip>
             </div>
 
-            <div class="sapling-stack-md sapling-work-card__assignees sapling-issue-card__assignees">
+            <div
+              class="sapling-stack-md sapling-work-card__assignees sapling-issue-card__assignees"
+            >
               <div class="sapling-label">{{ $t('issue.assignedTo') }}</div>
               <div
                 v-if="issue.assignees.length"
