@@ -46,7 +46,11 @@
   display: grid;
   grid-template-columns: minmax(150px, 1.3fr) minmax(120px, 0.8fr) minmax(140px, 0.8fr) auto;
   gap: var(--sapling-gap-md);
-  align-items: center;
+  align-items: start;
+}
+
+.sapling-config-settings > * {
+  min-width: 0;
 }
 
 .sapling-config-switches {
@@ -60,7 +64,10 @@
 
 .sapling-config-field-list {
   gap: var(--sapling-gap-md);
-  max-height: min(980px, calc(100vh - 360px));
+  flex: initial;
+  max-height: none;
+  min-height: auto;
+  overflow: visible;
   padding-right: var(--sapling-space-3xs);
 }
 
@@ -103,13 +110,26 @@
 .sapling-config-field__controls {
   display: grid;
   grid-template-columns:
-    minmax(120px, 1fr) minmax(120px, 1fr) minmax(76px, 0.45fr) minmax(92px, 0.55fr)
-    minmax(130px, 0.8fr) minmax(120px, 1fr);
+    minmax(120px, 1fr) minmax(76px, 0.45fr) minmax(92px, 0.55fr)
+    minmax(130px, 0.8fr);
   gap: var(--sapling-gap-sm);
+}
+
+.sapling-config-field__control {
+  min-width: 0;
+}
+
+.sapling-config-field__control--label,
+.sapling-config-field__control--placeholder {
+  grid-column: span 2;
 }
 
 .sapling-config-field__toggles {
   gap: var(--sapling-gap-xl);
+}
+
+.sapling-form-config__scope-handle {
+  min-width: 0;
 }
 
 .sapling-config-preview-header {
@@ -184,6 +204,11 @@
   .sapling-config-settings,
   .sapling-config-field__controls {
     grid-template-columns: 1fr;
+  }
+
+  .sapling-config-field__control--label,
+  .sapling-config-field__control--placeholder {
+    grid-column: auto;
   }
 
   .sapling-config-panel--sticky {

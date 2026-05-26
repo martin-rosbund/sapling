@@ -24,7 +24,9 @@
       </template>
 
       <template #side>
-        <div class="sapling-action-cluster sapling-config-hero-actions sapling-form-config__hero-actions">
+        <div
+          class="sapling-action-cluster sapling-config-hero-actions sapling-form-config__hero-actions"
+        >
           <v-btn
             prepend-icon="mdi-content-save"
             color="primary"
@@ -120,23 +122,28 @@
             :label="$t('formConfig.scope')"
             prepend-inner-icon="mdi-account-filter-outline"
           />
-          <SaplingFieldSingleSelect
-            v-if="scopeSelectEntityHandle"
-            :key="scopeSelectKey"
-            :model-value="selectedScopeItem"
-            :label="$t('formConfig.scopeHandle')"
-            :entity-handle="scopeSelectEntityHandle"
-            :placeholder="scopeHandle"
-            @update:model-value="onScopeItemUpdate"
-          />
-          <v-text-field
-            v-else
-            v-model="scopeHandle"
-            density="comfortable"
-            :label="$t('formConfig.scopeHandle')"
-            prepend-inner-icon="mdi-pound"
-            disabled
-          />
+          <div class="sapling-form-config__scope-handle">
+            <SaplingFieldSingleSelect
+              v-if="scopeSelectEntityHandle"
+              :key="scopeSelectKey"
+              :model-value="selectedScopeItem"
+              :label="$t('formConfig.scopeHandle')"
+              :entity-handle="scopeSelectEntityHandle"
+              :placeholder="scopeHandle"
+              density="comfortable"
+              hide-details
+              @update:model-value="onScopeItemUpdate"
+            />
+            <v-text-field
+              v-else
+              v-model="scopeHandle"
+              density="comfortable"
+              hide-details
+              :label="$t('formConfig.scopeHandle')"
+              prepend-inner-icon="mdi-pound"
+              disabled
+            />
+          </div>
           <div class="sapling-row-md sapling-config-switches sapling-form-config__switches">
             <v-switch
               v-model="isActive"
@@ -181,7 +188,10 @@
           </v-btn>
         </div>
 
-        <div class="sapling-scroll-list sapling-config-field-list sapling-form-config__field-list" role="list">
+        <div
+          class="sapling-scroll-list sapling-config-field-list sapling-form-config__field-list"
+          role="list"
+        >
           <SaplingSurface
             as="article"
             v-for="field in filteredFieldRows"
@@ -206,24 +216,35 @@
             <div class="sapling-config-field__controls sapling-form-config-field__controls">
               <v-text-field
                 v-model="field.label"
+                class="sapling-config-field__control sapling-config-field__control--label"
                 density="compact"
                 hide-details
                 :label="$t('formConfig.label')"
               />
               <v-text-field
+                v-model="field.placeholder"
+                class="sapling-config-field__control sapling-config-field__control--placeholder"
+                density="compact"
+                hide-details
+                :label="$t('formConfig.placeholder')"
+              />
+              <v-text-field
                 v-model="field.group"
+                class="sapling-config-field__control"
                 density="compact"
                 hide-details
                 :label="$t('formConfig.group')"
               />
               <v-number-input
                 v-model="field.order"
+                class="sapling-config-field__control"
                 density="compact"
                 hide-details
                 :label="$t('formConfig.order')"
               />
               <v-select
                 v-model="field.width"
+                class="sapling-config-field__control"
                 density="compact"
                 hide-details
                 :items="widthOptions"
@@ -233,6 +254,7 @@
               />
               <v-select
                 v-model="field.renderer"
+                class="sapling-config-field__control"
                 density="compact"
                 hide-details
                 :items="rendererOptions"
@@ -240,15 +262,11 @@
                 item-value="value"
                 :label="$t('formConfig.renderer')"
               />
-              <v-text-field
-                v-model="field.placeholder"
-                density="compact"
-                hide-details
-                :label="$t('formConfig.placeholder')"
-              />
             </div>
 
-            <div class="sapling-row-md sapling-config-field__toggles sapling-form-config-field__toggles">
+            <div
+              class="sapling-row-md sapling-config-field__toggles sapling-form-config-field__toggles"
+            >
               <v-checkbox
                 v-model="field.required"
                 density="compact"
@@ -270,7 +288,9 @@
         as="aside"
         class="sapling-panel-shell sapling-section-panel sapling-config-panel sapling-config-panel--blurred sapling-config-panel--sticky sapling-form-config__panel sapling-form-config__panel--preview"
       >
-        <div class="sapling-row-between-md sapling-config-preview-header sapling-form-config__preview-header">
+        <div
+          class="sapling-row-between-md sapling-config-preview-header sapling-form-config__preview-header"
+        >
           <div>
             <p class="sapling-eyebrow sapling-config-eyebrow sapling-form-config__eyebrow">
               {{ $t('formConfig.livePreview') }}

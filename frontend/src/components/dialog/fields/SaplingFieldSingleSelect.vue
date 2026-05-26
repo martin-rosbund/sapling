@@ -16,9 +16,10 @@
           :model-value="selectedItem"
           :item-title="getAutocompleteItemTitle"
           :search="fieldSearch"
+          :density="props.density"
+          :hide-details="props.hideDetails"
           return-object
           clearable
-          hide-details="auto"
           hide-no-data
           no-filter
           :menu="false"
@@ -78,15 +79,22 @@ import ApiGenericService, { type FilterQuery } from '@/services/api.generic.serv
 // #endregion
 
 // #region Props and Emits
-const props = defineProps<{
-  label: string
-  entityHandle: string
-  modelValue?: SaplingGenericItem | null | undefined
-  rules?: Array<(v: unknown) => true | string>
-  placeholder?: string
-  disabled?: boolean
-  parentFilter?: FilterQuery
-}>()
+const props = withDefaults(
+  defineProps<{
+    label: string
+    entityHandle: string
+    modelValue?: SaplingGenericItem | null | undefined
+    rules?: Array<(v: unknown) => true | string>
+    placeholder?: string
+    disabled?: boolean
+    parentFilter?: FilterQuery
+    density?: 'default' | 'comfortable' | 'compact'
+    hideDetails?: boolean | 'auto'
+  }>(),
+  {
+    hideDetails: 'auto',
+  },
+)
 const emit = defineEmits(['update:modelValue'])
 // #endregion
 
