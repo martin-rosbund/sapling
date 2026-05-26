@@ -122,13 +122,18 @@
       @select-record="(record: SaplingGenericItem) => emit('select-record', record)"
     />
     <SaplingNumberField
-      v-else-if="template.type === 'number' || isRenderer('number')"
+      v-else-if="
+        template.options?.includes('isNumeric') ||
+        template.type === 'number' ||
+        isRenderer('number')
+      "
       :label="requiredLabel"
       :model-value="numberValue(template.name)"
       :disabled="fieldDisabled"
       :required="template.nullable === false"
       :placeholder="defaultPlaceholder"
       :rules="rules"
+      :step="numberStep"
       @update:model-value="(val: unknown) => updateField(template.name, val)"
     />
     <SaplingBooleanField
@@ -398,6 +403,7 @@ const canReadReference = computed(
       ?.allowRead,
 )
 const jsonValue = computed(() => props.formValues[props.template.name])
+const numberStep = computed(() => (props.template.options?.includes('isNumeric') ? 1 : undefined))
 
 function stringValue(fieldName: string): string {
   const value = props.formValues[fieldName]

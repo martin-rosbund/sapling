@@ -27,6 +27,7 @@ export class EffortEstimatePositionItem {
   title!: string;
 
   @ApiPropertyOptional({ type: 'number' })
+  @Sapling(['isNumeric'])
   @SaplingForm({
     order: 200,
     group: 'effortEstimatePosition.groupBasics',

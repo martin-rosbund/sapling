@@ -21,7 +21,7 @@ const SAPLING_REFERENCE_TEMPLATE_METADATA_KEY = 'sapling:referenceTemplate';
 /**
  * Enumeration of all Sapling metadata options.
  *
- * @typedef {('isCompany'|'isPerson'|'isEntity'|'isSecurity'|'isValue'|'isHideAsReference'|'isColor'|'isIcon'|'isChip'|'isReadOnly'|'isLink'|'isMail'|'isPhone'|'isOrderASC'|'isOrderDESC'|'isNavigation'|'isMarkdown'|'isSystem'|'isPercent'|'isMoney'|'isDuplicateCheck')} SaplingOption
+ * @typedef {('isCompany'|'isPerson'|'isEntity'|'isSecurity'|'isValue'|'isHideAsReference'|'isColor'|'isIcon'|'isChip'|'isReadOnly'|'isLink'|'isMail'|'isPhone'|'isOrderASC'|'isOrderDESC'|'isNavigation'|'isMarkdown'|'isSystem'|'isPercent'|'isMoney'|'isNumeric'|'isDuplicateCheck')} SaplingOption
  *
  * @property isCompany           Marks property as company-related
  * @property isPerson            Marks property as person-related
@@ -43,6 +43,7 @@ const SAPLING_REFERENCE_TEMPLATE_METADATA_KEY = 'sapling:referenceTemplate';
  * @property isSystem            Property is a system field
  * @property isPercent           Property is a percentage value
  * @property isMoney             Property is a monetary value
+ * @property isNumeric           Property is a plain numeric value with step controls
  * @property isDuplicateCheck    Property is used for duplicate checking
  * @property isPartner           Property is used for partner filter
  * @property isToday             Property is used for today's date filter
@@ -71,6 +72,7 @@ export type SaplingOption =
   | 'isSystem'
   | 'isPercent'
   | 'isMoney'
+  | 'isNumeric'
   | 'isDuplicateCheck'
   | 'isPartner'
   | 'isToday'

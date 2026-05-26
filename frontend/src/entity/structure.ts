@@ -44,6 +44,7 @@ export type SaplingOption =
   | 'isSystem'
   | 'isPercent'
   | 'isMoney'
+  | 'isNumeric'
   | 'isDuplicateCheck'
   | 'isPartner'
   | 'isToday'
