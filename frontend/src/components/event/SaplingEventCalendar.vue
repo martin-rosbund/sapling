@@ -3,7 +3,7 @@
     :as="VCalendar"
     v-model="calendarValue"
     class="sapling-event-vcalendar"
-    :class="props.calendarClass"
+    :class="[props.calendarClass, `sapling-event-vcalendar--${props.calendarDisplayType}`]"
     color="primary"
     :event-color="props.getEventColor"
     :event-ripple="false"

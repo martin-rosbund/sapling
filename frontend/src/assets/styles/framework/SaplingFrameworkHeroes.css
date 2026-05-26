@@ -253,7 +253,6 @@
   opacity: var(--sapling-opacity-secondary);
 }
 
-.sapling-event-stat-card__content span,
 .sapling-calendar-event-card__type {
   font-size: var(--sapling-text-label-size-sm);
   font-weight: 700;

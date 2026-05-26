@@ -7,20 +7,10 @@
       <div class="sapling-page-skeleton sapling-event-skeleton">
         <SaplingSurface
           as="section"
-          class="sapling-page-hero sapling-page-hero--calendar sapling-event-skeleton__hero"
+          class="sapling-page-hero sapling-page-hero--calendar sapling-page-hero--copy-only sapling-event-skeleton__hero"
         >
           <div class="sapling-event-skeleton__hero-copy">
             <v-skeleton-loader type="text, heading, paragraph" />
-          </div>
-          <div
-            class="sapling-stat-grid sapling-stat-grid--three sapling-event-skeleton__hero-stats"
-          >
-            <v-skeleton-loader
-              v-for="index in 3"
-              :key="index"
-              class="sapling-event-skeleton__stat"
-              type="article"
-            />
           </div>
         </SaplingSurface>
 
@@ -64,24 +54,6 @@
         <template #title-prefix>
           <div class="sapling-icon-tile sapling-event-hero__icon-wrap">
             <v-icon size="28">{{ entityEvent?.icon || 'mdi-calendar-month-outline' }}</v-icon>
-          </div>
-        </template>
-
-        <template #side>
-          <div class="sapling-stat-grid sapling-stat-grid--three sapling-event-hero__stats">
-            <article
-              v-for="stat in heroStats"
-              :key="stat.key"
-              class="sapling-stat-card sapling-event-stat-card"
-            >
-              <div class="sapling-stat-card__icon sapling-event-stat-card__icon">
-                <v-icon>{{ stat.icon }}</v-icon>
-              </div>
-              <div class="sapling-stat-card__content sapling-event-stat-card__content">
-                <span>{{ stat.label }}</span>
-                <strong>{{ stat.value }}</strong>
-              </div>
-            </article>
           </div>
         </template>
       </SaplingPageHero>
@@ -335,7 +307,6 @@ const {
   mouseMove,
   endDrag,
   cancelDrag,
-  heroStats,
   informationDialogItem,
   templates,
   updateConflictDialog,
