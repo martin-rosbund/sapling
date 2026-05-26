@@ -234,6 +234,7 @@ const {
   ticketEntries,
   taskEntries,
   salesOpportunityEntries,
+  effortEstimateEntries,
   summaryCards,
   sections,
   openEntry,
@@ -243,7 +244,10 @@ const {
 
 const overviewCount = computed(
   () =>
-    ticketEntries.value.length + taskEntries.value.length + salesOpportunityEntries.value.length,
+    ticketEntries.value.length +
+    taskEntries.value.length +
+    salesOpportunityEntries.value.length +
+    effortEstimateEntries.value.length,
 )
 const hasOverviewItems = computed(() => overviewCount.value > 0)
 const hasUnreadNotifications = computed(() => notificationEntries.value.length > 0)
@@ -262,7 +266,7 @@ const sortedNotificationEntries = computed<InboxEntry[]>(() =>
 const hasNotificationItems = computed(() => sortedNotificationEntries.value.length > 0)
 
 const heroStats = computed(() => [
-  { label: t('navigation.inboxNotification'), value: notificationEntries.value.length },
+  { label: t('navigation.effortEstimate'), value: effortEstimateEntries.value.length },
   { label: t('navigation.ticket'), value: ticketEntries.value.length },
   { label: t('navigation.event'), value: taskEntries.value.length },
   { label: t('navigation.salesOpportunity'), value: salesOpportunityEntries.value.length },

@@ -83,10 +83,10 @@ export interface InboxSection {
 }
 
 export interface InboxSummaryCard {
-  key: 'total' | 'notifications' | 'overdue' | 'today' | 'upcoming'
+  key: 'total' | 'effortEstimates' | 'overdue' | 'today' | 'upcoming'
   labelKey:
     | 'navigation.inbox'
-    | 'navigation.inboxNotification'
+    | 'navigation.effortEstimate'
     | 'inbox.overdue'
     | 'inbox.today'
     | 'inbox.upcoming'
@@ -412,10 +412,10 @@ export function useSaplingInbox(emit: CloseEmitter) {
       tone: 'primary',
     },
     {
-      key: 'notifications',
-      labelKey: 'navigation.inboxNotification',
-      icon: 'mdi-bell-outline',
-      count: notificationEntries.value.length,
+      key: 'effortEstimates',
+      labelKey: 'navigation.effortEstimate',
+      icon: 'mdi-clipboard-text-clock-outline',
+      count: effortEstimateEntries.value.length,
       tone: 'info',
     },
     {
