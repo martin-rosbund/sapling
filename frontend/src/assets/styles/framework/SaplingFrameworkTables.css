@@ -6,6 +6,8 @@
 .sapling-table-row__select-cell {
   width: var(--sapling-table-select-column-width);
   max-width: var(--sapling-table-select-column-width);
+  background: var(--sapling-tilt-drawer-bg) !important;
+  backdrop-filter: blur(var(--sapling-blur-sm)) !important;
   text-align: center;
 }
 
@@ -13,6 +15,8 @@
 .sapling-table-row__actions-cell {
   width: var(--sapling-table-actions-column-width);
   max-width: var(--sapling-table-actions-column-width);
+  background: var(--sapling-tilt-drawer-bg) !important;
+  backdrop-filter: blur(var(--sapling-blur-sm)) !important;
   overflow: hidden;
 }
 
@@ -147,6 +151,8 @@
 
 .sapling-table-header-cell {
   white-space: nowrap;
+  background: var(--sapling-tilt-drawer-bg) !important;
+  backdrop-filter: blur(var(--sapling-blur-sm)) !important;
 }
 
 .sapling-table-header-cell--data,
