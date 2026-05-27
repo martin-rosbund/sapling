@@ -20,41 +20,47 @@
         @mousedown.stop
       >
         <v-icon size="16">mdi-video-outline</v-icon>
-        <span>Online Meeting beitreten</span>
+        <span>{{ t('calendar.joinOnlineMeeting') }}</span>
       </a>
     </div>
 
     <div class="sapling-calendar-event-tooltip-card__sections">
       <section class="sapling-calendar-event-tooltip-card__section">
-        <span class="sapling-calendar-event-tooltip-card__section-label">Kunde</span>
+        <span class="sapling-calendar-event-tooltip-card__section-label">
+          {{ t('calendar.customer') }}
+        </span>
         <div class="sapling-calendar-event-tooltip-card__rows">
           <div class="sapling-calendar-event-tooltip-card__row">
-            <span>Firma</span>
+            <span>{{ t('calendar.company') }}</span>
             <strong>{{ customerCompanyName }}</strong>
           </div>
           <div class="sapling-calendar-event-tooltip-card__row">
-            <span>Person</span>
+            <span>{{ t('calendar.person') }}</span>
             <strong>{{ customerPersonName }}</strong>
           </div>
         </div>
       </section>
 
       <section class="sapling-calendar-event-tooltip-card__section">
-        <span class="sapling-calendar-event-tooltip-card__section-label">Verantwortlich</span>
+        <span class="sapling-calendar-event-tooltip-card__section-label">
+          {{ t('calendar.responsible') }}
+        </span>
         <div class="sapling-calendar-event-tooltip-card__rows">
           <div class="sapling-calendar-event-tooltip-card__row">
-            <span>Firma</span>
+            <span>{{ t('calendar.company') }}</span>
             <strong>{{ responsibleCompanyName }}</strong>
           </div>
           <div class="sapling-calendar-event-tooltip-card__row">
-            <span>Person</span>
+            <span>{{ t('calendar.person') }}</span>
             <strong>{{ responsiblePersonName }}</strong>
           </div>
         </div>
       </section>
 
       <section class="sapling-calendar-event-tooltip-card__section">
-        <span class="sapling-calendar-event-tooltip-card__section-label">Teilnehmer</span>
+        <span class="sapling-calendar-event-tooltip-card__section-label">
+          {{ t('calendar.participants') }}
+        </span>
         <div
           v-if="participantNames.length > 0"
           class="sapling-calendar-event-tooltip-card__participants"
@@ -68,7 +74,7 @@
           </span>
         </div>
         <span v-else class="sapling-calendar-event-tooltip-card__empty">
-          Keine Teilnehmer
+          {{ t('calendar.noParticipants') }}
         </span>
       </section>
     </div>
@@ -77,6 +83,7 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs'
 import type { EventItem } from '@/entity/entity'
 import type { CalendarParticipant } from '@/composables/event/eventCalendar.utils'
@@ -110,9 +117,10 @@ const props = defineProps<{
   icon: string
 }>()
 
+const { t } = useI18n()
 const record = computed(() => props.event.event as TooltipRecord | undefined)
 const eventIcon = computed(() => record.value?.type?.icon || record.value?.icon || props.icon)
-const eventTitle = computed(() => record.value?.title || props.event.name || 'Termin')
+const eventTitle = computed(() => record.value?.title || props.event.name || t('event.defaultTitle'))
 
 const customerCompanyName = computed(() => resolveRelationName(record.value?.creatorCompany))
 const customerPersonName = computed(() => resolveRelationName(record.value?.creatorPerson))
@@ -133,7 +141,7 @@ function resolveParticipantName(participant: CalendarParticipant | undefined) {
 
   if (typeof participant === 'number' || typeof participant === 'string') {
     const value = String(participant).trim()
-    return value ? `Person ${value}` : null
+    return value ? `${t('global.person')} ${value}` : null
   }
 
   return resolveRelationName(participant)
@@ -141,12 +149,12 @@ function resolveParticipantName(participant: CalendarParticipant | undefined) {
 
 function resolveRelationName(relation: TooltipRelation | number | string | null | undefined) {
   if (relation == null) {
-    return 'Keine Angabe'
+    return t('calendar.noValue')
   }
 
   if (typeof relation === 'number' || typeof relation === 'string') {
     const value = String(relation).trim()
-    return value || 'Keine Angabe'
+    return value || t('calendar.noValue')
   }
 
   const fullName = [relation.firstName, relation.lastName].filter(Boolean).join(' ').trim()
@@ -156,7 +164,7 @@ function resolveRelationName(relation: TooltipRelation | number | string | null 
     fullName ||
     relation.name ||
     relation.email ||
-    (relation.handle != null ? String(relation.handle) : 'Keine Angabe')
+    (relation.handle != null ? String(relation.handle) : t('calendar.noValue'))
   )
 }
 

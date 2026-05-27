@@ -1,0 +1,11 @@
+[
+  { "entity": "calendar", "property": "joinOnlineMeeting", "de": "Online Meeting beitreten", "en": "Join online meeting" },
+  { "entity": "calendar", "property": "customer", "de": "Kunde", "en": "Customer" },
+  { "entity": "calendar", "property": "responsible", "de": "Verantwortlich", "en": "Responsible" },
+  { "entity": "calendar", "property": "company", "de": "Firma", "en": "Company" },
+  { "entity": "calendar", "property": "person", "de": "Person", "en": "Person" },
+  { "entity": "calendar", "property": "participants", "de": "Teilnehmer", "en": "Participants" },
+  { "entity": "calendar", "property": "noParticipants", "de": "Keine Teilnehmer", "en": "No participants" },
+  { "entity": "calendar", "property": "noValue", "de": "Keine Angabe", "en": "Not specified" },
+  { "entity": "event", "property": "defaultTitle", "de": "Termin", "en": "Appointment" }
+]
