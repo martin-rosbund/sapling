@@ -15,8 +15,6 @@ import type {
   DialogSaveContext,
   DialogState,
   EntityTemplate,
-  SaplingFormConfigPayload,
-  SaplingFormFieldConfig,
 } from '@/entity/structure'
 import ApiGenericService from '@/services/api.generic.service'
 import ApiFormConfigService, {
@@ -37,19 +35,24 @@ import { useSaplingDialogEditDirty } from './useSaplingDialogEditDirty'
 import { useSaplingDialogEditForm } from './useSaplingDialogEditForm'
 import { useSaplingDialogEditRelations } from './useSaplingDialogEditRelations'
 import { useSaplingDialogEditReferences } from './useSaplingDialogEditReferences'
+import {
+  applyFormConfigOverlay,
+  formatLocalDate,
+  formatLocalTime,
+  getDefaultFormConfigHandle,
+  getItemHandle,
+  getLocalDateTimeParts,
+  hasFormValue,
+  isFormValid,
+  isValidDate,
+  toUtcIsoString,
+  type FormConfigMenuItem,
+  type FormConfigSelectionHandle,
+  type VuetifyFormValidationResult,
+} from './saplingDialogEdit.utils'
 // #endregion
 
 // #region Types
-type VuetifyFormValidationResult = boolean | { valid: boolean } | undefined
-type FormConfigSelectionHandle = number | null
-
-interface FormConfigMenuItem {
-  handle: FormConfigSelectionHandle
-  title: string
-  icon: string
-  active: boolean
-}
-
 type VuetifyFormRef = {
   validate: () => Promise<VuetifyFormValidationResult>
   resetValidation?: () => void
@@ -136,75 +139,6 @@ export function useSaplingDialogEdit(
   // #endregion
 
   // #region Helpers
-  /**
-   * Extracts a stable backend handle from a generic record.
-   */
-  function getItemHandle(item?: SaplingGenericItem | null): string | number | null {
-    if (!item || typeof item !== 'object') {
-      return null
-    }
-
-    const { handle } = item
-    return typeof handle === 'string' || typeof handle === 'number' ? handle : null
-  }
-
-  /**
-   * Normalizes Vuetify form validation results across supported return shapes.
-   */
-  function isFormValid(result: VuetifyFormValidationResult): boolean {
-    if (typeof result === 'boolean') {
-      return result
-    }
-
-    return result?.valid === true
-  }
-
-  /**
-   * Checks whether a form value already contains meaningful user input.
-   */
-  function hasFormValue(value: unknown): boolean {
-    if (Array.isArray(value)) {
-      return value.length > 0
-    }
-
-    return value !== null && value !== undefined && value !== ''
-  }
-
-  function getFieldConfig(value: unknown): SaplingFormFieldConfig | null {
-    return value && typeof value === 'object' && !Array.isArray(value)
-      ? (value as SaplingFormFieldConfig)
-      : null
-  }
-
-  function applyFormConfigOverlay(
-    sourceTemplates: EntityTemplate[],
-    config: SaplingFormConfigPayload | null,
-  ): EntityTemplate[] {
-    if (!config?.fields) {
-      return sourceTemplates
-    }
-
-    return sourceTemplates.map((template) => {
-      const fieldConfig = getFieldConfig(config.fields?.[template.name])
-      if (!fieldConfig) {
-        return template
-      }
-
-      return {
-        ...template,
-        formGroup: fieldConfig.group ?? template.formGroup,
-        formGroupOrder: fieldConfig.groupOrder ?? template.formGroupOrder,
-        formOrder: fieldConfig.order ?? template.formOrder,
-        formWidth: fieldConfig.width ?? template.formWidth,
-        isRequired: fieldConfig.required ?? template.isRequired,
-        formConfig: {
-          ...(template.formConfig ?? {}),
-          ...fieldConfig,
-        },
-      }
-    })
-  }
-
   const formConfigMenuItems = computed<FormConfigMenuItem[]>(() => {
     const selectableConfigs = formConfigs.value.filter(
       (config) => config.isActive !== false && typeof config.handle === 'number',
@@ -232,21 +166,8 @@ export function useSaplingDialogEdit(
 
   const selectedFormConfigLabel = computed(() => selectedFormConfig.value?.name ?? '')
 
-  function getDefaultFormConfigHandle(
-    configs: SaplingFormConfigItem[] = formConfigs.value,
-  ): FormConfigSelectionHandle {
-    return (
-      configs.find(
-        (config) =>
-          config.isActive !== false &&
-          config.isDefault === true &&
-          typeof config.handle === 'number',
-      )?.handle ?? null
-    )
-  }
-
   function selectDefaultFormConfig(): void {
-    selectedFormConfigHandle.value = getDefaultFormConfigHandle()
+    selectedFormConfigHandle.value = getDefaultFormConfigHandle(formConfigs.value)
   }
 
   async function loadFormConfigs(): Promise<void> {
@@ -446,98 +367,6 @@ export function useSaplingDialogEdit(
         )
       })
     }
-  }
-
-  function formatLocalDate(date: Date): string {
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day}`
-  }
-
-  function formatLocalTime(date: Date): string {
-    const hours = String(date.getHours()).padStart(2, '0')
-    const minutes = String(date.getMinutes()).padStart(2, '0')
-    return `${hours}:${minutes}`
-  }
-
-  function isValidDate(date: Date): boolean {
-    return !Number.isNaN(date.getTime())
-  }
-
-  function getLocalDateTimeParts(value: unknown): { date: string; time: string } {
-    if (value instanceof Date) {
-      return isValidDate(value)
-        ? { date: formatLocalDate(value), time: formatLocalTime(value) }
-        : { date: '', time: '' }
-    }
-
-    if (typeof value !== 'string') {
-      return { date: '', time: '' }
-    }
-
-    const trimmedValue = value.trim()
-    if (!trimmedValue) {
-      return { date: '', time: '' }
-    }
-
-    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmedValue)) {
-      return { date: trimmedValue, time: '' }
-    }
-
-    const parsedDate = new Date(trimmedValue)
-    if (isValidDate(parsedDate)) {
-      return {
-        date: formatLocalDate(parsedDate),
-        time: formatLocalTime(parsedDate),
-      }
-    }
-
-    const [date = '', time = ''] = trimmedValue.split('T')
-    return { date, time: time.slice(0, 5) }
-  }
-
-  function toUtcIsoString(dateValue: unknown, timeValue: unknown): string | null {
-    const date =
-      typeof dateValue === 'string'
-        ? dateValue.trim()
-        : dateValue instanceof Date
-          ? formatLocalDate(dateValue)
-          : ''
-
-    if (!date) {
-      return null
-    }
-
-    const time =
-      typeof timeValue === 'string'
-        ? timeValue.trim()
-        : timeValue instanceof Date
-          ? formatLocalTime(timeValue)
-          : ''
-
-    if (!time) {
-      return date
-    }
-
-    const dateMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date)
-    const timeMatch = /^(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(time)
-    if (!dateMatch || !timeMatch) {
-      return `${date}T${time}`
-    }
-
-    const [, year, month, day] = dateMatch
-    const [, hours, minutes, seconds] = timeMatch
-    const localDateTime = new Date(
-      Number(year),
-      Number(month) - 1,
-      Number(day),
-      Number(hours),
-      Number(minutes),
-      Number(seconds ?? '0'),
-    )
-
-    return isValidDate(localDateTime) ? localDateTime.toISOString() : `${date}T${time}`
   }
 
   const requiredRule = (label: string) => (v: unknown) =>

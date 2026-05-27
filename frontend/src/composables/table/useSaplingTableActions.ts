@@ -35,6 +35,15 @@ import { buildMailMenuActions } from '@/utils/saplingMailMenuUtil'
 import { buildCsv, buildCsvTemplate, parseCsv } from '@/utils/saplingCsvUtil'
 import type { SaplingContextMenuTableActionPayload } from '@/composables/context/useSaplingContextMenuTable'
 import type { SaplingTableRowContextMenuOpenPayload } from '@/composables/table/useSaplingTableRow'
+import {
+  buildConcurrencyOptions,
+  buildConcurrencyPayload,
+  downloadJSONFile,
+  downloadTextFile,
+  getItemHandle,
+  isSupportedCsvFile,
+  normalizeConcurrencyTimestamp,
+} from '@/composables/table/saplingTableAction.utils'
 
 interface FavoriteDialogState {
   visible: boolean
@@ -397,33 +406,6 @@ export function useSaplingTableActions({
     )
   }
 
-  function downloadJSONFile(data: unknown, filename: string) {
-    downloadTextFile(JSON.stringify(data, null, 2), filename, 'application/json')
-  }
-
-  function downloadTextFile(data: string, filename: string, type: string) {
-    const blob = new Blob([data], { type })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = filename
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
-  }
-
-  function isSupportedCsvFile(file: File): boolean {
-    const normalizedName = file.name.toLowerCase()
-    return (
-      normalizedName.endsWith('.csv') ||
-      normalizedName.endsWith('.txt') ||
-      normalizedName.endsWith('.tsv') ||
-      file.type === 'text/csv' ||
-      file.type === 'text/plain'
-    )
-  }
-
   function openContextMenu({ item, x, y }: SaplingTableRowContextMenuOpenPayload) {
     // Kontextmenü nur öffnen, wenn showActions true ist
     if (props.showActions === false) {
@@ -629,80 +611,6 @@ export function useSaplingTableActions({
     })
   }
 
-  function normalizeConcurrencyTimestamp(value: unknown): string | null {
-    if (value instanceof Date) {
-      return Number.isNaN(value.getTime()) ? null : value.toISOString()
-    }
-
-    if (typeof value !== 'string' && typeof value !== 'number') {
-      return null
-    }
-
-    const rawValue = String(value).trim()
-    if (!rawValue) {
-      return null
-    }
-
-    const parsedDate = new Date(rawValue)
-    return Number.isNaN(parsedDate.getTime()) ? rawValue : parsedDate.toISOString()
-  }
-
-  function buildConcurrencyPayload(
-    source: SaplingGenericItem | null,
-  ): Record<string, unknown> | null {
-    if (!source) {
-      return null
-    }
-
-    const payload: Record<string, unknown> = {}
-
-    props.entityTemplates.filter(isConcurrencyComparableTemplate).forEach((template) => {
-      if (!template.name || !Object.prototype.hasOwnProperty.call(source, template.name)) {
-        return
-      }
-
-      payload[template.name] = normalizeConcurrencyPayloadValue(source[template.name], template)
-    })
-
-    return payload
-  }
-
-  function normalizeConcurrencyPayloadValue(value: unknown, template: EntityTemplate): unknown {
-    if (value instanceof Date) {
-      return Number.isNaN(value.getTime()) ? null : value.toISOString()
-    }
-
-    if (template.type === 'datetime' && typeof value === 'string') {
-      return normalizeConcurrencyTimestamp(value) ?? value
-    }
-
-    return value ?? null
-  }
-
-  function isConcurrencyComparableTemplate(template: EntityTemplate): boolean {
-    if (!template.name || template.isPersistent === false) {
-      return false
-    }
-
-    if (template.kind === 'm:1') {
-      return true
-    }
-
-    if (template.isReference) {
-      return false
-    }
-
-    return !['1:m', 'm:n', 'n:m', '1:1'].includes(template.kind ?? '')
-  }
-
-  function buildConcurrencyOptions(source: SaplingGenericItem | null) {
-    return {
-      expectedUpdatedAt: normalizeConcurrencyTimestamp(source?.updatedAt),
-      basePayload: buildConcurrencyPayload(source),
-      resolution: 'detect' as const,
-    }
-  }
-
   async function saveDialog(
     item: SaplingGenericItem,
     action: DialogSaveAction,
@@ -724,7 +632,7 @@ export function useSaplingTableActions({
 
         nextDialogItem = await loadDialogItem(
           await ApiGenericService.update(props.entityHandle, handle, item, {
-            concurrency: buildConcurrencyOptions(editDialog.value.item),
+            concurrency: buildConcurrencyOptions(props.entityTemplates, editDialog.value.item),
             suppressConflictMessage: true,
           }),
         )
@@ -828,7 +736,7 @@ export function useSaplingTableActions({
         concurrency: {
           expectedUpdatedAt:
             conflict.currentUpdatedAt ?? normalizeConcurrencyTimestamp(conflict.current?.updatedAt),
-          basePayload: buildConcurrencyPayload(conflict.current ?? null),
+          basePayload: buildConcurrencyPayload(props.entityTemplates, conflict.current ?? null),
           resolution: 'detect',
         },
         suppressConflictMessage: true,
@@ -1166,13 +1074,4 @@ export function useSaplingTableActions({
     runSelectionScriptButton,
     runRowScriptButton,
   }
-}
-
-function getItemHandle(item?: SaplingGenericItem | null) {
-  if (!item || typeof item !== 'object') {
-    return null
-  }
-
-  const { handle } = item
-  return typeof handle === 'string' || typeof handle === 'number' ? handle : null
 }

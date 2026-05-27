@@ -16,6 +16,7 @@ The documentation should stay close to the code, but not duplicate every class o
 - [Inbox And Open Task Notifications](features/inbox-notifications.md)
 - [Integrations And Deliveries](integrations/deliveries.md)
 - [Testing And Verification](development/testing.md)
+- [Refactor Watchlist](development/refactor-watchlist.md)
 - [Calendar And Recurrence](features/calendar.md)
 - [KPI And Dashboard System](features/kpi-dashboard.md)
 - [Scripts And Script Buttons](development/scripts-and-buttons.md)

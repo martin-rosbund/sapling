@@ -44,14 +44,27 @@ import {
   normalizeBoolean,
   normalizeImportRow,
 } from './generic-import.util';
+import {
+  areUpdateConflictValuesEqual,
+  asChangeLogRecord,
+  buildChangeLogDetails,
+  extractChangeLogReference,
+  mergeChangeLogPayloadShape,
+  normalizeChangeLogPayload,
+  normalizeChangeLogValue,
+  normalizeConcurrencyBasePayload,
+  normalizeConcurrencyTimestamp,
+  normalizeUpdateConflictValue,
+  projectChangeLogPayload,
+  type ChangeLogAction,
+  type ChangeLogPayload,
+} from './generic-change-log.util';
 import type {
   GenericImportResponse,
   GenericImportRowResult,
 } from './generic-import.util';
 export type { GenericImportResponse } from './generic-import.util';
 
-type ChangeLogPayload = Record<string, unknown> | null;
-type ChangeLogAction = 'create' | 'update' | 'delete';
 type GenericUpdateConcurrencyResolution = 'detect' | 'merge' | 'overwrite';
 export type GenericUpdateConcurrencyOptions = {
   expectedUpdatedAt?: string | Date | null;
@@ -88,7 +101,6 @@ type RelationMutationContext = Awaited<
   ReturnType<GenericRelationService['addReferenceAndFlush']>
 >;
 const GENERIC_CONCURRENCY_METADATA_KEY = '_saplingConcurrency';
-const CHANGE_LOG_DETAIL_IGNORED_FIELDS = new Set(['updatedAt']);
 const UPDATE_CONFLICT_IGNORED_FIELDS = new Set([
   'createdAt',
   'updatedAt',
@@ -543,14 +555,14 @@ export class GenericService {
         'person',
         item.person,
       ) as ChangeLogResponseDto['person'];
-      response.oldPayload = this.normalizeChangeLogPayload(item.oldPayload);
-      response.newPayload = this.normalizeChangeLogPayload(item.newPayload);
+      response.oldPayload = normalizeChangeLogPayload(item.oldPayload);
+      response.newPayload = normalizeChangeLogPayload(item.newPayload);
       response.details = [...item.details]
         .sort((left, right) => (left.handle ?? 0) - (right.handle ?? 0))
         .map((detail) => ({
           property: detail.property,
-          oldValue: this.normalizeChangeLogValue(detail.oldValue),
-          newValue: this.normalizeChangeLogValue(detail.newValue),
+          oldValue: normalizeChangeLogValue(detail.oldValue),
+          newValue: normalizeChangeLogValue(detail.newValue),
         }));
       response.createdAt = item.createdAt ?? new Date();
       return response;
@@ -1620,10 +1632,10 @@ export class GenericService {
     return {
       data: nextData,
       concurrency: {
-        expectedUpdatedAt: this.normalizeConcurrencyTimestamp(
+        expectedUpdatedAt: normalizeConcurrencyTimestamp(
           metadata.expectedUpdatedAt,
         ),
-        basePayload: this.normalizeConcurrencyBasePayload(metadata.basePayload),
+        basePayload: normalizeConcurrencyBasePayload(metadata.basePayload),
         resolution,
       },
     };
@@ -1637,7 +1649,7 @@ export class GenericService {
     concurrency: NormalizedUpdateConcurrencyMetadata,
   ): UpdateConflictEvaluation {
     const expectedUpdatedAt = concurrency.expectedUpdatedAt ?? null;
-    const currentUpdatedAt = this.normalizeConcurrencyTimestamp(
+    const currentUpdatedAt = normalizeConcurrencyTimestamp(
       (item as { updatedAt?: unknown }).updatedAt,
     );
     const basePayload = this.projectUpdateConflictPayload(
@@ -1648,7 +1660,7 @@ export class GenericService {
       template,
       attemptedPayload,
     );
-    const comparisonShape = this.mergeChangeLogPayloadShape(
+    const comparisonShape = mergeChangeLogPayloadShape(
       basePayload,
       attemptedConflictPayload,
     );
@@ -1696,9 +1708,9 @@ export class GenericService {
     currentPayload: ChangeLogPayload,
     attemptedPayload: ChangeLogPayload,
   ): UpdateConflictField[] {
-    const baseRecord = this.asChangeLogRecord(basePayload);
-    const currentRecord = this.asChangeLogRecord(currentPayload);
-    const attemptedRecord = this.asChangeLogRecord(attemptedPayload);
+    const baseRecord = asChangeLogRecord(basePayload);
+    const currentRecord = asChangeLogRecord(currentPayload);
+    const attemptedRecord = asChangeLogRecord(attemptedPayload);
     const hasBasePayload = basePayload != null;
     const propertyNames = new Set([
       ...Object.keys(baseRecord),
@@ -1713,25 +1725,23 @@ export class GenericService {
           attemptedRecord,
           property,
         );
-        const baseValue = this.normalizeUpdateConflictValue(
-          baseRecord[property],
-        );
-        const currentValue = this.normalizeUpdateConflictValue(
+        const baseValue = normalizeUpdateConflictValue(baseRecord[property]);
+        const currentValue = normalizeUpdateConflictValue(
           currentRecord[property],
         );
         const attemptedValue = attemptedHasProperty
-          ? this.normalizeUpdateConflictValue(attemptedRecord[property])
+          ? normalizeUpdateConflictValue(attemptedRecord[property])
           : baseValue;
         const changedInAttempt = hasBasePayload
-          ? !this.areUpdateConflictValuesEqual(baseValue, attemptedValue)
+          ? !areUpdateConflictValuesEqual(baseValue, attemptedValue)
           : attemptedHasProperty;
         const changedInCurrent = hasBasePayload
-          ? !this.areUpdateConflictValuesEqual(baseValue, currentValue)
-          : !this.areUpdateConflictValuesEqual(currentValue, attemptedValue);
+          ? !areUpdateConflictValuesEqual(baseValue, currentValue)
+          : !areUpdateConflictValuesEqual(currentValue, attemptedValue);
         const conflict =
           changedInAttempt &&
           changedInCurrent &&
-          !this.areUpdateConflictValuesEqual(currentValue, attemptedValue);
+          !areUpdateConflictValuesEqual(currentValue, attemptedValue);
 
         return {
           property,
@@ -1765,7 +1775,7 @@ export class GenericService {
         .map((field) => field.name)
         .filter((name): name is string => typeof name === 'string'),
     );
-    const sourceRecord = this.asChangeLogRecord(payload);
+    const sourceRecord = asChangeLogRecord(payload);
     const comparablePayload = Object.fromEntries(
       Object.entries(sourceRecord).filter(([key]) =>
         comparableFieldNames.has(key),
@@ -1776,7 +1786,7 @@ export class GenericService {
       return null;
     }
 
-    return this.projectChangeLogPayload(comparableTemplate, comparablePayload);
+    return projectChangeLogPayload(comparableTemplate, comparablePayload);
   }
 
   private isUpdateConflictComparableField(field: EntityTemplateDto): boolean {
@@ -1825,7 +1835,7 @@ export class GenericService {
       handle,
     );
     const current = {
-      ...this.asChangeLogRecord(conflict.currentPayload),
+      ...asChangeLogRecord(conflict.currentPayload),
       handle: normalizedHandle,
       updatedAt: conflict.currentUpdatedAt,
     };
@@ -1899,59 +1909,12 @@ export class GenericService {
     }
   }
 
-  private mergeChangeLogPayloadShape(
-    ...payloads: ChangeLogPayload[]
-  ): ChangeLogPayload {
-    const shape: Record<string, unknown> = {};
-
-    for (const payload of payloads) {
-      const record = this.asChangeLogRecord(payload);
-      for (const key of Object.keys(record)) {
-        shape[key] = record[key];
-      }
-    }
-
-    return Object.keys(shape).length > 0 ? shape : null;
-  }
-
-  private normalizeConcurrencyBasePayload(value: unknown): ChangeLogPayload {
-    if (!value || typeof value !== 'object' || Array.isArray(value)) {
-      return null;
-    }
-
-    return this.normalizeChangeLogPayload(value as Record<string, unknown>);
-  }
-
   private normalizeConcurrencyResolution(
     value: unknown,
   ): GenericUpdateConcurrencyResolution | undefined {
     return value === 'merge' || value === 'overwrite' || value === 'detect'
       ? value
       : undefined;
-  }
-
-  private normalizeConcurrencyTimestamp(value: unknown): string | null {
-    if (value == null) {
-      return null;
-    }
-
-    if (value instanceof Date) {
-      return Number.isNaN(value.getTime()) ? null : value.toISOString();
-    }
-
-    if (typeof value !== 'string' && typeof value !== 'number') {
-      return null;
-    }
-
-    const rawValue = String(value).trim();
-    if (!rawValue) {
-      return null;
-    }
-
-    const parsedDate = new Date(rawValue);
-    return Number.isNaN(parsedDate.getTime())
-      ? rawValue
-      : parsedDate.toISOString();
   }
 
   private asUnknownRecord(value: unknown): Record<string, unknown> | null {
@@ -2001,7 +1964,7 @@ export class GenericService {
       return;
     }
 
-    const reference = this.extractChangeLogReference(newPayload ?? oldPayload);
+    const reference = extractChangeLogReference(newPayload ?? oldPayload);
     if (reference == null) {
       return;
     }
@@ -2023,7 +1986,7 @@ export class GenericService {
       oldPayload,
       newPayload,
     } as any);
-    const details = this.buildChangeLogDetails(action, oldPayload, newPayload);
+    const details = buildChangeLogDetails(action, oldPayload, newPayload);
 
     for (const detail of details) {
       log.details.add(
@@ -2039,153 +2002,13 @@ export class GenericService {
     await logEm.flush();
   }
 
-  private buildChangeLogDetails(
-    action: ChangeLogAction,
-    oldPayload: ChangeLogPayload,
-    newPayload: ChangeLogPayload,
-  ): Array<{
-    property: string;
-    oldValue: unknown;
-    newValue: unknown;
-  }> {
-    const oldRecord = this.asChangeLogRecord(oldPayload);
-    const newRecord = this.asChangeLogRecord(newPayload);
-    const propertyNames =
-      action === 'delete'
-        ? new Set(Object.keys(oldRecord))
-        : new Set(Object.keys(newRecord));
-    const details: Array<{
-      property: string;
-      oldValue: unknown;
-      newValue: unknown;
-    }> = [];
-
-    [...propertyNames]
-      .sort((left, right) => left.localeCompare(right))
-      .forEach((property) => {
-        if (CHANGE_LOG_DETAIL_IGNORED_FIELDS.has(property)) {
-          return;
-        }
-
-        const oldValue = this.normalizeChangeLogValue(oldRecord[property]);
-        const newValue = this.normalizeChangeLogValue(newRecord[property]);
-
-        if (this.areChangeLogValuesEqual(oldValue, newValue)) {
-          return;
-        }
-
-        details.push({
-          property,
-          oldValue,
-          newValue,
-        });
-      });
-
-    return details;
-  }
-
-  private areChangeLogValuesEqual(left: unknown, right: unknown): boolean {
-    return JSON.stringify(left) === JSON.stringify(right);
-  }
-
-  private areUpdateConflictValuesEqual(left: unknown, right: unknown): boolean {
-    return (
-      JSON.stringify(this.normalizeUpdateConflictValue(left)) ===
-      JSON.stringify(this.normalizeUpdateConflictValue(right))
-    );
-  }
-
-  private normalizeUpdateConflictValue(
-    value: unknown,
-    visited = new WeakMap<object, unknown>(),
-  ): unknown {
-    if (value == null) {
-      return null;
-    }
-
-    if (typeof value === 'string') {
-      return value.trim().length === 0 ? null : value;
-    }
-
-    if (value instanceof Date) {
-      return value.toISOString();
-    }
-
-    if (Array.isArray(value)) {
-      return value.map((entry) =>
-        this.normalizeUpdateConflictValue(entry, visited),
-      );
-    }
-
-    if (typeof value !== 'object') {
-      return value;
-    }
-
-    const cached = visited.get(value);
-    if (typeof cached !== 'undefined') {
-      return cached;
-    }
-
-    const normalizedRecord: Record<string, unknown> = {};
-    visited.set(value, normalizedRecord);
-
-    Object.keys(value)
-      .sort((leftKey, rightKey) => leftKey.localeCompare(rightKey))
-      .forEach((key) => {
-        normalizedRecord[key] = this.normalizeUpdateConflictValue(
-          (value as Record<string, unknown>)[key],
-          visited,
-        );
-      });
-
-    return normalizedRecord;
-  }
-
-  private extractChangeLogReference(
-    payload: ChangeLogPayload | object,
-  ): string | number | null {
-    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
-      return null;
-    }
-
-    const handle = (payload as Record<string, unknown>).handle;
-    return typeof handle === 'string' || typeof handle === 'number'
-      ? handle
-      : null;
-  }
-
-  private asChangeLogRecord(
-    payload: ChangeLogPayload,
-  ): Record<string, unknown> {
-    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
-      return {};
-    }
-
-    return payload;
-  }
-
-  private normalizeChangeLogPayload(
-    payload: Record<string, unknown> | null | undefined,
-  ): ChangeLogPayload {
-    if (!payload) {
-      return null;
-    }
-
-    const normalized = this.normalizeChangeLogValue(payload);
-    return normalized &&
-      typeof normalized === 'object' &&
-      !Array.isArray(normalized)
-      ? (normalized as Record<string, unknown>)
-      : null;
-  }
-
   private captureEntityChangeLogPayload(
     entityHandle: string,
     value: object,
     template: EntityTemplateDto[],
     shapeSource?: ChangeLogPayload,
   ): ChangeLogPayload {
-    const sanitized = this.normalizeChangeLogPayload(
+    const sanitized = normalizeChangeLogPayload(
       this.genericSanitizerService.sanitizeEntityResult(
         entityHandle,
         value,
@@ -2193,7 +2016,7 @@ export class GenericService {
       ) as Record<string, unknown>,
     );
 
-    return this.projectChangeLogPayload(template, sanitized, shapeSource);
+    return projectChangeLogPayload(template, sanitized, shapeSource);
   }
 
   private captureSubmittedChangeLogPayload(
@@ -2204,135 +2027,11 @@ export class GenericService {
       return null;
     }
 
-    const normalized = this.normalizeChangeLogPayload({
+    const normalized = normalizeChangeLogPayload({
       ...payload,
     });
 
-    return this.projectChangeLogPayload(template, normalized);
-  }
-
-  private projectChangeLogPayload(
-    template: EntityTemplateDto[],
-    payload: ChangeLogPayload,
-    shapeSource?: ChangeLogPayload,
-  ): ChangeLogPayload {
-    if (!payload) {
-      return null;
-    }
-
-    const templateFieldMap = new Map(
-      template.map((field) => [field.name, field]),
-    );
-    const sourceRecord = this.asChangeLogRecord(payload);
-    const shapeRecord = this.asChangeLogRecord(shapeSource ?? null);
-    const keys =
-      shapeSource == null
-        ? Object.keys(sourceRecord)
-        : Object.keys(shapeRecord);
-    const projected: Record<string, unknown> = {};
-
-    keys.forEach((key) => {
-      const field = templateFieldMap.get(key);
-      const sourceValue = sourceRecord[key];
-
-      if (field?.options?.includes('isSecurity')) {
-        projected[key] =
-          shapeSource == null
-            ? (sourceValue ?? null)
-            : Object.prototype.hasOwnProperty.call(shapeRecord, key)
-              ? shapeRecord[key]
-              : null;
-        return;
-      }
-
-      projected[key] = this.projectChangeLogFieldValue(field, sourceValue);
-    });
-
-    return projected;
-  }
-
-  private projectChangeLogFieldValue(
-    field: EntityTemplateDto | undefined,
-    value: unknown,
-  ): unknown {
-    if (value == null || !field?.isReference) {
-      return value ?? null;
-    }
-
-    if (Array.isArray(value)) {
-      return value.map((entry) =>
-        this.projectChangeLogReferenceValue(field, entry),
-      );
-    }
-
-    return this.projectChangeLogReferenceValue(field, value);
-  }
-
-  private projectChangeLogReferenceValue(
-    field: EntityTemplateDto,
-    value: unknown,
-  ): unknown {
-    if (value == null) {
-      return null;
-    }
-
-    if (typeof value !== 'object' || Array.isArray(value)) {
-      return value;
-    }
-
-    if (field.referencedPks.length <= 1) {
-      const pk = field.referencedPks[0] ?? 'handle';
-      return this.normalizeChangeLogValue(
-        (value as Record<string, unknown>)[pk],
-      );
-    }
-
-    return Object.fromEntries(
-      field.referencedPks.map((pk) => [
-        pk,
-        this.normalizeChangeLogValue((value as Record<string, unknown>)[pk]),
-      ]),
-    );
-  }
-
-  private normalizeChangeLogValue(
-    value: unknown,
-    visited = new WeakMap<object, unknown>(),
-  ): unknown {
-    if (value == null) {
-      return null;
-    }
-
-    if (value instanceof Date) {
-      return value.toISOString();
-    }
-
-    if (Array.isArray(value)) {
-      return value.map((entry) => this.normalizeChangeLogValue(entry, visited));
-    }
-
-    if (typeof value !== 'object') {
-      return value;
-    }
-
-    const cached = visited.get(value);
-    if (typeof cached !== 'undefined') {
-      return cached;
-    }
-
-    const normalizedRecord: Record<string, unknown> = {};
-    visited.set(value, normalizedRecord);
-
-    Object.keys(value)
-      .sort((left, right) => left.localeCompare(right))
-      .forEach((key) => {
-        normalizedRecord[key] = this.normalizeChangeLogValue(
-          (value as Record<string, unknown>)[key],
-          visited,
-        );
-      });
-
-    return normalizedRecord;
+    return projectChangeLogPayload(template, normalized);
   }
   // #endregion
 }
