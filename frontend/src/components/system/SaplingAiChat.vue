@@ -13,26 +13,7 @@
         class="sapling-floating-panel sapling-floating-panel--top-center sapling-floating-panel--mobile-sheet sapling-ai-chat"
         @click.stop
       >
-        <template v-if="isTranslationLoading">
-          <div class="d-flex flex-column ga-4 pa-4 fill-height">
-            <div class="d-flex align-center justify-space-between ga-4">
-              <v-skeleton-loader type="heading, text" class="flex-grow-1" />
-              <div class="d-flex ga-2">
-                <v-skeleton-loader v-for="index in 3" :key="index" type="button" width="72" />
-              </div>
-            </div>
-
-            <div class="d-flex flex-grow-1 ga-4">
-              <v-skeleton-loader
-                class="flex-grow-0"
-                type="list-item-two-line@6"
-                min-width="220"
-                width="220"
-              />
-              <v-skeleton-loader class="flex-grow-1" type="article, article, article, article" />
-            </div>
-          </div>
-        </template>
+        <SaplingAiChatLoadingState v-if="isTranslationLoading" />
 
         <template v-else>
           <SaplingAiChatHeader
@@ -144,7 +125,20 @@ import type {
 import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingAiChatConversation from '@/components/system/ai-chat/SaplingAiChatConversation.vue'
 import SaplingAiChatHeader from '@/components/system/ai-chat/SaplingAiChatHeader.vue'
+import SaplingAiChatLoadingState from '@/components/system/ai-chat/SaplingAiChatLoadingState.vue'
 import SaplingAiChatSessions from '@/components/system/ai-chat/SaplingAiChatSessions.vue'
+import {
+  getDefaultModelForProvider,
+  getModelHandle,
+  getModelProviderHandle,
+  getProviderHandle,
+  resolveRuntimeTarget,
+} from '@/components/system/ai-chat/aiChatRuntimeTargets'
+import {
+  doesSpeechMetadataMatchSelection,
+  getMessageSpeechMetadata,
+} from '@/components/system/ai-chat/aiChatSpeechMetadata'
+import { useSaplingAiChatMessages } from '@/components/system/ai-chat/useSaplingAiChatMessages'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import ApiAiService, { type AiChatStreamEvent } from '@/services/api.ai.service'
 import { useSaplingAiChat } from '@/composables/system/useSaplingAiChat'
@@ -186,7 +180,6 @@ const transcriptionModelConfigs = ref<AiProviderModelItem[]>([])
 const speechProviderConfigs = ref<AiProviderTypeItem[]>([])
 const speechModelConfigs = ref<AiProviderModelItem[]>([])
 const sessions = ref<AiChatSessionItem[]>([])
-const messages = ref<AiChatMessageItem[]>([])
 const activeSession = ref<AiChatSessionItem | null>(null)
 const selectedProviderHandle = ref<string | null>(null)
 const selectedModelHandle = ref<string | null>(null)
@@ -198,14 +191,10 @@ const draftMessage = ref('')
 const editingSessionHandle = ref<number | null>(null)
 const editingSessionTitle = ref('')
 const isSessionRailCollapsed = ref(false)
-const hasMoreMessages = ref(false)
-const nextMessageBeforeSequence = ref<number | null>(null)
 const isLoadingOlderMessages = ref(false)
 const isRecordingVoiceInput = ref(false)
 const isTranscribingVoiceInput = ref(false)
 const streamAbortController = ref<AbortController | null>(null)
-const streamingClock = ref(Date.now())
-const streamingMessageStartedAt = new Map<number, number>()
 const hasInitialized = ref(false)
 const activeTranscriptionHandle = ref<number | null>(null)
 const activeVoiceRecorder = ref<MediaRecorder | null>(null)
@@ -224,7 +213,6 @@ const speechLoadingByHandle = ref<Record<number, boolean>>({})
 const speechFailedByHandle = ref<Record<number, boolean>>({})
 let initializationPromise: Promise<void> | null = null
 let streamingClockTimer: number | null = null
-let nextLocalMessageHandle = -1
 let voiceRecordingStartedAt: number | null = null
 let pendingVoiceChunks: Blob[] = []
 let discardPendingVoiceRecording = false
@@ -233,6 +221,18 @@ let lastDetectedVoiceActivityAt: number | null = null
 const pendingSpeechRequestByHandle = new Map<number, Promise<AiChatMessageItem>>()
 const speechObjectUrlByDocumentHandle = new Map<number, string>()
 const autoRequestedSpeechHandles = new Set<number>()
+const {
+  messages,
+  hasMoreMessages,
+  nextMessageBeforeSequence,
+  streamingClock,
+  streamingDurationByHandle,
+  resetMessageWindow,
+  mergeMessages,
+  upsertMessage,
+  appendMessageDelta,
+  appendLocalFailedExchange,
+} = useSaplingAiChatMessages()
 
 const isBusy = computed(
   () =>
@@ -345,14 +345,6 @@ const isVoiceInputAvailable = computed(
 const isVoiceOutputAvailable = computed(
   () => typeof Audio !== 'undefined' && hasConfiguredSpeechProviders.value,
 )
-
-const streamingDurationByHandle = computed<Record<number, number>>(() => {
-  const entries = messages.value
-    .filter((message) => message.handle != null)
-    .map((message) => [message.handle as number, getStreamingDurationSeconds(message)] as const)
-
-  return Object.fromEntries(entries)
-})
 
 const activeConversationTitle = computed(
   () => activeSession.value?.title || t('aiChat.draftConversation'),
@@ -607,25 +599,6 @@ async function reloadSessions() {
   } finally {
     isLoadingSessions.value = false
   }
-}
-
-function resetMessageWindow() {
-  hasMoreMessages.value = false
-  nextMessageBeforeSequence.value = null
-}
-
-function mergeMessages(olderMessages: AiChatMessageItem[], existingMessages: AiChatMessageItem[]) {
-  const keyedMessages = new Map<string, AiChatMessageItem>()
-
-  for (const message of [...olderMessages, ...existingMessages]) {
-    const key =
-      message.handle != null
-        ? `handle:${message.handle}`
-        : `sequence:${message.sequence}:${message.role}`
-    keyedMessages.set(key, message)
-  }
-
-  return [...keyedMessages.values()].sort((left, right) => left.sequence - right.sequence)
 }
 
 async function loadMessages(
@@ -1128,7 +1101,8 @@ async function updateSelectedProvider(value: unknown) {
 
   selectedProviderHandle.value = nextProviderHandle
   selectedModelHandle.value =
-    getDefaultModelForProvider(nextProviderHandle, previousModelHandle)?.handle ?? null
+    getDefaultModelForProvider(modelConfigs.value, nextProviderHandle, previousModelHandle)
+      ?.handle ?? null
 
   if (!activeSession.value?.handle) {
     return
@@ -1148,7 +1122,8 @@ function updateSelectedTranscriptionProvider(value: unknown) {
 
   selectedTranscriptionProviderHandle.value = nextProviderHandle
   selectedTranscriptionModelHandle.value =
-    getDefaultTranscriptionModelForProvider(
+    getDefaultModelForProvider(
+      transcriptionModelConfigs.value,
       nextProviderHandle,
       selectedTranscriptionModelHandle.value,
     )?.handle ?? null
@@ -1168,8 +1143,11 @@ function updateSelectedSpeechProvider(value: unknown) {
 
   selectedSpeechProviderHandle.value = nextProviderHandle
   selectedSpeechModelHandle.value =
-    getDefaultSpeechModelForProvider(nextProviderHandle, selectedSpeechModelHandle.value)?.handle ??
-    null
+    getDefaultModelForProvider(
+      speechModelConfigs.value,
+      nextProviderHandle,
+      selectedSpeechModelHandle.value,
+    )?.handle ?? null
 }
 
 function updateSelectedSpeechModel(value: unknown) {
@@ -1260,61 +1238,6 @@ function handleStreamEvent(event: AiChatStreamEvent) {
   }
 }
 
-function upsertMessage(message: AiChatMessageItem) {
-  const index = messages.value.findIndex((item) => item.handle === message.handle)
-
-  if (index >= 0) {
-    messages.value.splice(index, 1, message)
-  } else {
-    messages.value.push(message)
-  }
-
-  trackStreamingMessage(message)
-  messages.value = [...messages.value].sort((left, right) => left.sequence - right.sequence)
-}
-
-function appendMessageDelta(handle: number, delta: string) {
-  const message = messages.value.find((item) => item.handle === handle)
-  if (!message || !delta) {
-    return
-  }
-
-  if (!streamingMessageStartedAt.has(handle)) {
-    streamingMessageStartedAt.set(handle, Date.now())
-  }
-
-  message.content += delta
-}
-
-function trackStreamingMessage(message: AiChatMessageItem) {
-  if (message.handle == null) {
-    return
-  }
-
-  if (message.status === 'streaming') {
-    if (!streamingMessageStartedAt.has(message.handle)) {
-      streamingMessageStartedAt.set(message.handle, Date.now())
-    }
-    return
-  }
-
-  streamingMessageStartedAt.delete(message.handle)
-}
-
-function getStreamingDurationSeconds(message: AiChatMessageItem) {
-  if (message.handle == null) {
-    return 0
-  }
-
-  const startedAt = streamingMessageStartedAt.get(message.handle)
-
-  if (!startedAt) {
-    return 0
-  }
-
-  return Math.max(0, Math.floor((streamingClock.value - startedAt) / 1000))
-}
-
 function replaceSession(session: AiChatSessionItem) {
   const index = sessions.value.findIndex((item) => item.handle === session.handle)
 
@@ -1342,219 +1265,42 @@ function normalizeHandle(value: unknown): string | null {
 function syncSelectedRuntimeTarget() {
   const sessionProviderHandle = getProviderHandle(activeSession.value?.provider)
   const sessionModelHandle = getModelHandle(activeSession.value?.model)
-  const availableProviderHandles = new Set(providerConfigs.value.map((item) => item.handle ?? ''))
-  const availableModelHandles = new Set(modelConfigs.value.map((item) => item.handle ?? ''))
+  const target = resolveRuntimeTarget({
+    providerConfigs: providerConfigs.value,
+    modelConfigs: modelConfigs.value,
+    requestedProviderHandle: sessionProviderHandle,
+    requestedModelHandle: sessionModelHandle,
+    preferredModelHandle: selectedModelHandle.value,
+  })
 
-  if (sessionModelHandle && availableModelHandles.has(sessionModelHandle)) {
-    const sessionModel =
-      modelConfigs.value.find((item) => item.handle === sessionModelHandle) ?? null
-    selectedProviderHandle.value = sessionProviderHandle ?? getModelProviderHandle(sessionModel)
-    selectedModelHandle.value = sessionModelHandle
-    return
-  }
-
-  if (sessionProviderHandle && availableProviderHandles.has(sessionProviderHandle)) {
-    selectedProviderHandle.value = sessionProviderHandle
-    selectedModelHandle.value =
-      getDefaultModelForProvider(sessionProviderHandle, selectedModelHandle.value)?.handle ?? null
-    return
-  }
-
-  const defaultModel = getGlobalDefaultModel()
-  selectedProviderHandle.value = getModelProviderHandle(defaultModel)
-  selectedModelHandle.value = defaultModel?.handle ?? null
+  selectedProviderHandle.value = target.providerHandle
+  selectedModelHandle.value = target.modelHandle
 }
 
 function syncSelectedTranscriptionTarget() {
-  const availableProviderHandles = new Set(
-    transcriptionProviderConfigs.value.map((item) => item.handle ?? ''),
-  )
-  const availableModelHandles = new Set(
-    transcriptionModelConfigs.value.map((item) => item.handle ?? ''),
-  )
+  const target = resolveRuntimeTarget({
+    providerConfigs: transcriptionProviderConfigs.value,
+    modelConfigs: transcriptionModelConfigs.value,
+    requestedProviderHandle: selectedTranscriptionProviderHandle.value,
+    requestedModelHandle: selectedTranscriptionModelHandle.value,
+    preferredModelHandle: selectedTranscriptionModelHandle.value,
+  })
 
-  if (
-    selectedTranscriptionModelHandle.value &&
-    availableModelHandles.has(selectedTranscriptionModelHandle.value)
-  ) {
-    const selectedModel =
-      transcriptionModelConfigs.value.find(
-        (item) => item.handle === selectedTranscriptionModelHandle.value,
-      ) ?? null
-    selectedTranscriptionProviderHandle.value =
-      getModelProviderHandle(selectedModel) ?? selectedTranscriptionProviderHandle.value
-    return
-  }
-
-  if (
-    selectedTranscriptionProviderHandle.value &&
-    availableProviderHandles.has(selectedTranscriptionProviderHandle.value)
-  ) {
-    selectedTranscriptionModelHandle.value =
-      getDefaultTranscriptionModelForProvider(
-        selectedTranscriptionProviderHandle.value,
-        selectedTranscriptionModelHandle.value,
-      )?.handle ?? null
-    return
-  }
-
-  const defaultModel = getGlobalDefaultTranscriptionModel()
-  selectedTranscriptionProviderHandle.value = getModelProviderHandle(defaultModel)
-  selectedTranscriptionModelHandle.value = defaultModel?.handle ?? null
+  selectedTranscriptionProviderHandle.value = target.providerHandle
+  selectedTranscriptionModelHandle.value = target.modelHandle
 }
 
 function syncSelectedSpeechTarget() {
-  const availableProviderHandles = new Set(
-    speechProviderConfigs.value.map((item) => item.handle ?? ''),
-  )
-  const availableModelHandles = new Set(speechModelConfigs.value.map((item) => item.handle ?? ''))
+  const target = resolveRuntimeTarget({
+    providerConfigs: speechProviderConfigs.value,
+    modelConfigs: speechModelConfigs.value,
+    requestedProviderHandle: selectedSpeechProviderHandle.value,
+    requestedModelHandle: selectedSpeechModelHandle.value,
+    preferredModelHandle: selectedSpeechModelHandle.value,
+  })
 
-  if (
-    selectedSpeechModelHandle.value &&
-    availableModelHandles.has(selectedSpeechModelHandle.value)
-  ) {
-    const selectedModel =
-      speechModelConfigs.value.find((item) => item.handle === selectedSpeechModelHandle.value) ??
-      null
-    selectedSpeechProviderHandle.value =
-      getModelProviderHandle(selectedModel) ?? selectedSpeechProviderHandle.value
-    return
-  }
-
-  if (
-    selectedSpeechProviderHandle.value &&
-    availableProviderHandles.has(selectedSpeechProviderHandle.value)
-  ) {
-    selectedSpeechModelHandle.value =
-      getDefaultSpeechModelForProvider(
-        selectedSpeechProviderHandle.value,
-        selectedSpeechModelHandle.value,
-      )?.handle ?? null
-    return
-  }
-
-  const defaultModel = getGlobalDefaultSpeechModel()
-  selectedSpeechProviderHandle.value = getModelProviderHandle(defaultModel)
-  selectedSpeechModelHandle.value = defaultModel?.handle ?? null
-}
-
-function getGlobalDefaultModel() {
-  return modelConfigs.value.find((item) => item.isDefault) ?? modelConfigs.value[0] ?? null
-}
-
-function getGlobalDefaultTranscriptionModel() {
-  return (
-    transcriptionModelConfigs.value.find((item) => item.isDefault) ??
-    transcriptionModelConfigs.value[0] ??
-    null
-  )
-}
-
-function getGlobalDefaultSpeechModel() {
-  return (
-    speechModelConfigs.value.find((item) => item.isDefault) ?? speechModelConfigs.value[0] ?? null
-  )
-}
-
-function getDefaultModelForProvider(
-  providerHandle?: string | null,
-  preferredModelHandle?: string | null,
-) {
-  if (!providerHandle) {
-    return null
-  }
-
-  const filteredModels = modelConfigs.value.filter(
-    (item) => getModelProviderHandle(item) === providerHandle,
-  )
-
-  if (preferredModelHandle) {
-    const preferredModel =
-      filteredModels.find((item) => item.handle === preferredModelHandle) ?? null
-    if (preferredModel) {
-      return preferredModel
-    }
-  }
-
-  return filteredModels.find((item) => item.isDefault) ?? filteredModels[0] ?? null
-}
-
-function getDefaultTranscriptionModelForProvider(
-  providerHandle?: string | null,
-  preferredModelHandle?: string | null,
-) {
-  if (!providerHandle) {
-    return null
-  }
-
-  const filteredModels = transcriptionModelConfigs.value.filter(
-    (item) => getModelProviderHandle(item) === providerHandle,
-  )
-
-  if (preferredModelHandle) {
-    const preferredModel =
-      filteredModels.find((item) => item.handle === preferredModelHandle) ?? null
-    if (preferredModel) {
-      return preferredModel
-    }
-  }
-
-  return filteredModels.find((item) => item.isDefault) ?? filteredModels[0] ?? null
-}
-
-function getDefaultSpeechModelForProvider(
-  providerHandle?: string | null,
-  preferredModelHandle?: string | null,
-) {
-  if (!providerHandle) {
-    return null
-  }
-
-  const filteredModels = speechModelConfigs.value.filter(
-    (item) => getModelProviderHandle(item) === providerHandle,
-  )
-
-  if (preferredModelHandle) {
-    const preferredModel =
-      filteredModels.find((item) => item.handle === preferredModelHandle) ?? null
-    if (preferredModel) {
-      return preferredModel
-    }
-  }
-
-  return filteredModels.find((item) => item.isDefault) ?? filteredModels[0] ?? null
-}
-
-function getProviderHandle(provider?: AiProviderTypeItem | string | null) {
-  if (!provider) {
-    return null
-  }
-
-  if (typeof provider === 'string') {
-    return provider
-  }
-
-  return provider.handle ?? null
-}
-
-function getModelHandle(model?: AiProviderModelItem | string | null) {
-  if (!model) {
-    return null
-  }
-
-  if (typeof model === 'string') {
-    return model
-  }
-
-  return model.handle ?? null
-}
-
-function getModelProviderHandle(model?: AiProviderModelItem | string | null) {
-  if (!model || typeof model === 'string') {
-    return null
-  }
-
-  return getProviderHandle(model.provider)
+  selectedSpeechProviderHandle.value = target.providerHandle
+  selectedSpeechModelHandle.value = target.modelHandle
 }
 
 function markActiveSendAttemptAsStarted() {
@@ -1577,7 +1323,12 @@ function handleChatRequestFailure(error: unknown, reportToMessageCenter = true) 
     return
   }
 
-  appendLocalFailedExchange(activeSendAttempt.value?.content ?? '', messageKey)
+  appendLocalFailedExchange({
+    content: activeSendAttempt.value?.content ?? '',
+    errorMessage: messageKey,
+    personHandle: currentPersonStore.person?.handle ?? 0,
+    sessionHandle: activeSession.value?.handle ?? 0,
+  })
 }
 
 function normalizeChatErrorMessage(error: unknown) {
@@ -1603,123 +1354,9 @@ function normalizeChatErrorMessage(error: unknown) {
     : 'ai.chat.streamFailed'
 }
 
-function appendLocalFailedExchange(content: string, errorMessage: string) {
-  const trimmedContent = content.trim()
-
-  if (!trimmedContent) {
-    return
-  }
-
-  const lastMessage = messages.value.length > 0 ? messages.value[messages.value.length - 1] : null
-  const nextSequence = (lastMessage?.sequence ?? 0) + 1
-  const personHandle = currentPersonStore.person?.handle ?? 0
-  const sessionHandle = activeSession.value?.handle ?? 0
-  const timestamp = new Date()
-
-  upsertMessage({
-    handle: nextLocalMessageHandle--,
-    session: sessionHandle,
-    person: personHandle,
-    role: 'user',
-    status: 'failed',
-    sequence: nextSequence,
-    content: trimmedContent,
-    createdAt: timestamp,
-    updatedAt: timestamp,
-  } as AiChatMessageItem)
-
-  upsertMessage({
-    handle: nextLocalMessageHandle--,
-    session: sessionHandle,
-    person: personHandle,
-    role: 'assistant',
-    status: 'failed',
-    sequence: nextSequence + 1,
-    content: '',
-    responsePayload: {
-      error: errorMessage,
-    },
-    createdAt: timestamp,
-    updatedAt: timestamp,
-  } as AiChatMessageItem)
-}
-
-interface AssistantSpeechMetadata {
-  status: string
-  providerHandle: string | null
-  model: string | null
-  voice: string | null
-  speed: number | null
-  documentHandle: number | null
-  mimeType: string | null
-  filename: string | null
-  sourceTextLength: number | null
-  wasTruncated: boolean
-  generatedAt: string | null
-  error: string | null
-}
-
-function asRecord(value: unknown): Record<string, unknown> | null {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    return null
-  }
-
-  return value as Record<string, unknown>
-}
-
-function getMessageSpeechMetadata(
-  message?: AiChatMessageItem | null,
-): AssistantSpeechMetadata | null {
-  const responsePayload = asRecord(message?.responsePayload)
-  const speechPayload = asRecord(responsePayload?.speech)
-
-  if (!speechPayload) {
-    return null
-  }
-
-  return {
-    status: typeof speechPayload.status === 'string' ? speechPayload.status : 'completed',
-    providerHandle:
-      typeof speechPayload.providerHandle === 'string' ? speechPayload.providerHandle : null,
-    model: typeof speechPayload.model === 'string' ? speechPayload.model : null,
-    voice: typeof speechPayload.voice === 'string' ? speechPayload.voice : null,
-    speed: typeof speechPayload.speed === 'number' ? speechPayload.speed : null,
-    documentHandle:
-      typeof speechPayload.documentHandle === 'number' ? speechPayload.documentHandle : null,
-    mimeType: typeof speechPayload.mimeType === 'string' ? speechPayload.mimeType : null,
-    filename: typeof speechPayload.filename === 'string' ? speechPayload.filename : null,
-    sourceTextLength:
-      typeof speechPayload.sourceTextLength === 'number' ? speechPayload.sourceTextLength : null,
-    wasTruncated: speechPayload.wasTruncated === true,
-    generatedAt: typeof speechPayload.generatedAt === 'string' ? speechPayload.generatedAt : null,
-    error: typeof speechPayload.error === 'string' ? speechPayload.error : null,
-  }
-}
-
 function getSelectedSpeechModelConfig() {
   return (
     speechModelConfigs.value.find((item) => item.handle === selectedSpeechModelHandle.value) ?? null
-  )
-}
-
-function doesSpeechMetadataMatchSelection(metadata: AssistantSpeechMetadata | null) {
-  const selectedModel = getSelectedSpeechModelConfig()
-  const selectedProviderHandle =
-    getModelProviderHandle(selectedModel) ?? selectedSpeechProviderHandle.value
-
-  if (!metadata || metadata.status !== 'completed' || metadata.documentHandle == null) {
-    return false
-  }
-
-  if (!selectedModel) {
-    return true
-  }
-
-  return (
-    metadata.providerHandle === selectedProviderHandle &&
-    metadata.model === selectedModel.providerModel &&
-    metadata.voice === selectedModel.speechVoice &&
-    metadata.speed === selectedModel.speechSpeed
   )
 }
 
@@ -1787,7 +1424,13 @@ async function ensureMessageSpeech(
 
   const existingSpeech = getMessageSpeechMetadata(message)
 
-  if (doesSpeechMetadataMatchSelection(existingSpeech)) {
+  if (
+    doesSpeechMetadataMatchSelection(
+      existingSpeech,
+      getSelectedSpeechModelConfig(),
+      selectedSpeechProviderHandle.value,
+    )
+  ) {
     return message
   }
 

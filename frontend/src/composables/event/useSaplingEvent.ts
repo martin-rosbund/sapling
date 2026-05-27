@@ -45,25 +45,22 @@ import { formatDateFromTo, formatDateValue, formatTimeValue } from '@/utils/sapl
 import { expandRecurringEvent, isRecurringCalendarEvent } from '@/utils/eventRecurrence'
 import { buildMailMenuActions } from '@/utils/saplingMailMenuUtil'
 import { buildTableOrderBy } from '@/utils/saplingTableUtil'
+import {
+  formatLocalDate,
+  getEventDateParts,
+  getWeekNumber,
+  isValidDate,
+  normalizeDateForCalendarType,
+  parseLocalCalendarDate,
+  roundTime,
+  toTime,
+  type CalendarDateItem,
+  type CalendarType,
+} from '@/composables/event/eventDate.utils'
 
 interface CalendarDatePair {
   start: CalendarDateItem
   end: CalendarDateItem
-}
-
-interface CalendarDateItem {
-  date: string
-  year: number
-  month: number
-  day: number
-  hour: number
-  minute: number
-}
-
-interface EventDateParts {
-  iso: string
-  date: string
-  time: string
 }
 
 interface EventHeroStat {
@@ -108,7 +105,6 @@ export interface SelectedPersonPreviewItem {
   isOwn: boolean
 }
 
-type CalendarType = 'workweek' | 'month' | 'day' | 'week'
 type CalendarViewMode = 'single' | 'sidebyside'
 type CalendarMode = 'default' | 'extended'
 type CalendarParticipant = PersonItem | number | string
@@ -625,19 +621,6 @@ export function useSaplingEvent() {
   }
 
   /**
-   * Parses a yyyy-mm-dd date without converting it through UTC.
-   */
-  function parseLocalCalendarDate(input: string): Date {
-    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(input.trim())
-    if (!match) {
-      return new Date(input)
-    }
-
-    const [, year, month, day] = match
-    return new Date(Number(year), Number(month) - 1, Number(day))
-  }
-
-  /**
    * Moves the calendar anchor to a specific date while keeping the current view aligned.
    */
   function goToDate(target: Date | string) {
@@ -647,7 +630,7 @@ export function useSaplingEvent() {
       return
     }
 
-    const nextValue = formatLocalDate(normalizeDateForCalendarType(parsedDate))
+    const nextValue = formatLocalDate(normalizeDateForCalendarType(parsedDate, calendarType.value))
     if (value.value === nextValue) {
       queueScrollToCurrentTime(0)
       return
@@ -683,6 +666,7 @@ export function useSaplingEvent() {
   function shiftCalendar(direction: 1 | -1) {
     const current = normalizeDateForCalendarType(
       value.value ? parseLocalCalendarDate(value.value) : new Date(),
+      calendarType.value,
     )
     const nextDate = new Date(current)
 
@@ -699,32 +683,7 @@ export function useSaplingEvent() {
         break
     }
 
-    value.value = formatLocalDate(normalizeDateForCalendarType(nextDate))
-  }
-
-  /**
-   * Normalizes an anchor date so weekly and monthly views always land on stable boundaries.
-   */
-  function normalizeDateForCalendarType(date: Date) {
-    const normalized = new Date(date)
-    normalized.setHours(0, 0, 0, 0)
-
-    switch (calendarType.value) {
-      case 'day':
-        return normalized
-      case 'workweek':
-      case 'week': {
-        const day = normalized.getDay()
-        const offsetToMonday = day === 0 ? -6 : 1 - day
-        normalized.setDate(normalized.getDate() + offsetToMonday)
-        return normalized
-      }
-      case 'month':
-        normalized.setDate(1)
-        return normalized
-      default:
-        return normalized
-    }
+    value.value = formatLocalDate(normalizeDateForCalendarType(nextDate, calendarType.value))
   }
 
   /**
@@ -2217,85 +2176,12 @@ export function useSaplingEvent() {
   }
 
   /**
-   * Converts any date-like value into the ISO/date/time fragments used by the edit dialog.
-   */
-  function getEventDateParts(value: number | string | Date): EventDateParts {
-    const date = new Date(value)
-    return {
-      iso: isValidDate(date) ? date.toISOString() : '',
-      date: isValidDate(date) ? formatLocalDate(date) : '',
-      time: isValidDate(date) ? formatLocalTime(date) : '',
-    }
-  }
-
-  /**
-   * Checks whether a date instance represents a valid timestamp.
-   */
-  function isValidDate(date: Date) {
-    return !Number.isNaN(date.getTime())
-  }
-
-  /**
-   * Formats a date as yyyy-mm-dd in local time.
-   */
-  function formatLocalDate(date: Date) {
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day}`
-  }
-
-  /**
-   * Formats a date as HH:mm in local time.
-   */
-  function formatLocalTime(date: Date) {
-    const hours = String(date.getHours()).padStart(2, '0')
-    const minutes = String(date.getMinutes()).padStart(2, '0')
-    return `${hours}:${minutes}`
-  }
-
-  /**
-   * Rounds a timestamp to the configured 15-minute grid.
-   */
-  function roundTime(time: number, down = true) {
-    const roundTo = 15 * 60 * 1000
-    if (down) {
-      return time - (time % roundTo)
-    }
-
-    return time % roundTo === 0 ? time : time + (roundTo - (time % roundTo))
-  }
-
-  /**
-   * Converts a calendar slot payload into a local timestamp.
-   */
-  function toTime(timeSlot: CalendarDateItem) {
-    return new Date(
-      timeSlot.year,
-      timeSlot.month - 1,
-      timeSlot.day,
-      timeSlot.hour,
-      timeSlot.minute,
-    ).getTime()
-  }
-
-  /**
    * Resolves the persisted handle regardless of whether it lives on the root or nested event object.
    */
   function getCalendarEventHandle(event: CalendarEvent | null) {
     return event?.event?.handle ?? event?.handle ?? null
   }
 
-  /**
-   * Computes the ISO week number for the current header label.
-   */
-  function getWeekNumber(date: Date) {
-    const normalized = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
-    const dayNum = normalized.getUTCDay() || 7
-    normalized.setUTCDate(normalized.getUTCDate() + 4 - dayNum)
-    const yearStart = new Date(Date.UTC(normalized.getUTCFullYear(), 0, 1))
-    return Math.ceil(((normalized.getTime() - yearStart.getTime()) / 86400000 + 1) / 7)
-  }
   //#endregion
 
   //#region Return

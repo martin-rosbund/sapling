@@ -85,7 +85,7 @@ export class EffortEstimateItem {
   @Sapling(['isReadOnly'])
   @Property({ persist: false, nullable: true, type: 'float' })
   get totalEstimatedHours(): number {
-    if (!this.positions.isInitialized()) {
+    if (!this.positions?.isInitialized()) {
       return 0;
     }
 

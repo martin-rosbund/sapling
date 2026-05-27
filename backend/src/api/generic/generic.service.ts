@@ -37,6 +37,18 @@ import {
   TimelineRelationDescriptor,
 } from './generic-timeline.service';
 import { GENERIC_DOWNLOAD_LIMIT } from '../../constants/project.constants';
+import {
+  extractImportHandle,
+  getImportErrorMessage,
+  hasImportableRowValues,
+  normalizeBoolean,
+  normalizeImportRow,
+} from './generic-import.util';
+import type {
+  GenericImportResponse,
+  GenericImportRowResult,
+} from './generic-import.util';
+export type { GenericImportResponse } from './generic-import.util';
 
 type ChangeLogPayload = Record<string, unknown> | null;
 type ChangeLogAction = 'create' | 'update' | 'delete';
@@ -75,22 +87,6 @@ type UpdateConflictEvaluation = {
 type RelationMutationContext = Awaited<
   ReturnType<GenericRelationService['addReferenceAndFlush']>
 >;
-type GenericImportAction = 'created' | 'updated' | 'failed' | 'skipped';
-type GenericImportRowResult = {
-  rowNumber: number;
-  action: GenericImportAction;
-  handle?: string | number | null;
-  message?: string;
-};
-export type GenericImportResponse = {
-  totalRows: number;
-  created: number;
-  updated: number;
-  skipped: number;
-  failed: number;
-  rows: GenericImportRowResult[];
-};
-
 const GENERIC_CONCURRENCY_METADATA_KEY = '_saplingConcurrency';
 const CHANGE_LOG_DETAIL_IGNORED_FIELDS = new Set(['updatedAt']);
 const UPDATE_CONFLICT_IGNORED_FIELDS = new Set([
@@ -358,13 +354,13 @@ export class GenericService {
     for (const [index, row] of rows.entries()) {
       const rowNumber = index + 2;
 
-      if (!this.hasImportableRowValues(row)) {
+      if (!hasImportableRowValues(row)) {
         results.push({ rowNumber, action: 'skipped' });
         continue;
       }
 
-      const payload = this.normalizeImportRow(template, row);
-      const handle = this.extractImportHandle(payload);
+      const payload = normalizeImportRow(template, row);
+      const handle = extractImportHandle(payload);
 
       try {
         if (handle == null) {
@@ -400,7 +396,7 @@ export class GenericService {
           rowNumber,
           action: 'failed',
           handle,
-          message: this.getImportErrorMessage(error),
+          message: getImportErrorMessage(error),
         });
       }
     }
@@ -1612,8 +1608,8 @@ export class GenericService {
       metadata.resolution = 'merge';
     }
 
-    const mergeRequested = this.normalizeBoolean(metadata.merge);
-    const forceRequested = this.normalizeBoolean(metadata.force);
+    const mergeRequested = normalizeBoolean(metadata.merge);
+    const forceRequested = normalizeBoolean(metadata.force);
     const resolution =
       forceRequested === true
         ? 'overwrite'
@@ -1713,7 +1709,7 @@ export class GenericService {
       .filter((property) => !UPDATE_CONFLICT_IGNORED_FIELDS.has(property))
       .sort((left, right) => left.localeCompare(right))
       .map((property) => {
-        const attemptedHasProperty = Object.prototype.hasOwnProperty.call(
+        const attemptedHasProperty = this.hasOwnRecordProperty(
           attemptedRecord,
           property,
         );
@@ -1806,13 +1802,14 @@ export class GenericService {
     const mergeableProperties = new Set(conflict.mergeableProperties);
     const mergedData = Object.fromEntries(
       Object.entries(data).filter(([key]) => mergeableProperties.has(key)),
-    ) as { createdAt?: Date; updatedAt?: Date; [key: string]: any };
+    ) as { createdAt?: Date; updatedAt?: Date } & Record<string, unknown>;
+    const dataRecord = data as Record<string, unknown>;
 
     if (
-      !Object.prototype.hasOwnProperty.call(mergedData, 'handle') &&
-      Object.prototype.hasOwnProperty.call(data, 'handle')
+      !this.hasOwnRecordProperty(mergedData, 'handle') &&
+      this.hasOwnRecordProperty(dataRecord, 'handle')
     ) {
-      mergedData.handle = data.handle;
+      mergedData.handle = dataRecord.handle;
     }
 
     return mergedData;
@@ -1957,154 +1954,14 @@ export class GenericService {
       : parsedDate.toISOString();
   }
 
-  private normalizeBoolean(value: unknown): boolean | null {
-    if (typeof value === 'boolean') {
-      return value;
-    }
-
-    if (typeof value !== 'string') {
-      return null;
-    }
-
-    const normalizedValue = value.trim().toLowerCase();
-    if (['1', 'true', 'yes', 'on'].includes(normalizedValue)) {
-      return true;
-    }
-
-    if (['0', 'false', 'no', 'off'].includes(normalizedValue)) {
-      return false;
-    }
-
-    return null;
-  }
-
-  private hasImportableRowValues(row: unknown): row is Record<string, unknown> {
-    if (!row || typeof row !== 'object' || Array.isArray(row)) {
-      return false;
-    }
-
-    return Object.values(row).some(
-      (value) => value != null && String(value).trim().length > 0,
-    );
-  }
-
-  private normalizeImportRow(
-    template: EntityTemplateDto[],
-    row: Record<string, unknown>,
-  ): { createdAt?: Date; updatedAt?: Date; [key: string]: any } {
-    const templateByName = new Map(
-      template.map((field) => [field.name, field]),
-    );
-    const payload: { createdAt?: Date; updatedAt?: Date; [key: string]: any } =
-      {};
-
-    for (const [key, value] of Object.entries(row)) {
-      const field = templateByName.get(key);
-
-      if (!field || this.shouldSkipImportField(field)) {
-        continue;
-      }
-
-      payload[key] = this.normalizeImportValue(field, value);
-    }
-
-    return payload;
-  }
-
-  private shouldSkipImportField(field: EntityTemplateDto): boolean {
-    if (!field.name || field.isPersistent === false) {
-      return true;
-    }
-
-    if (field.options?.includes('isReadOnly')) {
-      return true;
-    }
-
-    if (field.kind && ['1:m', 'm:n', 'n:m', '1:1'].includes(field.kind)) {
-      return true;
-    }
-
-    return false;
-  }
-
-  private normalizeImportValue(
-    field: EntityTemplateDto,
-    value: unknown,
-  ): unknown {
-    if (value == null) {
-      return null;
-    }
-
-    if (typeof value !== 'string') {
-      return value;
-    }
-
-    const trimmedValue = value.trim();
-    if (!trimmedValue) {
-      return null;
-    }
-
-    if (field.type === 'boolean') {
-      return this.normalizeBoolean(trimmedValue) ?? trimmedValue;
-    }
-
-    if (this.isImportNumberField(field)) {
-      const normalizedNumber = Number(
-        trimmedValue.includes(',') && !trimmedValue.includes('.')
-          ? trimmedValue.replace(',', '.')
-          : trimmedValue,
-      );
-      return Number.isFinite(normalizedNumber)
-        ? normalizedNumber
-        : trimmedValue;
-    }
-
-    return trimmedValue;
-  }
-
-  private isImportNumberField(field: EntityTemplateDto): boolean {
-    return [
-      'number',
-      'float',
-      'double',
-      'decimal',
-      'real',
-      'int',
-      'integer',
-      'smallint',
-      'bigint',
-    ].includes(field.type);
-  }
-
-  private extractImportHandle(
-    payload: Record<string, unknown>,
-  ): string | number | null {
-    const handle = payload.handle;
-    return typeof handle === 'string' || typeof handle === 'number'
-      ? handle
-      : null;
-  }
-
-  private getImportErrorMessage(error: unknown): string {
-    if (error && typeof error === 'object') {
-      const response = (error as { response?: unknown }).response;
-      if (typeof response === 'string') {
-        return response;
-      }
-
-      const message = (error as { message?: unknown }).message;
-      if (typeof message === 'string' && message.trim()) {
-        return message;
-      }
-    }
-
-    return 'exception.unknownError';
-  }
-
   private asUnknownRecord(value: unknown): Record<string, unknown> | null {
     return value && typeof value === 'object' && !Array.isArray(value)
       ? (value as Record<string, unknown>)
       : null;
+  }
+
+  private hasOwnRecordProperty(record: object, property: PropertyKey): boolean {
+    return Object.prototype.hasOwnProperty.call(record, property) === true;
   }
 
   private async safeStoreChangeLog(

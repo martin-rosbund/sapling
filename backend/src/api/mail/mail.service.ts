@@ -16,11 +16,23 @@ import * as path from 'path';
 import { TemplateService } from '../template/template.service';
 import { MessageTemplateService } from '../template/message-template.service';
 import { renderMarkdownBlocks } from './markdown.util';
+import { buildMimeMessage } from './mail-mime.util';
+import {
+  buildFallbackSenderOptions,
+  buildPersonDisplayName,
+  buildStandaloneSenderOption,
+  extractProviderHandle,
+  getAssignedSharedMailboxSenders,
+  isSupportedMailProvider,
+  mergeSenderOptions,
+  parseSupportedProvider,
+  pushSenderOption,
+  type MailSenderOption,
+} from './mail-sender-options.util';
 import { EmailTemplateItem } from '../../entity/EmailTemplateItem';
 import { PersonItem } from '../../entity/PersonItem';
 import {
   MailSenderListResponseDto,
-  MailSenderOptionDto,
   MailPreviewDto,
   MailPreviewResponseDto,
   MailSendDto,
@@ -46,177 +58,22 @@ import {
   GOOGLE_CLIENT_SECRET,
   REDIS_ENABLED,
 } from '../../constants/project.constants';
-
-type JsonRecord = Record<string, unknown>;
-type SupportedMailProvider = 'azure' | 'google';
-
-type MailAttachment = {
-  handle: number;
-  filename: string;
-  mimetype: string;
-  filePath: string;
-};
-
-type SendResult = {
-  responseStatusCode?: number;
-  responseBody?: object;
-  responseHeaders?: object;
-  providerMessageId?: string;
-};
-
-type MailSenderOption = MailSenderOptionDto;
-type ProviderErrorShape = {
-  statusCode?: number;
-  body?: unknown;
-  headers?: unknown;
-  message?: string;
-};
+import {
+  buildMailEventDescription,
+  buildMailEventTitle,
+  getMailProviderErrorShape,
+  isAuthenticationProviderError,
+  isRecord,
+  normalizeDisplayName,
+  normalizeEmailAddress,
+  toPersistedObject,
+  type JsonRecord,
+  type MailAttachment,
+  type SendResult,
+  type SupportedMailProvider,
+} from './mail-delivery.util';
 
 const MAIL_EVENT_DURATION_MINUTES = 5;
-const MAIL_EVENT_TITLE_MAX_LENGTH = 128;
-const MAIL_EVENT_TITLE_TRUNCATE_AT = 125;
-const MAIL_EVENT_DESCRIPTION_MAX_LENGTH = 1024;
-const MAIL_EVENT_DESCRIPTION_TRUNCATE_AT = 1021;
-
-function truncateWithEllipsis(
-  value: string,
-  maxLength: number,
-  truncateAt: number,
-): string {
-  return value.length > maxLength ? `${value.slice(0, truncateAt)}...` : value;
-}
-
-function buildMailEventTitle(delivery: EmailDeliveryItem): string {
-  const recipientList = (delivery.toRecipients ?? []).join(', ');
-  const baseTitle = recipientList ? `E-Mail an ${recipientList}` : 'E-Mail';
-  return truncateWithEllipsis(
-    baseTitle,
-    MAIL_EVENT_TITLE_MAX_LENGTH,
-    MAIL_EVENT_TITLE_TRUNCATE_AT,
-  );
-}
-
-function buildMailEventDescription(delivery: EmailDeliveryItem): string {
-  const subjectLine = delivery.subject
-    ? `Betreff: ${delivery.subject}\n\n`
-    : '';
-  const body = delivery.bodyMarkdown ?? '';
-  return truncateWithEllipsis(
-    `${subjectLine}${body}`,
-    MAIL_EVENT_DESCRIPTION_MAX_LENGTH,
-    MAIL_EVENT_DESCRIPTION_TRUNCATE_AT,
-  );
-}
-
-function isRecord(value: unknown): value is JsonRecord {
-  return typeof value === 'object' && value !== null;
-}
-
-function toPersistedObject(value: unknown): object | undefined {
-  return isRecord(value) ? value : undefined;
-}
-
-function extractStatusCode(value: unknown): number | undefined {
-  return typeof value === 'number' ? value : undefined;
-}
-
-function getMailProviderErrorShape(error: unknown): ProviderErrorShape {
-  if (isRecord(error)) {
-    const response = isRecord(error.response) ? error.response : undefined;
-
-    return {
-      statusCode:
-        extractStatusCode(error.statusCode) ??
-        extractStatusCode(response?.status),
-      body: error.body ?? response?.data,
-      headers: error.headers ?? response?.headers,
-      message: typeof error.message === 'string' ? error.message : undefined,
-    };
-  }
-
-  return {
-    message: error instanceof Error ? error.message : 'Unknown error',
-  };
-}
-
-function extractProviderErrorCode(body: unknown): string | undefined {
-  if (!isRecord(body)) {
-    return undefined;
-  }
-
-  const directCode =
-    typeof body.code === 'string' ? body.code.trim() : undefined;
-  if (directCode) {
-    return directCode;
-  }
-
-  if (isRecord(body.error) && typeof body.error.code === 'string') {
-    const nestedCode = body.error.code.trim();
-    if (nestedCode.length > 0) {
-      return nestedCode;
-    }
-  }
-
-  if (typeof body.error === 'string') {
-    const errorCode = body.error.trim();
-    return errorCode.length > 0 ? errorCode : undefined;
-  }
-
-  return undefined;
-}
-
-function isAuthenticationProviderError(error: unknown): boolean {
-  const providerError = getMailProviderErrorShape(error);
-  if (providerError.statusCode === 401 || providerError.statusCode === 403) {
-    return true;
-  }
-
-  const errorCode = extractProviderErrorCode(providerError.body)?.toLowerCase();
-  return Boolean(
-    errorCode &&
-    (errorCode.includes('token') ||
-      errorCode.includes('auth') ||
-      errorCode.includes('unauthorized') ||
-      errorCode.includes('forbidden') ||
-      errorCode.includes('invalid_grant')),
-  );
-}
-
-function normalizeEmailAddress(
-  value: string | null | undefined,
-): string | undefined {
-  const rawValue = value?.trim();
-  if (!rawValue) {
-    return undefined;
-  }
-
-  const angleBracketMatch = rawValue.match(/<([^<>]+)>/);
-  const bracketNormalized = angleBracketMatch?.[1]?.trim() ?? rawValue;
-
-  if (/^[a-z][a-z0-9+.-]*:/i.test(bracketNormalized)) {
-    if (!/^smtp:/i.test(bracketNormalized)) {
-      return undefined;
-    }
-  }
-
-  const normalized = bracketNormalized.replace(/^smtp:/i, '').trim();
-  if (
-    !normalized ||
-    /\s/.test(normalized) ||
-    !/^[^@\s<>]+@[^@\s<>]+$/.test(normalized)
-  ) {
-    return undefined;
-  }
-
-  return normalized;
-}
-
-function normalizeDisplayName(
-  value: string | null | undefined,
-): string | undefined {
-  const normalized = value?.trim();
-  return normalized ? normalized : undefined;
-}
 
 @Injectable()
 export class MailService {
@@ -237,10 +94,10 @@ export class MailService {
       return { senders: [] };
     }
 
-    const provider = this.extractProviderHandle(person);
-    const fallbackSenders = this.buildFallbackSenderOptions(person, provider);
+    const provider = extractProviderHandle(person);
+    const fallbackSenders = buildFallbackSenderOptions(person, provider);
 
-    if (!this.isSupportedMailProvider(provider) || !person.session) {
+    if (!isSupportedMailProvider(provider) || !person.session) {
       return {
         provider,
         senders: fallbackSenders,
@@ -864,7 +721,7 @@ export class MailService {
       throw new BadRequestException('mail.sessionNotFound');
     }
 
-    const provider = this.parseSupportedProvider(delivery.provider);
+    const provider = parseSupportedProvider(delivery.provider);
     if (!provider) {
       throw new BadRequestException('mail.providerNotSupported');
     }
@@ -1013,9 +870,10 @@ export class MailService {
     });
 
     const gmail = google.gmail({ version: 'v1', auth });
-    const rawMessage = this.buildMimeMessage(
+    const rawMessage = buildMimeMessage(
       delivery,
       attachments,
+      this.messageTemplateService.stripMarkdown(delivery.bodyMarkdown),
       senderEmail,
     );
     const result = await gmail.users.messages.send({
@@ -1037,124 +895,6 @@ export class MailService {
       ),
       providerMessageId: result.data.id ?? undefined,
     };
-  }
-
-  private buildMimeMessage(
-    delivery: EmailDeliveryItem,
-    attachments: MailAttachment[],
-    senderEmail?: string,
-  ): string {
-    const mixedBoundary = `mixed_${Date.now()}`;
-    const alternativeBoundary = `alt_${Date.now()}`;
-    const headers = [
-      ...(senderEmail ? [`From: ${senderEmail}`] : []),
-      `To: ${delivery.toRecipients.join(', ')}`,
-      ...(delivery.ccRecipients?.length
-        ? [`Cc: ${delivery.ccRecipients.join(', ')}`]
-        : []),
-      ...(delivery.bccRecipients?.length
-        ? [`Bcc: ${delivery.bccRecipients.join(', ')}`]
-        : []),
-      `Subject: ${this.encodeMimeHeader(delivery.subject)}`,
-      'MIME-Version: 1.0',
-      attachments.length > 0
-        ? `Content-Type: multipart/mixed; boundary="${mixedBoundary}"`
-        : `Content-Type: multipart/alternative; boundary="${alternativeBoundary}"`,
-      '',
-    ];
-
-    const alternativeBody = [
-      `--${alternativeBoundary}`,
-      'Content-Type: text/plain; charset="UTF-8"',
-      'Content-Transfer-Encoding: 7bit',
-      '',
-      this.stripMarkdown(delivery.bodyMarkdown),
-      '',
-      `--${alternativeBoundary}`,
-      'Content-Type: text/html; charset="UTF-8"',
-      'Content-Transfer-Encoding: 7bit',
-      '',
-      delivery.bodyHtml,
-      '',
-      `--${alternativeBoundary}--`,
-      '',
-    ].join('\r\n');
-
-    if (attachments.length === 0) {
-      return `${headers.join('\r\n')}${alternativeBody}`;
-    }
-
-    const parts = [
-      `--${mixedBoundary}`,
-      `Content-Type: multipart/alternative; boundary="${alternativeBoundary}"`,
-      '',
-      alternativeBody,
-    ];
-
-    for (const attachment of attachments) {
-      const content = fs.readFileSync(attachment.filePath).toString('base64');
-      parts.push(
-        `--${mixedBoundary}`,
-        `Content-Type: ${attachment.mimetype}; name="${this.escapeMimeValue(attachment.filename)}"`,
-        'Content-Transfer-Encoding: base64',
-        `Content-Disposition: attachment; filename="${this.escapeMimeValue(attachment.filename)}"`,
-        '',
-        content,
-        '',
-      );
-    }
-
-    parts.push(`--${mixedBoundary}--`, '');
-
-    return `${headers.join('\r\n')}${parts.join('\r\n')}`;
-  }
-
-  private encodeMimeHeader(value: string): string {
-    return `=?UTF-8?B?${Buffer.from(value, 'utf8').toString('base64')}?=`;
-  }
-
-  private escapeMimeValue(value: string): string {
-    return value.replace(/"/g, '');
-  }
-
-  private stripMarkdown(markdown: string): string {
-    return this.messageTemplateService.stripMarkdown(markdown);
-  }
-
-  private htmlToPlainText(html: string): string {
-    return this.decodeHtmlEntities(
-      html
-        .replace(/<br\s*\/?>/gi, '\n')
-        .replace(/<li[^>]*>/gi, '- ')
-        .replace(/<\/li>/gi, '\n')
-        .replace(/<\/(p|div|h1|h2|h3|h4|h5|h6|blockquote|pre|tr)>/gi, '\n')
-        .replace(/<\/(ul|ol|table|thead|tbody)>/gi, '\n')
-        .replace(/<t[dh][^>]*>/gi, '')
-        .replace(/<\/t[dh]>/gi, '\t')
-        .replace(/<[^>]+>/g, '')
-        .replace(/\t\n/g, '\n')
-        .replace(/\n{3,}/g, '\n\n')
-        .split('\n')
-        .map((line) => line.trimEnd())
-        .join('\n')
-        .trim(),
-    );
-  }
-
-  private decodeHtmlEntities(value: string): string {
-    return value
-      .replace(/&nbsp;/g, ' ')
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'")
-      .replace(/&#(\d+);/g, (_match, code) =>
-        String.fromCodePoint(Number(code)),
-      )
-      .replace(/&#x([\da-f]+);/gi, (_match, code) =>
-        String.fromCodePoint(parseInt(String(code), 16)),
-      );
   }
 
   private async loadCurrentMailPerson(
@@ -1179,70 +919,12 @@ export class MailService {
     );
   }
 
-  private extractProviderHandle(person: PersonItem): string | undefined {
-    if (typeof person.type === 'string') {
-      return person.type;
-    }
-
-    return person.type?.handle;
-  }
-
-  private isSupportedMailProvider(
-    provider: string | undefined,
-  ): provider is SupportedMailProvider {
-    return provider === 'azure' || provider === 'google';
-  }
-
-  private parseSupportedProvider(
-    provider: string | undefined,
-  ): SupportedMailProvider | null {
-    return this.isSupportedMailProvider(provider) ? provider : null;
-  }
-
-  private extractSharedMailboxProviderHandle(
-    provider:
-      | string
-      | {
-          handle?: string;
-        }
-      | null
-      | undefined,
-  ): string | undefined {
-    if (typeof provider === 'string') {
-      return provider;
-    }
-
-    return provider?.handle;
-  }
-
-  private buildFallbackSenderOptions(
-    person: PersonItem,
-    provider: string | undefined,
-  ): MailSenderOption[] {
-    const fallbackEmail = normalizeEmailAddress(person.email);
-    if (!fallbackEmail) {
-      return [];
-    }
-
-    return [
-      {
-        email: fallbackEmail,
-        displayName:
-          `${person.firstName ?? ''} ${person.lastName ?? ''}`.trim() ||
-          fallbackEmail,
-        provider: provider ?? 'sapling',
-        source: 'profile',
-        isDefault: true,
-      },
-    ];
-  }
-
   private async listAvailableSendersForProvider(
     provider: SupportedMailProvider,
     person: PersonItem,
     session: PersonSessionItem,
   ): Promise<MailSenderOption[]> {
-    const assignedSharedMailboxes = this.getAssignedSharedMailboxSenders(
+    const assignedSharedMailboxes = getAssignedSharedMailboxSenders(
       person,
       provider,
     );
@@ -1252,17 +934,14 @@ export class MailService {
         person,
         session,
       );
-      return this.mergeSenderOptions(
-        discoveredSenders,
-        assignedSharedMailboxes,
-      );
+      return mergeSenderOptions(discoveredSenders, assignedSharedMailboxes);
     }
 
     const discoveredSenders = await this.listGoogleSenderOptions(
       person,
       session,
     );
-    return this.mergeSenderOptions(discoveredSenders, assignedSharedMailboxes);
+    return mergeSenderOptions(discoveredSenders, assignedSharedMailboxes);
   }
 
   private async resolveRequestedSender(
@@ -1273,19 +952,19 @@ export class MailService {
     const person = await this.loadCurrentMailPerson(currentUser);
 
     if (!person) {
-      return this.buildStandaloneSenderOption(
+      return buildStandaloneSenderOption(
         normalizedRequested ?? normalizeEmailAddress(currentUser.email),
-        this.extractProviderHandle(currentUser) ?? 'sapling',
-        this.buildPersonDisplayName(currentUser),
+        extractProviderHandle(currentUser) ?? 'sapling',
+        buildPersonDisplayName(currentUser),
       );
     }
 
-    const provider = this.extractProviderHandle(person);
-    if (!this.isSupportedMailProvider(provider) || !person.session) {
-      return this.buildStandaloneSenderOption(
+    const provider = extractProviderHandle(person);
+    if (!isSupportedMailProvider(provider) || !person.session) {
+      return buildStandaloneSenderOption(
         normalizedRequested ?? normalizeEmailAddress(person.email),
         provider ?? 'sapling',
-        this.buildPersonDisplayName(person),
+        buildPersonDisplayName(person),
       );
     }
 
@@ -1296,10 +975,10 @@ export class MailService {
     );
 
     if (senders.length === 0) {
-      return this.buildStandaloneSenderOption(
+      return buildStandaloneSenderOption(
         normalizedRequested ?? normalizeEmailAddress(person.email),
         provider,
-        this.buildPersonDisplayName(person),
+        buildPersonDisplayName(person),
       );
     }
 
@@ -1326,7 +1005,7 @@ export class MailService {
   ): Promise<MailSenderOption[]> {
     const accessToken = await this.resolveActiveAccessToken('azure', session);
     if (!accessToken) {
-      return this.buildFallbackSenderOptions(person, 'azure');
+      return buildFallbackSenderOptions(person, 'azure');
     }
 
     const client = Client.init({
@@ -1347,7 +1026,7 @@ export class MailService {
       normalizeEmailAddress(person.email);
     const senders: MailSenderOption[] = [];
 
-    this.pushSenderOption(
+    pushSenderOption(
       senders,
       primaryEmail,
       displayName,
@@ -1356,7 +1035,7 @@ export class MailService {
       true,
     );
 
-    this.pushSenderOption(
+    pushSenderOption(
       senders,
       normalizeEmailAddress(person.email),
       displayName,
@@ -1384,7 +1063,7 @@ export class MailService {
       primaryEmail ||
       undefined;
 
-    this.pushSenderOption(
+    pushSenderOption(
       senders,
       primaryEmail,
       displayName,
@@ -1402,7 +1081,7 @@ export class MailService {
         : [];
 
       for (const sendAs of sendAsEntries) {
-        this.pushSenderOption(
+        pushSenderOption(
           senders,
           normalizeEmailAddress(sendAs.sendAsEmail),
           sendAs.displayName || displayName,
@@ -1417,7 +1096,7 @@ export class MailService {
       );
     }
 
-    this.pushSenderOption(
+    pushSenderOption(
       senders,
       normalizeEmailAddress(person.email),
       displayName,
@@ -1426,141 +1105,6 @@ export class MailService {
     );
 
     return senders;
-  }
-
-  private pushSenderOption(
-    target: MailSenderOption[],
-    email: string | undefined,
-    displayName: string | undefined,
-    provider: SupportedMailProvider,
-    source: string,
-    isDefault = false,
-  ): void {
-    const normalizedEmail = normalizeEmailAddress(email);
-    if (!normalizedEmail) {
-      return;
-    }
-
-    const existing = target.find(
-      (entry) =>
-        entry.email.trim().toLowerCase() ===
-        normalizedEmail.trim().toLowerCase(),
-    );
-
-    if (existing) {
-      if (!existing.displayName && displayName) {
-        existing.displayName = displayName;
-      }
-      existing.isDefault = existing.isDefault || isDefault;
-      return;
-    }
-
-    target.push({
-      email: normalizedEmail,
-      displayName,
-      provider,
-      source,
-      isDefault,
-    });
-  }
-
-  private mergeSenderOptions(
-    discoveredSenders: MailSenderOption[],
-    configuredSenders: MailSenderOption[],
-  ): MailSenderOption[] {
-    const merged = [...discoveredSenders];
-
-    for (const configuredSender of configuredSenders) {
-      const existing = merged.find(
-        (sender) =>
-          sender.email.trim().toLowerCase() ===
-          configuredSender.email.trim().toLowerCase(),
-      );
-
-      if (existing) {
-        existing.displayName =
-          configuredSender.displayName ?? existing.displayName;
-        existing.provider = configuredSender.provider;
-        existing.source = configuredSender.source;
-        existing.isDefault = existing.isDefault || configuredSender.isDefault;
-        continue;
-      }
-
-      this.pushSenderOption(
-        merged,
-        configuredSender.email,
-        configuredSender.displayName,
-        configuredSender.provider as SupportedMailProvider,
-        configuredSender.source,
-        configuredSender.isDefault,
-      );
-    }
-
-    return merged;
-  }
-
-  private buildPersonDisplayName(person: PersonItem): string | undefined {
-    return (
-      `${person.firstName ?? ''} ${person.lastName ?? ''}`.trim() || undefined
-    );
-  }
-
-  private buildStandaloneSenderOption(
-    email: string | undefined,
-    provider: string,
-    displayName?: string,
-  ): MailSenderOption | undefined {
-    const normalizedEmail = normalizeEmailAddress(email);
-    if (!normalizedEmail) {
-      return undefined;
-    }
-
-    return {
-      email: normalizedEmail,
-      displayName,
-      provider,
-      source: 'profile',
-      isDefault: true,
-    };
-  }
-
-  private getAssignedSharedMailboxSenders(
-    person: PersonItem,
-    provider: SupportedMailProvider,
-  ): MailSenderOption[] {
-    const sharedMailboxGroups = person.sharedMailboxGroups ?? [];
-    const configuredSenders: MailSenderOption[] = [];
-
-    for (const sharedMailboxGroup of sharedMailboxGroups) {
-      if (sharedMailboxGroup.isActive === false) {
-        continue;
-      }
-
-      const groupMailboxes = sharedMailboxGroup.items ?? [];
-      for (const sharedMailbox of groupMailboxes) {
-        if (!sharedMailbox.isActive) {
-          continue;
-        }
-
-        if (
-          this.extractSharedMailboxProviderHandle(sharedMailbox.provider)
-            ?.trim()
-            .toLowerCase() !== provider.trim().toLowerCase()
-        ) {
-          continue;
-        }
-
-        this.pushSenderOption(
-          configuredSenders,
-          sharedMailbox.email,
-          sharedMailbox.title?.trim() || sharedMailbox.email,
-          provider,
-          'configured',
-        );
-      }
-    }
-
-    return configuredSenders;
   }
 
   private async resolveActiveAccessToken(
