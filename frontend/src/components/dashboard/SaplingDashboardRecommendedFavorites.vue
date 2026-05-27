@@ -30,12 +30,8 @@ import type { FavoriteTemplateItem } from '@/entity/entity'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-const {
-  isLoading,
-  hasFavoriteTemplateAccess,
-  favoriteTemplates,
-  goToFavoriteTemplate,
-} = useSaplingFavorites()
+const { isLoading, hasFavoriteTemplateAccess, favoriteTemplates, goToFavoriteTemplate } =
+  useSaplingFavorites()
 
 const { t } = useI18n()
 

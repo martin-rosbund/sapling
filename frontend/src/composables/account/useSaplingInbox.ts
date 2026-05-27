@@ -84,12 +84,7 @@ export interface InboxSection {
 
 export interface InboxSummaryCard {
   key: 'total' | 'overdue' | 'today' | 'upcoming' | 'later'
-  labelKey:
-    | 'navigation.inbox'
-    | 'inbox.overdue'
-    | 'inbox.today'
-    | 'inbox.upcoming'
-    | 'inbox.later'
+  labelKey: 'navigation.inbox' | 'inbox.overdue' | 'inbox.today' | 'inbox.upcoming' | 'inbox.later'
   icon: string
   count: number
   tone: 'primary' | 'warning' | 'info' | 'success'

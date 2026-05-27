@@ -1,0 +1,13 @@
+[
+  {
+    "handle": "ollama",
+    "title": "Ollama",
+    "icon": "mdi-server",
+    "color": "#1F2937",
+    "credentialTypes": ["ollamaBaseUrl"],
+    "credentials": {
+      "ollamaBaseUrl": "http://127.0.0.1:11434/v1"
+    },
+    "isActive": true
+  }
+]

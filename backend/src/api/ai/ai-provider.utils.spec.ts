@@ -15,9 +15,11 @@ import {
 } from './ai-provider.utils';
 
 describe('ai-provider.utils', () => {
-  it('resolves LM Studio as an OpenAI-compatible provider', () => {
+  it('resolves local OpenAI-compatible providers', () => {
     expect(resolveProviderKind('lmstudio')).toBe('openaiCompatible');
     expect(resolveProviderKind('LMStudio')).toBe('openaiCompatible');
+    expect(resolveProviderKind('ollama')).toBe('openaiCompatible');
+    expect(resolveProviderKind('Ollama')).toBe('openaiCompatible');
     expect(resolveProviderKind('gemini')).toBe('gemini');
     expect(resolveProviderKind('openai')).toBe('openai');
   });
@@ -40,5 +42,16 @@ describe('ai-provider.utils', () => {
         credentials: null,
       } as never),
     ).toBe(false);
+  });
+
+  it('accepts an Ollama base URL as usable provider configuration', () => {
+    expect(
+      hasUsableProviderCredentials({
+        handle: 'ollama',
+        credentials: {
+          ollamaBaseUrl: 'http://127.0.0.1:11434/v1',
+        },
+      } as never),
+    ).toBe(true);
   });
 });

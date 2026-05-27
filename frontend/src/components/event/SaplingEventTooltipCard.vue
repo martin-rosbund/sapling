@@ -120,18 +120,26 @@ const props = defineProps<{
 const { t } = useI18n()
 const record = computed(() => props.event.event as TooltipRecord | undefined)
 const eventIcon = computed(() => record.value?.type?.icon || record.value?.icon || props.icon)
-const eventTitle = computed(() => record.value?.title || props.event.name || t('event.defaultTitle'))
+const eventTitle = computed(
+  () => record.value?.title || props.event.name || t('event.defaultTitle'),
+)
 
 const customerCompanyName = computed(() => resolveRelationName(record.value?.creatorCompany))
 const customerPersonName = computed(() => resolveRelationName(record.value?.creatorPerson))
 const responsibleCompanyName = computed(() => resolveRelationName(record.value?.assigneeCompany))
 const responsiblePersonName = computed(() => resolveRelationName(record.value?.assigneePerson))
-const onlineMeetingUrl = computed(() => normalizeUrl(
-  record.value?.onlineMeetingURL ?? record.value?.onlineMeetingUrl ?? record.value?.online_meeting_url,
-))
+const onlineMeetingUrl = computed(() =>
+  normalizeUrl(
+    record.value?.onlineMeetingURL ??
+      record.value?.onlineMeetingUrl ??
+      record.value?.online_meeting_url,
+  ),
+)
 
 const participantNames = computed(() =>
-  normalizeNames(record.value?.participants?.map((participant) => resolveParticipantName(participant))),
+  normalizeNames(
+    record.value?.participants?.map((participant) => resolveParticipantName(participant)),
+  ),
 )
 
 function resolveParticipantName(participant: CalendarParticipant | undefined) {

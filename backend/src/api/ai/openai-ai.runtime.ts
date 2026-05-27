@@ -6,6 +6,8 @@ const OPENAI_API_KEY_CREDENTIAL = 'openAiApiKey';
 const OPENAI_BASE_URL_CREDENTIAL = 'openAiBaseUrl';
 const LM_STUDIO_API_KEY_CREDENTIAL = 'lmStudioApiKey';
 const LM_STUDIO_BASE_URL_CREDENTIAL = 'lmStudioBaseUrl';
+const OLLAMA_API_KEY_CREDENTIAL = 'ollamaApiKey';
+const OLLAMA_BASE_URL_CREDENTIAL = 'ollamaBaseUrl';
 const LOCAL_OPENAI_COMPATIBLE_API_KEY = 'sapling-local';
 
 export function createOpenAiClient(provider: AiProviderTypeItem): OpenAI {
@@ -31,7 +33,8 @@ export function getOpenAiApiKey(provider: AiProviderTypeItem): string | null {
 export function getOpenAiBaseUrl(provider: AiProviderTypeItem): string | null {
   const baseUrl =
     getProviderCredential(provider, OPENAI_BASE_URL_CREDENTIAL) ??
-    getProviderCredential(provider, LM_STUDIO_BASE_URL_CREDENTIAL);
+    getProviderCredential(provider, LM_STUDIO_BASE_URL_CREDENTIAL) ??
+    getProviderCredential(provider, OLLAMA_BASE_URL_CREDENTIAL);
 
   return baseUrl ? normalizeOpenAiBaseUrl(baseUrl) : null;
 }
@@ -121,6 +124,7 @@ function getOpenAiCompatibleApiKey(provider: AiProviderTypeItem): string {
   return (
     getOpenAiApiKey(provider) ??
     getProviderCredential(provider, LM_STUDIO_API_KEY_CREDENTIAL) ??
+    getProviderCredential(provider, OLLAMA_API_KEY_CREDENTIAL) ??
     LOCAL_OPENAI_COMPATIBLE_API_KEY
   );
 }

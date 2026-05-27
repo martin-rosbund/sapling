@@ -7,5 +7,6 @@
   { "entity": "calendar", "property": "participants", "de": "Teilnehmer", "en": "Participants" },
   { "entity": "calendar", "property": "noParticipants", "de": "Keine Teilnehmer", "en": "No participants" },
   { "entity": "calendar", "property": "noValue", "de": "Keine Angabe", "en": "Not specified" },
+  
   { "entity": "event", "property": "defaultTitle", "de": "Termin", "en": "Appointment" }
 ]

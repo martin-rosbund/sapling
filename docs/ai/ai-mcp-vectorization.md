@@ -37,8 +37,8 @@ Provider/model records are stored in the database. Runtime credentials and provi
 
 ### OpenAI-Compatible Local Providers
 
-LM Studio is registered as an OpenAI-compatible provider with handle `lmstudio`.
-It uses the normal provider/model records, so the frontend selectors do not need
+LM Studio and Ollama are registered as OpenAI-compatible local providers. They
+use the normal provider/model records, so the frontend selectors do not need
 special-case behavior.
 
 Default local configuration:
@@ -50,9 +50,22 @@ chat model: openai/gpt-oss-20b
 embedding model: text-embedding-nomic-embed-text-v1.5
 ```
 
+Default Ollama configuration:
+
+```text
+provider handle: ollama
+base URL credential: ollamaBaseUrl = http://127.0.0.1:11434/v1
+chat model example: gpt-oss:20b
+embedding model example: nomic-embed-text
+```
+
 Local models should set `supportsTools` only when the loaded model reliably
 supports OpenAI-style tool calls. Chat still works without tools, but Songbird
 will not automatically call Sapling MCP tools for that model.
+
+Ollama model seed records are inactive by default because local installations
+may not have the example models pulled yet. Pull the model in Ollama, update
+`providerModel` if needed, then activate the matching `AiProviderModelItem`.
 
 ## Songbird System Prompt
 

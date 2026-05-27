@@ -15,7 +15,7 @@ export function resolveProviderKind(
     return 'gemini';
   }
 
-  if (normalizedProvider === 'lmstudio') {
+  if (normalizedProvider === 'lmstudio' || normalizedProvider === 'ollama') {
     return 'openaiCompatible';
   }
 

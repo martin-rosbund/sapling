@@ -13,13 +13,13 @@
           </div>
 
           <div class="sapling-dashboard__actions-skeleton">
-            <div
-              v-for="item in 4"
-              :key="item"
-              class="sapling-dashboard__action-skeleton"
-            >
-              <span class="sapling-dashboard__skeleton-bone sapling-dashboard__action-icon-skeleton" />
-              <span class="sapling-dashboard__skeleton-bone sapling-dashboard__action-line-skeleton" />
+            <div v-for="item in 4" :key="item" class="sapling-dashboard__action-skeleton">
+              <span
+                class="sapling-dashboard__skeleton-bone sapling-dashboard__action-icon-skeleton"
+              />
+              <span
+                class="sapling-dashboard__skeleton-bone sapling-dashboard__action-line-skeleton"
+              />
             </div>
           </div>
         </div>
@@ -48,11 +48,7 @@
         <div
           class="sapling-tabs-shell sapling-dashboard__tabs-shell sapling-dashboard__tabs-shell--loading"
         >
-          <div
-            v-for="item in 6"
-            :key="item"
-            class="sapling-dashboard__tab-skeleton"
-          >
+          <div v-for="item in 6" :key="item" class="sapling-dashboard__tab-skeleton">
             <span class="sapling-dashboard__skeleton-bone sapling-dashboard__tab-title-skeleton" />
             <span class="sapling-dashboard__skeleton-bone sapling-dashboard__tab-meta-skeleton" />
           </div>

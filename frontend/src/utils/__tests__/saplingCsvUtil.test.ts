@@ -23,19 +23,17 @@ describe('saplingCsvUtil', () => {
           status: { handle: 'open', title: 'Open' },
         },
       ],
-      [
-        createTemplate({ name: 'title' }),
-        createTemplate({ name: 'status', kind: 'm:1' }),
-      ],
+      [createTemplate({ name: 'title' }), createTemplate({ name: 'status', kind: 'm:1' })],
     )
 
     expect(csv).toBe('\uFEFFhandle;title;status\r\n7;"Planning; kickoff";open\r\n')
   })
 
   it('adds the handle header even when metadata does not contain it', () => {
-    const csv = buildCsv([{ handle: 9, title: 'Imported later' }], [
-      createTemplate({ name: 'title' }),
-    ])
+    const csv = buildCsv(
+      [{ handle: 9, title: 'Imported later' }],
+      [createTemplate({ name: 'title' })],
+    )
 
     expect(csv).toBe('\uFEFFhandle;title\r\n9;Imported later\r\n')
   })

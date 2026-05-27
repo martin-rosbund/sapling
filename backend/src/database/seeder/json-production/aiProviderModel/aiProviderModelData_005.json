@@ -1,0 +1,31 @@
+[
+  {
+    "handle": "ollama-gpt-oss-20b",
+    "title": "GPT OSS 20B",
+    "description": "Local Ollama chat model exposed through the OpenAI-compatible API. Activate after pulling the matching model in Ollama.",
+    "provider": "ollama",
+    "providerModel": "gpt-oss:20b",
+    "supportsStreaming": true,
+    "supportsTools": true,
+    "supportsEmbeddings": false,
+    "isDefault": true,
+    "isActive": false,
+    "sortOrder": 10,
+    "maxToolCallIterations": 20
+  },
+  {
+    "handle": "ollama-nomic-embed-text",
+    "title": "Nomic Embed Text",
+    "description": "Local Ollama embedding model for semantic search. Activate after pulling nomic-embed-text in Ollama.",
+    "provider": "ollama",
+    "providerModel": "nomic-embed-text",
+    "supportsStreaming": false,
+    "supportsTools": false,
+    "supportsEmbeddings": true,
+    "embeddingBatchSize": 16,
+    "isDefault": true,
+    "isActive": false,
+    "sortOrder": 50,
+    "maxToolCallIterations": 20
+  }
+]

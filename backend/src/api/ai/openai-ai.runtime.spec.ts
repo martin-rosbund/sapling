@@ -50,4 +50,24 @@ describe('openai-ai.runtime', () => {
     expect(getOpenAiBaseUrl(provider)).toBe('http://127.0.0.1:1234/v1');
     expect(hasOpenAiCompatibleCredentials(provider)).toBe(true);
   });
+
+  it('creates an OpenAI-compatible client for Ollama with a local base URL', () => {
+    const client = createOpenAiClient({
+      handle: 'ollama',
+      credentials: {
+        ollamaBaseUrl: 'http://127.0.0.1:11434/v1/',
+      },
+    } as never);
+
+    expect(client).toEqual({
+      options: {
+        apiKey: 'sapling-local',
+        baseURL: 'http://127.0.0.1:11434/v1',
+      },
+    });
+    expect(OpenAI).toHaveBeenCalledWith({
+      apiKey: 'sapling-local',
+      baseURL: 'http://127.0.0.1:11434/v1',
+    });
+  });
 });
