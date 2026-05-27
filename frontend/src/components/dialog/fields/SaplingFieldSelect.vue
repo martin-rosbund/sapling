@@ -16,6 +16,7 @@
           :model-value="selectedItems"
           :item-title="getAutocompleteItemTitle"
           :search="fieldSearch"
+          :menu="false"
           return-object
           multiple
           chips
@@ -24,11 +25,11 @@
           hide-details="auto"
           hide-no-data
           no-filter
-          :menu="false"
           autocomplete="off"
           @focus="openMenu"
           @mousedown:control="openMenu"
           @click:clear="clearSelection"
+          @update:menu="closeAutocompleteMenu"
           @update:model-value="onActivatorModelUpdate"
           @update:search="onActivatorSearchUpdate"
         />
@@ -71,7 +72,7 @@
 import SaplingTable from '@/components/table/SaplingTable.vue'
 import type { SaplingGenericItem } from '@/entity/entity'
 import { useSaplingTable } from '@/composables/table/useSaplingTable'
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { getEntityValueLabel } from '@/utils/saplingTableUtil'
 import { useSaplingSelectField } from '@/composables/fields/useSaplingSelectField'
 import { useSaplingReferenceFilter } from '@/composables/fields/useSaplingReferenceFilter'
@@ -119,7 +120,7 @@ const {
 const { selectedItems, menuOpen } = useSaplingSelectField(props)
 const { combineFilters, normalizeFilter, areFiltersEqual } = useSaplingReferenceFilter()
 const fieldSearch = ref('')
-const autocompleteItems = computed(() => [...selectedItems.value])
+const autocompleteItems = ref<SaplingGenericItem[]>([])
 // #endregion
 
 // #region Selection State
@@ -128,7 +129,7 @@ function onTableSelect(newSelected: SaplingGenericItem[]) {
   clearSearch()
 }
 
-function onActivatorModelUpdate(value: SaplingGenericItem[] | null) {
+function onActivatorModelUpdate(value: readonly SaplingGenericItem[] | null) {
   const normalizedSelection = normalizeSelectedItems(value)
   if (!areSameItemCollections(normalizedSelection, selectedItems.value)) {
     selectedItems.value = normalizedSelection
@@ -143,7 +144,7 @@ function onActivatorSearchUpdate(value: string) {
     return
   }
 
-  onSearchUpdate(fieldSearch.value)
+  onSearchUpdate(getTableSearchValue())
 }
 
 function clearSelection() {
@@ -157,6 +158,10 @@ function openMenu() {
   }
 }
 
+function closeAutocompleteMenu() {
+  // The autocomplete is only used as an input surface. Results are rendered by SaplingTable.
+}
+
 function clearSearch() {
   if (fieldSearch.value === '' && search.value === '') {
     return
@@ -166,6 +171,10 @@ function clearSearch() {
   if (isInitialized.value) {
     onSearchUpdate('')
   }
+}
+
+function getTableSearchValue() {
+  return fieldSearch.value
 }
 
 function getAutocompleteItemTitle(item: unknown) {
@@ -195,14 +204,15 @@ watch(menuOpen, async (isOpen) => {
   }
 
   if (!isInitialized.value) {
-    await initializeEntityState()
+    await initializeEntityState({ initialSearch: getTableSearchValue() })
     if (!menuOpen.value) {
       return
     }
   }
 
-  if (search.value !== fieldSearch.value) {
-    onSearchUpdate(fieldSearch.value)
+  const tableSearch = getTableSearchValue()
+  if (search.value !== tableSearch) {
+    onSearchUpdate(tableSearch)
     return
   }
 
@@ -258,7 +268,7 @@ function getItemIdentity(item?: Record<string, unknown>) {
   return JSON.stringify(item)
 }
 
-function normalizeSelectedItems(value: SaplingGenericItem[] | null | undefined) {
+function normalizeSelectedItems(value: readonly SaplingGenericItem[] | null | undefined) {
   return (value ?? [])
     .map((item) => resolveSaplingItem(item))
     .filter((item): item is SaplingGenericItem => item !== null)

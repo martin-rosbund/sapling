@@ -95,6 +95,15 @@ function createQueryEnabledTestHost(entityHandle: Ref<string>) {
   })
 }
 
+function createManualTestHost(entityHandle: Ref<string>) {
+  return defineComponent({
+    setup() {
+      return useSaplingTable(entityHandle, 25, false, false)
+    },
+    template: '<div />',
+  })
+}
+
 const mountedWrappers: Array<ReturnType<typeof mount>> = []
 
 function mountTestHost(entityHandle: Ref<string>) {
@@ -105,6 +114,12 @@ function mountTestHost(entityHandle: Ref<string>) {
 
 function mountQueryEnabledTestHost(entityHandle: Ref<string>) {
   const wrapper = mount(createQueryEnabledTestHost(entityHandle))
+  mountedWrappers.push(wrapper)
+  return wrapper
+}
+
+function mountManualTestHost(entityHandle: Ref<string>) {
+  const wrapper = mount(createManualTestHost(entityHandle))
   mountedWrappers.push(wrapper)
   return wrapper
 }
@@ -258,6 +273,32 @@ describe('useSaplingTable', () => {
         },
       }),
     )
+  })
+
+  it('uses an initial search value for the first manual initialization request', async () => {
+    loadGenericMock.mockResolvedValue(undefined)
+    apiFindMock.mockResolvedValue({
+      data: [{ handle: 1, name: 'Ada Lovelace' }],
+      meta: { total: 1 },
+    })
+
+    const wrapper = mountManualTestHost(ref('partner'))
+
+    await wrapper.vm.initializeEntityState({ initialSearch: 'Ada' })
+    await flushPromises()
+
+    expect(apiFindMock).toHaveBeenCalledTimes(1)
+    expect(apiFindMock).toHaveBeenCalledWith(
+      'partner',
+      expect.objectContaining({
+        filter: {
+          $or: [{ name: { $ilike: '%Ada%' } }],
+        },
+        page: 1,
+        limit: 25,
+      }),
+    )
+    expect(wrapper.vm.search).toBe('Ada')
   })
 
   it('applies decoded route query filters when query parameters are enabled', async () => {

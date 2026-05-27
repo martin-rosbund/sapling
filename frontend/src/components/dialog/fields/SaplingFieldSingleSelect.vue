@@ -16,17 +16,18 @@
           :model-value="selectedItem"
           :item-title="getAutocompleteItemTitle"
           :search="fieldSearch"
+          :menu="false"
           :density="props.density"
           :hide-details="props.hideDetails"
           return-object
           clearable
           hide-no-data
           no-filter
-          :menu="false"
           autocomplete="off"
           @focus="openMenu"
           @mousedown:control="openMenu"
           @click:clear="clearSelection"
+          @update:menu="closeAutocompleteMenu"
           @update:model-value="onActivatorModelUpdate"
           @update:search="onActivatorSearchUpdate"
         />
@@ -70,7 +71,7 @@
 import SaplingTable from '@/components/table/SaplingTable.vue'
 import type { SaplingGenericItem } from '@/entity/entity'
 import { useSaplingTable } from '@/composables/table/useSaplingTable'
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { getEntityValueLabel } from '@/utils/saplingTableUtil'
 import { useSaplingSingleSelectField } from '@/composables/fields/useSaplingSingleSelectField'
 import { useSaplingReferenceFilter } from '@/composables/fields/useSaplingReferenceFilter'
@@ -126,7 +127,7 @@ const {
 const { selectedItem, menuOpen } = useSaplingSingleSelectField(props)
 const { combineFilters, normalizeFilter, areFiltersEqual } = useSaplingReferenceFilter()
 const fieldSearch = ref('')
-const autocompleteItems = computed(() => (selectedItem.value ? [selectedItem.value] : []))
+const autocompleteItems = ref<SaplingGenericItem[]>([])
 // #endregion
 
 // #region Selection State
@@ -152,14 +153,23 @@ function onActivatorModelUpdate(value: SaplingGenericItem | null) {
 }
 
 function onActivatorSearchUpdate(value: string) {
-  fieldSearch.value = value ?? ''
+  const nextSearch = value ?? ''
+  fieldSearch.value = nextSearch
+
+  if (isSelectedItemDisplayText(nextSearch)) {
+    if (isInitialized.value && search.value !== '') {
+      onSearchUpdate('')
+    }
+    return
+  }
+
   openMenu()
 
   if (!isInitialized.value) {
     return
   }
 
-  onSearchUpdate(fieldSearch.value)
+  onSearchUpdate(getTableSearchValue())
 }
 
 function clearSelection() {
@@ -173,6 +183,10 @@ function openMenu() {
   }
 }
 
+function closeAutocompleteMenu() {
+  // The autocomplete is only used as an input surface. Results are rendered by SaplingTable.
+}
+
 function clearSearch() {
   if (fieldSearch.value === '' && search.value === '') {
     return
@@ -184,8 +198,20 @@ function clearSearch() {
   }
 }
 
+function getTableSearchValue() {
+  return isSelectedItemDisplayText(fieldSearch.value) ? '' : fieldSearch.value
+}
+
 function getAutocompleteItemTitle(item: unknown) {
   return getEntityValueLabel(resolveSaplingItem(item), entityTemplates.value)
+}
+
+function isSelectedItemDisplayText(value: string) {
+  if (!selectedItem.value || !value) {
+    return false
+  }
+
+  return value === getAutocompleteItemTitle(selectedItem.value)
 }
 // #endregion
 
@@ -211,14 +237,15 @@ watch(menuOpen, async (isOpen) => {
   }
 
   if (!isInitialized.value) {
-    await initializeEntityState()
+    await initializeEntityState({ initialSearch: getTableSearchValue() })
     if (!menuOpen.value) {
       return
     }
   }
 
-  if (search.value !== fieldSearch.value) {
-    onSearchUpdate(fieldSearch.value)
+  const tableSearch = getTableSearchValue()
+  if (search.value !== tableSearch) {
+    onSearchUpdate(tableSearch)
     return
   }
 

@@ -22,6 +22,10 @@ import {
 
 const TABLE_LOAD_DEBOUNCE_MS = 250
 
+type InitializeEntityStateOptions = {
+  initialSearch?: string
+}
+
 /**
  * Shared table state for entity-backed data tables.
  * Handles metadata loading, server pagination, sorting and column filtering.
@@ -299,7 +303,7 @@ export function useSaplingTable(
     columnFilters.value = extractColumnFiltersFromFilterQuery(nextEntityTemplates, urlFilter)
   }
 
-  async function initializeEntityState() {
+  async function initializeEntityState(options?: InitializeEntityStateOptions) {
     const currentEntityHandle = entityHandle.value
     const initializationId = ++latestInitializationId
 
@@ -314,6 +318,9 @@ export function useSaplingTable(
     activeLoadController = null
     latestLoadRequestId += 1
     resetEntityState()
+    if (typeof options?.initialSearch === 'string') {
+      search.value = options.initialSearch
+    }
 
     try {
       await genericStore.loadGeneric(currentEntityHandle, 'global', 'filter', 'exception')
