@@ -8,6 +8,7 @@ export interface Message {
   entity: string
   timestamp: Date
   hidden: boolean
+  count: number
   technical?: unknown
 }
 
@@ -38,6 +39,28 @@ export function useSaplingMessageCenter() {
     entity: string,
     technical?: unknown,
   ) {
+    const existingMessage = messages.value.find(
+      (entry) =>
+        !entry.hidden &&
+        entry.type === type &&
+        entry.message === message &&
+        entry.entity === entity &&
+        areDescriptionsCompatible(entry.description, description),
+    )
+
+    if (existingMessage) {
+      existingMessage.count += 1
+      existingMessage.description = existingMessage.description || description
+      existingMessage.timestamp = new Date()
+      existingMessage.technical = mergeTechnicalPayload(existingMessage.technical, technical)
+      clearHideTimer(existingMessage.id)
+      hideTimers.set(
+        existingMessage.id,
+        setTimeout(() => hideMessage(existingMessage.id), 5000),
+      )
+      return
+    }
+
     const messageItem: Message = {
       id: nextId++,
       type,
@@ -46,6 +69,7 @@ export function useSaplingMessageCenter() {
       entity,
       timestamp: new Date(),
       hidden: false,
+      count: 1,
       technical,
     }
 
@@ -130,6 +154,22 @@ export function useSaplingMessageCenter() {
 
     clearTimeout(timer)
     hideTimers.delete(id)
+  }
+
+  function mergeTechnicalPayload(existing: unknown, incoming: unknown) {
+    if (!incoming) {
+      return existing
+    }
+
+    if (!existing) {
+      return incoming
+    }
+
+    return Array.isArray(existing) ? [...existing, incoming] : [existing, incoming]
+  }
+
+  function areDescriptionsCompatible(left: string, right: string) {
+    return left === right || !left || !right
   }
   //#endregion
 

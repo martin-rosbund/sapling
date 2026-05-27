@@ -3,14 +3,26 @@
     <Teleport to="body">
       <!-- Floating Meldungen -->
       <transition-group name="messages-fade" tag="div" class="messages-float">
-        <div v-for="message in visibleMessages" :key="message.id" class="message">
+        <div
+          v-for="message in visibleMessages"
+          :key="message.id"
+          class="message"
+          role="button"
+          tabindex="0"
+          @click="hideMessage(message.id)"
+          @keydown.enter.prevent="hideMessage(message.id)"
+          @keydown.space.prevent="hideMessage(message.id)"
+        >
           <v-alert :type="message.type" density="comfortable" border="start" class="ma-2">
             <template v-if="isTranslationLoading">
               <v-skeleton-loader type="text, text" />
             </template>
             <template v-else>
-              <div>
-                {{ formatMessageLabel(message) }}
+              <div class="message__title-row">
+                <span>{{ formatMessageLabel(message) }}</span>
+                <v-chip v-if="message.count > 1" size="x-small" variant="tonal">
+                  {{ message.count }}x
+                </v-chip>
               </div>
               <div v-if="message.description" class="message__description">
                 {{ formatMessageDescription(message.description) }}
@@ -72,7 +84,12 @@
                     </div>
                   </template>
                   <template #title>
-                    <span :class="message.type">{{ formatMessageLabel(message) }}</span>
+                    <span :class="message.type">
+                      {{ formatMessageLabel(message) }}
+                      <v-chip v-if="message.count > 1" size="x-small" variant="tonal" class="ml-2">
+                        {{ message.count }}x
+                      </v-chip>
+                    </span>
                     <div
                       v-if="message.description"
                       class="sapling-message-center-entry__description"
@@ -135,6 +152,7 @@ const {
   dialog,
   messages,
   visibleMessages,
+  hideMessage,
   removeMessage,
   clearAll,
   openDialog,
