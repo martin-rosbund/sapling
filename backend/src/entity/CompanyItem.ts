@@ -362,7 +362,6 @@ export class CompanyItem {
    * @type {Collection<CompanyRelationshipItem>}
    */
   @ApiPropertyOptional({ type: () => CompanyRelationshipItem, isArray: true })
-  @Sapling(['isHideAsReference'])
   @OneToMany(() => CompanyRelationshipItem, (x) => x.sourceCompany)
   outgoingRelationships: Collection<CompanyRelationshipItem> =
     new Collection<CompanyRelationshipItem>(this);
@@ -372,7 +371,6 @@ export class CompanyItem {
    * @type {Collection<CompanyRelationshipItem>}
    */
   @ApiPropertyOptional({ type: () => CompanyRelationshipItem, isArray: true })
-  @Sapling(['isHideAsReference'])
   @OneToMany(() => CompanyRelationshipItem, (x) => x.targetCompany)
   incomingRelationships: Collection<CompanyRelationshipItem> =
     new Collection<CompanyRelationshipItem>(this);
