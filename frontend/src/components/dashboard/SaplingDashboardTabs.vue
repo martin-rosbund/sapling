@@ -1,6 +1,6 @@
 <template>
-  <section class="sapling-section-stack sapling-section-stack--md">
-    <div class="sapling-tabs-shell glass-panel">
+  <section class="sapling-dashboard__board glass-panel">
+    <div class="sapling-tabs-shell sapling-dashboard__tabs-shell">
       <v-tabs v-model="activeTabModel" class="sapling-dashboard__tabs" height="52" show-arrows>
         <v-tab
           v-for="(dashboard, dashboardIndex) in dashboards"

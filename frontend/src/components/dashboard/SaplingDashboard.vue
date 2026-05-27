@@ -1,51 +1,108 @@
 <template>
   <v-container class="sapling-page-shell sapling-page-shell--uniform-inset sapling-dashboard" fluid>
-    <section v-if="isLoading" class="sapling-dashboard__hero glass-panel">
-      <div class="sapling-dashboard__copy">
-        <v-skeleton-loader type="heading, text" />
-      </div>
-
-      <div class="sapling-action-stack">
-        <v-skeleton-loader v-for="item in 3" :key="item" type="button" />
-      </div>
-    </section>
-    <SaplingPageHero
-      v-else
-      class="sapling-dashboard__hero"
-      variant="workspace"
-      :eyebrow="$t('dashboard.workspace')"
-      :title="currentDashboard?.name || $t('dashboard.executiveOverview')"
-      :subtitle="$t('dashboard.workspaceSubtitle')"
-    >
-      <template #side>
-        <SaplingDashboardHeroActions
-          :has-dashboards="hasDashboards"
-          :current-person-loaded="currentPersonStore.loaded"
-          @add-kpi="requestAddKpi"
-          @open-dashboard="openDashboardDialog"
-          @open-template-load="openDashboardTemplateLoadDialog"
-          @open-template-save="openDashboardTemplateSaveDialog"
-        />
-      </template>
-    </SaplingPageHero>
-
-    <SaplingDashboardRecommendedFavorites v-if="!isLoading" />
-
     <template v-if="isLoading || !currentPersonStore.loaded">
-      <section class="sapling-section-stack sapling-section-stack--md">
-        <div class="sapling-tabs-shell glass-panel">
-          <v-skeleton-loader type="heading" />
+      <section class="sapling-dashboard__overview">
+        <div class="sapling-dashboard__hero sapling-dashboard__hero--loading glass-panel">
+          <div class="sapling-dashboard__copy sapling-dashboard__copy--skeleton">
+            <span class="sapling-dashboard__skeleton-bone sapling-dashboard__eyebrow-skeleton" />
+            <span class="sapling-dashboard__skeleton-bone sapling-dashboard__title-skeleton" />
+            <span
+              class="sapling-dashboard__skeleton-bone sapling-dashboard__title-skeleton sapling-dashboard__title-skeleton--short"
+            />
+            <span class="sapling-dashboard__skeleton-bone sapling-dashboard__subtitle-skeleton" />
+          </div>
+
+          <div class="sapling-dashboard__actions-skeleton">
+            <div
+              v-for="item in 4"
+              :key="item"
+              class="sapling-dashboard__action-skeleton"
+            >
+              <span class="sapling-dashboard__skeleton-bone sapling-dashboard__action-icon-skeleton" />
+              <span class="sapling-dashboard__skeleton-bone sapling-dashboard__action-line-skeleton" />
+            </div>
+          </div>
         </div>
 
-        <div class="sapling-dashboard__loading glass-panel">
-          <v-skeleton-loader
-            class="sapling-dashboard__loading-bone"
-            type="article, article, article"
-          />
+        <div
+          class="sapling-card-strip sapling-dashboard__favorites sapling-dashboard__favorites--loading glass-panel"
+        >
+          <div class="sapling-card-strip__track">
+            <div
+              v-for="item in 12"
+              :key="item"
+              class="sapling-dashboard-favorite-button sapling-dashboard-favorite-button--loading sapling-panel-shell-muted"
+            >
+              <span
+                class="sapling-dashboard__skeleton-bone sapling-dashboard-favorite-button__icon-skeleton"
+              />
+              <span
+                class="sapling-dashboard__skeleton-bone sapling-dashboard-favorite-button__text-skeleton"
+              />
+            </div>
+          </div>
         </div>
+      </section>
+
+      <section class="sapling-dashboard__board glass-panel">
+        <div
+          class="sapling-tabs-shell sapling-dashboard__tabs-shell sapling-dashboard__tabs-shell--loading"
+        >
+          <div
+            v-for="item in 6"
+            :key="item"
+            class="sapling-dashboard__tab-skeleton"
+          >
+            <span class="sapling-dashboard__skeleton-bone sapling-dashboard__tab-title-skeleton" />
+            <span class="sapling-dashboard__skeleton-bone sapling-dashboard__tab-meta-skeleton" />
+          </div>
+        </div>
+
+        <v-row class="sapling-kpi-grid sapling-dashboard__kpi-skeleton-grid" density="comfortable">
+          <v-col v-for="item in 8" :key="item" cols="12" sm="6" lg="4" xl="3">
+            <div class="sapling-dashboard__loading-card">
+              <div class="sapling-dashboard__loading-card-header">
+                <v-skeleton-loader type="text" class="sapling-dashboard__loading-chip" />
+                <div class="sapling-dashboard__loading-card-actions">
+                  <span
+                    v-for="action in 3"
+                    :key="action"
+                    class="sapling-dashboard__skeleton-bone sapling-dashboard__loading-action"
+                  />
+                </div>
+              </div>
+              <v-skeleton-loader type="heading" class="sapling-dashboard__loading-title" />
+              <v-skeleton-loader type="paragraph" class="sapling-dashboard__loading-copy" />
+              <v-skeleton-loader type="image" class="sapling-dashboard__loading-visual" />
+            </div>
+          </v-col>
+        </v-row>
       </section>
     </template>
     <template v-else>
+      <section class="sapling-dashboard__overview">
+        <SaplingPageHero
+          class="sapling-dashboard__hero"
+          variant="workspace"
+          :eyebrow="$t('dashboard.workspace')"
+          :title="currentDashboard?.name || $t('dashboard.executiveOverview')"
+          :subtitle="$t('dashboard.workspaceSubtitle')"
+        >
+          <template #side>
+            <SaplingDashboardHeroActions
+              :has-dashboards="hasDashboards"
+              :current-person-loaded="currentPersonStore.loaded"
+              @add-kpi="requestAddKpi"
+              @open-dashboard="openDashboardDialog"
+              @open-template-load="openDashboardTemplateLoadDialog"
+              @open-template-save="openDashboardTemplateSaveDialog"
+            />
+          </template>
+        </SaplingPageHero>
+
+        <SaplingDashboardRecommendedFavorites />
+      </section>
+
       <SaplingDashboardTabs
         v-if="hasDashboards"
         v-model:active-tab="activeTab"
