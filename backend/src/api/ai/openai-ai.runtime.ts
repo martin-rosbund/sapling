@@ -3,23 +3,47 @@ import type { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
 import type { AiSpeechResponseFormat } from './ai.types';
 
 const OPENAI_API_KEY_CREDENTIAL = 'openAiApiKey';
+const OPENAI_BASE_URL_CREDENTIAL = 'openAiBaseUrl';
+const LM_STUDIO_API_KEY_CREDENTIAL = 'lmStudioApiKey';
+const LM_STUDIO_BASE_URL_CREDENTIAL = 'lmStudioBaseUrl';
+const LOCAL_OPENAI_COMPATIBLE_API_KEY = 'sapling-local';
 
 export function createOpenAiClient(provider: AiProviderTypeItem): OpenAI {
-  const apiKey = getOpenAiApiKey(provider);
+  const baseURL = getOpenAiBaseUrl(provider);
+  const apiKey = baseURL
+    ? getOpenAiCompatibleApiKey(provider)
+    : getOpenAiApiKey(provider);
 
   if (!apiKey) {
     throw new Error('ai.providerNotConfigured');
   }
 
-  return new OpenAI({ apiKey });
+  return new OpenAI({
+    apiKey,
+    ...(baseURL ? { baseURL } : {}),
+  });
 }
 
 export function getOpenAiApiKey(provider: AiProviderTypeItem): string | null {
   return getProviderCredential(provider, OPENAI_API_KEY_CREDENTIAL);
 }
 
+export function getOpenAiBaseUrl(provider: AiProviderTypeItem): string | null {
+  const baseUrl =
+    getProviderCredential(provider, OPENAI_BASE_URL_CREDENTIAL) ??
+    getProviderCredential(provider, LM_STUDIO_BASE_URL_CREDENTIAL);
+
+  return baseUrl ? normalizeOpenAiBaseUrl(baseUrl) : null;
+}
+
 export function hasOpenAiCredentials(provider: AiProviderTypeItem): boolean {
   return getOpenAiApiKey(provider) != null;
+}
+
+export function hasOpenAiCompatibleCredentials(
+  provider: AiProviderTypeItem,
+): boolean {
+  return getOpenAiBaseUrl(provider) != null;
 }
 
 export async function embedOpenAiTexts(
@@ -91,4 +115,16 @@ function getProviderCredential(
 
   const value = credentials[key];
   return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+function getOpenAiCompatibleApiKey(provider: AiProviderTypeItem): string {
+  return (
+    getOpenAiApiKey(provider) ??
+    getProviderCredential(provider, LM_STUDIO_API_KEY_CREDENTIAL) ??
+    LOCAL_OPENAI_COMPATIBLE_API_KEY
+  );
+}
+
+function normalizeOpenAiBaseUrl(baseUrl: string): string {
+  return baseUrl.trim().replace(/\/+$/, '');
 }

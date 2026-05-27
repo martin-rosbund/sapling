@@ -38,6 +38,8 @@ export type AiProviderCapability =
   | 'transcription'
   | 'speech';
 
+export type AiProviderKind = 'openai' | 'gemini' | 'openaiCompatible';
+
 export type AiSpeechResponseFormat = 'mp3' | 'wav' | 'flac' | 'opus' | 'pcm';
 
 export type AiEmbeddingPurpose = 'document' | 'query';
@@ -76,7 +78,7 @@ export type AiPreparedSpeechText = {
 export type AiEmbeddingTarget = {
   provider: AiProviderTypeItem;
   model: AiProviderModelItem;
-  providerKind: 'openai' | 'gemini';
+  providerKind: AiProviderKind;
 };
 
 export type AiSpeechTarget = AiEmbeddingTarget & {

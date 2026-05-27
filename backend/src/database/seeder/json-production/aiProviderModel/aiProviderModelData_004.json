@@ -1,0 +1,31 @@
+[
+  {
+    "handle": "lmstudio-openai-gpt-oss-20b",
+    "title": "GPT OSS 20B",
+    "description": "Local LM Studio chat model exposed through the OpenAI-compatible API.",
+    "provider": "lmstudio",
+    "providerModel": "openai/gpt-oss-20b",
+    "supportsStreaming": true,
+    "supportsTools": true,
+    "supportsEmbeddings": false,
+    "isDefault": true,
+    "isActive": true,
+    "sortOrder": 10,
+    "maxToolCallIterations": 20
+  },
+  {
+    "handle": "lmstudio-nomic-embed-text-v1_5",
+    "title": "Nomic Embed Text v1.5",
+    "description": "Local LM Studio embedding model for semantic search.",
+    "provider": "lmstudio",
+    "providerModel": "text-embedding-nomic-embed-text-v1.5",
+    "supportsStreaming": false,
+    "supportsTools": false,
+    "supportsEmbeddings": true,
+    "embeddingBatchSize": 16,
+    "isDefault": true,
+    "isActive": true,
+    "sortOrder": 50,
+    "maxToolCallIterations": 20
+  }
+]

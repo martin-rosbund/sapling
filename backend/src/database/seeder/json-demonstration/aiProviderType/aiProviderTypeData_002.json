@@ -1,0 +1,13 @@
+[
+  {
+    "handle": "lmstudio",
+    "title": "LM Studio",
+    "icon": "mdi-desktop-tower-monitor",
+    "color": "#4B6BFB",
+    "credentialTypes": ["lmStudioBaseUrl"],
+    "credentials": {
+      "lmStudioBaseUrl": "http://127.0.0.1:1234/v1"
+    },
+    "isActive": true
+  }
+]

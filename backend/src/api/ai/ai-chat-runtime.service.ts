@@ -48,9 +48,15 @@ export class AiChatRuntimeService {
     maxToolCallIterations: number,
     clientTimeContext: AiClientTimeContext | undefined,
     onDelta: (delta: string) => Promise<void>,
+    supportsTools = true,
   ): Promise<AiStreamResult> {
-    const toolRegistry = buildToolRegistry(availableTools);
-    const messages = this.buildOpenAiMessages(history, user, clientTimeContext);
+    const toolRegistry = supportsTools ? buildToolRegistry(availableTools) : [];
+    const messages = this.buildOpenAiMessages(
+      history,
+      user,
+      clientTimeContext,
+      toolRegistry.length > 0,
+    );
     const executedToolCalls: AiExecutedToolCall[] = [];
 
     for (let iteration = 0; iteration < maxToolCallIterations; iteration += 1) {
@@ -128,13 +134,26 @@ export class AiChatRuntimeService {
     maxToolCallIterations: number,
     clientTimeContext: AiClientTimeContext | undefined,
     onDelta: (delta: string) => Promise<void>,
+    supportsTools = true,
   ): Promise<AiStreamResult> {
-    const toolRegistry = buildToolRegistry(availableTools);
+    const toolRegistry = supportsTools ? buildToolRegistry(availableTools) : [];
     const conversation = this.buildGeminiConversation(history);
     const currentTurn = conversation.pop();
 
     if (!currentTurn || currentTurn.role !== 'user') {
       throw new Error('ai.invalidHistory');
+    }
+
+    if (toolRegistry.length === 0) {
+      return this.streamGeminiWithoutTools(
+        provider,
+        modelName,
+        conversation,
+        currentTurn.parts,
+        user,
+        clientTimeContext,
+        onDelta,
+      );
     }
 
     try {
@@ -367,12 +386,13 @@ export class AiChatRuntimeService {
     history: AiChatMessageItem[],
     user?: PersonItem,
     clientTimeContext?: AiClientTimeContext,
+    includeToolGuidance = true,
   ) {
     const messages: Array<Record<string, unknown>> = [
       {
         role: 'system',
         content: this.buildSystemInstruction({
-          includeToolGuidance: true,
+          includeToolGuidance,
           user,
           clientTimeContext:
             clientTimeContext ?? extractClientTimeContextFromHistory(history),

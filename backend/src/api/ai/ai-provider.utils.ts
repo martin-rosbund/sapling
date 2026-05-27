@@ -1,11 +1,25 @@
 import type { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
+import type { AiProviderKind } from './ai.types';
 import { hasGeminiCredentials } from './gemini-ai.runtime';
-import { hasOpenAiCredentials } from './openai-ai.runtime';
+import {
+  hasOpenAiCompatibleCredentials,
+  hasOpenAiCredentials,
+} from './openai-ai.runtime';
 
 export function resolveProviderKind(
   preferredProvider?: string | null,
-): 'openai' | 'gemini' {
-  return preferredProvider === 'gemini' ? 'gemini' : 'openai';
+): AiProviderKind {
+  const normalizedProvider = preferredProvider?.trim().toLowerCase();
+
+  if (normalizedProvider === 'gemini') {
+    return 'gemini';
+  }
+
+  if (normalizedProvider === 'lmstudio') {
+    return 'openaiCompatible';
+  }
+
+  return 'openai';
 }
 
 export function hasUsableProviderCredentials(
@@ -17,6 +31,10 @@ export function hasUsableProviderCredentials(
 
   if (provider.handle === 'gemini') {
     return hasGeminiCredentials(provider);
+  }
+
+  if (resolveProviderKind(provider.handle) === 'openaiCompatible') {
+    return hasOpenAiCompatibleCredentials(provider);
   }
 
   return hasOpenAiCredentials(provider);

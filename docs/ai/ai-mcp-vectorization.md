@@ -35,6 +35,25 @@ McpServerConfigItem
 
 Provider/model records are stored in the database. Runtime credentials and provider behavior are resolved by backend AI provider services.
 
+### OpenAI-Compatible Local Providers
+
+LM Studio is registered as an OpenAI-compatible provider with handle `lmstudio`.
+It uses the normal provider/model records, so the frontend selectors do not need
+special-case behavior.
+
+Default local configuration:
+
+```text
+provider handle: lmstudio
+base URL credential: lmStudioBaseUrl = http://127.0.0.1:1234/v1
+chat model: openai/gpt-oss-20b
+embedding model: text-embedding-nomic-embed-text-v1.5
+```
+
+Local models should set `supportsTools` only when the loaded model reliably
+supports OpenAI-style tool calls. Chat still works without tools, but Songbird
+will not automatically call Sapling MCP tools for that model.
+
 ## Songbird System Prompt
 
 Songbird's base behavior and tool guidance live in:

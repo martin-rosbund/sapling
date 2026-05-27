@@ -308,29 +308,7 @@ export class AiService {
         runtimeTarget.model,
       );
 
-      if (runtimeTarget.providerKind === 'openai') {
-        streamResult = await this.chatRuntime.streamOpenAi(
-          history,
-          runtimeTarget.provider,
-          runtimeTarget.model.providerModel,
-          availableTools,
-          user,
-          maxToolCallIterations,
-          clientTimeContext,
-          async (delta) => {
-            if (!delta) {
-              return;
-            }
-
-            assistantMessage.content += delta;
-            await onEvent({
-              type: 'message.delta',
-              handle: assistantMessage.handle,
-              delta,
-            });
-          },
-        );
-      } else {
+      if (runtimeTarget.providerKind === 'gemini') {
         streamResult = await this.chatRuntime.streamGemini(
           history,
           runtimeTarget.provider,
@@ -351,6 +329,30 @@ export class AiService {
               delta,
             });
           },
+          runtimeTarget.model.supportsTools,
+        );
+      } else {
+        streamResult = await this.chatRuntime.streamOpenAi(
+          history,
+          runtimeTarget.provider,
+          runtimeTarget.model.providerModel,
+          availableTools,
+          user,
+          maxToolCallIterations,
+          clientTimeContext,
+          async (delta) => {
+            if (!delta) {
+              return;
+            }
+
+            assistantMessage.content += delta;
+            await onEvent({
+              type: 'message.delta',
+              handle: assistantMessage.handle,
+              delta,
+            });
+          },
+          runtimeTarget.model.supportsTools,
         );
       }
 
