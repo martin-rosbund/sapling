@@ -83,13 +83,13 @@ export interface InboxSection {
 }
 
 export interface InboxSummaryCard {
-  key: 'total' | 'effortEstimates' | 'overdue' | 'today' | 'upcoming'
+  key: 'total' | 'overdue' | 'today' | 'upcoming' | 'later'
   labelKey:
     | 'navigation.inbox'
-    | 'navigation.effortEstimate'
     | 'inbox.overdue'
     | 'inbox.today'
     | 'inbox.upcoming'
+    | 'inbox.later'
   icon: string
   count: number
   tone: 'primary' | 'warning' | 'info' | 'success'
@@ -412,13 +412,6 @@ export function useSaplingInbox(emit: CloseEmitter) {
       tone: 'primary',
     },
     {
-      key: 'effortEstimates',
-      labelKey: 'navigation.effortEstimate',
-      icon: 'mdi-clipboard-text-clock-outline',
-      count: effortEstimateEntries.value.length,
-      tone: 'info',
-    },
-    {
       key: 'overdue',
       labelKey: 'inbox.overdue',
       icon: 'mdi-alert-circle-outline',
@@ -438,6 +431,13 @@ export function useSaplingInbox(emit: CloseEmitter) {
       icon: 'mdi-calendar-clock-outline',
       count: upcomingEntries.value.length,
       tone: 'success',
+    },
+    {
+      key: 'later',
+      labelKey: 'inbox.later',
+      icon: 'mdi-timeline-clock-outline',
+      count: laterEntries.value.length,
+      tone: 'primary',
     },
   ])
 
