@@ -5,6 +5,7 @@
       :events="events"
       :calendar-display-type="calendarDisplayType"
       :calendar-weekdays="calendarWeekdays"
+      :is-drag-active="isDragActive"
       :work-hours="workHours"
       :show-work-hour-background="showWorkHourBackground"
       calendar-class="sapling-event-vcalendar--single"
@@ -42,6 +43,7 @@
               :events="getSideBySideEvents(personId)"
               :calendar-display-type="calendarDisplayType"
               :calendar-weekdays="calendarWeekdays"
+              :is-drag-active="isDragActive"
               :work-hours="workHours"
               :show-work-hour-background="showWorkHourBackground"
               calendar-class="sapling-event-vcalendar--column"
@@ -95,6 +97,7 @@ const props = defineProps<{
   events: CalendarEvent[]
   calendarDisplayType: CalendarDisplayType
   calendarWeekdays?: number[]
+  isDragActive: boolean
   workHours: WorkHourWeekItem | null
   showWorkHourBackground: boolean
   selectedPeoples: number[]

@@ -552,8 +552,8 @@
 
 .sapling-partner-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, var(--sapling-panel-width-md));
-  gap: var(--sapling-gap-md);
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+  gap: var(--sapling-gap-lg);
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
@@ -658,6 +658,57 @@
 
 .sapling-partner-filter-panel {
   align-self: stretch;
+}
+
+.sapling-partner-filter-panel.sapling-work-filter-panel.glass-panel {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--sapling-surface-fill-soft) 88%, transparent),
+      color-mix(in srgb, var(--sapling-surface-fill) 78%, transparent)
+    ),
+    var(--sapling-surface-fill) !important;
+  box-shadow: var(--sapling-inset-highlight);
+}
+
+.sapling-partner-filter-panel .sapling-work-filter-panel__header {
+  padding: var(--sapling-space-panel-sm) var(--sapling-space-panel-md);
+  background: color-mix(in srgb, var(--sapling-surface-fill-soft) 86%, transparent);
+}
+
+.sapling-partner-filter-panel .sapling-work-filter-panel__headline {
+  gap: var(--sapling-gap-sm);
+  font-size: var(--sapling-text-body-size-md);
+  font-weight: 650;
+}
+
+.sapling-partner-filter-panel .sapling-work-filter-panel__headline .v-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--sapling-icon-box-md);
+  height: var(--sapling-icon-box-md);
+  border-radius: var(--sapling-radius-sm);
+  background: color-mix(in srgb, rgb(var(--v-theme-primary)) 12%, transparent);
+  color: rgb(var(--v-theme-primary));
+}
+
+.sapling-partner-filter-panel .v-expansion-panel-title {
+  min-height: var(--sapling-control-size-2xl);
+  padding-inline: var(--sapling-space-panel-md);
+}
+
+.sapling-partner-filter-panel .v-list-subheader {
+  min-height: auto;
+  padding-inline: 0;
+  font-size: var(--sapling-text-label-size-sm);
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.sapling-partner-filter-panel .v-expansion-panel-text__wrapper {
+  padding-inline: var(--sapling-space-panel-md);
 }
 
 .sapling-partner-filter-dialog__surface {

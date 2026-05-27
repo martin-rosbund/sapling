@@ -3,7 +3,11 @@
     :as="VCalendar"
     v-model="calendarValue"
     class="sapling-event-vcalendar"
-    :class="[props.calendarClass, `sapling-event-vcalendar--${props.calendarDisplayType}`]"
+    :class="[
+      props.calendarClass,
+      `sapling-event-vcalendar--${props.calendarDisplayType}`,
+      { 'sapling-event-vcalendar--drag-active': props.isDragActive },
+    ]"
     color="primary"
     :event-color="props.getEventColor"
     :event-ripple="false"
@@ -31,60 +35,83 @@
     </template>
 
     <template v-slot:event="{ event }">
-      <div
-        class="sapling-calendar-event-card"
-        :class="getEventCardClasses(event)"
-        :style="getEventCardStyle(event)"
-        :role="isInteractiveEvent(event) ? 'button' : undefined"
-        :tabindex="isInteractiveEvent(event) ? 0 : undefined"
-        @click.left.stop="onEventActivate(event)"
-        @contextmenu.stop="onEventContextMenu($event, event)"
-        @keydown.enter.stop.prevent="onEventActivate(event)"
-        @keydown.space.stop.prevent="onEventActivate(event)"
+      <v-menu
+        :open-on-hover="!props.isDragActive"
+        :open-delay="500"
+        :close-delay="250"
+        :disabled="props.isDragActive"
+        :close-on-content-click="false"
+        :open-on-click="false"
+        content-class="sapling-calendar-event-tooltip-overlay"
+        location="bottom start"
+        transition="fade-transition"
       >
-        <div
-          class="sapling-calendar-event-card__accent"
-          :style="{ background: getEventAccentColor(event) }"
-        ></div>
-
-        <div class="sapling-calendar-event-card__content">
-          <div class="sapling-calendar-event-card__header">
-            <div class="sapling-calendar-event-card__type">
-              <v-icon size="14">{{ getEventIcon(event) }}</v-icon>
-              <v-icon v-if="isRecurringOccurrence(event)" size="14">mdi-repeat</v-icon>
-              <span class="sapling-calendar-event-card__time">{{
-                formatEventTimeRange(event)
-              }}</span>
-            </div>
-
-            <strong
-              v-if="shouldInlineTitle(event)"
-              class="sapling-calendar-event-card__title sapling-calendar-event-card__title--inline"
+        <template #activator="{ props: tooltipActivatorProps }">
+          <div class="sapling-calendar-event-tooltip-host" v-bind="tooltipActivatorProps">
+            <div
+              class="sapling-calendar-event-card"
+              :class="getEventCardClasses(event)"
+              :style="getEventCardStyle(event)"
+              :role="isInteractiveEvent(event) ? 'button' : undefined"
+              :tabindex="isInteractiveEvent(event) ? 0 : undefined"
+              @click.left.stop="onEventActivate(event)"
+              @contextmenu.stop.prevent="onEventContextMenu($event, event)"
+              @keydown.enter.stop.prevent="onEventActivate(event)"
+              @keydown.space.stop.prevent="onEventActivate(event)"
             >
-              {{ event.event?.title || event.name || '' }}
-            </strong>
+              <div
+                class="sapling-calendar-event-card__accent"
+                :style="{ background: getEventAccentColor(event) }"
+              ></div>
+
+              <div class="sapling-calendar-event-card__content">
+                <div class="sapling-calendar-event-card__header">
+                  <div class="sapling-calendar-event-card__type">
+                    <v-icon size="14">{{ getEventIcon(event) }}</v-icon>
+                    <v-icon v-if="isRecurringOccurrence(event)" size="14">mdi-repeat</v-icon>
+                    <span class="sapling-calendar-event-card__time">{{
+                      formatEventTimeRange(event)
+                    }}</span>
+                  </div>
+
+                  <strong
+                    v-if="shouldInlineTitle(event)"
+                    class="sapling-calendar-event-card__title sapling-calendar-event-card__title--inline"
+                  >
+                    {{ event.event?.title || event.name || '' }}
+                  </strong>
+                </div>
+
+                <strong v-if="!shouldInlineTitle(event)" class="sapling-calendar-event-card__title">
+                  {{ event.event?.title || event.name || '' }}
+                </strong>
+                <p
+                  v-if="shouldShowDescription(event) && event.event?.description"
+                  class="sapling-calendar-event-card__description"
+                >
+                  {{ event.event.description }}
+                </p>
+              </div>
+
+              <button
+                v-if="shouldShowResizeHandle(event)"
+                class="sapling-calendar-event-card__resize v-event-drag-bottom"
+                type="button"
+                @mousedown.left.stop="props.extendBottom(event)"
+              >
+                <v-icon :size="getResizeHandleIconSize(event)">mdi-resize-bottom-right</v-icon>
+              </button>
+            </div>
           </div>
+        </template>
 
-          <strong v-if="!shouldInlineTitle(event)" class="sapling-calendar-event-card__title">
-            {{ event.event?.title || event.name || '' }}
-          </strong>
-          <p
-            v-if="shouldShowDescription(event) && event.event?.description"
-            class="sapling-calendar-event-card__description"
-          >
-            {{ event.event.description }}
-          </p>
-        </div>
-
-        <button
-          v-if="props.showResizeHandle && isInteractiveEvent(event)"
-          class="sapling-calendar-event-card__resize v-event-drag-bottom"
-          type="button"
-          @mousedown.left.stop="props.extendBottom(event)"
-        >
-          <v-icon :size="getResizeHandleIconSize(event)">mdi-resize-bottom-right</v-icon>
-        </button>
-      </div>
+        <SaplingEventTooltipCard
+          :event="event"
+          class="glass-panel"
+          :time-range="formatEventTimeRange(event)"
+          :icon="getEventIcon(event)"
+        />
+      </v-menu>
     </template>
   </SaplingSurface>
 </template>
@@ -96,6 +123,7 @@ import type { CSSProperties } from 'vue'
 import type { WorkHourWeekItem } from '@/entity/entity'
 import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs'
 import SaplingSurface from '@/components/common/SaplingSurface.vue'
+import SaplingEventTooltipCard from '@/components/event/SaplingEventTooltipCard.vue'
 import { formatDateValue, formatTimeValue } from '@/utils/saplingFormatUtil'
 
 interface CalendarDatePair {
@@ -124,6 +152,7 @@ const props = withDefaults(
     events: CalendarEvent[]
     calendarDisplayType: CalendarDisplayType
     calendarWeekdays?: number[]
+    isDragActive?: boolean
     workHours: WorkHourWeekItem | null
     showWorkHourBackground: boolean
     calendarClass?: string | string[] | Record<string, boolean>
@@ -144,6 +173,7 @@ const props = withDefaults(
   {
     calendarWeekdays: undefined,
     calendarClass: '',
+    isDragActive: false,
     showResizeHandle: false,
   },
 )
@@ -207,12 +237,17 @@ function getEventCardClasses(event: CalendarEvent) {
 
   return {
     'v-event-draggable': isInteractiveEvent(event),
+    'sapling-calendar-event-card--all-day': !event.timed,
     'sapling-calendar-event-card--compact': density !== 'default',
     'sapling-calendar-event-card--inline': density === 'inline',
-    'sapling-calendar-event-card--resizable': props.showResizeHandle && isInteractiveEvent(event),
+    'sapling-calendar-event-card--resizable': shouldShowResizeHandle(event),
     'sapling-calendar-event-card--recurring': isRecurringOccurrence(event),
     'sapling-calendar-event-card--readonly': !isInteractiveEvent(event),
   }
+}
+
+function shouldShowResizeHandle(event: CalendarEvent) {
+  return Boolean(event.timed && props.showResizeHandle && isInteractiveEvent(event))
 }
 
 function getEventCardStyle(event: CalendarEvent): CSSProperties {

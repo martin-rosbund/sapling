@@ -170,7 +170,7 @@
       <v-menu v-model="menuActive">
         <template #activator="{ props: menuProps }">
           <v-btn
-            class="glass-panel"
+            class="glass-panel sapling-table-row__actions-button"
             v-bind="menuProps"
             icon="mdi-dots-vertical"
             size="small"

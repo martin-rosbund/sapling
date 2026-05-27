@@ -249,6 +249,9 @@ export function useSaplingEvent() {
   const calendarWeekdays = computed(() =>
     calendarType.value === 'workweek' ? WORKWEEK_DAYS : undefined,
   )
+  const isCalendarDragActive = computed(
+    () => dragEvent.value != null || createEvent.value != null || extendOriginal.value != null,
+  )
   const showWorkHourBackground = computed(() =>
     ['day', 'week', 'workweek'].includes(calendarType.value),
   )
@@ -1792,6 +1795,7 @@ export function useSaplingEvent() {
     goToNext,
     goToPrevious,
     goToToday,
+    isCalendarDragActive,
     isLoading,
     isNarrowScreen,
     nowY,

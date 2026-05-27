@@ -3,7 +3,7 @@
     <div class="sapling-toolbar-group sapling-event-toolbar__primary">
       <div class="sapling-toolbar-nav-group sapling-event-toolbar__nav-group">
         <v-btn-group class="sapling-event-toolbar__nav" density="comfortable">
-          <v-btn variant="outlined" icon="mdi-chevron-left" @click="emit('previous')" />
+          <v-btn variant="tonal" icon="mdi-chevron-left" @click="emit('previous')" />
           <v-btn prepend-icon="mdi-calendar-today" variant="tonal" @click="emit('today')">
             <template v-if="$vuetify.display.mdAndUp"> {{ $t('event.today') }}</template>
           </v-btn>
@@ -49,71 +49,71 @@
               />
             </SaplingSurface>
           </v-menu>
-          <v-btn variant="outlined" icon="mdi-chevron-right" @click="emit('next')" />
+          <v-btn variant="tonal" icon="mdi-chevron-right" @click="emit('next')" />
         </v-btn-group>
       </div>
-    </div>
 
-    <div class="sapling-toolbar-group sapling-event-toolbar__secondary">
-      <v-btn-toggle
-        v-model="calendarModeModel"
-        class="sapling-toolbar-toggle sapling-event-toolbar__mode-toggle"
-        density="comfortable"
-        mandatory
-      >
-        <v-btn prepend-icon="mdi-perspective-less" variant="outlined" value="default">
-          <template v-if="$vuetify.display.mdAndUp"> {{ $t('calendar.standard') }}</template>
-        </v-btn>
-        <v-btn prepend-icon="mdi-perspective-more" variant="outlined" value="extended">
-          <template v-if="$vuetify.display.mdAndUp"> {{ $t('calendar.extended') }}</template>
-        </v-btn>
-      </v-btn-toggle>
+      <div class="sapling-toolbar-group sapling-event-toolbar__options">
+        <v-btn-toggle
+          v-model="calendarModeModel"
+          class="sapling-toolbar-toggle sapling-event-toolbar__mode-toggle"
+          density="comfortable"
+          mandatory
+        >
+          <v-btn prepend-icon="mdi-perspective-less" variant="tonal" value="default">
+            <template v-if="$vuetify.display.mdAndUp"> {{ $t('calendar.standard') }}</template>
+          </v-btn>
+          <v-btn prepend-icon="mdi-perspective-more" variant="tonal" value="extended">
+            <template v-if="$vuetify.display.mdAndUp"> {{ $t('calendar.extended') }}</template>
+          </v-btn>
+        </v-btn-toggle>
 
-      <v-btn-toggle
-        v-if="!isNarrowScreen"
-        v-model="calendarViewModeModel"
-        class="sapling-toolbar-toggle sapling-event-toolbar__view-toggle"
-        density="comfortable"
-        mandatory
-      >
-        <v-btn prepend-icon="mdi-call-merge" variant="outlined" value="single">
-          <template v-if="$vuetify.display.mdAndUp"> {{ $t('calendar.combined') }}</template>
-        </v-btn>
-        <v-btn prepend-icon="mdi-call-split" variant="outlined" value="sidebyside">
-          <template v-if="$vuetify.display.mdAndUp"> {{ $t('calendar.sideBySide') }}</template>
-        </v-btn>
-      </v-btn-toggle>
+        <v-btn-toggle
+          v-if="!isNarrowScreen"
+          v-model="calendarViewModeModel"
+          class="sapling-toolbar-toggle sapling-event-toolbar__view-toggle"
+          density="comfortable"
+          mandatory
+        >
+          <v-btn prepend-icon="mdi-call-merge" variant="tonal" value="single">
+            <template v-if="$vuetify.display.mdAndUp"> {{ $t('calendar.combined') }}</template>
+          </v-btn>
+          <v-btn prepend-icon="mdi-call-split" variant="tonal" value="sidebyside">
+            <template v-if="$vuetify.display.mdAndUp"> {{ $t('calendar.sideBySide') }}</template>
+          </v-btn>
+        </v-btn-toggle>
 
-      <div class="d-none d-md-flex">
+        <div class="sapling-event-toolbar__overflow d-flex d-md-none">
+          <v-menu offset-y>
+            <template #activator="{ props }">
+              <v-btn v-bind="props" icon="mdi-tune" variant="tonal" />
+            </template>
+
+            <SaplingSurface :as="VList">
+              <v-list-item
+                v-for="type in calendarTypeOptions"
+                :key="type"
+                @click="calendarTypeModel = type"
+              >
+                <v-list-item-title>{{ $t(`calendar.${type}`) }}</v-list-item-title>
+              </v-list-item>
+            </SaplingSurface>
+          </v-menu>
+        </div>
+      </div>
+
+      <div class="d-none d-md-flex sapling-event-toolbar__type-wrap">
         <v-btn-toggle
           v-model="calendarTypeModel"
           class="sapling-toolbar-toggle sapling-event-toolbar__type-toggle"
           density="comfortable"
           mandatory
         >
-          <v-btn variant="outlined" value="day">{{ $t('calendar.day') }}</v-btn>
-          <v-btn variant="outlined" value="workweek">{{ $t('calendar.workweek') }}</v-btn>
-          <v-btn variant="outlined" value="week">{{ $t('calendar.week') }}</v-btn>
-          <v-btn variant="outlined" value="month">{{ $t('calendar.month') }}</v-btn>
+          <v-btn variant="tonal" value="day">{{ $t('calendar.day') }}</v-btn>
+          <v-btn variant="tonal" value="workweek">{{ $t('calendar.workweek') }}</v-btn>
+          <v-btn variant="tonal" value="week">{{ $t('calendar.week') }}</v-btn>
+          <v-btn variant="tonal" value="month">{{ $t('calendar.month') }}</v-btn>
         </v-btn-toggle>
-      </div>
-
-      <div class="sapling-event-toolbar__overflow d-flex d-md-none">
-        <v-menu offset-y>
-          <template #activator="{ props }">
-            <v-btn v-bind="props" icon="mdi-tune" variant="text" />
-          </template>
-
-          <SaplingSurface :as="VList">
-            <v-list-item
-              v-for="type in calendarTypeOptions"
-              :key="type"
-              @click="calendarTypeModel = type"
-            >
-              <v-list-item-title>{{ $t(`calendar.${type}`) }}</v-list-item-title>
-            </v-list-item>
-          </SaplingSurface>
-        </v-menu>
       </div>
     </div>
   </header>

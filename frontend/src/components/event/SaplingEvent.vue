@@ -87,6 +87,7 @@
               :events="events"
               :calendar-display-type="calendarDisplayType"
               :calendar-weekdays="calendarWeekdays"
+              :is-drag-active="isCalendarDragActive"
               :work-hours="workHours"
               :show-work-hour-background="showWorkHourBackground"
               :selected-peoples="selectedPeoples"
@@ -276,6 +277,7 @@ const {
   goToPrevious,
   goToToday,
   handleUpdateConflictVisibility,
+  isCalendarDragActive,
   isLoading,
   isNarrowScreen,
   mergeUpdateConflict,

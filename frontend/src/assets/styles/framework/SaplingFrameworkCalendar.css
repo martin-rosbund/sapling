@@ -108,12 +108,67 @@
 }
 
 .sapling-event-toolbar {
-  padding-bottom: var(--sapling-gap-xl);
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--sapling-gap-md);
+  min-height: calc(40px + var(--sapling-gap-lg));
+  padding-top: var(--sapling-gap-lg);
+  padding-bottom: var(--sapling-gap-lg);
   border-bottom: 1px solid var(--sapling-surface-fill);
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-width: none;
+}
+
+.sapling-event-toolbar::-webkit-scrollbar {
+  display: none;
 }
 
 .sapling-event-toolbar .v-btn {
-  font-weight: 600;
+  height: 40px;
+  min-height: 40px;
+  font-weight: 550;
+}
+
+.sapling-event-toolbar__primary {
+  flex: 1 1 auto;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  gap: var(--sapling-gap-sm);
+  min-width: 100%;
+  width: max-content;
+}
+
+.sapling-event-toolbar__nav-group,
+.sapling-event-toolbar__options {
+  flex-shrink: 0;
+}
+
+.sapling-event-toolbar__options {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  gap: var(--sapling-gap-sm);
+  width: max-content;
+}
+
+.sapling-event-toolbar__options .v-btn,
+.sapling-event-toolbar__type-toggle .v-btn {
+  font-weight: 500;
+}
+
+.sapling-event-toolbar__type-wrap {
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.sapling-event-toolbar__nav,
+.sapling-event-toolbar__mode-toggle,
+.sapling-event-toolbar__view-toggle,
+.sapling-event-toolbar__type-toggle {
+  background: color-mix(in srgb, var(--sapling-surface-fill-soft) 82%, transparent);
+  border-radius: var(--sapling-radius-pill);
 }
 
 .sapling-event-toolbar__nav .v-btn {
@@ -153,8 +208,16 @@
 }
 
 .sapling-event-vcalendar {
+  --sapling-calendar-all-day-card-height: 84px;
+  --sapling-calendar-all-day-head-height: 180px;
   height: 100%;
   min-height: 0;
+}
+
+.sapling-event-vcalendar.v-calendar-daily .v-calendar-daily__head,
+.sapling-event-vcalendar.v-calendar-daily .v-calendar-daily__intervals-head,
+.sapling-event-vcalendar.v-calendar-daily .v-calendar-daily_head-day {
+  min-height: var(--sapling-calendar-all-day-head-height);
 }
 
 .sapling-event-vcalendar--single {
@@ -314,14 +377,31 @@
 .sapling-calendar-event-card {
   position: relative;
   display: flex;
+  flex: 1 1 auto;
   align-items: stretch;
+  width: 100%;
+  height: 100%;
   min-height: 100%;
   overflow: hidden;
   background: linear-gradient(
     160deg,
-    color-mix(in srgb, var(--sapling-calendar-event-card-color, #3b82f6) 78%, white 22%),
-    color-mix(in srgb, var(--sapling-calendar-event-card-color, #3b82f6) 88%, black 12%)
+    color-mix(
+      in srgb,
+      var(--sapling-calendar-event-card-color, #3b82f6) 34%,
+      var(--sapling-surface-fill-soft) 66%
+    ),
+    color-mix(
+      in srgb,
+      var(--sapling-calendar-event-card-color, #3b82f6) 46%,
+      var(--sapling-surface-fill) 54%
+    )
   );
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--sapling-calendar-event-card-color, #3b82f6) 34%,
+      var(--sapling-surface-border) 66%
+    );
   box-shadow: var(--sapling-inset-highlight);
   cursor: pointer;
 }
@@ -330,9 +410,13 @@
   cursor: default;
 }
 
+.sapling-calendar-event-card--all-day {
+  min-height: var(--sapling-calendar-all-day-card-height);
+}
+
 .sapling-calendar-event-card--recurring {
   outline: 1px dashed
-    color-mix(in srgb, var(--sapling-calendar-event-card-color, #3b82f6) 55%, white 45%);
+    color-mix(in srgb, var(--sapling-calendar-event-card-color, #3b82f6) 40%, white 60%);
   outline-offset: -1px;
 }
 
@@ -501,6 +585,245 @@
   border-color: transparent !important;
 }
 
+.sapling-event-vcalendar .v-event:has(.sapling-calendar-event-card) {
+  overflow: visible;
+  background: transparent !important;
+  border-color: transparent !important;
+}
+
+.sapling-event-vcalendar .v-event:not(.v-event-timed):has(.sapling-calendar-event-card--all-day) {
+  min-height: var(--sapling-calendar-all-day-card-height);
+}
+
+.sapling-event-vcalendar .v-event:has(.sapling-calendar-event-tooltip-host:hover),
+.sapling-event-vcalendar .v-event:has(.sapling-calendar-event-tooltip-host:focus-within),
+.sapling-event-vcalendar .v-event-timed:has(.sapling-calendar-event-tooltip-host:hover),
+.sapling-event-vcalendar .v-event-timed:has(.sapling-calendar-event-tooltip-host:focus-within) {
+  z-index: 80 !important;
+}
+
+.sapling-calendar-event-tooltip-host {
+  position: relative;
+  z-index: 0;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+}
+
+.sapling-calendar-event-tooltip-host:hover,
+.sapling-calendar-event-tooltip-host:focus-within {
+  z-index: 80;
+}
+
+.sapling-calendar-event-tooltip-popover {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + var(--sapling-gap-xs));
+  left: 0;
+  width: max-content;
+  max-width: min(330px, calc(100vw - (var(--sapling-gap-md) * 2)));
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition:
+    opacity var(--sapling-motion-fast) ease,
+    transform var(--sapling-motion-fast) ease,
+    visibility 0s linear;
+  transition-delay: 0s;
+  visibility: hidden;
+}
+
+.sapling-calendar-event-tooltip-host:hover .sapling-calendar-event-tooltip-popover,
+.sapling-calendar-event-tooltip-host:focus-within .sapling-calendar-event-tooltip-popover {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition-delay: 0.5s;
+  visibility: visible;
+}
+
+.sapling-event-vcalendar--drag-active .sapling-calendar-event-tooltip-popover {
+  display: none;
+}
+
+.sapling-calendar-event-tooltip-card {
+  width: min(330px, calc(100vw - (var(--sapling-gap-md) * 2)));
+  overflow: auto;
+  border: 1px solid var(--sapling-surface-border);
+  border-radius: var(--sapling-radius-sm);
+  background:
+    linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--sapling-surface-fill) 92%, transparent),
+      color-mix(in srgb, var(--sapling-surface-fill-soft) 86%, transparent)
+    ),
+    var(--sapling-surface-fill);
+  box-shadow: var(--sapling-shadow-lift), var(--sapling-inset-highlight);
+  color: var(--sapling-surface-text);
+}
+
+.sapling-calendar-event-tooltip-overlay {
+  pointer-events: auto;
+}
+
+.sapling-calendar-event-tooltip-overlay .sapling-calendar-event-tooltip-card.glass-panel {
+  background: color-mix(in srgb, var(--sapling-surface-fill) 92%, var(--glass-bg)) !important;
+  backdrop-filter: blur(var(--sapling-blur-strong));
+  -webkit-backdrop-filter: blur(var(--sapling-blur-strong));
+}
+
+.sapling-calendar-event-tooltip-card__header {
+  display: grid;
+  grid-template-columns: var(--sapling-icon-box-md) minmax(0, 1fr);
+  gap: var(--sapling-gap-sm);
+  align-items: center;
+  padding: var(--sapling-gap-sm);
+  border-bottom: 1px solid var(--sapling-surface-border-muted);
+  background: color-mix(in srgb, rgb(var(--v-theme-primary)) 10%, transparent);
+}
+
+.sapling-calendar-event-tooltip-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--sapling-icon-box-md);
+  height: var(--sapling-icon-box-md);
+  border-radius: var(--sapling-radius-sm);
+  background: color-mix(in srgb, rgb(var(--v-theme-primary)) 18%, transparent);
+  color: rgb(var(--v-theme-primary));
+}
+
+.sapling-calendar-event-tooltip-card__heading {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--sapling-gap-2xs);
+}
+
+.sapling-calendar-event-tooltip-card__heading strong {
+  overflow: hidden;
+  font-size: var(--sapling-text-label-size-md);
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sapling-calendar-event-tooltip-card__heading span {
+  color: var(--sapling-surface-text-muted);
+  font-size: var(--sapling-text-label-size-sm);
+  font-weight: 650;
+}
+
+.sapling-calendar-event-tooltip-card__action {
+  padding: var(--sapling-gap-sm) var(--sapling-gap-sm) 0;
+}
+
+.sapling-calendar-event-tooltip-card__meeting-link {
+  display: inline-flex;
+  width: 100%;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sapling-gap-xs);
+  padding: var(--sapling-gap-xs) var(--sapling-gap-sm);
+  border: 1px solid color-mix(in srgb, rgb(var(--v-theme-primary)) 42%, transparent);
+  border-radius: var(--sapling-radius-sm);
+  background: color-mix(in srgb, rgb(var(--v-theme-primary)) 18%, transparent);
+  color: rgb(var(--v-theme-primary));
+  font-size: var(--sapling-text-label-size-md);
+  font-weight: 750;
+  text-decoration: none;
+  transition:
+    background var(--sapling-motion-fast) ease,
+    border-color var(--sapling-motion-fast) ease,
+    transform var(--sapling-motion-fast) ease;
+}
+
+.sapling-calendar-event-tooltip-card__meeting-link:hover,
+.sapling-calendar-event-tooltip-card__meeting-link:focus-visible {
+  border-color: color-mix(in srgb, rgb(var(--v-theme-primary)) 68%, transparent);
+  background: color-mix(in srgb, rgb(var(--v-theme-primary)) 26%, transparent);
+  transform: translateY(-1px);
+}
+
+.sapling-calendar-event-tooltip-card__sections {
+  display: grid;
+  gap: var(--sapling-gap-xs);
+  padding: var(--sapling-gap-sm);
+}
+
+.sapling-calendar-event-tooltip-card__section {
+  display: grid;
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-calendar-event-tooltip-card__section-label {
+  color: var(--sapling-surface-text-muted);
+  font-size: var(--sapling-text-label-size-sm);
+  font-weight: 750;
+}
+
+.sapling-calendar-event-tooltip-card__rows {
+  display: grid;
+  overflow: hidden;
+  border: 1px solid var(--sapling-surface-border-muted);
+  border-radius: var(--sapling-radius-sm);
+  background: color-mix(in srgb, var(--sapling-surface-fill-soft) 64%, transparent);
+}
+
+.sapling-calendar-event-tooltip-card__row {
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr);
+  gap: var(--sapling-gap-sm);
+  align-items: center;
+  min-width: 0;
+  padding: var(--sapling-gap-2xs) var(--sapling-gap-sm);
+}
+
+.sapling-calendar-event-tooltip-card__row + .sapling-calendar-event-tooltip-card__row {
+  border-top: 1px solid var(--sapling-surface-border-muted);
+}
+
+.sapling-calendar-event-tooltip-card__row span {
+  color: var(--sapling-surface-text-muted);
+  font-size: var(--sapling-text-label-size-sm);
+  font-weight: 650;
+}
+
+.sapling-calendar-event-tooltip-card__row strong {
+  overflow: hidden;
+  font-size: var(--sapling-text-label-size-md);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sapling-calendar-event-tooltip-card__participants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-calendar-event-tooltip-card__participant,
+.sapling-calendar-event-tooltip-card__empty {
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+  align-items: center;
+  padding: var(--sapling-gap-2xs) var(--sapling-gap-sm);
+  border: 1px solid var(--sapling-surface-border-muted);
+  border-radius: var(--sapling-radius-pill);
+  background: color-mix(in srgb, var(--sapling-surface-fill-soft) 72%, transparent);
+  color: var(--sapling-surface-text);
+  font-size: var(--sapling-text-label-size-sm);
+  font-weight: 650;
+}
+
+.sapling-calendar-event-tooltip-card__empty {
+  color: var(--sapling-surface-text-muted);
+}
+
 @media (max-width: 1380px) {
   .sapling-event-skeleton__context {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -591,32 +914,27 @@
     max-height: none;
   }
 
-  .sapling-event-toolbar,
-  .sapling-event-toolbar__primary,
-  .sapling-event-toolbar__secondary,
   .sapling-event-agenda-item__row {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .sapling-event-toolbar {
+  .sapling-event-toolbar__primary {
+    flex: 1 1 auto;
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: center;
-    gap: var(--sapling-gap-sm);
-  }
-
-  .sapling-event-toolbar__primary {
-    flex: 1 1 auto;
+    justify-content: space-between;
     min-width: 0;
   }
 
-  .sapling-event-toolbar__secondary {
-    flex: 0 0 auto;
+  .sapling-event-toolbar__options {
+    flex: 0 1 auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
   }
 
-  .sapling-event-toolbar__primary,
-  .sapling-event-toolbar__secondary,
   .sapling-event-toolbar__nav-group {
     flex-direction: row;
     flex-wrap: nowrap;
@@ -675,18 +993,11 @@
     width: 100%;
   }
 
-  .sapling-event-toolbar {
-    flex-direction: row;
-    align-items: center;
-    gap: var(--sapling-gap-xs);
+  .sapling-event-toolbar__primary {
+    width: 100%;
   }
 
-  .sapling-event-toolbar__primary,
-  .sapling-event-toolbar__secondary {
-    width: auto;
-  }
-
-  .sapling-event-toolbar__secondary {
+  .sapling-event-toolbar__options {
     flex: 1 1 auto;
     justify-content: space-between;
   }
