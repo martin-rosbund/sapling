@@ -35,5 +35,7 @@
   { "entity": "personPasskey", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
   { "entity": "personPasskey", "property": "groupBasics", "de": "Allgemein", "en": "General" },
   { "entity": "personPasskey", "property": "groupSecurity", "de": "Sicherheit", "en": "Security" },
-  { "entity": "personPasskey", "property": "groupReference", "de": "Zuordnung", "en": "Reference" }
+  { "entity": "personPasskey", "property": "groupReference", "de": "Zuordnung", "en": "Reference" },
+  
+  { "entity": "navigation", "property": "personPasskey", "de": "Person Passkey", "en": "Person Passkey" }
 ]

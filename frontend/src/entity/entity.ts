@@ -794,6 +794,8 @@ export interface PersonItem extends SaplingGenericItem {
   language?: LanguageItem | null
   /** Assigned work hour week */
   workWeek?: WorkHourWeekItem | number | null
+  /** Authentication/provider type for this person */
+  type?: PersonTypeItem | string | null
   /** List of roles assigned to the person */
   roles?: (RoleItem | string)[]
   /** Tickets assigned to the person */

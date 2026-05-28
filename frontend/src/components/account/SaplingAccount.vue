@@ -111,8 +111,10 @@
                 </v-table>
               </v-col>
             </v-row>
-            <v-divider class="my-4" />
-            <SaplingPasskeyManager />
+            <template v-if="isSaplingAccount">
+              <v-divider class="my-4" />
+              <SaplingPasskeyManager />
+            </template>
           </div>
         </template>
 
@@ -181,6 +183,12 @@ const accountTitle = computed(() => {
 const accountSubtitle = computed(
   () => currentPersonStore.person?.email || currentPersonStore.person?.mobile || '',
 )
+
+const isSaplingAccount = computed(() => {
+  const personType = currentPersonStore.person?.type
+
+  return typeof personType === 'string' ? personType === 'sapling' : personType?.handle === 'sapling'
+})
 
 function handleClose() {
   emit('close')
