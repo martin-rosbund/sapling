@@ -1,0 +1,19 @@
+[
+  { "entity": "navigation", "property": "knowledgeBase", "de": "Nachschlagwerk", "en": "Knowledge base" },
+
+  { "entity": "knowledgeBase", "property": "register", "de": "Register", "en": "Register" },
+  { "entity": "knowledgeBase", "property": "search", "de": "Wissensartikel suchen", "en": "Search knowledge articles" },
+  { "entity": "knowledgeBase", "property": "publishedCount", "de": "{count} von {total} veroeffentlicht", "en": "{count} of {total} published" },
+  { "entity": "knowledgeBase", "property": "filteredCount", "de": "{count} Artikel", "en": "{count} articles" },
+  { "entity": "knowledgeBase", "property": "articles", "de": "Artikel", "en": "Articles" },
+  { "entity": "knowledgeBase", "property": "allCategories", "de": "Alle Kategorien", "en": "All categories" },
+  { "entity": "knowledgeBase", "property": "allVisibility", "de": "Alle Sichtbarkeiten", "en": "All visibility" },
+  { "entity": "knowledgeBase", "property": "allAuthors", "de": "Alle Autoren", "en": "All authors" },
+  { "entity": "knowledgeBase", "property": "resetFilters", "de": "Filter zuruecksetzen", "en": "Reset filters" },
+  { "entity": "knowledgeBase", "property": "emptyTitle", "de": "Keine veroeffentlichten Artikel", "en": "No published articles" },
+  { "entity": "knowledgeBase", "property": "emptyText", "de": "Es gibt keinen passenden Treffer fuer die aktuelle Auswahl.", "en": "There is no matching result for the current selection." },
+  { "entity": "knowledgeBase", "property": "selectArticle", "de": "Waehle einen Artikel aus dem Register.", "en": "Select an article from the register." },
+  { "entity": "knowledgeBase", "property": "unknownAuthor", "de": "Unbekannter Autor", "en": "Unknown author" },
+  { "entity": "knowledgeBase", "property": "noPreview", "de": "Keine Kurzbeschreibung vorhanden.", "en": "No short description available." },
+  { "entity": "knowledgeBase", "property": "loadError", "de": "Die Wissensartikel konnten nicht geladen werden.", "en": "The knowledge articles could not be loaded." }
+]

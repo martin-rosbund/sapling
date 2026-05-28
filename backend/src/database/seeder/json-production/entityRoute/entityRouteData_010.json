@@ -1,0 +1,7 @@
+[
+  {
+    "entity": "knowledgeArticle",
+    "route": "knowledge",
+    "navigation": "knowledgeBase"
+  }
+]

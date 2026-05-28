@@ -116,11 +116,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
-import type {
-  AiChatSessionItem,
-  AiProviderModelItem,
-  AiProviderTypeItem,
-} from '@/entity/entity'
+import type { AiChatSessionItem, AiProviderModelItem, AiProviderTypeItem } from '@/entity/entity'
 import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingAiChatConversation from '@/components/system/ai-chat/SaplingAiChatConversation.vue'
 import SaplingAiChatHeader from '@/components/system/ai-chat/SaplingAiChatHeader.vue'

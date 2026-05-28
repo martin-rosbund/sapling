@@ -59,6 +59,11 @@ const router = createRouter({
         // System view (lazy loaded)
         { path: 'system', name: 'system', component: () => import('@/views/SystemView.vue') },
         {
+          path: 'knowledge',
+          name: 'knowledgeBase',
+          component: () => import('@/views/KnowledgeBaseView.vue'),
+        },
+        {
           path: 'form-config',
           name: 'formConfig',
           component: () => import('@/views/FormConfigView.vue'),
