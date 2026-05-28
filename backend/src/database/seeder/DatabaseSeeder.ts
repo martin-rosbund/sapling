@@ -61,6 +61,7 @@ import { EmailTemplateItem } from '../../entity/EmailTemplateItem';
 import { EMailListItem } from '../../entity/EMailListItem';
 import { ScriptButtonItem } from '../../entity/ScriptButtonItem';
 import { AiChatTranscriptionItem } from '../../entity/AiChatTranscriptionItem';
+import { AiEntityGenerationTemplateItem } from '../../entity/AiEntityGenerationTemplateItem';
 import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
 import { McpServerConfigItem } from '../../entity/McpServerConfigItem';
@@ -191,6 +192,7 @@ const SEED_ORDER: Array<EntityName<object> | (new () => Seeder)> = [
   AiChatTranscriptionItem,
   AiProviderTypeItem,
   AiProviderModelItem,
+  AiEntityGenerationTemplateItem,
   McpServerConfigItem,
 ];
 

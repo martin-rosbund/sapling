@@ -85,6 +85,7 @@ import { PersonPasskeyItem } from '../PersonPasskeyItem';
 import { AiChatSessionItem } from '../AiChatSessionItem';
 import { AiChatMessageItem } from '../AiChatMessageItem';
 import { AiChatTranscriptionItem } from '../AiChatTranscriptionItem';
+import { AiEntityGenerationTemplateItem } from '../AiEntityGenerationTemplateItem';
 import { AiProviderTypeItem } from '../AiProviderTypeItem';
 import { AiProviderModelItem } from '../AiProviderModelItem';
 import { McpServerConfigItem } from '../McpServerConfigItem';
@@ -209,6 +210,10 @@ const ENTITY_REGISTRY_ENTRIES: { name: string; class: any }[] = [
   { name: 'aiChatSession', class: AiChatSessionItem },
   { name: 'aiChatMessage', class: AiChatMessageItem },
   { name: 'aiChatTranscription', class: AiChatTranscriptionItem },
+  {
+    name: 'aiEntityGenerationTemplate',
+    class: AiEntityGenerationTemplateItem,
+  },
   { name: 'aiProviderType', class: AiProviderTypeItem },
   { name: 'aiProviderModel', class: AiProviderModelItem },
   { name: 'mcpServerConfig', class: McpServerConfigItem },

@@ -30,6 +30,7 @@ import { useTimelineDialogStore } from '@/stores/timelineDialogStore'
 import { useChangeLogDialogStore } from '@/stores/changeLogDialogStore'
 import { useSaplingFilterWork } from '@/composables/filter/useSaplingFilterWork'
 import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog'
+import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import {
   getSaplingContextMenuTableItems,
   type SaplingContextMenuTableMenuEntry,
@@ -42,6 +43,7 @@ import { formatDateFromTo, formatDateValue, formatTimeValue } from '@/utils/sapl
 import { expandRecurringEvent, isRecurringCalendarEvent } from '@/utils/eventRecurrence'
 import { buildMailMenuActions } from '@/utils/saplingMailMenuUtil'
 import { buildTableOrderBy } from '@/utils/saplingTableUtil'
+import { handleScriptResultClient } from '@/utils/saplingScriptResultUtil'
 import {
   formatLocalDate,
   getWeekNumber,
@@ -173,6 +175,7 @@ export function useSaplingEvent() {
   const timelineDialogStore = useTimelineDialogStore()
   const changeLogDialogStore = useChangeLogDialogStore()
   const { openMailDialog } = useSaplingMailDialog()
+  const { pushMessage } = useSaplingMessageCenter()
   const windowWatcher = new SaplingWindowWatcher()
   const { peopleMap } = useSaplingFilterWork()
 
@@ -1517,6 +1520,11 @@ export function useSaplingEvent() {
       scriptButton.name,
       scriptButton.parameter,
     )
+
+    await handleScriptResultClient(result, {
+      entity: entityEvent.value.handle || 'event',
+      pushMessage,
+    })
 
     if (result.isSuccess !== false) {
       await refreshVisibleEvents()

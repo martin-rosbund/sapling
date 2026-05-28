@@ -2,6 +2,7 @@ import type { ScriptResultClient } from './script.result.client.js';
 import type { ScriptResultServer } from './script.result.server';
 import type { AzureCalendarService } from '../../calendar/azure/azure.calendar.service';
 import type { GoogleCalendarService } from '../../calendar/google/google.calendar.service';
+import type { AiEntityGenerationService } from '../../api/script/ai-entity-generation.service';
 
 export type ScriptServerContext = {
   currentItems?: object[];
@@ -20,6 +21,7 @@ export type ScriptServerContext = {
 export interface ScriptInterface {
   azureCalendarService?: AzureCalendarService;
   googleCalendarService?: GoogleCalendarService;
+  aiEntityGenerationService?: AiEntityGenerationService;
   // #region Execute
   /**
    * Executes the main script logic.

@@ -1,0 +1,13 @@
+[
+  {
+    "handle": "aiEntityGenerationTemplate",
+    "canShow": true,
+    "icon": "mdi-creation",
+    "group": "ai",
+    "order": 30,
+    "canRead": true,
+    "canInsert": true,
+    "canUpdate": true,
+    "canDelete": true
+  }
+]

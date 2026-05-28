@@ -5,6 +5,7 @@ import type { MailService } from '../../api/mail/mail.service';
 import type { WebhookService } from '../../api/webhook/webhook.service';
 import type { EventDeliveryService } from '../../calendar/event.delivery.service';
 import type { TeamsService } from '../../api/teams/teams.service';
+import type { AiEntityGenerationService } from '../../api/script/ai-entity-generation.service';
 import type { EntityManager } from '@mikro-orm/core';
 import { EntityItem } from '../../entity/EntityItem.js';
 import { ScriptResultClient } from './script.result.client.js';
@@ -47,6 +48,7 @@ export abstract class ScriptClass implements ScriptInterface {
   public webhookService?: WebhookService;
   public eventDeliveryService?: EventDeliveryService;
   public teamsService?: TeamsService;
+  public aiEntityGenerationService?: AiEntityGenerationService;
   // #endregion
 
   // #region Constructor
@@ -66,6 +68,7 @@ export abstract class ScriptClass implements ScriptInterface {
     webhookService?: WebhookService,
     eventDeliveryService?: EventDeliveryService,
     teamsService?: TeamsService,
+    aiEntityGenerationService?: AiEntityGenerationService,
   ) {
     this.entity = entity;
     this.user = user;
@@ -76,6 +79,7 @@ export abstract class ScriptClass implements ScriptInterface {
     this.webhookService = webhookService;
     this.eventDeliveryService = eventDeliveryService;
     this.teamsService = teamsService;
+    this.aiEntityGenerationService = aiEntityGenerationService;
   }
   // #endregion
 

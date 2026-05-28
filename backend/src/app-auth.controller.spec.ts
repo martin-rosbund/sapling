@@ -107,7 +107,7 @@ describe('AuthController', () => {
     const req = createMockRequest();
     const res = createMockResponse();
 
-    controller.localLogin(req, res);
+    void controller.localLogin(req, res);
 
     expect(req.session?.regenerate).toHaveBeenCalledWith(expect.any(Function));
     expect(asMock(req.login)).toHaveBeenCalledWith(
@@ -238,7 +238,7 @@ describe('AuthController', () => {
     });
     const res = createMockResponse();
 
-    controller.localLogin(req, res);
+    void controller.localLogin(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send).toHaveBeenCalledWith(error);

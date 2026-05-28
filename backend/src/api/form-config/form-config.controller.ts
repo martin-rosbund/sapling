@@ -228,12 +228,7 @@ export class FormConfigController {
       return false;
     }
 
-    const roleItems =
-      typeof roles.getItems === 'function'
-        ? roles.getItems()
-        : Array.isArray(roles)
-          ? roles
-          : Array.from(roles);
+    const roleItems = roles.getItems();
 
     return roleItems.some(
       (role) =>

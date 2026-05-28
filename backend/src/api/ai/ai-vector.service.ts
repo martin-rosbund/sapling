@@ -708,11 +708,7 @@ export class AiVectorService {
         knowledgeArticleHandle: article.handle,
         title,
         status: relationLabel(article.status, 'description', 'handle'),
-        visibility: relationLabel(
-          article.visibility,
-          'description',
-          'handle',
-        ),
+        visibility: relationLabel(article.visibility, 'description', 'handle'),
         category: relationLabel(article.category, 'title', 'handle'),
         tags: article.tags?.trim() || null,
         publishedAt: formatVectorDate(article.publishedAt),
@@ -1068,7 +1064,10 @@ function buildKnowledgeArticleSectionContent(
   const lines = compactVectorLines([
     `Knowledge article: ${article.handle ?? ''}`.trim(),
     article.title?.trim() ? `Title: ${article.title.trim()}` : null,
-    vectorLine('Status', relationLabel(article.status, 'description', 'handle')),
+    vectorLine(
+      'Status',
+      relationLabel(article.status, 'description', 'handle'),
+    ),
     vectorLine(
       'Visibility',
       relationLabel(article.visibility, 'description', 'handle'),

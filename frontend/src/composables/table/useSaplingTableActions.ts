@@ -32,6 +32,7 @@ import { buildTableFilter, buildTableOrderBy } from '@/utils/saplingTableUtil'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog'
 import { buildMailMenuActions } from '@/utils/saplingMailMenuUtil'
+import { handleScriptResultClient } from '@/utils/saplingScriptResultUtil'
 import { buildCsv, buildCsvTemplate, parseCsv } from '@/utils/saplingCsvUtil'
 import type { SaplingContextMenuTableActionPayload } from '@/composables/context/useSaplingContextMenuTable'
 import type { SaplingTableRowContextMenuOpenPayload } from '@/composables/table/useSaplingTableRow'
@@ -876,6 +877,12 @@ export function useSaplingTableActions({
       button.name,
       button.parameter,
     )
+
+    await handleScriptResultClient(result, {
+      entity: props.entityHandle,
+      pushMessage,
+      router,
+    })
 
     if (result.isSuccess !== false) {
       emit('reload')

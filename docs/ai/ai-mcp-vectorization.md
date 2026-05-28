@@ -256,6 +256,25 @@ Use:
 - `generic_get` when the exact handle is known
 - `generic_timeline` for record history/activity questions
 
+## AI Draft Creation
+
+Phase 3 adds a generic entity-generation path for ScriptButtons. The shipped
+`ticketKnowledgeArticle` template creates draft `knowledgeArticle` records from
+ticket context through the configured/default chat provider.
+
+The configuration lives in `aiEntityGenerationTemplate`:
+
+- `sourceEntity`, `targetEntity`, and `actionName` bind a template to a
+  ScriptButton action.
+- `sourceRelations` controls which relations are loaded into the model prompt.
+- `fieldMapping` maps model JSON keys to target fields.
+- `targetDefaults` sets fixed values such as draft status and internal
+  visibility.
+- `sourceReferenceField` and `userReferenceField` preserve provenance.
+
+This keeps the first Ticket -> Knowledge Article action reusable instead of
+hard-coding the target fields into `TicketController`.
+
 ## Common Mistakes
 
 - Forgetting to run vectorization after adding a vectorizable entity.

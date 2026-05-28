@@ -375,6 +375,7 @@ import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { useTimelineDialogStore } from '@/stores/timelineDialogStore'
 import { useChangeLogDialogStore } from '@/stores/changeLogDialogStore'
 import { buildTableOrderBy } from '@/utils/saplingTableUtil'
+import { handleScriptResultClient } from '@/utils/saplingScriptResultUtil'
 // #endregion
 
 // #region Props & Emits
@@ -875,6 +876,12 @@ async function runScriptButtonFromRecord(scriptButton: ScriptButtonItem): Promis
     scriptButton.name,
     scriptButton.parameter,
   )
+
+  await handleScriptResultClient(result, {
+    entity: entityHandle.value || props.entity?.handle || 'script',
+    pushMessage,
+    onItemData: (item) => emit('update:item', item as SaplingGenericItem),
+  })
 
   if (result.isSuccess !== false) {
     await reloadDialogItem()

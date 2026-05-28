@@ -187,7 +187,9 @@ const accountSubtitle = computed(
 const isSaplingAccount = computed(() => {
   const personType = currentPersonStore.person?.type
 
-  return typeof personType === 'string' ? personType === 'sapling' : personType?.handle === 'sapling'
+  return typeof personType === 'string'
+    ? personType === 'sapling'
+    : personType?.handle === 'sapling'
 })
 
 function handleClose() {

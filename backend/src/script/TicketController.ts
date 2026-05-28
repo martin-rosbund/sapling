@@ -1,8 +1,9 @@
 import { TicketItem } from '../entity/TicketItem.js';
-import { EntityItem } from '../entity/EntityItem.js';
-import { PersonItem } from '../entity/PersonItem.js';
-import type { EntityManager } from '@mikro-orm/core';
 import { ScriptClass } from './core/script.class.js';
+import {
+  ScriptResultClient,
+  ScriptResultClientMethods,
+} from './core/script.result.client.js';
 import {
   ScriptResultServer,
   ScriptResultServerMethods,
@@ -17,14 +18,46 @@ import { SupportQueueItem } from '../entity/SupportQueueItem.js';
  * Extends the ScriptClass to provide custom logic for Note operations.
  */
 export class TicketController extends ScriptClass {
-  /**
-   * Creates a new instance of NoteController.
-   *
-   * @param {EntityItem} entity - The entity associated with the script.
-   * @param {PersonItem} user - The user executing the script.
-   */
-  constructor(entity: EntityItem, user: PersonItem, em?: EntityManager) {
-    super(entity, user, em);
+  async execute(
+    items: object[],
+    name: string,
+    parameter?: unknown,
+  ): Promise<ScriptResultClient> {
+    if (name !== 'aiCreateKnowledgeArticle') {
+      return super.execute(items, name, parameter);
+    }
+
+    if (!this.aiEntityGenerationService) {
+      throw new Error('aiEntityGeneration.serviceUnavailable');
+    }
+
+    const generationResult =
+      await this.aiEntityGenerationService.generateFromScriptButton({
+        items,
+        sourceEntity: this.entity,
+        user: this.user,
+        actionName: name,
+        parameter,
+      });
+    const result = new ScriptResultClient(
+      ScriptResultClientMethods.showMessage,
+      true,
+      JSON.stringify({
+        message: 'aiEntityGeneration.created',
+        description: this.buildGeneratedArticleDescription(
+          generationResult.createdItem,
+        ),
+        entity: generationResult.targetEntityHandle,
+        technical: {
+          template: generationResult.templateHandle,
+          targetEntity: generationResult.targetEntityHandle,
+          targetHandle: generationResult.createdItem.handle ?? null,
+        },
+      }),
+    );
+    result.item = generationResult.createdItem;
+
+    return result;
   }
 
   async beforeInsert(items: TicketItem[]): Promise<ScriptResultServer> {
@@ -429,5 +462,17 @@ export class TicketController extends ScriptClass {
     }
 
     return undefined;
+  }
+
+  private buildGeneratedArticleDescription(
+    item: Record<string, unknown>,
+  ): string {
+    const title = typeof item.title === 'string' ? item.title : '';
+    const handle =
+      typeof item.handle === 'string' || typeof item.handle === 'number'
+        ? `#${String(item.handle)}`
+        : '';
+
+    return [handle, title].filter(Boolean).join(' - ');
   }
 }

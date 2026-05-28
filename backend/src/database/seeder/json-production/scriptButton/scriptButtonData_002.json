@@ -1,0 +1,11 @@
+[
+  {
+    "name": "aiCreateKnowledgeArticle",
+    "title": "ticket.scriptAiCreateKnowledgeArticle",
+    "entity": "ticket",
+    "parameter": {
+      "template": "ticketKnowledgeArticle"
+    },
+    "isMultiSelect": false
+  }
+]

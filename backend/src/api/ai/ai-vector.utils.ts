@@ -114,7 +114,9 @@ export function isVectorizableEntity(
   );
 }
 
-export function assertVectorizableEntity(entityHandle: string): void {
+export function assertVectorizableEntity(
+  entityHandle: string,
+): asserts entityHandle is VectorizableEntityHandle {
   if (isVectorizableEntity(entityHandle)) {
     return;
   }

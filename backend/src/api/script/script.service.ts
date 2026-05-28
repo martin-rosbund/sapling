@@ -19,6 +19,7 @@ import { TeamsService } from '../teams/teams.service.js';
 import { TeamsSubscriptionItem } from '../../entity/TeamsSubscriptionItem.js';
 import { InboxService } from '../inbox/inbox.service.js';
 import { InboxSubscriptionItem } from '../../entity/InboxSubscriptionItem.js';
+import { AiEntityGenerationService } from './ai-entity-generation.service';
 
 // #region Enum
 /**
@@ -64,6 +65,7 @@ type ScriptControllerClass = {
     webhookService?: WebhookService,
     eventDeliveryService?: EventDeliveryService,
     teamsService?: TeamsService,
+    aiEntityGenerationService?: AiEntityGenerationService,
   ): ScriptClass;
 };
 
@@ -106,6 +108,7 @@ export class ScriptService {
     private readonly eventDeliveryService: EventDeliveryService,
     private readonly teamsService: TeamsService,
     private readonly inboxService: InboxService,
+    private readonly aiEntityGenerationService?: AiEntityGenerationService,
   ) {}
   // #endregion
 
@@ -135,6 +138,7 @@ export class ScriptService {
     webhookService?: WebhookService,
     eventDeliveryService?: EventDeliveryService,
     teamsService?: TeamsService,
+    aiEntityGenerationService?: AiEntityGenerationService,
   ): Promise<ScriptClass | null> {
     const ControllerClass = await this.getControllerClass(entity.handle);
     if (!ControllerClass) {
@@ -151,6 +155,7 @@ export class ScriptService {
       webhookService,
       eventDeliveryService,
       teamsService,
+      aiEntityGenerationService,
     );
   }
   // #endregion
@@ -221,6 +226,7 @@ export class ScriptService {
         this.webhookService,
         this.eventDeliveryService,
         this.teamsService,
+        this.aiEntityGenerationService,
       );
 
       if (entityClass) {
@@ -394,6 +400,7 @@ export class ScriptService {
         this.webhookService,
         this.eventDeliveryService,
         this.teamsService,
+        this.aiEntityGenerationService,
       );
 
       if (entityClass) {

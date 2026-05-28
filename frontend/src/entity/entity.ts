@@ -1759,6 +1759,46 @@ export interface AiChatMessageItem extends SaplingGenericItem {
 }
 
 /**
+ * Configures a generic AI action that creates one entity record from another.
+ */
+export interface AiEntityGenerationTemplateItem extends SaplingGenericItem {
+  /** String primary key */
+  handle?: string | null
+  /** Visible template title */
+  title: string
+  /** Script button action name */
+  actionName: string
+  /** Source entity used by the script button */
+  sourceEntity: EntityItem | string
+  /** Target entity to create */
+  targetEntity: EntityItem | string
+  /** Relations loaded for the source prompt */
+  sourceRelations?: string[] | null
+  /** Template-specific generation prompt */
+  promptMarkdown: string
+  /** Maps generated JSON keys to target fields */
+  fieldMapping?: Record<string, string> | null
+  /** Default values applied to the target record */
+  targetDefaults?: Record<string, unknown> | null
+  /** Target field that receives the source handle */
+  sourceReferenceField?: string | null
+  /** Target field that receives the current user handle */
+  userReferenceField?: string | null
+  /** Optional provider override */
+  provider?: AiProviderTypeItem | string | null
+  /** Optional model override */
+  model?: AiProviderModelItem | string | null
+  /** Whether the template is active */
+  isActive: boolean
+  /** Optional sort order */
+  sortOrder: number
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
  * Represents an AI provider type.
  */
 export interface AiProviderTypeItem extends SaplingGenericItem {

@@ -6,6 +6,7 @@ jest.mock('../entity/TicketItem', () => ({ TicketItem: class {} }));
 
 import { TicketController } from './TicketController';
 import type { TicketItem } from '../entity/TicketItem';
+import { ScriptResultClientMethods } from './core/script.result.client';
 import { ScriptResultServerMethods } from './core/script.result.server';
 
 describe('TicketController', () => {
@@ -34,6 +35,64 @@ describe('TicketController', () => {
     expect(items[0].number).toBe('2026#00042');
     expect(result.items).toBe(items);
     expect(result.method).toBe(ScriptResultServerMethods.overwrite);
+  });
+
+  it('creates a knowledge article draft through the generic AI generation service', async () => {
+    type GenerateFromScriptButtonMock = (
+      ...args: unknown[]
+    ) => Promise<unknown>;
+    const aiEntityGenerationService = {
+      generateFromScriptButton: jest
+        .fn<GenerateFromScriptButtonMock>()
+        .mockResolvedValue({
+          templateHandle: 'ticketKnowledgeArticle',
+          targetEntityHandle: 'knowledgeArticle',
+          createdItem: {
+            handle: 15,
+            title: 'Cache invalidation',
+          },
+          payload: {},
+        }),
+    };
+    const controller = new TicketController(
+      { handle: 'ticket' } as never,
+      { handle: 99 } as never,
+      {} as never,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      aiEntityGenerationService as never,
+    );
+
+    const result = await controller.execute(
+      [{ handle: 42 }],
+      'aiCreateKnowledgeArticle',
+      { template: 'ticketKnowledgeArticle' },
+    );
+
+    expect(
+      aiEntityGenerationService.generateFromScriptButton,
+    ).toHaveBeenCalledWith({
+      items: [{ handle: 42 }],
+      sourceEntity: { handle: 'ticket' },
+      user: { handle: 99 },
+      actionName: 'aiCreateKnowledgeArticle',
+      parameter: { template: 'ticketKnowledgeArticle' },
+    });
+    expect(result.method).toBe(ScriptResultClientMethods.showMessage);
+    expect(result.item).toMatchObject({ handle: 15 });
+    expect(JSON.parse(result.parameter)).toMatchObject({
+      message: 'aiEntityGeneration.created',
+      entity: 'knowledgeArticle',
+      technical: {
+        template: 'ticketKnowledgeArticle',
+        targetEntity: 'knowledgeArticle',
+        targetHandle: 15,
+      },
+    });
   });
 
   it('derives support defaults before insert', async () => {

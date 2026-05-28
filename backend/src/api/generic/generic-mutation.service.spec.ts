@@ -172,17 +172,22 @@ describe('GenericMutationService', () => {
 
   it('maps foreign key violations to actionable conflict errors', async () => {
     const em = {
-      nativeDelete: jest.fn(() =>
-        Promise.reject({
-          name: 'ForeignKeyConstraintViolationException',
-          message:
+      nativeDelete: jest.fn(() => {
+        const error = Object.assign(
+          new Error(
             'update or delete on table "person_item" violates foreign key constraint',
-          code: '23503',
-          detail:
-            'Key (handle)=(113) is still referenced from table "favorite_item".',
-          constraint: 'favorite_item_person_handle_foreign',
-        }),
-      ),
+          ),
+          {
+            name: 'ForeignKeyConstraintViolationException',
+            code: '23503',
+            detail:
+              'Key (handle)=(113) is still referenced from table "favorite_item".',
+            constraint: 'favorite_item_person_handle_foreign',
+          },
+        );
+
+        return Promise.reject(error);
+      }),
     };
     const service = new GenericMutationService(
       em as never,

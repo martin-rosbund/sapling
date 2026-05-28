@@ -117,7 +117,6 @@ import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
 import type {
-  AiChatMessageItem,
   AiChatSessionItem,
   AiProviderModelItem,
   AiProviderTypeItem,

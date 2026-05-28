@@ -869,7 +869,9 @@ export class SaplingMcpService {
       .map((handle) => handle.trim())
       .filter(Boolean);
     const candidates =
-      requested.length > 0 ? requested : this.defaultKnowledgeSearchEntityHandles;
+      requested.length > 0
+        ? requested
+        : this.defaultKnowledgeSearchEntityHandles;
     const allowed = new Set(this.defaultKnowledgeSearchEntityHandles);
     const normalized: string[] = [];
 

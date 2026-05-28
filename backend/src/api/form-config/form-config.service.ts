@@ -8,7 +8,6 @@ import { EntityItem } from '../../entity/EntityItem';
 import { PersonItem } from '../../entity/PersonItem';
 import {
   SaplingFormConfigItem,
-  type SaplingFormConfigPayload,
   type SaplingFormConfigScope,
 } from '../../entity/SaplingFormConfigItem';
 import type { EntityTemplateDto } from '../template/dto/entity-template.dto';
@@ -157,7 +156,7 @@ export class FormConfigService {
 
   validateConfig(
     entityHandle: string,
-    config: SaplingFormConfigPayload | unknown,
+    config: unknown,
     templates: EntityTemplateDto[],
   ): SaplingFormConfigValidationResultDto {
     const errors: SaplingFormConfigValidationIssueDto[] = [];
@@ -269,7 +268,7 @@ export class FormConfigService {
 
     const values =
       typeof (roles as { getItems?: () => unknown }).getItems === 'function'
-        ? ((roles as { getItems: () => unknown }).getItems() as unknown)
+        ? (roles as { getItems: () => unknown }).getItems()
         : roles;
 
     if (!Array.isArray(values)) {
@@ -277,13 +276,7 @@ export class FormConfigService {
     }
 
     return new Set(
-      values
-        .map((role) =>
-          role && typeof role === 'object'
-            ? String((role as { handle?: unknown }).handle ?? '')
-            : '',
-        )
-        .filter(Boolean),
+      values.map((role) => this.extractRoleHandle(role)).filter(Boolean),
     );
   }
 
@@ -337,7 +330,7 @@ export class FormConfigService {
 
   private normalizeConfig(
     entityHandle: string,
-    config: SaplingFormConfigPayload | unknown,
+    config: unknown,
     errors: SaplingFormConfigValidationIssueDto[],
   ): NormalizedSaplingFormConfig {
     const record =
@@ -421,19 +414,13 @@ export class FormConfigService {
       fieldConfig.validation = record.validation;
     }
     if (this.isPlainRecord(record.condition) || record.condition === null) {
-      fieldConfig.condition = record.condition as Record<
-        string,
-        unknown
-      > | null;
+      fieldConfig.condition = record.condition;
     }
     if (
       this.isPlainRecord(record.referenceFilter) ||
       record.referenceFilter === null
     ) {
-      fieldConfig.referenceFilter = record.referenceFilter as Record<
-        string,
-        unknown
-      > | null;
+      fieldConfig.referenceFilter = record.referenceFilter;
     }
 
     return fieldConfig;
@@ -536,5 +523,16 @@ export class FormConfigService {
 
   private normalizeOptionalString(value: unknown): string | undefined {
     return typeof value === 'string' && value.trim() ? value.trim() : undefined;
+  }
+
+  private extractRoleHandle(role: unknown): string {
+    if (!role || typeof role !== 'object' || !('handle' in role)) {
+      return '';
+    }
+
+    const handle = (role as { handle?: unknown }).handle;
+    return typeof handle === 'string' || typeof handle === 'number'
+      ? String(handle)
+      : '';
   }
 }

@@ -1,0 +1,31 @@
+[
+  { "entity": "navigation", "property": "aiEntityGenerationTemplate", "de": "AI-Erstellungsvorlagen", "en": "AI generation templates" },
+
+  { "entity": "aiEntityGenerationTemplate", "property": "aiEntityGenerationTemplate", "de": "AI-Erstellungsvorlage", "en": "AI generation template" },
+  { "entity": "aiEntityGenerationTemplate", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "aiEntityGenerationTemplate", "property": "title", "de": "Titel", "en": "Title" },
+  { "entity": "aiEntityGenerationTemplate", "property": "actionName", "de": "Aktion", "en": "Action" },
+  { "entity": "aiEntityGenerationTemplate", "property": "sourceEntity", "de": "Quell-Entitaet", "en": "Source entity" },
+  { "entity": "aiEntityGenerationTemplate", "property": "targetEntity", "de": "Ziel-Entitaet", "en": "Target entity" },
+  { "entity": "aiEntityGenerationTemplate", "property": "sourceRelations", "de": "Quell-Relationen", "en": "Source relations" },
+  { "entity": "aiEntityGenerationTemplate", "property": "promptMarkdown", "de": "Prompt", "en": "Prompt" },
+  { "entity": "aiEntityGenerationTemplate", "property": "fieldMapping", "de": "Feldzuordnung", "en": "Field mapping" },
+  { "entity": "aiEntityGenerationTemplate", "property": "targetDefaults", "de": "Ziel-Standardwerte", "en": "Target defaults" },
+  { "entity": "aiEntityGenerationTemplate", "property": "sourceReferenceField", "de": "Quell-Referenzfeld", "en": "Source reference field" },
+  { "entity": "aiEntityGenerationTemplate", "property": "userReferenceField", "de": "Benutzer-Referenzfeld", "en": "User reference field" },
+  { "entity": "aiEntityGenerationTemplate", "property": "provider", "de": "Provider", "en": "Provider" },
+  { "entity": "aiEntityGenerationTemplate", "property": "model", "de": "Modell", "en": "Model" },
+  { "entity": "aiEntityGenerationTemplate", "property": "isActive", "de": "Aktiv", "en": "Active" },
+  { "entity": "aiEntityGenerationTemplate", "property": "sortOrder", "de": "Sortierung", "en": "Sort order" },
+  { "entity": "aiEntityGenerationTemplate", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "aiEntityGenerationTemplate", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+  { "entity": "aiEntityGenerationTemplate", "property": "groupBasics", "de": "Allgemein", "en": "General" },
+  { "entity": "aiEntityGenerationTemplate", "property": "groupSource", "de": "Quelle und Ziel", "en": "Source and target" },
+  { "entity": "aiEntityGenerationTemplate", "property": "groupPrompt", "de": "Prompt", "en": "Prompt" },
+  { "entity": "aiEntityGenerationTemplate", "property": "groupMapping", "de": "Zuordnung", "en": "Mapping" },
+  { "entity": "aiEntityGenerationTemplate", "property": "groupRuntime", "de": "AI-Laufzeit", "en": "AI runtime" },
+  { "entity": "aiEntityGenerationTemplate", "property": "groupConfiguration", "de": "Konfiguration", "en": "Configuration" },
+
+  { "entity": "ticket", "property": "scriptAiCreateKnowledgeArticle", "de": "Wissensartikel mit AI erstellen", "en": "Create knowledge article with AI" },
+  { "entity": "aiEntityGeneration", "property": "created", "de": "AI-Entwurf erstellt", "en": "AI draft created" }
+]

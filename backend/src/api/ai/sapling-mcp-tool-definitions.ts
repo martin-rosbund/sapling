@@ -345,7 +345,9 @@ export const SAPLING_MCP_TOOL_DEFINITIONS: readonly SaplingMcpToolDefinition[] =
       serverInputSchema: {
         query: z
           .string()
-          .describe('Natural-language knowledge question or problem description.'),
+          .describe(
+            'Natural-language knowledge question or problem description.',
+          ),
         entityHandles: z
           .array(z.string())
           .optional()

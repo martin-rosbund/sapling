@@ -117,6 +117,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
     payload: ErrorResponseBody,
     exception: unknown,
   ) {
+    const errorPayload: unknown = JSON.parse(stringifyErrorForLog(exception));
     const logPayload = {
       requestId: payload.requestId,
       method: payload.method,
@@ -125,7 +126,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
       user: this.getRequestUserHandle(request),
       query: request.query,
       body: this.redactValue(request.body),
-      error: JSON.parse(stringifyErrorForLog(exception)),
+      error: errorPayload,
     };
 
     global.log?.error?.('http exception:', logPayload);

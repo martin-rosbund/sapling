@@ -127,6 +127,34 @@ Do not use scripts as a permission bypass. A script that reads or mutates other 
 7. Add translations and permissions if the new button entity data is user-visible.
 8. Add a focused script controller test.
 
+## Generic AI Entity Generation
+
+Script buttons can also trigger generic AI-backed record creation through
+`AiEntityGenerationTemplateItem` records.
+
+The first shipped template is `ticketKnowledgeArticle`: the ticket script button
+`aiCreateKnowledgeArticle` loads the configured source relations, asks the
+active/default chat provider to produce a strict JSON payload, maps that payload
+to `knowledgeArticle` fields, and creates a draft article linked to the source
+ticket.
+
+Use this pattern when the action should stay reusable across entities:
+
+1. Add or update an `aiEntityGenerationTemplate` seed.
+2. Set `sourceEntity`, `targetEntity`, and `actionName` to match the script
+   button.
+3. Configure `sourceRelations` for the context the model may use.
+4. Configure `fieldMapping` from generated JSON keys to target entity fields.
+5. Configure `targetDefaults`, `sourceReferenceField`, and
+   `userReferenceField` when the target needs fixed defaults or provenance.
+6. Add a script button whose `parameter.template` references the template
+   handle.
+7. Dispatch the action from the source entity controller by calling
+   `this.aiEntityGenerationService.generateFromScriptButton(...)`.
+
+The generic runner checks source read permission and target insert permission.
+It deliberately removes obvious secret fields from the prompt payload.
+
 ## Adding A Server Hook
 
 1. Add or update the entity script controller.

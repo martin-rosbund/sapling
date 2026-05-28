@@ -46,7 +46,6 @@ import {
 import {
   BeginPasskeyRegistrationDto,
   LocalLoginPasskeyChallengeResponseDto,
-  PasskeyAuthenticationOptionsResponseDto,
   PasskeyRegistrationOptionsResponseDto,
   PasskeyResponseDto,
   VerifyPasskeyAuthenticationDto,
@@ -305,7 +304,7 @@ export class AuthController {
       sessionPayload.challenge,
       sessionPayload.context,
     );
-    req.user = user as Express.User;
+    req.user = user;
 
     this.completeLogin(req, res, () => {
       this.setSessionMaxAge(req, sessionPayload.rememberMe);
