@@ -8,8 +8,8 @@
     "supportsStreaming": true,
     "supportsTools": true,
     "supportsEmbeddings": false,
-    "isDefault": true,
-    "isActive": true,
+    "isDefault": false,
+    "isActive": false,
     "sortOrder": 10,
     "maxToolCallIterations": 20
   },
@@ -23,7 +23,7 @@
     "supportsTools": true,
     "supportsEmbeddings": false,
     "isDefault": false,
-    "isActive": true,
+    "isActive": false,
     "sortOrder": 20,
     "maxToolCallIterations": 20
   },
@@ -37,7 +37,7 @@
     "supportsTools": true,
     "supportsEmbeddings": false,
     "isDefault": false,
-    "isActive": true,
+    "isActive": false,
     "sortOrder": 30,
     "maxToolCallIterations": 20
   },
@@ -51,7 +51,7 @@
     "supportsTools": true,
     "supportsEmbeddings": false,
     "isDefault": false,
-    "isActive": true,
+    "isActive": false,
     "sortOrder": 40,
     "maxToolCallIterations": 20
   },
@@ -64,8 +64,8 @@
     "supportsStreaming": true,
     "supportsTools": true,
     "supportsEmbeddings": false,
-    "isDefault": true,
-    "isActive": true,
+    "isDefault": false,
+    "isActive": false,
     "sortOrder": 10,
     "maxToolCallIterations": 20
   },
@@ -79,7 +79,7 @@
     "supportsTools": true,
     "supportsEmbeddings": false,
     "isDefault": false,
-    "isActive": true,
+    "isActive": false,
     "sortOrder": 20,
     "maxToolCallIterations": 20
   },
@@ -93,7 +93,7 @@
     "supportsTools": true,
     "supportsEmbeddings": false,
     "isDefault": false,
-    "isActive": true,
+    "isActive": false,
     "sortOrder": 30,
     "maxToolCallIterations": 20
   },
@@ -107,7 +107,7 @@
     "supportsTools": true,
     "supportsEmbeddings": false,
     "isDefault": false,
-    "isActive": true,
+    "isActive": false,
     "sortOrder": 40,
     "maxToolCallIterations": 20
   },
@@ -120,7 +120,7 @@
     "supportsStreaming": false,
     "supportsTools": false,
     "supportsEmbeddings": true,
-    "isDefault": true,
+    "isDefault": false,
     "isActive": true,
     "sortOrder": 50,
     "maxToolCallIterations": 20
@@ -134,7 +134,7 @@
     "supportsStreaming": false,
     "supportsTools": false,
     "supportsEmbeddings": true,
-    "isDefault": false,
+    "isDefault": true,
     "isActive": true,
     "sortOrder": 60,
     "maxToolCallIterations": 20

@@ -9,7 +9,7 @@
     "supportsTools": true,
     "supportsEmbeddings": false,
     "isDefault": true,
-    "isActive": true,
+    "isActive": false,
     "sortOrder": 10,
     "maxToolCallIterations": 20
   },
@@ -24,7 +24,7 @@
     "supportsEmbeddings": true,
     "embeddingBatchSize": 16,
     "isDefault": true,
-    "isActive": true,
+    "isActive": false,
     "sortOrder": 50,
     "maxToolCallIterations": 20
   }
