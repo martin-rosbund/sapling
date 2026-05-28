@@ -1228,6 +1228,8 @@ export interface KnowledgeArticleItem extends SaplingGenericItem {
   visibility: KnowledgeArticleVisibilityItem | string
   /** Optional category */
   category?: KnowledgeArticleCategoryItem | string | null
+  /** Optional product */
+  product?: ProductItem | number | null
   /** Short summary */
   summary?: string | null
   /** Comma-separated tags */
@@ -1778,6 +1780,8 @@ export interface AiEntityGenerationTemplateItem extends SaplingGenericItem {
   promptMarkdown: string
   /** Maps generated JSON keys to target fields */
   fieldMapping?: Record<string, string> | null
+  /** Maps source record paths to target fields */
+  sourceFieldMapping?: Record<string, string> | null
   /** Default values applied to the target record */
   targetDefaults?: Record<string, unknown> | null
   /** Target field that receives the source handle */

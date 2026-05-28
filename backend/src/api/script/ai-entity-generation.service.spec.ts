@@ -69,7 +69,7 @@ describe('AiEntityGenerationService', () => {
       actionName: 'aiCreateKnowledgeArticle',
       sourceEntity: { handle: 'ticket' },
       targetEntity: { handle: 'knowledgeArticle' },
-      sourceRelations: ['status'],
+      sourceRelations: ['status', 'contract.products'],
       promptMarkdown: 'Erstelle einen Artikel.',
       fieldMapping: {
         title: 'title',
@@ -77,6 +77,9 @@ describe('AiEntityGenerationService', () => {
         problemMarkdown: 'problemMarkdown',
         solutionMarkdown: 'solutionMarkdown',
         tags: 'tags',
+      },
+      sourceFieldMapping: {
+        'contract.products.0': 'product',
       },
       targetDefaults: {
         status: 'draft',
@@ -88,6 +91,9 @@ describe('AiEntityGenerationService', () => {
     const sourceRecord = {
       handle: 42,
       title: 'Cache Problem',
+      contract: {
+        products: [{ handle: 5, title: 'Sapling CRM' }],
+      },
       password: 'secret',
     };
     const createdEntity = {
@@ -159,6 +165,7 @@ describe('AiEntityGenerationService', () => {
         title: 'Cache neu aufbauen',
         summary: 'Interner Entwurf aus dem Ticket.',
         tags: 'cache, support',
+        product: 5,
         sourceTicket: 42,
         authorPerson: 7,
       }),
@@ -168,6 +175,7 @@ describe('AiEntityGenerationService', () => {
     ).toHaveBeenCalledWith(
       'knowledgeArticle',
       expect.objectContaining({
+        product: 5,
         sourceTicket: 42,
         authorPerson: 7,
       }),

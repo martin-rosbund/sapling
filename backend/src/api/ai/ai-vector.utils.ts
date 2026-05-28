@@ -73,6 +73,7 @@ export const VECTOR_SEARCH_RELATIONS: Record<
     'status',
     'visibility',
     'category',
+    'product',
     'sourceTicket',
     'sourceSalesOpportunity',
     'sourceEffortEstimate',

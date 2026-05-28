@@ -6,6 +6,7 @@ import { KnowledgeArticleCategoryItem } from './KnowledgeArticleCategoryItem';
 import { KnowledgeArticleStatusItem } from './KnowledgeArticleStatusItem';
 import { KnowledgeArticleVisibilityItem } from './KnowledgeArticleVisibilityItem';
 import { PersonItem } from './PersonItem';
+import { ProductItem } from './ProductItem';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
 import { TicketItem } from './TicketItem';
 import { Sapling, SaplingForm } from './global/entity.decorator';
@@ -68,6 +69,17 @@ export class KnowledgeArticleItem {
   })
   @ManyToOne(() => KnowledgeArticleCategoryItem, { nullable: true })
   category?: Rel<KnowledgeArticleCategoryItem>;
+
+  @ApiPropertyOptional({ type: () => ProductItem })
+  @Sapling(['isChip'])
+  @SaplingForm({
+    order: 450,
+    group: 'knowledgeArticle.groupBasics',
+    groupOrder: 100,
+    width: 1,
+  })
+  @ManyToOne(() => ProductItem, { nullable: true })
+  product?: Rel<ProductItem>;
 
   @ApiPropertyOptional()
   @SaplingForm({

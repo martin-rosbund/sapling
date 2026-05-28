@@ -14,6 +14,8 @@
       "creatorPerson",
       "assigneeCompany",
       "assigneePerson",
+      "contract",
+      "contract.products",
       "salesOpportunity",
       "effortEstimates"
     ],
@@ -24,6 +26,9 @@
       "problemMarkdown": "problemMarkdown",
       "solutionMarkdown": "solutionMarkdown",
       "tags": "tags"
+    },
+    "sourceFieldMapping": {
+      "contract.products.0": "product"
     },
     "targetDefaults": {
       "status": "draft",

@@ -1462,6 +1462,22 @@
           "enumItems": [],
           "mappedType": "string"
         },
+        "source_field_mapping": {
+          "name": "source_field_mapping",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "json"
+        },
         "source_reference_field": {
           "name": "source_reference_field",
           "type": "varchar(128)",
@@ -10558,6 +10574,22 @@
           "enumItems": [],
           "mappedType": "text"
         },
+        "product_handle": {
+          "name": "product_handle",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
         "published_at": {
           "name": "published_at",
           "type": "timestamptz(6)",
@@ -10803,6 +10835,18 @@
             "handle"
           ],
           "referencedTableName": "public.knowledge_article_category_item",
+          "deleteRule": "set null"
+        },
+        "knowledge_article_item_product_handle_foreign": {
+          "columnNames": [
+            "product_handle"
+          ],
+          "constraintName": "knowledge_article_item_product_handle_foreign",
+          "localTableName": "public.knowledge_article_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "public.product_item",
           "deleteRule": "set null"
         },
         "knowledge_article_item_reviewer_person_handle_foreign": {

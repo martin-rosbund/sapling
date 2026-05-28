@@ -101,11 +101,21 @@ export class AiEntityGenerationTemplateItem {
     width: 2,
   })
   @Property({ type: 'json', nullable: true })
-  targetDefaults?: Record<string, unknown> | null;
+  sourceFieldMapping?: Record<string, string> | null;
 
   @ApiPropertyOptional()
   @SaplingForm({
     order: 300,
+    group: 'aiEntityGenerationTemplate.groupMapping',
+    groupOrder: 400,
+    width: 2,
+  })
+  @Property({ type: 'json', nullable: true })
+  targetDefaults?: Record<string, unknown> | null;
+
+  @ApiPropertyOptional()
+  @SaplingForm({
+    order: 400,
     group: 'aiEntityGenerationTemplate.groupMapping',
     groupOrder: 400,
     width: 2,
@@ -115,7 +125,7 @@ export class AiEntityGenerationTemplateItem {
 
   @ApiPropertyOptional()
   @SaplingForm({
-    order: 400,
+    order: 500,
     group: 'aiEntityGenerationTemplate.groupMapping',
     groupOrder: 400,
     width: 2,

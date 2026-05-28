@@ -34,6 +34,17 @@
 
           <div class="sapling-knowledge-sidebar__filter-grid">
             <v-select
+              v-model="selectedProduct"
+              :items="productItems"
+              :label="t('knowledgeArticle.product')"
+              item-title="title"
+              item-value="value"
+              density="compact"
+              variant="outlined"
+              hide-details
+            />
+
+            <v-select
               v-model="selectedCategory"
               :items="categoryItems"
               :label="t('knowledgeArticle.category')"
@@ -108,7 +119,7 @@
             </span>
 
             <span class="sapling-knowledge-sidebar__article-meta">
-              {{ formatDate(article.publishedAt ?? article.updatedAt) }} ·
+              {{ formatDate(article.publishedAt ?? article.updatedAt) }} -
               {{ getAuthorLabel(article) }}
             </span>
 
@@ -117,6 +128,14 @@
             </span>
 
             <span class="sapling-chip-row sapling-knowledge-sidebar__badges">
+              <v-chip
+                v-if="hasRelationValue(article.product)"
+                prepend-icon="mdi-package-variant-closed"
+                size="x-small"
+                variant="tonal"
+              >
+                {{ resolveRelationLabel(article.product) }}
+              </v-chip>
               <v-chip
                 :color="resolveRelationColor(article.category)"
                 :prepend-icon="resolveRelationIcon(article.category, 'mdi-bookmark-outline')"
@@ -132,14 +151,6 @@
                 variant="tonal"
               >
                 {{ resolveRelationLabel(article.visibility) }}
-              </v-chip>
-              <v-chip
-                v-for="tag in getArticleTags(article).slice(0, 2)"
-                :key="tag"
-                size="x-small"
-                variant="outlined"
-              >
-                {{ tag }}
               </v-chip>
             </span>
           </button>
@@ -168,6 +179,14 @@
               </v-chip>
               <v-chip prepend-icon="mdi-calendar-check-outline" size="small" variant="tonal">
                 {{ formatDate(selectedArticle.publishedAt ?? selectedArticle.updatedAt) }}
+              </v-chip>
+              <v-chip
+                v-if="hasRelationValue(selectedArticle.product)"
+                prepend-icon="mdi-package-variant-closed"
+                size="small"
+                variant="tonal"
+              >
+                {{ resolveRelationLabel(selectedArticle.product) }}
               </v-chip>
             </div>
           </header>
@@ -224,6 +243,7 @@ import type {
   KnowledgeArticleStatusItem,
   KnowledgeArticleVisibilityItem,
   PersonItem,
+  ProductItem,
 } from '@/entity/entity'
 import ApiGenericService from '@/services/api.generic.service'
 
@@ -232,6 +252,7 @@ type RelationObject =
   | KnowledgeArticleStatusItem
   | KnowledgeArticleVisibilityItem
   | PersonItem
+  | ProductItem
 
 type RelationValue = RelationObject | string | number | null | undefined
 
@@ -243,7 +264,7 @@ interface FilterOption {
 
 const ALL_FILTER_VALUE = '__all__'
 const KNOWLEDGE_ARTICLE_PAGE_LIMIT = 100
-const ARTICLE_RELATIONS = ['status', 'visibility', 'category', 'authorPerson']
+const ARTICLE_RELATIONS = ['status', 'visibility', 'category', 'product', 'authorPerson']
 
 const { t, locale } = useI18n()
 const { isLoading: isTranslationLoading } = useTranslationLoader(
@@ -256,7 +277,8 @@ const { isLoading: isTranslationLoading } = useTranslationLoader(
 const articles = ref<KnowledgeArticleItem[]>([])
 const isLoading = ref(true)
 const loadError = ref(false)
-const search = ref('')
+const search = ref<string | null>('')
+const selectedProduct = ref(ALL_FILTER_VALUE)
 const selectedCategory = ref(ALL_FILTER_VALUE)
 const selectedVisibility = ref(ALL_FILTER_VALUE)
 const selectedAuthor = ref(ALL_FILTER_VALUE)
@@ -277,6 +299,7 @@ const filteredArticles = computed(() =>
   publishedArticles.value.filter((article) => {
     return (
       matchesSearch(article) &&
+      matchesFilter(article.product, selectedProduct.value) &&
       matchesFilter(article.category, selectedCategory.value) &&
       matchesFilter(article.visibility, selectedVisibility.value) &&
       matchesFilter(article.authorPerson, selectedAuthor.value)
@@ -294,6 +317,11 @@ const selectedArticle = computed(
 const categoryItems = computed(() => [
   createAllOption(t('knowledgeBase.allCategories')),
   ...buildRelationOptions(publishedArticles.value.map((article) => article.category)),
+])
+
+const productItems = computed(() => [
+  createAllOption(t('knowledgeBase.allProducts')),
+  ...buildRelationOptions(publishedArticles.value.map((article) => article.product)),
 ])
 
 const visibilityItems = computed(() => [
@@ -375,6 +403,7 @@ function matchesSearch(article: KnowledgeArticleItem): boolean {
     article.problemMarkdown,
     article.solutionMarkdown,
     resolveRelationLabel(article.category),
+    resolveRelationLabel(article.product),
     resolveRelationLabel(article.visibility),
     getAuthorLabel(article),
   ]
@@ -490,6 +519,7 @@ function resolveRelationLabel(value: RelationValue): string {
   if (isRelationObject(value)) {
     return (
       getTextValue(value.title) ||
+      getTextValue(value.name) ||
       getTextValue(value.description) ||
       (value.handle == null ? '' : String(value.handle)) ||
       t('global.notAvailable')
@@ -525,6 +555,10 @@ function getRelationHandle(value: RelationValue): string {
   return ''
 }
 
+function hasRelationValue(value: RelationValue): boolean {
+  return getRelationHandle(value) !== ''
+}
+
 function getRelationSortOrder(value: RelationValue): number {
   return isRelationObject(value) && typeof value.sortOrder === 'number'
     ? value.sortOrder
@@ -539,8 +573,8 @@ function getTextValue(value: string | null | undefined): string {
   return typeof value === 'string' ? value.trim() : ''
 }
 
-function normalizeSearch(value: string): string {
-  return value
+function normalizeSearch(value?: string | null): string {
+  return (value ?? '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLocaleLowerCase(locale.value)

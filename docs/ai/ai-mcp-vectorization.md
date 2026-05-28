@@ -268,6 +268,8 @@ The configuration lives in `aiEntityGenerationTemplate`:
   ScriptButton action.
 - `sourceRelations` controls which relations are loaded into the model prompt.
 - `fieldMapping` maps model JSON keys to target fields.
+- `sourceFieldMapping` copies deterministic values from source record paths to
+  target fields, such as `contract.products.0` to `product`.
 - `targetDefaults` sets fixed values such as draft status and internal
   visibility.
 - `sourceReferenceField` and `userReferenceField` preserve provenance.

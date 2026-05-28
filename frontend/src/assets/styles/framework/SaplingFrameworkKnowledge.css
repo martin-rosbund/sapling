@@ -5,7 +5,7 @@
 
 .sapling-knowledge-notebook {
   display: grid;
-  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  grid-template-columns: minmax(400px, 460px) minmax(0, 1fr);
   flex: 1 1 auto;
   gap: var(--sapling-gap-xl);
   min-width: 0;
@@ -17,6 +17,7 @@
   min-width: 0;
   min-height: 0;
   overflow: hidden;
+  border-radius: var(--sapling-panel-radius-compact);
 }
 
 .sapling-knowledge-sidebar {
@@ -210,7 +211,7 @@
 
 @media (max-width: 1180px) {
   .sapling-knowledge-notebook {
-    grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+    grid-template-columns: minmax(380px, 440px) minmax(0, 1fr);
   }
 
   .sapling-knowledge-reader__scroll {

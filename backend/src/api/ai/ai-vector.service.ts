@@ -710,6 +710,7 @@ export class AiVectorService {
         status: relationLabel(article.status, 'description', 'handle'),
         visibility: relationLabel(article.visibility, 'description', 'handle'),
         category: relationLabel(article.category, 'title', 'handle'),
+        product: relationLabel(article.product, 'title', 'name', 'handle'),
         tags: article.tags?.trim() || null,
         publishedAt: formatVectorDate(article.publishedAt),
         validUntil: formatVectorDate(article.validUntil),
@@ -1073,6 +1074,10 @@ function buildKnowledgeArticleSectionContent(
       relationLabel(article.visibility, 'description', 'handle'),
     ),
     vectorLine('Category', relationLabel(article.category, 'title', 'handle')),
+    vectorLine(
+      'Product',
+      relationLabel(article.product, 'title', 'name', 'handle'),
+    ),
     article.tags?.trim() ? `Tags: ${article.tags.trim()}` : null,
     vectorLine('Published at', formatVectorDate(article.publishedAt)),
     vectorLine('Valid until', formatVectorDate(article.validUntil)),

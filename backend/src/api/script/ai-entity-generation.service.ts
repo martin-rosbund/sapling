@@ -86,6 +86,7 @@ export class AiEntityGenerationService {
     const payload = this.buildTargetPayload(
       template,
       generatedFields,
+      sourceRecord,
       sourceHandle,
       permissionUser,
     );
@@ -235,6 +236,7 @@ export class AiEntityGenerationService {
   private buildTargetPayload(
     template: AiEntityGenerationTemplateItem,
     generatedFields: Record<string, unknown>,
+    sourceRecord: object,
     sourceHandle: string | number,
     user: PersonItem,
   ): Record<string, unknown> {
@@ -266,6 +268,12 @@ export class AiEntityGenerationService {
         }
       }
     }
+
+    this.applySourceFieldMapping(
+      payload,
+      sourceRecord,
+      template.sourceFieldMapping,
+    );
 
     if (template.sourceReferenceField?.trim()) {
       payload[template.sourceReferenceField.trim()] = sourceHandle;
@@ -489,11 +497,40 @@ export class AiEntityGenerationService {
     }
 
     return Object.fromEntries(
-      Object.entries(record).filter(
-        (entry): entry is [string, string] =>
-          typeof entry[1] === 'string' && entry[1].trim().length > 0,
-      ),
+      Object.entries(record)
+        .map(([key, targetField]) => [
+          key.trim(),
+          typeof targetField === 'string' ? targetField.trim() : '',
+        ])
+        .filter(
+          (entry): entry is [string, string] =>
+            entry[0].length > 0 && entry[1].length > 0,
+        ),
     );
+  }
+
+  private applySourceFieldMapping(
+    payload: Record<string, unknown>,
+    sourceRecord: object,
+    sourceFieldMapping: unknown,
+  ): void {
+    const fieldMapping = this.normalizeFieldMapping(sourceFieldMapping);
+
+    if (Object.keys(fieldMapping).length === 0) {
+      return;
+    }
+
+    const sourcePlain = this.toPlainRecord(sourceRecord);
+
+    for (const [sourcePath, targetField] of Object.entries(fieldMapping)) {
+      const copiedValue = this.normalizeCopiedSourceValue(
+        this.readSourcePath(sourcePlain, sourcePath),
+      );
+
+      if (typeof copiedValue !== 'undefined') {
+        payload[targetField] = copiedValue;
+      }
+    }
   }
 
   private normalizeGeneratedValue(value: unknown): unknown {
@@ -518,6 +555,58 @@ export class AiEntityGenerationService {
 
     if (typeof value === 'object') {
       return JSON.stringify(value);
+    }
+
+    return value;
+  }
+
+  private readSourcePath(sourceRecord: unknown, sourcePath: string): unknown {
+    return sourcePath
+      .split('.')
+      .filter(Boolean)
+      .reduce<unknown>((currentValue, pathSegment) => {
+        if (currentValue == null) {
+          return undefined;
+        }
+
+        if (Array.isArray(currentValue)) {
+          const pathIndex = Number.parseInt(pathSegment, 10);
+          return Number.isInteger(pathIndex) &&
+            String(pathIndex) === pathSegment
+            ? currentValue[pathIndex]
+            : undefined;
+        }
+
+        if (typeof currentValue !== 'object') {
+          return undefined;
+        }
+
+        return (currentValue as Record<string, unknown>)[pathSegment];
+      }, sourceRecord);
+  }
+
+  private normalizeCopiedSourceValue(value: unknown): unknown {
+    if (typeof value === 'undefined') {
+      return undefined;
+    }
+
+    if (value == null) {
+      return null;
+    }
+
+    if (Array.isArray(value)) {
+      return value
+        .map((entry) => this.normalizeCopiedSourceValue(entry))
+        .filter((entry) => typeof entry !== 'undefined');
+    }
+
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+
+    if (typeof value === 'object') {
+      const record = value as Record<string, unknown>;
+      return this.hasOwn(record, 'handle') ? record.handle : record;
     }
 
     return value;
