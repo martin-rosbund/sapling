@@ -28,21 +28,35 @@
               }}
             </div>
 
-            <v-btn
-              v-if="hasFavoritesAccess"
-              class="sapling-navigation-shell__panel-toggle"
-              :icon="
-                activePanel === 'navigation'
-                  ? 'mdi-bookmark-multiple-outline'
-                  : 'mdi-compass-outline'
-              "
-              size="small"
-              variant="tonal"
-              :aria-label="
-                activePanel === 'navigation' ? $t('navigation.favorite') : $t('global.navigation')
-              "
-              @click="toggleActivePanel"
-            />
+            <div class="sapling-navigation-shell__hero-actions">
+              <v-btn
+                class="sapling-navigation-shell__panel-toggle"
+                icon="mdi-book-open-page-variant-outline"
+                size="small"
+                variant="tonal"
+                :color="isKnowledgeBaseActive ? 'primary' : undefined"
+                :aria-label="$t('navigation.knowledgeBase')"
+                @click="navigateToKnowledgeBase"
+              />
+
+              <v-btn
+                v-if="hasFavoritesAccess"
+                class="sapling-navigation-shell__panel-toggle"
+                :icon="
+                  activePanel === 'navigation'
+                    ? 'mdi-bookmark-multiple-outline'
+                    : 'mdi-compass-outline'
+                "
+                size="small"
+                variant="tonal"
+                :aria-label="
+                  activePanel === 'navigation'
+                    ? $t('navigation.favorite')
+                    : $t('global.navigation')
+                "
+                @click="toggleActivePanel"
+              />
+            </div>
           </div>
           <div class="sapling-drawer-hero__summary sapling-navigation-shell__summary">
             <template v-if="activePanel === 'navigation'">
@@ -271,6 +285,7 @@
 <script lang="ts" setup>
 // #region Imports
 import { computed, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import SaplingFavorites from '@/components/dashboard/SaplingFavorites.vue'
 import { useSaplingNavigation } from '@/composables/system/useSaplingNavigation'
 import {
@@ -308,7 +323,10 @@ const {
 
 const { hasFavoritesAccess } = useSaplingFavoritesAccess()
 const { favorites, isLoading: isFavoritesSummaryLoading } = useSaplingFavorites()
+const route = useRoute()
+const router = useRouter()
 const activePanel = ref<'navigation' | 'favorites'>('navigation')
+const isKnowledgeBaseActive = computed(() => route.name === 'knowledgeBase')
 const favoriteSummary = computed(() => {
   const entityHandles = new Set(
     favorites.value
@@ -328,6 +346,14 @@ function toggleActivePanel() {
 
 function closeNavigation() {
   onDrawerUpdate(false)
+}
+
+async function navigateToKnowledgeBase() {
+  if (!isKnowledgeBaseActive.value) {
+    await router.push({ name: 'knowledgeBase' })
+  }
+
+  closeNavigation()
 }
 // #endregion
 </script>

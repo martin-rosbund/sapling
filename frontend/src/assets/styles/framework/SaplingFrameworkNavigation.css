@@ -236,6 +236,13 @@
   flex: 0 0 auto;
 }
 
+.sapling-navigation-shell__hero-actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--sapling-gap-xs);
+}
+
 .sapling-navigation-section__trigger {
   --sapling-nav-line-padding: var(--sapling-space-panel-md);
 }
