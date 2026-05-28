@@ -148,6 +148,14 @@
   margin-left: calc(var(--sapling-control-size-xs) + var(--sapling-gap-sm));
 }
 
+.sapling-knowledge-sidebar__pagination {
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  padding: var(--sapling-space-sm) var(--sapling-space-panel-md);
+  border-top: 1px solid var(--sapling-surface-border-muted);
+}
+
 .sapling-knowledge-reader {
   display: flex;
   flex-direction: column;
