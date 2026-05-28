@@ -6,6 +6,7 @@ import type {
   KnowledgeArticleVisibilityItem,
   PersonItem,
   ProductItem,
+  SaplingGenericItem,
 } from '@/entity/entity'
 import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service'
 
@@ -21,20 +22,12 @@ type PersonRelationValue = PersonItem | string | number | null | undefined
 type FilterOptionValue = string | number
 type TranslateFunction = (key: string) => string
 
-interface FilterOption {
-  title: string
-  value: FilterOptionValue
-  sortOrder: number
-}
-
 interface UseSaplingKnowledgeBaseOptions {
   t: TranslateFunction
   locale: Ref<string>
 }
 
-const ALL_FILTER_VALUE = '__all__'
 const KNOWLEDGE_ARTICLE_PAGE_LIMIT = 10
-const FILTER_OPTION_PAGE_LIMIT = 100
 const RELATION_SEARCH_PAGE_LIMIT = 25
 const KNOWLEDGE_ARTICLE_LOAD_DEBOUNCE_MS = 250
 const ARTICLE_RELATIONS = ['status', 'visibility', 'category', 'product', 'authorPerson']
@@ -49,19 +42,17 @@ const ARTICLE_SEARCH_FIELDS = [
 export function useSaplingKnowledgeBase({ t, locale }: UseSaplingKnowledgeBaseOptions) {
   const articles = ref<KnowledgeArticleItem[]>([])
   const isLoading = ref(true)
+  const isInitialLoading = ref(true)
   const loadError = ref(false)
+  const hasLoadedOnce = ref(false)
   const search = ref<string | null>('')
-  const selectedProduct = ref<FilterOptionValue>(ALL_FILTER_VALUE)
-  const selectedCategory = ref<FilterOptionValue>(ALL_FILTER_VALUE)
-  const selectedVisibility = ref<FilterOptionValue>(ALL_FILTER_VALUE)
-  const selectedAuthor = ref<FilterOptionValue>(ALL_FILTER_VALUE)
+  const selectedProducts = ref<SaplingGenericItem[]>([])
+  const selectedCategories = ref<SaplingGenericItem[]>([])
+  const selectedVisibilities = ref<SaplingGenericItem[]>([])
+  const selectedAuthors = ref<SaplingGenericItem[]>([])
   const selectedHandle = ref<string | null>(null)
   const page = ref(1)
   const totalArticles = ref(0)
-  const categoryFilterValues = ref<KnowledgeArticleCategoryItem[]>([])
-  const productFilterValues = ref<ProductItem[]>([])
-  const visibilityFilterValues = ref<KnowledgeArticleVisibilityItem[]>([])
-  const authorFilterValues = ref<PersonItem[]>([])
 
   let activeLoadController: AbortController | null = null
   let scheduledLoadTimeout: ReturnType<typeof setTimeout> | null = null
@@ -78,38 +69,20 @@ export function useSaplingKnowledgeBase({ t, locale }: UseSaplingKnowledgeBaseOp
       null,
   )
 
-  const categoryItems = computed(() => [
-    createAllOption(t('knowledgeBase.allCategories')),
-    ...buildRelationOptions(categoryFilterValues.value),
-  ])
-
-  const productItems = computed(() => [
-    createAllOption(t('knowledgeBase.allProducts')),
-    ...buildRelationOptions(productFilterValues.value),
-  ])
-
-  const visibilityItems = computed(() => [
-    createAllOption(t('knowledgeBase.allVisibility')),
-    ...buildRelationOptions(visibilityFilterValues.value),
-  ])
-
-  const authorItems = computed(() => [
-    createAllOption(t('knowledgeBase.allAuthors')),
-    ...buildAuthorOptions(authorFilterValues.value),
-  ])
+  const activeLoadArticles = computed(() => (isLoading.value ? [] : articles.value))
+  const isInitialLoadError = computed(() => loadError.value && !hasLoadedOnce.value)
 
   const filterSignature = computed(() =>
     JSON.stringify({
       search: search.value?.trim() ?? '',
-      product: selectedProduct.value,
-      category: selectedCategory.value,
-      visibility: selectedVisibility.value,
-      author: selectedAuthor.value,
+      products: getSelectedHandles(selectedProducts.value),
+      categories: getSelectedHandles(selectedCategories.value),
+      visibilities: getSelectedHandles(selectedVisibilities.value),
+      authors: getSelectedHandles(selectedAuthors.value),
     }),
   )
 
   onMounted(() => {
-    void loadFilterOptions()
     void loadArticles()
   })
 
@@ -173,13 +146,16 @@ export function useSaplingKnowledgeBase({ t, locale }: UseSaplingKnowledgeBaseOp
 
       articles.value = response.data
       totalArticles.value = response.meta.total
+      hasLoadedOnce.value = true
     } catch (error) {
       if (isAbortError(error)) {
         return
       }
 
-      articles.value = []
-      totalArticles.value = 0
+      if (!hasLoadedOnce.value) {
+        articles.value = []
+        totalArticles.value = 0
+      }
       loadError.value = true
     } finally {
       if (activeLoadController === loadController) {
@@ -188,42 +164,8 @@ export function useSaplingKnowledgeBase({ t, locale }: UseSaplingKnowledgeBaseOp
 
       if (requestId === latestLoadRequestId) {
         isLoading.value = false
+        isInitialLoading.value = false
       }
-    }
-  }
-
-  async function loadFilterOptions(): Promise<void> {
-    try {
-      const [categories, products, visibilities, authors] = await Promise.all([
-        ApiGenericService.find<KnowledgeArticleCategoryItem>('knowledgeArticleCategory', {
-          filter: { isActive: true },
-          orderBy: { sortOrder: 'ASC', title: 'ASC' },
-          limit: FILTER_OPTION_PAGE_LIMIT,
-        }),
-        ApiGenericService.find<ProductItem>('product', {
-          orderBy: { title: 'ASC' },
-          limit: FILTER_OPTION_PAGE_LIMIT,
-        }),
-        ApiGenericService.find<KnowledgeArticleVisibilityItem>('knowledgeArticleVisibility', {
-          orderBy: { sortOrder: 'ASC', description: 'ASC' },
-          limit: FILTER_OPTION_PAGE_LIMIT,
-        }),
-        ApiGenericService.find<PersonItem>('person', {
-          filter: { isActive: true },
-          orderBy: { firstName: 'ASC', lastName: 'ASC' },
-          limit: FILTER_OPTION_PAGE_LIMIT,
-        }),
-      ])
-
-      categoryFilterValues.value = categories.data
-      productFilterValues.value = products.data
-      visibilityFilterValues.value = visibilities.data
-      authorFilterValues.value = authors.data
-    } catch {
-      categoryFilterValues.value = []
-      productFilterValues.value = []
-      visibilityFilterValues.value = []
-      authorFilterValues.value = []
     }
   }
 
@@ -248,60 +190,14 @@ export function useSaplingKnowledgeBase({ t, locale }: UseSaplingKnowledgeBaseOp
     selectedHandle.value = getArticleHandle(article)
   }
 
-  function createAllOption(title: string): FilterOption {
-    return { title, value: ALL_FILTER_VALUE, sortOrder: -1 }
-  }
-
-  function buildRelationOptions(values: RelationValue[]): FilterOption[] {
-    const optionByValue = new Map<FilterOptionValue, FilterOption>()
-
-    values.forEach((value) => {
-      const handle = getRelationHandleValue(value)
-      if (handle == null || handle === '' || optionByValue.has(handle)) {
-        return
-      }
-
-      optionByValue.set(handle, {
-        title: resolveRelationLabel(value),
-        value: handle,
-        sortOrder: getRelationSortOrder(value),
-      })
-    })
-
-    return Array.from(optionByValue.values()).sort(sortFilterOptions)
-  }
-
-  function buildAuthorOptions(values: PersonItem[]): FilterOption[] {
-    const optionByValue = new Map<FilterOptionValue, FilterOption>()
-
-    values.forEach((author) => {
-      const handle = getRelationHandleValue(author)
-      if (handle == null || handle === '' || optionByValue.has(handle)) {
-        return
-      }
-
-      optionByValue.set(handle, {
-        title: getPersonLabel(author),
-        value: handle,
-        sortOrder: Number.MAX_SAFE_INTEGER,
-      })
-    })
-
-    return Array.from(optionByValue.values()).sort(sortFilterOptions)
-  }
-
-  function sortFilterOptions(left: FilterOption, right: FilterOption): number {
-    return left.sortOrder - right.sortOrder || left.title.localeCompare(right.title, locale.value)
-  }
-
   async function buildArticleFilter(signal: AbortSignal): Promise<FilterQuery> {
     const clauses: FilterQuery[] = [{ isActive: true }, { status: { isPublished: true } }]
     const searchValue = search.value?.trim()
 
-    addRelationFilter(clauses, 'product', selectedProduct.value)
-    addRelationFilter(clauses, 'category', selectedCategory.value)
-    addRelationFilter(clauses, 'visibility', selectedVisibility.value)
-    addRelationFilter(clauses, 'authorPerson', selectedAuthor.value)
+    addRelationFilter(clauses, 'product', selectedProducts.value)
+    addRelationFilter(clauses, 'category', selectedCategories.value)
+    addRelationFilter(clauses, 'visibility', selectedVisibilities.value)
+    addRelationFilter(clauses, 'authorPerson', selectedAuthors.value)
 
     if (searchValue) {
       const relationSearchClauses = await buildRelationSearchClauses(searchValue, signal)
@@ -405,15 +301,16 @@ export function useSaplingKnowledgeBase({ t, locale }: UseSaplingKnowledgeBaseOp
   function addRelationFilter(
     clauses: FilterQuery[],
     relationName: string,
-    value: FilterOptionValue,
+    values: SaplingGenericItem[],
   ): void {
-    if (value === ALL_FILTER_VALUE || value === '') {
+    const handles = getSelectedHandles(values)
+    if (handles.length === 0) {
       return
     }
 
     clauses.push({
       [relationName]: {
-        handle: value,
+        handle: handles.length === 1 ? handles[0] : { $in: handles },
       },
     })
   }
@@ -514,10 +411,10 @@ export function useSaplingKnowledgeBase({ t, locale }: UseSaplingKnowledgeBaseOp
     return getRelationHandle(value) !== ''
   }
 
-  function getRelationSortOrder(value: RelationValue): number {
-    return isRelationObject(value) && typeof value.sortOrder === 'number'
-      ? value.sortOrder
-      : Number.MAX_SAFE_INTEGER
+  function getSelectedHandles(values: SaplingGenericItem[]): FilterOptionValue[] {
+    return values
+      .map((value) => getRelationHandleValue(value as RelationValue))
+      .filter((value): value is FilterOptionValue => value !== null && value !== '')
   }
 
   function isRelationObject(value: RelationValue): value is RelationObject {
@@ -559,34 +456,31 @@ export function useSaplingKnowledgeBase({ t, locale }: UseSaplingKnowledgeBaseOp
   }
 
   return {
-    articles,
-    authorItems,
-    categoryItems,
+    activeLoadArticles,
     formatDate,
     getArticleHandle,
     getArticlePreview,
     getArticleTags,
     getAuthorLabel,
     hasRelationValue,
+    isInitialLoadError,
+    isInitialLoading,
     isLoading,
-    loadError,
     onPageUpdate,
     page,
-    productItems,
     resolveRelationColor,
     resolveRelationIcon,
     resolveRelationLabel,
     search,
     selectArticle,
+    selectedAuthors,
     selectedArticle,
-    selectedAuthor,
-    selectedCategory,
+    selectedCategories,
     selectedHandle,
-    selectedProduct,
-    selectedVisibility,
+    selectedProducts,
+    selectedVisibilities,
     totalArticles,
     totalPages,
-    visibilityItems,
   }
 }
 

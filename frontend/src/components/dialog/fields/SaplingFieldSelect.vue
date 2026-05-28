@@ -17,12 +17,13 @@
           :item-title="getAutocompleteItemTitle"
           :search="fieldSearch"
           :menu="false"
+          :density="props.density"
+          :hide-details="props.hideDetails"
           return-object
           multiple
           chips
           closable-chips
           clearable
-          hide-details="auto"
           hide-no-data
           no-filter
           autocomplete="off"
@@ -37,6 +38,7 @@
     </template>
     <div class="glass-panel sapling-menu-surface sapling-menu-surface--field-table">
       <sapling-table
+        v-if="menuOpen"
         :entity-handle="entityHandle"
         :items="items"
         :search="search"
@@ -80,15 +82,22 @@ import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants'
 import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service'
 
 // #region Props and Emits
-const props = defineProps<{
-  label: string
-  entityHandle: string
-  modelValue?: SaplingGenericItem[]
-  rules?: Array<(v: unknown) => true | string>
-  placeholder?: string
-  disabled?: boolean
-  parentFilter?: FilterQuery
-}>()
+const props = withDefaults(
+  defineProps<{
+    label: string
+    entityHandle: string
+    modelValue?: SaplingGenericItem[]
+    rules?: Array<(v: unknown) => true | string>
+    placeholder?: string
+    disabled?: boolean
+    parentFilter?: FilterQuery
+    density?: 'default' | 'comfortable' | 'compact'
+    hideDetails?: boolean | 'auto'
+  }>(),
+  {
+    hideDetails: 'auto',
+  },
+)
 const emit = defineEmits(['update:modelValue'])
 // #endregion
 

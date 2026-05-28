@@ -13,7 +13,12 @@
       </SaplingSurface>
     </div>
 
-    <v-alert v-else-if="loadError" color="error" variant="tonal" icon="mdi-alert-circle-outline">
+    <v-alert
+      v-else-if="isInitialLoadError"
+      color="error"
+      variant="tonal"
+      icon="mdi-alert-circle-outline"
+    >
       {{ t('knowledgeBase.loadError') }}
     </v-alert>
 
@@ -54,47 +59,37 @@
               'sapling-knowledge-sidebar__filter-grid--open': isFilterPanelOpen,
             }"
           >
-            <v-select
-              v-model="selectedProduct"
-              :items="productItems"
+            <SaplingFieldSelect
+              v-model="selectedProducts"
+              entity-handle="product"
               :label="t('knowledgeArticle.product')"
-              item-title="title"
-              item-value="value"
               density="compact"
-              variant="outlined"
               hide-details
             />
 
-            <v-select
-              v-model="selectedCategory"
-              :items="categoryItems"
+            <SaplingFieldSelect
+              v-model="selectedCategories"
+              entity-handle="knowledgeArticleCategory"
               :label="t('knowledgeArticle.category')"
-              item-title="title"
-              item-value="value"
+              :parent-filter="activeReferenceFilter"
               density="compact"
-              variant="outlined"
               hide-details
             />
 
-            <v-select
-              v-model="selectedVisibility"
-              :items="visibilityItems"
+            <SaplingFieldSelect
+              v-model="selectedVisibilities"
+              entity-handle="knowledgeArticleVisibility"
               :label="t('knowledgeArticle.visibility')"
-              item-title="title"
-              item-value="value"
               density="compact"
-              variant="outlined"
               hide-details
             />
 
-            <v-select
-              v-model="selectedAuthor"
-              :items="authorItems"
+            <SaplingFieldSelect
+              v-model="selectedAuthors"
+              entity-handle="person"
               :label="t('knowledgeArticle.authorPerson')"
-              item-title="title"
-              item-value="value"
+              :parent-filter="activeReferenceFilter"
               density="compact"
-              variant="outlined"
               hide-details
             />
           </div>
@@ -107,8 +102,16 @@
           </div>
         </header>
 
+        <div v-if="isLoading" class="sapling-knowledge-sidebar__article-list">
+          <v-skeleton-loader
+            v-for="skeletonIndex in 4"
+            :key="`knowledge-article-skeleton-${skeletonIndex}`"
+            type="list-item-three-line"
+          />
+        </div>
+
         <div
-          v-if="articles.length === 0"
+          v-else-if="activeLoadArticles.length === 0"
           class="sapling-empty-state-panel sapling-empty-state-panel--compact sapling-knowledge-sidebar__empty"
         >
           <v-icon icon="mdi-book-search-outline" size="32" />
@@ -118,7 +121,7 @@
 
         <div v-else class="sapling-knowledge-sidebar__article-list">
           <button
-            v-for="article in articles"
+            v-for="article in activeLoadArticles"
             :key="getArticleHandle(article)"
             class="sapling-knowledge-sidebar__article"
             :class="{
@@ -265,6 +268,7 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SaplingMarkdownContent from '@/components/common/SaplingMarkdownContent.vue'
 import SaplingSurface from '@/components/common/SaplingSurface.vue'
+import SaplingFieldSelect from '@/components/dialog/fields/SaplingFieldSelect.vue'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import { useSaplingKnowledgeBase } from '@/composables/knowledge/useSaplingKnowledgeBase'
 
@@ -278,37 +282,35 @@ const { isLoading: isTranslationLoading } = useTranslationLoader(
 )
 
 const isFilterPanelOpen = ref(false)
+const activeReferenceFilter = { isActive: true }
 const emptyMarkdown = computed(() => t('global.notAvailable'))
 const {
-  articles,
-  authorItems,
-  categoryItems,
+  activeLoadArticles,
   formatDate,
   getArticleHandle,
   getArticlePreview,
   getArticleTags,
   getAuthorLabel,
   hasRelationValue,
+  isInitialLoadError,
+  isInitialLoading,
   isLoading,
-  loadError,
   onPageUpdate,
   page,
-  productItems,
   resolveRelationColor,
   resolveRelationIcon,
   resolveRelationLabel,
   search,
   selectArticle,
+  selectedAuthors,
   selectedArticle,
-  selectedAuthor,
-  selectedCategory,
+  selectedCategories,
   selectedHandle,
-  selectedProduct,
-  selectedVisibility,
+  selectedProducts,
+  selectedVisibilities,
   totalArticles,
   totalPages,
-  visibilityItems,
 } = useSaplingKnowledgeBase({ t, locale })
 
-const isPageLoading = computed(() => isLoading.value || isTranslationLoading.value)
+const isPageLoading = computed(() => isInitialLoading.value || isTranslationLoading.value)
 </script>

@@ -485,6 +485,10 @@ export const customerPermissionsInput: PermissionMatrixInput = {
     'favorite',
     'favoriteTemplate',
     'dashboardTemplate',
+    'knowledgeArticle',
+    'knowledgeArticleCategory',
+    'knowledgeArticleStatus',
+    'knowledgeArticleVisibility',
   ],
   insert: [
     'ticket',
@@ -533,6 +537,10 @@ export const contractorPermissionsInput: PermissionMatrixInput = {
     'favorite',
     'favoriteTemplate',
     'dashboardTemplate',
+    'knowledgeArticle',
+    'knowledgeArticleCategory',
+    'knowledgeArticleStatus',
+    'knowledgeArticleVisibility',
   ],
   insert: [
     'ticket',
