@@ -4,7 +4,11 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { AiProviderModelItem } from './AiProviderModelItem';
 import { AiProviderTypeItem } from './AiProviderTypeItem';
 import { EntityItem } from './EntityItem';
-import { Sapling, SaplingForm } from './global/entity.decorator';
+import {
+  Sapling,
+  SaplingDependsOn,
+  SaplingForm,
+} from './global/entity.decorator';
 
 @Entity()
 export class AiEntityGenerationTemplateItem {
@@ -151,6 +155,12 @@ export class AiEntityGenerationTemplateItem {
     group: 'aiEntityGenerationTemplate.groupRuntime',
     groupOrder: 500,
     width: 2,
+  })
+  @SaplingDependsOn({
+    parentField: 'provider',
+    targetField: 'provider',
+    requireParent: true,
+    clearOnParentChange: true,
   })
   @ManyToOne(() => AiProviderModelItem, { nullable: true })
   model?: Rel<AiProviderModelItem> | null;
