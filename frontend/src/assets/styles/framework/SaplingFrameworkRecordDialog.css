@@ -41,7 +41,8 @@
 
 .sapling-record-dialog-tabs .v-tab {
   min-height: var(--sapling-tab-strip-height);
-  border-radius: var(--sapling-panel-radius-compact);
+  border-top-left-radius: var(--sapling-radius-sm);
+  border-top-right-radius: var(--sapling-radius-sm);
   font-weight: 600;
   letter-spacing: 0.01em;
   text-transform: none;

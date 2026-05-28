@@ -5,6 +5,8 @@
         color="primary"
         variant="plain"
         prepend-icon="mdi-chart-box-plus-outline"
+        :aria-label="$t('kpi.addKpi')"
+        :title="$t('kpi.addKpi')"
         :disabled="!hasDashboards || !currentPersonLoaded"
         @click="emit('addKpi')"
       >
@@ -16,6 +18,8 @@
         color="primary"
         variant="plain"
         prepend-icon="mdi-plus-circle-outline"
+        :aria-label="$t('dashboard.addDashboard')"
+        :title="$t('dashboard.addDashboard')"
         :disabled="!currentPersonLoaded"
         @click="emit('openDashboard')"
       >
@@ -27,6 +31,8 @@
         color="primary"
         variant="plain"
         prepend-icon="mdi-file-import-outline"
+        :aria-label="$t('dashboard.loadTemplate')"
+        :title="$t('dashboard.loadTemplate')"
         :disabled="!currentPersonLoaded"
         @click="emit('openTemplateLoad')"
       >
@@ -38,6 +44,8 @@
         color="primary"
         variant="plain"
         prepend-icon="mdi-content-save-outline"
+        :aria-label="$t('dashboard.saveAsTemplate')"
+        :title="$t('dashboard.saveAsTemplate')"
         :disabled="!hasDashboards || !currentPersonLoaded"
         @click="emit('openTemplateSave')"
       >

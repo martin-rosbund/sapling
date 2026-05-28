@@ -107,7 +107,7 @@
 }
 
 .sapling-admin-tabs {
-  min-height: 50px;
+  min-height: 60px;
 }
 
 .sapling-admin-tabs .v-slide-group__content {
@@ -115,7 +115,8 @@
 }
 
 .sapling-admin-tab {
-  border-radius: var(--sapling-radius-sm);
+  border-top-left-radius: var(--sapling-radius-sm);
+  border-top-right-radius: var(--sapling-radius-sm);
   letter-spacing: normal;
   text-transform: none;
 }
