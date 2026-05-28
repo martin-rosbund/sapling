@@ -8,12 +8,16 @@ import type { PersonItem } from './entity/PersonItem';
 
 type MockRequest = Request & {
   user?: Express.User;
+  body?: Record<string, unknown>;
   login: jest.Mock;
   logout: jest.Mock;
   isAuthenticated: jest.Mock;
   session?: {
+    cookie?: { maxAge?: number };
     regenerate: jest.Mock;
     destroy: jest.Mock;
+    save?: jest.Mock;
+    passkeyLogin?: unknown;
   };
 };
 
@@ -47,12 +51,18 @@ const createMockRequest = (
     }),
     isAuthenticated: jest.fn(() => true),
     session: {
+      cookie: {},
       regenerate: jest.fn((callback?: unknown) => {
         if (typeof callback === 'function') {
           (callback as () => void)();
         }
       }),
       destroy: jest.fn((callback?: unknown) => {
+        if (typeof callback === 'function') {
+          (callback as () => void)();
+        }
+      }),
+      save: jest.fn((callback?: unknown) => {
         if (typeof callback === 'function') {
           (callback as () => void)();
         }
@@ -104,6 +114,108 @@ describe('AuthController', () => {
       req.user,
       expect.any(Function),
     );
+    expect(res.send).toHaveBeenCalledWith();
+  });
+
+  it('returns a passkey challenge instead of logging in when local passkeys exist', async () => {
+    const options = { challenge: 'challenge-1', rpId: 'localhost' };
+    const passkeyService = {
+      hasPasskeysForPerson: jest
+        .fn<(...args: unknown[]) => Promise<boolean>>()
+        .mockResolvedValue(true),
+      resolveRequestContext: jest.fn(() => ({
+        origin: 'http://localhost:5173',
+        rpID: 'localhost',
+        rpName: 'Sapling',
+      })),
+      createAuthenticationOptions: jest
+        .fn<(...args: unknown[]) => Promise<typeof options>>()
+        .mockResolvedValue(options),
+    };
+    const controller = new AuthController({} as never, passkeyService as never);
+    const req = createMockRequest({
+      body: { rememberMe: true },
+    });
+    const res = createMockResponse();
+
+    await controller.localLogin(req, res);
+
+    expect(passkeyService.hasPasskeysForPerson).toHaveBeenCalledWith(1);
+    expect(passkeyService.createAuthenticationOptions).toHaveBeenCalledWith(1, {
+      origin: 'http://localhost:5173',
+      rpID: 'localhost',
+      rpName: 'Sapling',
+    });
+    expect(asMock(req.login)).not.toHaveBeenCalled();
+    expect(req.session?.save).toHaveBeenCalled();
+    expect(req.session?.passkeyLogin).toEqual(
+      expect.objectContaining({
+        challenge: 'challenge-1',
+        personHandle: 1,
+        rememberMe: true,
+      }),
+    );
+    expect(res.send).toHaveBeenCalledWith({
+      passkeyRequired: true,
+      options,
+    });
+  });
+
+  it('verifies a local passkey challenge and then establishes the session', async () => {
+    const authenticatedUser = createMockUser();
+    const passkeyService = {
+      verifyAuthentication: jest
+        .fn<(...args: unknown[]) => Promise<PersonItem>>()
+        .mockResolvedValue(authenticatedUser),
+    };
+    const controller = new AuthController({} as never, passkeyService as never);
+    const req = createMockRequest({
+      user: undefined,
+      session: {
+        cookie: {},
+        regenerate: jest.fn((callback?: unknown) => {
+          if (typeof callback === 'function') {
+            (callback as () => void)();
+          }
+        }),
+        destroy: jest.fn(),
+        save: jest.fn(),
+        passkeyLogin: {
+          challenge: 'challenge-1',
+          context: {
+            origin: 'http://localhost:5173',
+            rpID: 'localhost',
+            rpName: 'Sapling',
+          },
+          createdAt: Date.now(),
+          personHandle: 1,
+          rememberMe: true,
+        },
+      },
+    });
+    const res = createMockResponse();
+    const response = { id: 'credential-1' };
+
+    await controller.verifyLocalPasskeyLogin(req, res, {
+      response,
+    } as never);
+
+    expect(passkeyService.verifyAuthentication).toHaveBeenCalledWith(
+      1,
+      response,
+      'challenge-1',
+      {
+        origin: 'http://localhost:5173',
+        rpID: 'localhost',
+        rpName: 'Sapling',
+      },
+    );
+    expect(req.user).toBe(authenticatedUser);
+    expect(asMock(req.login)).toHaveBeenCalledWith(
+      authenticatedUser,
+      expect.any(Function),
+    );
+    expect(req.session?.passkeyLogin).toBeUndefined();
     expect(res.send).toHaveBeenCalledWith();
   });
 

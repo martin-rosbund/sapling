@@ -81,6 +81,7 @@ import { SupportTeamItem } from '../SupportTeamItem';
 import { SupportQueueItem } from '../SupportQueueItem';
 import { SlaPolicyItem } from '../SlaPolicyItem';
 import { PersonApiTokenItem } from '../PersonApiTokenItem';
+import { PersonPasskeyItem } from '../PersonPasskeyItem';
 import { AiChatSessionItem } from '../AiChatSessionItem';
 import { AiChatMessageItem } from '../AiChatMessageItem';
 import { AiChatTranscriptionItem } from '../AiChatTranscriptionItem';
@@ -179,6 +180,7 @@ const ENTITY_REGISTRY_ENTRIES: { name: string; class: any }[] = [
   { name: 'personDepartment', class: PersonDepartmentItem },
   { name: 'personSession', class: PersonSessionItem },
   { name: 'personApiToken', class: PersonApiTokenItem },
+  { name: 'personPasskey', class: PersonPasskeyItem },
   { name: 'personType', class: PersonTypeItem },
   { name: 'person', class: PersonItem },
   { name: 'socialMediaType', class: SocialMediaTypeItem },

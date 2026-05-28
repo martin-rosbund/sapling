@@ -7,6 +7,7 @@ Sapling supports session authentication for the browser, bearer-token authentica
 ```text
 backend/src/auth/auth.controller.ts
 backend/src/auth/auth.service.ts
+backend/src/auth/auth-passkey.service.ts
 backend/src/auth/local/local.strategy.ts
 backend/src/auth/azure/azure.strategy.ts
 backend/src/auth/google/google.strategy.ts
@@ -16,6 +17,7 @@ backend/src/auth/guard/admin-permission.guard.ts
 backend/src/session/session.serializer.ts
 backend/src/session/session.config.ts
 backend/src/entity/PersonItem.ts
+backend/src/entity/PersonPasskeyItem.ts
 backend/src/entity/PersonSessionItem.ts
 backend/src/entity/PersonApiTokenItem.ts
 frontend/src/stores/authStore.ts
@@ -29,6 +31,7 @@ frontend/src/components/account/SaplingLogin.vue
 | Mode | Purpose |
 | --- | --- |
 | Local session | Browser login with username/password |
+| Local passkey step-up | Browser WebAuthn/passkey challenge after a valid local password when passkeys are registered |
 | Azure session | Browser OAuth login and provider tokens for Microsoft Graph |
 | Google session | Browser OAuth login and provider tokens for Google APIs |
 | Bearer API token | API access for automations, MCP, and integrations |
@@ -72,6 +75,22 @@ GET /api/auth/isAuthenticated
 
 `AuthController.completeLogin()` regenerates the session before logging in the user. Local login sets session max age based on `rememberMe`.
 
+Local passkeys:
+
+```text
+GET /api/auth/passkey
+POST /api/auth/passkey/register/options
+POST /api/auth/passkey/register/verify
+DELETE /api/auth/passkey/:handle
+POST /api/auth/local/passkey/verify
+```
+
+Passkeys apply only to Sapling's local username/password login. Azure and Google OAuth continue to rely on their provider-side authentication and MFA policies.
+
+When a local user has at least one registered `PersonPasskeyItem`, `POST /api/auth/local/login` validates the password but does not establish the session immediately. It stores a short-lived WebAuthn challenge in the browser session and returns authentication options. The frontend calls `navigator.credentials.get` through `@simplewebauthn/browser`, then posts the assertion to `/api/auth/local/passkey/verify`. Only after successful verification does the backend call `completeLogin()`.
+
+If a user loses all passkeys, an administrator can delete the user's `personPasskey` records. With no registered passkeys remaining, the account falls back to normal local password login.
+
 ## Person And Provider Sessions
 
 `PersonItem` contains the core account fields:
@@ -83,8 +102,20 @@ GET /api/auth/isAuthenticated
 - `type`
 - roles and permissions
 - optional `session`
+- related `passkeys`
 
 `PersonSessionItem` stores provider access and refresh tokens for Azure/Google integrations. Mail, Teams, and calendar services use these tokens for provider APIs and refresh them when possible.
+
+`PersonPasskeyItem` stores WebAuthn credentials for local logins:
+
+- `credentialId`
+- `publicKey`
+- `counter`
+- optional `transports`
+- `credentialDeviceType` and `credentialBackedUp`
+- `lastUsedAt`
+
+Credential IDs and public keys are marked as security fields and are stripped from generic API responses.
 
 `AuthService.saveNewLogin()` creates or updates the person and session after Azure/Google OAuth login:
 
@@ -195,10 +226,10 @@ Routing outcomes:
 Useful commands:
 
 ```powershell
-npm test --prefix backend -- session.serializer.spec.ts generic-permission.guard.spec.ts --runInBand
+npm test --prefix backend -- app-auth.controller.spec.ts session.serializer.spec.ts generic-permission.guard.spec.ts --runInBand
 npm test --prefix backend -- encrypted-string.spec.ts request-origin-protection.spec.ts --runInBand
 npm run type-check:backend
 npm run type-check:frontend
 ```
 
-Also verify login, logout, token creation/rotation/deactivation, and impersonation in a browser against a test database.
+Also verify login, local passkey registration/login/deletion, logout, token creation/rotation/deactivation, and impersonation in a browser against a test database.

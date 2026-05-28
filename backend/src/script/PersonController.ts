@@ -154,7 +154,7 @@ export class PersonController extends ScriptClass {
       PersonItem,
       { handle: person.handle },
       {
-        populate: ['socialMediaProfiles', 'apiTokens', 'session'],
+        populate: ['socialMediaProfiles', 'apiTokens', 'session', 'passkeys'],
       },
     );
 
@@ -172,11 +172,13 @@ export class PersonController extends ScriptClass {
     const pseudonymSuffix = pseudonymHandle.toString().padStart(6, '0');
     const socialMediaProfiles = this.toArray(person.socialMediaProfiles);
     const apiTokens = this.toArray(person.apiTokens);
+    const passkeys = this.toArray(person.passkeys);
 
     this.logInfo('pseudonymizePerson', 'Pseudonymizing person master data', {
       personHandle: person.handle,
       socialMediaCount: socialMediaProfiles.length,
       apiTokenCount: apiTokens.length,
+      passkeyCount: passkeys.length,
       hasSession: Boolean(person.session),
     });
 
@@ -203,6 +205,16 @@ export class PersonController extends ScriptClass {
         personHandle: person.handle,
         apiTokenHandle: apiToken.handle,
       });
+    }
+
+    if (this.em) {
+      for (const passkey of passkeys) {
+        this.em.remove(passkey);
+        this.logDebug('pseudonymizePerson', 'Removed person passkey', {
+          personHandle: person.handle,
+          passkeyHandle: passkey.handle,
+        });
+      }
     }
 
     if (this.em && person.session) {

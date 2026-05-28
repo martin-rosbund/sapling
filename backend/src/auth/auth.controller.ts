@@ -5,6 +5,7 @@ import {
   Delete,
   ForbiddenException,
   Get,
+  InternalServerErrorException,
   NotFoundException,
   Param,
   Post,
@@ -32,12 +33,25 @@ import {
 } from '../constants/project.constants';
 import { SessionOrBearerAuthGuard } from './guard/session-or-token-auth.guard';
 import { AuthService } from './auth.service';
+import {
+  AuthPasskeyService,
+  type PasskeyRequestContext,
+} from './auth-passkey.service';
 import { CreateApiTokenDto } from './dto/create-api-token.dto';
 import { RotateApiTokenDto } from './dto/rotate-api-token.dto';
 import {
   ApiTokenResponseDto,
   ApiTokenSecretResponseDto,
 } from './dto/api-token-response.dto';
+import {
+  BeginPasskeyRegistrationDto,
+  LocalLoginPasskeyChallengeResponseDto,
+  PasskeyAuthenticationOptionsResponseDto,
+  PasskeyRegistrationOptionsResponseDto,
+  PasskeyResponseDto,
+  VerifyPasskeyAuthenticationDto,
+  VerifyPasskeyRegistrationDto,
+} from './dto/passkey.dto';
 import {
   GenericPermission,
   GenericPermissionEntity,
@@ -50,6 +64,24 @@ import type {
   ImpersonatorInfo,
   SessionUserPayload,
 } from '../session/session.serializer';
+
+const PASSKEY_CHALLENGE_TTL_MS = 5 * 60 * 1000;
+
+type PasskeyRegistrationSessionPayload = {
+  challenge: string;
+  context: PasskeyRequestContext;
+  createdAt: number;
+};
+
+type PasskeyLoginSessionPayload = PasskeyRegistrationSessionPayload & {
+  personHandle: number;
+  rememberMe: boolean;
+};
+
+type PasskeySessionData = {
+  passkeyRegistration?: PasskeyRegistrationSessionPayload;
+  passkeyLogin?: PasskeyLoginSessionPayload;
+};
 
 /**
  * @class
@@ -68,7 +100,10 @@ import type {
 @ApiTags('Auth')
 @Controller('api/auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly authPasskeyService?: AuthPasskeyService,
+  ) {}
 
   private completeLogin(
     req: Request,
@@ -108,6 +143,74 @@ export class AuthController {
     });
   }
 
+  private getPasskeyService(): AuthPasskeyService {
+    if (!this.authPasskeyService) {
+      throw new InternalServerErrorException('login.passkeyUnavailable');
+    }
+
+    return this.authPasskeyService;
+  }
+
+  private getPasskeySession(req: Request): PasskeySessionData {
+    return (req.session ?? {}) as unknown as PasskeySessionData;
+  }
+
+  private async saveSession(req: Request): Promise<void> {
+    const session = req.session as
+      | (Request['session'] & {
+          save?: (callback: (error?: Error) => void) => void;
+        })
+      | undefined;
+
+    if (typeof session?.save !== 'function') {
+      return;
+    }
+
+    await new Promise<void>((resolve, reject) =>
+      session.save((error?: Error) => (error ? reject(error) : resolve())),
+    );
+  }
+
+  private assertFreshPasskeyRegistrationSession(
+    req: Request,
+  ): PasskeyRegistrationSessionPayload {
+    const payload = this.getPasskeySession(req).passkeyRegistration;
+    if (!payload || Date.now() - payload.createdAt > PASSKEY_CHALLENGE_TTL_MS) {
+      throw new BadRequestException('login.passkeyChallengeExpired');
+    }
+
+    return payload;
+  }
+
+  private assertFreshPasskeyLoginSession(
+    req: Request,
+  ): PasskeyLoginSessionPayload {
+    const payload = this.getPasskeySession(req).passkeyLogin;
+    if (!payload || Date.now() - payload.createdAt > PASSKEY_CHALLENGE_TTL_MS) {
+      throw new BadRequestException('login.passkeyChallengeExpired');
+    }
+
+    return payload;
+  }
+
+  private clearPasskeyRegistrationSession(req: Request): void {
+    delete this.getPasskeySession(req).passkeyRegistration;
+  }
+
+  private clearPasskeyLoginSession(req: Request): void {
+    delete this.getPasskeySession(req).passkeyLogin;
+  }
+
+  private setSessionMaxAge(req: Request, rememberMe: boolean): void {
+    if (!req.session?.cookie) {
+      return;
+    }
+
+    req.session.cookie.maxAge = rememberMe
+      ? SESSION_REMEMBER_ME_MAX_AGE
+      : SESSION_MAX_AGE;
+  }
+
   /**
    * Local login endpoint using Passport local strategy.
    * @param req Express request object
@@ -138,15 +241,74 @@ export class AuthController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @UseGuards(AuthGuard('local'))
-  localLogin(@Req() req: Request, @Res() res: Response) {
-    this.completeLogin(req, res, () => {
-      if (req.session?.cookie) {
-        const body = req.body as { rememberMe?: unknown } | undefined;
-        req.session.cookie.maxAge =
-          body?.rememberMe === true
-            ? SESSION_REMEMBER_ME_MAX_AGE
-            : SESSION_MAX_AGE;
+  async localLogin(@Req() req: Request, @Res() res: Response) {
+    const user = req.user as PersonItem | undefined;
+    const body = req.body as { rememberMe?: unknown } | undefined;
+
+    if (
+      user &&
+      this.authPasskeyService &&
+      (await this.authPasskeyService.hasPasskeysForPerson(user.handle))
+    ) {
+      if (typeof user.handle !== 'number') {
+        throw new ForbiddenException('global.permissionDenied');
       }
+
+      const context = this.authPasskeyService.resolveRequestContext(req);
+      const options = await this.authPasskeyService.createAuthenticationOptions(
+        user.handle,
+        context,
+      );
+      this.getPasskeySession(req).passkeyLogin = {
+        challenge: options.challenge,
+        context,
+        createdAt: Date.now(),
+        personHandle: user.handle,
+        rememberMe: body?.rememberMe === true,
+      };
+      await this.saveSession(req);
+      res.send({
+        passkeyRequired: true,
+        options,
+      } satisfies LocalLoginPasskeyChallengeResponseDto);
+      return;
+    }
+
+    this.completeLogin(req, res, () => {
+      this.setSessionMaxAge(req, body?.rememberMe === true);
+      res.send();
+    });
+  }
+
+  @Post('local/passkey/verify')
+  @ApiOperation({
+    summary: 'Verify local login passkey challenge',
+    description:
+      'Completes local username/password login after a registered passkey assertion succeeds.',
+  })
+  @ApiBody({ type: VerifyPasskeyAuthenticationDto })
+  @ApiResponse({ status: 200, description: 'Passkey verified' })
+  @ApiResponse({ status: 400, description: 'Challenge missing or expired' })
+  @ApiResponse({ status: 403, description: 'Passkey verification failed' })
+  async verifyLocalPasskeyLogin(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Body() dto: VerifyPasskeyAuthenticationDto,
+  ): Promise<void> {
+    const passkeyService = this.getPasskeyService();
+    const sessionPayload = this.assertFreshPasskeyLoginSession(req);
+    this.clearPasskeyLoginSession(req);
+
+    const user = await passkeyService.verifyAuthentication(
+      sessionPayload.personHandle,
+      dto.response,
+      sessionPayload.challenge,
+      sessionPayload.context,
+    );
+    req.user = user as Express.User;
+
+    this.completeLogin(req, res, () => {
+      this.setSessionMaxAge(req, sessionPayload.rememberMe);
       res.send();
     });
   }
@@ -313,6 +475,114 @@ export class AuthController {
     } else {
       return res.status(401).send({ authenticated: false });
     }
+  }
+
+  @Get('passkey')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'List current user passkeys',
+    description: 'Returns passkey metadata for the authenticated user.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Registered passkeys',
+    type: PasskeyResponseDto,
+    isArray: true,
+  })
+  @UseGuards(SessionOrBearerAuthGuard)
+  listPasskeys(
+    @Req() req: Request & { user: PersonItem },
+  ): Promise<PasskeyResponseDto[]> {
+    return this.getPasskeyService().listPasskeys(req.user);
+  }
+
+  @Post('passkey/register/options')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Begin passkey registration',
+    description:
+      'Creates WebAuthn registration options and stores the short-lived challenge in the current session.',
+  })
+  @ApiBody({ type: BeginPasskeyRegistrationDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Passkey registration options',
+    type: PasskeyRegistrationOptionsResponseDto,
+  })
+  @UseGuards(SessionOrBearerAuthGuard)
+  async beginPasskeyRegistration(
+    @Req() req: Request & { user: PersonItem },
+  ): Promise<PasskeyRegistrationOptionsResponseDto> {
+    if (!req.session) {
+      throw new BadRequestException('login.passkeySessionRequired');
+    }
+
+    const passkeyService = this.getPasskeyService();
+    const context = passkeyService.resolveRequestContext(req);
+    const options = await passkeyService.createRegistrationOptions(
+      req.user,
+      context,
+    );
+
+    this.getPasskeySession(req).passkeyRegistration = {
+      challenge: options.challenge,
+      context,
+      createdAt: Date.now(),
+    };
+    await this.saveSession(req);
+
+    return { options };
+  }
+
+  @Post('passkey/register/verify')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Verify passkey registration',
+    description:
+      'Verifies a WebAuthn registration response and stores the resulting credential for the authenticated user.',
+  })
+  @ApiBody({ type: VerifyPasskeyRegistrationDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Registered passkey metadata',
+    type: PasskeyResponseDto,
+  })
+  @UseGuards(SessionOrBearerAuthGuard)
+  async verifyPasskeyRegistration(
+    @Req() req: Request & { user: PersonItem },
+    @Body() dto: VerifyPasskeyRegistrationDto,
+  ): Promise<PasskeyResponseDto> {
+    const sessionPayload = this.assertFreshPasskeyRegistrationSession(req);
+    this.clearPasskeyRegistrationSession(req);
+
+    return this.getPasskeyService().verifyRegistration(
+      req.user,
+      dto.response,
+      sessionPayload.challenge,
+      sessionPayload.context,
+      dto.label,
+    );
+  }
+
+  @Delete('passkey/:handle')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Delete a current user passkey',
+    description: 'Deletes one passkey owned by the authenticated user.',
+  })
+  @ApiParam({ name: 'handle', type: Number })
+  @ApiResponse({ status: 200, description: 'Passkey deleted' })
+  @UseGuards(SessionOrBearerAuthGuard)
+  deletePasskey(
+    @Req() req: Request & { user: PersonItem },
+    @Param('handle') handle: string,
+  ): Promise<{ deleted: boolean }> {
+    const passkeyHandle = Number(handle);
+    if (!Number.isFinite(passkeyHandle) || passkeyHandle <= 0) {
+      throw new BadRequestException('global.invalidHandle');
+    }
+
+    return this.getPasskeyService().deletePasskey(req.user, passkeyHandle);
   }
 
   /**

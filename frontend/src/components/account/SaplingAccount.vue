@@ -1,7 +1,7 @@
 <template>
   <!-- Dialog container for the account -->
   <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-medium">
-    <SaplingDialogCard class="sapling-account-dialog">
+    <SaplingDialogCard class="sapling-account-dialog" :tilt="false">
       <SaplingDialogShell
         fill-shell
         body-class="sapling-account-dialog__body"
@@ -111,6 +111,8 @@
                 </v-table>
               </v-col>
             </v-row>
+            <v-divider class="my-4" />
+            <SaplingPasskeyManager />
           </div>
         </template>
 
@@ -140,6 +142,7 @@
 import { computed } from 'vue'
 import { useSaplingAccount } from '@/composables/account/useSaplingAccount'
 import SaplingChangePassword from '@/components/account/SaplingChangePassword.vue'
+import SaplingPasskeyManager from '@/components/account/SaplingPasskeyManager.vue'
 import SaplingActionAccount from '@/components/actions/SaplingActionAccount.vue'
 import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkeleton.vue'
 import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'

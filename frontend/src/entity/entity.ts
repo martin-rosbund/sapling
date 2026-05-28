@@ -808,10 +808,42 @@ export interface PersonItem extends SaplingGenericItem {
   sharedMailboxGroups?: SharedMailboxGroupItem[]
   /** List of favorites referencing this person */
   favorites?: FavoriteItem[]
+  /** Passkeys registered for local Sapling login */
+  passkeys?: PersonPasskeyItem[]
   /** Preferred color */
   color?: string | null
   /** Creation date */
   createdAt: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a local Sapling passkey credential.
+ */
+export interface PersonPasskeyItem extends SaplingGenericItem {
+  /** Unique identifier for the passkey */
+  handle: number | null
+  /** Human-readable passkey label */
+  label: string
+  /** WebAuthn credential ID */
+  credentialId?: string
+  /** WebAuthn credential public key */
+  publicKey?: string
+  /** WebAuthn signature counter */
+  counter: number
+  /** Authenticator transports */
+  transports?: string[]
+  /** WebAuthn credential device type */
+  credentialDeviceType?: string | null
+  /** Whether the credential is backed up by the authenticator ecosystem */
+  credentialBackedUp: boolean
+  /** Last successful passkey use */
+  lastUsedAt?: Date | null
+  /** The person this passkey belongs to */
+  person: PersonItem | number
+  /** Creation date */
+  createdAt?: Date | null
   /** Last update date */
   updatedAt?: Date | null
 }

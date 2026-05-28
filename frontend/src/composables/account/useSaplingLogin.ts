@@ -8,6 +8,13 @@ import type { ApplicationState } from '@/entity/system'
 import CookieService from '@/services/cookie.service'
 import { resolvePostLoginPath } from '@/utils/authRouting'
 import { useAuthStore } from '@/stores/authStore'
+import { startAuthentication } from '@simplewebauthn/browser'
+import type { PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/browser'
+
+type LocalLoginResponse = {
+  passkeyRequired?: boolean
+  options?: PublicKeyCredentialRequestOptionsJSON
+}
 
 /**
  * Provides login state and actions for the local and external authentication flows.
@@ -107,11 +114,21 @@ export function useSaplingLogin() {
 
     try {
       // Send a POST request to the backend to log in
-      await axios.post(BACKEND_URL + 'auth/local/login', {
+      const loginResponse = await axios.post<LocalLoginResponse>(BACKEND_URL + 'auth/local/login', {
         loginName: email.value,
         loginPassword: password.value,
         rememberMe: rememberMe.value,
       })
+
+      if (loginResponse.data?.passkeyRequired && loginResponse.data.options) {
+        const passkeyResponse = await startAuthentication({
+          optionsJSON: loginResponse.data.options,
+        })
+        await axios.post(BACKEND_URL + 'auth/local/passkey/verify', {
+          response: passkeyResponse,
+        })
+      }
+
       authStore.markAuthenticated()
 
       // After login, fetch the current user's data
@@ -202,6 +219,8 @@ function resolveLoginErrorMessage(error: AxiosError | unknown) {
     switch (status) {
       case 401:
         return resolveMessage('login.wrongCredentials')
+      case 403:
+        return resolveMessage(getErrorResponseMessage(error) ?? 'login.passkeyVerificationFailed')
       case 429:
         return resolveMessage('global.tooManyRequests')
       default:
@@ -209,9 +228,25 @@ function resolveLoginErrorMessage(error: AxiosError | unknown) {
           return resolveMessage(error.response.data)
         }
 
-        return resolveMessage('login.unknownError')
+        return resolveMessage(getErrorResponseMessage(error) ?? 'login.unknownError')
     }
   }
 
   return resolveMessage('login.unknownError')
+}
+
+function getErrorResponseMessage(error: AxiosError): string | null {
+  const data = error.response?.data
+
+  if (
+    typeof data === 'object' &&
+    data !== null &&
+    'message' in data &&
+    typeof data.message === 'string' &&
+    data.message.trim().length > 0
+  ) {
+    return data.message
+  }
+
+  return null
 }

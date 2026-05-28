@@ -159,6 +159,39 @@
   gap: var(--sapling-gap-md);
 }
 
+.sapling-passkey-manager {
+  display: grid;
+  gap: var(--sapling-gap-sm);
+  min-width: 0;
+}
+
+.sapling-passkey-manager__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-passkey-manager__header h3 {
+  margin: 0;
+  font-size: var(--sapling-text-title-size);
+  font-weight: 700;
+}
+
+.sapling-passkey-manager__eyebrow {
+  font-size: var(--sapling-text-label-size);
+  font-weight: 700;
+  letter-spacing: var(--sapling-letter-spacing-label);
+  text-transform: uppercase;
+  opacity: var(--sapling-opacity-secondary);
+}
+
+.sapling-passkey-manager__list {
+  border: 1px solid var(--sapling-surface-border-muted);
+  border-radius: var(--sapling-radius-md);
+  background: var(--sapling-surface-fill);
+}
+
 .sapling-change-password-dialog,
 .sapling-login-dialog {
   width: 100%;

@@ -33,6 +33,7 @@ import { SocialMediaItem } from './SocialMediaItem';
 import { type Rel } from '@mikro-orm/core';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
 import { PersonApiTokenItem } from './PersonApiTokenItem';
+import { PersonPasskeyItem } from './PersonPasskeyItem';
 import { HolidayGroupItem } from './HolidayGroupItem';
 
 import { EMailListItem } from './EMailListItem';
@@ -470,6 +471,16 @@ export class PersonItem {
   @OneToMany(() => PersonApiTokenItem, (apiToken) => apiToken.person)
   apiTokens: Collection<PersonApiTokenItem> =
     new Collection<PersonApiTokenItem>(this);
+
+  /**
+   * Passkeys registered for local Sapling login.
+   */
+  @ApiPropertyOptional({ type: () => PersonPasskeyItem, isArray: true })
+  @Sapling(['isHideAsReference'])
+  @OneToMany(() => PersonPasskeyItem, (passkey) => passkey.person)
+  passkeys: Collection<PersonPasskeyItem> = new Collection<PersonPasskeyItem>(
+    this,
+  );
 
   /**
    * Favorite items referencing this person.

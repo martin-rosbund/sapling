@@ -51,6 +51,7 @@
     "@nestjs/platform-express": "^11.1.19",
     "@nestjs/swagger": "^11.4.2",
     "@oxc-node/core": "^0.1.0",
+    "@simplewebauthn/server": "^13.3.1",
     "@types/passport-microsoft": "^2.1.1",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.76.8",

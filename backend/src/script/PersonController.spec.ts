@@ -38,6 +38,7 @@ describe('PersonController', () => {
   it('pseudonymizes people while keeping the record handles', async () => {
     const session = { handle: 3 };
     const apiToken = { isActive: true, allowedIps: ['127.0.0.1'] };
+    const passkey = { handle: 4 };
     const socialMediaProfile = {
       title: 'Original',
       username: 'original-user',
@@ -60,6 +61,7 @@ describe('PersonController', () => {
       requirePasswordChange: false,
       socialMediaProfiles: [socialMediaProfile],
       apiTokens: [apiToken],
+      passkeys: [passkey],
       session,
     } as unknown as PersonItem;
     const em = {
@@ -103,6 +105,7 @@ describe('PersonController', () => {
     expect(apiToken.isActive).toBe(false);
     expect(apiToken.allowedIps).toEqual([]);
     expect(em.remove).toHaveBeenCalledWith(session);
+    expect(em.remove).toHaveBeenCalledWith(passkey);
     expect(em.flush).toHaveBeenCalled();
     expect(result.method).toBe(ScriptResultClientMethods.setItemData);
     expect(result.item).toBe(loadedPerson);

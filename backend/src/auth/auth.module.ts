@@ -8,6 +8,7 @@ import { PassportModule } from '@nestjs/passport';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { AuthPasskeyService } from './auth-passkey.service';
 import { SessionSerializer } from '../session/session.serializer';
 import { LocalStrategy } from './local/local.strategy';
 import { AzureStrategy } from './azure/azure.strategy';
@@ -53,6 +54,7 @@ const loginLimiter = rateLimit({
   controllers: [AuthController],
   providers: [
     AuthService,
+    AuthPasskeyService,
     LocalStrategy,
     AzureStrategy,
     GoogleStrategy,
@@ -80,6 +82,8 @@ export class AuthModule implements NestModule {
    * @param consumer MiddlewareConsumer instance
    */
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(loginLimiter).forRoutes('auth/local/login');
+    consumer
+      .apply(loginLimiter)
+      .forRoutes('auth/local/login', 'auth/local/passkey/verify');
   }
 }

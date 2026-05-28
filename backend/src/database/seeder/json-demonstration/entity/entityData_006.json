@@ -1,0 +1,12 @@
+[
+  {
+    "handle": "personPasskey",
+    "canShow": true,
+    "icon": "mdi-key-variant",
+    "group": "authentication",
+    "order": 25,
+    "canInsert": false,
+    "canUpdate": true,
+    "canDelete": true
+  }
+]

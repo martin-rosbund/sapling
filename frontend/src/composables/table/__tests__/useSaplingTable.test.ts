@@ -4,14 +4,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { ColumnFilterItem, EntityTemplate } from '@/entity/structure'
 
-const { apiFindMock, loadGenericMock, fetchCurrentPermissionMock, routeState } = vi.hoisted(
-  () => ({
-    apiFindMock: vi.fn(),
-    loadGenericMock: vi.fn(),
-    fetchCurrentPermissionMock: vi.fn(),
-    routeState: { query: {} as Record<string, unknown> },
-  }),
-)
+const { apiFindMock, loadGenericMock, fetchCurrentPermissionMock, routeState } = vi.hoisted(() => ({
+  apiFindMock: vi.fn(),
+  loadGenericMock: vi.fn(),
+  fetchCurrentPermissionMock: vi.fn(),
+  routeState: { query: {} as Record<string, unknown> },
+}))
 
 vi.mock('vue-router', () => ({
   useRoute: () => routeState,
