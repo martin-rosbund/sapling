@@ -26,43 +26,37 @@
             v-if="isLoading || !currentPersonStore.loaded"
             class="sapling-account-dialog__content"
           >
-            <v-row>
-              <v-col :cols="$vuetify.display.xs ? 12 : 6">
+            <div class="sapling-account-dialog__summary-grid">
+              <section class="sapling-account-dialog__details">
                 <v-skeleton-loader
                   elevation="12"
                   type="list-item-two-line, list-item-two-line, list-item-two-line"
                 />
-              </v-col>
-              <v-col :cols="$vuetify.display.xs ? 12 : 6">
+              </section>
+              <section class="sapling-account-dialog__workhours">
                 <v-skeleton-loader elevation="12" type="table-heading, table-tbody" />
-              </v-col>
-            </v-row>
+              </section>
+            </div>
           </div>
 
           <div v-else-if="currentPersonStore.person" class="sapling-account-dialog__content">
-            <v-row>
-              <v-col :cols="$vuetify.display.xs ? 12 : 6">
+            <div class="sapling-account-dialog__summary-grid">
+              <section class="sapling-account-dialog__details">
                 <v-list density="comfortable">
                   <v-list-item v-for="detail in accountDetails" :key="detail.key">
-                    <v-row>
-                      <v-col cols="12" class="d-flex align-center">
-                        <v-icon color="primary" class="mr-2">{{ detail.icon }}</v-icon>
-                        <span>
-                          {{ detail.value }}
-                          <template v-if="detail.suffixKey && detail.value !== '-'">
-                            {{ $t(detail.suffixKey) }}
-                          </template>
-                        </span>
-                      </v-col>
-                    </v-row>
+                    <div class="sapling-account-dialog__detail-row">
+                      <v-icon color="primary">{{ detail.icon }}</v-icon>
+                      <span class="sapling-account-dialog__detail-value">
+                        {{ detail.value }}
+                        <template v-if="detail.suffixKey && detail.value !== '-'">
+                          {{ $t(detail.suffixKey) }}
+                        </template>
+                      </span>
+                    </div>
                   </v-list-item>
                 </v-list>
-              </v-col>
-              <v-col
-                :cols="$vuetify.display.xs ? 12 : 6"
-                v-if="workHours"
-                class="sapling-account-dialog__workhours"
-              >
+              </section>
+              <section v-if="workHours" class="sapling-account-dialog__workhours">
                 <div v-if="$vuetify.display.smAndDown" class="sapling-workhours-list mt-4">
                   <article
                     v-for="(workHourRow, index) in workHourRows"
@@ -109,8 +103,8 @@
                     </tr>
                   </tbody>
                 </v-table>
-              </v-col>
-            </v-row>
+              </section>
+            </div>
             <template v-if="isSaplingAccount">
               <v-divider class="my-4" />
               <SaplingPasskeyManager />
