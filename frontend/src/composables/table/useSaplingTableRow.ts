@@ -1,13 +1,14 @@
 // #region Imports
 import { computed, ref } from 'vue'
 import { useGenericStore } from '@/stores/genericStore'
+import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
 import type { EntityItem, SaplingGenericItem, ScriptButtonItem } from '@/entity/entity'
 import type {
   AccumulatedPermission,
   EntityTemplate,
   SaplingTableHeaderItem,
 } from '@/entity/structure'
-import { getEntityValueLabel } from '@/utils/saplingTableUtil'
+import { canReadReferenceTemplate, getEntityValueLabel } from '@/utils/saplingTableUtil'
 import { buildMailMenuActions } from '@/utils/saplingMailMenuUtil'
 import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog'
 import { useI18n } from 'vue-i18n'
@@ -17,7 +18,7 @@ import {
 } from '@/composables/context/useSaplingContextMenuTable'
 // #endregion
 
-const REFERENCE_COLUMN_KINDS = ['m:1']
+const REFERENCE_COLUMN_KINDS = ['m:1', '1:1']
 
 export interface SaplingTableRowContextMenuOpenPayload {
   item: SaplingGenericItem
@@ -80,6 +81,7 @@ const INTERACTIVE_ROW_SELECTOR = [
 export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSaplingTableRowEmit) {
   // #region State
   const genericStore = useGenericStore()
+  const currentPermissionStore = useCurrentPermissionStore()
   const { t } = useI18n()
   const { openMailDialog } = useSaplingMailDialog()
   const menuActive = ref(false)
@@ -144,7 +146,12 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
       const columnKey = column.key as string
 
       const referenceValue = props.item[columnKey]
-      if (!column.referenceName || !referenceValue || typeof referenceValue !== 'object') {
+      if (
+        !column.referenceName ||
+        !canReadReferenceColumn(column) ||
+        !referenceValue ||
+        typeof referenceValue !== 'object'
+      ) {
         titles[columnKey] = ''
         continue
       }
@@ -176,8 +183,12 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     return REFERENCE_COLUMN_KINDS.includes(column.kind ?? '') && Boolean(column.referenceName)
   }
 
+  function canReadReferenceColumn(column: EntityTemplate) {
+    return canReadReferenceTemplate(column, currentPermissionStore.accumulatedPermission ?? [])
+  }
+
   function isReferenceLoading(column: EntityTemplate) {
-    if (!column.referenceName) {
+    if (!column.referenceName || !canReadReferenceColumn(column)) {
       return false
     }
 
@@ -422,6 +433,7 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     getReferenceTemplates,
     getReferenceEntity,
     isReferenceColumn,
+    canReadReferenceColumn,
     isReferenceLoading,
     getCompactPanelTitle,
     isDateTimeColumn,

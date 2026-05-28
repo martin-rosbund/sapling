@@ -11,11 +11,13 @@ import type {
 } from '@/entity/structure'
 import type { SaplingGenericItem } from '@/entity/entity'
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants'
+import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
 import { useGenericStore } from '@/stores/genericStore'
 import { extractColumnFiltersFromFilterQuery } from '@/composables/table/useSaplingTableFilterHelpers'
 import {
   buildTableFilter,
   buildTableOrderBy,
+  getReadableReferenceRelationNames,
   isGenericReferenceTemplate,
 } from '@/utils/saplingTableUtil'
 // #endregion
@@ -51,6 +53,7 @@ export function useSaplingTable(
   const isInitialized = ref(false)
 
   const route = useRoute()
+  const currentPermissionStore = useCurrentPermissionStore()
   const genericStore = useGenericStore()
   let activeLoadController: AbortController | null = null
   let scheduledLoadTimeout: ReturnType<typeof setTimeout> | null = null
@@ -65,6 +68,12 @@ export function useSaplingTable(
   )
   const entityTemplates = computed(() => genericStore.getState(entityHandle.value).entityTemplates)
   const isLoading = computed(() => genericStore.getState(entityHandle.value).isLoading)
+  const readableReferenceRelations = computed(() =>
+    getReadableReferenceRelationNames(
+      entityTemplates.value,
+      currentPermissionStore.accumulatedPermission ?? [],
+    ),
+  )
   // #endregion
 
   // #region Filters and Sorting
@@ -223,7 +232,7 @@ export function useSaplingTable(
         orderBy: buildTableOrderBy(validSortBy.value),
         page: page.value,
         limit: itemsPerPage.value,
-        relations: ['m:1'],
+        relations: readableReferenceRelations.value,
         signal: loadController.signal,
       })
 
@@ -323,7 +332,10 @@ export function useSaplingTable(
     }
 
     try {
-      await genericStore.loadGeneric(currentEntityHandle, 'global', 'filter', 'exception')
+      await Promise.all([
+        genericStore.loadGeneric(currentEntityHandle, 'global', 'filter', 'exception'),
+        currentPermissionStore.fetchCurrentPermission(),
+      ])
 
       if (
         initializationId !== latestInitializationId ||

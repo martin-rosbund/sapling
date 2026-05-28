@@ -17,7 +17,11 @@ import type { EntityItem, ScriptButtonItem } from '@/entity/entity'
 import type { FilterQuery } from '@/services/api.generic.service'
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
 import { useGenericStore } from '@/stores/genericStore'
-import { getTableHeaders } from '@/utils/saplingTableUtil'
+import {
+  canReadReferenceTemplate,
+  filterTableHeadersByReferencePermission,
+  getTableHeaders,
+} from '@/utils/saplingTableUtil'
 import { useSaplingTableFilters } from '@/composables/table/useSaplingTableFilters'
 import { useSaplingTableSelection } from '@/composables/table/useSaplingTableSelection'
 import { useSaplingTableActions } from '@/composables/table/useSaplingTableActions'
@@ -62,6 +66,7 @@ export type UseSaplingTableEmit = {
 
 const MOBILE_TABLE_BREAKPOINT = DEFAULT_SMALL_WINDOW_WIDTH
 const COMPACT_TOOLBAR_BREAKPOINT = 760
+const PRELOAD_REFERENCE_KINDS = ['m:1', '1:1']
 
 /**
  * Encapsulates the local UI workflow for the shared data table.
@@ -186,6 +191,7 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   const showToolbarActionsInline = computed(
     () => responsiveWidth.value >= COMPACT_TOOLBAR_BREAKPOINT,
   )
+  const currentPermissions = computed(() => currentPermissionStore.accumulatedPermission ?? [])
   // #endregion
 
   // #region Lifecycle
@@ -229,11 +235,9 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
         props.entityTemplates
           .filter(
             (template) =>
-              template.kind === 'm:1' &&
+              PRELOAD_REFERENCE_KINDS.includes(template.kind ?? '') &&
               template.referenceName &&
-              currentPermissionStore.accumulatedPermission?.find(
-                (permission) => permission.entityHandle === template.referenceName,
-              )?.allowRead,
+              canReadReferenceTemplate(template, currentPermissions.value),
           )
           .map((template) => template.referenceName as string),
       ),
@@ -287,9 +291,13 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   // #endregion
 
   // #region Computed
-  const tableHeaders = computed<SaplingTableHeaderItem[]>(() =>
-    props.headers?.length ? props.headers : getTableHeaders(props.entityTemplates, props.entity, t),
-  )
+  const tableHeaders = computed<SaplingTableHeaderItem[]>(() => {
+    if (props.headers?.length) {
+      return filterTableHeadersByReferencePermission(props.headers, currentPermissions.value)
+    }
+
+    return getTableHeaders(props.entityTemplates, props.entity, t, currentPermissions.value)
+  })
 
   const dataHeaders = computed(() =>
     tableHeaders.value.filter((header) => header.key !== '__select' && header.key !== '__actions'),

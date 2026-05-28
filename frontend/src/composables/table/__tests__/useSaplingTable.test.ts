@@ -4,11 +4,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { ColumnFilterItem, EntityTemplate } from '@/entity/structure'
 
-const { apiFindMock, loadGenericMock, routeState } = vi.hoisted(() => ({
-  apiFindMock: vi.fn(),
-  loadGenericMock: vi.fn(),
-  routeState: { query: {} as Record<string, unknown> },
-}))
+const { apiFindMock, loadGenericMock, fetchCurrentPermissionMock, routeState } = vi.hoisted(
+  () => ({
+    apiFindMock: vi.fn(),
+    loadGenericMock: vi.fn(),
+    fetchCurrentPermissionMock: vi.fn(),
+    routeState: { query: {} as Record<string, unknown> },
+  }),
+)
 
 vi.mock('vue-router', () => ({
   useRoute: () => routeState,
@@ -24,6 +27,16 @@ vi.mock('@/stores/genericStore', () => ({
   useGenericStore: () => ({
     getState: (key: string) => getMockedEntityState(key),
     loadGeneric: loadGenericMock,
+  }),
+}))
+
+vi.mock('@/stores/currentPermissionStore', () => ({
+  useCurrentPermissionStore: () => ({
+    accumulatedPermission: [
+      { entityHandle: 'ticketStatus', allowRead: true },
+      { entityHandle: 'person', allowRead: true },
+    ],
+    fetchCurrentPermission: fetchCurrentPermissionMock,
   }),
 }))
 
@@ -128,6 +141,7 @@ describe('useSaplingTable', () => {
   beforeEach(() => {
     apiFindMock.mockReset()
     loadGenericMock.mockReset()
+    fetchCurrentPermissionMock.mockReset()
     routeState.query = {}
   })
 
@@ -317,6 +331,7 @@ describe('useSaplingTable', () => {
     expect(apiFindMock).toHaveBeenCalledWith(
       'ticket',
       expect.objectContaining({
+        relations: ['status', 'assigneePerson'],
         filter: {
           $and: [
             { status: { handle: 'open' } },

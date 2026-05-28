@@ -20,13 +20,62 @@ export function isGenericReferenceTemplate(template?: Partial<EntityTemplate>): 
   )
 }
 
-function isVisibleTableTemplate(template: EntityTemplate): boolean {
+const TABLE_REFERENCE_PERMISSION_KINDS = ['m:1', '1:1']
+
+export function canReadReferenceTemplate(
+  template?: Partial<EntityTemplate>,
+  permissions: AccumulatedPermission[] = [],
+): boolean {
+  if (!template?.referenceName) {
+    return true
+  }
+
+  if (template.kind && !TABLE_REFERENCE_PERMISSION_KINDS.includes(template.kind)) {
+    return true
+  }
+
+  return permissions.some(
+    (permission) => permission.entityHandle === template.referenceName && permission.allowRead,
+  )
+}
+
+export function filterTableHeadersByReferencePermission<T extends Partial<EntityTemplate>>(
+  headers: T[],
+  permissions: AccumulatedPermission[] = [],
+): T[] {
+  return headers.filter((header) => canReadReferenceTemplate(header, permissions))
+}
+
+export function getReadableReferenceRelationNames(
+  entityTemplates: EntityTemplate[],
+  permissions: AccumulatedPermission[] = [],
+): string[] {
+  return [
+    ...new Set(
+      entityTemplates
+        .filter(
+          (template) =>
+            TABLE_REFERENCE_PERMISSION_KINDS.includes(template.kind ?? '') &&
+            Boolean(template.name) &&
+            Boolean(template.referenceName) &&
+            canReadReferenceTemplate(template, permissions),
+        )
+        .map((template) => template.name),
+    ),
+  ]
+}
+
+function isVisibleTableTemplate(
+  template: EntityTemplate,
+  permissions: AccumulatedPermission[] = [],
+): boolean {
   return (
     (!template.options?.includes('isSystem') || isGenericReferenceTemplate(template)) &&
     !template.isAutoIncrement &&
     !template.options?.includes('isSecurity') &&
     !((template.length ?? 0) > 256) &&
-    !['1:m', 'm:n', 'n:m', '1:1'].includes(template.kind ?? '')
+    !['1:m', 'm:n', 'n:m', '1:1'].includes(template.kind ?? '') &&
+    canReadReferenceTemplate(template, permissions)
   )
 }
 
@@ -39,13 +88,7 @@ export function getRelationTableHeaders(
   const result: Record<string, SaplingTableHeaderItem[]> = {}
   for (const key in relationTableStates) {
     result[key] = (relationTableStates[key]?.entityTemplates ?? [])
-      .filter(
-        (template) =>
-          isVisibleTableTemplate(template) &&
-          (!template.referenceName ||
-            permissions.find((permission) => permission.entityHandle === template.referenceName)
-              ?.allowRead),
-      )
+      .filter((template) => isVisibleTableTemplate(template, permissions))
       .map((tpl: EntityTemplate) => ({
         ...tpl,
         key: tpl.name,
@@ -77,12 +120,15 @@ export function getTableHeaders(
   entityTemplates: EntityTemplate[],
   entity: EntityItem | null,
   t: (key: string) => string,
+  permissions: AccumulatedPermission[] = [],
 ) {
-  const result = entityTemplates.filter(isVisibleTableTemplate).map((tpl: EntityTemplate) => ({
-    ...tpl,
-    key: tpl.name,
-    title: t(`${entity?.handle}.${tpl.name}`),
-  }))
+  const result = entityTemplates
+    .filter((template) => isVisibleTableTemplate(template, permissions))
+    .map((tpl: EntityTemplate) => ({
+      ...tpl,
+      key: tpl.name,
+      title: t(`${entity?.handle}.${tpl.name}`),
+    }))
 
   return result
 }

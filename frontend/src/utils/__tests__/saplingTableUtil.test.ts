@@ -6,12 +6,15 @@ import type { DialogState, EntityState, EntityTemplate, SortItem } from '@/entit
 import {
   buildTableFilter,
   buildTableOrderBy,
+  canReadReferenceTemplate,
+  filterTableHeadersByReferencePermission,
   getAllowedColumnFilterOperators,
   getEntityValueLabel,
   getDefaultColumnFilterOperatorForTemplate,
   getEditDialogHeaders,
   getGenericReferenceEntityHandle,
   getGenericReferenceHandle,
+  getReadableReferenceRelationNames,
   getRelationTableHeaders,
   getTableHeaders,
   isBooleanTemplate,
@@ -57,7 +60,21 @@ describe('saplingTableUtil', () => {
       kind: 'm:1',
       referenceName: 'salesOpportunity',
     })
+    const readableReferenceTemplate = createTemplate({
+      name: 'company',
+      kind: 'm:1',
+      referenceName: 'company',
+    })
+    const unreadableOneToOneTemplate = createTemplate({
+      name: 'primaryContact',
+      kind: '1:1',
+      referenceName: 'person',
+    })
     const translate = (key: string) => `translated:${key}`
+    const permissions = [
+      { entityHandle: 'company', allowRead: true },
+      { entityHandle: 'salesOpportunity', allowRead: false },
+    ]
 
     expect(
       getRelationTableHeaders(
@@ -69,13 +86,37 @@ describe('saplingTableUtil', () => {
           ]),
         },
         translate,
-        [{ entityHandle: 'salesOpportunity', allowRead: false }],
+        permissions,
       ).tickets,
     ).toEqual([expect.objectContaining({ key: 'title', title: 'translated:ticket.title' })])
 
     expect(
-      getTableHeaders([visibleTemplate, hiddenTemplate], { handle: 'ticket' } as never, translate),
-    ).toEqual([expect.objectContaining({ key: 'title', title: 'translated:ticket.title' })])
+      getTableHeaders(
+        [visibleTemplate, hiddenTemplate, readableReferenceTemplate, unreadableReferenceTemplate],
+        { handle: 'ticket' } as never,
+        translate,
+        permissions,
+      ),
+    ).toEqual([
+      expect.objectContaining({ key: 'title', title: 'translated:ticket.title' }),
+      expect.objectContaining({ key: 'company', title: 'translated:ticket.company' }),
+    ])
+
+    expect(canReadReferenceTemplate(readableReferenceTemplate, permissions)).toBe(true)
+    expect(canReadReferenceTemplate(unreadableReferenceTemplate, permissions)).toBe(false)
+    expect(canReadReferenceTemplate(unreadableOneToOneTemplate, permissions)).toBe(false)
+    expect(
+      filterTableHeadersByReferencePermission(
+        [readableReferenceTemplate, unreadableReferenceTemplate, unreadableOneToOneTemplate],
+        permissions,
+      ),
+    ).toEqual([readableReferenceTemplate])
+    expect(
+      getReadableReferenceRelationNames(
+        [readableReferenceTemplate, unreadableReferenceTemplate, unreadableOneToOneTemplate],
+        permissions,
+      ),
+    ).toEqual(['company'])
   })
 
   it('filters edit dialog headers by mode, reference visibility, and permissions', () => {

@@ -42,7 +42,10 @@
         />
         <!-- Expansion panel for m:1 columns (object value) -->
         <div v-else-if="isReferenceColumn(col)">
-          <template v-if="item[col.key || ''] && !isReferenceLoading(col)">
+          <template v-if="!canReadReferenceColumn(col)">
+            <div></div>
+          </template>
+          <template v-else-if="item[col.key || ''] && !isReferenceLoading(col)">
             <v-btn
               size="small"
               @click.stop="openDialogForCol(col.key || '')"
@@ -257,6 +260,7 @@ const {
   getReferenceTemplates,
   getReferenceEntity,
   isReferenceColumn,
+  canReadReferenceColumn,
   isReferenceLoading,
   getCompactPanelTitle,
   isDateTimeColumn,
