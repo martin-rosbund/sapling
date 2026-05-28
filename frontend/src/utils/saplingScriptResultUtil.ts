@@ -1,4 +1,5 @@
 import type { Router } from 'vue-router'
+import type { SaplingGenericItem, ScriptButtonItem } from '@/entity/entity'
 import type { ScriptResultClient } from '@/services/api.script.service'
 
 export enum ScriptResultClientMethod {
@@ -15,6 +16,9 @@ type PushMessage = (
   entity: string,
   technical?: unknown,
 ) => void
+
+type Translate = (key: string, values?: Record<string, unknown>, plural?: number) => string
+type HasTranslation = (key: string) => boolean
 
 type ScriptMessageParameter = {
   message?: string
@@ -100,4 +104,76 @@ function parseMessageParameter(parameter: string): ScriptMessageParameter {
   }
 
   return { message: parameter }
+}
+
+export function buildScriptButtonExecutionKey(
+  button: ScriptButtonItem,
+  items: SaplingGenericItem[],
+): string {
+  const buttonKey = String(button.handle ?? button.name ?? button.title ?? 'script')
+  const itemKeys = items.map((item, index) => String(item.handle ?? `index-${index}`)).join(',')
+
+  return `${buttonKey}:${itemKeys}`
+}
+
+export function resolveScriptButtonDisplayTitle(
+  button: ScriptButtonItem,
+  translate: Translate,
+  hasTranslation: HasTranslation,
+): string {
+  const title = typeof button.title === 'string' ? button.title.trim() : ''
+
+  if (title) {
+    return hasTranslation(title) ? translate(title) : title
+  }
+
+  const name = typeof button.name === 'string' ? button.name.trim() : ''
+  return name || translate('global.scriptAction')
+}
+
+export function pushScriptButtonStartedMessage(options: {
+  button: ScriptButtonItem
+  entity: string
+  itemCount: number
+  pushMessage: PushMessage
+  translate: Translate
+  hasTranslation: HasTranslation
+}): void {
+  const action = resolveScriptButtonDisplayTitle(
+    options.button,
+    options.translate,
+    options.hasTranslation,
+  )
+  const descriptionKey =
+    options.itemCount === 1
+      ? 'global.scriptActionStartedDescription'
+      : 'global.scriptActionStartedDescriptionWithCount'
+
+  options.pushMessage(
+    'info',
+    options.translate('global.scriptActionStarted'),
+    options.translate(descriptionKey, { action, count: options.itemCount }, options.itemCount),
+    options.entity,
+  )
+}
+
+export function pushScriptButtonAlreadyRunningMessage(options: {
+  button: ScriptButtonItem
+  entity: string
+  pushMessage: PushMessage
+  translate: Translate
+  hasTranslation: HasTranslation
+}): void {
+  const action = resolveScriptButtonDisplayTitle(
+    options.button,
+    options.translate,
+    options.hasTranslation,
+  )
+
+  options.pushMessage(
+    'warning',
+    options.translate('global.scriptActionAlreadyRunning'),
+    options.translate('global.scriptActionAlreadyRunningDescription', { action }),
+    options.entity,
+  )
 }

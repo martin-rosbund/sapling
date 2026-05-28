@@ -375,7 +375,12 @@ import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { useTimelineDialogStore } from '@/stores/timelineDialogStore'
 import { useChangeLogDialogStore } from '@/stores/changeLogDialogStore'
 import { buildTableOrderBy } from '@/utils/saplingTableUtil'
-import { handleScriptResultClient } from '@/utils/saplingScriptResultUtil'
+import {
+  buildScriptButtonExecutionKey,
+  handleScriptResultClient,
+  pushScriptButtonAlreadyRunningMessage,
+  pushScriptButtonStartedMessage,
+} from '@/utils/saplingScriptResultUtil'
 // #endregion
 
 // #region Props & Emits
@@ -559,17 +564,21 @@ const canDeleteRecord = computed(
   () => hasPersistedItem.value && Boolean(entityPermission.value?.allowDelete),
 )
 
-const recordActionButtonsDisabled = computed(
-  () => isSaving.value || (props.mode === 'edit' && isDirty.value),
-)
-
 const recordDeleteDialog = ref(false)
 const showUploadDialog = ref(false)
 const showInformationDialog = ref(false)
 const loadedScriptButtons = ref<ScriptButtonItem[]>([])
+const runningScriptActionCount = ref(0)
 const formSurfaceRef = ref<HTMLElement | null>(null)
 
 let scriptButtonsRequestId = 0
+const runningScriptButtonKeys = new Set<string>()
+
+const isScriptActionRunning = computed(() => runningScriptActionCount.value > 0)
+
+const recordActionButtonsDisabled = computed(
+  () => isSaving.value || isScriptActionRunning.value || (props.mode === 'edit' && isDirty.value),
+)
 
 const recordActionMenuItems = computed<SaplingContextMenuTableMenuEntry[]>(() => {
   const groups: SaplingContextMenuTableMenuEntry[] =
@@ -864,27 +873,58 @@ async function runScriptButtonFromRecord(scriptButton: ScriptButtonItem): Promis
     return
   }
 
-  await currentPersonStore.fetchCurrentPerson()
-  if (!currentPersonStore.person) {
+  const executionKey = buildScriptButtonExecutionKey(scriptButton, [props.item])
+  const scriptEntity = entityHandle.value || props.entity?.handle || 'script'
+  if (runningScriptButtonKeys.has(executionKey)) {
+    pushScriptButtonAlreadyRunningMessage({
+      button: scriptButton,
+      entity: scriptEntity,
+      pushMessage,
+      translate: t,
+      hasTranslation: te,
+    })
     return
   }
 
-  const result = await ApiScriptService.runClient(
-    [props.item],
-    props.entity,
-    currentPersonStore.person,
-    scriptButton.name,
-    scriptButton.parameter,
-  )
-
-  await handleScriptResultClient(result, {
-    entity: entityHandle.value || props.entity?.handle || 'script',
+  runningScriptButtonKeys.add(executionKey)
+  runningScriptActionCount.value = runningScriptButtonKeys.size
+  pushScriptButtonStartedMessage({
+    button: scriptButton,
+    entity: scriptEntity,
+    itemCount: 1,
     pushMessage,
-    onItemData: (item) => emit('update:item', item as SaplingGenericItem),
+    translate: t,
+    hasTranslation: te,
   })
 
-  if (result.isSuccess !== false) {
-    await reloadDialogItem()
+  try {
+    await currentPersonStore.fetchCurrentPerson()
+    if (!currentPersonStore.person) {
+      return
+    }
+
+    const result = await ApiScriptService.runClient(
+      [props.item],
+      props.entity,
+      currentPersonStore.person,
+      scriptButton.name,
+      scriptButton.parameter,
+    )
+
+    await handleScriptResultClient(result, {
+      entity: scriptEntity,
+      pushMessage,
+      onItemData: (item) => emit('update:item', item as SaplingGenericItem),
+    })
+
+    if (result.isSuccess !== false) {
+      await reloadDialogItem()
+    }
+  } catch {
+    // API errors are already routed through the shared message center.
+  } finally {
+    runningScriptButtonKeys.delete(executionKey)
+    runningScriptActionCount.value = runningScriptButtonKeys.size
   }
 }
 

@@ -32,7 +32,12 @@ import { buildTableFilter, buildTableOrderBy } from '@/utils/saplingTableUtil'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog'
 import { buildMailMenuActions } from '@/utils/saplingMailMenuUtil'
-import { handleScriptResultClient } from '@/utils/saplingScriptResultUtil'
+import {
+  buildScriptButtonExecutionKey,
+  handleScriptResultClient,
+  pushScriptButtonAlreadyRunningMessage,
+  pushScriptButtonStartedMessage,
+} from '@/utils/saplingScriptResultUtil'
 import { buildCsv, buildCsvTemplate, parseCsv } from '@/utils/saplingCsvUtil'
 import type { SaplingContextMenuTableActionPayload } from '@/composables/context/useSaplingContextMenuTable'
 import type { SaplingTableRowContextMenuOpenPayload } from '@/composables/table/useSaplingTableRow'
@@ -113,7 +118,7 @@ export function useSaplingTableActions({
   selectedRows,
   clearSelection,
 }: UseSaplingTableActionsOptions) {
-  const { t } = useI18n()
+  const { t, te } = useI18n()
   const route = useRoute()
   const router = useRouter()
   const currentPersonStore = useCurrentPersonStore()
@@ -124,6 +129,7 @@ export function useSaplingTableActions({
   const { openMailDialog } = useSaplingMailDialog()
 
   const loadedScriptButtons = ref<ScriptButtonItem[]>([])
+  const runningScriptButtonKeys = new Set<string>()
   const editDialog = ref<EditDialogOptions>({ visible: false, mode: 'create', item: null })
   const deleteDialog = ref<DeleteDialogState>({ visible: false, item: null })
   const bulkDeleteDialog = ref<BulkDeleteDialogState>({ visible: false, items: [] })
@@ -865,27 +871,55 @@ export function useSaplingTableActions({
       return
     }
 
-    await currentPersonStore.fetchCurrentPerson()
-    if (!currentPersonStore.person) {
+    const executionKey = buildScriptButtonExecutionKey(button, items)
+    if (runningScriptButtonKeys.has(executionKey)) {
+      pushScriptButtonAlreadyRunningMessage({
+        button,
+        entity: props.entityHandle,
+        pushMessage,
+        translate: t,
+        hasTranslation: te,
+      })
       return
     }
 
-    const result = await ApiScriptService.runClient(
-      items,
-      props.entity,
-      currentPersonStore.person,
-      button.name,
-      button.parameter,
-    )
-
-    await handleScriptResultClient(result, {
+    runningScriptButtonKeys.add(executionKey)
+    pushScriptButtonStartedMessage({
+      button,
       entity: props.entityHandle,
+      itemCount: items.length,
       pushMessage,
-      router,
+      translate: t,
+      hasTranslation: te,
     })
 
-    if (result.isSuccess !== false) {
-      emit('reload')
+    try {
+      await currentPersonStore.fetchCurrentPerson()
+      if (!currentPersonStore.person) {
+        return
+      }
+
+      const result = await ApiScriptService.runClient(
+        items,
+        props.entity,
+        currentPersonStore.person,
+        button.name,
+        button.parameter,
+      )
+
+      await handleScriptResultClient(result, {
+        entity: props.entityHandle,
+        pushMessage,
+        router,
+      })
+
+      if (result.isSuccess !== false) {
+        emit('reload')
+      }
+    } catch {
+      // API errors are already routed through the shared message center.
+    } finally {
+      runningScriptButtonKeys.delete(executionKey)
     }
   }
 

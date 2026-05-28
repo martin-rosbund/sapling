@@ -43,7 +43,12 @@ import { formatDateFromTo, formatDateValue, formatTimeValue } from '@/utils/sapl
 import { expandRecurringEvent, isRecurringCalendarEvent } from '@/utils/eventRecurrence'
 import { buildMailMenuActions } from '@/utils/saplingMailMenuUtil'
 import { buildTableOrderBy } from '@/utils/saplingTableUtil'
-import { handleScriptResultClient } from '@/utils/saplingScriptResultUtil'
+import {
+  buildScriptButtonExecutionKey,
+  handleScriptResultClient,
+  pushScriptButtonAlreadyRunningMessage,
+  pushScriptButtonStartedMessage,
+} from '@/utils/saplingScriptResultUtil'
 import {
   formatLocalDate,
   getWeekNumber,
@@ -245,6 +250,7 @@ export function useSaplingEvent() {
   let stopWindowWatcher: (() => void) | null = null
   let scrollTimeoutId: number | null = null
   let scriptButtonsRequestId = 0
+  const runningScriptButtonKeys = new Set<string>()
 
   const calendarDisplayType = computed(() =>
     calendarType.value === 'workweek' ? 'week' : calendarType.value,
@@ -1508,26 +1514,55 @@ export function useSaplingEvent() {
       return
     }
 
-    await currentPersonStore.fetchCurrentPerson()
-    if (!currentPersonStore.person) {
+    const executionKey = buildScriptButtonExecutionKey(scriptButton, [eventContextMenu.value.item])
+    const scriptEntity = entityEvent.value.handle || 'event'
+    if (runningScriptButtonKeys.has(executionKey)) {
+      pushScriptButtonAlreadyRunningMessage({
+        button: scriptButton,
+        entity: scriptEntity,
+        pushMessage,
+        translate: i18n.global.t,
+        hasTranslation: i18n.global.te,
+      })
       return
     }
 
-    const result = await ApiScriptService.runClient(
-      [eventContextMenu.value.item],
-      entityEvent.value,
-      currentPersonStore.person,
-      scriptButton.name,
-      scriptButton.parameter,
-    )
-
-    await handleScriptResultClient(result, {
-      entity: entityEvent.value.handle || 'event',
+    runningScriptButtonKeys.add(executionKey)
+    pushScriptButtonStartedMessage({
+      button: scriptButton,
+      entity: scriptEntity,
+      itemCount: 1,
       pushMessage,
+      translate: i18n.global.t,
+      hasTranslation: i18n.global.te,
     })
 
-    if (result.isSuccess !== false) {
-      await refreshVisibleEvents()
+    try {
+      await currentPersonStore.fetchCurrentPerson()
+      if (!currentPersonStore.person) {
+        return
+      }
+
+      const result = await ApiScriptService.runClient(
+        [eventContextMenu.value.item],
+        entityEvent.value,
+        currentPersonStore.person,
+        scriptButton.name,
+        scriptButton.parameter,
+      )
+
+      await handleScriptResultClient(result, {
+        entity: scriptEntity,
+        pushMessage,
+      })
+
+      if (result.isSuccess !== false) {
+        await refreshVisibleEvents()
+      }
+    } catch {
+      // API errors are already routed through the shared message center.
+    } finally {
+      runningScriptButtonKeys.delete(executionKey)
     }
   }
 

@@ -1,0 +1,38 @@
+[
+  {
+    "entity": "global",
+    "property": "scriptAction",
+    "de": "Skriptaktion",
+    "en": "Script action"
+  },
+  {
+    "entity": "global",
+    "property": "scriptActionStarted",
+    "de": "Aktion gestartet",
+    "en": "Action started"
+  },
+  {
+    "entity": "global",
+    "property": "scriptActionStartedDescription",
+    "de": "\"{action}\" wird ausgeführt. Das kann einen Moment dauern.",
+    "en": "\"{action}\" is running. This may take a moment."
+  },
+  {
+    "entity": "global",
+    "property": "scriptActionStartedDescriptionWithCount",
+    "de": "\"{action}\" wird für {count} Datensätze ausgeführt. Das kann einen Moment dauern.",
+    "en": "\"{action}\" is running for {count} records. This may take a moment."
+  },
+  {
+    "entity": "global",
+    "property": "scriptActionAlreadyRunning",
+    "de": "Aktion läuft bereits",
+    "en": "Action already running"
+  },
+  {
+    "entity": "global",
+    "property": "scriptActionAlreadyRunningDescription",
+    "de": "\"{action}\" wurde bereits gestartet. Bitte warte auf das Ergebnis.",
+    "en": "\"{action}\" is already running. Please wait for the result."
+  }
+]
