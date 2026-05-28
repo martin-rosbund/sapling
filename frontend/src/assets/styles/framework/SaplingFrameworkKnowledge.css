@@ -33,9 +33,14 @@
 
 .sapling-knowledge-sidebar__search-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
+  gap: var(--sapling-gap-sm);
   padding-bottom: var(--sapling-gap-xl);
+}
+
+.sapling-knowledge-sidebar__filter-toggle {
+  display: none;
 }
 
 .sapling-knowledge-sidebar__filter-grid {
@@ -246,17 +251,61 @@
   .sapling-knowledge-reader__scroll {
     overflow: visible;
   }
+
+  .sapling-knowledge-sidebar__search-row {
+    padding-bottom: 0;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .sapling-knowledge-sidebar__filter-toggle {
+    display: inline-flex;
+  }
+
+  .sapling-knowledge-sidebar__filter-grid {
+    display: none;
+    margin-top: var(--sapling-space-md);
+  }
+
+  .sapling-knowledge-sidebar__filter-grid--open {
+    display: grid;
+  }
+
+  .sapling-knowledge-sidebar__article-list {
+    display: flex;
+    gap: var(--sapling-gap-sm);
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 var(--sapling-space-panel-md) var(--sapling-space-panel-md);
+    scroll-padding-inline: var(--sapling-space-panel-md);
+    scroll-snap-type: x proximity;
+  }
+
+  .sapling-knowledge-sidebar__article {
+    flex: 0 0 min(82vw, 360px);
+    border: 1px solid var(--sapling-surface-border-muted);
+    border-radius: var(--sapling-radius-sm);
+    scroll-snap-align: start;
+  }
+
+  .sapling-knowledge-sidebar__article--active {
+    box-shadow: inset 0 4px 0 rgb(var(--v-theme-primary));
+  }
 }
 
 @media (max-width: 640px) {
   .sapling-knowledge-sidebar__controls,
   .sapling-knowledge-sidebar__header,
   .sapling-knowledge-sidebar__article {
-    padding: var(--sapling-space-panel-sm);
+    padding: var(--sapling-space-panel-md);
   }
 
-  .sapling-knowledge-sidebar__search-row {
-    grid-template-columns: minmax(0, 1fr) auto;
+  .sapling-knowledge-sidebar__filter-toggle {
+    min-width: var(--sapling-control-size-2xl);
+    padding-inline: var(--sapling-space-sm);
+  }
+
+  .sapling-knowledge-sidebar__filter-toggle .v-btn__content {
+    display: none;
   }
 
   .sapling-knowledge-reader__scroll {

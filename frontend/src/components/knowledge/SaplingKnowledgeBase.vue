@@ -30,9 +30,30 @@
               clearable
               hide-details
             />
+
+            <v-btn
+              class="sapling-knowledge-sidebar__filter-toggle"
+              :append-icon="isFilterPanelOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+              :aria-label="t('filter.filter')"
+              :aria-expanded="isFilterPanelOpen"
+              :title="t('filter.filter')"
+              aria-controls="sapling-knowledge-filter-grid"
+              color="primary"
+              prepend-icon="mdi-filter-variant"
+              variant="tonal"
+              @click="isFilterPanelOpen = !isFilterPanelOpen"
+            >
+              {{ t('filter.filter') }}
+            </v-btn>
           </div>
 
-          <div class="sapling-knowledge-sidebar__filter-grid">
+          <div
+            id="sapling-knowledge-filter-grid"
+            class="sapling-knowledge-sidebar__filter-grid"
+            :class="{
+              'sapling-knowledge-sidebar__filter-grid--open': isFilterPanelOpen,
+            }"
+          >
             <v-select
               v-model="selectedProduct"
               :items="productItems"
@@ -84,9 +105,6 @@
             <p class="sapling-eyebrow">{{ t('navigation.knowledgeBase') }}</p>
             <h2>{{ t('knowledgeBase.filteredCount', { count: filteredArticles.length }) }}</h2>
           </div>
-          <v-chip color="success" size="small" variant="tonal">
-            {{ publishedArticles.length }}
-          </v-chip>
         </header>
 
         <div
@@ -270,6 +288,7 @@ const { t, locale } = useI18n()
 const { isLoading: isTranslationLoading } = useTranslationLoader(
   'global',
   'navigation',
+  'filter',
   'knowledgeArticle',
   'knowledgeBase',
 )
@@ -283,6 +302,7 @@ const selectedCategory = ref(ALL_FILTER_VALUE)
 const selectedVisibility = ref(ALL_FILTER_VALUE)
 const selectedAuthor = ref(ALL_FILTER_VALUE)
 const selectedHandle = ref<string | null>(null)
+const isFilterPanelOpen = ref(false)
 
 const emptyMarkdown = computed(() => t('global.notAvailable'))
 const isPageLoading = computed(() => isLoading.value || isTranslationLoading.value)
