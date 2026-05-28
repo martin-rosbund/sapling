@@ -27,6 +27,15 @@ type ScriptMessageParameter = {
   technical?: unknown
 }
 
+type AiChatPromptDetail = {
+  prompt: string
+  autoSend: boolean
+  newChat: boolean
+  title?: string
+}
+
+export const SAPLING_AI_CHAT_PROMPT_EVENT = 'sapling-ai-chat-prompt'
+
 export async function handleScriptResultClient(
   result: ScriptResultClient,
   options: {
@@ -75,21 +84,29 @@ function showResultMessage(
 }
 
 async function openResultUrl(url: string, router?: Router) {
-  if (!url) {
+  const normalizedUrl = url.trim()
+
+  if (!normalizedUrl) {
     return
   }
 
-  if (url.startsWith('http://') || url.startsWith('https://')) {
-    window.open(url, '_blank')
+  const aiChatPrompt = parseAiChatPromptUrl(normalizedUrl)
+  if (aiChatPrompt) {
+    window.dispatchEvent(new CustomEvent(SAPLING_AI_CHAT_PROMPT_EVENT, { detail: aiChatPrompt }))
+    return
+  }
+
+  if (normalizedUrl.startsWith('http://') || normalizedUrl.startsWith('https://')) {
+    window.open(normalizedUrl, '_blank')
     return
   }
 
   if (router) {
-    await router.push(url)
+    await router.push(normalizedUrl)
     return
   }
 
-  window.open(url, '_self')
+  window.open(normalizedUrl, '_self')
 }
 
 function parseMessageParameter(parameter: string): ScriptMessageParameter {
@@ -104,6 +121,41 @@ function parseMessageParameter(parameter: string): ScriptMessageParameter {
   }
 
   return { message: parameter }
+}
+
+function parseAiChatPromptUrl(url: string): AiChatPromptDetail | null {
+  if (!url.startsWith('sapling-ai-chat://')) {
+    return null
+  }
+
+  try {
+    const parsedUrl = new URL(url)
+    const prompt =
+      parsedUrl.searchParams.get('prompt')?.trim() ||
+      parsedUrl.searchParams.get('content')?.trim() ||
+      ''
+
+    if (!prompt) {
+      return null
+    }
+
+    return {
+      prompt,
+      autoSend: parseBooleanSearchParam(parsedUrl.searchParams.get('autoSend'), true),
+      newChat: parseBooleanSearchParam(parsedUrl.searchParams.get('newChat'), true),
+      title: parsedUrl.searchParams.get('title')?.trim() || undefined,
+    }
+  } catch {
+    return null
+  }
+}
+
+function parseBooleanSearchParam(value: string | null, fallback: boolean): boolean {
+  if (value == null || value.trim() === '') {
+    return fallback
+  }
+
+  return ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
 }
 
 export function buildScriptButtonExecutionKey(

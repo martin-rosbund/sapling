@@ -136,6 +136,14 @@ import ApiAiService, { type AiChatStreamEvent } from '@/services/api.ai.service'
 import { useSaplingAiChat } from '@/composables/system/useSaplingAiChat'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
+import { SAPLING_AI_CHAT_PROMPT_EVENT } from '@/utils/saplingScriptResultUtil'
+
+interface SaplingAiChatPromptEventDetail {
+  prompt?: string
+  autoSend?: boolean
+  newChat?: boolean
+  title?: string
+}
 
 const route = useRoute()
 const currentPersonStore = useCurrentPersonStore()
@@ -410,6 +418,7 @@ watch(
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
+  window.addEventListener(SAPLING_AI_CHAT_PROMPT_EVENT, handleAiChatPromptEvent as EventListener)
   streamingClockTimer = window.setInterval(() => {
     streamingClock.value = Date.now()
   }, 1000)
@@ -417,6 +426,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
+  window.removeEventListener(SAPLING_AI_CHAT_PROMPT_EVENT, handleAiChatPromptEvent as EventListener)
   streamAbortController.value?.abort()
   cancelVoiceInput()
   stopSpeechPlayback()
@@ -429,6 +439,37 @@ onUnmounted(() => {
 function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'Escape') {
     closePanel()
+  }
+}
+
+function handleAiChatPromptEvent(event: CustomEvent<SaplingAiChatPromptEventDetail>) {
+  void openPromptFromScriptButton(event.detail)
+}
+
+async function openPromptFromScriptButton(detail?: SaplingAiChatPromptEventDetail) {
+  const prompt = detail?.prompt?.trim()
+
+  if (!prompt) {
+    return
+  }
+
+  if (!(await ensureSaplingAiChatAccess())) {
+    messageCenter.pushMessage('warning', 'global.permissionDenied', '', 'aiChat')
+    return
+  }
+
+  isOpen.value = true
+  await ensureChatInitialized()
+
+  if (detail?.newChat !== false) {
+    startNewChat()
+  }
+
+  draftMessage.value = prompt
+
+  if (detail?.autoSend !== false) {
+    await nextTick()
+    await sendMessage()
   }
 }
 

@@ -1,0 +1,14 @@
+[
+  {
+    "name": "aiSuggestSimilarEstimates",
+    "title": "effortEstimate.scriptAiSuggestSimilarEstimates",
+    "entity": "effortEstimate",
+    "isMultiSelect": false
+  },
+  {
+    "name": "aiFindOpportunityReferences",
+    "title": "salesOpportunity.scriptAiFindOpportunityReferences",
+    "entity": "salesOpportunity",
+    "isMultiSelect": false
+  }
+]
