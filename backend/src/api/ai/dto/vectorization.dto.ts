@@ -4,7 +4,7 @@ import { IsString, MaxLength } from 'class-validator';
 export class VectorizeEntityDto {
   @ApiProperty({
     description:
-      'Registered Sapling entity handle that should be vectorized. Supported: ticket, event, salesOpportunity, effortEstimate, effortEstimatePosition.',
+      'Registered Sapling entity handle that should be vectorized. Supported: ticket, event, salesOpportunity, effortEstimate, effortEstimatePosition, knowledgeArticle.',
   })
   @IsString()
   @MaxLength(64)

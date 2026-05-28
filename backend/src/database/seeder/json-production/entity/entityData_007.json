@@ -1,0 +1,38 @@
+[
+  {
+    "handle": "knowledgeArticle",
+    "canShow": true,
+    "icon": "mdi-lightbulb-on-outline",
+    "group": "knowledge",
+    "order": 10,
+    "canInsert": true,
+    "canUpdate": true,
+    "canDelete": true
+  },
+  {
+    "handle": "knowledgeArticleCategory",
+    "canShow": true,
+    "icon": "mdi-shape-outline",
+    "group": "knowledge",
+    "order": 20,
+    "canInsert": true,
+    "canUpdate": true,
+    "canDelete": true
+  },
+  {
+    "handle": "knowledgeArticleStatus",
+    "canShow": true,
+    "icon": "mdi-progress-check",
+    "group": "knowledge",
+    "order": 30,
+    "canUpdate": true
+  },
+  {
+    "handle": "knowledgeArticleVisibility",
+    "canShow": true,
+    "icon": "mdi-eye-outline",
+    "group": "knowledge",
+    "order": 40,
+    "canUpdate": true
+  }
+]

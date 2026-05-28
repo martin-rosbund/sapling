@@ -1,0 +1,15 @@
+[
+  { "entity": "knowledgeArticle", "route": "table/knowledgeArticle" },
+  {
+    "entity": "knowledgeArticleCategory",
+    "route": "table/knowledgeArticleCategory"
+  },
+  {
+    "entity": "knowledgeArticleStatus",
+    "route": "table/knowledgeArticleStatus"
+  },
+  {
+    "entity": "knowledgeArticleVisibility",
+    "route": "table/knowledgeArticleVisibility"
+  }
+]

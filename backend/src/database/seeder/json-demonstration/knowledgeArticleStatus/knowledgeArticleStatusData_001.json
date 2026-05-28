@@ -1,0 +1,38 @@
+[
+  {
+    "handle": "draft",
+    "description": "Entwurf",
+    "color": "#607D8B",
+    "icon": "mdi-file-edit-outline",
+    "sortOrder": 10,
+    "isPublished": false,
+    "isArchived": false
+  },
+  {
+    "handle": "review",
+    "description": "In Pruefung",
+    "color": "#FF9800",
+    "icon": "mdi-file-search-outline",
+    "sortOrder": 20,
+    "isPublished": false,
+    "isArchived": false
+  },
+  {
+    "handle": "published",
+    "description": "Veroeffentlicht",
+    "color": "#4CAF50",
+    "icon": "mdi-check-decagram-outline",
+    "sortOrder": 30,
+    "isPublished": true,
+    "isArchived": false
+  },
+  {
+    "handle": "archived",
+    "description": "Archiviert",
+    "color": "#9E9E9E",
+    "icon": "mdi-archive-outline",
+    "sortOrder": 40,
+    "isPublished": false,
+    "isArchived": true
+  }
+]

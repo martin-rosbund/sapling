@@ -98,6 +98,44 @@ export function buildNavigationLink(
     };
   }
 
+  if (toolCall.toolName === 'knowledge_search') {
+    const resultItems = Array.isArray(rawResult?.results)
+      ? rawResult.results
+      : [];
+    const firstEntityHandle = resultItems
+      .map((item) => asNonEmptyString(asRecord(item)?.entityHandle))
+      .find((value): value is string => !!value);
+
+    if (!firstEntityHandle) {
+      return null;
+    }
+
+    const resultHandles = resultItems
+      .filter(
+        (item) =>
+          asNonEmptyString(asRecord(item)?.entityHandle) === firstEntityHandle,
+      )
+      .map((item) => asRecord(item)?.handle)
+      .filter(
+        (value): value is string | number =>
+          typeof value === 'string' || typeof value === 'number',
+      );
+
+    if (resultHandles.length === 0) {
+      return null;
+    }
+
+    return {
+      path: buildEntityTablePath(firstEntityHandle, {
+        handle: {
+          $in: resultHandles,
+        },
+      }),
+      entityHandle: firstEntityHandle,
+      kind: 'list',
+    };
+  }
+
   if (!entityHandle) {
     return null;
   }

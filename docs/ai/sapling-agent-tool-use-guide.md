@@ -51,6 +51,7 @@ The internal server currently registers these tools:
 | `generic_timeline` | Load record-centric related activity by month. |
 | `ticket_search` | Keyword search across ticket text fields. |
 | `semantic_search` | Vector search across indexed long-text entities. |
+| `knowledge_search` | Combined semantic knowledge search across articles, tickets, estimates, estimate positions, and opportunities. |
 | `generic_create` | Create a generic record. |
 | `generic_update` | Update a generic record. |
 | `generic_delete` | Delete a generic record. |
@@ -88,6 +89,12 @@ Use `semantic_search` when:
 - wording may differ from stored records
 - the relevant content is in long markdown/text fields
 
+Use `knowledge_search` when:
+
+- the user asks for a known solution, troubleshooting guidance, reusable implementation knowledge, estimation patterns, or sales arguments
+- the relevant source could be a curated knowledge article, ticket, effort estimate, estimate position, or sales opportunity
+- you want one permission-filtered search before drilling into a specific record
+
 Supported semantic entities currently include:
 
 - `ticket`
@@ -95,6 +102,7 @@ Supported semantic entities currently include:
 - `salesOpportunity`
 - `effortEstimate`
 - `effortEstimatePosition`
+- `knowledgeArticle`
 
 Use `generic_list` when:
 
@@ -244,4 +252,3 @@ Agents should not infer that missing records do not exist globally. A missing re
 - Mutations are small and user-intended.
 - The final answer mentions what changed or what was found.
 - No secrets, token values, or security fields are exposed.
-

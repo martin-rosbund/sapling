@@ -6,6 +6,7 @@ import { EventItem } from '../../entity/EventItem';
 import { SalesOpportunityItem } from '../../entity/SalesOpportunityItem';
 import { EffortEstimateItem } from '../../entity/EffortEstimateItem';
 import { EffortEstimatePositionItem } from '../../entity/EffortEstimatePositionItem';
+import { KnowledgeArticleItem } from '../../entity/KnowledgeArticleItem';
 import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import { GenericService } from '../generic/generic.service';
 import {
@@ -360,6 +361,8 @@ export class AiVectorService {
         return this.buildEffortEstimateVectorDocuments(embeddingModel);
       case 'effortEstimatePosition':
         return this.buildEffortEstimatePositionVectorDocuments(embeddingModel);
+      case 'knowledgeArticle':
+        return this.buildKnowledgeArticleVectorDocuments(embeddingModel);
       default:
         throw new BadRequestException('ai.vectorizationUnsupportedEntity');
     }
@@ -681,6 +684,94 @@ export class AiVectorService {
     return documents;
   }
 
+  private async buildKnowledgeArticleVectorDocuments(
+    embeddingModel: AiProviderModelItem,
+  ): Promise<AiVectorDocumentDraft[]> {
+    const articles = await this.em.find(
+      KnowledgeArticleItem,
+      {},
+      {
+        populate: getVectorSearchRelations('knowledgeArticle') as never[],
+        orderBy: { updatedAt: 'DESC' },
+      },
+    );
+    const documents: AiVectorDocumentDraft[] = [];
+
+    for (const article of articles) {
+      if (article.handle == null) {
+        continue;
+      }
+
+      const sourceRecordHandle = String(article.handle);
+      const title = article.title?.trim() || null;
+      const metadata = {
+        knowledgeArticleHandle: article.handle,
+        title,
+        status: relationLabel(article.status, 'description', 'handle'),
+        visibility: relationLabel(
+          article.visibility,
+          'description',
+          'handle',
+        ),
+        category: relationLabel(article.category, 'title', 'handle'),
+        tags: article.tags?.trim() || null,
+        publishedAt: formatVectorDate(article.publishedAt),
+        validUntil: formatVectorDate(article.validUntil),
+        sourceTicket: relationLabel(
+          article.sourceTicket,
+          'number',
+          'title',
+          'handle',
+        ),
+        sourceSalesOpportunity: relationLabel(
+          article.sourceSalesOpportunity,
+          'title',
+          'handle',
+        ),
+        sourceEffortEstimate: relationLabel(
+          article.sourceEffortEstimate,
+          'title',
+          'handle',
+        ),
+        authorPerson: personRelationLabel(article.authorPerson),
+        reviewerPerson: personRelationLabel(article.reviewerPerson),
+      };
+
+      documents.push(
+        ...createVectorSectionDocuments(
+          sourceRecordHandle,
+          'overview',
+          buildKnowledgeArticleSectionContent(article, 'overview'),
+          title,
+          metadata,
+          embeddingModel,
+        ),
+      );
+      documents.push(
+        ...createVectorSectionDocuments(
+          sourceRecordHandle,
+          'problem',
+          buildKnowledgeArticleSectionContent(article, 'problem'),
+          title,
+          metadata,
+          embeddingModel,
+        ),
+      );
+      documents.push(
+        ...createVectorSectionDocuments(
+          sourceRecordHandle,
+          'solution',
+          buildKnowledgeArticleSectionContent(article, 'solution'),
+          title,
+          metadata,
+          embeddingModel,
+        ),
+      );
+    }
+
+    return documents;
+  }
+
   private async embedTexts(
     texts: string[],
     target: AiEmbeddingTarget,
@@ -967,6 +1058,70 @@ function buildEffortEstimatePositionSectionContent(
 
   lines.push('Section: Offer text');
   lines.push(position.offerTextMarkdown.trim());
+  return lines.join('\n');
+}
+
+function buildKnowledgeArticleSectionContent(
+  article: KnowledgeArticleItem,
+  section: 'overview' | 'problem' | 'solution',
+): string {
+  const lines = compactVectorLines([
+    `Knowledge article: ${article.handle ?? ''}`.trim(),
+    article.title?.trim() ? `Title: ${article.title.trim()}` : null,
+    vectorLine('Status', relationLabel(article.status, 'description', 'handle')),
+    vectorLine(
+      'Visibility',
+      relationLabel(article.visibility, 'description', 'handle'),
+    ),
+    vectorLine('Category', relationLabel(article.category, 'title', 'handle')),
+    article.tags?.trim() ? `Tags: ${article.tags.trim()}` : null,
+    vectorLine('Published at', formatVectorDate(article.publishedAt)),
+    vectorLine('Valid until', formatVectorDate(article.validUntil)),
+    vectorLine(
+      'Source ticket',
+      relationLabel(article.sourceTicket, 'number', 'title', 'handle'),
+    ),
+    vectorLine(
+      'Source sales opportunity',
+      relationLabel(article.sourceSalesOpportunity, 'title', 'handle'),
+    ),
+    vectorLine(
+      'Source effort estimate',
+      relationLabel(article.sourceEffortEstimate, 'title', 'handle'),
+    ),
+    vectorLine('Author', personRelationLabel(article.authorPerson)),
+    vectorLine('Reviewer', personRelationLabel(article.reviewerPerson)),
+  ]);
+
+  if (section === 'overview') {
+    lines.push('Section: Overview');
+    if (article.summary?.trim()) {
+      lines.push(`Summary: ${summarizeVectorText(article.summary)}`);
+    }
+    if (article.problemMarkdown?.trim()) {
+      lines.push(
+        `Problem summary: ${summarizeVectorText(article.problemMarkdown)}`,
+      );
+    }
+    if (article.solutionMarkdown?.trim()) {
+      lines.push(
+        `Solution summary: ${summarizeVectorText(article.solutionMarkdown)}`,
+      );
+    }
+    return lines.join('\n');
+  }
+
+  const body =
+    section === 'problem'
+      ? (article.problemMarkdown?.trim() ?? '')
+      : (article.solutionMarkdown?.trim() ?? '');
+
+  if (!body) {
+    return '';
+  }
+
+  lines.push(`Section: ${section === 'problem' ? 'Problem' : 'Solution'}`);
+  lines.push(body);
   return lines.join('\n');
 }
 

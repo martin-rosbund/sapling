@@ -234,6 +234,7 @@ const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoad
   'salesOpportunity',
   'effortEstimate',
   'effortEstimatePosition',
+  'knowledgeArticle',
 )
 const {
   isOpen,
@@ -293,6 +294,10 @@ const entityOptions = computed<SelectOption[]>(() => [
     label: t('aiVectorization.entityEffortEstimatePosition'),
     value: 'effortEstimatePosition',
   },
+  {
+    label: t('aiVectorization.entityKnowledgeArticle'),
+    value: 'knowledgeArticle',
+  },
 ])
 
 const indexedFieldLabels = computed(() => {
@@ -323,6 +328,16 @@ const indexedFieldLabels = computed(() => {
       'effortEstimatePosition.title',
       'effortEstimatePosition.offerTextMarkdown',
       'effortEstimatePosition.estimatedHours',
+    ],
+    knowledgeArticle: [
+      'knowledgeArticle.title',
+      'knowledgeArticle.summary',
+      'knowledgeArticle.problemMarkdown',
+      'knowledgeArticle.solutionMarkdown',
+      'knowledgeArticle.status',
+      'knowledgeArticle.visibility',
+      'knowledgeArticle.category',
+      'knowledgeArticle.tags',
     ],
   }
 

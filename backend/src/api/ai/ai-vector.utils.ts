@@ -10,6 +10,7 @@ export const VECTOR_ENTITY_HANDLES = [
   'salesOpportunity',
   'effortEstimate',
   'effortEstimatePosition',
+  'knowledgeArticle',
 ] as const;
 
 export type VectorizableEntityHandle = (typeof VECTOR_ENTITY_HANDLES)[number];
@@ -23,6 +24,7 @@ export const VECTOR_SEARCHABLE_SECTIONS: Record<
   salesOpportunity: ['overview', 'description', 'painPoints'],
   effortEstimate: ['overview', 'requirements'],
   effortEstimatePosition: ['overview', 'offerText'],
+  knowledgeArticle: ['overview', 'problem', 'solution'],
 };
 
 export const VECTOR_SEARCH_RELATIONS: Record<
@@ -67,6 +69,16 @@ export const VECTOR_SEARCH_RELATIONS: Record<
     'salesOpportunity',
   ],
   effortEstimatePosition: ['estimate', 'estimate.status', 'template'],
+  knowledgeArticle: [
+    'status',
+    'visibility',
+    'category',
+    'sourceTicket',
+    'sourceSalesOpportunity',
+    'sourceEffortEstimate',
+    'authorPerson',
+    'reviewerPerson',
+  ],
 };
 
 export const VECTOR_SEARCH_USAGE_HINTS: Record<
@@ -88,6 +100,9 @@ export const VECTOR_SEARCH_USAGE_HINTS: Record<
   ],
   effortEstimatePosition: [
     'Use semantic search for offer text, implementation tasks, and estimate position scope.',
+  ],
+  knowledgeArticle: [
+    'Use semantic search for curated knowledge-base articles, reusable fixes, procedures, estimation guidance, and sales enablement notes.',
   ],
 };
 

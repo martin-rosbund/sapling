@@ -355,6 +355,8 @@ describe('AiService', () => {
     expect(instruction).toContain(
       'indexed long-text fields on event, salesOpportunity, effortEstimate, and effortEstimatePosition',
     );
+    expect(instruction).toContain('use knowledge_search first');
+    expect(instruction).toContain('knowledgeArticle');
     expect(instruction).toContain('Use ticket_search for exact ticket numbers');
     expect(instruction).toContain(
       'Prefer ticket_search with searchMode solution',

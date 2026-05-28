@@ -84,6 +84,10 @@ import { EffortEstimateItem } from '../../entity/EffortEstimateItem';
 import { EffortEstimatePositionItem } from '../../entity/EffortEstimatePositionItem';
 import { EffortEstimatePositionTemplateItem } from '../../entity/EffortEstimatePositionTemplateItem';
 import { EffortEstimateStatusItem } from '../../entity/EffortEstimateStatusItem';
+import { KnowledgeArticleItem } from '../../entity/KnowledgeArticleItem';
+import { KnowledgeArticleCategoryItem } from '../../entity/KnowledgeArticleCategoryItem';
+import { KnowledgeArticleStatusItem } from '../../entity/KnowledgeArticleStatusItem';
+import { KnowledgeArticleVisibilityItem } from '../../entity/KnowledgeArticleVisibilityItem';
 import { RoleStarterSeeder } from './RoleStarterSeeder';
 import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
 import type { EntityName } from '@mikro-orm/core';
@@ -170,6 +174,10 @@ const SEED_ORDER: Array<EntityName<object> | (new () => Seeder)> = [
   EffortEstimatePositionTemplateItem,
   EffortEstimateItem,
   EffortEstimatePositionItem,
+  KnowledgeArticleStatusItem,
+  KnowledgeArticleVisibilityItem,
+  KnowledgeArticleCategoryItem,
+  KnowledgeArticleItem,
   DocumentTypeItem,
   EmailTemplateItem,
   EMailListItem,

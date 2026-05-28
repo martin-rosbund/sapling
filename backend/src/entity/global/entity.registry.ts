@@ -106,6 +106,10 @@ import { EffortEstimateItem } from '../EffortEstimateItem';
 import { EffortEstimatePositionItem } from '../EffortEstimatePositionItem';
 import { EffortEstimatePositionTemplateItem } from '../EffortEstimatePositionTemplateItem';
 import { EffortEstimateStatusItem } from '../EffortEstimateStatusItem';
+import { KnowledgeArticleItem } from '../KnowledgeArticleItem';
+import { KnowledgeArticleCategoryItem } from '../KnowledgeArticleCategoryItem';
+import { KnowledgeArticleStatusItem } from '../KnowledgeArticleStatusItem';
+import { KnowledgeArticleVisibilityItem } from '../KnowledgeArticleVisibilityItem';
 
 /**
  * @file entity.registry.ts
@@ -160,6 +164,10 @@ const ENTITY_REGISTRY_ENTRIES: { name: string; class: any }[] = [
     class: EffortEstimatePositionTemplateItem,
   },
   { name: 'effortEstimateStatus', class: EffortEstimateStatusItem },
+  { name: 'knowledgeArticle', class: KnowledgeArticleItem },
+  { name: 'knowledgeArticleCategory', class: KnowledgeArticleCategoryItem },
+  { name: 'knowledgeArticleStatus', class: KnowledgeArticleStatusItem },
+  { name: 'knowledgeArticleVisibility', class: KnowledgeArticleVisibilityItem },
   { name: 'changeLogAction', class: ChangeLogActionItem },
   { name: 'changeLog', class: ChangeLogItem },
   { name: 'changeLogDetail', class: ChangeLogDetailItem },

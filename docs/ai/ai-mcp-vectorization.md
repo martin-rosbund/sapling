@@ -190,6 +190,7 @@ event
 salesOpportunity
 effortEstimate
 effortEstimatePosition
+knowledgeArticle
 ```
 
 Sections:
@@ -201,6 +202,7 @@ Sections:
 | `salesOpportunity` | `overview`, `description`, `painPoints` |
 | `effortEstimate` | `overview`, `requirements` |
 | `effortEstimatePosition` | `overview`, `offerText` |
+| `knowledgeArticle` | `overview`, `problem`, `solution` |
 
 ## Running Vectorization
 
@@ -248,6 +250,7 @@ The matching vector index must exist before `semantic_search` returns semantic r
 Use:
 
 - `ticket_search` for exact ticket numbers, external numbers, strict keywords, known fix lookup
+- `knowledge_search` for broad knowledge-base questions across curated articles, tickets, effort estimates, estimate positions, and sales opportunities
 - `semantic_search` for natural-language long-text questions
 - `entity_schema` before generic create/update/filter on unfamiliar entities
 - `generic_get` when the exact handle is known

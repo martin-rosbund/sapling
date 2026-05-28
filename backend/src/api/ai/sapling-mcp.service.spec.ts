@@ -33,6 +33,7 @@ jest.mock('../../entity/global/entity.registry', () => ({
     'salesOpportunity',
     'effortEstimate',
     'effortEstimatePosition',
+    'knowledgeArticle',
   ],
 }));
 
@@ -410,6 +411,78 @@ describe('SaplingMcpService', () => {
       entityHandle: 'effortEstimate',
       indexed: true,
       results: [],
+    });
+  });
+
+  it('combines readable sources for knowledge_search', async () => {
+    const aiService = {
+      searchVectorDocuments: jest
+        .fn<(...args: unknown[]) => Promise<unknown>>()
+        .mockImplementation((entityHandle: unknown) =>
+          Promise.resolve({
+            entityHandle,
+            indexed: true,
+            results: [
+              {
+                handle: entityHandle === 'knowledgeArticle' ? 7 : 42,
+                score: entityHandle === 'knowledgeArticle' ? 0.91 : 0.82,
+                record: { title: `${String(entityHandle)} Treffer` },
+                matches: [],
+              },
+            ],
+          }),
+        ),
+    };
+    const permissionService = {
+      assertEntityPermission: jest
+        .fn<(...args: unknown[]) => Promise<void>>()
+        .mockResolvedValue(undefined),
+    };
+    const service = createService({ aiService, permissionService });
+    const user = { handle: 1 } as never;
+
+    const result = await service.executeTool(
+      'knowledge_search',
+      {
+        query: 'Sage startet nach Update nicht',
+        entityHandles: ['knowledgeArticle', 'ticket'],
+        limit: 5,
+      },
+      user,
+    );
+
+    expect(permissionService.assertEntityPermission).toHaveBeenCalledWith(
+      user,
+      'knowledgeArticle',
+      'allowRead',
+    );
+    expect(aiService.searchVectorDocuments).toHaveBeenCalledWith(
+      'knowledgeArticle',
+      'Sage startet nach Update nicht',
+      user,
+      5,
+    );
+    expect(aiService.searchVectorDocuments).toHaveBeenCalledWith(
+      'ticket',
+      'Sage startet nach Update nicht',
+      user,
+      5,
+    );
+    expect(result.rawResult).toMatchObject({
+      query: 'Sage startet nach Update nicht',
+      indexedEntityHandles: ['knowledgeArticle', 'ticket'],
+      results: [
+        {
+          entityHandle: 'knowledgeArticle',
+          handle: 7,
+          score: 0.91,
+        },
+        {
+          entityHandle: 'ticket',
+          handle: 42,
+          score: 0.82,
+        },
+      ],
     });
   });
 });

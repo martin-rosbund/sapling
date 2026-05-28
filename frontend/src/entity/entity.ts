@@ -1215,6 +1215,124 @@ export interface EffortEstimatePositionTemplateItem extends SaplingGenericItem {
 }
 
 /**
+ * Represents a curated knowledge-base article.
+ */
+export interface KnowledgeArticleItem extends SaplingGenericItem {
+  /** Unique identifier for the article */
+  handle?: number | null
+  /** Article title */
+  title: string
+  /** Current lifecycle status */
+  status: KnowledgeArticleStatusItem | string
+  /** Intended article visibility */
+  visibility: KnowledgeArticleVisibilityItem | string
+  /** Optional category */
+  category?: KnowledgeArticleCategoryItem | string | null
+  /** Short summary */
+  summary?: string | null
+  /** Comma-separated tags */
+  tags?: string | null
+  /** Problem or question text written in markdown */
+  problemMarkdown?: string | null
+  /** Solution or answer text written in markdown */
+  solutionMarkdown?: string | null
+  /** Whether the article is active */
+  isActive?: boolean
+  /** Publication timestamp */
+  publishedAt?: Date | null
+  /** Optional validity date */
+  validUntil?: Date | null
+  /** Source ticket */
+  sourceTicket?: TicketItem | number | null
+  /** Source sales opportunity */
+  sourceSalesOpportunity?: SalesOpportunityItem | number | null
+  /** Source effort estimate */
+  sourceEffortEstimate?: EffortEstimateItem | number | null
+  /** Author */
+  authorPerson?: PersonItem | number | null
+  /** Reviewer */
+  reviewerPerson?: PersonItem | number | null
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a knowledge article status.
+ */
+export interface KnowledgeArticleStatusItem extends SaplingGenericItem {
+  /** Unique status key */
+  handle: string
+  /** Display description */
+  description: string
+  /** UI color */
+  color: string
+  /** UI icon */
+  icon?: string | null
+  /** Sort order */
+  sortOrder?: number | null
+  /** Whether this status means published */
+  isPublished?: boolean
+  /** Whether this status means archived */
+  isArchived?: boolean
+  /** Articles in this status */
+  articles?: KnowledgeArticleItem[]
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a knowledge article visibility.
+ */
+export interface KnowledgeArticleVisibilityItem extends SaplingGenericItem {
+  /** Unique visibility key */
+  handle: string
+  /** Display description */
+  description: string
+  /** UI color */
+  color: string
+  /** UI icon */
+  icon?: string | null
+  /** Sort order */
+  sortOrder?: number | null
+  /** Articles with this visibility */
+  articles?: KnowledgeArticleItem[]
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a knowledge article category.
+ */
+export interface KnowledgeArticleCategoryItem extends SaplingGenericItem {
+  /** Unique category key */
+  handle: string
+  /** Display title */
+  title: string
+  /** Optional description */
+  description?: string | null
+  /** UI icon */
+  icon: string
+  /** UI color */
+  color: string
+  /** Sort order */
+  sortOrder?: number | null
+  /** Whether the category is active */
+  isActive?: boolean
+  /** Articles in this category */
+  articles?: KnowledgeArticleItem[]
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
  * Represents a ticket entity.
  */
 export interface TicketItem extends SaplingGenericItem {

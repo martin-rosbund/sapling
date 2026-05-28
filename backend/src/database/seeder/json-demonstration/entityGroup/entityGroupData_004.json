@@ -1,0 +1,9 @@
+[
+  {
+    "handle": "knowledge",
+    "icon": "mdi-lightbulb-on-outline",
+    "isExpanded": false,
+    "sortOrder": 30,
+    "parent": "ai"
+  }
+]

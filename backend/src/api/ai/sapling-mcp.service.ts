@@ -29,6 +29,13 @@ type SaplingMcpSession = {
 export class SaplingMcpService {
   private readonly transports = new Map<string, SaplingMcpSession>();
   private readonly internalServerName = 'sapling';
+  private readonly defaultKnowledgeSearchEntityHandles = [
+    'knowledgeArticle',
+    'ticket',
+    'effortEstimate',
+    'effortEstimatePosition',
+    'salesOpportunity',
+  ];
 
   constructor(
     private readonly genericService: GenericService,
@@ -90,6 +97,9 @@ export class SaplingMcpService {
           break;
         case 'semantic_search':
           payload = await this.executeSemanticSearch(args, user);
+          break;
+        case 'knowledge_search':
+          payload = await this.executeKnowledgeSearch(args, user);
           break;
         case 'generic_create':
           payload = await this.executeGenericCreate(args, user);
@@ -750,6 +760,147 @@ export class SaplingMcpService {
       ...result,
       usageHints: [...SAPLING_MCP_USAGE_HINTS.semanticSearch],
     };
+  }
+
+  private async executeKnowledgeSearch(
+    args: Record<string, unknown>,
+    user: PersonItem,
+  ): Promise<unknown> {
+    const query = this.requireStringArg(args.query, 'query');
+    const limit = Math.min(this.asPositiveNumber(args.limit) ?? 8, 30);
+    const requestedEntityHandles = this.asStringArray(args.entityHandles);
+    const entityHandles = this.normalizeKnowledgeSearchEntityHandles(
+      requestedEntityHandles,
+    );
+    const perEntityLimit = Math.min(Math.max(limit, 5), 20);
+    const skippedEntityHandles: string[] = [];
+    const unindexedEntityHandles: string[] = [];
+    const indexedEntityHandles: string[] = [];
+    const sourceResults: unknown[] = [];
+    const errors: Array<{ entityHandle: string; error: string }> = [];
+    const combinedResults: Array<{
+      entityHandle: string;
+      handle: string | number | null;
+      score: number;
+      record: unknown;
+      matches: unknown[];
+    }> = [];
+
+    for (const entityHandle of entityHandles) {
+      try {
+        await this.permissionService.assertEntityPermission(
+          user,
+          entityHandle,
+          'allowRead',
+        );
+      } catch {
+        skippedEntityHandles.push(entityHandle);
+        continue;
+      }
+
+      try {
+        const result = await this.aiService.searchVectorDocuments(
+          entityHandle,
+          query,
+          user,
+          perEntityLimit,
+        );
+        const resultRecord = this.asRecord(result);
+        sourceResults.push(result);
+
+        if (resultRecord.indexed === false) {
+          unindexedEntityHandles.push(entityHandle);
+          continue;
+        }
+
+        indexedEntityHandles.push(entityHandle);
+        const results = Array.isArray(resultRecord.results)
+          ? resultRecord.results
+          : [];
+
+        for (const item of results) {
+          const itemRecord = this.asRecord(item);
+
+          if (!itemRecord) {
+            continue;
+          }
+
+          combinedResults.push({
+            entityHandle,
+            handle: this.asResultHandle(itemRecord.handle),
+            score: this.asScore(itemRecord.score),
+            record: itemRecord.record ?? null,
+            matches: Array.isArray(itemRecord.matches)
+              ? itemRecord.matches
+              : [],
+          });
+        }
+      } catch (error) {
+        errors.push({
+          entityHandle,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+
+    return {
+      query,
+      entityHandles,
+      indexedEntityHandles,
+      unindexedEntityHandles,
+      skippedEntityHandles,
+      results: combinedResults
+        .sort(
+          (left, right) =>
+            right.score - left.score ||
+            left.entityHandle.localeCompare(right.entityHandle),
+        )
+        .slice(0, limit),
+      sourceResults,
+      errors,
+      usageHints: [...SAPLING_MCP_USAGE_HINTS.knowledgeSearch],
+    };
+  }
+
+  private normalizeKnowledgeSearchEntityHandles(
+    requestedEntityHandles: string[],
+  ): string[] {
+    const requested = requestedEntityHandles
+      .map((handle) => handle.trim())
+      .filter(Boolean);
+    const candidates =
+      requested.length > 0 ? requested : this.defaultKnowledgeSearchEntityHandles;
+    const allowed = new Set(this.defaultKnowledgeSearchEntityHandles);
+    const normalized: string[] = [];
+
+    for (const entityHandle of candidates) {
+      if (!allowed.has(entityHandle) || normalized.includes(entityHandle)) {
+        continue;
+      }
+
+      normalized.push(entityHandle);
+    }
+
+    return normalized.length > 0
+      ? normalized
+      : [...this.defaultKnowledgeSearchEntityHandles];
+  }
+
+  private asResultHandle(value: unknown): string | number | null {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+
+    return null;
+  }
+
+  private asScore(value: unknown): number {
+    const score = typeof value === 'number' ? value : Number(value);
+    return Number.isFinite(score) ? score : 0;
   }
 
   private asTicketSearchMode(value: unknown): 'all' | 'problem' | 'solution' {

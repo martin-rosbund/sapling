@@ -1,0 +1,30 @@
+[
+  {
+    "handle": "internal",
+    "description": "Intern",
+    "color": "#3F51B5",
+    "icon": "mdi-shield-account-outline",
+    "sortOrder": 10
+  },
+  {
+    "handle": "support",
+    "description": "Support",
+    "color": "#009688",
+    "icon": "mdi-lifebuoy",
+    "sortOrder": 20
+  },
+  {
+    "handle": "sales",
+    "description": "Vertrieb",
+    "color": "#8BC34A",
+    "icon": "mdi-cash-multiple",
+    "sortOrder": 30
+  },
+  {
+    "handle": "customer",
+    "description": "Kunde",
+    "color": "#03A9F4",
+    "icon": "mdi-account-group-outline",
+    "sortOrder": 40
+  }
+]

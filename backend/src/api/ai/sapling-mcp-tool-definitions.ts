@@ -317,6 +317,53 @@ export const SAPLING_MCP_TOOL_DEFINITIONS: readonly SaplingMcpToolDefinition[] =
       },
     },
     {
+      toolName: 'knowledge_search',
+      description: SAPLING_MCP_TOOL_DESCRIPTIONS.knowledgeSearch,
+      jsonSchema: {
+        type: 'object',
+        properties: {
+          query: {
+            type: 'string',
+            description:
+              'Natural-language knowledge question or problem description.',
+          },
+          entityHandles: {
+            type: 'array',
+            description:
+              'Optional subset of indexed knowledge sources. Defaults to knowledgeArticle, ticket, effortEstimate, effortEstimatePosition, and salesOpportunity.',
+            items: { type: 'string' },
+          },
+          limit: {
+            type: 'integer',
+            description:
+              'Maximum combined result size across all knowledge sources, default 8.',
+          },
+        },
+        required: ['query'],
+        additionalProperties: false,
+      },
+      serverInputSchema: {
+        query: z
+          .string()
+          .describe('Natural-language knowledge question or problem description.'),
+        entityHandles: z
+          .array(z.string())
+          .optional()
+          .describe(
+            'Optional subset of indexed knowledge sources. Defaults to knowledgeArticle, ticket, effortEstimate, effortEstimatePosition, and salesOpportunity.',
+          ),
+        limit: z
+          .number()
+          .int()
+          .positive()
+          .max(30)
+          .optional()
+          .describe(
+            'Maximum combined result size across all knowledge sources, default 8.',
+          ),
+      },
+    },
+    {
       toolName: 'generic_create',
       description: SAPLING_MCP_TOOL_DESCRIPTIONS.genericCreate,
       jsonSchema: {

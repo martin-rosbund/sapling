@@ -15,6 +15,9 @@ export const AI_SYSTEM_PROMPT_TOOL_GUIDANCE =
 export const AI_SYSTEM_PROMPT_VECTOR_GUIDANCE =
   'Semantic search also covers indexed long-text fields on event, salesOpportunity, effortEstimate, and effortEstimatePosition, including descriptions, pain points, requirements, and offer texts. Choose the entityHandle that matches the user question before searching.';
 
+export const AI_SYSTEM_PROMPT_KNOWLEDGE_GUIDANCE =
+  'For broad knowledge-base, troubleshooting, known-solution, effort-estimation, or sales-enablement questions, use knowledge_search first because it searches curated knowledge articles, tickets, effort estimates, estimate positions, and sales opportunities together. Semantic search also covers indexed long-text fields on knowledgeArticle, including knowledge summaries, problems, and solutions.';
+
 export const AI_ASSISTANT_SPEECH_INSTRUCTIONS =
   'Speak as Songbird in a warm, lovely, clear female voice. Speak naturally in the language of the message and do not read Markdown as syntax.';
 
@@ -46,7 +49,7 @@ export function buildSystemInstruction(options?: {
 }): string {
   const referenceDate = options?.referenceDate ?? new Date();
   const toolInstruction = options?.includeToolGuidance
-    ? ` ${AI_SYSTEM_PROMPT_TOOL_GUIDANCE} ${AI_SYSTEM_PROMPT_VECTOR_GUIDANCE}`
+    ? ` ${AI_SYSTEM_PROMPT_TOOL_GUIDANCE} ${AI_SYSTEM_PROMPT_VECTOR_GUIDANCE} ${AI_SYSTEM_PROMPT_KNOWLEDGE_GUIDANCE}`
     : '';
 
   return `${AI_SYSTEM_PROMPT_BASE}${toolInstruction} ${buildCurrentDateInstruction(

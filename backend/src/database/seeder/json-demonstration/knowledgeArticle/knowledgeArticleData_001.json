@@ -1,0 +1,38 @@
+[
+  {
+    "title": "Semantische Suche liefert keine Treffer",
+    "status": "published",
+    "visibility": "internal",
+    "category": "troubleshooting",
+    "summary": "Wenn Songbird bei beschreibenden Ticketfragen keine semantischen Treffer findet, fehlt meist ein aktiver Vektorindex fuer die betroffene Entitaet.",
+    "tags": "ai, suche, vector, tickets",
+    "problemMarkdown": "Benutzer stellen natuerlich formulierte Fragen zu bekannten Problemen, erhalten aber keine Treffer. Die klassische Ticket-Suche funktioniert, semantische Antworten bleiben leer oder melden einen fehlenden Index.",
+    "solutionMarkdown": "Im Admin-Dialog die Vektorisierung fuer `ticket`, `knowledgeArticle` und je nach Frage auch `effortEstimate`, `effortEstimatePosition` oder `salesOpportunity` ausfuehren. Danach die Anfrage erneut stellen. Bei Modell- oder Providerwechsel muss der Index erneut aufgebaut werden.",
+    "publishedAt": "2026-05-28T08:00:00.000Z",
+    "isActive": true
+  },
+  {
+    "title": "Aufwandsschaetzung aus aehnlichen Positionen ableiten",
+    "status": "published",
+    "visibility": "support",
+    "category": "estimation",
+    "summary": "Vergangene Schaetzpositionen sind gute Anker fuer neue Aufwandsschaetzungen, wenn Titel, Angebotstext und Stunden gemeinsam betrachtet werden.",
+    "tags": "aufwand, schaetzung, angebot, positionen",
+    "problemMarkdown": "Neue Anforderungen wirken oft groesser oder kleiner als bekannte Arbeiten, obwohl bestehende Schaetzpositionen passende Vergleichswerte enthalten. Ohne Wissenssuche werden diese Erfahrungswerte leicht uebersehen.",
+    "solutionMarkdown": "Mit `knowledge_search` oder semantischer Suche gegen `effortEstimatePosition` nach dem fachlichen Ziel suchen. Relevante Positionen vergleichen, optionale Leistungen markieren und die Stunden als Bereich statt als Einzelwert uebernehmen.",
+    "publishedAt": "2026-05-28T08:00:00.000Z",
+    "isActive": true
+  },
+  {
+    "title": "Vertriebsargumente aus Pain Points wiederverwenden",
+    "status": "published",
+    "visibility": "sales",
+    "category": "salesEnablement",
+    "summary": "Sales Opportunities enthalten Pain Points und naechste Schritte, die fuer neue Chancen als Argumentationshilfe dienen koennen.",
+    "tags": "vertrieb, opportunity, pain points, argumente",
+    "problemMarkdown": "Bei neuen Verkaufschancen fehlen oft passende Referenzen, obwohl aehnliche Pain Points und Loesungsansaetze bereits in frueheren Opportunities dokumentiert wurden.",
+    "solutionMarkdown": "Semantisch nach dem Kundenproblem suchen und Treffer aus `salesOpportunity`, `ticket` und `knowledgeArticle` kombinieren. In der Antwort nur fachliche Muster, passende Argumente und naechste Schritte verwenden; interne Handles bleiben technische Metadaten.",
+    "publishedAt": "2026-05-28T08:00:00.000Z",
+    "isActive": true
+  }
+]

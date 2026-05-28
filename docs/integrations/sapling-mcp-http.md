@@ -89,6 +89,7 @@ generic_get
 generic_timeline
 ticket_search
 semantic_search
+knowledge_search
 generic_create
 generic_update
 generic_delete
@@ -124,9 +125,12 @@ event
 salesOpportunity
 effortEstimate
 effortEstimatePosition
+knowledgeArticle
 ```
 
 The matching vector index must already exist. Run vectorization in Sapling before using semantic search for an entity.
+
+Use `knowledge_search` when the client wants a combined knowledge-base lookup across curated knowledge articles, tickets, effort estimates, estimate positions, and sales opportunities. It still uses the authenticated user's permissions and skips sources the user cannot read.
 
 ## Generic Entity Access
 
