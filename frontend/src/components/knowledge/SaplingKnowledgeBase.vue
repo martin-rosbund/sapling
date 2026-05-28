@@ -209,12 +209,12 @@
             </v-chip>
           </div>
 
-          <section class="sapling-knowledge-reader__section">
+          <section class="sapling-knowledge-reader__section sapling-knowledge-reader__section--focus glass-panel">
             <h3>{{ t('knowledgeArticle.problemMarkdown') }}</h3>
             <SaplingMarkdownContent :source="selectedArticle.problemMarkdown || emptyMarkdown" />
           </section>
 
-          <section class="sapling-knowledge-reader__section">
+          <section class="sapling-knowledge-reader__section sapling-knowledge-reader__section--focus glass-panel">
             <h3>{{ t('knowledgeArticle.solutionMarkdown') }}</h3>
             <SaplingMarkdownContent :source="selectedArticle.solutionMarkdown || emptyMarkdown" />
           </section>

@@ -1,7 +1,7 @@
 [
   { "entity": "navigation", "property": "saplingFormConfig", "de": "Formular-Konfiguration", "en": "Form Configuration" },
   { "entity": "saplingFormConfig", "property": "name", "de": "Name", "en": "Name" },
-  { "entity": "saplingFormConfig", "property": "entity", "de": "Entitaet", "en": "Entity" },
+  { "entity": "saplingFormConfig", "property": "entity", "de": "Entität", "en": "Entity" },
   { "entity": "saplingFormConfig", "property": "scope", "de": "Geltungsbereich", "en": "Scope" },
   { "entity": "saplingFormConfig", "property": "scopeHandle", "de": "Scope-Handle", "en": "Scope handle" },
   { "entity": "saplingFormConfig", "property": "isActive", "de": "Aktiv", "en": "Active" },

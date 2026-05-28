@@ -146,6 +146,7 @@ const { isLoading: isTranslationLoading } = useTranslationLoader(
   'navigation',
   'login',
   'exception',
+  'aiEntityGeneration',
 )
 
 const {

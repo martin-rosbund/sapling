@@ -193,6 +193,13 @@
   border-top: 1px solid var(--sapling-surface-border-muted);
 }
 
+.sapling-knowledge-reader__section--focus {
+  padding: var(--sapling-space-panel-md);
+  border-top: 0;
+  border-radius: var(--sapling-radius-sm);
+  background: color-mix(in srgb, var(--sapling-surface-fill) 72%, var(--glass-bg)) !important;
+}
+
 .sapling-knowledge-reader__section h3 {
   margin: 0 0 var(--sapling-space-md);
   font-size: var(--sapling-text-title-size-sm);

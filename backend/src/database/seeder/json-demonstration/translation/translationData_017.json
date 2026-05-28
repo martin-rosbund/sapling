@@ -4,15 +4,15 @@
   { "entity": "global", "property": "downloadCsvTemplate", "de": "CSV-Vorlage herunterladen", "en": "Download CSV template" },
   { "entity": "global", "property": "importCsv", "de": "CSV importieren", "en": "Import CSV" },
   { "entity": "global", "property": "csvExported", "de": "CSV exportiert", "en": "CSV exported" },
-  { "entity": "global", "property": "csvExportedDescription", "de": "{count} Datensaetze wurden als CSV heruntergeladen.", "en": "{count} records were downloaded as CSV." },
+  { "entity": "global", "property": "csvExportedDescription", "de": "{count} Datensätze wurden als CSV heruntergeladen.", "en": "{count} records were downloaded as CSV." },
   { "entity": "global", "property": "csvTemplateExported", "de": "CSV-Vorlage exportiert", "en": "CSV template exported" },
-  { "entity": "global", "property": "csvTemplateExportedDescription", "de": "Die Vorlage enthaelt die importierbaren Spalten als Kopfzeile.", "en": "The template contains the importable columns as a header row." },
+  { "entity": "global", "property": "csvTemplateExportedDescription", "de": "Die Vorlage enthält die importierbaren Spalten als Kopfzeile.", "en": "The template contains the importable columns as a header row." },
   { "entity": "global", "property": "csvImported", "de": "CSV importiert", "en": "CSV imported" },
-  { "entity": "global", "property": "csvImportedDescription", "de": "{created} erstellt, {updated} aktualisiert, {failed} fehlerhaft, {skipped} uebersprungen.", "en": "{created} created, {updated} updated, {failed} failed, {skipped} skipped." },
-  { "entity": "global", "property": "csvImportUnsupportedFile", "de": "Datei nicht unterstuetzt", "en": "Unsupported file" },
+  { "entity": "global", "property": "csvImportedDescription", "de": "{created} erstellt, {updated} aktualisiert, {failed} fehlerhaft, {skipped} übersprungen.", "en": "{created} created, {updated} updated, {failed} failed, {skipped} skipped." },
+  { "entity": "global", "property": "csvImportUnsupportedFile", "de": "Datei nicht unterstützt", "en": "Unsupported file" },
   { "entity": "global", "property": "csvImportUnsupportedFileDescription", "de": "Bitte eine CSV-, TXT- oder TSV-Datei hochladen. Excel kann CSV-Dateien direkt speichern.", "en": "Please upload a CSV, TXT or TSV file. Excel can save CSV files directly." },
   
   { "entity": "exception", "property": "invalidPayload", "de": "Ungueltige Anfrage", "en": "Invalid payload" },
   
-  { "entity": "inbox", "property": "heroTitle", "de": "Meine Nachrichten", "en": "My Messages" }
+  { "entity": "inbox", "property": "heroTitle", "de": "Nachrichten", "en": "Messages" }
 ]
