@@ -1,0 +1,26 @@
+[
+  {
+    "entity": "formConfig",
+    "property": "previewForm",
+    "de": "Formular",
+    "en": "Form"
+  },
+  {
+    "entity": "formConfig",
+    "property": "previewTable",
+    "de": "Tabelle",
+    "en": "Table"
+  },
+  {
+    "entity": "formConfig",
+    "property": "previewMobileTable",
+    "de": "Mobile Tabelle",
+    "en": "Mobile table"
+  },
+  {
+    "entity": "formConfig",
+    "property": "noPreviewFields",
+    "de": "Keine sichtbaren Felder",
+    "en": "No visible fields"
+  }
+]
