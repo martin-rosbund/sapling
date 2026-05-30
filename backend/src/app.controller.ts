@@ -1,8 +1,7 @@
 import { Body, Controller, Get, Post, Redirect } from '@nestjs/common';
+import { ApiBody, ApiResponse } from '@nestjs/swagger';
 import { AppService } from './app.service';
 import { SAPLING_FRONTEND_URL } from './constants/project.constants';
-import { ApiResponse } from '@nestjs/swagger/dist/decorators/api-response.decorator';
-import { ApiBody } from '@nestjs/swagger/dist/decorators/api-body.decorator';
 
 /**
  * @class AppController
