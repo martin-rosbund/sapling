@@ -48,6 +48,11 @@ export class AddressItem {
     group: 'address.groupAddress',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   street!: string;
@@ -63,6 +68,11 @@ export class AddressItem {
     group: 'address.groupAddress',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: true,
   })
   @Property({ length: 16, nullable: true })
   zip?: string;
@@ -78,6 +88,11 @@ export class AddressItem {
     group: 'address.groupAddress',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: true,
   })
   @Property({ length: 64, nullable: true })
   city?: string;
@@ -93,6 +108,11 @@ export class AddressItem {
     group: 'address.groupContact',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 32, nullable: true })
   phone?: string;
@@ -108,6 +128,11 @@ export class AddressItem {
     group: 'address.groupContact',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ length: 32, nullable: true })
   mobile?: string;
@@ -123,6 +148,11 @@ export class AddressItem {
     group: 'address.groupContact',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: true })
   email?: string;
@@ -138,6 +168,11 @@ export class AddressItem {
     group: 'address.groupContact',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: true })
   website?: string;
@@ -155,6 +190,11 @@ export class AddressItem {
     group: 'address.groupReference',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => CompanyItem, { nullable: false })
   company!: Rel<CompanyItem>;
@@ -169,6 +209,11 @@ export class AddressItem {
     group: 'address.groupReference',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => AddressTypeItem, { nullable: false })
   type!: Rel<AddressTypeItem>;
@@ -183,6 +228,11 @@ export class AddressItem {
     group: 'address.groupAddress',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @ManyToOne(() => CountryItem, {
     defaultRaw: `'DE'`,

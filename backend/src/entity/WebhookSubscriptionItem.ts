@@ -76,6 +76,11 @@ export class WebhookSubscriptionItem {
     group: 'webhookSubscription.groupContent',
     groupOrder: 100,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   description!: string;
@@ -90,6 +95,11 @@ export class WebhookSubscriptionItem {
     group: 'webhookSubscription.groupContent',
     groupOrder: 100,
     width: 4,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   customHeaders?: object;
@@ -105,6 +115,11 @@ export class WebhookSubscriptionItem {
     group: 'webhookSubscription.groupContent',
     groupOrder: 100,
     width: 4,
+    visible: true,
+    tableOrder: 225,
+    tableVisible: true,
+    mobileOrder: 225,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: true })
   containerName?: string;
@@ -120,6 +135,11 @@ export class WebhookSubscriptionItem {
     group: 'webhookSubscription.groupContent',
     groupOrder: 100,
     width: 4,
+    visible: true,
+    tableOrder: 250,
+    tableVisible: true,
+    mobileOrder: 250,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   relations?: string[] | null;
@@ -138,6 +158,11 @@ export class WebhookSubscriptionItem {
     group: 'webhookSubscription.groupContent',
     groupOrder: 100,
     width: 4,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @ManyToOne(() => WebhookSubscriptionPayloadType, {
     defaultRaw: `'list'`,
@@ -157,6 +182,11 @@ export class WebhookSubscriptionItem {
     group: 'webhookSubscription.groupIntegration',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 256, nullable: false })
   url!: string;
@@ -173,6 +203,11 @@ export class WebhookSubscriptionItem {
     group: 'webhookSubscription.groupConfiguration',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   isActive: boolean = true;
@@ -193,6 +228,11 @@ export class WebhookSubscriptionItem {
     group: 'webhookSubscription.groupSecurity',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => WebhookAuthenticationTypeItem, {
     defaultRaw: `'none'`,
@@ -210,6 +250,11 @@ export class WebhookSubscriptionItem {
     group: 'webhookSubscription.groupSecurity',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => WebhookAuthenticationApiKeyItem, { nullable: true })
   authenticationApiKey!: WebhookAuthenticationApiKeyItem;
@@ -224,6 +269,11 @@ export class WebhookSubscriptionItem {
     group: 'webhookSubscription.groupSecurity',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @ManyToOne(() => WebhookAuthenticationOAuth2Item, { nullable: true })
   authenticationOAuth2!: WebhookAuthenticationOAuth2Item;
@@ -238,6 +288,11 @@ export class WebhookSubscriptionItem {
     group: 'webhookSubscription.groupSecurity',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @ManyToOne(() => WebhookAuthenticationBasicItem, { nullable: true })
   authenticationBasic!: WebhookAuthenticationBasicItem;
@@ -253,6 +308,11 @@ export class WebhookSubscriptionItem {
     group: 'webhookSubscription.groupSecurity',
     groupOrder: 400,
     width: 4,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: true, hidden: true })
   signingSecret?: string;
@@ -272,6 +332,11 @@ export class WebhookSubscriptionItem {
     group: 'webhookSubscription.groupReference',
     groupOrder: 500,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => EntityItem, {
     nullable: false,
@@ -292,6 +357,11 @@ export class WebhookSubscriptionItem {
     group: 'webhookSubscription.groupReference',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => WebhookSubscriptionTypeItem, {
     defaultRaw: `'afterInsert'`,
@@ -313,6 +383,11 @@ export class WebhookSubscriptionItem {
     group: 'webhookSubscription.groupReference',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @ManyToOne(() => WebhookSubscriptionMethodItem, {
     defaultRaw: `'post'`,

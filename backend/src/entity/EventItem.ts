@@ -71,6 +71,11 @@ export class EventItem {
     group: 'event.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -86,6 +91,11 @@ export class EventItem {
     group: 'event.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'text' })
   description?: string;
@@ -101,6 +111,11 @@ export class EventItem {
     group: 'event.groupSchedule',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ nullable: false, type: 'datetime' })
   startDate!: Date;
@@ -116,6 +131,11 @@ export class EventItem {
     group: 'event.groupSchedule',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: true,
   })
   @Property({ nullable: false, type: 'datetime' })
   endDate!: Date;
@@ -130,6 +150,11 @@ export class EventItem {
     group: 'event.groupSchedule',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ default: false, nullable: false })
   isAllDay!: boolean;
@@ -144,6 +169,11 @@ export class EventItem {
     group: 'event.groupSchedule',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 350,
+    tableVisible: true,
+    mobileOrder: 350,
+    mobileVisible: false,
   })
   @Property({ nullable: true, length: 512 })
   recurrenceRule?: string | null;
@@ -159,6 +189,11 @@ export class EventItem {
     group: 'event.groupContact',
     groupOrder: 400,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: true, length: 512 })
   onlineMeetingURL?: string;
@@ -175,6 +210,11 @@ export class EventItem {
     group: 'event.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => EventTypeItem, { defaultRaw: `'internal'`, nullable: false })
   type!: EventTypeItem;
@@ -212,6 +252,11 @@ export class EventItem {
     group: 'event.groupReference',
     groupOrder: 500,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => CompanyItem, { nullable: true })
   assigneeCompany?: Rel<CompanyItem>;
@@ -232,6 +277,11 @@ export class EventItem {
     group: 'event.groupReference',
     groupOrder: 500,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: true })
   assigneePerson?: Rel<PersonItem>;
@@ -247,6 +297,11 @@ export class EventItem {
     group: 'event.groupReference',
     groupOrder: 500,
     width: 2,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @ManyToOne(() => CompanyItem, { nullable: false })
   creatorCompany?: Rel<CompanyItem>;
@@ -268,6 +323,11 @@ export class EventItem {
     group: 'event.groupReference',
     groupOrder: 500,
     width: 2,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: false })
   creatorPerson?: Rel<PersonItem>;
@@ -282,6 +342,11 @@ export class EventItem {
     group: 'event.groupReference',
     groupOrder: 500,
     width: 2,
+    visible: true,
+    tableOrder: 600,
+    tableVisible: true,
+    mobileOrder: 600,
+    mobileVisible: false,
   })
   @ManyToOne(() => TicketItem, { nullable: true })
   ticket?: Rel<TicketItem>;
@@ -304,6 +369,11 @@ export class EventItem {
     group: 'event.groupReference',
     groupOrder: 500,
     width: 2,
+    visible: true,
+    tableOrder: 700,
+    tableVisible: true,
+    mobileOrder: 700,
+    mobileVisible: false,
   })
   @ManyToOne(() => SalesOpportunityItem, { nullable: true })
   salesOpportunity?: SalesOpportunityItem;
@@ -318,6 +388,11 @@ export class EventItem {
     group: 'event.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @ManyToOne(() => EventStatusItem, {
     defaultRaw: `'scheduled'`,
@@ -336,6 +411,11 @@ export class EventItem {
     group: 'event.groupReference',
     groupOrder: 500,
     width: 2,
+    visible: false,
+    tableOrder: 900,
+    tableVisible: false,
+    mobileOrder: 900,
+    mobileVisible: false,
   })
   @OneToOne(() => EventAzureItem, (x) => x.event)
   azure?: EventAzureItem;
@@ -351,6 +431,11 @@ export class EventItem {
     group: 'event.groupReference',
     groupOrder: 500,
     width: 2,
+    visible: false,
+    tableOrder: 1000,
+    tableVisible: false,
+    mobileOrder: 1000,
+    mobileVisible: false,
   })
   @OneToOne(() => EventGoogleItem, (x) => x.event)
   google?: EventGoogleItem;

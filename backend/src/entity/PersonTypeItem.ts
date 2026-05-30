@@ -40,6 +40,11 @@ export class PersonTypeItem {
     group: 'personType.groupAppearance',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: 'mdi-calendar', length: 64, nullable: false })
   icon?: string = 'mdi-calendar';
@@ -54,6 +59,11 @@ export class PersonTypeItem {
     group: 'personType.groupAppearance',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color!: string;

@@ -17,6 +17,11 @@ export class KnowledgeArticleStatusItem {
     group: 'knowledgeArticleStatus.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 64, nullable: false })
   description!: string;
@@ -28,6 +33,11 @@ export class KnowledgeArticleStatusItem {
     group: 'knowledgeArticleStatus.groupAppearance',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 32, nullable: false })
   color!: string;
@@ -39,6 +49,11 @@ export class KnowledgeArticleStatusItem {
     group: 'knowledgeArticleStatus.groupAppearance',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({
     default: 'mdi-file-document-outline',
@@ -54,6 +69,11 @@ export class KnowledgeArticleStatusItem {
     group: 'knowledgeArticleStatus.groupAppearance',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ default: 100, nullable: false })
   sortOrder = 100;
@@ -64,6 +84,11 @@ export class KnowledgeArticleStatusItem {
     group: 'knowledgeArticleStatus.groupConfiguration',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: false, nullable: false })
   isPublished = false;
@@ -74,6 +99,11 @@ export class KnowledgeArticleStatusItem {
     group: 'knowledgeArticleStatus.groupConfiguration',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: false, nullable: false })
   isArchived = false;

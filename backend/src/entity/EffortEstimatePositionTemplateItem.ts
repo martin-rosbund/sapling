@@ -17,6 +17,11 @@ export class EffortEstimatePositionTemplateItem {
     group: 'effortEstimatePositionTemplate.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -27,6 +32,11 @@ export class EffortEstimatePositionTemplateItem {
     group: 'effortEstimatePositionTemplate.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ length: 256, nullable: true })
   description?: string;
@@ -38,6 +48,11 @@ export class EffortEstimatePositionTemplateItem {
     group: 'effortEstimatePositionTemplate.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'float' })
   estimatedHours?: number;
@@ -49,6 +64,11 @@ export class EffortEstimatePositionTemplateItem {
     group: 'effortEstimatePositionTemplate.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: false, type: 'text' })
   offerTextMarkdown!: string;
@@ -59,6 +79,11 @@ export class EffortEstimatePositionTemplateItem {
     group: 'effortEstimatePositionTemplate.groupConfiguration',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   isActive = true;

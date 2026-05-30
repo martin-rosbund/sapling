@@ -50,6 +50,11 @@ export class RoleItem {
     group: 'role.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 64, nullable: false })
   title!: string;
@@ -63,6 +68,11 @@ export class RoleItem {
     group: 'role.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 110,
+    tableVisible: true,
+    mobileOrder: 110,
+    mobileVisible: false,
   })
   @Property({ nullable: false, default: false })
   isAdministrator = false;
@@ -94,6 +104,11 @@ export class RoleItem {
     group: 'role.groupStarter',
     groupOrder: 250,
     width: 4,
+    visible: false,
+    tableOrder: 100,
+    tableVisible: false,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToMany(() => DashboardTemplateItem, undefined, { owner: true })
   starterDashboardTemplates: Collection<DashboardTemplateItem> =
@@ -108,6 +123,11 @@ export class RoleItem {
     group: 'role.groupStarter',
     groupOrder: 250,
     width: 4,
+    visible: false,
+    tableOrder: 200,
+    tableVisible: false,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToMany(() => FavoriteTemplateItem, undefined, { owner: true })
   starterFavoriteTemplates: Collection<FavoriteTemplateItem> =
@@ -122,6 +142,11 @@ export class RoleItem {
     group: 'role.groupReference',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => RoleStageItem)
   stage!: RoleStageItem;

@@ -14,7 +14,16 @@ import {
 describe('entity.decorator', () => {
   class ExampleEntity {
     @Sapling(['isValue'])
-    @SaplingForm({ group: ' details ', order: 7.9, width: 3.4 as never })
+    @SaplingForm({
+      group: ' details ',
+      order: 7.9,
+      width: 3.4 as never,
+      visible: false,
+      tableOrder: 12.9,
+      tableVisible: false,
+      mobileOrder: 3.9,
+      mobileVisible: true,
+    })
     title!: string;
 
     @SaplingForm({ group: '   ', order: Number.NaN, width: 99 as never })
@@ -53,6 +62,11 @@ describe('entity.decorator', () => {
       groupOrder: null,
       order: 7,
       width: 3,
+      formVisible: false,
+      tableOrder: 12,
+      tableVisible: false,
+      mobileOrder: 3,
+      mobileVisible: true,
     });
   });
 
@@ -64,6 +78,11 @@ describe('entity.decorator', () => {
       groupOrder: null,
       order: null,
       width: 4,
+      formVisible: null,
+      tableOrder: null,
+      tableVisible: null,
+      mobileOrder: null,
+      mobileVisible: null,
     });
 
     expect(getSaplingFormLayout(ExampleEntity.prototype, 'missing')).toEqual({
@@ -71,6 +90,11 @@ describe('entity.decorator', () => {
       groupOrder: null,
       order: null,
       width: null,
+      formVisible: null,
+      tableOrder: null,
+      tableVisible: null,
+      mobileOrder: null,
+      mobileVisible: null,
     });
   });
 
@@ -80,6 +104,11 @@ describe('entity.decorator', () => {
       groupOrder: null,
       order: null,
       width: 2,
+      formVisible: null,
+      tableOrder: null,
+      tableVisible: null,
+      mobileOrder: null,
+      mobileVisible: null,
     });
   });
 

@@ -39,6 +39,11 @@ export class WebhookAuthenticationApiKeyItem {
     group: 'webhookAuthenticationApiKey.groupContent',
     groupOrder: 100,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   description!: string;
@@ -53,6 +58,11 @@ export class WebhookAuthenticationApiKeyItem {
     group: 'webhookAuthenticationApiKey.groupContent',
     groupOrder: 100,
     width: 4,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: false })
   headerName!: string;
@@ -68,6 +78,11 @@ export class WebhookAuthenticationApiKeyItem {
     group: 'webhookAuthenticationApiKey.groupSecurity',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: true, length: 256, hidden: true })
   apiKey?: string;

@@ -18,6 +18,11 @@ export class SocialMediaItem {
     group: 'socialMedia.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: true })
   title?: string;
@@ -29,6 +34,11 @@ export class SocialMediaItem {
     group: 'socialMedia.groupContact',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 256, nullable: false })
   url!: string;
@@ -40,6 +50,11 @@ export class SocialMediaItem {
     group: 'socialMedia.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: true,
   })
   @Property({ length: 64, nullable: true })
   username?: string;
@@ -50,6 +65,11 @@ export class SocialMediaItem {
     group: 'socialMedia.groupIntegration',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: true, name: 'external_id' })
   externalId?: string;
@@ -60,6 +80,11 @@ export class SocialMediaItem {
     group: 'socialMedia.groupConfiguration',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: false, nullable: false, name: 'is_primary' })
   isPrimary?: boolean = false;
@@ -70,6 +95,11 @@ export class SocialMediaItem {
     group: 'socialMedia.groupConfiguration',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false, name: 'is_public' })
   isPublic?: boolean = true;
@@ -80,6 +110,11 @@ export class SocialMediaItem {
     group: 'socialMedia.groupContent',
     groupOrder: 500,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 256, nullable: true })
   notes?: string;
@@ -91,6 +126,11 @@ export class SocialMediaItem {
     group: 'socialMedia.groupReference',
     groupOrder: 600,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;
@@ -102,6 +142,11 @@ export class SocialMediaItem {
     group: 'socialMedia.groupReference',
     groupOrder: 600,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => SocialMediaTypeItem, { nullable: false })
   type!: Rel<SocialMediaTypeItem>;

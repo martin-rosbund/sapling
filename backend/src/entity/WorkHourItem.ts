@@ -46,6 +46,11 @@ export class WorkHourItem {
     group: 'workHour.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 64, nullable: false })
   title!: string;
@@ -60,6 +65,11 @@ export class WorkHourItem {
     group: 'workHour.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ type: 'time', nullable: false })
   timeFrom!: string;
@@ -74,6 +84,11 @@ export class WorkHourItem {
     group: 'workHour.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ type: 'time', nullable: false })
   timeTo!: string;

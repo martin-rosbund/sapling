@@ -38,6 +38,11 @@ export class MoneyItem {
     group: 'money.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ unique: true, length: 64, nullable: false })
   name!: string;
@@ -51,6 +56,11 @@ export class MoneyItem {
     group: 'money.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ length: 8, nullable: false })
   symbol!: string;

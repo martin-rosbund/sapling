@@ -19,6 +19,11 @@ export class HolidayItem {
     group: 'holiday.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -29,6 +34,11 @@ export class HolidayItem {
     group: 'holiday.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: true, length: 1024 })
   description?: string;
@@ -39,6 +49,11 @@ export class HolidayItem {
     group: 'holiday.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => HolidayGroupItem, { nullable: false })
   group!: HolidayGroupItem;
@@ -50,6 +65,11 @@ export class HolidayItem {
     group: 'holiday.groupSchedule',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: false, type: 'datetime' })
   startDate!: Date;
@@ -61,6 +81,11 @@ export class HolidayItem {
     group: 'holiday.groupSchedule',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ nullable: false, type: 'datetime' })
   endDate!: Date;
@@ -71,6 +96,11 @@ export class HolidayItem {
     group: 'holiday.groupSchedule',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   isAllDay: boolean = true;
@@ -82,6 +112,11 @@ export class HolidayItem {
     group: 'holiday.groupAppearance',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: 'mdi-calendar-alert', length: 64, nullable: false })
   icon?: string = 'mdi-calendar-alert';
@@ -93,6 +128,11 @@ export class HolidayItem {
     group: 'holiday.groupAppearance',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: '#C62828', length: 32, nullable: false })
   color: string = '#C62828';

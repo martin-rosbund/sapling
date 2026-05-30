@@ -46,6 +46,11 @@ export class FavoriteItem {
     group: 'favorite.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -60,6 +65,11 @@ export class FavoriteItem {
     group: 'favorite.groupContent',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 150,
+    tableVisible: true,
+    mobileOrder: 150,
+    mobileVisible: false,
   })
   @Property({ length: 256, nullable: true })
   search?: string;
@@ -74,6 +84,11 @@ export class FavoriteItem {
     group: 'favorite.groupContent',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 175,
+    tableVisible: true,
+    mobileOrder: 175,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   sortBy?: object;
@@ -88,6 +103,11 @@ export class FavoriteItem {
     group: 'favorite.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   filter?: object;
@@ -105,6 +125,11 @@ export class FavoriteItem {
     group: 'favorite.groupReference',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;
@@ -119,6 +144,11 @@ export class FavoriteItem {
     group: 'favorite.groupReference',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => EntityItem, { nullable: false })
   @Sapling(['isEntity'])
@@ -140,6 +170,11 @@ export class FavoriteItem {
     group: 'favorite.groupReference',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @ManyToOne(() => EntityRouteItem, { nullable: true })
   entityRoute?: Rel<EntityRouteItem>;

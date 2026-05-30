@@ -30,6 +30,10 @@ export interface SaplingFormFieldConfig {
   groupOrder?: number | null;
   order?: number | null;
   width?: SaplingFormFieldWidth | null;
+  tableVisible?: boolean;
+  tableOrder?: number | null;
+  mobileVisible?: boolean;
+  mobileOrder?: number | null;
   label?: string | null;
   helpText?: string | null;
   placeholder?: string | null;

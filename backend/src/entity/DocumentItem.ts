@@ -86,6 +86,11 @@ export class DocumentItem {
     group: 'document.groupContent',
     groupOrder: 100,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ nullable: true, length: 256 })
   description?: string;
@@ -102,6 +107,11 @@ export class DocumentItem {
     group: 'document.groupReference',
     groupOrder: 250,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 64 })
   reference!: string;
@@ -119,6 +129,11 @@ export class DocumentItem {
     group: 'document.groupReference',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => EntityItem)
   entity!: Rel<EntityItem>;
@@ -133,6 +148,11 @@ export class DocumentItem {
     group: 'document.groupReference',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => DocumentTypeItem)
   type!: DocumentTypeItem;
@@ -148,6 +168,11 @@ export class DocumentItem {
     group: 'document.groupReference',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;

@@ -10,7 +10,6 @@ import type {
 import type { SaplingGenericItem } from '@/entity/entity'
 import {
   DESKTOP_TABLE_COLUMN_LIMIT,
-  MOBILE_CARD_FIELD_LIMIT,
   DEFAULT_SMALL_WINDOW_WIDTH,
 } from '@/constants/project.constants'
 import type { EntityItem, ScriptButtonItem } from '@/entity/entity'
@@ -20,6 +19,8 @@ import { useGenericStore } from '@/stores/genericStore'
 import {
   canReadReferenceTemplate,
   filterTableHeadersByReferencePermission,
+  getMobileTableHeaders,
+  getSupportedTableHeaders,
   getTableHeaders,
 } from '@/utils/saplingTableUtil'
 import { useSaplingTableFilters } from '@/composables/table/useSaplingTableFilters'
@@ -291,9 +292,22 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   // #endregion
 
   // #region Computed
-  const tableHeaders = computed<SaplingTableHeaderItem[]>(() => {
+  const supportedTableHeaders = computed<SaplingTableHeaderItem[]>(() => {
     if (props.headers?.length) {
       return filterTableHeadersByReferencePermission(props.headers, currentPermissions.value)
+    }
+
+    return getSupportedTableHeaders(
+      props.entityTemplates,
+      props.entity,
+      t,
+      currentPermissions.value,
+    )
+  })
+
+  const tableHeaders = computed<SaplingTableHeaderItem[]>(() => {
+    if (props.headers?.length) {
+      return supportedTableHeaders.value
     }
 
     return getTableHeaders(props.entityTemplates, props.entity, t, currentPermissions.value)
@@ -304,12 +318,13 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   )
 
   const mobileCardHeaders = computed<SaplingTableHeaderItem[]>(() => {
-    const compactHeaders = dataHeaders.value.filter((header) => header.options?.includes('isValue'))
-    const fallbackHeaders = dataHeaders.value.filter(
-      (header) => !header.options?.includes('isValue'),
-    )
+    const mobileSourceHeaders = props.headers?.length
+      ? dataHeaders.value
+      : supportedTableHeaders.value.filter(
+          (header) => header.key !== '__select' && header.key !== '__actions',
+        )
 
-    return [...compactHeaders, ...fallbackHeaders].slice(0, MOBILE_CARD_FIELD_LIMIT)
+    return getMobileTableHeaders(mobileSourceHeaders)
   })
 
   const visibleHeaders = computed<SaplingTableHeaderItem[]>(() => {

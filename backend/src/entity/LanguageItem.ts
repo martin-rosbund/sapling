@@ -41,6 +41,11 @@ export class LanguageItem {
     group: 'language.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ unique: true, length: 64, nullable: false })
   name!: string;

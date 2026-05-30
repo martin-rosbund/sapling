@@ -32,6 +32,11 @@ export class ScriptButtonItem {
     group: 'scriptButton.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: false })
   name!: string;
@@ -47,6 +52,11 @@ export class ScriptButtonItem {
     group: 'scriptButton.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -61,6 +71,11 @@ export class ScriptButtonItem {
     group: 'scriptButton.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   parameter?: object;
@@ -75,6 +90,11 @@ export class ScriptButtonItem {
     group: 'scriptButton.groupConfiguration',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: false, nullable: false })
   isMultiSelect: boolean = false;
@@ -92,6 +112,11 @@ export class ScriptButtonItem {
     group: 'scriptButton.groupReference',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => EntityItem, { nullable: false })
   entity!: Rel<EntityItem>;

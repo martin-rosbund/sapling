@@ -18,6 +18,11 @@ export class SharedMailboxItem {
     group: 'sharedMailbox.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -29,6 +34,11 @@ export class SharedMailboxItem {
     group: 'sharedMailbox.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ length: 256, nullable: false })
   email!: string;
@@ -39,6 +49,11 @@ export class SharedMailboxItem {
     group: 'sharedMailbox.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 256, nullable: true })
   description?: string;
@@ -50,6 +65,11 @@ export class SharedMailboxItem {
     group: 'sharedMailbox.groupConfiguration',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonTypeItem, { default: 'azure', nullable: false })
   provider!: Rel<PersonTypeItem>;
@@ -60,6 +80,11 @@ export class SharedMailboxItem {
     group: 'sharedMailbox.groupConfiguration',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   isActive = true;
@@ -70,6 +95,11 @@ export class SharedMailboxItem {
     group: 'sharedMailbox.groupReference',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => SharedMailboxGroupItem, { nullable: true })
   group?: Rel<SharedMailboxGroupItem>;

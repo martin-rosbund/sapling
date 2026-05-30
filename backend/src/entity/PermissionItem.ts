@@ -47,6 +47,11 @@ export class PermissionItem {
     group: 'permission.groupConfiguration',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ default: true, nullable: false })
   allowRead?: boolean = true;
@@ -61,6 +66,11 @@ export class PermissionItem {
     group: 'permission.groupConfiguration',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: true,
   })
   @Property({ default: true, nullable: false })
   allowInsert?: boolean = true;
@@ -75,6 +85,11 @@ export class PermissionItem {
     group: 'permission.groupSchedule',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ default: true, nullable: false })
   allowUpdate?: boolean = true;
@@ -89,6 +104,11 @@ export class PermissionItem {
     group: 'permission.groupConfiguration',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: true,
   })
   @Property({ default: true, nullable: false })
   allowDelete?: boolean = true;
@@ -102,6 +122,11 @@ export class PermissionItem {
     group: 'permission.groupConfiguration',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   allowShow?: boolean = true;
@@ -118,6 +143,11 @@ export class PermissionItem {
     group: 'permission.groupReference',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => EntityItem)
   entity!: EntityItem;
@@ -131,6 +161,11 @@ export class PermissionItem {
     group: 'permission.groupReference',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => RoleItem)
   role!: Rel<RoleItem>;

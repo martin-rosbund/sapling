@@ -24,6 +24,11 @@ export class PersonPasskeyItem {
     group: 'personPasskey.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   label!: string;
@@ -35,6 +40,11 @@ export class PersonPasskeyItem {
     group: 'personPasskey.groupSecurity',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 512, nullable: false, unique: true, hidden: true })
   credentialId!: string;
@@ -46,6 +56,11 @@ export class PersonPasskeyItem {
     group: 'personPasskey.groupSecurity',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ columnType: 'text', nullable: false, hidden: true })
   publicKey!: string;
@@ -82,6 +97,11 @@ export class PersonPasskeyItem {
     group: 'personPasskey.groupReference',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;

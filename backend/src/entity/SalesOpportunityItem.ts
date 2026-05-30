@@ -67,6 +67,11 @@ export class SalesOpportunityItem {
     group: 'salesOpportunity.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -81,6 +86,11 @@ export class SalesOpportunityItem {
     group: 'salesOpportunity.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'text' })
   description?: string;
@@ -95,6 +105,11 @@ export class SalesOpportunityItem {
     group: 'salesOpportunity.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: true,
   })
   @Property({ nullable: true, type: 'float' })
   expectedRevenue?: number;
@@ -109,6 +124,11 @@ export class SalesOpportunityItem {
     group: 'salesOpportunity.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: true,
   })
   @Property({ nullable: true, type: 'float' })
   probability?: number;
@@ -122,6 +142,11 @@ export class SalesOpportunityItem {
     group: 'salesOpportunity.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 800,
+    tableVisible: true,
+    mobileOrder: 800,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'date' })
   closeDate?: Date;
@@ -135,6 +160,11 @@ export class SalesOpportunityItem {
     group: 'salesOpportunity.groupBasics',
     groupOrder: 100,
     width: 4,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ length: 256, nullable: true })
   nextStep?: string;
@@ -149,6 +179,11 @@ export class SalesOpportunityItem {
     group: 'salesOpportunity.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'text' })
   painPoints?: string;
@@ -162,6 +197,11 @@ export class SalesOpportunityItem {
     group: 'salesOpportunity.groupConfiguration',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   isActive?: boolean = true;
@@ -178,6 +218,11 @@ export class SalesOpportunityItem {
     group: 'salesOpportunity.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 600,
+    tableVisible: true,
+    mobileOrder: 600,
+    mobileVisible: false,
   })
   @ManyToOne(() => SalesOpportunityStageItem, {
     defaultRaw: `'new'`,
@@ -195,6 +240,11 @@ export class SalesOpportunityItem {
     group: 'salesOpportunity.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 700,
+    tableVisible: true,
+    mobileOrder: 700,
+    mobileVisible: false,
   })
   @ManyToOne(() => SalesOpportunityForecastItem, {
     defaultRaw: `'pipeline'`,
@@ -211,6 +261,11 @@ export class SalesOpportunityItem {
     group: 'salesOpportunity.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 750,
+    tableVisible: true,
+    mobileOrder: 750,
+    mobileVisible: false,
   })
   @ManyToOne(() => SalesOpportunitySourceItem, { nullable: false })
   source!: SalesOpportunitySourceItem;
@@ -248,6 +303,11 @@ export class SalesOpportunityItem {
     group: 'salesOpportunity.groupReference',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: true,
   })
   @ManyToOne(() => CompanyItem, { nullable: true })
   assigneeCompany?: Rel<CompanyItem>;
@@ -268,6 +328,11 @@ export class SalesOpportunityItem {
     group: 'salesOpportunity.groupReference',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: true })
   assigneePerson?: Rel<PersonItem>;
@@ -283,6 +348,11 @@ export class SalesOpportunityItem {
     group: 'salesOpportunity.groupReference',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 600,
+    tableVisible: true,
+    mobileOrder: 600,
+    mobileVisible: false,
   })
   @ManyToOne(() => CompanyItem, { nullable: false })
   creatorCompany?: Rel<CompanyItem>;
@@ -304,6 +374,11 @@ export class SalesOpportunityItem {
     group: 'salesOpportunity.groupReference',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 700,
+    tableVisible: true,
+    mobileOrder: 700,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: false })
   creatorPerson?: Rel<PersonItem>;

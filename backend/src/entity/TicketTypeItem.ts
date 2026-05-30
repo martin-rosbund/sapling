@@ -18,6 +18,11 @@ export class TicketTypeItem {
     group: 'ticketType.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -29,6 +34,11 @@ export class TicketTypeItem {
     group: 'ticketType.groupAppearance',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({
     default: 'mdi-alert-circle-outline',
@@ -44,6 +54,11 @@ export class TicketTypeItem {
     group: 'ticketType.groupAppearance',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: '#F44336', length: 32, nullable: false })
   color: string = '#F44336';

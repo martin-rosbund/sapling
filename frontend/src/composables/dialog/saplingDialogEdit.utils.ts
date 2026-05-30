@@ -61,6 +61,11 @@ export function applyFormConfigOverlay(
       formGroupOrder: fieldConfig.groupOrder ?? template.formGroupOrder,
       formOrder: fieldConfig.order ?? template.formOrder,
       formWidth: fieldConfig.width ?? template.formWidth,
+      formVisible: fieldConfig.visible ?? template.formVisible,
+      tableOrder: fieldConfig.tableOrder ?? template.tableOrder,
+      tableVisible: fieldConfig.tableVisible ?? template.tableVisible,
+      mobileOrder: fieldConfig.mobileOrder ?? template.mobileOrder,
+      mobileVisible: fieldConfig.mobileVisible ?? template.mobileVisible,
       isRequired: fieldConfig.required ?? template.isRequired,
       formConfig: {
         ...(template.formConfig ?? {}),

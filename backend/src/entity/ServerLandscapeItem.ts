@@ -45,6 +45,11 @@ export class ServerLandscapeItem {
     group: 'serverLandscape.groupIntegration',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   serverName!: string;
@@ -59,6 +64,11 @@ export class ServerLandscapeItem {
     group: 'serverLandscape.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 512, nullable: true })
   description?: string;
@@ -73,6 +83,11 @@ export class ServerLandscapeItem {
     group: 'serverLandscape.groupConfiguration',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: false, nullable: false })
   allowRemoteAccess: boolean = false;
@@ -87,6 +102,11 @@ export class ServerLandscapeItem {
     group: 'serverLandscape.groupConfiguration',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   hasInternetAccess: boolean = true;
@@ -104,6 +124,11 @@ export class ServerLandscapeItem {
     group: 'serverLandscape.groupReference',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => ServerLandscapeTypeItem, { nullable: false })
   type!: Rel<ServerLandscapeTypeItem>;
@@ -119,6 +144,11 @@ export class ServerLandscapeItem {
     group: 'serverLandscape.groupReference',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => ServerLandscapeTypeUsageItem, { nullable: false })
   usage!: Rel<ServerLandscapeTypeUsageItem>;
@@ -134,6 +164,11 @@ export class ServerLandscapeItem {
     group: 'serverLandscape.groupReference',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: true,
   })
   @ManyToOne(() => CompanyItem, { nullable: false })
   company!: Rel<CompanyItem>;

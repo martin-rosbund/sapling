@@ -63,6 +63,11 @@ export class EntityItem {
     group: 'entity.groupAppearance',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: 'square-rounded', length: 64, nullable: false })
   icon?: string = 'square-rounded';
@@ -78,6 +83,11 @@ export class EntityItem {
     group: 'entity.groupConfiguration',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 250,
+    tableVisible: true,
+    mobileOrder: 250,
+    mobileVisible: false,
   })
   @Property({ default: 0, fieldName: 'sort_order' })
   order?: number = 0;
@@ -92,6 +102,11 @@ export class EntityItem {
     group: 'entity.groupConfiguration',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: true })
   canRead: boolean = true;
@@ -106,6 +121,11 @@ export class EntityItem {
     group: 'entity.groupConfiguration',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: false })
   canInsert: boolean = false;
@@ -120,6 +140,11 @@ export class EntityItem {
     group: 'entity.groupSchedule',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: false })
   canUpdate: boolean = false;
@@ -134,6 +159,11 @@ export class EntityItem {
     group: 'entity.groupConfiguration',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ default: false })
   canDelete: boolean = false;
@@ -148,6 +178,11 @@ export class EntityItem {
     group: 'entity.groupConfiguration',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ default: false })
   canShow: boolean = false;
@@ -164,6 +199,11 @@ export class EntityItem {
     group: 'entity.groupReference',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => EntityGroupItem, { nullable: true })
   group?: EntityGroupItem;

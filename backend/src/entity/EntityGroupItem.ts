@@ -48,6 +48,11 @@ export class EntityGroupItem {
     group: 'entityGroup.groupAppearance',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: 'mdi-folder', length: 64, nullable: false })
   icon?: string = 'mdi-folder';
@@ -62,6 +67,11 @@ export class EntityGroupItem {
     group: 'entityGroup.groupConfiguration',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: true })
   isExpanded?: boolean = true;
@@ -77,6 +87,11 @@ export class EntityGroupItem {
     group: 'entityGroup.groupConfiguration',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: 0 })
   sortOrder?: number = 0;
@@ -93,6 +108,11 @@ export class EntityGroupItem {
     group: 'entityGroup.groupReference',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => EntityGroupItem, { nullable: true })
   parent?: Rel<EntityGroupItem> | null;

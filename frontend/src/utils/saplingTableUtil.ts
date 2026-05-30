@@ -21,6 +21,7 @@ export function isGenericReferenceTemplate(template?: Partial<EntityTemplate>): 
 }
 
 const TABLE_REFERENCE_PERMISSION_KINDS = ['m:1', '1:1']
+const TABLE_UNSUPPORTED_RELATION_KINDS = ['1:m', 'm:n', 'n:m']
 
 export function canReadReferenceTemplate(
   template?: Partial<EntityTemplate>,
@@ -65,17 +66,120 @@ export function getReadableReferenceRelationNames(
   ]
 }
 
-function isVisibleTableTemplate(
+function normalizeTemplateOrder(order?: number | null): number | null {
+  return typeof order === 'number' && Number.isFinite(order) ? Math.trunc(order) : null
+}
+
+function getTemplateConfiguredBoolean(
+  template: Partial<EntityTemplate>,
+  key: 'tableVisible' | 'mobileVisible',
+): boolean | null {
+  const configuredValue = template.formConfig?.[key]
+  if (typeof configuredValue === 'boolean') {
+    return configuredValue
+  }
+
+  const directValue = template[key]
+  return typeof directValue === 'boolean' ? directValue : null
+}
+
+function getTemplateConfiguredFormVisible(template: Partial<EntityTemplate>): boolean | null {
+  if (typeof template.formConfig?.visible === 'boolean') {
+    return template.formConfig.visible
+  }
+
+  return typeof template.formVisible === 'boolean' ? template.formVisible : null
+}
+
+function getTemplateConfiguredOrder(
+  template: Partial<EntityTemplate>,
+  key: 'tableOrder' | 'mobileOrder',
+): number | null {
+  return normalizeTemplateOrder(template.formConfig?.[key]) ?? normalizeTemplateOrder(template[key])
+}
+
+export function isSupportedTableTemplate(
   template: EntityTemplate,
   permissions: AccumulatedPermission[] = [],
 ): boolean {
   return (
-    (!template.options?.includes('isSystem') || isGenericReferenceTemplate(template)) &&
-    !template.isAutoIncrement &&
     !template.options?.includes('isSecurity') &&
-    !((template.length ?? 0) > 256) &&
-    !['1:m', 'm:n', 'n:m', '1:1'].includes(template.kind ?? '') &&
+    !TABLE_UNSUPPORTED_RELATION_KINDS.includes(template.kind ?? '') &&
     canReadReferenceTemplate(template, permissions)
+  )
+}
+
+export function isVisibleTableTemplate(
+  template: EntityTemplate,
+  permissions: AccumulatedPermission[] = [],
+): boolean {
+  if (!isSupportedTableTemplate(template, permissions)) {
+    return false
+  }
+
+  return getTemplateConfiguredBoolean(template, 'tableVisible') === true
+}
+
+export function getTableHeaderOrder(template: Partial<EntityTemplate>, index: number): number {
+  return getTemplateConfiguredOrder(template, 'tableOrder') ?? index
+}
+
+export function sortTableHeaders<T extends Partial<EntityTemplate>>(headers: T[]): T[] {
+  return [...headers]
+    .map((header, index) => ({
+      header,
+      index,
+      order: getTableHeaderOrder(header, index),
+    }))
+    .sort((left, right) => {
+      if (left.order === right.order) {
+        return left.index - right.index
+      }
+
+      return left.order - right.order
+    })
+    .map(({ header }) => header)
+}
+
+export function getMobileTableHeaders<T extends SaplingTableHeaderItem>(
+  headers: T[],
+): T[] {
+  const sortMobileHeaders = (items: T[]) =>
+    [...items]
+      .map((header, index) => ({
+        header,
+        index,
+        mobileOrder: getTemplateConfiguredOrder(header, 'mobileOrder'),
+        valueRank: header.options?.includes('isValue') ? 0 : 1,
+      }))
+      .sort((left, right) => {
+        if (left.mobileOrder != null && right.mobileOrder != null) {
+          if (left.mobileOrder === right.mobileOrder) {
+            return left.index - right.index
+          }
+
+          return left.mobileOrder - right.mobileOrder
+        }
+
+        if (left.mobileOrder != null) {
+          return -1
+        }
+
+        if (right.mobileOrder != null) {
+          return 1
+        }
+
+        if (left.valueRank !== right.valueRank) {
+          return left.valueRank - right.valueRank
+        }
+
+        return left.index - right.index
+      })
+      .map(({ header }) => header)
+
+  const orderedHeaders = sortMobileHeaders(headers)
+  return orderedHeaders.filter(
+    (header) => getTemplateConfiguredBoolean(header, 'mobileVisible') === true,
   )
 }
 
@@ -87,15 +191,34 @@ export function getRelationTableHeaders(
 ) {
   const result: Record<string, SaplingTableHeaderItem[]> = {}
   for (const key in relationTableStates) {
-    result[key] = (relationTableStates[key]?.entityTemplates ?? [])
-      .filter((template) => isVisibleTableTemplate(template, permissions))
+    result[key] = sortTableHeaders(
+      (relationTableStates[key]?.entityTemplates ?? [])
+        .filter((template) => isVisibleTableTemplate(template, permissions))
+        .map((tpl: EntityTemplate) => ({
+          ...tpl,
+          key: tpl.name,
+          title: t(`${relationTableStates[key]?.entity?.handle}.${tpl.name}`),
+        })),
+    )
+  }
+  return result
+}
+
+export function getSupportedTableHeaders(
+  entityTemplates: EntityTemplate[],
+  entity: EntityItem | null,
+  t: (key: string) => string,
+  permissions: AccumulatedPermission[] = [],
+) {
+  return sortTableHeaders(
+    entityTemplates
+      .filter((template) => isSupportedTableTemplate(template, permissions))
       .map((tpl: EntityTemplate) => ({
         ...tpl,
         key: tpl.name,
-        title: t(`${relationTableStates[key]?.entity?.handle}.${tpl.name}`),
-      }))
-  }
-  return result
+        title: t(`${entity?.handle}.${tpl.name}`),
+      })),
+  )
 }
 
 export function getEditDialogHeaders(
@@ -106,10 +229,9 @@ export function getEditDialogHeaders(
 ) {
   return entityTemplates.filter(
     (x) =>
-      x.formConfig?.visible !== false &&
-      (!x.options?.includes('isSystem') || isGenericReferenceTemplate(x)) &&
+      getTemplateConfiguredFormVisible(x) === true &&
       !x.isAutoIncrement &&
-      !['1:m', 'm:n', 'n:m', '1:1'].includes(x.kind || '') &&
+      !['1:m', 'm:n', 'n:m', '1:1'].includes(x.kind ?? '') &&
       (x.name !== 'handle' || mode === 'create') &&
       (!x.isReference || showReference) &&
       (!x.referenceName || permissions?.find((p) => p.entityHandle === x.referenceName)?.allowRead),
@@ -122,13 +244,9 @@ export function getTableHeaders(
   t: (key: string) => string,
   permissions: AccumulatedPermission[] = [],
 ) {
-  const result = entityTemplates
-    .filter((template) => isVisibleTableTemplate(template, permissions))
-    .map((tpl: EntityTemplate) => ({
-      ...tpl,
-      key: tpl.name,
-      title: t(`${entity?.handle}.${tpl.name}`),
-    }))
+  const result = getSupportedTableHeaders(entityTemplates, entity, t, permissions).filter(
+    (template) => isVisibleTableTemplate(template, permissions),
+  )
 
   return result
 }

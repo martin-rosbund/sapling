@@ -318,6 +318,21 @@ export class FormConfigService {
     if (Object.prototype.hasOwnProperty.call(fieldConfig, 'width')) {
       nextTemplate.formWidth = fieldConfig.width ?? null;
     }
+    if (Object.prototype.hasOwnProperty.call(fieldConfig, 'visible')) {
+      nextTemplate.formVisible = fieldConfig.visible ?? null;
+    }
+    if (Object.prototype.hasOwnProperty.call(fieldConfig, 'tableOrder')) {
+      nextTemplate.tableOrder = fieldConfig.tableOrder ?? null;
+    }
+    if (Object.prototype.hasOwnProperty.call(fieldConfig, 'tableVisible')) {
+      nextTemplate.tableVisible = fieldConfig.tableVisible ?? null;
+    }
+    if (Object.prototype.hasOwnProperty.call(fieldConfig, 'mobileOrder')) {
+      nextTemplate.mobileOrder = fieldConfig.mobileOrder ?? null;
+    }
+    if (Object.prototype.hasOwnProperty.call(fieldConfig, 'mobileVisible')) {
+      nextTemplate.mobileVisible = fieldConfig.mobileVisible ?? null;
+    }
     if (fieldConfig.required === true) {
       nextTemplate.isRequired = true;
     }
@@ -398,12 +413,16 @@ export class FormConfigService {
     this.setBoolean(record, fieldConfig, 'visible');
     this.setBoolean(record, fieldConfig, 'required');
     this.setBoolean(record, fieldConfig, 'readonly');
+    this.setBoolean(record, fieldConfig, 'tableVisible');
+    this.setBoolean(record, fieldConfig, 'mobileVisible');
     this.setNullableString(record, fieldConfig, 'group');
     this.setNullableString(record, fieldConfig, 'label');
     this.setNullableString(record, fieldConfig, 'helpText');
     this.setNullableString(record, fieldConfig, 'placeholder');
     this.setNullableNumber(record, fieldConfig, 'groupOrder');
     this.setNullableNumber(record, fieldConfig, 'order');
+    this.setNullableNumber(record, fieldConfig, 'tableOrder');
+    this.setNullableNumber(record, fieldConfig, 'mobileOrder');
     this.setNullableWidth(record, fieldConfig, 'width');
     this.setRenderer(record, fieldConfig);
 
@@ -429,7 +448,7 @@ export class FormConfigService {
   private setBoolean(
     source: Record<string, unknown>,
     target: SaplingFormFieldConfig,
-    key: 'visible' | 'required' | 'readonly',
+    key: 'visible' | 'required' | 'readonly' | 'tableVisible' | 'mobileVisible',
   ): void {
     if (typeof source[key] === 'boolean') {
       target[key] = source[key];
@@ -454,7 +473,7 @@ export class FormConfigService {
   private setNullableNumber(
     source: Record<string, unknown>,
     target: SaplingFormFieldConfig,
-    key: 'groupOrder' | 'order',
+    key: 'groupOrder' | 'order' | 'tableOrder' | 'mobileOrder',
   ): void {
     if (!Object.prototype.hasOwnProperty.call(source, key)) {
       return;

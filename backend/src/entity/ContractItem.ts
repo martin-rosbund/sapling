@@ -56,6 +56,11 @@ export class ContractItem {
     group: 'contract.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -71,6 +76,11 @@ export class ContractItem {
     group: 'contract.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: true, length: 512 })
   description?: string;
@@ -86,6 +96,11 @@ export class ContractItem {
     group: 'contract.groupSchedule',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ type: 'datetime', nullable: false })
   startDate!: Date;
@@ -101,6 +116,11 @@ export class ContractItem {
     group: 'contract.groupSchedule',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ type: 'datetime', nullable: true })
   endDate?: Date;
@@ -116,6 +136,11 @@ export class ContractItem {
     group: 'contract.groupSchedule',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ type: 'datetime', nullable: true })
   lastServiceDate?: Date;
@@ -131,6 +156,11 @@ export class ContractItem {
     group: 'contract.groupSchedule',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ type: 'datetime', nullable: true })
   nextServiceDate?: Date;
@@ -145,6 +175,11 @@ export class ContractItem {
     group: 'contract.groupConfiguration',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   isActive: boolean = true;
@@ -159,6 +194,11 @@ export class ContractItem {
     group: 'contract.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ default: 0, nullable: false })
   annualIncludedHours: number = 0;
@@ -173,6 +213,11 @@ export class ContractItem {
     group: 'contract.groupSchedule',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @Property({ default: false, nullable: false })
   hasUpdateservice: boolean = false;
@@ -190,6 +235,11 @@ export class ContractItem {
     group: 'contract.groupReference',
     groupOrder: 500,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @ManyToOne(() => CompanyItem, { nullable: true })
   company?: Rel<CompanyItem>;
@@ -205,6 +255,11 @@ export class ContractItem {
     group: 'contract.groupReference',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => ContractServiceItem, { nullable: true })
   serviceLevel?: Rel<ContractServiceItem>;
@@ -220,6 +275,11 @@ export class ContractItem {
     group: 'contract.groupReference',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @ManyToOne(() => SupportTeamItem, { nullable: true })
   defaultSupportTeam?: Rel<SupportTeamItem>;
@@ -235,6 +295,11 @@ export class ContractItem {
     group: 'contract.groupReference',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @ManyToOne(() => SupportQueueItem, { nullable: true })
   defaultSupportQueue?: Rel<SupportQueueItem>;
@@ -250,6 +315,11 @@ export class ContractItem {
     group: 'contract.groupReference',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @ManyToOne(() => SlaPolicyItem, { nullable: true })
   slaPolicy?: Rel<SlaPolicyItem>;

@@ -18,6 +18,11 @@ export class ChangeLogDetailItem {
     group: 'changeLogDetail.groupReference',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => ChangeLogItem, { nullable: false })
   log!: Rel<ChangeLogItem>;
@@ -29,6 +34,11 @@ export class ChangeLogDetailItem {
     group: 'changeLogDetail.groupContent',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 256, nullable: false })
   property!: string;
@@ -39,6 +49,11 @@ export class ChangeLogDetailItem {
     group: 'changeLogDetail.groupContent',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   oldValue?: unknown;
@@ -49,6 +64,11 @@ export class ChangeLogDetailItem {
     group: 'changeLogDetail.groupContent',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   newValue?: unknown;

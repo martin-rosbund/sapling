@@ -121,10 +121,20 @@ Example:
   group: 'ticket.groupBasics',
   groupOrder: 100,
   width: 2,
+  visible: true,
+  tableOrder: 100,
+  tableVisible: true,
+  mobileOrder: 100,
+  mobileVisible: true,
 })
 ```
 
 Fields are sorted by group order and field order. Width is a 1-4 grid span.
+`visible` controls generated edit-dialog fields. Table and mobile options
+independently control generated table columns and mobile card fields. These
+values are explicit initial metadata on `SaplingForm`; saved form-configuration
+overlays can override them per entity, role, or person. The current mobile
+convention is to set `mobileVisible: true` only on `isValue` fields.
 
 ### `@SaplingDependsOn(...)`
 

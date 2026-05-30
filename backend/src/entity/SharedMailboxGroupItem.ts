@@ -23,6 +23,11 @@ export class SharedMailboxGroupItem {
     group: 'sharedMailboxGroup.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -33,6 +38,11 @@ export class SharedMailboxGroupItem {
     group: 'sharedMailboxGroup.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 256, nullable: true })
   description?: string;
@@ -44,6 +54,11 @@ export class SharedMailboxGroupItem {
     group: 'sharedMailboxGroup.groupAppearance',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: 'mdi-email-lock-outline', length: 64, nullable: false })
   icon: string = 'mdi-email-lock-outline';
@@ -55,6 +70,11 @@ export class SharedMailboxGroupItem {
     group: 'sharedMailboxGroup.groupAppearance',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: '#1565C0', length: 32, nullable: false })
   color: string = '#1565C0';
@@ -65,6 +85,11 @@ export class SharedMailboxGroupItem {
     group: 'sharedMailboxGroup.groupConfiguration',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   isActive = true;

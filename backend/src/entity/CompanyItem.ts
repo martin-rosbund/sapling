@@ -80,6 +80,11 @@ export class CompanyItem {
     group: 'company.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ unique: true, length: 128, nullable: false })
   name!: string;
@@ -95,6 +100,11 @@ export class CompanyItem {
     group: 'company.groupAddress',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: false })
   street!: string;
@@ -110,6 +120,11 @@ export class CompanyItem {
     group: 'company.groupAddress',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ length: 16, nullable: true })
   zip?: string;
@@ -125,6 +140,11 @@ export class CompanyItem {
     group: 'company.groupAddress',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ length: 64, nullable: true })
   city?: string;
@@ -140,6 +160,11 @@ export class CompanyItem {
     group: 'company.groupContact',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 32, nullable: true })
   phone?: string;
@@ -155,6 +180,11 @@ export class CompanyItem {
     group: 'company.groupContact',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ length: 32, nullable: true })
   mobile?: string;
@@ -170,6 +200,11 @@ export class CompanyItem {
     group: 'company.groupContact',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: true })
   email?: string;
@@ -185,6 +220,11 @@ export class CompanyItem {
     group: 'company.groupContact',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: true })
   website?: string;
@@ -199,6 +239,11 @@ export class CompanyItem {
     group: 'company.groupConfiguration',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   isActive?: boolean = true;
@@ -213,6 +258,11 @@ export class CompanyItem {
     group: 'company.groupConfiguration',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   allowNewsletter?: boolean = true;
@@ -232,6 +282,11 @@ export class CompanyItem {
     group: 'company.groupAddress',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @ManyToOne(() => CountryItem, {
     defaultRaw: `'DE'`,
@@ -339,6 +394,11 @@ export class CompanyItem {
     group: 'company.groupReference',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => WorkHourWeekItem, { nullable: true })
   workWeek!: WorkHourWeekItem;
@@ -353,6 +413,11 @@ export class CompanyItem {
     group: 'company.groupReference',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 150,
+    tableVisible: true,
+    mobileOrder: 150,
+    mobileVisible: false,
   })
   @ManyToOne(() => HolidayGroupItem, { nullable: true })
   holidayGroup?: HolidayGroupItem;
@@ -393,6 +458,11 @@ export class CompanyItem {
     group: 'company.groupReference',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => CompanyItem, { nullable: true })
   serviceProvider!: CompanyItem;

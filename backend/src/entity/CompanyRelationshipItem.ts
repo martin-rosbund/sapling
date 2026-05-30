@@ -46,6 +46,11 @@ export class CompanyRelationshipItem {
     group: 'companyRelationship.groupContent',
     groupOrder: 100,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: true, length: 1024 })
   description?: string;
@@ -63,6 +68,11 @@ export class CompanyRelationshipItem {
     group: 'companyRelationship.groupReference',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @ManyToOne(() => CompanyItem, { nullable: false })
   sourceCompany!: Rel<CompanyItem>;
@@ -78,6 +88,11 @@ export class CompanyRelationshipItem {
     group: 'companyRelationship.groupReference',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: true,
   })
   @ManyToOne(() => CompanyItem, { nullable: false })
   targetCompany!: Rel<CompanyItem>;
@@ -93,6 +108,11 @@ export class CompanyRelationshipItem {
     group: 'companyRelationship.groupReference',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: true,
   })
   @ManyToOne(() => CompanyRelationshipTypeItem, { nullable: false })
   type!: Rel<CompanyRelationshipTypeItem>;

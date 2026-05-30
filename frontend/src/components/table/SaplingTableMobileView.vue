@@ -221,9 +221,7 @@ const emit = defineEmits<SaplingTableMobileViewEmit>()
 
 const mobileControlsVisible = ref(false)
 
-const sortableMobileHeaders = computed(() =>
-  props.mobileCardHeaders.filter((column) => column.options?.includes('isValue')),
-)
+const sortableMobileHeaders = computed(() => props.mobileCardHeaders)
 const filterableMobileHeaders = computed(() =>
   sortableMobileHeaders.value.filter((column) => props.isColumnFilterable(column)),
 )

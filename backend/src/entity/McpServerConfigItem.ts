@@ -15,6 +15,11 @@ export class McpServerConfigItem {
     group: 'mcpServerConfig.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   name!: string;
@@ -25,6 +30,11 @@ export class McpServerConfigItem {
     group: 'mcpServerConfig.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 512, nullable: true })
   description?: string | null;
@@ -36,6 +46,11 @@ export class McpServerConfigItem {
     group: 'mcpServerConfig.groupIntegration',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 32, nullable: false, default: 'http' })
   transport = 'http';
@@ -46,6 +61,11 @@ export class McpServerConfigItem {
     group: 'mcpServerConfig.groupConfiguration',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   isActive = true;
@@ -56,6 +76,11 @@ export class McpServerConfigItem {
     group: 'mcpServerConfig.groupSchedule',
     groupOrder: 500,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 512, nullable: true })
   endpoint?: string | null;
@@ -66,6 +91,11 @@ export class McpServerConfigItem {
     group: 'mcpServerConfig.groupBasics',
     groupOrder: 100,
     width: 4,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ length: 512, nullable: true })
   command?: string | null;
@@ -76,6 +106,11 @@ export class McpServerConfigItem {
     group: 'mcpServerConfig.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   args?: string[] | null;
@@ -87,6 +122,11 @@ export class McpServerConfigItem {
     group: 'mcpServerConfig.groupSecurity',
     groupOrder: 600,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true, hidden: true })
   environment?: Record<string, string> | null;
@@ -97,6 +137,11 @@ export class McpServerConfigItem {
     group: 'mcpServerConfig.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   headers?: Record<string, string> | null;
@@ -108,6 +153,11 @@ export class McpServerConfigItem {
     group: 'mcpServerConfig.groupSecurity',
     groupOrder: 600,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true, hidden: true })
   authConfig?: Record<string, unknown> | null;
@@ -118,6 +168,11 @@ export class McpServerConfigItem {
     group: 'mcpServerConfig.groupConfiguration',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   allowedTools?: string[] | null;
@@ -128,6 +183,11 @@ export class McpServerConfigItem {
     group: 'mcpServerConfig.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ nullable: true })
   timeoutMs?: number | null;
@@ -138,6 +198,11 @@ export class McpServerConfigItem {
     group: 'mcpServerConfig.groupConfiguration',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ nullable: false, default: 0 })
   sortOrder = 0;

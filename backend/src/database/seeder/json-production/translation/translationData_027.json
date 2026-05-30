@@ -1,0 +1,38 @@
+[
+  {
+    "entity": "formConfig",
+    "property": "formVisible",
+    "de": "Formular sichtbar",
+    "en": "Visible in form"
+  },
+  {
+    "entity": "formConfig",
+    "property": "tableVisible",
+    "de": "Tabelle sichtbar",
+    "en": "Visible in table"
+  },
+  {
+    "entity": "formConfig",
+    "property": "mobileVisible",
+    "de": "Mobil sichtbar",
+    "en": "Visible on mobile"
+  },
+  {
+    "entity": "formConfig",
+    "property": "formOrder",
+    "de": "Reihenfolge Formular",
+    "en": "Form order"
+  },
+  {
+    "entity": "formConfig",
+    "property": "tableOrder",
+    "de": "Reihenfolge Tabelle",
+    "en": "Table order"
+  },
+  {
+    "entity": "formConfig",
+    "property": "mobileOrder",
+    "de": "Reihenfolge Mobil",
+    "en": "Mobile order"
+  }
+]

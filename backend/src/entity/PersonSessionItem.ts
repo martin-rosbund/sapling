@@ -42,6 +42,11 @@ export class PersonSessionItem {
     group: 'personSession.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: false })
   number!: string;
@@ -56,6 +61,11 @@ export class PersonSessionItem {
     group: 'personSession.groupSecurity',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({
     nullable: false,
@@ -75,6 +85,11 @@ export class PersonSessionItem {
     group: 'personSession.groupSecurity',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({
     nullable: false,
@@ -96,6 +111,11 @@ export class PersonSessionItem {
     group: 'personSession.groupReference',
     groupOrder: 300,
     width: 2,
+    visible: false,
+    tableOrder: 100,
+    tableVisible: false,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @OneToOne(() => PersonItem, { nullable: false, unique: true })
   person!: Rel<PersonItem>;

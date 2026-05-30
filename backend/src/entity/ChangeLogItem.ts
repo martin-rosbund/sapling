@@ -30,6 +30,11 @@ export class ChangeLogItem {
     group: 'changeLog.groupContent',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => ChangeLogActionItem, { nullable: false })
   action!: Rel<ChangeLogActionItem>;
@@ -42,6 +47,11 @@ export class ChangeLogItem {
     group: 'changeLog.groupContent',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: true,
   })
   @Property({ length: 64, nullable: false })
   reference!: string;
@@ -53,6 +63,11 @@ export class ChangeLogItem {
     group: 'changeLog.groupReference',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => EntityItem, { nullable: false })
   entity!: Rel<EntityItem>;
@@ -64,6 +79,11 @@ export class ChangeLogItem {
     group: 'changeLog.groupReference',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;
@@ -74,6 +94,11 @@ export class ChangeLogItem {
     group: 'changeLog.groupContent',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   oldPayload?: Record<string, unknown> | null;
@@ -84,6 +109,11 @@ export class ChangeLogItem {
     group: 'changeLog.groupContent',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   newPayload?: Record<string, unknown> | null;

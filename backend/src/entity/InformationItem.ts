@@ -34,6 +34,11 @@ export class InformationItem {
     group: 'information.groupContent',
     groupOrder: 100,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ type: 'text' })
   content!: string;
@@ -45,6 +50,11 @@ export class InformationItem {
     group: 'information.groupReference',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => EntityItem)
   entity!: Rel<EntityItem>;
@@ -56,6 +66,11 @@ export class InformationItem {
     group: 'information.groupReference',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;

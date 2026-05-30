@@ -53,6 +53,11 @@ export class PersonApiTokenItem {
     group: 'personApiToken.groupContent',
     groupOrder: 100,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   description!: string;
@@ -80,6 +85,11 @@ export class PersonApiTokenItem {
     group: 'personApiToken.groupSecurity',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: false, unique: true, hidden: true })
   tokenHash!: string;
@@ -93,6 +103,11 @@ export class PersonApiTokenItem {
     group: 'personApiToken.groupConfiguration',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   isActive = true;
@@ -106,6 +121,11 @@ export class PersonApiTokenItem {
     group: 'personApiToken.groupSchedule',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: false, type: 'datetime' })
   expiresAt!: Date;
@@ -127,6 +147,11 @@ export class PersonApiTokenItem {
     group: 'personApiToken.groupSecurity',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   allowedIps?: string[];
@@ -143,6 +168,11 @@ export class PersonApiTokenItem {
     group: 'personApiToken.groupReference',
     groupOrder: 500,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;

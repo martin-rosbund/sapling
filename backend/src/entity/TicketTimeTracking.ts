@@ -45,6 +45,11 @@ export class TicketTimeTrackingItem {
     group: 'ticketTimeTracking.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 64, nullable: false })
   title!: string;
@@ -60,6 +65,11 @@ export class TicketTimeTrackingItem {
     group: 'ticketTimeTracking.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 256, nullable: false })
   description!: string;
@@ -75,6 +85,11 @@ export class TicketTimeTrackingItem {
     group: 'ticketTimeTracking.groupReference',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;
@@ -89,6 +104,11 @@ export class TicketTimeTrackingItem {
     group: 'ticketTimeTracking.groupReference',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => TicketItem, { nullable: false })
   ticket!: Rel<TicketItem>;
@@ -106,6 +126,11 @@ export class TicketTimeTrackingItem {
     group: 'ticketTimeTracking.groupSchedule',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ type: 'datetime', nullable: false })
   startTime!: Date;
@@ -121,6 +146,11 @@ export class TicketTimeTrackingItem {
     group: 'ticketTimeTracking.groupSchedule',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ type: 'datetime', nullable: false })
   endTime!: Date;

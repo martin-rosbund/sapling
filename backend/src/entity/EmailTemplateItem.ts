@@ -17,6 +17,11 @@ export class EmailTemplateItem {
     group: 'emailTemplate.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   name!: string;
@@ -27,6 +32,11 @@ export class EmailTemplateItem {
     group: 'emailTemplate.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: true, length: 256 })
   description?: string;
@@ -37,6 +47,11 @@ export class EmailTemplateItem {
     group: 'emailTemplate.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ length: 256, nullable: false })
   subjectTemplate!: string;
@@ -48,6 +63,11 @@ export class EmailTemplateItem {
     group: 'emailTemplate.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ nullable: false, length: 8192 })
   bodyMarkdown!: string;
@@ -58,6 +78,11 @@ export class EmailTemplateItem {
     group: 'emailTemplate.groupConfiguration',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: false, nullable: false })
   isDefault: boolean = false;
@@ -68,6 +93,11 @@ export class EmailTemplateItem {
     group: 'emailTemplate.groupConfiguration',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   isActive: boolean = true;
@@ -79,6 +109,11 @@ export class EmailTemplateItem {
     group: 'emailTemplate.groupReference',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => EntityItem, { nullable: false })
   entity!: Rel<EntityItem>;

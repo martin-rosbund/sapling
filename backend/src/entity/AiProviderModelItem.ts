@@ -24,6 +24,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -34,6 +39,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 512, nullable: true })
   description?: string | null;
@@ -45,6 +55,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupReference',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => AiProviderTypeItem, { nullable: false })
   provider!: Rel<AiProviderTypeItem>;
@@ -55,6 +70,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupIntegration',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: false })
   providerModel!: string;
@@ -65,6 +85,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupIntegration',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ nullable: false, default: true })
   supportsStreaming = true;
@@ -75,6 +100,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupIntegration',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ nullable: false, default: false })
   supportsTools = false;
@@ -85,6 +115,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupIntegration',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ nullable: false, default: false })
   supportsEmbeddings = false;
@@ -95,6 +130,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupIntegration',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @Property({ nullable: false, default: false })
   supportsTranscription = false;
@@ -105,6 +145,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupIntegration',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 525,
+    tableVisible: true,
+    mobileOrder: 525,
+    mobileVisible: false,
   })
   @Property({ nullable: false, default: 32 })
   embeddingBatchSize = 32;
@@ -115,6 +160,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupIntegration',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 530,
+    tableVisible: true,
+    mobileOrder: 530,
+    mobileVisible: false,
   })
   @Property({ nullable: false, default: 1200 })
   vectorChunkLength = 1200;
@@ -125,6 +175,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupIntegration',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 535,
+    tableVisible: true,
+    mobileOrder: 535,
+    mobileVisible: false,
   })
   @Property({ nullable: false, default: 200 })
   vectorChunkOverlap = 200;
@@ -135,6 +190,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupIntegration',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 540,
+    tableVisible: true,
+    mobileOrder: 540,
+    mobileVisible: false,
   })
   @Property({ nullable: false, default: 6 })
   vectorSearchCandidateMultiplier = 6;
@@ -145,6 +205,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupIntegration',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 545,
+    tableVisible: true,
+    mobileOrder: 545,
+    mobileVisible: false,
   })
   @Property({ nullable: false, default: 60 })
   vectorSearchMaxCandidateLimit = 60;
@@ -155,6 +220,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupIntegration',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 548,
+    tableVisible: true,
+    mobileOrder: 548,
+    mobileVisible: false,
   })
   @Property({ nullable: false, default: 10 })
   vectorSearchMaxResults = 10;
@@ -165,6 +235,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupIntegration',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 550,
+    tableVisible: true,
+    mobileOrder: 550,
+    mobileVisible: false,
   })
   @Property({ nullable: false, default: false })
   supportsSpeech = false;
@@ -175,6 +250,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupIntegration',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 650,
+    tableVisible: true,
+    mobileOrder: 650,
+    mobileVisible: false,
   })
   @Property({ length: 64, nullable: false, default: 'nova' })
   speechVoice = 'nova';
@@ -185,6 +265,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupIntegration',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 750,
+    tableVisible: true,
+    mobileOrder: 750,
+    mobileVisible: false,
   })
   @Property({ nullable: false, default: 1, type: 'float' })
   speechSpeed = 1;
@@ -195,6 +280,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupIntegration',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 850,
+    tableVisible: true,
+    mobileOrder: 850,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: false, default: 'audio/mpeg' })
   speechMimeType = 'audio/mpeg';
@@ -205,6 +295,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupIntegration',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 950,
+    tableVisible: true,
+    mobileOrder: 950,
+    mobileVisible: false,
   })
   @Property({ length: 16, nullable: false, default: 'mp3' })
   speechFileExtension = 'mp3';
@@ -215,6 +310,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupIntegration',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 1050,
+    tableVisible: true,
+    mobileOrder: 1050,
+    mobileVisible: false,
   })
   @Property({ nullable: false, default: 4000 })
   speechMaxInputLength = 4000;
@@ -225,6 +325,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ nullable: false, default: 8 })
   maxToolCallIterations = 8;
@@ -235,6 +340,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupConfiguration',
     groupOrder: 500,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: false, default: false })
   isDefault = false;
@@ -245,6 +355,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupConfiguration',
     groupOrder: 500,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ nullable: false, default: true })
   isActive = true;
@@ -255,6 +370,11 @@ export class AiProviderModelItem {
     group: 'aiProviderModel.groupConfiguration',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ nullable: true, default: 0 })
   sortOrder?: number | null = 0;

@@ -205,7 +205,8 @@
                 color="primary"
                 hide-details
                 density="compact"
-                :aria-label="$t('formConfig.visible')"
+                :label="$t('formConfig.formVisible')"
+                :aria-label="$t('formConfig.formVisible')"
               />
               <div>
                 <strong>{{ resolveFieldLabel(field.name) }}</strong>
@@ -240,7 +241,21 @@
                 class="sapling-config-field__control"
                 density="compact"
                 hide-details
-                :label="$t('formConfig.order')"
+                :label="$t('formConfig.formOrder')"
+              />
+              <v-number-input
+                v-model="field.tableOrder"
+                class="sapling-config-field__control"
+                density="compact"
+                hide-details
+                :label="$t('formConfig.tableOrder')"
+              />
+              <v-number-input
+                v-model="field.mobileOrder"
+                class="sapling-config-field__control"
+                density="compact"
+                hide-details
+                :label="$t('formConfig.mobileOrder')"
               />
               <v-select
                 v-model="field.width"
@@ -272,6 +287,18 @@
                 density="compact"
                 hide-details
                 :label="$t('formConfig.required')"
+              />
+              <v-checkbox
+                v-model="field.tableVisible"
+                density="compact"
+                hide-details
+                :label="$t('formConfig.tableVisible')"
+              />
+              <v-checkbox
+                v-model="field.mobileVisible"
+                density="compact"
+                hide-details
+                :label="$t('formConfig.mobileVisible')"
               />
               <v-checkbox
                 v-model="field.readonly"
@@ -370,6 +397,10 @@ type FieldDraft = {
   group: string
   order: number | null
   width: EntityTemplateFormWidth
+  tableVisible: boolean
+  tableOrder: number | null
+  mobileVisible: boolean
+  mobileOrder: number | null
   renderer: SaplingFormRenderer
   placeholder: string
   required: boolean
@@ -491,6 +522,10 @@ const draftConfig = computed<SaplingFormConfigPayload>(() => ({
         group: field.group.trim() || null,
         order: field.order,
         width: field.width,
+        tableVisible: field.tableVisible,
+        tableOrder: field.tableOrder,
+        mobileVisible: field.mobileVisible,
+        mobileOrder: field.mobileOrder,
         renderer: field.renderer,
         placeholder: field.placeholder.trim() || null,
         required: field.required,
@@ -640,14 +675,25 @@ function buildFieldRows(configFields: SaplingFormConfigPayload['fields']): void 
     .filter((template) => !['1:m', 'm:n', 'n:m', '1:1'].includes(template.kind ?? ''))
     .forEach((template, index) => {
       const fieldConfig = getFieldConfig(configFields?.[template.name])
+      const visible = fieldConfig.visible ?? template.formVisible ?? false
       fieldRows.push({
         name: template.name,
         type: template.type,
-        visible: fieldConfig.visible !== false,
+        visible,
         label: fieldConfig.label ?? '',
         group: fieldConfig.group ?? template.formGroup ?? '',
         order: fieldConfig.order ?? template.formOrder ?? index + 1,
         width: fieldConfig.width ?? template.formWidth ?? getDialogTemplateWidth(template),
+        tableVisible: fieldConfig.tableVisible ?? template.tableVisible ?? visible,
+        tableOrder:
+          fieldConfig.tableOrder ?? template.tableOrder ?? template.formOrder ?? index + 1,
+        mobileVisible: fieldConfig.mobileVisible ?? template.mobileVisible ?? false,
+        mobileOrder:
+          fieldConfig.mobileOrder ??
+          template.mobileOrder ??
+          template.tableOrder ??
+          template.formOrder ??
+          index + 1,
         renderer: fieldConfig.renderer ?? 'auto',
         placeholder: fieldConfig.placeholder ?? '',
         required: fieldConfig.required ?? template.isRequired === true,
@@ -686,6 +732,11 @@ function applyDraftToTemplate(template: EntityTemplate): EntityTemplate {
     formGroup: field.group || null,
     formOrder: field.order,
     formWidth: field.width,
+    formVisible: field.visible,
+    tableVisible: field.tableVisible,
+    tableOrder: field.tableOrder,
+    mobileVisible: field.mobileVisible,
+    mobileOrder: field.mobileOrder,
     isRequired: field.required,
     formConfig: {
       visible: field.visible,
@@ -693,6 +744,10 @@ function applyDraftToTemplate(template: EntityTemplate): EntityTemplate {
       group: field.group || null,
       order: field.order,
       width: field.width,
+      tableVisible: field.tableVisible,
+      tableOrder: field.tableOrder,
+      mobileVisible: field.mobileVisible,
+      mobileOrder: field.mobileOrder,
       renderer: field.renderer,
       placeholder: field.placeholder || null,
       required: field.required,
@@ -747,6 +802,8 @@ function resetCurrentConfig(): void {
 function showAllFields(): void {
   fieldRows.forEach((field) => {
     field.visible = true
+    field.tableVisible = true
+    field.mobileVisible = true
   })
 }
 

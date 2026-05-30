@@ -17,6 +17,11 @@ export class KnowledgeArticleCategoryItem {
     group: 'knowledgeArticleCategory.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -27,6 +32,11 @@ export class KnowledgeArticleCategoryItem {
     group: 'knowledgeArticleCategory.groupBasics',
     groupOrder: 100,
     width: 3,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ length: 256, nullable: true })
   description?: string;
@@ -38,6 +48,11 @@ export class KnowledgeArticleCategoryItem {
     group: 'knowledgeArticleCategory.groupAppearance',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({
     default: 'mdi-shape-outline',
@@ -53,6 +68,11 @@ export class KnowledgeArticleCategoryItem {
     group: 'knowledgeArticleCategory.groupAppearance',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: '#607D8B', length: 32, nullable: false })
   color: string = '#607D8B';
@@ -64,6 +84,11 @@ export class KnowledgeArticleCategoryItem {
     group: 'knowledgeArticleCategory.groupAppearance',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ default: 100, nullable: false })
   sortOrder = 100;
@@ -74,6 +99,11 @@ export class KnowledgeArticleCategoryItem {
     group: 'knowledgeArticleCategory.groupConfiguration',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   isActive = true;
