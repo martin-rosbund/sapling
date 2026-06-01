@@ -49,6 +49,11 @@ export const SAPLING_MCP_USAGE_HINTS = {
   genericGet: [
     'Use this tool when you already know the exact record handle and need the current sanitized record.',
   ],
+  userFacingValues: [
+    'Use displayValue and fields marked as isValue for user-facing prose.',
+    'Do not mention raw record handles, primary keys, or generic IDs unless the user explicitly asks for them.',
+    'For relations, prefer the nested displayValue or other descriptive text fields over relation handles.',
+  ],
   ticketSearch: [
     'TicketItem is exposed via the generic entity handle ticket.',
     'Use searchMode solution when the user asks for an existing fix, workaround, or ticket solution.',

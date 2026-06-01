@@ -111,6 +111,7 @@ export class AiChatRuntimeService {
           serverName: toolExecution.serverName,
           toolName: toolExecution.toolName,
           arguments: args,
+          modelResult: toolExecution.modelResult,
           rawResult: toolExecution.rawResult,
         });
 
@@ -300,6 +301,7 @@ export class AiChatRuntimeService {
           serverName: toolExecution.serverName,
           toolName: toolExecution.toolName,
           arguments: args,
+          modelResult: toolExecution.modelResult,
           rawResult: toolExecution.rawResult,
         });
 
@@ -311,7 +313,7 @@ export class AiChatRuntimeService {
           functionResponse: {
             name: functionCall.name,
             response: {
-              content: toolExecution.rawResult,
+              content: toolExecution.modelResult,
             },
           },
         });

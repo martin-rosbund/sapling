@@ -66,7 +66,7 @@ export class SaplingMcpService {
     toolName: string,
     args: Record<string, unknown>,
     user: PersonItem,
-  ): Promise<{ content: string; rawResult: unknown }> {
+  ): Promise<{ content: string; modelResult: unknown; rawResult: unknown }> {
     let payload: unknown;
 
     try {
@@ -117,8 +117,11 @@ export class SaplingMcpService {
       payload = this.createToolErrorPayload(toolName, error);
     }
 
+    const modelResult = this.createModelResult(toolName, payload, args);
+
     return {
-      content: JSON.stringify(payload, null, 2),
+      content: JSON.stringify(modelResult, null, 2),
+      modelResult,
       rawResult: payload,
     };
   }
@@ -223,7 +226,7 @@ export class SaplingMcpService {
         },
         async (args: Record<string, unknown> = {}) => {
           const result = await this.executeTool(tool.toolName, args, user);
-          return this.createJsonContent(result.rawResult);
+          return this.createJsonContent(result.modelResult);
         },
       );
     }
@@ -240,6 +243,381 @@ export class SaplingMcpService {
         },
       ],
     };
+  }
+
+  private createModelResult(
+    toolName: string,
+    payload: unknown,
+    args: Record<string, unknown>,
+  ): unknown {
+    if (this.isToolErrorPayload(payload)) {
+      return payload;
+    }
+
+    switch (toolName) {
+      case 'current_person':
+        return this.sanitizeUnknownValue(payload);
+      case 'generic_list':
+      case 'ticket_search':
+        return this.createModelListResult(payload, args);
+      case 'generic_get':
+        return this.createModelGetResult(payload);
+      case 'semantic_search':
+        return this.createModelSemanticSearchResult(payload);
+      case 'knowledge_search':
+        return this.createModelKnowledgeSearchResult(payload);
+      case 'generic_create':
+      case 'generic_update':
+        return this.createModelMutationResult(payload, args);
+      case 'generic_delete':
+        return this.createModelDeleteResult(payload);
+      case 'generic_timeline':
+        return this.sanitizeUnknownValue(payload);
+      default:
+        return payload;
+    }
+  }
+
+  private createModelListResult(
+    payload: unknown,
+    args: Record<string, unknown>,
+  ): unknown {
+    const record = this.asRecord(payload);
+    const entityHandle =
+      this.asStringValue(record.entityHandle) ??
+      this.asStringValue(args.entityHandle);
+
+    if (!entityHandle) {
+      return this.sanitizeUnknownValue(payload);
+    }
+
+    return {
+      ...this.copyModelResultMetadata(record, [
+        'entityHandle',
+        'query',
+        'searchMode',
+        'searchFields',
+        'meta',
+        'usageHints',
+      ]),
+      entityHandle,
+      data: Array.isArray(record.data)
+        ? record.data.map((item) =>
+            this.sanitizeEntityRecord(entityHandle, item),
+          )
+        : [],
+    };
+  }
+
+  private createModelGetResult(payload: unknown): unknown {
+    const record = this.asRecord(payload);
+    const entityHandle = this.asStringValue(record.entityHandle);
+    const sourceRecord = this.asEntityRecord(record.record);
+
+    if (!entityHandle || !sourceRecord) {
+      return this.sanitizeUnknownValue(payload);
+    }
+
+    return {
+      entityHandle,
+      found: record.found === true,
+      displayValue: this.buildRecordDisplayValue(entityHandle, sourceRecord),
+      record: this.sanitizeEntityRecord(entityHandle, sourceRecord),
+      usageHints: [
+        ...SAPLING_MCP_USAGE_HINTS.genericGet,
+        ...SAPLING_MCP_USAGE_HINTS.userFacingValues,
+      ],
+    };
+  }
+
+  private createModelSemanticSearchResult(payload: unknown): unknown {
+    const record = this.asRecord(payload);
+    const entityHandle = this.asStringValue(record.entityHandle);
+
+    if (!entityHandle) {
+      return this.sanitizeUnknownValue(payload);
+    }
+
+    return {
+      ...this.copyModelResultMetadata(record, [
+        'entityHandle',
+        'query',
+        'indexed',
+        'searchableSections',
+        'usageHints',
+      ]),
+      results: this.sanitizeSearchResults(entityHandle, record.results),
+    };
+  }
+
+  private createModelKnowledgeSearchResult(payload: unknown): unknown {
+    const record = this.asRecord(payload);
+    const results = Array.isArray(record.results) ? record.results : [];
+
+    return {
+      ...this.copyModelResultMetadata(record, [
+        'query',
+        'entityHandles',
+        'indexedEntityHandles',
+        'unindexedEntityHandles',
+        'skippedEntityHandles',
+        'errors',
+        'usageHints',
+      ]),
+      results: results
+        .map((item) => {
+          const result = this.asRecord(item);
+          const entityHandle = this.asStringValue(result.entityHandle);
+          const sourceRecord = this.asEntityRecord(result.record);
+
+          if (!entityHandle) {
+            return this.sanitizeUnknownValue(item);
+          }
+
+          return {
+            entityHandle,
+            score: this.asScore(result.score),
+            displayValue: sourceRecord
+              ? this.buildRecordDisplayValue(entityHandle, sourceRecord)
+              : null,
+            record: sourceRecord
+              ? this.sanitizeEntityRecord(entityHandle, sourceRecord)
+              : null,
+            matches: this.sanitizeUnknownValue(result.matches),
+          };
+        })
+        .filter((item) => item != null),
+    };
+  }
+
+  private createModelMutationResult(
+    payload: unknown,
+    args: Record<string, unknown>,
+  ): unknown {
+    const record = this.asRecord(payload);
+    const entityHandle =
+      this.asStringValue(record.entityHandle) ??
+      this.asStringValue(args.entityHandle);
+
+    if (!entityHandle) {
+      return this.sanitizeUnknownValue(payload);
+    }
+
+    return this.sanitizeEntityRecord(entityHandle, record);
+  }
+
+  private createModelDeleteResult(payload: unknown): unknown {
+    const record = this.asRecord(payload);
+
+    return {
+      success: record.success === true,
+      entityHandle: this.asStringValue(record.entityHandle),
+      usageHints: [...SAPLING_MCP_USAGE_HINTS.userFacingValues],
+    };
+  }
+
+  private sanitizeSearchResults(
+    entityHandle: string,
+    value: unknown,
+  ): unknown[] {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value
+      .map((item) => {
+        const result = this.asRecord(item);
+        const sourceRecord = this.asEntityRecord(result.record);
+
+        return {
+          score: this.asScore(result.score),
+          displayValue: sourceRecord
+            ? this.buildRecordDisplayValue(entityHandle, sourceRecord)
+            : null,
+          record: sourceRecord
+            ? this.sanitizeEntityRecord(entityHandle, sourceRecord)
+            : null,
+          matches: this.sanitizeUnknownValue(result.matches),
+        };
+      })
+      .filter((item) => item.record != null || item.displayValue != null);
+  }
+
+  private sanitizeEntityRecord(entityHandle: string, value: unknown): unknown {
+    if (Array.isArray(value)) {
+      return value.map((item) => this.sanitizeEntityRecord(entityHandle, item));
+    }
+
+    const record = this.asEntityRecord(value);
+
+    if (!record) {
+      return this.sanitizeUnknownValue(value);
+    }
+
+    const template = this.getEntityTemplate(entityHandle);
+    const fieldsByName = new Map(template.map((field) => [field.name, field]));
+    const sanitizedRecord: Record<string, unknown> = {};
+    const displayValue = this.buildRecordDisplayValue(entityHandle, record);
+
+    if (displayValue) {
+      sanitizedRecord.displayValue = displayValue;
+    }
+
+    for (const [key, rawValue] of Object.entries(record)) {
+      const field = fieldsByName.get(key);
+
+      if (this.isInternalIdentifierKey(key) || field?.isPrimaryKey) {
+        continue;
+      }
+
+      if (field?.options?.includes('isSecurity')) {
+        continue;
+      }
+
+      if (field?.isReference && field.referenceName) {
+        sanitizedRecord[key] = this.sanitizeEntityRecord(
+          field.referenceName,
+          rawValue,
+        );
+        continue;
+      }
+
+      sanitizedRecord[key] = this.sanitizeUnknownValue(rawValue);
+    }
+
+    return sanitizedRecord;
+  }
+
+  private sanitizeUnknownValue(value: unknown): unknown {
+    if (Array.isArray(value)) {
+      return value.map((item) => this.sanitizeUnknownValue(item));
+    }
+
+    if (!value || typeof value !== 'object') {
+      return value;
+    }
+
+    const record = value as Record<string, unknown>;
+    const sanitizedRecord: Record<string, unknown> = {};
+
+    for (const [key, rawValue] of Object.entries(record)) {
+      if (this.isInternalIdentifierKey(key)) {
+        continue;
+      }
+
+      sanitizedRecord[key] = this.sanitizeUnknownValue(rawValue);
+    }
+
+    return sanitizedRecord;
+  }
+
+  private buildRecordDisplayValue(
+    entityHandle: string,
+    record: Record<string, unknown>,
+  ): string | null {
+    const template = this.getEntityTemplate(entityHandle);
+    const valueFieldNames = template
+      .filter((field) => field.options?.includes('isValue'))
+      .map((field) => field.name);
+    const valueParts = valueFieldNames
+      .map((fieldName) => this.formatDisplayValuePart(record[fieldName]))
+      .filter((part): part is string => !!part);
+
+    if (valueParts.length > 0) {
+      return valueParts.join(' ');
+    }
+
+    const fallbackParts = [
+      this.formatDisplayValuePart(record.title),
+      this.formatDisplayValuePart(record.name),
+      this.formatDisplayValuePart(record.number),
+      this.formatDisplayValuePart(record.description),
+      this.formatDisplayValuePart(record.subject),
+      this.formatPersonDisplayValue(record),
+      this.formatDisplayValuePart(record.email),
+    ].filter((part): part is string => !!part);
+
+    return fallbackParts[0] ?? null;
+  }
+
+  private formatPersonDisplayValue(
+    record: Record<string, unknown>,
+  ): string | null {
+    const name = [
+      this.formatDisplayValuePart(record.firstName),
+      this.formatDisplayValuePart(record.lastName),
+    ]
+      .filter((part): part is string => !!part)
+      .join(' ')
+      .trim();
+
+    return name || null;
+  }
+
+  private formatDisplayValuePart(value: unknown): string | null {
+    if (value == null) {
+      return null;
+    }
+
+    if (
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      typeof value === 'boolean'
+    ) {
+      const normalized = String(value).trim();
+      return normalized || null;
+    }
+
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+
+    return null;
+  }
+
+  private copyModelResultMetadata(
+    record: Record<string, unknown>,
+    keys: string[],
+  ): Record<string, unknown> {
+    const metadata: Record<string, unknown> = {};
+
+    for (const key of keys) {
+      if (key in record) {
+        metadata[key] = this.sanitizeUnknownValue(record[key]);
+      }
+    }
+
+    if (Array.isArray(metadata.usageHints)) {
+      metadata.usageHints = [
+        ...metadata.usageHints,
+        ...SAPLING_MCP_USAGE_HINTS.userFacingValues,
+      ];
+    }
+
+    return metadata;
+  }
+
+  private isToolErrorPayload(payload: unknown): boolean {
+    return !!(
+      payload &&
+      typeof payload === 'object' &&
+      (payload as { ok?: unknown }).ok === false
+    );
+  }
+
+  private isInternalIdentifierKey(key: string): boolean {
+    return (
+      key === 'handle' ||
+      key === 'id' ||
+      key.endsWith('Handle') ||
+      key.endsWith('Id') ||
+      key.endsWith('_handle') ||
+      key.endsWith('_id')
+    );
+  }
+
+  private asStringValue(value: unknown): string | null {
+    return typeof value === 'string' && value.trim() ? value.trim() : null;
   }
 
   private async executeGenericList(

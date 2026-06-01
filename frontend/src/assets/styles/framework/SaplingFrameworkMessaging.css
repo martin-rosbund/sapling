@@ -19,7 +19,7 @@
 
 .sapling-ai-chat-fab {
   position: fixed !important;
-  top: calc(var(--v-layout-top, 0px) + var(--sapling-space-sm));
+  top: calc(var(--v-layout-top, 0px) + 4px);
   left: 50%;
   z-index: 12990;
   width: var(--sapling-control-size-2xl) !important;

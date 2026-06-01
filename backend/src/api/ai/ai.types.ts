@@ -7,6 +7,7 @@ export type AiExecutedToolCall = {
   serverName: string;
   toolName: string;
   arguments: Record<string, unknown>;
+  modelResult?: unknown;
   rawResult: unknown;
 };
 

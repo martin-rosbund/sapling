@@ -75,7 +75,7 @@ function buildSalesOpportunityPrompt(
     '',
     'Gib mir kompakt:',
     '- aehnliche Pain Points und wie sie geloest wurden',
-    '- passende Tickets, Schaetzungen und Positionen mit Handles',
+    '- passende Tickets, Schaetzungen und Positionen',
     '- Argumente, Referenzloesungen und wiederverwendbare Angebotsbausteine',
     '- Risiken, Einwaende und naechste Fragen fuer Sales',
     '- eine kurze Antwort auf: Welche Tickets/Schaetzungen passen zu dieser Chance?',

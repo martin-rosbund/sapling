@@ -74,7 +74,7 @@ function buildEffortEstimatePrompt(
     '4. Wenn ein Vektorindex fehlt, nenne ihn kurz und nutze die verfuegbaren Quellen weiter.',
     '',
     'Gib mir kompakt:',
-    '- aehnliche vergangene Schaetzungen und passende Positionen mit Handles',
+    '- aehnliche vergangene Schaetzungen und passende Positionen',
     '- typische Positionen, die hier wahrscheinlich gebraucht werden',
     '- sinnvolle Stundenbereiche je Position und insgesamt',
     '- Risiken, Annahmen und offene Fragen',
