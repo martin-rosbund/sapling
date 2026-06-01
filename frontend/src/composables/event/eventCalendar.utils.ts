@@ -178,6 +178,26 @@ export function isReadonlyCalendarEvent(event: CalendarEvent | null | undefined)
   return (event as SaplingCalendarEvent | null | undefined)?.saplingSource === 'holiday'
 }
 
+export function getCalendarInteractionForcedDirtyFields(interaction: {
+  isNewDraft: boolean
+  wasDragged: boolean
+  wasResized: boolean
+}): string[] {
+  if (interaction.isNewDraft) {
+    return []
+  }
+
+  if (interaction.wasResized) {
+    return ['endDate']
+  }
+
+  if (interaction.wasDragged) {
+    return ['startDate', 'endDate']
+  }
+
+  return []
+}
+
 export function toPersistedEventItem(event: CalendarEvent | null | undefined): EventItem | null {
   if (!event || isReadonlyCalendarEvent(event)) {
     return null

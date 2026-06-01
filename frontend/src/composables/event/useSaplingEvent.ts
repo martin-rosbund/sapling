@@ -70,6 +70,7 @@ import {
   filterByCalendarMode as filterEventsByCalendarMode,
   filterWorkweekEvents as filterEventsByWorkweek,
   getCalendarEventAccentColor as resolveCalendarEventAccentColor,
+  getCalendarInteractionForcedDirtyFields,
   getCalendarEventDescription,
   getCalendarEventHandle,
   getCalendarEventIcon,
@@ -1014,9 +1015,9 @@ export function useSaplingEvent() {
    *      will be set. The dialog must open with `forceDirty=true` so the
    *      save button is enabled even though the per-field snapshot already
    *      reflects the new dates.
-   *   3. A click or drag on empty space which creates a brand new draft via
-   *      `startTime`. `createEvent` will be set with no backend handle yet,
-   *      so we open the create dialog with a fresh draft payload.
+   *   3. A click or drag on empty space creates a brand new draft via
+   *      `startTime`. Its initial date values are the create baseline, so the
+   *      dialog opens clean until the user actually changes a field.
    */
   function endDrag() {
     const isNewDraft =
@@ -1036,13 +1037,21 @@ export function useSaplingEvent() {
         ownPerson.value,
         selectedPeoples.value,
       )
-      forceEditDialogDirtyFields.value = ['startDate', 'endDate']
+      forceEditDialogDirtyFields.value = getCalendarInteractionForcedDirtyFields({
+        isNewDraft,
+        wasDragged,
+        wasResized,
+      })
       showEditDialog.value = true
       suppressNextEventClick.value = true
     } else if (wasDragged || wasResized) {
       editEvent.value = dragEvent.value ?? createEvent.value
       applyCalendarEventDateParts(editEvent.value)
-      forceEditDialogDirtyFields.value = wasResized ? ['endDate'] : ['startDate', 'endDate']
+      forceEditDialogDirtyFields.value = getCalendarInteractionForcedDirtyFields({
+        isNewDraft,
+        wasDragged,
+        wasResized,
+      })
       showEditDialog.value = editEvent.value != null
       suppressNextEventClick.value = true
     }
