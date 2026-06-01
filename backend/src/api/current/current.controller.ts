@@ -10,6 +10,8 @@ import {
   Sse,
   MessageEvent,
   Header,
+  Patch,
+  Optional,
 } from '@nestjs/common';
 import { CurrentService } from './current.service';
 import { CurrentMetadataService } from './current-metadata.service';
@@ -34,6 +36,11 @@ import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
 import { UseGuards } from '@nestjs/common';
 import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth.guard';
 import { CurrentEntityMetadataDto } from './dto/current-entity-metadata.dto';
+import { CalendarSyncSubscriptionService } from '../../calendar/sync/calendar-sync-subscription.service';
+import {
+  CalendarSyncSubscriptionDto,
+  UpdateCalendarSyncSubscriptionDto,
+} from '../../calendar/sync/dto/calendar-sync-subscription.dto';
 
 /**
  * @class
@@ -71,6 +78,8 @@ export class CurrentController {
     private readonly currentService: CurrentService,
     private readonly currentMetadataService: CurrentMetadataService,
     private readonly openTaskEventsService: OpenTaskEventsService,
+    @Optional()
+    private readonly calendarSyncSubscriptionService?: CalendarSyncSubscriptionService,
   ) {}
 
   /**
@@ -338,5 +347,53 @@ export class CurrentController {
   getWorkWeek(@Req() req: Request): Promise<WorkHourWeekItem | null> {
     const user = req.user as PersonItem;
     return this.currentService.getWorkWeek(user);
+  }
+
+  @Get('calendarSync')
+  @ApiOperation({
+    summary: 'Get current user calendar synchronization settings',
+    description:
+      'Returns the Outlook automatic import settings for the authenticated user.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Calendar synchronization settings for the current user.',
+    type: CalendarSyncSubscriptionDto,
+  })
+  getCalendarSyncSubscription(
+    @Req() req: Request,
+  ): Promise<CalendarSyncSubscriptionDto> {
+    const user = req.user as PersonItem;
+    return this.getCalendarSyncService().getCurrentSubscription(user);
+  }
+
+  @Patch('calendarSync')
+  @ApiOperation({
+    summary: 'Update current user calendar synchronization settings',
+    description:
+      'Creates or updates the Outlook automatic import subscription for the authenticated user.',
+  })
+  @ApiBody({ type: UpdateCalendarSyncSubscriptionDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Updated calendar synchronization settings.',
+    type: CalendarSyncSubscriptionDto,
+  })
+  updateCalendarSyncSubscription(
+    @Req() req: Request,
+    @Body() dto: UpdateCalendarSyncSubscriptionDto,
+  ): Promise<CalendarSyncSubscriptionDto> {
+    const user = req.user as PersonItem;
+    return this.getCalendarSyncService().updateCurrentSubscription(user, dto);
+  }
+
+  private getCalendarSyncService(): CalendarSyncSubscriptionService {
+    if (!this.calendarSyncSubscriptionService) {
+      throw new BadRequestException(
+        'calendarSyncSubscription.serviceUnavailable',
+      );
+    }
+
+    return this.calendarSyncSubscriptionService;
   }
 }

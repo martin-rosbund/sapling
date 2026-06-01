@@ -13,6 +13,14 @@
       class="sapling-action-cluster sapling-floating-panel__actions sapling-ai-chat__header-actions"
     >
       <v-btn
+        icon="mdi-account-cog-outline"
+        size="small"
+        variant="text"
+        :aria-label="t('aiChat.openAccountSettings')"
+        :title="t('aiChat.openAccountSettings')"
+        @click="emit('openAccountSettings')"
+      />
+      <v-btn
         v-if="isCompactHeaderActions"
         icon="mdi-refresh"
         size="small"
@@ -68,6 +76,7 @@ defineProps<{
 const emit = defineEmits<{
   (event: 'refresh'): void
   (event: 'newChat'): void
+  (event: 'openAccountSettings'): void
   (event: 'close'): void
 }>()
 

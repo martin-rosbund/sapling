@@ -111,6 +111,7 @@ import { KnowledgeArticleItem } from '../KnowledgeArticleItem';
 import { KnowledgeArticleCategoryItem } from '../KnowledgeArticleCategoryItem';
 import { KnowledgeArticleStatusItem } from '../KnowledgeArticleStatusItem';
 import { KnowledgeArticleVisibilityItem } from '../KnowledgeArticleVisibilityItem';
+import { CalendarSyncSubscriptionItem } from '../CalendarSyncSubscriptionItem';
 
 /**
  * @file entity.registry.ts
@@ -172,6 +173,7 @@ const ENTITY_REGISTRY_ENTRIES: { name: string; class: any }[] = [
   { name: 'changeLogAction', class: ChangeLogActionItem },
   { name: 'changeLog', class: ChangeLogItem },
   { name: 'changeLogDetail', class: ChangeLogDetailItem },
+  { name: 'calendarSyncSubscription', class: CalendarSyncSubscriptionItem },
   { name: 'favorite', class: FavoriteItem },
   { name: 'favoriteTemplate', class: FavoriteTemplateItem },
   { name: 'kpi', class: KpiItem },

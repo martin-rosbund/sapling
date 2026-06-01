@@ -17,14 +17,127 @@
  * @method          deleteEvent          Deletes an event from Azure calendar and removes reference
  * @method          getAzureEvent        Maps EventItem to Azure Calendar event resource
  */
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  forwardRef,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Client } from '@microsoft/microsoft-graph-client';
+import axios from 'axios';
 import { EventItem } from '../../entity/EventItem';
 import { EventDeliveryService } from '../event.delivery.service';
 import { PersonSessionItem } from '../../entity/PersonSessionItem';
 import { EntityManager } from '@mikro-orm/core';
 import { EventAzureItem } from '../../entity/EventAzureItem';
 import { buildAzureRecurrence } from '../calendar.recurrence';
+import { PersonItem } from '../../entity/PersonItem';
+import { EventTypeItem } from '../../entity/EventTypeItem';
+import { EventStatusItem } from '../../entity/EventStatusItem';
+import {
+  AZURE_AD_CLIENT_ID,
+  AZURE_AD_CLIENT_SECRET,
+  AZURE_AD_SCOPE,
+  AZURE_AD_TENNANT_ID,
+} from '../../constants/project.constants';
+import { ImportAzureCalendarEventsResponseDto } from './dto/import-azure-calendar-events.dto';
+
+type ImportAzureCalendarEventsRange = {
+  startDateTime: Date;
+  endDateTime: Date;
+};
+
+type AzureGraphDateTime = {
+  dateTime?: string | null;
+  timeZone?: string | null;
+};
+
+type AzureGraphAttendee = {
+  emailAddress?: {
+    address?: string | null;
+    name?: string | null;
+  } | null;
+};
+
+type AzureGraphCalendarEvent = {
+  id?: string;
+  subject?: string | null;
+  bodyPreview?: string | null;
+  start?: AzureGraphDateTime | null;
+  end?: AzureGraphDateTime | null;
+  isAllDay?: boolean | null;
+  isCancelled?: boolean | null;
+  attendees?: AzureGraphAttendee[] | null;
+  onlineMeetingUrl?: string | null;
+  onlineMeeting?: {
+    joinUrl?: string | null;
+  } | null;
+};
+
+type AzureCalendarViewResponse = {
+  value?: AzureGraphCalendarEvent[];
+  '@odata.nextLink'?: string;
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isAuthenticationProviderError(error: unknown): boolean {
+  if (!isRecord(error)) {
+    return false;
+  }
+
+  const status =
+    typeof error.statusCode === 'number'
+      ? error.statusCode
+      : isRecord(error.response) && typeof error.response.status === 'number'
+        ? error.response.status
+        : undefined;
+
+  if (status === 401 || status === 403) {
+    return true;
+  }
+
+  const message =
+    typeof error.message === 'string' ? error.message.toLowerCase() : '';
+  return (
+    message.includes('token') ||
+    message.includes('auth') ||
+    message.includes('unauthorized') ||
+    message.includes('forbidden')
+  );
+}
+
+function normalizeGraphDateTime(
+  value?: AzureGraphDateTime | null,
+): Date | null {
+  const rawDateTime = value?.dateTime?.trim();
+  if (!rawDateTime) {
+    return null;
+  }
+
+  const normalizedDateTime = /(?:z|[+-]\d{2}:\d{2})$/i.test(rawDateTime)
+    ? rawDateTime
+    : `${rawDateTime}Z`;
+  const date = new Date(normalizedDateTime);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function truncate(value: string, maxLength: number): string {
+  return value.length <= maxLength
+    ? value
+    : value.slice(0, maxLength - 3) + '...';
+}
+
+function normalizeEmail(value: string | null | undefined): string | null {
+  const normalized = value?.trim().toLowerCase();
+  return normalized && /^[^@\s<>]+@[^@\s<>]+$/.test(normalized)
+    ? normalized
+    : null;
+}
 
 /**
  * Service for managing calendar events in Microsoft Azure (Outlook) via Microsoft Graph API.
@@ -106,6 +219,93 @@ export class AzureCalendarService {
     }
   }
 
+  async importEvents(
+    currentUser: PersonItem,
+    range: ImportAzureCalendarEventsRange,
+  ): Promise<ImportAzureCalendarEventsResponseDto> {
+    if (
+      Number.isNaN(range.startDateTime.getTime()) ||
+      Number.isNaN(range.endDateTime.getTime()) ||
+      range.startDateTime > range.endDateTime
+    ) {
+      throw new BadRequestException('calendar.invalidImportRange');
+    }
+
+    if (this.getPersonTypeHandle(currentUser) !== 'azure') {
+      throw new ForbiddenException('calendar.azureUserRequired');
+    }
+
+    const emFork = this.em.fork();
+    const session = await emFork.findOne(PersonSessionItem, {
+      person: { handle: currentUser.handle },
+    });
+
+    if (!session) {
+      throw new UnauthorizedException('calendar.azureSessionNotFound');
+    }
+
+    const accessToken = await this.resolveAzureAccessToken(session);
+    if (!accessToken) {
+      throw new UnauthorizedException('calendar.azureTokenNotAvailable');
+    }
+
+    const graphEvents = await this.fetchCalendarViewWithRetry(
+      session,
+      accessToken,
+      range,
+    );
+
+    const user = await emFork.findOne(
+      PersonItem,
+      { handle: currentUser.handle },
+      { populate: ['company', 'type'] },
+    );
+    const type = await emFork.findOne(EventTypeItem, { handle: 'internal' });
+    const scheduledStatus = await emFork.findOne(EventStatusItem, {
+      handle: 'scheduled',
+    });
+    const canceledStatus = await emFork.findOne(EventStatusItem, {
+      handle: 'canceled',
+    });
+
+    if (!user || this.getPersonTypeHandle(user) !== 'azure') {
+      throw new ForbiddenException('calendar.azureUserRequired');
+    }
+
+    if (!user.company || !type || !scheduledStatus || !canceledStatus) {
+      throw new BadRequestException('calendar.importDefaultsMissing');
+    }
+
+    const result: ImportAzureCalendarEventsResponseDto = {
+      imported: 0,
+      created: 0,
+      updated: 0,
+      skipped: 0,
+    };
+
+    for (const graphEvent of graphEvents) {
+      const saved = await this.upsertImportedEvent(emFork, graphEvent, {
+        user,
+        type,
+        scheduledStatus,
+        canceledStatus,
+      });
+
+      if (saved === 'created') {
+        result.created += 1;
+        result.imported += 1;
+      } else if (saved === 'updated') {
+        result.updated += 1;
+        result.imported += 1;
+      } else {
+        result.skipped += 1;
+      }
+    }
+
+    await emFork.flush();
+    return result;
+  }
+
   /**
    * Creates a Microsoft Graph API client for the given access token.
    * @param {string} accessToken The OAuth access token for the user
@@ -118,6 +318,237 @@ export class AzureCalendarService {
       },
     });
     return client;
+  }
+
+  private async fetchCalendarViewWithRetry(
+    session: PersonSessionItem,
+    accessToken: string,
+    range: ImportAzureCalendarEventsRange,
+  ): Promise<AzureGraphCalendarEvent[]> {
+    try {
+      return await this.fetchCalendarView(accessToken, range);
+    } catch (error) {
+      if (!isAuthenticationProviderError(error)) {
+        throw error;
+      }
+
+      const refreshedToken = await this.refreshAzureAccessToken(session);
+      if (!refreshedToken) {
+        throw error;
+      }
+
+      return this.fetchCalendarView(refreshedToken, range);
+    }
+  }
+
+  private async fetchCalendarView(
+    accessToken: string,
+    range: ImportAzureCalendarEventsRange,
+  ): Promise<AzureGraphCalendarEvent[]> {
+    const client = this.createClient(accessToken);
+    const events: AzureGraphCalendarEvent[] = [];
+    let response = (await client
+      .api('/me/calendarView')
+      .query({
+        startDateTime: range.startDateTime.toISOString(),
+        endDateTime: range.endDateTime.toISOString(),
+        $select:
+          'id,subject,bodyPreview,start,end,isAllDay,isCancelled,attendees,onlineMeeting,onlineMeetingUrl',
+        $top: '100',
+      })
+      .header('Prefer', 'outlook.timezone="UTC"')
+      .get()) as AzureCalendarViewResponse;
+
+    events.push(...(response.value ?? []));
+
+    while (response['@odata.nextLink']) {
+      response = (await client
+        .api(response['@odata.nextLink'])
+        .header('Prefer', 'outlook.timezone="UTC"')
+        .get()) as AzureCalendarViewResponse;
+      events.push(...(response.value ?? []));
+    }
+
+    return events;
+  }
+
+  private async refreshAzureAccessToken(
+    session: PersonSessionItem,
+  ): Promise<string | null> {
+    const refreshToken = session.refreshToken?.trim();
+    if (!refreshToken) {
+      return null;
+    }
+
+    const tokenEndpoint = `https://login.microsoftonline.com/${AZURE_AD_TENNANT_ID || 'common'}/oauth2/v2.0/token`;
+    const params = new URLSearchParams({
+      client_id: AZURE_AD_CLIENT_ID,
+      client_secret: AZURE_AD_CLIENT_SECRET,
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+    });
+
+    if (AZURE_AD_SCOPE.length > 0) {
+      params.set('scope', AZURE_AD_SCOPE.join(' '));
+    }
+
+    const response = await axios.post<{ access_token?: string }>(
+      tokenEndpoint,
+      params.toString(),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      },
+    );
+
+    const accessToken = response.data.access_token?.trim() ?? null;
+    if (accessToken) {
+      session.accessToken = accessToken;
+    }
+
+    return accessToken;
+  }
+
+  private async resolveAzureAccessToken(
+    session: PersonSessionItem,
+  ): Promise<string | null> {
+    const directToken = session.accessToken?.trim();
+    if (directToken) {
+      return directToken;
+    }
+
+    return this.refreshAzureAccessToken(session);
+  }
+
+  private getPersonTypeHandle(person: PersonItem): string | undefined {
+    return person.type?.handle;
+  }
+
+  private async upsertImportedEvent(
+    emFork: EntityManager,
+    graphEvent: AzureGraphCalendarEvent,
+    defaults: {
+      user: PersonItem;
+      type: EventTypeItem;
+      scheduledStatus: EventStatusItem;
+      canceledStatus: EventStatusItem;
+    },
+  ): Promise<'created' | 'updated' | 'skipped'> {
+    const referenceHandle = graphEvent.id?.trim();
+    const startDate = normalizeGraphDateTime(graphEvent.start);
+    const endDate = normalizeGraphDateTime(graphEvent.end);
+
+    if (!referenceHandle || !startDate || !endDate) {
+      return 'skipped';
+    }
+
+    const reference = await emFork.findOne(
+      EventAzureItem,
+      { referenceHandle },
+      { populate: ['event', 'event.participants'] },
+    );
+
+    if (graphEvent.isCancelled === true && !reference) {
+      return 'skipped';
+    }
+
+    const status =
+      graphEvent.isCancelled === true
+        ? defaults.canceledStatus
+        : defaults.scheduledStatus;
+    const participantPeople = await this.resolveImportedParticipants(
+      emFork,
+      graphEvent,
+      defaults.user,
+    );
+
+    if (reference?.event && typeof reference.event === 'object') {
+      this.assignImportedEvent(reference.event, graphEvent, {
+        startDate,
+        endDate,
+        status,
+        participants: participantPeople,
+      });
+      return 'updated';
+    }
+
+    const event = new EventItem();
+    event.type = defaults.type;
+    event.creatorCompany = defaults.user.company;
+    event.creatorPerson = defaults.user;
+    event.assigneeCompany = defaults.user.company;
+    event.assigneePerson = defaults.user;
+    this.assignImportedEvent(event, graphEvent, {
+      startDate,
+      endDate,
+      status,
+      participants: participantPeople,
+    });
+
+    const newReference = new EventAzureItem();
+    newReference.event = event;
+    newReference.referenceHandle = referenceHandle;
+
+    emFork.persist(event);
+    emFork.persist(newReference);
+    return 'created';
+  }
+
+  private assignImportedEvent(
+    event: EventItem,
+    graphEvent: AzureGraphCalendarEvent,
+    values: {
+      startDate: Date;
+      endDate: Date;
+      status: EventStatusItem;
+      participants: PersonItem[];
+    },
+  ): void {
+    event.title = truncate(graphEvent.subject?.trim() || 'Outlook event', 128);
+    event.description = graphEvent.bodyPreview?.trim() || undefined;
+    event.startDate = values.startDate;
+    event.endDate = values.endDate;
+    event.isAllDay = graphEvent.isAllDay === true;
+    event.onlineMeetingURL =
+      graphEvent.onlineMeeting?.joinUrl ??
+      graphEvent.onlineMeetingUrl ??
+      event.onlineMeetingURL;
+    event.status = values.status;
+    event.participants.removeAll();
+    event.participants.add(values.participants);
+  }
+
+  private async resolveImportedParticipants(
+    emFork: EntityManager,
+    graphEvent: AzureGraphCalendarEvent,
+    user: PersonItem,
+  ): Promise<PersonItem[]> {
+    const attendeeEmails = Array.from(
+      new Set(
+        (graphEvent.attendees ?? [])
+          .map((attendee) => normalizeEmail(attendee.emailAddress?.address))
+          .filter((email): email is string => Boolean(email)),
+      ),
+    );
+
+    const knownAttendees =
+      attendeeEmails.length > 0
+        ? await emFork.find(PersonItem, { email: { $in: attendeeEmails } })
+        : [];
+    const participantsByHandle = new Map<number, PersonItem>();
+
+    if (typeof user.handle === 'number') {
+      participantsByHandle.set(user.handle, user);
+    }
+
+    for (const attendee of knownAttendees) {
+      if (typeof attendee.handle === 'number') {
+        participantsByHandle.set(attendee.handle, attendee);
+      }
+    }
+
+    return Array.from(participantsByHandle.values());
   }
 
   /**

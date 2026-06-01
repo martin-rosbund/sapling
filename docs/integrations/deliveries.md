@@ -185,13 +185,17 @@ Main files:
 backend/src/calendar/
 backend/src/calendar/azure/
 backend/src/calendar/google/
+backend/src/calendar/sync/
 backend/src/entity/EventDeliveryItem.ts
 backend/src/entity/EventDeliveryStatusItem.ts
 backend/src/entity/EventAzureItem.ts
 backend/src/entity/EventGoogleItem.ts
+backend/src/entity/CalendarSyncSubscriptionItem.ts
 ```
 
 Calendar delivery handles synchronization with external providers and recurrence-aware event behavior.
+
+Automatic Outlook import uses the `calendar-sync` BullMQ queue and `CalendarSyncSubscriptionItem`. A scheduler job finds due active subscriptions and creates one import job per subscription, reusing the same Azure import code path as the manual calendar action.
 
 See also:
 

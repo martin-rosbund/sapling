@@ -31,13 +31,7 @@ const KNOWLEDGE_ARTICLE_PAGE_LIMIT = 10
 const RELATION_SEARCH_PAGE_LIMIT = 25
 const KNOWLEDGE_ARTICLE_LOAD_DEBOUNCE_MS = 250
 const ARTICLE_RELATIONS = ['status', 'visibility', 'category', 'product', 'authorPerson']
-const ARTICLE_SEARCH_FIELDS = [
-  'title',
-  'summary',
-  'tags',
-  'problemMarkdown',
-  'solutionMarkdown',
-]
+const ARTICLE_SEARCH_FIELDS = ['title', 'summary', 'tags', 'problemMarkdown', 'solutionMarkdown']
 
 export function useSaplingKnowledgeBase({ t, locale }: UseSaplingKnowledgeBaseOptions) {
   const articles = ref<KnowledgeArticleItem[]>([])

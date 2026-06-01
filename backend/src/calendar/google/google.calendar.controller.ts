@@ -29,6 +29,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth.guard';
+import {
+  ImportGoogleCalendarEventsDto,
+  ImportGoogleCalendarEventsResponseDto,
+} from './dto/import-google-calendar-events.dto';
 
 @ApiTags('Google Calendar')
 @ApiBearerAuth()
@@ -66,5 +70,27 @@ export class GoogleCalendarController {
       message: 'Google calendar event queued',
       jobId: job?.handle,
     };
+  }
+
+  @Post('events/import')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Import Google calendar events into Sapling',
+    description:
+      'Fetches the current user Google calendar view and creates or updates matching Sapling events.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Google calendar events imported',
+    type: ImportGoogleCalendarEventsResponseDto,
+  })
+  async importEvents(
+    @Req() req: Request & { user: PersonItem },
+    @Body() dto: ImportGoogleCalendarEventsDto,
+  ): Promise<ImportGoogleCalendarEventsResponseDto> {
+    return this.googleCalendarService.importEvents(req.user, {
+      startDateTime: new Date(dto.startDateTime),
+      endDateTime: new Date(dto.endDateTime),
+    });
   }
 }

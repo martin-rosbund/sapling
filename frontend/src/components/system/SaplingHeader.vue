@@ -52,11 +52,11 @@
   />
 
   <SaplingInbox v-if="showInbox" @close="closeInbox" />
-  <SaplingAccount v-if="showAccount" @close="closeAccount" />
+  <SaplingAccount v-if="showAccount" :initial-tab="initialAccountTab" @close="closeAccount" />
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSaplingHeader } from '@/composables/system/useSaplingHeader'
 import { useSaplingHeaderInboxPreview } from '@/composables/system/useSaplingHeaderInboxPreview'
@@ -70,10 +70,16 @@ import SaplingAccount from '@/components/account/SaplingAccount.vue'
 import SaplingHeaderInboxPreview from '@/components/system/header/SaplingHeaderInboxPreview.vue'
 import SaplingHeaderProfileMenu from '@/components/system/header/SaplingHeaderProfileMenu.vue'
 import SaplingHeaderStatusActions from '@/components/system/header/SaplingHeaderStatusActions.vue'
+import {
+  SAPLING_OPEN_ACCOUNT_DIALOG_EVENT,
+  type SaplingAccountDialogTab,
+  type SaplingOpenAccountDialogDetail,
+} from '@/services/account-dialog.service'
 import type { SaplingProfileAction } from '@/components/system/header/header.types'
 
 const router = useRouter()
 const showProfileMenu = ref(false)
+const initialAccountTab = ref<SaplingAccountDialogTab>('profile')
 
 const props = withDefaults(
   defineProps<{
@@ -119,6 +125,17 @@ const {
 const { visibleIncomingInboxPreview, openIncomingInboxPreview } =
   useSaplingHeaderInboxPreview(incomingInboxPreview)
 
+onMounted(() => {
+  window.addEventListener(SAPLING_OPEN_ACCOUNT_DIALOG_EVENT, handleOpenAccountEvent as EventListener)
+})
+
+onUnmounted(() => {
+  window.removeEventListener(
+    SAPLING_OPEN_ACCOUNT_DIALOG_EVENT,
+    handleOpenAccountEvent as EventListener,
+  )
+})
+
 function toggleNavigation() {
   emit('update:modelValue', !props.modelValue)
 }
@@ -137,6 +154,13 @@ function openIssueFromProfile() {
 }
 
 function openAccountFromProfile() {
+  showProfileMenu.value = false
+  initialAccountTab.value = 'profile'
+  openAccount()
+}
+
+function handleOpenAccountEvent(event: CustomEvent<SaplingOpenAccountDialogDetail>) {
+  initialAccountTab.value = event.detail?.tab ?? 'profile'
   showProfileMenu.value = false
   openAccount()
 }

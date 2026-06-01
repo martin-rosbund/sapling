@@ -1,0 +1,13 @@
+[
+  {
+    "handle": "calendarSyncSubscription",
+    "canShow": true,
+    "icon": "mdi-calendar-sync-outline",
+    "group": "event",
+    "order": 80,
+    "canRead": true,
+    "canInsert": false,
+    "canUpdate": true,
+    "canDelete": false
+  }
+]

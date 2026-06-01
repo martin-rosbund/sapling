@@ -84,6 +84,15 @@ export const REDIS_REMOVE_ON_COMPLETE: boolean =
   process.env.REDIS_REMOVE_ON_COMPLETE === 'true';
 
 /**
+ * @constant {number} CALENDAR_SYNC_SCHEDULER_INTERVAL_MS
+ * Interval for the calendar sync scheduler job. Defaults to 5 minutes.
+ */
+export const CALENDAR_SYNC_SCHEDULER_INTERVAL_MS: number = parseInt(
+  process.env.CALENDAR_SYNC_SCHEDULER_INTERVAL_MS || '300000',
+  10,
+);
+
+/**
  * @constant {string} GOOGLE_CLIENT_ID
  * Google OAuth client ID. Defaults to empty string.
  */
