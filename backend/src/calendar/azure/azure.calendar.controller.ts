@@ -29,6 +29,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth.guard';
+import {
+  ImportAzureCalendarEventsDto,
+  ImportAzureCalendarEventsResponseDto,
+} from './dto/import-azure-calendar-events.dto';
 
 @ApiTags('Azure Calendar')
 @ApiBearerAuth()
@@ -66,5 +70,27 @@ export class AzureCalendarController {
       message: 'Azure calendar event queued',
       jobId: job?.handle,
     };
+  }
+
+  @Post('events/import')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Import Outlook calendar events into Sapling',
+    description:
+      'Fetches the current user Outlook calendar view from Microsoft Graph and creates or updates matching Sapling events.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Outlook calendar events imported',
+    type: ImportAzureCalendarEventsResponseDto,
+  })
+  async importEvents(
+    @Req() req: Request & { user: PersonItem },
+    @Body() dto: ImportAzureCalendarEventsDto,
+  ): Promise<ImportAzureCalendarEventsResponseDto> {
+    return this.azureCalendarService.importEvents(req.user, {
+      startDateTime: new Date(dto.startDateTime),
+      endDateTime: new Date(dto.endDateTime),
+    });
   }
 }

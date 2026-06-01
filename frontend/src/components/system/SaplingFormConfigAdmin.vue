@@ -756,7 +756,7 @@ async function loadEntities(): Promise<void> {
     selectedEntityHandle.value =
       requestedEntity && entities.value.some((entity) => entity.handle === requestedEntity)
         ? requestedEntity
-        : entities.value[0]?.handle ?? ''
+        : (entities.value[0]?.handle ?? '')
   } catch {
     errorMessage.value = t('formConfig.loadFailed')
   } finally {

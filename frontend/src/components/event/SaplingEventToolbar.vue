@@ -68,6 +68,23 @@
           </v-btn>
         </v-btn-toggle>
 
+        <v-tooltip v-if="calendarSyncProvider" :text="calendarSyncDescription" location="bottom">
+          <template #activator="{ props: tooltipProps }">
+            <v-btn
+              v-bind="tooltipProps"
+              :loading="isSyncingExternalCalendar"
+              :disabled="isSyncingExternalCalendar"
+              :prepend-icon="calendarSyncIcon"
+              variant="tonal"
+              @click="emit('syncCalendar')"
+            >
+              <template v-if="$vuetify.display.mdAndUp">
+                {{ calendarSyncLabel }}
+              </template>
+            </v-btn>
+          </template>
+        </v-tooltip>
+
         <v-btn-toggle
           v-if="!isNarrowScreen"
           v-model="calendarViewModeModel"
@@ -121,12 +138,14 @@
 
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { VList } from 'vuetify/components'
 import SaplingSurface from '@/components/common/SaplingSurface.vue'
 
 type CalendarType = 'workweek' | 'month' | 'day' | 'week'
 type CalendarViewMode = 'single' | 'sidebyside'
 type CalendarMode = 'default' | 'extended'
+type CalendarSyncProvider = 'azure' | 'google'
 
 const props = defineProps<{
   isNarrowScreen: boolean
@@ -135,7 +154,11 @@ const props = defineProps<{
   calendarViewMode: CalendarViewMode
   calendarMode: CalendarMode
   modelValue: string
+  isSyncingExternalCalendar: boolean
+  calendarSyncProvider: CalendarSyncProvider | null
 }>()
+
+const { t } = useI18n()
 
 const emit = defineEmits<{
   (event: 'update:calendarType', value: CalendarType): void
@@ -145,6 +168,7 @@ const emit = defineEmits<{
   (event: 'today'): void
   (event: 'next'): void
   (event: 'selectDate', value: string): void
+  (event: 'syncCalendar'): void
 }>()
 
 const calendarTypeModel = computed({
@@ -169,6 +193,17 @@ const pickerDateModel = computed(() => resolvePickerDate(props.modelValue))
 const pickerMonth = computed(() => pickerDateModel.value.getMonth())
 const isWeekPicker = computed(() => ['week', 'workweek'].includes(props.calendarType))
 const isMonthPicker = computed(() => props.calendarType === 'month')
+const calendarSyncLabel = computed(() =>
+  props.calendarSyncProvider === 'google' ? t('calendar.syncGoogle') : t('calendar.syncOutlook'),
+)
+const calendarSyncDescription = computed(() =>
+  props.calendarSyncProvider === 'google'
+    ? t('calendar.syncGoogleDescription')
+    : t('calendar.syncOutlookDescription'),
+)
+const calendarSyncIcon = computed(() =>
+  props.calendarSyncProvider === 'google' ? 'mdi-google' : 'mdi-microsoft-outlook',
+)
 
 watch(
   () => props.modelValue,

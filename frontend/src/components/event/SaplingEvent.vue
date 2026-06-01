@@ -69,12 +69,15 @@
             v-model:calendar-view-mode="calendarViewMode"
             v-model:calendar-mode="calendarMode"
             :is-narrow-screen="isNarrowScreen"
+            :is-syncing-external-calendar="isSyncingExternalCalendar"
+            :calendar-sync-provider="calendarSyncProvider"
             :calendar-type-options="calendarTypeOptions"
             :model-value="value"
             @previous="goToPrevious"
             @today="goToToday"
             @next="goToNext"
             @select-date="goToDate"
+            @sync-calendar="syncExternalCalendar"
           />
 
           <div
@@ -258,6 +261,7 @@ const {
   calendarType,
   calendarTypeOptions,
   calendarMode,
+  calendarSyncProvider,
   currentDateRangeLabel,
   calendarViewMode,
   calendarWeekdays,
@@ -279,6 +283,7 @@ const {
   handleUpdateConflictVisibility,
   isCalendarDragActive,
   isLoading,
+  isSyncingExternalCalendar,
   isNarrowScreen,
   mergeUpdateConflict,
   nowY,
@@ -295,6 +300,7 @@ const {
   selectedPeoples,
   selectedPeopleOverflowCount,
   selectedPeoplePreview,
+  syncExternalCalendar,
   closeEventContextMenu,
   closeInformationDialog,
   closeUploadDialog,

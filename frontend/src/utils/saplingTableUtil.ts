@@ -141,9 +141,7 @@ export function sortTableHeaders<T extends Partial<EntityTemplate>>(headers: T[]
     .map(({ header }) => header)
 }
 
-export function getMobileTableHeaders<T extends SaplingTableHeaderItem>(
-  headers: T[],
-): T[] {
+export function getMobileTableHeaders<T extends SaplingTableHeaderItem>(headers: T[]): T[] {
   const sortMobileHeaders = (items: T[]) =>
     [...items]
       .map((header, index) => ({

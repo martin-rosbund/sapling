@@ -50,9 +50,7 @@
                 size="small"
                 variant="tonal"
                 :aria-label="
-                  activePanel === 'navigation'
-                    ? $t('navigation.favorite')
-                    : $t('global.navigation')
+                  activePanel === 'navigation' ? $t('navigation.favorite') : $t('global.navigation')
                 "
                 @click="toggleActivePanel"
               />

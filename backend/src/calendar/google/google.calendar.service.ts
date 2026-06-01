@@ -16,7 +16,14 @@
  * @method          deleteEvent          Deletes an event from Google calendar and removes reference
  * @method          getGoogleEvent       Maps EventItem to Google Calendar event resource
  */
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  forwardRef,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { google } from 'googleapis';
 import { EventItem } from '../../entity/EventItem';
 import { EventDeliveryService } from '../event.delivery.service';
@@ -25,6 +32,83 @@ import { calendar_v3 } from '@googleapis/calendar';
 import { EntityManager } from '@mikro-orm/core';
 import { EventGoogleItem } from '../../entity/EventGoogleItem';
 import { buildGoogleRecurrence } from '../calendar.recurrence';
+import { PersonItem } from '../../entity/PersonItem';
+import { EventTypeItem } from '../../entity/EventTypeItem';
+import { EventStatusItem } from '../../entity/EventStatusItem';
+import {
+  GOOGLE_CALLBACK_URL,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+} from '../../constants/project.constants';
+import { ImportGoogleCalendarEventsResponseDto } from './dto/import-google-calendar-events.dto';
+
+type ImportGoogleCalendarEventsRange = {
+  startDateTime: Date;
+  endDateTime: Date;
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isAuthenticationProviderError(error: unknown): boolean {
+  if (!isRecord(error)) {
+    return false;
+  }
+
+  const status =
+    typeof error.status === 'number'
+      ? error.status
+      : typeof error.code === 'number'
+        ? error.code
+        : isRecord(error.response) && typeof error.response.status === 'number'
+          ? error.response.status
+          : undefined;
+
+  if (status === 401 || status === 403) {
+    return true;
+  }
+
+  const message =
+    typeof error.message === 'string' ? error.message.toLowerCase() : '';
+  return (
+    message.includes('token') ||
+    message.includes('auth') ||
+    message.includes('unauthorized') ||
+    message.includes('forbidden')
+  );
+}
+
+function normalizeGoogleDateTime(
+  value?: calendar_v3.Schema$EventDateTime | null,
+): Date | null {
+  const rawDateTime = value?.dateTime?.trim();
+  if (rawDateTime) {
+    const date = new Date(rawDateTime);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  const rawDate = value?.date?.trim();
+  if (!rawDate) {
+    return null;
+  }
+
+  const date = new Date(`${rawDate}T00:00:00.000Z`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function truncate(value: string, maxLength: number): string {
+  return value.length <= maxLength
+    ? value
+    : value.slice(0, maxLength - 3) + '...';
+}
+
+function normalizeEmail(value: string | null | undefined): string | null {
+  const normalized = value?.trim().toLowerCase();
+  return normalized && /^[^@\s<>]+@[^@\s<>]+$/.test(normalized)
+    ? normalized
+    : null;
+}
 
 /**
  * Service for managing calendar events in Google Calendar via Google Calendar API.
@@ -114,6 +198,312 @@ export class GoogleCalendarService {
           return await this.createEvent(calendar, event, accessToken, emFork);
         }
     }
+  }
+
+  async importEvents(
+    currentUser: PersonItem,
+    range: ImportGoogleCalendarEventsRange,
+  ): Promise<ImportGoogleCalendarEventsResponseDto> {
+    if (
+      Number.isNaN(range.startDateTime.getTime()) ||
+      Number.isNaN(range.endDateTime.getTime()) ||
+      range.startDateTime > range.endDateTime
+    ) {
+      throw new BadRequestException('calendar.invalidImportRange');
+    }
+
+    if (this.getPersonTypeHandle(currentUser) !== 'google') {
+      throw new ForbiddenException('calendar.googleUserRequired');
+    }
+
+    const emFork = this.em.fork();
+    const session = await emFork.findOne(PersonSessionItem, {
+      person: { handle: currentUser.handle },
+    });
+
+    if (!session) {
+      throw new UnauthorizedException('calendar.googleSessionNotFound');
+    }
+
+    const accessToken = await this.resolveGoogleAccessToken(session);
+    if (!accessToken) {
+      throw new UnauthorizedException('calendar.googleTokenNotAvailable');
+    }
+
+    const graphEvents = await this.fetchCalendarEventsWithRetry(
+      session,
+      accessToken,
+      range,
+    );
+
+    const user = await emFork.findOne(
+      PersonItem,
+      { handle: currentUser.handle },
+      { populate: ['company', 'type'] },
+    );
+    const type = await emFork.findOne(EventTypeItem, { handle: 'internal' });
+    const scheduledStatus = await emFork.findOne(EventStatusItem, {
+      handle: 'scheduled',
+    });
+    const canceledStatus = await emFork.findOne(EventStatusItem, {
+      handle: 'canceled',
+    });
+
+    if (!user || this.getPersonTypeHandle(user) !== 'google') {
+      throw new ForbiddenException('calendar.googleUserRequired');
+    }
+
+    if (!user.company || !type || !scheduledStatus || !canceledStatus) {
+      throw new BadRequestException('calendar.importDefaultsMissing');
+    }
+
+    const result: ImportGoogleCalendarEventsResponseDto = {
+      imported: 0,
+      created: 0,
+      updated: 0,
+      skipped: 0,
+    };
+
+    for (const graphEvent of graphEvents) {
+      const saved = await this.upsertImportedEvent(emFork, graphEvent, {
+        user,
+        type,
+        scheduledStatus,
+        canceledStatus,
+      });
+
+      if (saved === 'created') {
+        result.created += 1;
+        result.imported += 1;
+      } else if (saved === 'updated') {
+        result.updated += 1;
+        result.imported += 1;
+      } else {
+        result.skipped += 1;
+      }
+    }
+
+    await emFork.flush();
+    return result;
+  }
+
+  private async fetchCalendarEventsWithRetry(
+    session: PersonSessionItem,
+    accessToken: string,
+    range: ImportGoogleCalendarEventsRange,
+  ): Promise<calendar_v3.Schema$Event[]> {
+    try {
+      return await this.fetchCalendarEvents(accessToken, range);
+    } catch (error) {
+      if (!isAuthenticationProviderError(error)) {
+        throw error;
+      }
+
+      const refreshedToken = await this.refreshGoogleAccessToken(session);
+      if (!refreshedToken) {
+        throw error;
+      }
+
+      return this.fetchCalendarEvents(refreshedToken, range);
+    }
+  }
+
+  private async fetchCalendarEvents(
+    accessToken: string,
+    range: ImportGoogleCalendarEventsRange,
+  ): Promise<calendar_v3.Schema$Event[]> {
+    const calendar = google.calendar({ version: 'v3' });
+    const events: calendar_v3.Schema$Event[] = [];
+    let pageToken: string | undefined;
+
+    do {
+      const response = await calendar.events.list({
+        calendarId: 'primary',
+        auth: accessToken,
+        timeMin: range.startDateTime.toISOString(),
+        timeMax: range.endDateTime.toISOString(),
+        singleEvents: true,
+        showDeleted: true,
+        orderBy: 'startTime',
+        maxResults: 2500,
+        pageToken,
+      });
+
+      events.push(...(response.data.items ?? []));
+      pageToken = response.data.nextPageToken ?? undefined;
+    } while (pageToken);
+
+    return events;
+  }
+
+  private async refreshGoogleAccessToken(
+    session: PersonSessionItem,
+  ): Promise<string | null> {
+    const refreshToken = session.refreshToken?.trim();
+    if (!refreshToken) {
+      return null;
+    }
+
+    const auth = new google.auth.OAuth2(
+      GOOGLE_CLIENT_ID || undefined,
+      GOOGLE_CLIENT_SECRET || undefined,
+      GOOGLE_CALLBACK_URL || undefined,
+    );
+
+    auth.setCredentials({ refresh_token: refreshToken });
+    const refreshed = await auth.refreshAccessToken();
+    const accessToken = refreshed.credentials.access_token?.trim() ?? null;
+
+    if (accessToken) {
+      session.accessToken = accessToken;
+    }
+
+    return accessToken;
+  }
+
+  private async resolveGoogleAccessToken(
+    session: PersonSessionItem,
+  ): Promise<string | null> {
+    const directToken = session.accessToken?.trim();
+    if (directToken) {
+      return directToken;
+    }
+
+    return this.refreshGoogleAccessToken(session);
+  }
+
+  private getPersonTypeHandle(person: PersonItem): string | undefined {
+    return person.type?.handle;
+  }
+
+  private async upsertImportedEvent(
+    emFork: EntityManager,
+    graphEvent: calendar_v3.Schema$Event,
+    defaults: {
+      user: PersonItem;
+      type: EventTypeItem;
+      scheduledStatus: EventStatusItem;
+      canceledStatus: EventStatusItem;
+    },
+  ): Promise<'created' | 'updated' | 'skipped'> {
+    const referenceHandle = graphEvent.id?.trim();
+    const startDate = normalizeGoogleDateTime(graphEvent.start);
+    const endDate = normalizeGoogleDateTime(graphEvent.end);
+
+    if (!referenceHandle || !startDate || !endDate) {
+      return 'skipped';
+    }
+
+    const reference = await emFork.findOne(
+      EventGoogleItem,
+      { referenceHandle },
+      { populate: ['event', 'event.participants'] },
+    );
+
+    if (graphEvent.status === 'cancelled' && !reference) {
+      return 'skipped';
+    }
+
+    const status =
+      graphEvent.status === 'cancelled'
+        ? defaults.canceledStatus
+        : defaults.scheduledStatus;
+    const participantPeople = await this.resolveImportedParticipants(
+      emFork,
+      graphEvent,
+      defaults.user,
+    );
+
+    if (reference?.event && typeof reference.event === 'object') {
+      this.assignImportedEvent(reference.event, graphEvent, {
+        startDate,
+        endDate,
+        status,
+        participants: participantPeople,
+      });
+      return 'updated';
+    }
+
+    const event = new EventItem();
+    event.type = defaults.type;
+    event.creatorCompany = defaults.user.company;
+    event.creatorPerson = defaults.user;
+    event.assigneeCompany = defaults.user.company;
+    event.assigneePerson = defaults.user;
+    this.assignImportedEvent(event, graphEvent, {
+      startDate,
+      endDate,
+      status,
+      participants: participantPeople,
+    });
+
+    const newReference = new EventGoogleItem();
+    newReference.event = event;
+    newReference.referenceHandle = referenceHandle;
+
+    emFork.persist(event);
+    emFork.persist(newReference);
+    return 'created';
+  }
+
+  private assignImportedEvent(
+    event: EventItem,
+    graphEvent: calendar_v3.Schema$Event,
+    values: {
+      startDate: Date;
+      endDate: Date;
+      status: EventStatusItem;
+      participants: PersonItem[];
+    },
+  ): void {
+    event.title = truncate(graphEvent.summary?.trim() || 'Google event', 128);
+    event.description = graphEvent.description?.trim() || undefined;
+    event.startDate = values.startDate;
+    event.endDate = values.endDate;
+    event.isAllDay = Boolean(
+      graphEvent.start?.date && !graphEvent.start?.dateTime,
+    );
+    event.onlineMeetingURL =
+      graphEvent.hangoutLink ??
+      graphEvent.conferenceData?.entryPoints?.find(
+        (entryPoint) => entryPoint.entryPointType === 'video',
+      )?.uri ??
+      event.onlineMeetingURL;
+    event.status = values.status;
+    event.participants.removeAll();
+    event.participants.add(values.participants);
+  }
+
+  private async resolveImportedParticipants(
+    emFork: EntityManager,
+    graphEvent: calendar_v3.Schema$Event,
+    user: PersonItem,
+  ): Promise<PersonItem[]> {
+    const attendeeEmails = Array.from(
+      new Set(
+        (graphEvent.attendees ?? [])
+          .map((attendee) => normalizeEmail(attendee.email))
+          .filter((email): email is string => Boolean(email)),
+      ),
+    );
+
+    const knownAttendees =
+      attendeeEmails.length > 0
+        ? await emFork.find(PersonItem, { email: { $in: attendeeEmails } })
+        : [];
+    const participantsByHandle = new Map<number, PersonItem>();
+
+    if (typeof user.handle === 'number') {
+      participantsByHandle.set(user.handle, user);
+    }
+
+    for (const attendee of knownAttendees) {
+      if (typeof attendee.handle === 'number') {
+        participantsByHandle.set(attendee.handle, attendee);
+      }
+    }
+
+    return Array.from(participantsByHandle.values());
   }
 
   /**

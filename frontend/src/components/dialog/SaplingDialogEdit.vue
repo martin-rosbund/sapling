@@ -103,11 +103,7 @@
           </template>
           <template v-else>
             <div class="sapling-dialog-edit-tabs-shell">
-              <v-tabs
-                v-model="activeTab"
-                class="sapling-record-dialog-tabs"
-                grow
-              >
+              <v-tabs v-model="activeTab" class="sapling-record-dialog-tabs" grow>
                 <v-tab class="sapling-record-dialog-tab sapling-dialog-edit-tab">
                   {{ entityLabel }}
                 </v-tab>

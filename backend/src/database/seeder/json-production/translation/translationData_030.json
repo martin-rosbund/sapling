@@ -1,0 +1,56 @@
+[
+  {
+    "entity": "calendar",
+    "property": "syncOutlook",
+    "de": "Outlook abrufen",
+    "en": "Fetch Outlook"
+  },
+  {
+    "entity": "calendar",
+    "property": "syncOutlookDescription",
+    "de": "Termine aus Outlook fuer den sichtbaren Zeitraum abrufen und Sapling aktualisieren.",
+    "en": "Fetch events from Outlook for the visible range and update Sapling."
+  },
+  {
+    "entity": "calendar",
+    "property": "syncOutlookSuccess",
+    "de": "Outlook-Kalender aktualisiert",
+    "en": "Outlook calendar updated"
+  },
+  {
+    "entity": "calendar",
+    "property": "syncGoogle",
+    "de": "Google abrufen",
+    "en": "Fetch Google"
+  },
+  {
+    "entity": "calendar",
+    "property": "syncGoogleDescription",
+    "de": "Termine aus Google fuer den sichtbaren Zeitraum abrufen und Sapling aktualisieren.",
+    "en": "Fetch events from Google for the visible range and update Sapling."
+  },
+  {
+    "entity": "calendar",
+    "property": "syncGoogleSuccess",
+    "de": "Google-Kalender aktualisiert",
+    "en": "Google calendar updated"
+  },
+  {
+    "entity": "calendar",
+    "property": "syncCalendarSuccessDescription",
+    "de": "{imported} Termine importiert ({created} neu, {updated} aktualisiert, {skipped} uebersprungen).",
+    "en": "{imported} events imported ({created} new, {updated} updated, {skipped} skipped)."
+  },
+  {
+    "entity": "calendar",
+    "property": "azureUserRequired",
+    "de": "Der Outlook-Abruf ist nur fuer Microsoft-Benutzer verfuegbar.",
+    "en": "Outlook fetch is only available for Microsoft users."
+  },
+  {
+    "entity": "calendar",
+    "property": "googleUserRequired",
+    "de": "Der Google-Abruf ist nur fuer Google-Benutzer verfuegbar.",
+    "en": "Google fetch is only available for Google users."
+  }
+]

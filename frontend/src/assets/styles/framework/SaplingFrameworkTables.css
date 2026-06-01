@@ -2,7 +2,6 @@
   cursor: pointer;
 }
 
-
 .sapling-table-row__select-cell {
   width: var(--sapling-table-select-column-width);
   max-width: var(--sapling-table-select-column-width);

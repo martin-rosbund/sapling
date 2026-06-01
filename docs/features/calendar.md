@@ -94,6 +94,21 @@ Calendar delivery starts after an event change asks for synchronization.
 
 Retries use `EventDeliveryService.retryDelivery(handle)`. The delivery is reset to pending, `nextRetryAt` is cleared, and the same queue-or-direct execution path is used.
 
+## Provider Import
+
+The calendar page can manually fetch external provider events for the currently visible date range through:
+
+```text
+POST /api/azure/events/import
+POST /api/google/events/import
+```
+
+The Azure endpoint uses the signed-in user's stored Microsoft session (`PersonSessionItem`) and Microsoft Graph calendar view. Returned Outlook items are matched by `EventAzureItem.referenceHandle`. The Google endpoint uses the signed-in user's stored Google session and Google Calendar events list. Returned Google items are matched by `EventGoogleItem.referenceHandle`.
+
+Existing Sapling events are updated and unknown provider items are created as internal scheduled events for the current user. Known attendee email addresses are linked as participants when matching `PersonItem` records exist. The current user is always added as a participant so imported events appear in their calendar filter.
+
+This import is intentionally user-triggered. It does not require provider webhooks and relies on the existing Microsoft or Google login scopes instead of a separate calendar-only setup.
+
 ## Frontend Behavior
 
 `useSaplingEvent.ts` owns the calendar view behavior:
@@ -101,6 +116,7 @@ Retries use `EventDeliveryService.retryDelivery(handle)`. The delivery is reset 
 - Load events and recurring series for the visible range.
 - Expand recurring events for display.
 - Create, drag, resize, and update calendar events.
+- Manually fetch Azure or Google events for the visible range and refresh the calendar.
 - Skip external-calendar assumptions for event types where `showInDefaultCalendar` is `false`.
 - Keep non-recurring edits separate from recurring occurrence handling.
 

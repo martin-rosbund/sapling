@@ -122,6 +122,15 @@ interface UpdateConflictDialogState {
   isSaving: boolean
 }
 
+type CalendarSyncProvider = 'azure' | 'google'
+
+interface CalendarImportResult {
+  imported: number
+  created: number
+  updated: number
+  skipped: number
+}
+
 export interface EventAgendaItem {
   key: string
   title: string
@@ -246,6 +255,7 @@ export function useSaplingEvent() {
   const uploadDialogItem = ref<SaplingGenericItem | null>(null)
   const showInformationDialog = ref(false)
   const informationDialogItem = ref<SaplingGenericItem | null>(null)
+  const isSyncingExternalCalendar = ref(false)
   const loadedScriptButtons = ref<ScriptButtonItem[]>([])
 
   let stopWindowWatcher: (() => void) | null = null
@@ -324,6 +334,12 @@ export function useSaplingEvent() {
       calendarViewMode.value === 'single' ? 'calendar.combined' : 'calendar.sideBySide',
     ),
   )
+  const calendarSyncProvider = computed<CalendarSyncProvider | null>(() => {
+    const personType = ownPerson.value?.type ?? currentPersonStore.person?.type
+    const typeHandle = typeof personType === 'string' ? personType : personType?.handle
+
+    return typeHandle === 'azure' || typeHandle === 'google' ? typeHandle : null
+  })
 
   const currentMonthLabel = computed(() => {
     if (!value.value) {
@@ -622,6 +638,51 @@ export function useSaplingEvent() {
     }
 
     await getEvents(calendarDateRange.value)
+  }
+
+  async function syncExternalCalendar() {
+    if (
+      !calendarDateRange.value ||
+      isSyncingExternalCalendar.value ||
+      !calendarSyncProvider.value
+    ) {
+      return
+    }
+
+    isSyncingExternalCalendar.value = true
+    const provider = calendarSyncProvider.value
+
+    const startDate = parseLocalCalendarDate(calendarDateRange.value.start.date)
+    startDate.setHours(0, 0, 0, 0)
+
+    const endDate = parseLocalCalendarDate(calendarDateRange.value.end.date)
+    endDate.setHours(23, 59, 59, 999)
+
+    try {
+      const result = await ApiService.post<CalendarImportResult>(`${provider}/events/import`, {
+        startDateTime: startDate.toISOString(),
+        endDateTime: endDate.toISOString(),
+      })
+
+      await refreshVisibleEvents()
+      pushMessage(
+        'success',
+        i18n.global.t(
+          provider === 'azure' ? 'calendar.syncOutlookSuccess' : 'calendar.syncGoogleSuccess',
+        ),
+        i18n.global.t('calendar.syncCalendarSuccessDescription', {
+          imported: result.imported,
+          created: result.created,
+          updated: result.updated,
+          skipped: result.skipped,
+        }),
+        'calendar',
+      )
+    } catch {
+      // Shared API handling already publishes the provider or validation error.
+    } finally {
+      isSyncingExternalCalendar.value = false
+    }
   }
   //#endregion
 
@@ -1820,6 +1881,7 @@ export function useSaplingEvent() {
     calendarTypeOptions: CALENDAR_TYPE_OPTIONS,
     calendarViewMode,
     calendarMode,
+    calendarSyncProvider,
     calendarWeekdays,
     createEvent,
     currentCalendarLayoutLabel,
@@ -1849,6 +1911,7 @@ export function useSaplingEvent() {
     goToToday,
     isCalendarDragActive,
     isLoading,
+    isSyncingExternalCalendar,
     isNarrowScreen,
     nowY,
     openEventContextMenu,
@@ -1868,6 +1931,7 @@ export function useSaplingEvent() {
     selectedPeoples,
     selectedPeopleOverflowCount,
     selectedPeoplePreview,
+    syncExternalCalendar,
     closeEventContextMenu,
     closeInformationDialog,
     closeUploadDialog,
