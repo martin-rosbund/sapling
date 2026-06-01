@@ -10,17 +10,6 @@
       </div>
     </v-app-bar-title>
 
-    <div class="sapling-header__center">
-      <v-btn
-        v-if="hasSaplingAiChatAccess"
-        color="primary"
-        icon="mdi-robot-happy-outline"
-        size="default"
-        variant="tonal"
-        @click="toggleSaplingAiChat"
-      />
-    </div>
-
     <template #append>
       <SaplingHeaderStatusActions
         :inbox-count="inboxCount"
@@ -74,7 +63,6 @@ import { useSaplingHeaderInboxPreview } from '@/composables/system/useSaplingHea
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useSaplingPreferences } from '@/composables/system/useSaplingPreferences'
 import { useSaplingVectorization } from '@/composables/system/useSaplingVectorization'
-import { useSaplingAiChat } from '@/composables/system/useSaplingAiChat'
 import { BACKEND_URL, GIT_URL } from '@/constants/project.constants'
 import { i18n } from '@/i18n'
 import SaplingInbox from '@/components/account/SaplingInbox.vue'
@@ -112,7 +100,6 @@ const messageBadgeColor = computed(() => {
   return getMessageColor(latestMessage.type)
 })
 
-const { toggleSaplingAiChat, hasSaplingAiChatAccess } = useSaplingAiChat()
 const { currentLanguage, languageOptions, issueAction, appearanceActions, setLanguage } =
   useSaplingPreferences()
 const { toggleSaplingVectorization } = useSaplingVectorization()

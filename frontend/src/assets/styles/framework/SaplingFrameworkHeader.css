@@ -2,21 +2,6 @@
   --sapling-inline-cluster-gap: var(--sapling-header-cluster-gap);
 }
 
-.sapling-header__center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.sapling-header__center > * {
-  pointer-events: auto;
-}
-
 .sapling-header__desktop-action {
   display: inline-flex;
 }

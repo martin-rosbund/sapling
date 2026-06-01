@@ -424,7 +424,7 @@
               v-if="previewMobileTemplates.length > 0"
               class="sapling-form-config-preview-mobile"
             >
-              <div class="sapling-form-config-preview-phone">
+              <div class="sapling-form-config-preview-phone glass-panel">
                 <div class="sapling-form-config-preview-phone__status">
                   <span>{{ previewTitle }}</span>
                   <v-icon icon="mdi-dots-horizontal" size="small" />
