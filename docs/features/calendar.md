@@ -16,6 +16,7 @@ backend/src/calendar/calendar.recurrence.ts
 backend/src/calendar/event.delivery.service.ts
 backend/src/calendar/calendar.processor.ts
 backend/src/calendar/calendar-delivery.executor.ts
+backend/src/calendar/sync/
 backend/src/calendar/azure/
 backend/src/calendar/google/
 frontend/src/composables/event/useSaplingEvent.ts
@@ -109,6 +110,19 @@ Existing Sapling events are updated and unknown provider items are created as in
 
 This import is intentionally user-triggered. It does not require provider webhooks and relies on the existing Microsoft or Google login scopes instead of a separate calendar-only setup.
 
+## Automatic Outlook Import
+
+Automatic Outlook polling is configured per user through `CalendarSyncSubscriptionItem`. The account dialog exposes the current user's subscription through:
+
+```text
+GET /api/current/calendarSync
+PATCH /api/current/calendarSync
+```
+
+The subscription stores whether automatic import is active, the import range (`day`, `week`, or `month`), the polling interval in minutes, and the latest run/result metadata. Tokens remain in `PersonSessionItem`; the subscription only references the person.
+
+When Redis is enabled, `CalendarSyncModule` registers a BullMQ `calendar-sync` queue. On startup it adds a repeatable `schedule-calendar-imports` job, which finds due active Outlook subscriptions and enqueues one `import-calendar-for-subscription` job per user. Each import job calls the same `AzureCalendarService.importEvents()` path as the manual Outlook button. When Redis is disabled, automatic import is not scheduled.
+
 ## Frontend Behavior
 
 `useSaplingEvent.ts` owns the calendar view behavior:
@@ -147,6 +161,7 @@ Useful targeted commands:
 
 ```powershell
 npm test --prefix backend -- calendar.recurrence.spec.ts calendar.processor.spec.ts calendar-delivery.executor.spec.ts event.delivery.service.spec.ts --runInBand
+npm test --prefix backend -- calendar-sync-subscription.service.spec.ts calendar-sync.processor.spec.ts --runInBand
 npm test --prefix backend -- azure.calendar.controller.spec.ts google.calendar.controller.spec.ts --runInBand
 npm run type-check:backend
 npm run type-check:frontend

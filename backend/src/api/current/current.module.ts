@@ -9,6 +9,7 @@ import { TemplateService } from '../template/template.service';
 import { InboxModule } from '../inbox/inbox.module';
 import { OpenTaskEventsModule } from './open-task-events.module';
 import { FormConfigService } from '../form-config/form-config.service';
+import { CalendarSyncModule } from '../../calendar/sync/calendar-sync.module';
 
 /**
  * @class
@@ -24,6 +25,7 @@ import { FormConfigService } from '../form-config/form-config.service';
   imports: [
     forwardRef(() => AuthModule),
     InboxModule,
+    CalendarSyncModule,
     OpenTaskEventsModule,
     MikroOrmModule.forFeature(
       ENTITY_REGISTRY.map((e) => e.class as new () => any),

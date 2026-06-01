@@ -3,7 +3,7 @@
     :is="as"
     v-bind="$attrs"
     v-tilt="resolvedTiltOptions"
-    class="sapling-surface"
+    class="sapling-surface glass-panel"
     :class="surfaceClasses"
   >
     <template v-for="(_, slotName) in $slots" #[slotName]="slotProps">

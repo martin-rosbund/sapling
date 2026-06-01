@@ -297,6 +297,10 @@
   flex: 13 1 0;
 }
 
+.sapling-ai-chat__composer-action-buttons {
+  margin-left: auto;
+}
+
 .sapling-chat-empty-state {
   padding: var(--sapling-space-lg);
   border-radius: var(--sapling-radius-card);

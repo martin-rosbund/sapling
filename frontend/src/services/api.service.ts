@@ -57,6 +57,23 @@ class ApiService {
   }
 
   /**
+   * Sends a PATCH request to the given endpoint.
+   * @template T The expected response type.
+   * @param entityHandle Name of the endpoint relative to the backend base URL.
+   * @param body Optional request body.
+   * @returns Promise resolving to the response payload.
+   */
+  static async patch<T>(entityHandle: string, body?: unknown): Promise<T> {
+    try {
+      const response = await axios.patch<T>(`${BACKEND_URL}${entityHandle}`, body)
+      return response.data
+    } catch (error) {
+      pushApiErrorMessage(error, 'exception.unknownError', entityHandle)
+      throw error
+    }
+  }
+
+  /**
    * Uploads a document for an entity.
    * @param entityHandle Name of the entity (e.g., 'company').
    * @param reference Reference handle (item.handle).

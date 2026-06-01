@@ -5,18 +5,6 @@
         :title="activeConversationTitle"
         :title-preview-limit="titlePreviewLimit"
       />
-      <SaplingAiChatRuntimeSelectors
-        :provider-options="providerOptions"
-        :model-options="modelOptions"
-        :selected-provider-handle="selectedProviderHandle"
-        :selected-model-handle="selectedModelHandle"
-        :has-configured-providers="hasConfiguredProviders"
-        :is-sending="isSending"
-        :is-loading-providers="isLoadingProviders"
-        :is-loading-models="isLoadingModels"
-        @update:selected-provider="emit('update:selectedProvider', $event)"
-        @update:selected-model="emit('update:selectedModel', $event)"
-      />
     </div>
 
     <SaplingAiChatMessageList
@@ -52,29 +40,7 @@
       <div
         class="sapling-row-between-md sapling-chat-composer__actions sapling-ai-chat__composer-actions"
       >
-        <SaplingAiChatVoiceSelectors
-          :transcription-provider-options="transcriptionProviderOptions"
-          :transcription-model-options="transcriptionModelOptions"
-          :speech-provider-options="speechProviderOptions"
-          :speech-model-options="speechModelOptions"
-          :selected-transcription-provider-handle="selectedTranscriptionProviderHandle"
-          :selected-transcription-model-handle="selectedTranscriptionModelHandle"
-          :selected-speech-provider-handle="selectedSpeechProviderHandle"
-          :selected-speech-model-handle="selectedSpeechModelHandle"
-          :has-configured-speech-providers="hasConfiguredSpeechProviders"
-          :is-sending="isSending"
-          :is-loading-transcription-providers="isLoadingTranscriptionProviders"
-          :is-loading-transcription-models="isLoadingTranscriptionModels"
-          :is-loading-speech-providers="isLoadingSpeechProviders"
-          :is-loading-speech-models="isLoadingSpeechModels"
-          @update:selected-transcription-provider="
-            emit('update:selectedTranscriptionProvider', $event)
-          "
-          @update:selected-transcription-model="emit('update:selectedTranscriptionModel', $event)"
-          @update:selected-speech-provider="emit('update:selectedSpeechProvider', $event)"
-          @update:selected-speech-model="emit('update:selectedSpeechModel', $event)"
-        />
-        <div class="d-flex ga-2">
+        <div class="d-flex ga-2 sapling-ai-chat__composer-action-buttons">
           <v-btn
             variant="text"
             :disabled="
@@ -107,41 +73,15 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SaplingAiChatConversationTitle from '@/components/system/ai-chat/SaplingAiChatConversationTitle.vue'
 import SaplingAiChatMessageList from '@/components/system/ai-chat/SaplingAiChatMessageList.vue'
-import SaplingAiChatRuntimeSelectors from '@/components/system/ai-chat/SaplingAiChatRuntimeSelectors.vue'
-import SaplingAiChatVoiceSelectors from '@/components/system/ai-chat/SaplingAiChatVoiceSelectors.vue'
 import type { AiChatMessageItem } from '@/entity/entity'
-
-interface SelectOption {
-  label: string
-  value: string
-}
 
 const props = withDefaults(
   defineProps<{
     activeConversationTitle: string
-    providerOptions: SelectOption[]
-    modelOptions: SelectOption[]
-    transcriptionProviderOptions: SelectOption[]
-    transcriptionModelOptions: SelectOption[]
-    speechProviderOptions: SelectOption[]
-    speechModelOptions: SelectOption[]
-    selectedProviderHandle: string | null
-    selectedModelHandle: string | null
-    selectedTranscriptionProviderHandle: string | null
-    selectedTranscriptionModelHandle: string | null
-    selectedSpeechProviderHandle: string | null
-    selectedSpeechModelHandle: string | null
     hasConfiguredProviders: boolean
     hasConfiguredTranscriptionProviders: boolean
-    hasConfiguredSpeechProviders: boolean
     canSendMessage: boolean
     isSending: boolean
-    isLoadingProviders: boolean
-    isLoadingModels: boolean
-    isLoadingTranscriptionProviders: boolean
-    isLoadingTranscriptionModels: boolean
-    isLoadingSpeechProviders: boolean
-    isLoadingSpeechModels: boolean
     messages: AiChatMessageItem[]
     draftMessage: string
     assistantName: string
@@ -162,12 +102,6 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (event: 'update:selectedProvider', value: unknown): void
-  (event: 'update:selectedModel', value: unknown): void
-  (event: 'update:selectedTranscriptionProvider', value: unknown): void
-  (event: 'update:selectedTranscriptionModel', value: unknown): void
-  (event: 'update:selectedSpeechProvider', value: unknown): void
-  (event: 'update:selectedSpeechModel', value: unknown): void
   (event: 'update:draftMessage', value: string): void
   (event: 'send'): void
   (event: 'close'): void

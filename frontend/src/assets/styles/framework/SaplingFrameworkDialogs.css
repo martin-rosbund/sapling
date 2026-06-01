@@ -131,6 +131,46 @@
   align-items: start;
 }
 
+.sapling-account-center {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: var(--sapling-gap-xl);
+  width: 100%;
+  min-width: 0;
+}
+
+.sapling-account-center__tabs {
+  align-self: start;
+  min-width: 0;
+  border-right: 1px solid var(--sapling-surface-border-muted);
+}
+
+.sapling-account-center__tab {
+  justify-content: flex-start;
+  gap: var(--sapling-gap-sm);
+  min-width: 0;
+  width: 100%;
+}
+
+.sapling-account-center__tab .v-btn__content {
+  justify-content: flex-start;
+  gap: var(--sapling-gap-sm);
+  min-width: 0;
+  width: 100%;
+}
+
+.sapling-account-center__tab span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sapling-account-center__panels {
+  min-width: 0;
+  width: 100%;
+}
+
 .sapling-account-dialog__details,
 .sapling-account-dialog__workhours {
   width: 100%;
@@ -151,6 +191,89 @@
 .sapling-account-dialog__detail-value {
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+.sapling-account-dialog__calendar-sync {
+  display: grid;
+  gap: var(--sapling-gap-md);
+  min-width: 0;
+}
+
+.sapling-account-dialog__panel-stack {
+  display: grid;
+  gap: var(--sapling-gap-lg);
+  min-width: 0;
+}
+
+.sapling-account-dialog__section-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--sapling-gap-sm);
+  min-width: 0;
+  font-weight: 600;
+}
+
+.sapling-account-dialog__sync-controls {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1fr) minmax(10rem, 1fr) minmax(10rem, 1fr) auto;
+  gap: var(--sapling-gap-md);
+  align-items: center;
+  min-width: 0;
+}
+
+.sapling-account-dialog__sync-list {
+  width: 100%;
+  min-width: 0;
+}
+
+.sapling-account-dialog__sync-unavailable {
+  color: var(--sapling-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.sapling-account-dialog__language-toggle {
+  justify-self: start;
+}
+
+.sapling-account-dialog__preference-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-account-dialog__preference-action {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sapling-gap-sm);
+  min-width: 0;
+  padding: var(--sapling-gap-md);
+  border: 1px solid var(--sapling-surface-border-muted);
+  border-radius: var(--sapling-radius-md);
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sapling-account-dialog__preference-action--active {
+  border-color: rgb(var(--v-theme-primary));
+}
+
+.sapling-account-dialog__preference-icon {
+  display: inline-flex;
+}
+
+.sapling-account-dialog__preference-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.sapling-account-dialog__ai-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sapling-gap-md);
+  min-width: 0;
 }
 
 .sapling-workhours-list {
@@ -678,6 +801,33 @@
   .sapling-account-dialog__summary-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--sapling-gap-md);
+  }
+
+  .sapling-account-center {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sapling-gap-md);
+  }
+
+  .sapling-account-center__tabs {
+    border-right: 0;
+    border-bottom: 1px solid var(--sapling-surface-border-muted);
+  }
+
+  .sapling-account-center__tabs .v-slide-group__content {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .sapling-account-center__tab {
+    width: auto;
+  }
+
+  .sapling-account-dialog__sync-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sapling-account-dialog__ai-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

@@ -36,6 +36,7 @@
               :is-compact-header-actions="isCompactHeaderActions"
               @close="closePanel"
               @new-chat="startNewChat"
+              @open-account-settings="openAccountSettings"
               @refresh="reloadSessions"
             />
 
@@ -70,29 +71,10 @@
 
               <SaplingAiChatConversation
                 :active-conversation-title="activeConversationTitle"
-                :provider-options="providerOptions"
-                :model-options="modelOptions"
-                :transcription-provider-options="transcriptionProviderOptions"
-                :transcription-model-options="transcriptionModelOptions"
-                :speech-provider-options="speechProviderOptions"
-                :speech-model-options="speechModelOptions"
-                :selected-provider-handle="selectedProviderHandle"
-                :selected-model-handle="selectedModelHandle"
-                :selected-transcription-provider-handle="selectedTranscriptionProviderHandle"
-                :selected-transcription-model-handle="selectedTranscriptionModelHandle"
-                :selected-speech-provider-handle="selectedSpeechProviderHandle"
-                :selected-speech-model-handle="selectedSpeechModelHandle"
                 :has-configured-providers="hasConfiguredProviders"
                 :has-configured-transcription-providers="hasConfiguredTranscriptionProviders"
-                :has-configured-speech-providers="hasConfiguredSpeechProviders"
                 :can-send-message="canSendMessage"
                 :is-sending="isSending"
-                :is-loading-providers="isLoadingProviders"
-                :is-loading-models="isLoadingModels"
-                :is-loading-transcription-providers="isLoadingTranscriptionProviders"
-                :is-loading-transcription-models="isLoadingTranscriptionModels"
-                :is-loading-speech-providers="isLoadingSpeechProviders"
-                :is-loading-speech-models="isLoadingSpeechModels"
                 :messages="messages"
                 :draft-message="draftMessage"
                 :assistant-name="assistantName"
@@ -106,12 +88,6 @@
                 :is-transcribing-voice-input="isTranscribingVoiceInput"
                 :speech-state-by-handle="speechStateByHandle"
                 :title-preview-limit="TITLE_PREVIEW_LIMIT"
-                @update:selected-provider="updateSelectedProvider"
-                @update:selected-model="updateSelectedModel"
-                @update:selected-transcription-provider="updateSelectedTranscriptionProvider"
-                @update:selected-transcription-model="updateSelectedTranscriptionModel"
-                @update:selected-speech-provider="updateSelectedSpeechProvider"
-                @update:selected-speech-model="updateSelectedSpeechModel"
                 @update:draft-message="updateDraftMessage"
                 @close="closePanel"
                 @load-older-messages="loadOlderMessages"
@@ -140,9 +116,7 @@ import SaplingAiChatHeader from '@/components/system/ai-chat/SaplingAiChatHeader
 import SaplingAiChatLoadingState from '@/components/system/ai-chat/SaplingAiChatLoadingState.vue'
 import SaplingAiChatSessions from '@/components/system/ai-chat/SaplingAiChatSessions.vue'
 import {
-  getDefaultModelForProvider,
   getModelHandle,
-  getModelProviderHandle,
   getProviderHandle,
   resolveRuntimeTarget,
 } from '@/components/system/ai-chat/aiChatRuntimeTargets'
@@ -154,6 +128,12 @@ import { useSaplingAiChat } from '@/composables/system/useSaplingAiChat'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { SAPLING_AI_CHAT_PROMPT_EVENT } from '@/utils/saplingScriptResultUtil'
+import {
+  SAPLING_AI_PREFERENCES_UPDATED_EVENT,
+  loadSaplingAiPreferences,
+  type SaplingAiPreferences,
+} from '@/services/ai-preferences.service'
+import { openSaplingAccountDialog } from '@/services/account-dialog.service'
 
 interface SaplingAiChatPromptEventDetail {
   prompt?: string
@@ -165,6 +145,7 @@ interface SaplingAiChatPromptEventDetail {
 const route = useRoute()
 const currentPersonStore = useCurrentPersonStore()
 const messageCenter = useSaplingMessageCenter()
+const storedAiPreferences = loadSaplingAiPreferences()
 const { t } = useI18n()
 const { mdAndDown } = useDisplay()
 const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoader('aiChat', 'ai')
@@ -203,12 +184,16 @@ const speechProviderConfigs = ref<AiProviderTypeItem[]>([])
 const speechModelConfigs = ref<AiProviderModelItem[]>([])
 const sessions = ref<AiChatSessionItem[]>([])
 const activeSession = ref<AiChatSessionItem | null>(null)
-const selectedProviderHandle = ref<string | null>(null)
-const selectedModelHandle = ref<string | null>(null)
-const selectedTranscriptionProviderHandle = ref<string | null>(null)
-const selectedTranscriptionModelHandle = ref<string | null>(null)
-const selectedSpeechProviderHandle = ref<string | null>(null)
-const selectedSpeechModelHandle = ref<string | null>(null)
+const selectedProviderHandle = ref<string | null>(storedAiPreferences.chatProviderHandle)
+const selectedModelHandle = ref<string | null>(storedAiPreferences.chatModelHandle)
+const selectedTranscriptionProviderHandle = ref<string | null>(
+  storedAiPreferences.transcriptionProviderHandle,
+)
+const selectedTranscriptionModelHandle = ref<string | null>(
+  storedAiPreferences.transcriptionModelHandle,
+)
+const selectedSpeechProviderHandle = ref<string | null>(storedAiPreferences.speechProviderHandle)
+const selectedSpeechModelHandle = ref<string | null>(storedAiPreferences.speechModelHandle)
 const draftMessage = ref('')
 const editingSessionHandle = ref<number | null>(null)
 const editingSessionTitle = ref('')
@@ -271,76 +256,16 @@ const currentPersonDisplayName = computed(() => {
   return fullName || person.loginName || t('aiChat.user')
 })
 
-const providerOptions = computed(() =>
-  providerConfigs.value.map((item) => ({
-    label: item.title,
-    value: item.handle ?? '',
-  })),
-)
-
 const hasConfiguredProviders = computed(
-  () => providerOptions.value.length > 0 && modelConfigs.value.length > 0,
-)
-
-const transcriptionProviderOptions = computed(() =>
-  transcriptionProviderConfigs.value.map((item) => ({
-    label: item.title,
-    value: item.handle ?? '',
-  })),
-)
-
-const speechProviderOptions = computed(() =>
-  speechProviderConfigs.value.map((item) => ({
-    label: item.title,
-    value: item.handle ?? '',
-  })),
+  () => providerConfigs.value.length > 0 && modelConfigs.value.length > 0,
 )
 
 const hasConfiguredTranscriptionProviders = computed(
-  () => transcriptionProviderOptions.value.length > 0 && transcriptionModelConfigs.value.length > 0,
+  () => transcriptionProviderConfigs.value.length > 0 && transcriptionModelConfigs.value.length > 0,
 )
 
 const hasConfiguredSpeechProviders = computed(
-  () => speechProviderOptions.value.length > 0 && speechModelConfigs.value.length > 0,
-)
-
-const filteredModelConfigs = computed(() =>
-  modelConfigs.value.filter(
-    (item) => getModelProviderHandle(item) === selectedProviderHandle.value,
-  ),
-)
-
-const modelOptions = computed(() =>
-  filteredModelConfigs.value.map((item) => ({
-    label: `${item.title} (${item.providerModel})`,
-    value: item.handle ?? '',
-  })),
-)
-
-const filteredTranscriptionModelConfigs = computed(() =>
-  transcriptionModelConfigs.value.filter(
-    (item) => getModelProviderHandle(item) === selectedTranscriptionProviderHandle.value,
-  ),
-)
-
-const transcriptionModelOptions = computed(() =>
-  filteredTranscriptionModelConfigs.value.map((item) => ({
-    label: `${item.title} (${item.providerModel})`,
-    value: item.handle ?? '',
-  })),
-)
-
-const filteredSpeechModelConfigs = computed(() =>
-  speechModelConfigs.value.filter(
-    (item) => getModelProviderHandle(item) === selectedSpeechProviderHandle.value,
-  ),
-)
-
-const speechModelOptions = computed(() =>
-  filteredSpeechModelConfigs.value.map((item) => ({
-    label: `${item.title} (${item.providerModel})`,
-    value: item.handle ?? '',
-  })),
+  () => speechProviderConfigs.value.length > 0 && speechModelConfigs.value.length > 0,
 )
 
 const canSendMessage = computed(
@@ -441,6 +366,10 @@ watch(
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
   window.addEventListener(SAPLING_AI_CHAT_PROMPT_EVENT, handleAiChatPromptEvent as EventListener)
+  window.addEventListener(
+    SAPLING_AI_PREFERENCES_UPDATED_EVENT,
+    handleAiPreferencesUpdated as EventListener,
+  )
   streamingClockTimer = window.setInterval(() => {
     streamingClock.value = Date.now()
   }, 1000)
@@ -449,6 +378,10 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
   window.removeEventListener(SAPLING_AI_CHAT_PROMPT_EVENT, handleAiChatPromptEvent as EventListener)
+  window.removeEventListener(
+    SAPLING_AI_PREFERENCES_UPDATED_EVENT,
+    handleAiPreferencesUpdated as EventListener,
+  )
   streamAbortController.value?.abort()
   cancelVoiceInput()
   stopSpeechPlayback()
@@ -466,6 +399,21 @@ function handleKeydown(event: KeyboardEvent) {
 
 function handleAiChatPromptEvent(event: CustomEvent<SaplingAiChatPromptEventDetail>) {
   void openPromptFromScriptButton(event.detail)
+}
+
+function handleAiPreferencesUpdated(event: CustomEvent<SaplingAiPreferences>) {
+  const preferences = event.detail
+
+  selectedProviderHandle.value = preferences.chatProviderHandle
+  selectedModelHandle.value = preferences.chatModelHandle
+  selectedTranscriptionProviderHandle.value = preferences.transcriptionProviderHandle
+  selectedTranscriptionModelHandle.value = preferences.transcriptionModelHandle
+  selectedSpeechProviderHandle.value = preferences.speechProviderHandle
+  selectedSpeechModelHandle.value = preferences.speechModelHandle
+
+  syncSelectedRuntimeTarget()
+  syncSelectedTranscriptionTarget()
+  syncSelectedSpeechTarget()
 }
 
 async function openPromptFromScriptButton(detail?: SaplingAiChatPromptEventDetail) {
@@ -499,6 +447,10 @@ function closePanel() {
   cancelVoiceInput()
   stopSpeechPlayback()
   closeSaplingAiChat()
+}
+
+function openAccountSettings() {
+  openSaplingAccountDialog('songbird')
 }
 
 async function ensureChatInitialized() {
@@ -1120,106 +1072,6 @@ function buildVoiceRecordingFilename(mimeType: string) {
   return 'sapling-chat-audio.webm'
 }
 
-async function updateSelectedProvider(value: unknown) {
-  const nextProviderHandle = normalizeHandle(value)
-  const previousProviderHandle = selectedProviderHandle.value
-  const previousModelHandle = selectedModelHandle.value
-
-  selectedProviderHandle.value = nextProviderHandle
-  selectedModelHandle.value =
-    getDefaultModelForProvider(modelConfigs.value, nextProviderHandle, previousModelHandle)
-      ?.handle ?? null
-
-  if (!activeSession.value?.handle) {
-    return
-  }
-
-  try {
-    await persistRuntimeTargetSelection()
-  } catch (error) {
-    selectedProviderHandle.value = previousProviderHandle
-    selectedModelHandle.value = previousModelHandle
-    throw error
-  }
-}
-
-function updateSelectedTranscriptionProvider(value: unknown) {
-  const nextProviderHandle = normalizeHandle(value)
-
-  selectedTranscriptionProviderHandle.value = nextProviderHandle
-  selectedTranscriptionModelHandle.value =
-    getDefaultModelForProvider(
-      transcriptionModelConfigs.value,
-      nextProviderHandle,
-      selectedTranscriptionModelHandle.value,
-    )?.handle ?? null
-}
-
-function updateSelectedTranscriptionModel(value: unknown) {
-  const nextHandle = normalizeHandle(value)
-  const nextModel =
-    transcriptionModelConfigs.value.find((item) => item.handle === nextHandle) ?? null
-
-  selectedTranscriptionProviderHandle.value = getModelProviderHandle(nextModel)
-  selectedTranscriptionModelHandle.value = nextModel?.handle ?? null
-}
-
-function updateSelectedSpeechProvider(value: unknown) {
-  const nextProviderHandle = normalizeHandle(value)
-
-  selectedSpeechProviderHandle.value = nextProviderHandle
-  selectedSpeechModelHandle.value =
-    getDefaultModelForProvider(
-      speechModelConfigs.value,
-      nextProviderHandle,
-      selectedSpeechModelHandle.value,
-    )?.handle ?? null
-}
-
-function updateSelectedSpeechModel(value: unknown) {
-  const nextHandle = normalizeHandle(value)
-  const nextModel = speechModelConfigs.value.find((item) => item.handle === nextHandle) ?? null
-
-  selectedSpeechProviderHandle.value = getModelProviderHandle(nextModel)
-  selectedSpeechModelHandle.value = nextModel?.handle ?? null
-}
-
-async function updateSelectedModel(value: unknown) {
-  const nextHandle = normalizeHandle(value)
-  const nextModel = modelConfigs.value.find((item) => item.handle === nextHandle) ?? null
-  const nextProviderHandle = getModelProviderHandle(nextModel)
-  const previousProviderHandle = selectedProviderHandle.value
-  const previousHandle = selectedModelHandle.value
-
-  selectedProviderHandle.value = nextProviderHandle
-  selectedModelHandle.value = nextModel?.handle ?? null
-
-  if (!nextModel || !activeSession.value?.handle) {
-    return
-  }
-
-  try {
-    await persistRuntimeTargetSelection()
-  } catch (error) {
-    selectedProviderHandle.value = previousProviderHandle
-    selectedModelHandle.value = previousHandle
-    throw error
-  }
-}
-
-async function persistRuntimeTargetSelection() {
-  if (!activeSession.value?.handle || !selectedProviderHandle.value || !selectedModelHandle.value) {
-    return
-  }
-
-  const updatedSession = await ApiAiService.updateSession(activeSession.value.handle, {
-    providerHandle: selectedProviderHandle.value,
-    modelHandle: selectedModelHandle.value,
-  })
-  replaceSession(updatedSession)
-  activeSession.value = updatedSession
-}
-
 function handleStreamEvent(event: AiChatStreamEvent) {
   switch (event.type) {
     case 'session.upsert':
@@ -1278,14 +1130,6 @@ function replaceSession(session: AiChatSessionItem) {
     const rightDate = right.lastMessageAt || right.updatedAt || right.createdAt
     return new Date(rightDate ?? 0).getTime() - new Date(leftDate ?? 0).getTime()
   })
-}
-
-function normalizeHandle(value: unknown): string | null {
-  if (typeof value === 'string' && value.trim()) {
-    return value.trim()
-  }
-
-  return null
 }
 
 function syncSelectedRuntimeTarget() {

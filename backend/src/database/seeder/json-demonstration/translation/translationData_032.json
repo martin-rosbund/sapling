@@ -1,0 +1,11 @@
+[
+  { "entity": "account", "property": "profile", "de": "Profil", "en": "Profile" },
+  { "entity": "account", "property": "synchronizations", "de": "Synchronisationen", "en": "Synchronizations" },
+  { "entity": "account", "property": "security", "de": "Sicherheit", "en": "Security" },
+  { "entity": "account", "property": "preferences", "de": "Design & Sprache", "en": "Design & language" },
+  { "entity": "account", "property": "songbird", "de": "Songbird", "en": "Songbird" },
+  { "entity": "account", "property": "saveSongbird", "de": "Songbird speichern", "en": "Save Songbird" },
+  { "entity": "account", "property": "aiPreferencesSaved", "de": "Songbird-Einstellungen gespeichert", "en": "Songbird settings saved" },
+  { "entity": "aiChat", "property": "openAccountSettings", "de": "Songbird-Einstellungen oeffnen", "en": "Open Songbird settings" },
+  { "entity": "navigation", "property": "language", "de": "Sprache", "en": "Language" }
+]
