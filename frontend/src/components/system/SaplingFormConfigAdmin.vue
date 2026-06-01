@@ -162,6 +162,21 @@
           </div>
         </div>
 
+        <div class="sapling-form-config__summary" aria-live="polite">
+          <v-chip size="small" color="primary" variant="tonal" prepend-icon="mdi-form-select">
+            {{ formVisibleCount }} {{ $t('formConfig.formFields') }}
+          </v-chip>
+          <v-chip size="small" variant="outlined" prepend-icon="mdi-table">
+            {{ tableVisibleCount }} {{ $t('formConfig.tableFields') }}
+          </v-chip>
+          <v-chip size="small" variant="outlined" prepend-icon="mdi-cellphone">
+            {{ mobileVisibleCount }} {{ $t('formConfig.mobileFields') }}
+          </v-chip>
+          <v-chip size="small" variant="outlined" prepend-icon="mdi-eye-off-outline">
+            {{ hiddenFieldCount }} {{ $t('formConfig.hiddenFields') }}
+          </v-chip>
+        </div>
+
         <div class="sapling-config-field-tools sapling-form-config__field-tools">
           <v-text-field
             v-model="fieldSearch"
@@ -458,6 +473,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 import ApiFormConfigService, {
   type SaplingFormConfigItem,
 } from '@/services/api.form-config.service'
@@ -506,6 +522,7 @@ const PREVIEW_UNSUPPORTED_RELATION_KINDS = ['1:m', 'm:n', 'n:m']
 const PREVIEW_UNSUPPORTED_FORM_RELATION_KINDS = [...PREVIEW_UNSUPPORTED_RELATION_KINDS, '1:1']
 
 const { t, te } = useI18n()
+const route = useRoute()
 
 const entities = ref<EntityItem[]>([])
 const configs = ref<SaplingFormConfigItem[]>([])
@@ -689,10 +706,25 @@ const activePreviewCount = computed(() => {
   return previewTemplates.value.length
 })
 
+const formVisibleCount = computed(() => fieldRows.filter((field) => field.visible).length)
+const tableVisibleCount = computed(() => fieldRows.filter((field) => field.tableVisible).length)
+const mobileVisibleCount = computed(() => fieldRows.filter((field) => field.mobileVisible).length)
+const hiddenFieldCount = computed(() => fieldRows.filter((field) => !field.visible).length)
+
 const previewTitle = computed(() =>
   selectedEntityHandle.value
     ? translateEntity(selectedEntityHandle.value)
     : t('formConfig.preview'),
+)
+
+watch(
+  () => route.query.entity,
+  () => {
+    const requestedEntity = getRequestedEntityHandle()
+    if (requestedEntity && requestedEntity !== selectedEntityHandle.value) {
+      selectedEntityHandle.value = requestedEntity
+    }
+  },
 )
 
 watch(selectedEntityHandle, () => {
@@ -720,7 +752,11 @@ async function loadEntities(): Promise<void> {
 
   try {
     entities.value = await fetchAllEntities()
-    selectedEntityHandle.value = entities.value[0]?.handle ?? ''
+    const requestedEntity = getRequestedEntityHandle()
+    selectedEntityHandle.value =
+      requestedEntity && entities.value.some((entity) => entity.handle === requestedEntity)
+        ? requestedEntity
+        : entities.value[0]?.handle ?? ''
   } catch {
     errorMessage.value = t('formConfig.loadFailed')
   } finally {
@@ -746,6 +782,12 @@ async function fetchAllEntities(): Promise<EntityItem[]> {
   } while (page <= totalPages)
 
   return result
+}
+
+function getRequestedEntityHandle(): string {
+  const rawEntity = route.query.entity
+  const value = Array.isArray(rawEntity) ? rawEntity[0] : rawEntity
+  return typeof value === 'string' ? value.trim() : ''
 }
 
 async function loadEntityContext(): Promise<void> {

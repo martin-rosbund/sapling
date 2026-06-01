@@ -80,8 +80,9 @@
               @select-favorite="selectFavorite"
               @add="openCreateDialog"
             >
-              <template v-if="showSidePanelToggleButton" #leading>
+              <template v-if="showSidePanelToggleButton || showFormConfigButton" #leading>
                 <v-btn
+                  v-if="showSidePanelToggleButton"
                   class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--utility"
                   color="primary"
                   :variant="sidePanelVisible ? 'flat' : 'tonal'"
@@ -91,6 +92,18 @@
                   @click="emit('toggleSidePanel')"
                 >
                   <v-icon>{{ sidePanelToggleIcon }}</v-icon>
+                </v-btn>
+                <v-btn
+                  v-if="showFormConfigButton"
+                  class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--utility"
+                  color="primary"
+                  variant="tonal"
+                  icon
+                  :title="$t('formConfig.openForEntity')"
+                  :aria-label="$t('formConfig.openForEntity')"
+                  @click="openFormConfigForTable"
+                >
+                  <v-icon>mdi-table-cog</v-icon>
                 </v-btn>
               </template>
             </SaplingTableToolbarActions>
@@ -251,6 +264,7 @@
 // #region Imports
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import SaplingSearch from '@/components/system/SaplingSearch.vue'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog'
@@ -289,6 +303,7 @@ const props = withDefaults(defineProps<SaplingTableProps>(), {
 })
 const emit = defineEmits<SaplingTableEmit>()
 const { t } = useI18n()
+const router = useRouter()
 const { isLoading: isHeaderTranslationLoading } = useTranslationLoader(props.entityHandle)
 const currentPersonStore = useCurrentPersonStore()
 
@@ -325,6 +340,9 @@ const showImportButton = computed(
   () =>
     currentPersonStore.isAdministrator &&
     (Boolean(props.entityPermission?.allowInsert) || Boolean(props.entityPermission?.allowUpdate)),
+)
+const showFormConfigButton = computed(
+  () => currentPersonStore.isAdministrator && Boolean(props.entityHandle),
 )
 const showSearchField = computed(() => props.showSearch !== false)
 const showSidePanelToggleButton = computed(() => props.showSidePanelToggle === true)
@@ -439,6 +457,14 @@ function onMailToSelected(action: SaplingBulkMailAction): void {
 
 function openImportFilePicker(): void {
   importInputRef.value?.click()
+}
+
+async function openFormConfigForTable(): Promise<void> {
+  if (!props.entityHandle) {
+    return
+  }
+
+  await router.push({ name: 'formConfig', query: { entity: props.entityHandle } })
 }
 
 function onImportFileInputChange(event: Event): void {

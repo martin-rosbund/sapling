@@ -58,6 +58,18 @@
   justify-content: flex-end;
 }
 
+.sapling-form-config__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sapling-gap-xs);
+  align-items: center;
+  padding: var(--sapling-space-sm-plus);
+  border: 1px solid var(--sapling-surface-border-muted);
+  border-radius: var(--sapling-radius-sm);
+  background: var(--sapling-surface-fill-soft);
+  box-shadow: var(--sapling-inset-highlight);
+}
+
 .sapling-config-field-tools {
   grid-template-columns: minmax(180px, 1fr) auto auto;
 }

@@ -72,6 +72,17 @@
               >
                 {{ itemHandleLabel }}
               </v-chip>
+              <v-btn
+                v-if="canOpenFormConfigEditor"
+                size="small"
+                color="primary"
+                variant="tonal"
+                prepend-icon="mdi-table-cog"
+                :title="$t('formConfig.openForEntity')"
+                @click="openFormConfigEditor"
+              >
+                {{ $t('formConfig.configure') }}
+              </v-btn>
             </template>
           </SaplingDialogEditHero>
         </v-card-title>
@@ -337,6 +348,7 @@
 // #region Imports
 import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import type {
   AccumulatedPermission,
   DialogSaveAction,
@@ -410,6 +422,7 @@ const emit = defineEmits<{
 // #endregion
 
 const { t, d, te } = useI18n()
+const router = useRouter()
 const { pushMessage } = useSaplingMessageCenter()
 const currentPersonStore = useCurrentPersonStore()
 const timelineDialogStore = useTimelineDialogStore()
@@ -502,6 +515,15 @@ function onShellKeydown(event: KeyboardEvent) {
     event.preventDefault()
     cancel()
   }
+}
+
+async function openFormConfigEditor(): Promise<void> {
+  const targetEntityHandle = props.entity?.handle
+  if (!targetEntityHandle) {
+    return
+  }
+
+  await router.push({ name: 'formConfig', query: { entity: targetEntityHandle } })
 }
 
 const entityLabel = computed(() =>
@@ -644,6 +666,9 @@ const selectedFormConfigChipLabel = computed(() =>
   selectedFormConfigLabel.value
     ? `${t('formConfig.currentView')}: ${selectedFormConfigLabel.value}`
     : '',
+)
+const canOpenFormConfigEditor = computed(
+  () => currentPersonStore.isAdministrator && Boolean(props.entity?.handle),
 )
 
 const resetButtonLabel = computed(() => t('filter.reset'))
