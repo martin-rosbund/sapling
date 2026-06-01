@@ -17,6 +17,11 @@ export class AiChatMessageItem {
     group: 'aiChatMessage.groupReference',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => AiChatSessionItem, { nullable: false })
   session!: Rel<AiChatSessionItem>;
@@ -28,6 +33,11 @@ export class AiChatMessageItem {
     group: 'aiChatMessage.groupReference',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;
@@ -39,6 +49,11 @@ export class AiChatMessageItem {
     group: 'aiChatMessage.groupBasics',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 32, nullable: false })
   role!: string;
@@ -50,6 +65,11 @@ export class AiChatMessageItem {
     group: 'aiChatMessage.groupBasics',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ length: 32, nullable: false, default: 'completed' })
   status = 'completed';
@@ -60,6 +80,11 @@ export class AiChatMessageItem {
     group: 'aiChatMessage.groupBasics',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ nullable: false })
   sequence!: number;
@@ -71,6 +96,11 @@ export class AiChatMessageItem {
     group: 'aiChatMessage.groupContent',
     groupOrder: 300,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 16384, nullable: false })
   content!: string;
@@ -81,6 +111,11 @@ export class AiChatMessageItem {
     group: 'aiChatMessage.groupContent',
     groupOrder: 300,
     width: 4,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   contextPayload?: object | null;
@@ -91,6 +126,11 @@ export class AiChatMessageItem {
     group: 'aiChatMessage.groupBasics',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   toolCalls?: object[] | null;
@@ -101,6 +141,11 @@ export class AiChatMessageItem {
     group: 'aiChatMessage.groupContent',
     groupOrder: 300,
     width: 4,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   requestPayload?: object | null;
@@ -111,6 +156,11 @@ export class AiChatMessageItem {
     group: 'aiChatMessage.groupContent',
     groupOrder: 300,
     width: 4,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   responsePayload?: object | null;
@@ -122,6 +172,11 @@ export class AiChatMessageItem {
     group: 'aiChatMessage.groupIntegration',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 64, nullable: true })
   provider?: string | null;
@@ -132,6 +187,11 @@ export class AiChatMessageItem {
     group: 'aiChatMessage.groupIntegration',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: true })
   model?: string | null;
@@ -142,6 +202,11 @@ export class AiChatMessageItem {
     group: 'aiChatMessage.groupIntegration',
     groupOrder: 400,
     width: 4,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ length: 512, nullable: true })
   url?: string | null;
@@ -152,6 +217,11 @@ export class AiChatMessageItem {
     group: 'aiChatMessage.groupBasics',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: true })
   routeName?: string | null;
@@ -163,6 +233,11 @@ export class AiChatMessageItem {
     group: 'aiChatMessage.groupBasics',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 600,
+    tableVisible: true,
+    mobileOrder: 600,
+    mobileVisible: true,
   })
   @Property({ length: 256, nullable: true })
   pageTitle?: string | null;

@@ -60,6 +60,11 @@ export class KpiItem {
     group: 'kpi.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   name!: string;
@@ -73,6 +78,11 @@ export class KpiItem {
     group: 'kpi.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 256, nullable: true })
   description?: string;
@@ -86,6 +96,11 @@ export class KpiItem {
     group: 'kpi.groupReference',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => KpiAggregationItem, { nullable: false })
   aggregation!: KpiAggregationItem;
@@ -99,6 +114,11 @@ export class KpiItem {
     group: 'kpi.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: false })
   field!: string;
@@ -112,6 +132,11 @@ export class KpiItem {
     group: 'kpi.groupReference',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => KpiTypeItem, { nullable: false, default: 'ITEM' })
   type!: KpiTypeItem;
@@ -125,6 +150,11 @@ export class KpiItem {
     group: 'kpi.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: true })
   timeframeField?: string;
@@ -138,6 +168,11 @@ export class KpiItem {
     group: 'kpi.groupReference',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @ManyToOne(() => KpiTimeframeItem, { nullable: true })
   timeframe?: KpiTimeframeItem;
@@ -151,6 +186,11 @@ export class KpiItem {
     group: 'kpi.groupReference',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @ManyToOne(() => KpiTimeframeItem, { nullable: true })
   timeframeInterval?: KpiTimeframeItem;
@@ -164,6 +204,11 @@ export class KpiItem {
     group: 'kpi.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   filter?: object;
@@ -177,6 +222,11 @@ export class KpiItem {
     group: 'kpi.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   groupBy?: string[];
@@ -190,6 +240,11 @@ export class KpiItem {
     group: 'kpi.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: true })
   relationField?: string;
@@ -206,6 +261,11 @@ export class KpiItem {
     group: 'kpi.groupReference',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @ManyToOne(() => EntityItem, { nullable: true })
   relation?: Rel<EntityItem>;
@@ -219,6 +279,11 @@ export class KpiItem {
     group: 'kpi.groupReference',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 600,
+    tableVisible: true,
+    mobileOrder: 600,
+    mobileVisible: false,
   })
   @ManyToOne(() => EntityItem, { nullable: true })
   targetEntity!: Rel<EntityItem>;

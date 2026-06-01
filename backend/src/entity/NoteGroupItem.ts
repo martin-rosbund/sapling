@@ -38,6 +38,11 @@ export class NoteGroupItem {
     group: 'noteGroup.groupAppearance',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: 'mdi-folder', length: 64, nullable: false })
   icon: string = 'mdi-folder';

@@ -100,6 +100,11 @@ export class PersonItem {
     group: 'person.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 64, nullable: false })
   firstName!: string;
@@ -114,6 +119,11 @@ export class PersonItem {
     group: 'person.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: true,
   })
   @Property({ length: 64, nullable: false })
   lastName!: string;
@@ -127,6 +137,11 @@ export class PersonItem {
     group: 'person.groupSecurity',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ unique: true, length: 64, nullable: true })
   loginName?: string;
@@ -141,6 +156,11 @@ export class PersonItem {
     group: 'person.groupSecurity',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({
     nullable: true,
@@ -160,6 +180,11 @@ export class PersonItem {
     group: 'person.groupContact',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: true, length: 32 })
   phone?: string;
@@ -174,6 +199,11 @@ export class PersonItem {
     group: 'person.groupContact',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ nullable: true, length: 32 })
   mobile?: string;
@@ -188,6 +218,11 @@ export class PersonItem {
     group: 'person.groupContact',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ nullable: true, length: 128 })
   email?: string;
@@ -201,6 +236,11 @@ export class PersonItem {
     group: 'person.groupSchedule',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'date' })
   birthDay?: Date;
@@ -214,6 +254,11 @@ export class PersonItem {
     group: 'person.groupSecurity',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ default: false, nullable: false })
   requirePasswordChange?: boolean = false;
@@ -227,6 +272,11 @@ export class PersonItem {
     group: 'person.groupConfiguration',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   isActive?: boolean = true;
@@ -240,6 +290,11 @@ export class PersonItem {
     group: 'person.groupSchedule',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   sendNewsletter?: boolean = true;
@@ -254,6 +309,11 @@ export class PersonItem {
     group: 'person.groupAppearance',
     groupOrder: 600,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color?: string = '#4CAF50';
@@ -270,6 +330,11 @@ export class PersonItem {
     group: 'person.groupReference',
     groupOrder: 700,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => CompanyItem, { nullable: true })
   company?: Rel<CompanyItem>;
@@ -304,6 +369,11 @@ export class PersonItem {
     group: 'person.groupReference',
     groupOrder: 700,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonTypeItem, { default: 'sapling', nullable: true })
   type!: PersonTypeItem;
@@ -318,6 +388,11 @@ export class PersonItem {
     group: 'person.groupReference',
     groupOrder: 700,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonDepartmentItem, { nullable: true })
   department?: PersonDepartmentItem;
@@ -331,6 +406,11 @@ export class PersonItem {
     group: 'person.groupReference',
     groupOrder: 700,
     width: 1,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @ManyToOne(() => LanguageItem, { default: 'de', nullable: true })
   language?: LanguageItem;
@@ -344,6 +424,11 @@ export class PersonItem {
     group: 'person.groupReference',
     groupOrder: 700,
     width: 1,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @ManyToOne(() => WorkHourWeekItem, { nullable: true })
   workWeek?: WorkHourWeekItem;
@@ -357,6 +442,11 @@ export class PersonItem {
     group: 'person.groupReference',
     groupOrder: 700,
     width: 1,
+    visible: true,
+    tableOrder: 550,
+    tableVisible: true,
+    mobileOrder: 550,
+    mobileVisible: false,
   })
   @ManyToOne(() => HolidayGroupItem, { nullable: true })
   holidayGroup?: HolidayGroupItem;
@@ -459,6 +549,11 @@ export class PersonItem {
     group: 'person.groupReference',
     groupOrder: 700,
     width: 2,
+    visible: false,
+    tableOrder: 600,
+    tableVisible: false,
+    mobileOrder: 600,
+    mobileVisible: false,
   })
   @OneToOne(() => PersonSessionItem, (session) => session.person)
   session?: PersonSessionItem;

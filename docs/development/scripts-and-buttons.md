@@ -69,6 +69,14 @@ Client actions are named operations on the entity script's `execute(items, name,
 
 The frontend type lives in `frontend/src/services/api.script.service.ts`. Keep backend and frontend result contracts aligned when adding a method.
 
+`callURL` also supports the internal `sapling-ai-chat://prompt` URL scheme.
+Use it when a script button should open Songbird with a prepared prompt instead
+of duplicating AI/MCP orchestration in an entity script. The frontend dispatches
+the prompt to `SaplingAiChat`, where it can open a new chat and optionally send
+the prompt immediately. This pattern is used by the effort-estimate and
+sales-opportunity Phase 4 actions so Songbird can call `generic_get`,
+`knowledge_search`, and semantic tools with the current user's permissions.
+
 ## Server Lifecycle Hooks
 
 Server scripts can run around generic entity operations.

@@ -18,6 +18,11 @@ export class AiProviderTypeItem {
     group: 'aiProviderType.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -29,6 +34,11 @@ export class AiProviderTypeItem {
     group: 'aiProviderType.groupAppearance',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: 'mdi-robot-outline', length: 64, nullable: false })
   icon = 'mdi-robot-outline';
@@ -40,6 +50,11 @@ export class AiProviderTypeItem {
     group: 'aiProviderType.groupAppearance',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: '#546E7A', length: 32, nullable: false })
   color = '#546E7A';
@@ -50,6 +65,11 @@ export class AiProviderTypeItem {
     group: 'aiProviderType.groupSecurity',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   credentialTypes?: string[] | null;
@@ -61,6 +81,11 @@ export class AiProviderTypeItem {
     group: 'aiProviderType.groupSecurity',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true, hidden: true })
   credentials?: Record<string, string> | null;
@@ -71,6 +96,11 @@ export class AiProviderTypeItem {
     group: 'aiProviderType.groupConfiguration',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: false, default: true })
   isActive = true;

@@ -40,6 +40,11 @@ export class ServerLandscapeTypeUsageItem {
     group: 'serverLandscapeTypeUsage.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -55,6 +60,11 @@ export class ServerLandscapeTypeUsageItem {
     group: 'serverLandscapeTypeUsage.groupAppearance',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: 'mdi-console-network', length: 64, nullable: false })
   icon?: string = 'mdi-console-network';
@@ -70,6 +80,11 @@ export class ServerLandscapeTypeUsageItem {
     group: 'serverLandscapeTypeUsage.groupAppearance',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: '#2E7D32', length: 32, nullable: false })
   color: string = '#2E7D32';

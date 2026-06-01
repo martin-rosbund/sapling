@@ -99,6 +99,11 @@ export class TemplateService {
         formGroupOrder: formLayout.groupOrder,
         formOrder: formLayout.order,
         formWidth: formLayout.width,
+        formVisible: formLayout.formVisible,
+        tableOrder: formLayout.tableOrder,
+        tableVisible: formLayout.tableVisible,
+        mobileOrder: formLayout.mobileOrder,
+        mobileVisible: formLayout.mobileVisible,
         referenceDependency: getSaplingReferenceDependency(
           entityClass.prototype as object,
           prop.name,

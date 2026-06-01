@@ -14,8 +14,10 @@ import {
   getEditDialogHeaders,
   getGenericReferenceEntityHandle,
   getGenericReferenceHandle,
+  getMobileTableHeaders,
   getReadableReferenceRelationNames,
   getRelationTableHeaders,
+  getSupportedTableHeaders,
   getTableHeaders,
   isBooleanTemplate,
   isDateTemplate,
@@ -24,6 +26,7 @@ import {
   isManyToOneTemplate,
   isNumericTemplate,
   isRangeTemplate,
+  isVisibleTableTemplate,
   isTextSearchableTemplate,
   isTimeTemplate,
 } from '../saplingTableUtil'
@@ -35,6 +38,9 @@ function createTemplate(overrides: Partial<EntityTemplate> = {}): EntityTemplate
     key: overrides.key ?? name,
     name,
     type: overrides.type ?? 'StringType',
+    formVisible: overrides.formVisible ?? true,
+    tableVisible: overrides.tableVisible ?? true,
+    mobileVisible: overrides.mobileVisible ?? false,
     ...overrides,
   }
 }
@@ -54,7 +60,12 @@ function createRelationState(entityHandle: string, templates: EntityTemplate[]):
 describe('saplingTableUtil', () => {
   it('builds visible headers for relation and standalone tables', () => {
     const visibleTemplate = createTemplate({ name: 'title' })
-    const hiddenTemplate = createTemplate({ name: 'secret', options: ['isSystem'] })
+    const hiddenTemplate = createTemplate({
+      name: 'secret',
+      options: ['isSystem'],
+      formVisible: false,
+      tableVisible: false,
+    })
     const unreadableReferenceTemplate = createTemplate({
       name: 'salesOpportunity',
       kind: 'm:1',
@@ -119,6 +130,79 @@ describe('saplingTableUtil', () => {
     ).toEqual(['company'])
   })
 
+  it('applies configured table visibility and column order', () => {
+    const templates = [
+      createTemplate({ name: 'hidden', tableVisible: false }),
+      createTemplate({ name: 'longNotes', length: 512, tableVisible: true, tableOrder: 20 }),
+      createTemplate({ name: 'title', tableOrder: 10 }),
+    ]
+
+    expect(isVisibleTableTemplate(templates[0])).toBe(false)
+    expect(isVisibleTableTemplate(templates[1])).toBe(true)
+    expect(
+      getTableHeaders(templates, { handle: 'ticket' } as never, (key) => key).map(
+        (header) => header.key,
+      ),
+    ).toEqual(['title', 'longNotes'])
+  })
+
+  it('builds mobile headers from mobile visibility independently of table visibility', () => {
+    const templates = [
+      createTemplate({ name: 'summary', tableOrder: 20 }),
+      createTemplate({
+        name: 'title',
+        options: ['isValue'],
+        tableOrder: 10,
+        mobileVisible: true,
+      }),
+      createTemplate({
+        name: 'hiddenValue',
+        options: ['isValue'],
+        tableVisible: false,
+        tableOrder: 30,
+        mobileVisible: true,
+      }),
+      createTemplate({
+        name: 'mobileOnly',
+        tableVisible: false,
+        mobileVisible: true,
+        mobileOrder: 5,
+      }),
+      createTemplate({ name: 'suppressedMobile', mobileVisible: false, tableOrder: 1 }),
+    ]
+    const translate = (key: string) => key
+    const supportedHeaders = getSupportedTableHeaders(
+      templates,
+      { handle: 'ticket' } as never,
+      translate,
+    )
+    const desktopHeaders = getTableHeaders(templates, { handle: 'ticket' } as never, translate)
+
+    expect(desktopHeaders.map((header) => header.key)).toEqual([
+      'suppressedMobile',
+      'title',
+      'summary',
+    ])
+    expect(getMobileTableHeaders(supportedHeaders).map((header) => header.key)).toEqual([
+      'mobileOnly',
+      'title',
+      'hiddenValue',
+    ])
+  })
+
+  it('uses explicit mobile visibility instead of deriving it from isValue', () => {
+    const headers = [
+      createTemplate({ name: 'title', options: ['isValue'], mobileVisible: true }),
+      createTemplate({ name: 'description' }),
+    ].map((template) => ({
+      ...template,
+      key: template.name,
+      title: template.name,
+    }))
+
+    expect(getMobileTableHeaders(headers).map((header) => header.key)).toEqual(['title'])
+  })
+
   it('filters edit dialog headers by mode, reference visibility, and permissions', () => {
     const templates = [
       createTemplate({ name: 'handle' }),
@@ -127,6 +211,10 @@ describe('saplingTableUtil', () => {
         kind: 'm:1',
         referenceName: 'company',
         isReference: true,
+      }),
+      createTemplate({
+        name: 'internalNote',
+        formVisible: false,
       }),
     ]
 

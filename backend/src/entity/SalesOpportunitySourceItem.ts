@@ -38,6 +38,11 @@ export class SalesOpportunitySourceItem {
     group: 'salesOpportunitySource.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -51,6 +56,11 @@ export class SalesOpportunitySourceItem {
     group: 'salesOpportunitySource.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ length: 64, nullable: false })
   name!: string;

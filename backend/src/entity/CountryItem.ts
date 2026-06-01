@@ -51,6 +51,11 @@ export class CountryItem {
     group: 'country.groupBasics',
     groupOrder: 100,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 256, nullable: false })
   name!: string;
@@ -65,6 +70,11 @@ export class CountryItem {
     group: 'country.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ nullable: true, length: 8 })
   dialingCode?: string | null = null;
@@ -81,6 +91,11 @@ export class CountryItem {
     group: 'country.groupReference',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => LanguageItem, { defaultRaw: `'en'`, nullable: true })
   language!: Rel<LanguageItem>;
@@ -95,6 +110,11 @@ export class CountryItem {
     group: 'country.groupReference',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => MoneyItem, { nullable: true })
   money?: MoneyItem;

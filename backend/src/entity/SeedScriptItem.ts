@@ -38,6 +38,11 @@ export class SeedScriptItem {
     group: 'seedScript.groupContent',
     groupOrder: 100,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 256, nullable: false })
   scriptName!: string;
@@ -52,6 +57,11 @@ export class SeedScriptItem {
     group: 'seedScript.groupBasics',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 64, nullable: false })
   entityHandle!: string;
@@ -66,6 +76,11 @@ export class SeedScriptItem {
     group: 'seedScript.groupSchedule',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: false, type: 'datetime' })
   executedAt!: Date;
@@ -81,6 +96,11 @@ export class SeedScriptItem {
     group: 'seedScript.groupConfiguration',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   isSuccess!: boolean;

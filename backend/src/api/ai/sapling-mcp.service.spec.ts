@@ -279,6 +279,126 @@ describe('SaplingMcpService', () => {
     });
   });
 
+  it('uses isValue fields in model-facing generic_get output and hides raw handles', async () => {
+    const genericService = {
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      getRecordTimeline: jest.fn(),
+      findAndCount: jest.fn().mockResolvedValue({
+        data: [
+          {
+            handle: 21,
+            title: 'Dokumentenablage fuer Angebote',
+            ticket: {
+              handle: 46,
+              title: 'Techniker Einsatzplanung',
+            },
+            positions: [
+              {
+                handle: 61,
+                title: 'Dokumenttypen definieren',
+              },
+            ],
+          },
+        ],
+      } as never),
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn((entityHandle: string) => {
+        if (entityHandle === 'effortEstimate') {
+          return [
+            createTemplateField({
+              name: 'handle',
+              type: 'number',
+              isPrimaryKey: true,
+              isAutoIncrement: true,
+            }),
+            createTemplateField({ name: 'title', options: ['isValue'] }),
+            createTemplateField({
+              name: 'ticket',
+              isReference: true,
+              referenceName: 'ticket',
+            }),
+            createTemplateField({
+              name: 'positions',
+              isReference: true,
+              referenceName: 'effortEstimatePosition',
+            }),
+          ];
+        }
+
+        if (entityHandle === 'ticket') {
+          return [
+            createTemplateField({
+              name: 'handle',
+              type: 'number',
+              isPrimaryKey: true,
+              isAutoIncrement: true,
+            }),
+            createTemplateField({ name: 'title', options: ['isValue'] }),
+          ];
+        }
+
+        if (entityHandle === 'effortEstimatePosition') {
+          return [
+            createTemplateField({
+              name: 'handle',
+              type: 'number',
+              isPrimaryKey: true,
+              isAutoIncrement: true,
+            }),
+            createTemplateField({ name: 'title', options: ['isValue'] }),
+          ];
+        }
+
+        return [];
+      }),
+    };
+    const service = createService({ genericService, templateService });
+    const user = { handle: 1 } as never;
+
+    const result = await service.executeTool(
+      'generic_get',
+      {
+        entityHandle: 'effortEstimate',
+        handle: 21,
+        relations: ['ticket', 'positions'],
+      },
+      user,
+    );
+
+    expect(result.rawResult).toMatchObject({
+      handle: 21,
+      record: {
+        handle: 21,
+        ticket: { handle: 46 },
+        positions: [{ handle: 61 }],
+      },
+    });
+    expect(result.modelResult).toMatchObject({
+      entityHandle: 'effortEstimate',
+      displayValue: 'Dokumentenablage fuer Angebote',
+      record: {
+        displayValue: 'Dokumentenablage fuer Angebote',
+        title: 'Dokumentenablage fuer Angebote',
+        ticket: {
+          displayValue: 'Techniker Einsatzplanung',
+          title: 'Techniker Einsatzplanung',
+        },
+        positions: [
+          {
+            displayValue: 'Dokumenttypen definieren',
+            title: 'Dokumenttypen definieren',
+          },
+        ],
+      },
+    });
+    expect(JSON.stringify(result.modelResult)).not.toContain('"handle"');
+    expect(result.content).toContain('"displayValue"');
+    expect(result.content).not.toContain('"handle"');
+  });
+
   it('loads a record timeline via generic_timeline', async () => {
     const genericService = {
       create: jest.fn(),
@@ -376,6 +496,11 @@ describe('SaplingMcpService', () => {
       searchMode: 'solution',
       data: [{ handle: 42, title: 'Sage 100 Fehler' }],
     });
+    expect(result.modelResult).toMatchObject({
+      entityHandle: 'ticket',
+      data: [{ displayValue: 'Sage 100 Fehler', title: 'Sage 100 Fehler' }],
+    });
+    expect(JSON.stringify(result.modelResult)).not.toContain('"handle"');
   });
 
   it('forwards semantic_search to AiService with normalized limits', async () => {
@@ -484,5 +609,6 @@ describe('SaplingMcpService', () => {
         },
       ],
     });
+    expect(JSON.stringify(result.modelResult)).not.toContain('"handle"');
   });
 });

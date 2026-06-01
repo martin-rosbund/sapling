@@ -137,6 +137,13 @@ Common responsibilities:
 - table component state
 
 Table columns are driven by template metadata and translations.
+`SaplingForm` metadata carries explicit defaults for form, desktop table, and
+mobile table rendering. Desktop columns use `tableVisible` and `tableOrder`.
+Mobile table cards use separate `mobileVisible` and `mobileOrder` metadata.
+The current entity convention sets `mobileVisible: true` only for fields marked
+with `isValue`, but this is stored in the decorator and not inferred in the
+frontend. Hiding a field from the desktop table does not automatically hide a
+mobile-visible field.
 
 ## Dialogs
 

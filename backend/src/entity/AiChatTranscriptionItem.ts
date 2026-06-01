@@ -21,6 +21,11 @@ export class AiChatTranscriptionItem {
     group: 'aiChatTranscription.groupReference',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => AiChatSessionItem, { nullable: true })
   session?: Rel<AiChatSessionItem> | null;
@@ -31,6 +36,11 @@ export class AiChatTranscriptionItem {
     group: 'aiChatTranscription.groupReference',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => AiChatMessageItem, { nullable: true })
   message?: Rel<AiChatMessageItem> | null;
@@ -41,6 +51,11 @@ export class AiChatTranscriptionItem {
     group: 'aiChatTranscription.groupReference',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @ManyToOne(() => DocumentItem, { nullable: true })
   document?: Rel<DocumentItem> | null;
@@ -52,6 +67,11 @@ export class AiChatTranscriptionItem {
     group: 'aiChatTranscription.groupReference',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;
@@ -63,6 +83,11 @@ export class AiChatTranscriptionItem {
     group: 'aiChatTranscription.groupReference',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @ManyToOne(() => AiProviderTypeItem, { nullable: true })
   provider?: Rel<AiProviderTypeItem> | null;
@@ -73,6 +98,11 @@ export class AiChatTranscriptionItem {
     group: 'aiChatTranscription.groupReference',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 600,
+    tableVisible: true,
+    mobileOrder: 600,
+    mobileVisible: false,
   })
   @ManyToOne(() => AiProviderModelItem, { nullable: true })
   model?: Rel<AiProviderModelItem> | null;
@@ -84,6 +114,11 @@ export class AiChatTranscriptionItem {
     group: 'aiChatTranscription.groupBasics',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 32, nullable: false, default: 'processing' })
   status = 'processing';
@@ -95,6 +130,11 @@ export class AiChatTranscriptionItem {
     group: 'aiChatTranscription.groupContent',
     groupOrder: 300,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 16384, nullable: true })
   transcript?: string | null;
@@ -105,6 +145,11 @@ export class AiChatTranscriptionItem {
     group: 'aiChatTranscription.groupContent',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ length: 16, nullable: true })
   detectedLanguage?: string | null;
@@ -115,6 +160,11 @@ export class AiChatTranscriptionItem {
     group: 'aiChatTranscription.groupIntegration',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: false })
   mimeType!: string;
@@ -125,6 +175,11 @@ export class AiChatTranscriptionItem {
     group: 'aiChatTranscription.groupIntegration',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ nullable: false })
   byteLength!: number;
@@ -135,6 +190,11 @@ export class AiChatTranscriptionItem {
     group: 'aiChatTranscription.groupIntegration',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'float' })
   durationSeconds?: number | null;
@@ -145,6 +205,11 @@ export class AiChatTranscriptionItem {
     group: 'aiChatTranscription.groupContent',
     groupOrder: 300,
     width: 4,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   requestPayload?: object | null;
@@ -155,6 +220,11 @@ export class AiChatTranscriptionItem {
     group: 'aiChatTranscription.groupContent',
     groupOrder: 300,
     width: 4,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   responsePayload?: object | null;
@@ -165,6 +235,11 @@ export class AiChatTranscriptionItem {
     group: 'aiChatTranscription.groupContent',
     groupOrder: 300,
     width: 4,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   failurePayload?: object | null;

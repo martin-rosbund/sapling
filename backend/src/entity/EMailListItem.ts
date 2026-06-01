@@ -46,6 +46,11 @@ export class EMailListItem {
     group: 'mailList.groupBasics',
     groupOrder: 100,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -61,6 +66,11 @@ export class EMailListItem {
     group: 'mailList.groupReference',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => EmailTemplateItem, { nullable: true })
   mailTemplate?: Rel<EmailTemplateItem>;

@@ -19,6 +19,11 @@ export class SessionStoreItem {
     group: 'sessionStore.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ primary: true, length: 255, fieldName: 'handle' })
   handle!: string;
@@ -32,6 +37,11 @@ export class SessionStoreItem {
     group: 'sessionStore.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: false })
   payload!: string;
@@ -45,6 +55,11 @@ export class SessionStoreItem {
     group: 'sessionStore.groupSchedule',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ nullable: false, type: 'datetime', index: true })
   expiresAt!: Date;

@@ -25,6 +25,11 @@ export class FavoriteTemplateItem {
     group: 'favoriteTemplate.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   name!: string;
@@ -36,6 +41,11 @@ export class FavoriteTemplateItem {
     group: 'favoriteTemplate.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => EntityItem, { nullable: false })
   entity!: Rel<EntityItem>;
@@ -52,6 +62,11 @@ export class FavoriteTemplateItem {
     group: 'favoriteTemplate.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 250,
+    tableVisible: true,
+    mobileOrder: 250,
+    mobileVisible: false,
   })
   @ManyToOne(() => EntityRouteItem, { nullable: true })
   entityRoute?: Rel<EntityRouteItem>;
@@ -62,6 +77,11 @@ export class FavoriteTemplateItem {
     group: 'favoriteTemplate.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   filter?: object;
@@ -72,6 +92,11 @@ export class FavoriteTemplateItem {
     group: 'favoriteTemplate.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ default: false, nullable: false })
   isRecommended = false;

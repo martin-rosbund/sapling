@@ -97,6 +97,11 @@ export interface SaplingFormLayoutMetadata {
   groupOrder: number | null;
   order: number | null;
   width: SaplingFormWidthSpan | null;
+  formVisible: boolean | null;
+  tableOrder: number | null;
+  tableVisible: boolean | null;
+  mobileOrder: number | null;
+  mobileVisible: boolean | null;
 }
 
 export interface SaplingFormOptions {
@@ -104,6 +109,12 @@ export interface SaplingFormOptions {
   groupOrder?: number | null;
   order?: number | null;
   width?: SaplingFormWidthSpan | null;
+  visible?: boolean | null;
+  formVisible?: boolean | null;
+  tableOrder?: number | null;
+  tableVisible?: boolean | null;
+  mobileOrder?: number | null;
+  mobileVisible?: boolean | null;
 }
 
 export interface SaplingGenericReferenceMetadata {
@@ -126,6 +137,11 @@ const DEFAULT_SAPLING_FORM_LAYOUT: SaplingFormLayoutMetadata = {
   groupOrder: null,
   order: null,
   width: null,
+  formVisible: null,
+  tableOrder: null,
+  tableVisible: null,
+  mobileOrder: null,
+  mobileVisible: null,
 };
 
 function normalizeSaplingFormGroup(group: string): string | null {
@@ -138,6 +154,10 @@ function normalizeSaplingFormOrder(order: number): number | null {
 }
 
 function normalizeSaplingFormGroupOrder(order: number): number | null {
+  return Number.isFinite(order) ? Math.trunc(order) : null;
+}
+
+function normalizeSaplingFormLayoutOrder(order: number): number | null {
   return Number.isFinite(order) ? Math.trunc(order) : null;
 }
 
@@ -241,6 +261,47 @@ export function SaplingForm(options: SaplingFormOptions) {
             width:
               typeof options.width === 'number'
                 ? normalizeSaplingFormWidth(options.width)
+                : null,
+          }
+        : {}),
+      ...(Object.prototype.hasOwnProperty.call(options, 'formVisible') ||
+      Object.prototype.hasOwnProperty.call(options, 'visible')
+        ? {
+            formVisible:
+              typeof (options.formVisible ?? options.visible) === 'boolean'
+                ? (options.formVisible ?? options.visible)
+                : null,
+          }
+        : {}),
+      ...(Object.prototype.hasOwnProperty.call(options, 'tableOrder')
+        ? {
+            tableOrder:
+              typeof options.tableOrder === 'number'
+                ? normalizeSaplingFormLayoutOrder(options.tableOrder)
+                : null,
+          }
+        : {}),
+      ...(Object.prototype.hasOwnProperty.call(options, 'tableVisible')
+        ? {
+            tableVisible:
+              typeof options.tableVisible === 'boolean'
+                ? options.tableVisible
+                : null,
+          }
+        : {}),
+      ...(Object.prototype.hasOwnProperty.call(options, 'mobileOrder')
+        ? {
+            mobileOrder:
+              typeof options.mobileOrder === 'number'
+                ? normalizeSaplingFormLayoutOrder(options.mobileOrder)
+                : null,
+          }
+        : {}),
+      ...(Object.prototype.hasOwnProperty.call(options, 'mobileVisible')
+        ? {
+            mobileVisible:
+              typeof options.mobileVisible === 'boolean'
+                ? options.mobileVisible
                 : null,
           }
         : {}),
@@ -363,6 +424,26 @@ export function getSaplingFormLayout(
       typeof layout.width === 'number'
         ? normalizeSaplingFormWidth(layout.width)
         : DEFAULT_SAPLING_FORM_LAYOUT.width,
+    formVisible:
+      typeof layout.formVisible === 'boolean'
+        ? layout.formVisible
+        : DEFAULT_SAPLING_FORM_LAYOUT.formVisible,
+    tableOrder:
+      typeof layout.tableOrder === 'number'
+        ? normalizeSaplingFormLayoutOrder(layout.tableOrder)
+        : DEFAULT_SAPLING_FORM_LAYOUT.tableOrder,
+    tableVisible:
+      typeof layout.tableVisible === 'boolean'
+        ? layout.tableVisible
+        : DEFAULT_SAPLING_FORM_LAYOUT.tableVisible,
+    mobileOrder:
+      typeof layout.mobileOrder === 'number'
+        ? normalizeSaplingFormLayoutOrder(layout.mobileOrder)
+        : DEFAULT_SAPLING_FORM_LAYOUT.mobileOrder,
+    mobileVisible:
+      typeof layout.mobileVisible === 'boolean'
+        ? layout.mobileVisible
+        : DEFAULT_SAPLING_FORM_LAYOUT.mobileVisible,
   };
 }
 

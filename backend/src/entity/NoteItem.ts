@@ -39,6 +39,11 @@ export class NoteItem {
     group: 'note.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -52,6 +57,11 @@ export class NoteItem {
     group: 'note.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: true, length: 1024 })
   description?: string;
@@ -68,6 +78,11 @@ export class NoteItem {
     group: 'note.groupReference',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: true })
   person?: PersonItem | number;
@@ -81,6 +96,11 @@ export class NoteItem {
     group: 'note.groupReference',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => NoteGroupItem, { nullable: true })
   group!: NoteGroupItem;

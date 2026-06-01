@@ -267,6 +267,7 @@ export class AiService {
           serverName: inlineToolExecution.serverName,
           toolName: inlineToolExecution.toolName,
           arguments: inlineToolExecution.arguments,
+          modelResult: inlineToolExecution.modelResult,
           rawResult: inlineToolExecution.rawResult,
         },
       ]);

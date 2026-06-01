@@ -18,7 +18,7 @@ import {
   buildTableFilter,
   buildTableOrderBy,
   getReadableReferenceRelationNames,
-  isGenericReferenceTemplate,
+  getTableHeaders,
 } from '@/utils/saplingTableUtil'
 // #endregion
 
@@ -279,18 +279,14 @@ export function useSaplingTable(
 
   function generateHeaders(nextEntityHandle = entityHandle.value) {
     const nextEntityTemplates = genericStore.getState(nextEntityHandle).entityTemplates
+    const nextEntity = genericStore.getState(nextEntityHandle).entity
 
-    headers.value = nextEntityTemplates
-      .filter(
-        (template) =>
-          !template.isAutoIncrement &&
-          (!template.options?.includes('isSystem') || isGenericReferenceTemplate(template)),
-      )
-      .map((template: EntityTemplate) => ({
-        ...template,
-        key: template.name,
-        title: i18n.global.t(`${nextEntityHandle}.${template.name}`),
-      }))
+    headers.value = getTableHeaders(
+      nextEntityTemplates,
+      nextEntity,
+      i18n.global.t,
+      currentPermissionStore.accumulatedPermission ?? [],
+    )
   }
 
   function resetEntityState() {

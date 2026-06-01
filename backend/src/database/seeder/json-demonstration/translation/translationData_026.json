@@ -1,0 +1,14 @@
+[
+  {
+    "entity": "effortEstimate",
+    "property": "scriptAiSuggestSimilarEstimates",
+    "de": "Ähnliche Schätzungen mit AI finden",
+    "en": "Find similar estimates with AI"
+  },
+  {
+    "entity": "salesOpportunity",
+    "property": "scriptAiFindOpportunityReferences",
+    "de": "Passende Fälle mit AI finden",
+    "en": "Find matching references with AI"
+  }
+]

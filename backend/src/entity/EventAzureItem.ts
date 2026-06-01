@@ -36,6 +36,11 @@ export class EventAzureItem {
     group: 'eventAzure.groupSecurity',
     groupOrder: 100,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 1024, nullable: false, hidden: true })
   referenceHandle!: string;
@@ -52,6 +57,11 @@ export class EventAzureItem {
     group: 'eventAzure.groupReference',
     groupOrder: 200,
     width: 2,
+    visible: false,
+    tableOrder: 100,
+    tableVisible: false,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @OneToOne(() => EventItem, { nullable: false, unique: true })
   event!: Rel<EventItem>;

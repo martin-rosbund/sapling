@@ -83,6 +83,10 @@ export interface SaplingFormFieldConfig {
   groupOrder?: number | null
   order?: number | null
   width?: EntityTemplateFormWidth | null
+  tableVisible?: boolean
+  tableOrder?: number | null
+  mobileVisible?: boolean
+  mobileOrder?: number | null
   label?: string | null
   helpText?: string | null
   placeholder?: string | null
@@ -189,6 +193,16 @@ export interface EntityTemplate {
   formOrder?: number | null
   /** Optional width span (1-4) for generated edit dialogs */
   formWidth?: EntityTemplateFormWidth | null
+  /** Optional visibility override for generated edit dialog fields */
+  formVisible?: boolean | null
+  /** Optional display order for generated table columns */
+  tableOrder?: number | null
+  /** Optional visibility override for generated table columns */
+  tableVisible?: boolean | null
+  /** Optional display order for generated mobile table card fields */
+  mobileOrder?: number | null
+  /** Optional visibility override for generated mobile table card fields */
+  mobileVisible?: boolean | null
   /** Effective user-configured form overlay for this field */
   formConfig?: SaplingFormFieldConfig | null
   /** Declarative parent-child dependency metadata for reference fields */

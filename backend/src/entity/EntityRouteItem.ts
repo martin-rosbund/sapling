@@ -46,6 +46,11 @@ export class EntityRouteItem {
     group: 'entityRoute.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 64, nullable: false })
   route!: string;
@@ -60,6 +65,11 @@ export class EntityRouteItem {
     group: 'entityRoute.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: true })
   navigation?: string;
@@ -77,6 +87,11 @@ export class EntityRouteItem {
     group: 'entityRoute.groupReference',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => EntityItem, { nullable: true })
   entity!: Rel<EntityItem>;

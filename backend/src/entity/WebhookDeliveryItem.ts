@@ -42,6 +42,11 @@ export class WebhookDeliveryItem {
     group: 'webhookDelivery.groupReference',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => WebhookDeliveryStatusItem, {
     defaultRaw: `'pending'`,
@@ -59,6 +64,11 @@ export class WebhookDeliveryItem {
     group: 'webhookDelivery.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => WebhookSubscriptionItem, { nullable: false })
   subscription!: Rel<WebhookSubscriptionItem>;
@@ -83,6 +93,11 @@ export class WebhookDeliveryItem {
     group: 'webhookDelivery.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: false })
   payload!: object;
@@ -97,6 +112,11 @@ export class WebhookDeliveryItem {
     group: 'webhookDelivery.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   requestHeaders?: object;
@@ -111,6 +131,11 @@ export class WebhookDeliveryItem {
     group: 'webhookDelivery.groupBasics',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: 200, nullable: true })
   responseStatusCode?: number = 200;
@@ -125,6 +150,11 @@ export class WebhookDeliveryItem {
     group: 'webhookDelivery.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   responseBody?: object;
@@ -139,6 +169,11 @@ export class WebhookDeliveryItem {
     group: 'webhookDelivery.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   responseHeaders?: object;
@@ -153,6 +188,11 @@ export class WebhookDeliveryItem {
     group: 'webhookDelivery.groupSchedule',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'datetime' })
   completedAt?: Date;
@@ -167,6 +207,11 @@ export class WebhookDeliveryItem {
     group: 'webhookDelivery.groupBasics',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: 0, nullable: false })
   attemptCount!: number;
@@ -181,6 +226,11 @@ export class WebhookDeliveryItem {
     group: 'webhookDelivery.groupSchedule',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'datetime' })
   nextRetryAt?: Date;

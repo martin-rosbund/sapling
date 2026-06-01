@@ -19,6 +19,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupReference',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => EmailDeliveryStatusItem, {
     defaultRaw: `'pending'`,
@@ -32,6 +37,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => EmailTemplateItem, { nullable: true })
   template?: Rel<EmailTemplateItem>;
@@ -43,6 +53,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupReference',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => EntityItem, { nullable: false })
   entity!: Rel<EntityItem>;
@@ -54,6 +69,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupReference',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: false })
   createdBy!: Rel<PersonItem>;
@@ -68,6 +88,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupBasics',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: true, length: 64 })
   referenceHandle?: string;
@@ -79,6 +104,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupIntegration',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 32, nullable: false })
   provider!: string;
@@ -89,6 +119,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupBasics',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: false })
   toRecipients!: string[];
@@ -99,6 +134,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupBasics',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   ccRecipients?: string[];
@@ -109,6 +149,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupBasics',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   bccRecipients?: string[];
@@ -119,6 +164,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupBasics',
     groupOrder: 300,
     width: 4,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @Property({ length: 256, nullable: false })
   subject!: string;
@@ -130,6 +180,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ nullable: false, length: 8192 })
   bodyMarkdown!: string;
@@ -140,6 +195,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ nullable: false, length: 16384 })
   bodyHtml!: string;
@@ -150,6 +210,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupBasics',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 600,
+    tableVisible: true,
+    mobileOrder: 600,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   attachmentHandles?: number[];
@@ -160,6 +225,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   requestPayload?: object;
@@ -170,6 +240,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupBasics',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 700,
+    tableVisible: true,
+    mobileOrder: 700,
+    mobileVisible: false,
   })
   @Property({ nullable: true })
   responseStatusCode?: number;
@@ -180,6 +255,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   responseBody?: object;
@@ -190,6 +270,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 550,
+    tableVisible: true,
+    mobileOrder: 550,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   responseHeaders?: object;
@@ -200,6 +285,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 600,
+    tableVisible: true,
+    mobileOrder: 600,
+    mobileVisible: false,
   })
   @Property({ nullable: true, length: 256 })
   providerMessageId?: string;
@@ -210,6 +300,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupSchedule',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'datetime' })
   completedAt?: Date;
@@ -220,6 +315,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupBasics',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 800,
+    tableVisible: true,
+    mobileOrder: 800,
+    mobileVisible: false,
   })
   @Property({ default: 0, nullable: false })
   attemptCount!: number;
@@ -230,6 +330,11 @@ export class EmailDeliveryItem {
     group: 'emailDelivery.groupSchedule',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'datetime' })
   nextRetryAt?: Date;

@@ -24,6 +24,11 @@ export class SupportQueueItem {
     group: 'supportQueue.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -34,6 +39,11 @@ export class SupportQueueItem {
     group: 'supportQueue.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 256, nullable: true })
   description?: string;
@@ -45,6 +55,11 @@ export class SupportQueueItem {
     group: 'supportQueue.groupAppearance',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({
     default: 'mdi-inbox-arrow-down-outline',
@@ -60,6 +75,11 @@ export class SupportQueueItem {
     group: 'supportQueue.groupAppearance',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: '#00897B', length: 32, nullable: false })
   color: string = '#00897B';
@@ -70,6 +90,11 @@ export class SupportQueueItem {
     group: 'supportQueue.groupConfiguration',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   isActive = true;
@@ -81,6 +106,11 @@ export class SupportQueueItem {
     group: 'supportQueue.groupReference',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => SupportTeamItem, { nullable: false })
   team!: Rel<SupportTeamItem>;
@@ -92,6 +122,11 @@ export class SupportQueueItem {
     group: 'supportQueue.groupReference',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => SlaPolicyItem, { nullable: true })
   defaultSlaPolicy?: Rel<SlaPolicyItem>;

@@ -67,6 +67,11 @@ export class TicketItem {
     group: 'ticket.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 32, nullable: true })
   number!: string;
@@ -82,6 +87,11 @@ export class TicketItem {
     group: 'ticket.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -97,6 +107,11 @@ export class TicketItem {
     group: 'ticket.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: true,
   })
   @ManyToOne(() => TicketStatusItem, { default: 'open', nullable: false })
   status!: TicketStatusItem;
@@ -112,6 +127,11 @@ export class TicketItem {
     group: 'ticket.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @ManyToOne(() => TicketPriorityItem, { default: 'normal', nullable: false })
   priority!: TicketPriorityItem;
@@ -127,6 +147,11 @@ export class TicketItem {
     group: 'ticket.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: true })
   externalNumber?: string;
@@ -144,6 +169,11 @@ export class TicketItem {
     group: 'ticket.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'text' })
   problemDescription?: string;
@@ -159,6 +189,11 @@ export class TicketItem {
     group: 'ticket.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'text' })
   solutionDescription?: string;
@@ -176,6 +211,11 @@ export class TicketItem {
     group: 'ticket.groupSchedule',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: false, type: 'datetime' })
   startDate!: Date;
@@ -191,6 +231,11 @@ export class TicketItem {
     group: 'ticket.groupSchedule',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'datetime' })
   endDate!: Date;
@@ -206,6 +251,11 @@ export class TicketItem {
     group: 'ticket.groupSchedule',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'datetime' })
   deadlineDate!: Date;
@@ -223,6 +273,11 @@ export class TicketItem {
     group: 'ticket.groupReference',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @ManyToOne(() => CompanyItem, { nullable: true })
   assigneeCompany?: Rel<CompanyItem>;
@@ -244,6 +299,11 @@ export class TicketItem {
     group: 'ticket.groupReference',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 600,
+    tableVisible: true,
+    mobileOrder: 600,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: true })
   assigneePerson?: Rel<PersonItem>;
@@ -259,6 +319,11 @@ export class TicketItem {
     group: 'ticket.groupReference',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 700,
+    tableVisible: true,
+    mobileOrder: 700,
+    mobileVisible: false,
   })
   @ManyToOne(() => CompanyItem, { nullable: false })
   creatorCompany?: Rel<CompanyItem>;
@@ -280,6 +345,11 @@ export class TicketItem {
     group: 'ticket.groupReference',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 800,
+    tableVisible: true,
+    mobileOrder: 800,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: false })
   creatorPerson?: Rel<PersonItem>;
@@ -294,6 +364,11 @@ export class TicketItem {
     group: 'ticket.groupReference',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 900,
+    tableVisible: true,
+    mobileOrder: 900,
+    mobileVisible: false,
   })
   @ManyToOne(() => SalesOpportunityItem, { nullable: true })
   salesOpportunity?: SalesOpportunityItem;
@@ -311,6 +386,11 @@ export class TicketItem {
     group: 'ticket.groupSla',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => SlaPolicyItem, { nullable: true })
   slaPolicy?: Rel<SlaPolicyItem>;
@@ -326,6 +406,11 @@ export class TicketItem {
     group: 'ticket.groupSla',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'datetime' })
   firstResponseDueAt?: Date;
@@ -341,6 +426,11 @@ export class TicketItem {
     group: 'ticket.groupSla',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'datetime' })
   resolutionDueAt?: Date;
@@ -356,6 +446,11 @@ export class TicketItem {
     group: 'ticket.groupSla',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'datetime' })
   firstRespondedAt?: Date;
@@ -371,6 +466,11 @@ export class TicketItem {
     group: 'ticket.groupSla',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'datetime' })
   resolvedAt?: Date;
@@ -388,6 +488,11 @@ export class TicketItem {
     group: 'ticket.groupSupport',
     groupOrder: 450,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => TicketTypeItem, { default: 'incident', nullable: false })
   type!: Rel<TicketTypeItem>;
@@ -408,6 +513,11 @@ export class TicketItem {
     group: 'ticket.groupSupport',
     groupOrder: 450,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => TicketCategoryItem, { nullable: true })
   category?: Rel<TicketCategoryItem>;
@@ -423,6 +533,11 @@ export class TicketItem {
     group: 'ticket.groupSupport',
     groupOrder: 450,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @ManyToOne(() => TicketSourceItem, { default: 'email', nullable: false })
   source!: Rel<TicketSourceItem>;
@@ -438,6 +553,11 @@ export class TicketItem {
     group: 'ticket.groupSupport',
     groupOrder: 450,
     width: 1,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @ManyToOne(() => SupportTeamItem, { nullable: true })
   supportTeam?: Rel<SupportTeamItem>;
@@ -458,6 +578,11 @@ export class TicketItem {
     group: 'ticket.groupSupport',
     groupOrder: 450,
     width: 1,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @ManyToOne(() => SupportQueueItem, { nullable: true })
   supportQueue?: Rel<SupportQueueItem>;
@@ -477,6 +602,11 @@ export class TicketItem {
     group: 'ticket.groupSupport',
     groupOrder: 450,
     width: 1,
+    visible: true,
+    tableOrder: 50,
+    tableVisible: true,
+    mobileOrder: 50,
+    mobileVisible: false,
   })
   @ManyToOne(() => ContractItem, { nullable: true })
   contract?: Rel<ContractItem>;

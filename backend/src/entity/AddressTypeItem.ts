@@ -41,6 +41,11 @@ export class AddressTypeItem {
     group: 'addressType.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -56,6 +61,11 @@ export class AddressTypeItem {
     group: 'addressType.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: 'mdi-map-marker-outline', length: 64, nullable: false })
   icon?: string = 'mdi-map-marker-outline';
@@ -71,6 +81,11 @@ export class AddressTypeItem {
     group: 'addressType.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ default: '#546E7A', length: 32, nullable: false })
   color!: string;

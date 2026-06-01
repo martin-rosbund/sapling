@@ -44,6 +44,11 @@ export class WebhookAuthenticationOAuth2Item {
     group: 'webhookAuthenticationOAuth2.groupContent',
     groupOrder: 100,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   description!: string;
@@ -58,6 +63,11 @@ export class WebhookAuthenticationOAuth2Item {
     group: 'webhookAuthenticationOAuth2.groupBasics',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: false })
   clientId!: string;
@@ -73,6 +83,11 @@ export class WebhookAuthenticationOAuth2Item {
     group: 'webhookAuthenticationOAuth2.groupSecurity',
     groupOrder: 300,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: true, length: 256, hidden: true })
   clientSecret?: string;
@@ -87,6 +102,11 @@ export class WebhookAuthenticationOAuth2Item {
     group: 'webhookAuthenticationOAuth2.groupSecurity',
     groupOrder: 300,
     width: 4,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ nullable: false, length: 256 })
   tokenUrl!: string;
@@ -101,6 +121,11 @@ export class WebhookAuthenticationOAuth2Item {
     group: 'webhookAuthenticationOAuth2.groupBasics',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ nullable: true, length: 256 })
   scope?: string;
@@ -115,6 +140,11 @@ export class WebhookAuthenticationOAuth2Item {
     group: 'webhookAuthenticationOAuth2.groupSecurity',
     groupOrder: 300,
     width: 4,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   parameters?: object;
@@ -130,6 +160,11 @@ export class WebhookAuthenticationOAuth2Item {
     group: 'webhookAuthenticationOAuth2.groupSecurity',
     groupOrder: 300,
     width: 4,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ nullable: true, length: 2048, hidden: true })
   cachedToken?: string;
@@ -144,6 +179,11 @@ export class WebhookAuthenticationOAuth2Item {
     group: 'webhookAuthenticationOAuth2.groupSecurity',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'datetime' })
   tokenExpiresAt?: Date;

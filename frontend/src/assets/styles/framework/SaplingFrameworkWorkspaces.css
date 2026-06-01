@@ -251,6 +251,8 @@
   padding-inline: var(--sapling-space-panel-sm);
   background: rgba(var(--v-theme-surface), 0.32);
   box-shadow: inset 0 0 0 1px rgba(var(--v-theme-on-surface), 0.06);
+  border-end-end-radius: 0;
+  border-end-start-radius: 0;
 }
 
 .sapling-dashboard__tabs-shell--loading {

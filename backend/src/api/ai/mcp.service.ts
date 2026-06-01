@@ -21,6 +21,7 @@ export interface McpInlineToolExecution {
   toolName: string;
   arguments: Record<string, unknown>;
   content: string;
+  modelResult: unknown;
   rawResult: unknown;
 }
 
@@ -81,6 +82,9 @@ export class McpService {
         rawResult: {
           error: errorMessage,
         },
+        modelResult: {
+          error: errorMessage,
+        },
       };
     }
 
@@ -104,6 +108,9 @@ export class McpService {
         ? `No active MCP server named "${parsedCommand.serverName}" could execute tool "${parsedCommand.toolName}".`
         : `No active MCP server could execute tool "${parsedCommand.toolName}".`,
       rawResult: {
+        error: 'tool_not_found',
+      },
+      modelResult: {
         error: 'tool_not_found',
       },
     };
@@ -137,6 +144,7 @@ export class McpService {
           toolName,
           arguments: args,
           content: result.content,
+          modelResult: result.modelResult,
           rawResult: result.rawResult,
         };
       }
@@ -174,6 +182,7 @@ export class McpService {
           toolName,
           arguments: args,
           content: result.content,
+          modelResult: result.rawResult,
           rawResult: result.rawResult,
         };
       } catch {

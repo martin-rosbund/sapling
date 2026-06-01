@@ -1,0 +1,44 @@
+[
+  {
+    "entity": "formConfig",
+    "property": "openForEntity",
+    "de": "Formular-Konfiguration fuer diese Entitaet oeffnen",
+    "en": "Open form configuration for this entity"
+  },
+  {
+    "entity": "formConfig",
+    "property": "configure",
+    "de": "Konfigurieren",
+    "en": "Configure"
+  },
+  {
+    "entity": "formConfig",
+    "property": "formFields",
+    "de": "Formularfelder",
+    "en": "form fields"
+  },
+  {
+    "entity": "formConfig",
+    "property": "tableFields",
+    "de": "Tabellenfelder",
+    "en": "table fields"
+  },
+  {
+    "entity": "formConfig",
+    "property": "mobileFields",
+    "de": "Mobilfelder",
+    "en": "mobile fields"
+  },
+  {
+    "entity": "formConfig",
+    "property": "hiddenFields",
+    "de": "ausgeblendet",
+    "en": "hidden"
+  },
+  {
+    "entity": "formConfig",
+    "property": "currentView",
+    "de": "Aktuelle Ansicht",
+    "en": "Current view"
+  }
+]

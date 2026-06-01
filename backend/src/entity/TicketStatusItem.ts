@@ -40,6 +40,11 @@ export class TicketStatusItem {
     group: 'ticketStatus.groupContent',
     groupOrder: 100,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 64, nullable: false })
   description!: string;
@@ -55,6 +60,11 @@ export class TicketStatusItem {
     group: 'ticketStatus.groupAppearance',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 16, nullable: false })
   color!: string;
@@ -70,6 +80,11 @@ export class TicketStatusItem {
     group: 'ticketStatus.groupAppearance',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: 'mdi-new-box', length: 64, nullable: false })
   icon?: string = 'mdi-new-box';

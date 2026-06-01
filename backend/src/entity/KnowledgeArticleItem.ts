@@ -24,6 +24,11 @@ export class KnowledgeArticleItem {
     group: 'knowledgeArticle.groupBasics',
     groupOrder: 100,
     width: 3,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 160, nullable: false })
   title!: string;
@@ -35,6 +40,11 @@ export class KnowledgeArticleItem {
     group: 'knowledgeArticle.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: true,
   })
   @ManyToOne(() => KnowledgeArticleStatusItem, {
     default: 'draft',
@@ -52,6 +62,11 @@ export class KnowledgeArticleItem {
     group: 'knowledgeArticle.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @ManyToOne(() => KnowledgeArticleVisibilityItem, {
     default: 'internal',
@@ -66,6 +81,11 @@ export class KnowledgeArticleItem {
     group: 'knowledgeArticle.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @ManyToOne(() => KnowledgeArticleCategoryItem, { nullable: true })
   category?: Rel<KnowledgeArticleCategoryItem>;
@@ -77,6 +97,11 @@ export class KnowledgeArticleItem {
     group: 'knowledgeArticle.groupBasics',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 450,
+    tableVisible: true,
+    mobileOrder: 450,
+    mobileVisible: false,
   })
   @ManyToOne(() => ProductItem, { nullable: true })
   product?: Rel<ProductItem>;
@@ -87,6 +112,11 @@ export class KnowledgeArticleItem {
     group: 'knowledgeArticle.groupBasics',
     groupOrder: 100,
     width: 4,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'text' })
   summary?: string;
@@ -97,6 +127,11 @@ export class KnowledgeArticleItem {
     group: 'knowledgeArticle.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 600,
+    tableVisible: true,
+    mobileOrder: 600,
+    mobileVisible: false,
   })
   @Property({ length: 512, nullable: true })
   tags?: string;
@@ -108,6 +143,11 @@ export class KnowledgeArticleItem {
     group: 'knowledgeArticle.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'text' })
   problemMarkdown?: string;
@@ -119,6 +159,11 @@ export class KnowledgeArticleItem {
     group: 'knowledgeArticle.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'text' })
   solutionMarkdown?: string;
@@ -129,6 +174,11 @@ export class KnowledgeArticleItem {
     group: 'knowledgeArticle.groupLifecycle',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   isActive = true;
@@ -140,6 +190,11 @@ export class KnowledgeArticleItem {
     group: 'knowledgeArticle.groupLifecycle',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'datetime' })
   publishedAt?: Date;
@@ -151,6 +206,11 @@ export class KnowledgeArticleItem {
     group: 'knowledgeArticle.groupLifecycle',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'date' })
   validUntil?: Date;
@@ -161,6 +221,11 @@ export class KnowledgeArticleItem {
     group: 'knowledgeArticle.groupSource',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => TicketItem, { nullable: true })
   sourceTicket?: Rel<TicketItem>;
@@ -171,6 +236,11 @@ export class KnowledgeArticleItem {
     group: 'knowledgeArticle.groupSource',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => SalesOpportunityItem, { nullable: true })
   sourceSalesOpportunity?: Rel<SalesOpportunityItem>;
@@ -181,6 +251,11 @@ export class KnowledgeArticleItem {
     group: 'knowledgeArticle.groupSource',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @ManyToOne(() => EffortEstimateItem, { nullable: true })
   sourceEffortEstimate?: Rel<EffortEstimateItem>;
@@ -192,6 +267,11 @@ export class KnowledgeArticleItem {
     group: 'knowledgeArticle.groupPeople',
     groupOrder: 500,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: true })
   authorPerson?: Rel<PersonItem>;
@@ -203,6 +283,11 @@ export class KnowledgeArticleItem {
     group: 'knowledgeArticle.groupPeople',
     groupOrder: 500,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: true })
   reviewerPerson?: Rel<PersonItem>;

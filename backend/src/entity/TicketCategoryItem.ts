@@ -23,6 +23,11 @@ export class TicketCategoryItem {
     group: 'ticketCategory.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -34,6 +39,11 @@ export class TicketCategoryItem {
     group: 'ticketCategory.groupAppearance',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({
     default: 'mdi-shape-outline',
@@ -49,6 +59,11 @@ export class TicketCategoryItem {
     group: 'ticketCategory.groupAppearance',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: '#5C6BC0', length: 32, nullable: false })
   color: string = '#5C6BC0';
@@ -60,6 +75,11 @@ export class TicketCategoryItem {
     group: 'ticketCategory.groupReference',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => TicketTypeItem, { nullable: true })
   type?: Rel<TicketTypeItem>;

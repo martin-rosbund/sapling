@@ -10,7 +10,30 @@ export type SaplingFormConfigScope = 'global' | 'role' | 'person';
 export interface SaplingFormConfigPayload {
   schema: 'sapling.form-config.v1';
   entityHandle: string;
-  fields?: Record<string, unknown>;
+  fields?: Record<
+    string,
+    {
+      visible?: boolean;
+      group?: string | null;
+      groupOrder?: number | null;
+      order?: number | null;
+      width?: 1 | 2 | 3 | 4 | null;
+      tableVisible?: boolean;
+      tableOrder?: number | null;
+      mobileVisible?: boolean;
+      mobileOrder?: number | null;
+      label?: string | null;
+      helpText?: string | null;
+      placeholder?: string | null;
+      required?: boolean | null;
+      readonly?: boolean | null;
+      renderer?: string | null;
+      defaultValue?: unknown;
+      validation?: unknown[];
+      condition?: Record<string, unknown> | null;
+      referenceFilter?: Record<string, unknown> | null;
+    }
+  >;
   groups?: Record<string, unknown>;
   layout?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
@@ -29,6 +52,11 @@ export class SaplingFormConfigItem {
     group: 'saplingFormConfig.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   name!: string;
@@ -40,6 +68,11 @@ export class SaplingFormConfigItem {
     group: 'saplingFormConfig.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => EntityItem, { nullable: false })
   entity!: Rel<EntityItem>;
@@ -51,6 +84,11 @@ export class SaplingFormConfigItem {
     group: 'saplingFormConfig.groupScope',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ default: 'global', length: 16, nullable: false })
   scope: SaplingFormConfigScope = 'global';
@@ -61,6 +99,11 @@ export class SaplingFormConfigItem {
     group: 'saplingFormConfig.groupScope',
     groupOrder: 200,
     width: 2,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ length: 64, nullable: true })
   scopeHandle?: string;
@@ -71,6 +114,11 @@ export class SaplingFormConfigItem {
     group: 'saplingFormConfig.groupScope',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   isActive = true;
@@ -81,6 +129,11 @@ export class SaplingFormConfigItem {
     group: 'saplingFormConfig.groupScope',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 600,
+    tableVisible: true,
+    mobileOrder: 600,
+    mobileVisible: false,
   })
   @Property({ default: false, nullable: false })
   isDefault = false;
@@ -91,6 +144,11 @@ export class SaplingFormConfigItem {
     group: 'saplingFormConfig.groupContent',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 700,
+    tableVisible: true,
+    mobileOrder: 700,
+    mobileVisible: false,
   })
   @Property({ default: 1, nullable: false })
   version = 1;
@@ -101,6 +159,11 @@ export class SaplingFormConfigItem {
     group: 'saplingFormConfig.groupContent',
     groupOrder: 300,
     width: 4,
+    visible: true,
+    tableOrder: 800,
+    tableVisible: true,
+    mobileOrder: 800,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: false })
   config!: SaplingFormConfigPayload;
@@ -112,6 +175,11 @@ export class SaplingFormConfigItem {
     group: 'saplingFormConfig.groupReference',
     groupOrder: 400,
     width: 2,
+    visible: true,
+    tableOrder: 900,
+    tableVisible: true,
+    mobileOrder: 900,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: true })
   person?: Rel<PersonItem>;

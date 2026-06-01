@@ -19,6 +19,11 @@ export class SlaPolicyItem {
     group: 'slaPolicy.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: true,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -29,6 +34,11 @@ export class SlaPolicyItem {
     group: 'slaPolicy.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 256, nullable: true })
   description?: string;
@@ -39,6 +49,11 @@ export class SlaPolicyItem {
     group: 'slaPolicy.groupTargets',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: 8, nullable: false })
   firstResponseHours = 8;
@@ -49,6 +64,11 @@ export class SlaPolicyItem {
     group: 'slaPolicy.groupTargets',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: 40, nullable: false })
   resolutionHours = 40;
@@ -60,6 +80,11 @@ export class SlaPolicyItem {
     group: 'slaPolicy.groupAppearance',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({
     default: 'mdi-timer-sand',
@@ -75,6 +100,11 @@ export class SlaPolicyItem {
     group: 'slaPolicy.groupAppearance',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ default: '#E53935', length: 32, nullable: false })
   color: string = '#E53935';
@@ -85,6 +115,11 @@ export class SlaPolicyItem {
     group: 'slaPolicy.groupConfiguration',
     groupOrder: 500,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ default: true, nullable: false })
   isActive = true;

@@ -1,13 +1,13 @@
 .sapling-ai-chat-shell {
-  --sapling-overlay-shell-z-index: 1250;
+  --sapling-overlay-shell-z-index: 13000;
 }
 
 .sapling-ai-chat__backdrop {
-  --sapling-overlay-backdrop-z-index: 1250;
+  --sapling-overlay-backdrop-z-index: 13000;
 }
 
 .sapling-ai-chat {
-  --sapling-floating-panel-z-index: 1251;
+  --sapling-floating-panel-z-index: 13001;
   --sapling-floating-panel-top: calc(var(--v-layout-top, 0px) + var(--sapling-space-sm-plus));
   --sapling-floating-panel-width: var(--sapling-chat-panel-width);
   --sapling-floating-panel-max-width: calc(100vw - var(--sapling-space-2xl));
@@ -15,6 +15,31 @@
     var(--sapling-chat-panel-height),
     calc(100dvh - var(--v-layout-top, 0px) - var(--sapling-space-sm-plus) - var(--sapling-space-lg))
   );
+}
+
+.sapling-ai-chat-fab {
+  position: fixed !important;
+  top: calc(var(--v-layout-top, 0px) + 4px);
+  left: 50%;
+  z-index: 12990;
+  width: var(--sapling-control-size-2xl) !important;
+  height: var(--sapling-control-size-2xl) !important;
+  background: var(--sapling-ai-fab-gradient) !important;
+  color: var(--sapling-ai-fab-icon-color) !important;
+  box-shadow: var(--sapling-ai-fab-shadow);
+  transform: translateX(-50%);
+  transition:
+    transform var(--sapling-motion-fast) ease,
+    box-shadow var(--sapling-motion-fast) ease;
+}
+
+.sapling-ai-chat-fab:hover {
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: var(--sapling-ai-fab-shadow-hover);
+}
+
+.sapling-ai-chat-fab__icon {
+  font-size: 2rem;
 }
 
 .sapling-ai-chat__eyebrow {

@@ -1,114 +1,130 @@
 <template>
-  <div class="sapling-overlay-shell sapling-ai-chat-shell">
-    <div
-      v-if="isOpen && hasSaplingAiChatAccess"
-      class="sapling-overlay-backdrop sapling-ai-chat__backdrop"
-      @click="closePanel"
-    ></div>
-
-    <transition name="sapling-floating-panel">
-      <SaplingSurface
-        as="section"
-        v-if="isOpen && hasSaplingAiChatAccess"
-        class="sapling-floating-panel sapling-floating-panel--top-center sapling-floating-panel--mobile-sheet sapling-ai-chat"
-        @click.stop
+  <Teleport to="body">
+    <div class="sapling-overlay-shell sapling-ai-chat-shell">
+      <v-btn
+        v-if="hasSaplingAiChatAccess && !isOpen"
+        class="sapling-ai-chat-fab"
+        color="primary"
+        :icon="true"
+        size="large"
+        variant="elevated"
+        aria-label="Songbird"
+        title="Songbird"
+        @click="toggleSaplingAiChat"
       >
-        <SaplingAiChatLoadingState v-if="isTranslationLoading" />
+        <SaplingSongbirdIcon class="sapling-ai-chat-fab__icon" />
+      </v-btn>
 
-        <template v-else>
-          <SaplingAiChatHeader
-            :assistant-name="assistantName"
-            :is-compact-header-actions="isCompactHeaderActions"
-            @close="closePanel"
-            @new-chat="startNewChat"
-            @refresh="reloadSessions"
-          />
+      <div
+        v-if="isOpen && hasSaplingAiChatAccess"
+        class="sapling-overlay-backdrop sapling-ai-chat__backdrop"
+        @click="closePanel"
+      ></div>
 
-          <div class="sapling-floating-panel__progress-slot sapling-ai-chat__progress-slot">
-            <v-progress-linear
-              v-if="isBusy"
-              indeterminate
-              color="primary"
-              class="sapling-floating-panel__progress sapling-ai-chat__progress"
-            />
-          </div>
+      <transition name="sapling-floating-panel">
+        <SaplingSurface
+          as="section"
+          v-if="isOpen && hasSaplingAiChatAccess"
+          class="sapling-floating-panel sapling-floating-panel--top-center sapling-floating-panel--mobile-sheet sapling-ai-chat"
+          @click.stop
+        >
+          <SaplingAiChatLoadingState v-if="isTranslationLoading" />
 
-          <div class="sapling-chat-layout sapling-ai-chat__layout">
-            <SaplingAiChatSessions
-              :sessions="sessions"
-              :active-session-handle="activeSession?.handle ?? null"
-              :active-session-title="activeSession?.title ?? ''"
-              :include-archived="includeArchived"
-              :editing-session-handle="editingSessionHandle"
-              :editing-session-title="editingSessionTitle"
-              :is-collapsible="isMobileLayout"
-              :is-collapsed="isSessionRailCollapsed"
-              :title-preview-limit="TITLE_PREVIEW_LIMIT"
-              @toggle-collapse="toggleSessionRail"
-              @update:include-archived="updateIncludeArchived"
-              @update:editing-session-title="updateEditingSessionTitle"
-              @select="selectSession"
-              @begin-rename="beginRename"
-              @save-title="saveSessionTitle"
-              @toggle-archive="toggleArchive"
-            />
-
-            <SaplingAiChatConversation
-              :active-conversation-title="activeConversationTitle"
-              :provider-options="providerOptions"
-              :model-options="modelOptions"
-              :transcription-provider-options="transcriptionProviderOptions"
-              :transcription-model-options="transcriptionModelOptions"
-              :speech-provider-options="speechProviderOptions"
-              :speech-model-options="speechModelOptions"
-              :selected-provider-handle="selectedProviderHandle"
-              :selected-model-handle="selectedModelHandle"
-              :selected-transcription-provider-handle="selectedTranscriptionProviderHandle"
-              :selected-transcription-model-handle="selectedTranscriptionModelHandle"
-              :selected-speech-provider-handle="selectedSpeechProviderHandle"
-              :selected-speech-model-handle="selectedSpeechModelHandle"
-              :has-configured-providers="hasConfiguredProviders"
-              :has-configured-transcription-providers="hasConfiguredTranscriptionProviders"
-              :has-configured-speech-providers="hasConfiguredSpeechProviders"
-              :can-send-message="canSendMessage"
-              :is-sending="isSending"
-              :is-loading-providers="isLoadingProviders"
-              :is-loading-models="isLoadingModels"
-              :is-loading-transcription-providers="isLoadingTranscriptionProviders"
-              :is-loading-transcription-models="isLoadingTranscriptionModels"
-              :is-loading-speech-providers="isLoadingSpeechProviders"
-              :is-loading-speech-models="isLoadingSpeechModels"
-              :messages="messages"
-              :draft-message="draftMessage"
+          <template v-else>
+            <SaplingAiChatHeader
               :assistant-name="assistantName"
-              :current-person-display-name="currentPersonDisplayName"
-              :streaming-duration-by-handle="streamingDurationByHandle"
-              :has-more-messages="hasMoreMessages"
-              :is-loading-older-messages="isLoadingOlderMessages"
-              :is-voice-input-available="isVoiceInputAvailable"
-              :is-voice-output-available="isVoiceOutputAvailable"
-              :is-recording-voice-input="isRecordingVoiceInput"
-              :is-transcribing-voice-input="isTranscribingVoiceInput"
-              :speech-state-by-handle="speechStateByHandle"
-              :title-preview-limit="TITLE_PREVIEW_LIMIT"
-              @update:selected-provider="updateSelectedProvider"
-              @update:selected-model="updateSelectedModel"
-              @update:selected-transcription-provider="updateSelectedTranscriptionProvider"
-              @update:selected-transcription-model="updateSelectedTranscriptionModel"
-              @update:selected-speech-provider="updateSelectedSpeechProvider"
-              @update:selected-speech-model="updateSelectedSpeechModel"
-              @update:draft-message="updateDraftMessage"
+              :is-compact-header-actions="isCompactHeaderActions"
               @close="closePanel"
-              @load-older-messages="loadOlderMessages"
-              @toggle-message-speech="toggleMessageSpeech"
-              @toggle-voice-input="toggleVoiceInput"
-              @send="sendMessage"
+              @new-chat="startNewChat"
+              @refresh="reloadSessions"
             />
-          </div>
-        </template>
-      </SaplingSurface>
-    </transition>
-  </div>
+
+            <div class="sapling-floating-panel__progress-slot sapling-ai-chat__progress-slot">
+              <v-progress-linear
+                v-if="isBusy"
+                indeterminate
+                color="primary"
+                class="sapling-floating-panel__progress sapling-ai-chat__progress"
+              />
+            </div>
+
+            <div class="sapling-chat-layout sapling-ai-chat__layout">
+              <SaplingAiChatSessions
+                :sessions="sessions"
+                :active-session-handle="activeSession?.handle ?? null"
+                :active-session-title="activeSession?.title ?? ''"
+                :include-archived="includeArchived"
+                :editing-session-handle="editingSessionHandle"
+                :editing-session-title="editingSessionTitle"
+                :is-collapsible="isMobileLayout"
+                :is-collapsed="isSessionRailCollapsed"
+                :title-preview-limit="TITLE_PREVIEW_LIMIT"
+                @toggle-collapse="toggleSessionRail"
+                @update:include-archived="updateIncludeArchived"
+                @update:editing-session-title="updateEditingSessionTitle"
+                @select="selectSession"
+                @begin-rename="beginRename"
+                @save-title="saveSessionTitle"
+                @toggle-archive="toggleArchive"
+              />
+
+              <SaplingAiChatConversation
+                :active-conversation-title="activeConversationTitle"
+                :provider-options="providerOptions"
+                :model-options="modelOptions"
+                :transcription-provider-options="transcriptionProviderOptions"
+                :transcription-model-options="transcriptionModelOptions"
+                :speech-provider-options="speechProviderOptions"
+                :speech-model-options="speechModelOptions"
+                :selected-provider-handle="selectedProviderHandle"
+                :selected-model-handle="selectedModelHandle"
+                :selected-transcription-provider-handle="selectedTranscriptionProviderHandle"
+                :selected-transcription-model-handle="selectedTranscriptionModelHandle"
+                :selected-speech-provider-handle="selectedSpeechProviderHandle"
+                :selected-speech-model-handle="selectedSpeechModelHandle"
+                :has-configured-providers="hasConfiguredProviders"
+                :has-configured-transcription-providers="hasConfiguredTranscriptionProviders"
+                :has-configured-speech-providers="hasConfiguredSpeechProviders"
+                :can-send-message="canSendMessage"
+                :is-sending="isSending"
+                :is-loading-providers="isLoadingProviders"
+                :is-loading-models="isLoadingModels"
+                :is-loading-transcription-providers="isLoadingTranscriptionProviders"
+                :is-loading-transcription-models="isLoadingTranscriptionModels"
+                :is-loading-speech-providers="isLoadingSpeechProviders"
+                :is-loading-speech-models="isLoadingSpeechModels"
+                :messages="messages"
+                :draft-message="draftMessage"
+                :assistant-name="assistantName"
+                :current-person-display-name="currentPersonDisplayName"
+                :streaming-duration-by-handle="streamingDurationByHandle"
+                :has-more-messages="hasMoreMessages"
+                :is-loading-older-messages="isLoadingOlderMessages"
+                :is-voice-input-available="isVoiceInputAvailable"
+                :is-voice-output-available="isVoiceOutputAvailable"
+                :is-recording-voice-input="isRecordingVoiceInput"
+                :is-transcribing-voice-input="isTranscribingVoiceInput"
+                :speech-state-by-handle="speechStateByHandle"
+                :title-preview-limit="TITLE_PREVIEW_LIMIT"
+                @update:selected-provider="updateSelectedProvider"
+                @update:selected-model="updateSelectedModel"
+                @update:selected-transcription-provider="updateSelectedTranscriptionProvider"
+                @update:selected-transcription-model="updateSelectedTranscriptionModel"
+                @update:selected-speech-provider="updateSelectedSpeechProvider"
+                @update:selected-speech-model="updateSelectedSpeechModel"
+                @update:draft-message="updateDraftMessage"
+                @close="closePanel"
+                @load-older-messages="loadOlderMessages"
+                @toggle-message-speech="toggleMessageSpeech"
+                @toggle-voice-input="toggleVoiceInput"
+                @send="sendMessage"
+              />
+            </div>
+          </template>
+        </SaplingSurface>
+      </transition>
+    </div>
+  </Teleport>
 </template>
 
 <script lang="ts" setup>
@@ -118,6 +134,7 @@ import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
 import type { AiChatSessionItem, AiProviderModelItem, AiProviderTypeItem } from '@/entity/entity'
 import SaplingSurface from '@/components/common/SaplingSurface.vue'
+import SaplingSongbirdIcon from '@/components/common/SaplingSongbirdIcon.vue'
 import SaplingAiChatConversation from '@/components/system/ai-chat/SaplingAiChatConversation.vue'
 import SaplingAiChatHeader from '@/components/system/ai-chat/SaplingAiChatHeader.vue'
 import SaplingAiChatLoadingState from '@/components/system/ai-chat/SaplingAiChatLoadingState.vue'
@@ -136,6 +153,14 @@ import ApiAiService, { type AiChatStreamEvent } from '@/services/api.ai.service'
 import { useSaplingAiChat } from '@/composables/system/useSaplingAiChat'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
+import { SAPLING_AI_CHAT_PROMPT_EVENT } from '@/utils/saplingScriptResultUtil'
+
+interface SaplingAiChatPromptEventDetail {
+  prompt?: string
+  autoSend?: boolean
+  newChat?: boolean
+  title?: string
+}
 
 const route = useRoute()
 const currentPersonStore = useCurrentPersonStore()
@@ -153,8 +178,13 @@ const VOICE_INPUT_INITIAL_GRACE_PERIOD_MS = 2500
 const isCompactHeaderActions = mdAndDown
 const isMobileLayout = computed(() => mdAndDown.value)
 
-const { isOpen, hasSaplingAiChatAccess, ensureSaplingAiChatAccess, closeSaplingAiChat } =
-  useSaplingAiChat()
+const {
+  isOpen,
+  hasSaplingAiChatAccess,
+  ensureSaplingAiChatAccess,
+  closeSaplingAiChat,
+  toggleSaplingAiChat,
+} = useSaplingAiChat()
 const includeArchived = ref(false)
 const isLoadingProviders = ref(false)
 const isLoadingModels = ref(false)
@@ -410,6 +440,7 @@ watch(
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
+  window.addEventListener(SAPLING_AI_CHAT_PROMPT_EVENT, handleAiChatPromptEvent as EventListener)
   streamingClockTimer = window.setInterval(() => {
     streamingClock.value = Date.now()
   }, 1000)
@@ -417,6 +448,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
+  window.removeEventListener(SAPLING_AI_CHAT_PROMPT_EVENT, handleAiChatPromptEvent as EventListener)
   streamAbortController.value?.abort()
   cancelVoiceInput()
   stopSpeechPlayback()
@@ -429,6 +461,37 @@ onUnmounted(() => {
 function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'Escape') {
     closePanel()
+  }
+}
+
+function handleAiChatPromptEvent(event: CustomEvent<SaplingAiChatPromptEventDetail>) {
+  void openPromptFromScriptButton(event.detail)
+}
+
+async function openPromptFromScriptButton(detail?: SaplingAiChatPromptEventDetail) {
+  const prompt = detail?.prompt?.trim()
+
+  if (!prompt) {
+    return
+  }
+
+  if (!(await ensureSaplingAiChatAccess())) {
+    messageCenter.pushMessage('warning', 'global.permissionDenied', '', 'aiChat')
+    return
+  }
+
+  isOpen.value = true
+  await ensureChatInitialized()
+
+  if (detail?.newChat !== false) {
+    startNewChat()
+  }
+
+  draftMessage.value = prompt
+
+  if (detail?.autoSend !== false) {
+    await nextTick()
+    await sendMessage()
   }
 }
 

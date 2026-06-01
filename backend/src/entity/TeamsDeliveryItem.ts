@@ -20,6 +20,11 @@ export class TeamsDeliveryItem {
     group: 'teamsDelivery.groupReference',
     groupOrder: 100,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => TeamsDeliveryStatusItem, {
     defaultRaw: `'pending'`,
@@ -33,6 +38,11 @@ export class TeamsDeliveryItem {
     group: 'teamsDelivery.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @ManyToOne(() => TeamsSubscriptionItem, { nullable: false })
   subscription!: Rel<TeamsSubscriptionItem>;
@@ -43,6 +53,11 @@ export class TeamsDeliveryItem {
     group: 'teamsDelivery.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => TeamsTemplateItem, { nullable: true })
   template?: Rel<TeamsTemplateItem>;
@@ -54,6 +69,11 @@ export class TeamsDeliveryItem {
     group: 'teamsDelivery.groupReference',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @ManyToOne(() => EntityItem, { nullable: false })
   entity!: Rel<EntityItem>;
@@ -65,6 +85,11 @@ export class TeamsDeliveryItem {
     group: 'teamsDelivery.groupReference',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: false })
   createdBy!: Rel<PersonItem>;
@@ -76,6 +101,11 @@ export class TeamsDeliveryItem {
     group: 'teamsDelivery.groupReference',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: true })
   recipientPerson?: Rel<PersonItem>;
@@ -90,6 +120,11 @@ export class TeamsDeliveryItem {
     group: 'teamsDelivery.groupBasics',
     groupOrder: 300,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: true, length: 64 })
   referenceHandle?: string;
@@ -101,6 +136,11 @@ export class TeamsDeliveryItem {
     group: 'teamsDelivery.groupBasics',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ length: 32, nullable: false, default: 'azure' })
   provider: string = 'azure';
@@ -112,6 +152,11 @@ export class TeamsDeliveryItem {
     group: 'teamsDelivery.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ nullable: false, length: 8192 })
   bodyMarkdown!: string;
@@ -122,6 +167,11 @@ export class TeamsDeliveryItem {
     group: 'teamsDelivery.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ nullable: false, length: 16384 })
   bodyHtml!: string;
@@ -132,6 +182,11 @@ export class TeamsDeliveryItem {
     group: 'teamsDelivery.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   requestPayload?: object;
@@ -142,6 +197,11 @@ export class TeamsDeliveryItem {
     group: 'teamsDelivery.groupBasics',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({ nullable: true })
   responseStatusCode?: number;
@@ -152,6 +212,11 @@ export class TeamsDeliveryItem {
     group: 'teamsDelivery.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 600,
+    tableVisible: true,
+    mobileOrder: 600,
+    mobileVisible: false,
   })
   @Property({ type: 'json', nullable: true })
   responseBody?: object;
@@ -162,6 +227,11 @@ export class TeamsDeliveryItem {
     group: 'teamsDelivery.groupContent',
     groupOrder: 200,
     width: 4,
+    visible: true,
+    tableOrder: 700,
+    tableVisible: true,
+    mobileOrder: 700,
+    mobileVisible: false,
   })
   @Property({ nullable: true, length: 256 })
   providerMessageId?: string;
@@ -172,6 +242,11 @@ export class TeamsDeliveryItem {
     group: 'teamsDelivery.groupSchedule',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'datetime' })
   completedAt?: Date;
@@ -182,6 +257,11 @@ export class TeamsDeliveryItem {
     group: 'teamsDelivery.groupBasics',
     groupOrder: 300,
     width: 1,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ default: 0, nullable: false })
   attemptCount!: number;
@@ -192,6 +272,11 @@ export class TeamsDeliveryItem {
     group: 'teamsDelivery.groupSchedule',
     groupOrder: 400,
     width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ nullable: true, type: 'datetime' })
   nextRetryAt?: Date;

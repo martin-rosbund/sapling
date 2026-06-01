@@ -18,6 +18,11 @@ export class ChangeLogActionItem {
     group: 'changeLogAction.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
   })
   @Property({ length: 128, nullable: false })
   title!: string;
@@ -28,6 +33,11 @@ export class ChangeLogActionItem {
     group: 'changeLogAction.groupBasics',
     groupOrder: 100,
     width: 2,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
   })
   @Property({ length: 256, nullable: true })
   description?: string | null;
@@ -39,6 +49,11 @@ export class ChangeLogActionItem {
     group: 'changeLogAction.groupAppearance',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
   })
   @Property({
     default: 'mdi-pencil-circle-outline',
@@ -54,6 +69,11 @@ export class ChangeLogActionItem {
     group: 'changeLogAction.groupAppearance',
     groupOrder: 200,
     width: 1,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
   })
   @Property({ default: '#546E7A', length: 32, nullable: false })
   color: string = '#546E7A';

@@ -35,6 +35,11 @@ import type { SaplingFormFieldConfig } from '../../form-config/form-config.types
  * @property        formGroupOrder      Optional display order for the enclosing form group
  * @property        formOrder           Optional form order index for generated edit dialogs
  * @property        formWidth           Optional form width span (1-4) for generated edit dialogs
+ * @property        formVisible         Optional generated edit dialog visibility override
+ * @property        tableOrder          Optional column order index for generated tables
+ * @property        tableVisible        Optional generated table visibility override
+ * @property        mobileOrder         Optional field order index for mobile table cards
+ * @property        mobileVisible       Optional mobile table card visibility override
  * @property        formConfig          Effective user-configured form overlay for this field
  * @property        referenceDependency Declarative parent-child dependency metadata for reference fields
  * @property        genericReference    Declarative metadata for generic entity+handle record references
@@ -170,6 +175,50 @@ export class EntityTemplateDto {
     enum: [1, 2, 3, 4],
   })
   formWidth: SaplingFormWidthSpan | null = null;
+
+  @ApiProperty({
+    description:
+      'Optional visibility override for generated edit dialog fields.',
+    nullable: true,
+    required: false,
+    type: Boolean,
+  })
+  formVisible?: boolean | null = null;
+
+  @ApiProperty({
+    description:
+      'Optional display order for generated table columns. Lower values are rendered first.',
+    nullable: true,
+    required: false,
+    type: Number,
+  })
+  tableOrder?: number | null = null;
+
+  @ApiProperty({
+    description: 'Optional visibility override for generated table columns.',
+    nullable: true,
+    required: false,
+    type: Boolean,
+  })
+  tableVisible?: boolean | null = null;
+
+  @ApiProperty({
+    description:
+      'Optional display order for generated mobile table card fields. Lower values are rendered first.',
+    nullable: true,
+    required: false,
+    type: Number,
+  })
+  mobileOrder?: number | null = null;
+
+  @ApiProperty({
+    description:
+      'Optional visibility override for generated mobile table card fields.',
+    nullable: true,
+    required: false,
+    type: Boolean,
+  })
+  mobileVisible?: boolean | null = null;
 
   @ApiProperty({
     description:
