@@ -1,7 +1,6 @@
 [
   {
     "entity": "calendarSyncSubscription",
-    "route": "table/calendarSyncSubscription",
-    "navigation": "calendar"
+    "route": "table/calendarSyncSubscription"
   }
 ]

@@ -1,10 +1,18 @@
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import {
+  getLatestOpenTaskSnapshot,
   useOpenTaskCountEvents,
+  type OpenTaskSnapshot,
   type OpenTaskStreamItem,
 } from '@/composables/system/useOpenTaskCountEvents'
+import {
+  isInSaplingNotificationQuietHours,
+  loadSaplingNotificationPreferences,
+  SAPLING_NOTIFICATION_PREFERENCES_UPDATED_EVENT,
+  type SaplingNotificationPreferences,
+} from '@/services/notification-preferences.service'
 
 export interface SaplingHeaderInboxPreview extends OpenTaskStreamItem {
   sequence: number
@@ -21,6 +29,9 @@ export function useSaplingHeader() {
   const inboxCount = ref(0)
   const inboxNotificationCount = ref(0)
   const incomingInboxPreview = ref<SaplingHeaderInboxPreview | null>(null)
+  const notificationPreferences = ref<SaplingNotificationPreferences>(
+    loadSaplingNotificationPreferences(),
+  )
   const currentPersonStore = useCurrentPersonStore()
   let incomingInboxPreviewSequence = 0
   //#endregion
@@ -28,16 +39,28 @@ export function useSaplingHeader() {
   const inboxBadgeColor = computed(() => (inboxNotificationCount.value > 0 ? 'error' : 'primary'))
 
   useOpenTaskCountEvents((snapshot, context) => {
-    inboxCount.value = snapshot.count
-    inboxNotificationCount.value = snapshot.notifications.length
+    applyNotificationPreferences(snapshot)
 
     if (!context || context.source !== 'stream' || context.newItems.length === 0) {
       return
     }
 
+    if (
+      !notificationPreferences.value.previewChannelEnabled ||
+      isInSaplingNotificationQuietHours(notificationPreferences.value)
+    ) {
+      return
+    }
+
+    const newItems = context.newItems.filter((item) => isStreamItemEnabled(item))
+
+    if (newItems.length === 0) {
+      return
+    }
+
     incomingInboxPreviewSequence += 1
     incomingInboxPreview.value = {
-      ...context.newItems[0],
+      ...newItems[0],
       sequence: incomingInboxPreviewSequence,
     }
   })
@@ -47,11 +70,58 @@ export function useSaplingHeader() {
    * Initializes the header state and starts the backend event stream.
    */
   onMounted(async () => {
+    window.addEventListener(
+      SAPLING_NOTIFICATION_PREFERENCES_UPDATED_EVENT,
+      handleNotificationPreferencesUpdate,
+    )
     await currentPersonStore.fetchCurrentPerson()
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener(
+      SAPLING_NOTIFICATION_PREFERENCES_UPDATED_EVENT,
+      handleNotificationPreferencesUpdate,
+    )
   })
   //#endregion
 
   //#region Methods
+  function handleNotificationPreferencesUpdate(event: Event) {
+    const customEvent = event as CustomEvent<SaplingNotificationPreferences>
+    notificationPreferences.value = customEvent.detail ?? loadSaplingNotificationPreferences()
+
+    const latestSnapshot = getLatestOpenTaskSnapshot()
+    if (latestSnapshot) {
+      applyNotificationPreferences(latestSnapshot)
+    }
+  }
+
+  function applyNotificationPreferences(snapshot: OpenTaskSnapshot) {
+    const preferences = notificationPreferences.value
+    const openTaskCount =
+      snapshot.tickets.length +
+      snapshot.tasks.length +
+      snapshot.salesOpportunities.length +
+      snapshot.effortEstimates.length
+    const notificationCount = snapshot.notifications.length
+
+    inboxCount.value = preferences.badgeChannelEnabled
+      ? (preferences.openTaskNotificationsEnabled ? openTaskCount : 0) +
+        (preferences.inboxNotificationsEnabled ? notificationCount : 0)
+      : 0
+    inboxNotificationCount.value =
+      preferences.badgeChannelEnabled && preferences.inboxNotificationsEnabled
+        ? notificationCount
+        : 0
+  }
+
+  function isStreamItemEnabled(item: OpenTaskStreamItem) {
+    if (item.kind === 'notification') {
+      return notificationPreferences.value.inboxNotificationsEnabled
+    }
+
+    return notificationPreferences.value.openTaskNotificationsEnabled
+  }
 
   /**
    * Opens the inbox dialog.

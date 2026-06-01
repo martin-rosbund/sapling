@@ -221,6 +221,66 @@
   min-width: 0;
 }
 
+.sapling-account-dialog__profile-grid,
+.sapling-account-dialog__notification-grid,
+.sapling-account-dialog__quiet-hours-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sapling-gap-md);
+  min-width: 0;
+}
+
+.sapling-account-dialog__quiet-hours-grid {
+  grid-template-columns: minmax(12rem, 1fr) minmax(9rem, 12rem) minmax(9rem, 12rem);
+  align-items: center;
+}
+
+.sapling-account-dialog__session-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sapling-gap-sm);
+}
+
+.sapling-account-dialog__session-list {
+  width: 100%;
+  min-width: 0;
+}
+
+.sapling-account-dialog__session-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sapling-gap-sm);
+  min-width: 0;
+}
+
+.sapling-account-dialog__session-main {
+  display: grid;
+  gap: var(--sapling-gap-xs);
+  min-width: 0;
+}
+
+.sapling-account-dialog__session-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sapling-gap-sm);
+  min-width: 0;
+  font-weight: 600;
+}
+
+.sapling-account-dialog__session-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sapling-gap-sm) var(--sapling-gap-md);
+  min-width: 0;
+  color: var(--sapling-text-muted);
+  font-size: var(--sapling-text-meta-size);
+}
+
+.sapling-account-dialog__session-meta span {
+  overflow-wrap: anywhere;
+}
+
 .sapling-account-dialog__sync-list {
   width: 100%;
   min-width: 0;
@@ -823,6 +883,12 @@
   }
 
   .sapling-account-dialog__sync-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sapling-account-dialog__profile-grid,
+  .sapling-account-dialog__notification-grid,
+  .sapling-account-dialog__quiet-hours-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 

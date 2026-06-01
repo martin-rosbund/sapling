@@ -1,4 +1,11 @@
-export type SaplingAccountDialogTab = 'profile' | 'sync' | 'security' | 'preferences' | 'songbird'
+export type SaplingAccountDialogTab =
+  | 'profile'
+  | 'notifications'
+  | 'sync'
+  | 'security'
+  | 'sessions'
+  | 'preferences'
+  | 'songbird'
 
 export interface SaplingOpenAccountDialogDetail {
   tab?: SaplingAccountDialogTab

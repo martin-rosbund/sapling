@@ -1,11 +1,16 @@
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import axios from 'axios'
 import { BACKEND_URL } from '@/constants/project.constants'
 import { i18n } from '@/i18n'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import ApiService from '@/services/api.service'
-import type { AiProviderModelItem, AiProviderTypeItem, WorkHourWeekItem } from '@/entity/entity'
+import type {
+  AiProviderModelItem,
+  AiProviderTypeItem,
+  PersonItem,
+  WorkHourWeekItem,
+} from '@/entity/entity'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useSaplingPreferences } from '@/composables/system/useSaplingPreferences'
 import ApiAiService from '@/services/api.ai.service'
@@ -19,6 +24,11 @@ import {
   saveSaplingAiPreferences,
   type SaplingAiPreferences,
 } from '@/services/ai-preferences.service'
+import {
+  loadSaplingNotificationPreferences,
+  saveSaplingNotificationPreferences,
+  type SaplingNotificationPreferences,
+} from '@/services/notification-preferences.service'
 
 interface AccountDetailItem {
   key: string
@@ -64,7 +74,14 @@ interface CalendarSyncOption<T> {
   value: T
 }
 
-export type AccountTab = 'profile' | 'sync' | 'security' | 'preferences' | 'songbird'
+export type AccountTab =
+  | 'profile'
+  | 'notifications'
+  | 'sync'
+  | 'security'
+  | 'sessions'
+  | 'preferences'
+  | 'songbird'
 
 interface AccountTabItem {
   key: AccountTab
@@ -75,6 +92,28 @@ interface AccountTabItem {
 interface AccountSelectOption<T> {
   title: string
   value: T
+}
+
+interface ProfileForm {
+  firstName: string
+  lastName: string
+  phone: string
+  mobile: string
+  color: string
+}
+
+interface CurrentSessionDto {
+  id: string
+  isCurrent: boolean
+  deviceLabel: string
+  createdAt: string | Date | null
+  lastActivityAt: string | Date | null
+  expiresAt: string | Date
+}
+
+interface TerminateSessionsResult {
+  terminatedCount: number
+  sessions: CurrentSessionDto[]
 }
 
 const WORK_HOUR_DAY_KEYS: WorkHourDayKey[] = [
@@ -117,8 +156,23 @@ export function useSaplingAccount() {
   } = useSaplingPreferences()
   const currentPersonStore = useCurrentPersonStore()
   const workHours = ref<WorkHourWeekItem | null>(null)
+  const profileForm = ref<ProfileForm>({
+    firstName: '',
+    lastName: '',
+    phone: '',
+    mobile: '',
+    color: '#4CAF50',
+  })
+  const isProfileSaving = ref(false)
   const calendarSync = ref<CalendarSyncSubscription | null>(null)
   const isCalendarSyncSaving = ref(false)
+  const notificationPreferences = ref<SaplingNotificationPreferences>(
+    loadSaplingNotificationPreferences(),
+  )
+  const isNotificationPreferencesSaving = ref(false)
+  const currentSessions = ref<CurrentSessionDto[]>([])
+  const isSessionsLoading = ref(false)
+  const isSessionsTerminating = ref(false)
   const activeAccountTab = ref<AccountTab>('profile')
   const isAiPreferencesLoading = ref(false)
   const isAiPreferencesSaving = ref(false)
@@ -215,8 +269,10 @@ export function useSaplingAccount() {
 
   const accountTabs = computed<AccountTabItem[]>(() => [
     { key: 'profile', icon: 'mdi-account-outline', label: i18n.global.t('account.profile') },
+    { key: 'notifications', icon: 'mdi-bell-outline', label: i18n.global.t('account.notifications') },
     { key: 'sync', icon: 'mdi-sync', label: i18n.global.t('account.synchronizations') },
     { key: 'security', icon: 'mdi-shield-key-outline', label: i18n.global.t('account.security') },
+    { key: 'sessions', icon: 'mdi-devices', label: i18n.global.t('account.sessions') },
     { key: 'preferences', icon: 'mdi-palette-outline', label: i18n.global.t('account.preferences') },
     { key: 'songbird', icon: 'mdi-creation-outline', label: i18n.global.t('account.songbird') },
   ])
@@ -259,9 +315,18 @@ export function useSaplingAccount() {
       currentPersonStore.fetchCurrentPerson(),
       loadWorkHours(),
       loadCalendarSync(),
+      loadCurrentSessions(),
       loadAiPreferences(),
     ])
   })
+
+  watch(
+    () => currentPersonStore.person,
+    () => {
+      syncProfileForm()
+    },
+    { immediate: true },
+  )
   //#endregion
 
   //#region Methods
@@ -322,6 +387,41 @@ export function useSaplingAccount() {
     workHours.value = await ApiService.findOne<WorkHourWeekItem>('current/workWeek')
   }
 
+  function syncProfileForm() {
+    const person = currentPersonStore.person
+
+    if (!person) {
+      return
+    }
+
+    profileForm.value = {
+      firstName: person.firstName || '',
+      lastName: person.lastName || '',
+      phone: person.phone || '',
+      mobile: person.mobile || '',
+      color: person.color || '#4CAF50',
+    }
+  }
+
+  async function saveProfile() {
+    isProfileSaving.value = true
+
+    try {
+      await ApiService.patch<PersonItem>('current/profile', {
+        firstName: profileForm.value.firstName,
+        lastName: profileForm.value.lastName,
+        phone: profileForm.value.phone,
+        mobile: profileForm.value.mobile,
+        color: profileForm.value.color,
+      })
+      await currentPersonStore.fetchCurrentPerson(true)
+      syncProfileForm()
+      pushMessage('success', 'account.profileSaved', '', 'account')
+    } finally {
+      isProfileSaving.value = false
+    }
+  }
+
   /**
    * Loads the current user's automatic Outlook import settings.
    */
@@ -349,6 +449,41 @@ export function useSaplingAccount() {
       pushMessage('success', 'calendarSyncSubscription.saveSuccess', '', 'calendarSyncSubscription')
     } finally {
       isCalendarSyncSaving.value = false
+    }
+  }
+
+  function saveNotificationPreferenceSelection() {
+    isNotificationPreferencesSaving.value = true
+
+    try {
+      saveSaplingNotificationPreferences(notificationPreferences.value)
+      pushMessage('success', 'account.notificationPreferencesSaved', '', 'account')
+    } finally {
+      isNotificationPreferencesSaving.value = false
+    }
+  }
+
+  async function loadCurrentSessions() {
+    isSessionsLoading.value = true
+
+    try {
+      currentSessions.value = await ApiService.findOne<CurrentSessionDto[]>('current/sessions')
+    } finally {
+      isSessionsLoading.value = false
+    }
+  }
+
+  async function terminateOtherSessions() {
+    isSessionsTerminating.value = true
+
+    try {
+      const result = await ApiService.post<TerminateSessionsResult>(
+        'current/sessions/terminateOthers',
+      )
+      currentSessions.value = result.sessions
+      pushMessage('success', 'account.sessionsTerminated', '', 'account')
+    } finally {
+      isSessionsTerminating.value = false
     }
   }
 
@@ -542,7 +677,14 @@ export function useSaplingAccount() {
     showPasswordChange,
     currentPersonStore,
     workHours,
+    profileForm,
+    isProfileSaving,
     calendarSync,
+    notificationPreferences,
+    isNotificationPreferencesSaving,
+    currentSessions,
+    isSessionsLoading,
+    isSessionsTerminating,
     activeAccountTab,
     accountTabs,
     calendarSyncRangeOptions,
@@ -567,7 +709,12 @@ export function useSaplingAccount() {
     workHourRows,
     changePassword,
     calculateAge,
+    saveProfile,
     saveCalendarSync,
+    saveNotificationPreferenceSelection,
+    loadCurrentSessions,
+    terminateOtherSessions,
+    formatDateTime,
     setLanguage,
     updateAiProvider,
     updateAiModel,

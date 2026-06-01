@@ -124,7 +124,136 @@
                         </tbody>
                       </v-table>
                     </section>
+                    <section class="sapling-account-dialog__panel-stack">
+                      <div class="sapling-account-dialog__section-heading">
+                        <v-icon color="primary">mdi-account-edit-outline</v-icon>
+                        <span>{{ $t('account.editProfile') }}</span>
+                      </div>
+                      <div class="sapling-account-dialog__profile-grid">
+                        <v-text-field
+                          v-model="profileForm.firstName"
+                          density="comfortable"
+                          variant="outlined"
+                          hide-details
+                          :label="$t('person.firstName')"
+                        />
+                        <v-text-field
+                          v-model="profileForm.lastName"
+                          density="comfortable"
+                          variant="outlined"
+                          hide-details
+                          :label="$t('person.lastName')"
+                        />
+                        <v-text-field
+                          v-model="profileForm.phone"
+                          density="comfortable"
+                          variant="outlined"
+                          hide-details
+                          :label="$t('person.phone')"
+                        />
+                        <v-text-field
+                          v-model="profileForm.mobile"
+                          density="comfortable"
+                          variant="outlined"
+                          hide-details
+                          :label="$t('person.mobile')"
+                        />
+                        <v-text-field
+                          v-model="profileForm.color"
+                          density="comfortable"
+                          variant="outlined"
+                          hide-details
+                          type="color"
+                          :label="$t('person.color')"
+                        />
+                      </div>
+                      <v-btn
+                        color="primary"
+                        variant="flat"
+                        prepend-icon="mdi-content-save-outline"
+                        :loading="isProfileSaving"
+                        @click="saveProfile"
+                      >
+                        {{ $t('account.saveProfile') }}
+                      </v-btn>
+                    </section>
                   </div>
+                </v-window-item>
+
+                <v-window-item value="notifications">
+                  <section class="sapling-account-dialog__panel-stack">
+                    <div class="sapling-account-dialog__section-heading">
+                      <v-icon color="primary">mdi-bell-outline</v-icon>
+                      <span>{{ $t('account.notifications') }}</span>
+                    </div>
+                    <div class="sapling-account-dialog__notification-grid">
+                      <v-switch
+                        v-model="notificationPreferences.inboxNotificationsEnabled"
+                        color="primary"
+                        hide-details
+                        inset
+                        :label="$t('account.inboxNotificationsEnabled')"
+                      />
+                      <v-switch
+                        v-model="notificationPreferences.openTaskNotificationsEnabled"
+                        color="primary"
+                        hide-details
+                        inset
+                        :label="$t('account.openTaskNotificationsEnabled')"
+                      />
+                      <v-switch
+                        v-model="notificationPreferences.badgeChannelEnabled"
+                        color="primary"
+                        hide-details
+                        inset
+                        :label="$t('account.badgeChannelEnabled')"
+                      />
+                      <v-switch
+                        v-model="notificationPreferences.previewChannelEnabled"
+                        color="primary"
+                        hide-details
+                        inset
+                        :label="$t('account.previewChannelEnabled')"
+                      />
+                    </div>
+                    <v-divider />
+                    <div class="sapling-account-dialog__quiet-hours-grid">
+                      <v-switch
+                        v-model="notificationPreferences.quietHoursEnabled"
+                        color="primary"
+                        hide-details
+                        inset
+                        :label="$t('account.quietHoursEnabled')"
+                      />
+                      <v-text-field
+                        v-model="notificationPreferences.quietHoursFrom"
+                        density="comfortable"
+                        variant="outlined"
+                        hide-details
+                        type="time"
+                        :disabled="!notificationPreferences.quietHoursEnabled"
+                        :label="$t('account.quietHoursFrom')"
+                      />
+                      <v-text-field
+                        v-model="notificationPreferences.quietHoursTo"
+                        density="comfortable"
+                        variant="outlined"
+                        hide-details
+                        type="time"
+                        :disabled="!notificationPreferences.quietHoursEnabled"
+                        :label="$t('account.quietHoursTo')"
+                      />
+                    </div>
+                    <v-btn
+                      color="primary"
+                      variant="flat"
+                      prepend-icon="mdi-content-save-outline"
+                      :loading="isNotificationPreferencesSaving"
+                      @click="saveNotificationPreferenceSelection"
+                    >
+                      {{ $t('account.saveNotifications') }}
+                    </v-btn>
+                  </section>
                 </v-window-item>
 
                 <v-window-item value="sync">
@@ -196,6 +325,77 @@
                     >
                       {{ $t('login.changePassword') }}
                     </v-btn>
+                  </section>
+                </v-window-item>
+
+                <v-window-item value="sessions">
+                  <section class="sapling-account-dialog__panel-stack">
+                    <div class="sapling-account-dialog__section-heading">
+                      <v-icon color="primary">mdi-devices</v-icon>
+                      <span>{{ $t('account.activeSessions') }}</span>
+                    </div>
+                    <div class="sapling-account-dialog__session-actions">
+                      <v-btn
+                        color="primary"
+                        variant="tonal"
+                        prepend-icon="mdi-refresh"
+                        :loading="isSessionsLoading"
+                        @click="loadCurrentSessions"
+                      >
+                        {{ $t('global.refresh') }}
+                      </v-btn>
+                      <v-btn
+                        color="error"
+                        variant="tonal"
+                        prepend-icon="mdi-logout-variant"
+                        :loading="isSessionsTerminating"
+                        @click="terminateOtherSessions"
+                      >
+                        {{ $t('account.terminateOtherSessions') }}
+                      </v-btn>
+                    </div>
+                    <v-list
+                      v-if="currentSessions.length > 0"
+                      density="comfortable"
+                      class="sapling-account-dialog__session-list"
+                    >
+                      <v-list-item v-for="session in currentSessions" :key="session.id">
+                        <div class="sapling-account-dialog__session-row">
+                          <v-icon color="primary">mdi-web</v-icon>
+                          <div class="sapling-account-dialog__session-main">
+                            <div class="sapling-account-dialog__session-title">
+                              <span>{{ session.deviceLabel }}</span>
+                              <v-chip
+                                v-if="session.isCurrent"
+                                color="primary"
+                                size="small"
+                                variant="tonal"
+                              >
+                                {{ $t('account.currentSession') }}
+                              </v-chip>
+                            </div>
+                            <div class="sapling-account-dialog__session-meta">
+                              <span>{{ session.id }}</span>
+                              <span>
+                                {{ $t('account.signedInAt') }}:
+                                {{ formatDateTime(session.createdAt) }}
+                              </span>
+                              <span>
+                                {{ $t('account.lastActivityAt') }}:
+                                {{ formatDateTime(session.lastActivityAt) }}
+                              </span>
+                              <span>
+                                {{ $t('account.expiresAt') }}:
+                                {{ formatDateTime(session.expiresAt) }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </v-list-item>
+                    </v-list>
+                    <div v-else class="sapling-account-dialog__sync-unavailable">
+                      {{ $t('account.noActiveSessions') }}
+                    </div>
                   </section>
                 </v-window-item>
 
@@ -385,7 +585,14 @@ const {
   showPasswordChange,
   currentPersonStore,
   workHours,
+  profileForm,
+  isProfileSaving,
   calendarSync,
+  notificationPreferences,
+  isNotificationPreferencesSaving,
+  currentSessions,
+  isSessionsLoading,
+  isSessionsTerminating,
   activeAccountTab,
   accountTabs,
   calendarSyncRangeOptions,
@@ -409,7 +616,12 @@ const {
   accountDetails,
   workHourRows,
   changePassword,
+  saveProfile,
   saveCalendarSync,
+  saveNotificationPreferenceSelection,
+  loadCurrentSessions,
+  terminateOtherSessions,
+  formatDateTime,
   setLanguage,
   updateAiProvider,
   updateAiModel,

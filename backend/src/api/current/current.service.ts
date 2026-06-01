@@ -15,6 +15,7 @@ import { RoleItem } from '../../entity/RoleItem';
 import { KpiItem } from '../../entity/KpiItem';
 import { InboxService } from '../inbox/inbox.service';
 import { InboxNotificationItem } from '../../entity/InboxNotificationItem';
+import { SessionStoreItem } from '../../entity/SessionStoreItem';
 import {
   AccumulatedPermissionDto,
   AccumulatedPermissionBufferDto,
@@ -27,6 +28,32 @@ export interface OpenTaskSnapshot {
   salesOpportunities: SalesOpportunityItem[];
   effortEstimates: EffortEstimateItem[];
   notifications: InboxNotificationItem[];
+}
+
+export interface CurrentProfileUpdateDto {
+  firstName?: string | null;
+  lastName?: string | null;
+  phone?: string | null;
+  mobile?: string | null;
+  color?: string | null;
+}
+
+export interface CurrentSessionDto {
+  id: string;
+  isCurrent: boolean;
+  deviceLabel: string;
+  createdAt: Date | null;
+  lastActivityAt: Date | null;
+  expiresAt: Date;
+}
+
+interface StoredSessionPayload {
+  passport?: {
+    user?: {
+      handle?: number | string;
+      impersonatedHandle?: number | string;
+    };
+  };
 }
 
 /**
@@ -195,6 +222,89 @@ export class CurrentService {
     return;
   }
 
+  async updateProfile(
+    user: Pick<PersonItem, 'handle'>,
+    dto: CurrentProfileUpdateDto,
+  ): Promise<PersonItem> {
+    if (user.handle == null) {
+      throw new Error('login.userNotFound');
+    }
+
+    const person = await this.em.findOne(PersonItem, { handle: user.handle });
+
+    if (!person) {
+      throw new Error('login.userNotFound');
+    }
+
+    const firstName = this.normalizeRequiredText(dto.firstName, person.firstName);
+    const lastName = this.normalizeRequiredText(dto.lastName, person.lastName);
+
+    person.firstName = firstName;
+    person.lastName = lastName;
+    person.phone = this.normalizeOptionalText(dto.phone, 32);
+    person.mobile = this.normalizeOptionalText(dto.mobile, 32);
+    person.color = this.normalizeColor(dto.color, person.color ?? '#4CAF50');
+
+    await this.em.flush();
+
+    return (await this.getPerson(person)) ?? person;
+  }
+
+  async getCurrentSessions(
+    user: Pick<PersonItem, 'handle'>,
+    currentSessionId?: string | null,
+  ): Promise<CurrentSessionDto[]> {
+    if (user.handle == null) {
+      return [];
+    }
+
+    const now = new Date();
+    const records = await this.em.find(
+      SessionStoreItem,
+      { expiresAt: { $gt: now } },
+      { orderBy: { updatedAt: 'DESC' } },
+    );
+
+    return records
+      .filter((record) => this.getSessionUserHandle(record) === user.handle)
+      .map((record) => this.mapCurrentSession(record, currentSessionId))
+      .sort((left, right) => {
+        if (left.isCurrent !== right.isCurrent) {
+          return left.isCurrent ? -1 : 1;
+        }
+
+        return (
+          new Date(right.lastActivityAt ?? 0).getTime() -
+          new Date(left.lastActivityAt ?? 0).getTime()
+        );
+      });
+  }
+
+  async terminateOtherSessions(
+    user: Pick<PersonItem, 'handle'>,
+    currentSessionId?: string | null,
+  ): Promise<{ terminatedCount: number; sessions: CurrentSessionDto[] }> {
+    if (user.handle == null) {
+      return { terminatedCount: 0, sessions: [] };
+    }
+
+    const sessions = await this.getCurrentSessionRecords(user);
+    const deletableSessionIds = sessions
+      .filter((sessionRecord) => sessionRecord.handle !== currentSessionId)
+      .map((sessionRecord) => sessionRecord.handle);
+
+    if (deletableSessionIds.length > 0) {
+      await this.em.nativeDelete(SessionStoreItem, {
+        handle: { $in: deletableSessionIds },
+      });
+    }
+
+    return {
+      terminatedCount: deletableSessionIds.length,
+      sessions: await this.getCurrentSessions(user, currentSessionId),
+    };
+  }
+
   /**
    * Returns all open tickets assigned to the user.
    * @param user The user whose tickets are to be retrieved
@@ -325,6 +435,104 @@ export class CurrentService {
       isActive: true,
       status: { handle: { $nin: ['completed', 'cancelled'] } },
     };
+  }
+
+  private async getCurrentSessionRecords(
+    user: Pick<PersonItem, 'handle'>,
+  ): Promise<SessionStoreItem[]> {
+    if (user.handle == null) {
+      return [];
+    }
+
+    const records = await this.em.find(SessionStoreItem, {
+      expiresAt: { $gt: new Date() },
+    });
+
+    return records.filter(
+      (record) => this.getSessionUserHandle(record) === user.handle,
+    );
+  }
+
+  private mapCurrentSession(
+    record: SessionStoreItem,
+    currentSessionId?: string | null,
+  ): CurrentSessionDto {
+    return {
+      id: this.maskSessionId(record.handle),
+      isCurrent: Boolean(currentSessionId && record.handle === currentSessionId),
+      deviceLabel: 'Browser-Sitzung',
+      createdAt: record.createdAt ?? null,
+      lastActivityAt: record.updatedAt ?? record.createdAt ?? null,
+      expiresAt: record.expiresAt,
+    };
+  }
+
+  private getSessionUserHandle(record: SessionStoreItem): number | null {
+    const payload = this.parseSessionPayload(record.payload);
+    const handle = payload?.passport?.user?.handle;
+
+    if (typeof handle === 'number' && Number.isFinite(handle)) {
+      return handle;
+    }
+
+    if (typeof handle === 'string') {
+      const parsedHandle = Number(handle);
+      return Number.isFinite(parsedHandle) ? parsedHandle : null;
+    }
+
+    return null;
+  }
+
+  private parseSessionPayload(payload: unknown): StoredSessionPayload | null {
+    try {
+      const parsedPayload =
+        typeof payload === 'string' ? (JSON.parse(payload) as unknown) : payload;
+
+      if (!parsedPayload || typeof parsedPayload !== 'object') {
+        return null;
+      }
+
+      return parsedPayload as StoredSessionPayload;
+    } catch {
+      return null;
+    }
+  }
+
+  private maskSessionId(sessionId: string): string {
+    const suffix = sessionId.slice(-8);
+    return suffix ? `...${suffix}` : '...';
+  }
+
+  private normalizeRequiredText(value: unknown, fallback: string): string {
+    if (typeof value !== 'string') {
+      return fallback;
+    }
+
+    const normalizedValue = value.trim().slice(0, 64);
+    return normalizedValue || fallback;
+  }
+
+  private normalizeOptionalText(
+    value: unknown,
+    maxLength: number,
+  ): string | undefined {
+    if (typeof value !== 'string') {
+      return undefined;
+    }
+
+    const normalizedValue = value.trim().slice(0, maxLength);
+    return normalizedValue || undefined;
+  }
+
+  private normalizeColor(value: unknown, fallback: string): string {
+    if (typeof value !== 'string') {
+      return fallback;
+    }
+
+    const normalizedValue = value.trim();
+    return /^#[0-9a-fA-F]{6}$/.test(normalizedValue)
+      ? normalizedValue
+      : fallback;
   }
 
   /**
