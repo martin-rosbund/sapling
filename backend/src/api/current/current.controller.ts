@@ -41,6 +41,10 @@ import {
   CalendarSyncSubscriptionDto,
   UpdateCalendarSyncSubscriptionDto,
 } from '../../calendar/sync/dto/calendar-sync-subscription.dto';
+import type {
+  CurrentProfileUpdateDto,
+  CurrentSessionDto,
+} from './current.service';
 
 /**
  * @class
@@ -168,6 +172,75 @@ export class CurrentController {
     }
     const user = req.user as PersonItem;
     await this.currentService.changePassword(user, newPassword);
+  }
+
+  @Patch('profile')
+  @ApiOperation({
+    summary: 'Update current user profile',
+    description:
+      'Updates editable profile fields for the authenticated user.',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        firstName: { type: 'string' },
+        lastName: { type: 'string' },
+        phone: { type: 'string', nullable: true },
+        mobile: { type: 'string', nullable: true },
+        color: { type: 'string', nullable: true },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Updated authenticated user profile.',
+    type: PersonItem,
+  })
+  async updateProfile(
+    @Req() req: Request,
+    @Body() dto: CurrentProfileUpdateDto,
+  ): Promise<PersonItem> {
+    const user = req.user as PersonItem;
+    return this.currentService.updateProfile(user, dto);
+  }
+
+  @Get('sessions')
+  @ApiOperation({
+    summary: 'List current user sessions',
+    description:
+      'Returns active browser sessions belonging to the authenticated user.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Active current-user browser sessions.',
+  })
+  getCurrentSessions(@Req() req: Request): Promise<CurrentSessionDto[]> {
+    const user = req.user as PersonItem;
+    return this.currentService.getCurrentSessions(
+      user,
+      this.getCurrentSessionId(req),
+    );
+  }
+
+  @Post('sessions/terminateOthers')
+  @ApiOperation({
+    summary: 'Terminate other current user sessions',
+    description:
+      'Deletes all active browser sessions for the authenticated user except the current session.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Session termination summary.',
+  })
+  terminateOtherSessions(
+    @Req() req: Request,
+  ): Promise<{ terminatedCount: number; sessions: CurrentSessionDto[] }> {
+    const user = req.user as PersonItem;
+    return this.currentService.terminateOtherSessions(
+      user,
+      this.getCurrentSessionId(req),
+    );
   }
 
   @Sse('openTaskCountEvents')
@@ -395,5 +468,10 @@ export class CurrentController {
     }
 
     return this.calendarSyncSubscriptionService;
+  }
+
+  private getCurrentSessionId(req: Request): string | null {
+    const sessionRequest = req as Request & { sessionID?: string };
+    return sessionRequest.sessionID ?? null;
   }
 }

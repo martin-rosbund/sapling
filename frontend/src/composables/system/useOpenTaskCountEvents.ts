@@ -243,6 +243,10 @@ export function updateOpenTaskSnapshot(snapshot: OpenTaskSnapshot) {
   applySnapshot(snapshot, 'local')
 }
 
+export function getLatestOpenTaskSnapshot(): OpenTaskSnapshot | null {
+  return latestSnapshot
+}
+
 export function useOpenTaskCountEvents(listener: OpenTaskCountListener) {
   onMounted(() => {
     listeners.add(listener)
