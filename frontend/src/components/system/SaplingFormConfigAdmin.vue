@@ -402,7 +402,10 @@
 
           <div v-else-if="previewMode === 'table'" class="sapling-form-config-preview__stage">
             <div v-if="previewTableTemplates.length > 0" class="sapling-form-config-preview-table">
-              <div class="sapling-form-config-preview-table__scroll">
+              <div
+                class="sapling-form-config-preview-table__scroll"
+                :style="previewTableScrollStyle"
+              >
                 <table>
                   <thead>
                     <tr>
@@ -683,6 +686,10 @@ const previewTableTemplates = computed(() =>
       .filter((template) => template.tableVisible === true),
   ),
 )
+
+const previewTableScrollStyle = computed(() => ({
+  '--sapling-form-config-preview-table-columns': String(previewTableTemplates.value.length),
+}))
 
 const previewMobileTemplates = computed(() =>
   getMobileTableHeaders(
