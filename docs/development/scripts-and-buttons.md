@@ -73,9 +73,10 @@ The frontend type lives in `frontend/src/services/api.script.service.ts`. Keep b
 Use it when a script button should open Songbird with a prepared prompt instead
 of duplicating AI/MCP orchestration in an entity script. The frontend dispatches
 the prompt to `SaplingAiChat`, where it can open a new chat and optionally send
-the prompt immediately. This pattern is used by the effort-estimate and
-sales-opportunity Phase 4 actions so Songbird can call `generic_get`,
-`knowledge_search`, and semantic tools with the current user's permissions.
+the prompt immediately. This pattern is used by the effort-estimate,
+sales-opportunity, and ticket reference actions so Songbird can call
+`generic_get`, `knowledge_search`, and semantic tools with the current user's
+permissions.
 
 ## Server Lifecycle Hooks
 

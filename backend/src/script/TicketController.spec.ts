@@ -95,6 +95,45 @@ describe('TicketController', () => {
     });
   });
 
+  it('opens Songbird with a ticket reference search prompt', async () => {
+    const controller = new TicketController(
+      { handle: 'ticket' } as never,
+      { handle: 99 } as never,
+      {} as never,
+    );
+
+    const result = await controller.execute(
+      [
+        {
+          handle: 42,
+          number: '2026#00042',
+          title: 'Cache invalidation',
+          externalNumber: 'EXT-7',
+          problemDescription: 'Cache entries are stale after deployment.',
+          solutionDescription: 'Clear generated cache and warm it again.',
+        },
+      ],
+      'aiFindTicketReferences',
+    );
+
+    expect(result.method).toBe(ScriptResultClientMethods.callURL);
+    expect(result.parameter).toContain('sapling-ai-chat://prompt?');
+
+    const url = new URL(result.parameter);
+    const prompt = url.searchParams.get('prompt') ?? '';
+
+    expect(url.searchParams.get('title')).toBe(
+      'Ticket mit Referenzen analysieren',
+    );
+    expect(url.searchParams.get('autoSend')).toBe('true');
+    expect(url.searchParams.get('newChat')).toBe('true');
+    expect(prompt).toContain('Aktuelles Ticket: 42 - 2026#00042');
+    expect(prompt).toContain('Cache invalidation');
+    expect(prompt).toContain('entityHandle: ticket, handle: 42');
+    expect(prompt).toContain('knowledge_search');
+    expect(prompt).toContain('ticket_search');
+  });
+
   it('derives support defaults before insert', async () => {
     const contract = {
       handle: 17,

@@ -256,17 +256,19 @@ Use:
 - `generic_get` when the exact handle is known
 - `generic_timeline` for record history/activity questions
 
-## Estimate And Opportunity Actions
+## Estimate, Opportunity, And Ticket Actions
 
 Phase 4 exposes the existing knowledge search through ScriptButtons on
-`effortEstimate` and `salesOpportunity`. The buttons open Songbird with a
-record-specific prompt. Songbird should first load the current record with
+`effortEstimate`, `salesOpportunity`, and `ticket`. The buttons open Songbird
+with a record-specific prompt. Songbird should first load the current record with
 `generic_get`, then use `knowledge_search` across the indexed knowledge sources:
 
 - effort estimates: compare previous estimates and estimate positions, derive
   typical positions, hour ranges, assumptions, and risks.
 - sales opportunities: find similar pain points, solved cases, tickets, effort
   estimates, estimate positions, and reusable reference solutions.
+- tickets: find similar cases, known fixes, knowledge articles, related effort
+  estimates, estimate positions, and reference opportunities.
 
 ## AI Draft Creation
 

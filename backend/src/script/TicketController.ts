@@ -23,6 +23,20 @@ export class TicketController extends ScriptClass {
     name: string,
     parameter?: unknown,
   ): Promise<ScriptResultClient> {
+    if (name === 'aiFindTicketReferences') {
+      void parameter;
+      const item = this.requireSingleItem(items);
+      const handle = this.requireHandle(item);
+      return new ScriptResultClient(
+        ScriptResultClientMethods.callURL,
+        true,
+        buildAiChatPromptUrl(
+          buildTicketReferencePrompt(handle, item),
+          'Ticket mit Referenzen analysieren',
+        ),
+      );
+    }
+
     if (name !== 'aiCreateKnowledgeArticle') {
       return super.execute(items, name, parameter);
     }
@@ -475,4 +489,85 @@ export class TicketController extends ScriptClass {
 
     return [handle, title].filter(Boolean).join(' - ');
   }
+
+  private requireSingleItem(items: object[]): Record<string, unknown> {
+    const item = items[0];
+
+    if (items.length !== 1 || !item || typeof item !== 'object') {
+      throw new Error('script.singleSelectionRequired');
+    }
+
+    return item as Record<string, unknown>;
+  }
+
+  private requireHandle(item: Record<string, unknown>): string | number {
+    const handle = item.handle;
+
+    if (
+      (typeof handle === 'string' && handle.trim()) ||
+      (typeof handle === 'number' && Number.isFinite(handle))
+    ) {
+      return handle;
+    }
+
+    throw new Error('global.invalidPayload');
+  }
+}
+
+function buildTicketReferencePrompt(
+  handle: string | number,
+  item: Record<string, unknown>,
+): string {
+  const number = normalizeString(item.number);
+  const title = normalizeString(item.title);
+  const externalNumber = normalizeString(item.externalNumber);
+  const problemDescription = normalizeString(item.problemDescription);
+  const solutionDescription = normalizeString(item.solutionDescription);
+
+  return [
+    'Bitte analysiere dieses Sapling-Ticket und finde passende Faelle, Loesungen und Referenzen.',
+    '',
+    `Aktuelles Ticket: ${String(handle)}${number ? ` - ${number}` : ''}${title ? ` - ${title}` : ''}`,
+    externalNumber ? `Externe Referenz aus der Liste: ${externalNumber}` : null,
+    problemDescription
+      ? `Bekannte Problembeschreibung aus der Liste: ${problemDescription}`
+      : null,
+    solutionDescription
+      ? `Bekannte Loesung aus der Liste: ${solutionDescription}`
+      : null,
+    '',
+    'Arbeitsweise:',
+    '1. Lade das aktuelle Ticket mit generic_get.',
+    `   entityHandle: ticket, handle: ${JSON.stringify(handle)}, relations: ["status", "priority", "type", "category", "source", "contract", "supportTeam", "supportQueue", "creatorCompany", "creatorPerson", "assigneeCompany", "assigneePerson", "salesOpportunity", "events", "effortEstimates"]`,
+    '2. Baue aus Titel, Problem, Loesung, Status, Prioritaet, Kunde, Vertrag und verknuepften Datensaetzen eine Suchanfrage.',
+    '3. Nutze knowledge_search mit entityHandles ["ticket", "knowledgeArticle", "effortEstimate", "effortEstimatePosition", "salesOpportunity"].',
+    '4. Nutze ticket_search ergaenzend, wenn Ticketnummern, externe Referenzen oder exakte Begriffe relevant sind.',
+    '5. Wenn ein Vektorindex fehlt, nenne ihn kurz und nutze die verfuegbaren Quellen weiter.',
+    '',
+    'Gib mir kompakt:',
+    '- aehnliche Tickets und deren Loesungen oder Workarounds',
+    '- passende Wissensartikel und wiederverwendbare Loesungsschritte',
+    '- verwandte Schaetzungen, Positionen oder Verkaufschancen, falls sie fachlich passen',
+    '- Risiken, offene Rueckfragen und naechste sinnvolle Support-Schritte',
+    '- eine kurze Antwort auf: Welche Faelle passen zu diesem Ticket?',
+  ]
+    .filter(
+      (line): line is string => typeof line === 'string' && line.length > 0,
+    )
+    .join('\n');
+}
+
+function buildAiChatPromptUrl(prompt: string, title: string): string {
+  const params = new URLSearchParams({
+    prompt,
+    title,
+    autoSend: 'true',
+    newChat: 'true',
+  });
+
+  return `sapling-ai-chat://prompt?${params.toString()}`;
+}
+
+function normalizeString(value: unknown): string {
+  return typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : '';
 }
