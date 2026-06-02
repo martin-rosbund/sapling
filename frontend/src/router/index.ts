@@ -48,6 +48,11 @@ const router = createRouter({
         { path: '', name: 'home', component: () => import('@/views/HomeView.vue') },
         // Calendar view (lazy loaded)
         { path: 'event', name: 'calendar', component: () => import('@/views/EventView.vue') },
+        {
+          path: 'sales-pipeline',
+          name: 'salesPipeline',
+          component: () => import('@/views/SalesPipelineView.vue'),
+        },
         // Note view (lazy loaded)
         { path: 'note', name: 'note', component: () => import('@/views/NoteView.vue') },
         // Playground view (lazy loaded)

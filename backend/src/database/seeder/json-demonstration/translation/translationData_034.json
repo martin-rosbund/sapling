@@ -1,0 +1,99 @@
+[
+  {
+    "entity": "navigation",
+    "property": "salesPipeline",
+    "de": "Sales-Pipeline",
+    "en": "Sales pipeline"
+  },
+  {
+    "entity": "salesPipeline",
+    "property": "title",
+    "de": "Sales-Pipeline",
+    "en": "Sales pipeline"
+  },
+  {
+    "entity": "salesPipeline",
+    "property": "subtitle",
+    "de": "Verkaufschancen nach Phase, Wert und Abschlusswahrscheinlichkeit steuern.",
+    "en": "Manage opportunities by stage, value, and closing probability."
+  },
+  {
+    "entity": "salesPipeline",
+    "property": "stages",
+    "de": "Phasen",
+    "en": "stages"
+  },
+  {
+    "entity": "salesPipeline",
+    "property": "openOpportunities",
+    "de": "Offene Chancen",
+    "en": "Open opportunities"
+  },
+  {
+    "entity": "salesPipeline",
+    "property": "pipelineValue",
+    "de": "Pipelinewert",
+    "en": "Pipeline value"
+  },
+  {
+    "entity": "salesPipeline",
+    "property": "weightedValue",
+    "de": "Gewichtet",
+    "en": "Weighted"
+  },
+  {
+    "entity": "salesPipeline",
+    "property": "open",
+    "de": "Offen",
+    "en": "Open"
+  },
+  { "entity": "salesPipeline", "property": "all", "de": "Alle", "en": "All" },
+  {
+    "entity": "salesPipeline",
+    "property": "emptyStage",
+    "de": "Keine Verkaufschancen",
+    "en": "No opportunities"
+  },
+  {
+    "entity": "salesPipeline",
+    "property": "wonStage",
+    "de": "Gewonnen",
+    "en": "Won"
+  },
+  {
+    "entity": "salesPipeline",
+    "property": "closedStage",
+    "de": "Geschlossen",
+    "en": "Closed"
+  },
+  {
+    "entity": "salesPipeline",
+    "property": "noCloseDate",
+    "de": "Kein Abschlussdatum",
+    "en": "No close date"
+  },
+  {
+    "entity": "salesPipeline",
+    "property": "noCompany",
+    "de": "Keine Firma",
+    "en": "No company"
+  },
+  {
+    "entity": "salesPipeline",
+    "property": "noOwner",
+    "de": "Ohne Verantwortlichen",
+    "en": "No owner"
+  },
+  {
+    "entity": "salesPipeline",
+    "property": "stageUpdated",
+    "de": "Phase aktualisiert",
+    "en": "Stage updated"
+  },
+  {
+    "entity": "salesPipeline",
+    "property": "stageUpdatedDescription",
+    "de": "Die Verkaufschance wurde nach {stage} verschoben.",
+    "en": "The opportunity was moved to {stage}."
+  }
+]
