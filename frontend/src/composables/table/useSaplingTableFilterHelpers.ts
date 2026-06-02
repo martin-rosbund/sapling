@@ -470,7 +470,7 @@ function restoreRangeFilter(
     }
   }
 
-  return restoreBetweenFilter(operatorValue)
+  return restoreBetweenFilter(template, operatorValue)
 }
 
 function restoreDateEqualityFilter(
@@ -603,10 +603,11 @@ function restoreRelationIdentifierOperatorFilter(
 }
 
 function restoreBetweenFilter(
+  template: EntityTemplate,
   operatorValue: Record<string, unknown>,
 ): Partial<ColumnFilterItem> | null {
-  const rangeStart = parseComparableRangeValue(operatorValue.$gt ?? operatorValue.$gte)
-  const rangeEnd = parseComparableRangeValue(operatorValue.$lt ?? operatorValue.$lte)
+  const rangeStart = parseComparableRangeValue(template, operatorValue.$gt ?? operatorValue.$gte)
+  const rangeEnd = parseComparableRangeValue(template, operatorValue.$lt ?? operatorValue.$lte)
   const rangeStartOperator =
     typeof operatorValue.$gt !== 'undefined'
       ? 'gt'
@@ -734,7 +735,7 @@ function normalizeRestoredColumnFilter(
     normalizedFilter.rangeEndOperator = filter.rangeEndOperator
     normalizedFilter.value = ''
   } else if (typeof filter.value === 'string') {
-    normalizedFilter.value = filter.value.trim()
+    normalizedFilter.value = normalizeRestoredFilterInputValue(template, filter.value)
   }
 
   if (isEmptyColumnFilterItem(normalizedFilter)) {
@@ -748,10 +749,52 @@ function isDateOnlyValue(value: string) {
   return /^\d{4}-\d{2}-\d{2}$/.test(value)
 }
 
-function parseComparableRangeValue(value: unknown) {
+function isTokenFilterValue(value: string) {
+  return /^\{\{\s*[^}]+?\s*\}\}$/.test(value.trim())
+}
+
+function parseComparableRangeValue(template: EntityTemplate, value: unknown) {
   if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean') {
     return undefined
   }
 
-  return String(value).trim() || undefined
+  const normalizedValue = normalizeRestoredFilterInputValue(template, String(value))
+  return normalizedValue || undefined
+}
+
+function normalizeRestoredFilterInputValue(template: EntityTemplate, rawValue: string) {
+  const value = rawValue.trim()
+  if (!value || !isDateTemplate(template) || isTokenFilterValue(value)) {
+    return value
+  }
+
+  if (isDateOnlyValue(value)) {
+    return value
+  }
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
+
+  if (normalizeTemplateType(template) === 'datetime') {
+    return (
+      [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, '0'),
+        String(date.getDate()).padStart(2, '0'),
+      ].join('-') +
+      `T${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+    )
+  }
+
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0'),
+  ].join('-')
+}
+
+function normalizeTemplateType(template?: Partial<EntityTemplate>) {
+  return String(template?.type ?? '').toLowerCase()
 }

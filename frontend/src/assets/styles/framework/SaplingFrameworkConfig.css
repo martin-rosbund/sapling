@@ -257,10 +257,7 @@
 
 .sapling-form-config-preview-table table {
   width: max-content;
-  min-width: max(
-    100%,
-    calc(var(--sapling-form-config-preview-table-columns) * 9.5rem)
-  );
+  min-width: max(100%, calc(var(--sapling-form-config-preview-table-columns) * 9.5rem));
   border-collapse: collapse;
   table-layout: auto;
 }

@@ -177,8 +177,7 @@ export class CurrentController {
   @Patch('profile')
   @ApiOperation({
     summary: 'Update current user profile',
-    description:
-      'Updates editable profile fields for the authenticated user.',
+    description: 'Updates editable profile fields for the authenticated user.',
   })
   @ApiBody({
     schema: {

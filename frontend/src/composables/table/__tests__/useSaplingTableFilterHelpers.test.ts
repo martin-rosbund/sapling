@@ -135,7 +135,50 @@ describe('useSaplingTableFilterHelpers', () => {
       },
     })
   })
+
+  it('rehydrates ISO datetime url filters as datetime-local input values', () => {
+    const templates = [
+      createTemplate({
+        name: 'startDate',
+        type: 'datetime',
+      }),
+      createTemplate({
+        name: 'endDate',
+        type: 'datetime',
+      }),
+    ]
+    const monthStartUtc = '2026-06-30T22:00:00.000Z'
+    const nextMonthStartUtc = '2026-07-31T22:00:00.000Z'
+
+    expect(
+      extractColumnFiltersFromFilterQuery(templates, {
+        $and: [{ startDate: { $lt: nextMonthStartUtc } }, { endDate: { $gte: monthStartUtc } }],
+      }),
+    ).toEqual({
+      startDate: {
+        operator: 'lt',
+        value: formatLocalDateTimeInput(nextMonthStartUtc),
+      },
+      endDate: {
+        operator: 'gte',
+        value: formatLocalDateTimeInput(monthStartUtc),
+      },
+    })
+  })
 })
+
+function formatLocalDateTimeInput(value: string): string {
+  const date = new Date(value)
+
+  return (
+    [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, '0'),
+      String(date.getDate()).padStart(2, '0'),
+    ].join('-') +
+    `T${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+  )
+}
 
 function createTemplate(
   overrides: Partial<EntityTemplate> & Pick<EntityTemplate, 'name' | 'type'>,

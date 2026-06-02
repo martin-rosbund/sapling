@@ -126,6 +126,9 @@ describe('useSaplingTableColumnFilter', () => {
       limit: 1,
     })
     expect(wrapper.vm.filterSummary).toBe('Geschlossen')
+    expect(wrapper.vm.relationDisplayItems).toEqual([
+      { handle: 'closed', description: 'Geschlossen' },
+    ])
   })
 
   it('renders dynamic placeholder values in a more readable summary', () => {

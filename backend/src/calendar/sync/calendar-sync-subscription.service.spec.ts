@@ -92,17 +92,19 @@ describe('calendar sync subscription helpers', () => {
     };
     const em = {
       fork: () => em,
-      findOne: jest.fn(async () => subscription),
-      flush: jest.fn(async () => undefined),
+      findOne: jest.fn(() => Promise.resolve(subscription)),
+      flush: jest.fn(() => Promise.resolve(undefined)),
     };
     const azureCalendarService = {
       importEvents: jest
-        .fn<(...args: unknown[]) => Promise<{
-          imported: number;
-          created: number;
-          updated: number;
-          skipped: number;
-        }>>()
+        .fn<
+          (...args: unknown[]) => Promise<{
+            imported: number;
+            created: number;
+            updated: number;
+            skipped: number;
+          }>
+        >()
         .mockResolvedValue({
           imported: 2,
           created: 1,

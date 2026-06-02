@@ -2819,4 +2819,123 @@ describe('GenericService', () => {
 
     ENTITY_REGISTRY.splice(0, ENTITY_REGISTRY.length);
   });
+
+  it('builds table-friendly timeline drilldown filters for primary date fields', () => {
+    const templateService = {
+      getEntityTemplate: jest.fn(() => []),
+    };
+    const currentService = {
+      getEntityPermissions: jest.fn(),
+    };
+    const timelineService = new GenericTimelineService(
+      templateService as never,
+      currentService as never,
+    );
+    const monthWindow = timelineService.createTimelineMonthWindow(
+      new Date(2026, 6, 1),
+    );
+    const monthEndExclusive = new Date(monthWindow.end.getTime() + 1);
+    const month = timelineService.buildTimelineMonth(
+      [
+        {
+          descriptor: {
+            entityHandle: 'event',
+            template: [],
+            relationFields: [
+              createTemplateField({
+                name: 'creatorCompany',
+                isReference: true,
+                kind: 'm:1',
+                referenceName: 'company',
+                referencedPks: ['handle'],
+              }),
+            ],
+            relationCategory: null,
+            dateFields: {
+              startFieldName: 'startDate',
+              endFieldName: 'endDate',
+              startFallbackFieldName: 'createdAt',
+              endFallbackFieldName: 'updatedAt',
+            },
+            chipFields: [],
+            booleanFields: [
+              createTemplateField({
+                name: 'isAllDay',
+                type: 'boolean',
+              }),
+            ],
+            moneyField: null,
+          },
+          relationFilter: {
+            creatorCompany: 4,
+          },
+          records: [
+            {
+              handle: 101,
+              creatorCompany: 4,
+              startDate: new Date(2026, 6, 6, 9),
+              endDate: new Date(2026, 6, 11, 17),
+              isAllDay: true,
+              createdAt: new Date(2026, 0, 1),
+              updatedAt: new Date(2026, 0, 2),
+            },
+          ],
+        },
+      ],
+      monthWindow,
+    );
+
+    expect(month.entities[0]?.startFilter).toEqual({
+      $and: [
+        { creatorCompany: 4 },
+        {
+          startDate: {
+            $gte: monthWindow.start,
+            $lt: monthEndExclusive,
+          },
+        },
+      ],
+    });
+    expect(month.entities[0]?.endFilter).toEqual({
+      $and: [
+        { creatorCompany: 4 },
+        {
+          endDate: {
+            $gte: monthWindow.start,
+            $lt: monthEndExclusive,
+          },
+        },
+      ],
+    });
+    expect(month.entities[0]?.groups[0]?.items[0]?.drilldownFilter).toEqual({
+      $and: [
+        {
+          $and: [
+            { creatorCompany: 4 },
+            {
+              $and: [
+                {
+                  startDate: {
+                    $lt: monthEndExclusive,
+                  },
+                },
+                {
+                  endDate: {
+                    $gte: monthWindow.start,
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        { isAllDay: true },
+      ],
+    });
+    expect(
+      JSON.stringify(month.entities[0]?.groups[0]?.items[0]?.drilldownFilter),
+    ).not.toContain('createdAt');
+    expect(
+      JSON.stringify(month.entities[0]?.groups[0]?.items[0]?.drilldownFilter),
+    ).not.toContain('updatedAt');
+  });
 });

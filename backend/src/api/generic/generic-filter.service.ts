@@ -272,9 +272,7 @@ export class GenericFilterService {
   private convertDateStrings<T>(obj: T, template: EntityTemplateDto[] = []): T {
     if (Array.isArray(obj)) {
       return (obj as unknown[]).map((item) =>
-        this.isPlainRecord(item)
-          ? this.convertDateStrings(item, template)
-          : item,
+        this.convertDateStrings(item, template),
       ) as T;
     }
 
@@ -300,6 +298,8 @@ export class GenericFilterService {
 
       if (normalizedValue) {
         record[key] = normalizedValue;
+      } else if (Array.isArray(record[key])) {
+        record[key] = this.convertDateStrings(record[key], template);
       } else if (this.isPlainRecord(record[key])) {
         const operatorRecord = record[key];
 

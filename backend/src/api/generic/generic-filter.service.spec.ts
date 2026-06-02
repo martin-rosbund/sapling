@@ -79,6 +79,55 @@ describe('GenericFilterService', () => {
     expect(result.$or[0].createdAt?.$gte).toBe(lowerBound);
   });
 
+  it('normalizes date filter values inside nested logical arrays', () => {
+    const service = new GenericFilterService();
+    const template = [
+      createTemplateField({ name: 'startDate', type: 'date' }),
+      createTemplateField({ name: 'endDate', type: 'date' }),
+      createTemplateField({ name: 'createdAt', type: 'date' }),
+      createTemplateField({ name: 'updatedAt', type: 'date' }),
+    ];
+
+    const result = service.prepareReadCriteria(
+      {
+        $and: [
+          {
+            $or: [
+              { startDate: { $lte: '2026-07-31T21:59:59.999Z' } },
+              {
+                $and: [
+                  { startDate: null },
+                  { createdAt: { $lte: '2026-07-31T21:59:59.999Z' } },
+                ],
+              },
+            ],
+          },
+          {
+            $or: [
+              { endDate: { $gte: '2026-06-30T22:00:00.000Z' } },
+              {
+                $and: [
+                  { endDate: null },
+                  { updatedAt: { $gte: '2026-06-30T22:00:00.000Z' } },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      template,
+    ) as NestedTimelineFilter;
+
+    expect(result.$and[0]?.$or?.[0]?.startDate?.$lte).toBeInstanceOf(Date);
+    expect(result.$and[0]?.$or?.[1]?.$and?.[1]?.createdAt?.$lte).toBeInstanceOf(
+      Date,
+    );
+    expect(result.$and[1]?.$or?.[0]?.endDate?.$gte).toBeInstanceOf(Date);
+    expect(result.$and[1]?.$or?.[1]?.$and?.[1]?.updatedAt?.$gte).toBeInstanceOf(
+      Date,
+    );
+  });
+
   it('resolves supported current-user placeholders before read criteria normalization', () => {
     const service = new GenericFilterService();
 
@@ -136,3 +185,21 @@ describe('GenericFilterService', () => {
     expect(result.title).toBe('Keep me');
   });
 });
+
+type DateOperatorFilter = {
+  $gte?: unknown;
+  $lte?: unknown;
+};
+
+type NestedTimelineFilterNode = {
+  $and?: NestedTimelineFilterNode[];
+  $or?: NestedTimelineFilterNode[];
+  createdAt?: DateOperatorFilter;
+  endDate?: DateOperatorFilter;
+  startDate?: DateOperatorFilter;
+  updatedAt?: DateOperatorFilter;
+};
+
+type NestedTimelineFilter = {
+  $and: NestedTimelineFilterNode[];
+};

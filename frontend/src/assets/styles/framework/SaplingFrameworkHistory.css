@@ -68,6 +68,66 @@
   opacity: var(--sapling-opacity-soft);
 }
 
+.sapling-record-timeline-month-card__month-title,
+.sapling-record-timeline-month-card__entity-heading {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-record-timeline-month-card__month-title h2,
+.sapling-record-timeline-month-card__entity-heading h3 {
+  margin: 0;
+}
+
+.sapling-record-timeline-month-card__month-icon,
+.sapling-record-timeline-month-card__entity-icon {
+  display: inline-grid;
+  flex: 0 0 var(--sapling-icon-box-md);
+  width: var(--sapling-icon-box-md);
+  height: var(--sapling-icon-box-md);
+  place-items: center;
+  border: 1px solid var(--sapling-surface-border-accent);
+  border-radius: var(--sapling-radius-sm);
+  background: color-mix(in srgb, rgb(var(--v-theme-primary)) 14%, var(--sapling-surface-fill));
+  color: rgb(var(--v-theme-primary));
+  box-shadow: var(--sapling-inset-highlight);
+}
+
+.sapling-record-timeline-month-card__month-stats,
+.sapling-record-timeline-month-card__entity-insights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sapling-gap-sm);
+  align-items: center;
+}
+
+.sapling-record-timeline-month-card__metric,
+.sapling-record-timeline-month-card__insight {
+  display: inline-flex;
+  min-height: var(--sapling-control-size-sm);
+  align-items: center;
+  gap: var(--sapling-gap-xs);
+  padding: var(--sapling-space-xs) var(--sapling-space-sm-plus);
+  border: 1px solid var(--sapling-surface-border);
+  border-radius: var(--sapling-radius-pill);
+  background: color-mix(in srgb, var(--sapling-surface-fill-subtle) 90%, transparent);
+  color: rgba(var(--v-theme-on-surface), 0.78);
+  font-size: var(--sapling-text-label-size-sm);
+  line-height: 1.2;
+}
+
+.sapling-record-timeline-month-card__metric strong,
+.sapling-record-timeline-month-card__insight strong {
+  color: rgba(var(--v-theme-on-surface), 0.96);
+  font-size: 0.95rem;
+}
+
+.sapling-record-timeline-month-card__entity-insights {
+  margin-top: var(--sapling-space-md);
+}
+
 .sapling-history-card__stack {
   gap: var(--sapling-gap-xl);
   margin-top: var(--sapling-space-md);
@@ -114,6 +174,11 @@
 
 .sapling-history-card__chip-meta {
   opacity: var(--sapling-opacity-soft);
+}
+
+.sapling-record-timeline-month-card__chip-action-icon {
+  margin-left: auto;
+  opacity: 0.58;
 }
 
 .sapling-history-card__empty {
@@ -384,6 +449,17 @@
   .sapling-history-card__header {
     flex-direction: column;
     gap: var(--sapling-gap-sm-plus);
+  }
+
+  .sapling-record-timeline-month-card__month-stats,
+  .sapling-record-timeline-month-card__entity-actions,
+  .sapling-record-timeline-month-card__entity-insights {
+    width: 100%;
+  }
+
+  .sapling-record-timeline-month-card__metric,
+  .sapling-record-timeline-month-card__insight {
+    flex: 1 1 auto;
   }
 
   .sapling-history-card__section {

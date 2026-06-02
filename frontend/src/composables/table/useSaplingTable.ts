@@ -13,7 +13,10 @@ import type { SaplingGenericItem } from '@/entity/entity'
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants'
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
 import { useGenericStore } from '@/stores/genericStore'
-import { extractColumnFiltersFromFilterQuery } from '@/composables/table/useSaplingTableFilterHelpers'
+import {
+  extractColumnFiltersFromFilterQuery,
+  removeRestoredColumnFiltersFromFilterQuery,
+} from '@/composables/table/useSaplingTableFilterHelpers'
 import {
   buildTableFilter,
   buildTableOrderBy,
@@ -306,6 +309,8 @@ export function useSaplingTable(
   function restoreQueryFilterState(nextEntityTemplates: EntityTemplate[]) {
     const urlFilter = getUrlFilterParam()
     columnFilters.value = extractColumnFiltersFromFilterQuery(nextEntityTemplates, urlFilter)
+    parentFilter.value =
+      removeRestoredColumnFiltersFromFilterQuery(nextEntityTemplates, urlFilter) ?? {}
   }
 
   async function initializeEntityState(options?: InitializeEntityStateOptions) {

@@ -23,10 +23,7 @@ const DEFAULT_NOTIFICATION_PREFERENCES: SaplingNotificationPreferences = {
   quietHoursTo: '08:00',
 }
 
-function readBoolean(
-  key: keyof SaplingNotificationPreferences,
-  fallback: boolean,
-): boolean {
+function readBoolean(key: keyof SaplingNotificationPreferences, fallback: boolean): boolean {
   if (typeof window === 'undefined') {
     return fallback
   }
@@ -88,9 +85,7 @@ export function loadSaplingNotificationPreferences(): SaplingNotificationPrefere
   }
 }
 
-export function saveSaplingNotificationPreferences(
-  preferences: SaplingNotificationPreferences,
-) {
+export function saveSaplingNotificationPreferences(preferences: SaplingNotificationPreferences) {
   for (const [key, value] of Object.entries(preferences)) {
     writeValue(key as keyof SaplingNotificationPreferences, value)
   }

@@ -607,7 +607,7 @@ export class GenericTimelineService {
   ): object {
     return this.combineWhere(
       relationFilter,
-      this.buildTimelineSpanOverlapFilter(dateFields, monthWindow),
+      this.buildTimelinePrimarySpanOverlapFilter(dateFields, monthWindow),
     );
   }
 
@@ -621,39 +621,30 @@ export class GenericTimelineService {
       boundary === 'start'
         ? dateFields.startFieldName
         : dateFields.endFieldName;
-    const fallbackFieldName =
-      boundary === 'start'
-        ? dateFields.startFallbackFieldName
-        : dateFields.endFallbackFieldName;
-
     return this.combineWhere(
       relationFilter,
-      this.buildTimelineBoundaryMonthFilter(
-        fieldName,
-        fallbackFieldName,
-        monthWindow,
-      ),
+      this.buildTimelineBoundaryMonthFilter(fieldName, monthWindow),
     );
   }
 
-  private buildTimelineSpanOverlapFilter(
+  private buildTimelinePrimarySpanOverlapFilter(
     dateFields: TimelineDateFieldConfig,
     monthWindow: TimelineMonthWindow,
   ): object {
+    const monthEndExclusive = this.getMonthEndExclusive(monthWindow);
+
     return {
       $and: [
-        this.buildTimelineBoundaryComparisonFilter(
-          dateFields.startFieldName,
-          dateFields.startFallbackFieldName,
-          '$lte',
-          monthWindow.end,
-        ),
-        this.buildTimelineBoundaryComparisonFilter(
-          dateFields.endFieldName,
-          dateFields.endFallbackFieldName,
-          '$gte',
-          monthWindow.start,
-        ),
+        {
+          [dateFields.startFieldName]: {
+            $lt: monthEndExclusive,
+          },
+        },
+        {
+          [dateFields.endFieldName]: {
+            $gte: monthWindow.start,
+          },
+        },
       ],
     };
   }
@@ -683,39 +674,20 @@ export class GenericTimelineService {
 
   private buildTimelineBoundaryMonthFilter(
     fieldName: string,
-    fallbackFieldName: string,
     monthWindow: TimelineMonthWindow,
   ): object {
-    if (fieldName === fallbackFieldName) {
-      return {
-        [fieldName]: {
-          $gte: monthWindow.start,
-          $lte: monthWindow.end,
-        },
-      };
-    }
+    const monthEndExclusive = this.getMonthEndExclusive(monthWindow);
 
     return {
-      $or: [
-        {
-          [fieldName]: {
-            $gte: monthWindow.start,
-            $lte: monthWindow.end,
-          },
-        },
-        {
-          $and: [
-            { [fieldName]: null },
-            {
-              [fallbackFieldName]: {
-                $gte: monthWindow.start,
-                $lte: monthWindow.end,
-              },
-            },
-          ],
-        },
-      ],
+      [fieldName]: {
+        $gte: monthWindow.start,
+        $lt: monthEndExclusive,
+      },
     };
+  }
+
+  private getMonthEndExclusive(monthWindow: TimelineMonthWindow): Date {
+    return new Date(monthWindow.end.getTime() + 1);
   }
 
   private getTimelineDateSpan(

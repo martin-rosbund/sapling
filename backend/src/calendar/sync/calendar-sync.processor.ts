@@ -17,7 +17,9 @@ export class CalendarSyncProcessor extends WorkerHost {
         return;
       case 'import-calendar-for-subscription':
         if (typeof job.data.subscriptionHandle !== 'number') {
-          throw new Error('calendarSyncSubscription.subscriptionHandleRequired');
+          throw new Error(
+            'calendarSyncSubscription.subscriptionHandleRequired',
+          );
         }
         await this.service.executeSubscriptionImport(
           job.data.subscriptionHandle,

@@ -430,7 +430,9 @@
                         :key="action.key"
                         type="button"
                         class="sapling-account-dialog__preference-action"
-                        :class="{ 'sapling-account-dialog__preference-action--active': action.isActive }"
+                        :class="{
+                          'sapling-account-dialog__preference-action--active': action.isActive,
+                        }"
                         @click="action.handler()"
                       >
                         <span class="sapling-account-dialog__preference-icon">

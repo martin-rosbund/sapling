@@ -13,7 +13,10 @@ export function useSaplingSingleSelectField(props: {
   watch(
     () => props.modelValue,
     (val) => {
-      selectedItem.value = val ?? null
+      const nextValue = val ?? null
+      if (!areSameItem(selectedItem.value, nextValue)) {
+        selectedItem.value = nextValue
+      }
     },
   )
 
@@ -21,4 +24,16 @@ export function useSaplingSingleSelectField(props: {
     menuOpen,
     selectedItem,
   }
+}
+
+function areSameItem(left: SaplingGenericItem | null, right: SaplingGenericItem | null) {
+  if (left === right) {
+    return true
+  }
+
+  if (!left || !right) {
+    return false
+  }
+
+  return JSON.stringify(left) === JSON.stringify(right)
 }

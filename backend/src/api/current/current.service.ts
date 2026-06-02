@@ -236,7 +236,10 @@ export class CurrentService {
       throw new Error('login.userNotFound');
     }
 
-    const firstName = this.normalizeRequiredText(dto.firstName, person.firstName);
+    const firstName = this.normalizeRequiredText(
+      dto.firstName,
+      person.firstName,
+    );
     const lastName = this.normalizeRequiredText(dto.lastName, person.lastName);
 
     person.firstName = firstName;
@@ -459,7 +462,9 @@ export class CurrentService {
   ): CurrentSessionDto {
     return {
       id: this.maskSessionId(record.handle),
-      isCurrent: Boolean(currentSessionId && record.handle === currentSessionId),
+      isCurrent: Boolean(
+        currentSessionId && record.handle === currentSessionId,
+      ),
       deviceLabel: 'Browser-Sitzung',
       createdAt: record.createdAt ?? null,
       lastActivityAt: record.updatedAt ?? record.createdAt ?? null,
@@ -486,13 +491,15 @@ export class CurrentService {
   private parseSessionPayload(payload: unknown): StoredSessionPayload | null {
     try {
       const parsedPayload =
-        typeof payload === 'string' ? (JSON.parse(payload) as unknown) : payload;
+        typeof payload === 'string'
+          ? (JSON.parse(payload) as unknown)
+          : payload;
 
       if (!parsedPayload || typeof parsedPayload !== 'object') {
         return null;
       }
 
-      return parsedPayload as StoredSessionPayload;
+      return parsedPayload;
     } catch {
       return null;
     }

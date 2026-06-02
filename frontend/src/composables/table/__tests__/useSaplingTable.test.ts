@@ -86,6 +86,27 @@ const entityStates = reactive<Record<string, ReturnType<typeof createEntityState
       referencedPks: ['handle'],
     }),
   ]),
+  event: createEntityState([
+    createTemplate({
+      name: 'creatorCompany',
+      type: 'string',
+      kind: 'm:1',
+      referenceName: 'company',
+      referencedPks: ['handle'],
+    }),
+    createTemplate({
+      name: 'startDate',
+      type: 'datetime',
+    }),
+    createTemplate({
+      name: 'endDate',
+      type: 'datetime',
+    }),
+    createTemplate({
+      name: 'isAllDay',
+      type: 'boolean',
+    }),
+  ]),
 })
 
 function createTestHost(entityHandle: Ref<string>) {
@@ -455,6 +476,85 @@ describe('useSaplingTable', () => {
       }),
     )
   })
+
+  it('restores timeline drilldown date filters into table header filters', async () => {
+    const monthStartUtc = '2026-06-30T22:00:00.000Z'
+    const nextMonthStartUtc = '2026-07-31T22:00:00.000Z'
+    const monthStartInputValue = formatLocalDateTimeInput(monthStartUtc)
+    const nextMonthStartInputValue = formatLocalDateTimeInput(nextMonthStartUtc)
+
+    loadGenericMock.mockResolvedValue(undefined)
+    routeState.query = {
+      filter: JSON.stringify({
+        $and: [
+          {
+            creatorCompany: 4,
+          },
+          {
+            $and: [
+              {
+                startDate: { $lt: nextMonthStartUtc },
+              },
+              {
+                endDate: { $gte: monthStartUtc },
+              },
+            ],
+          },
+          {
+            isAllDay: true,
+          },
+        ],
+      }),
+    }
+    apiFindMock.mockResolvedValue({
+      data: [{ handle: 7, title: 'Vacation in July' }],
+      meta: { total: 1 },
+    })
+
+    const wrapper = mountQueryEnabledTestHost(ref('event'))
+    await flushPromises()
+
+    expect(wrapper.vm.columnFilters).toEqual({
+      creatorCompany: {
+        operator: 'eq',
+        value: '',
+        relationItems: [{ handle: 4 }],
+      },
+      isAllDay: {
+        operator: 'eq',
+        value: 'true',
+      },
+      startDate: {
+        operator: 'lt',
+        value: nextMonthStartInputValue,
+      },
+      endDate: {
+        operator: 'gte',
+        value: monthStartInputValue,
+      },
+    })
+    expect(apiFindMock).toHaveBeenCalledWith(
+      'event',
+      expect.objectContaining({
+        filter: {
+          $and: [
+            {
+              creatorCompany: { handle: 4 },
+            },
+            {
+              startDate: { $lt: nextMonthStartInputValue },
+            },
+            {
+              endDate: { $gte: monthStartInputValue },
+            },
+            {
+              isAllDay: { $eq: true },
+            },
+          ],
+        },
+      }),
+    )
+  })
 })
 
 function createEntityState(entityTemplates: EntityTemplate[] = []) {
@@ -471,6 +571,19 @@ function createEntityState(entityTemplates: EntityTemplate[] = []) {
 
 function getMockedEntityState(key: string) {
   return entityStates[key] ?? createEntityState()
+}
+
+function formatLocalDateTimeInput(value: string): string {
+  const date = new Date(value)
+
+  return (
+    [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, '0'),
+      String(date.getDate()).padStart(2, '0'),
+    ].join('-') +
+    `T${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+  )
 }
 
 function createTemplate(

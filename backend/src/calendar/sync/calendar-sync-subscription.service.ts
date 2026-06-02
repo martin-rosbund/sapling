@@ -184,7 +184,7 @@ export class CalendarSyncSubscriptionService implements OnModuleInit {
         continue;
       }
 
-      if (!this.isAzureSyncAvailable(subscription.person as PersonItem)) {
+      if (!this.isAzureSyncAvailable(subscription.person)) {
         continue;
       }
 

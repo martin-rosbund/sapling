@@ -121,6 +121,14 @@ export function useSaplingTableColumnFilter(
   const rangeStartValue = computed(() => activeFilter.value.rangeStart ?? '')
   const rangeEndValue = computed(() => activeFilter.value.rangeEnd ?? '')
   const relationItems = computed(() => activeFilter.value.relationItems ?? [])
+  const relationDisplayItems = computed(() =>
+    relationItems.value.map((item) => {
+      const relationLookupKey = getRelationLookupKey(item, referenceIdentifierKeys.value)
+      return relationLookupKey != null
+        ? (resolvedRelationItems.value[relationLookupKey] ?? item)
+        : item
+    }),
+  )
   const referenceIdentifierKeys = computed(() => {
     if (normalizedColumn.value.referencedPks?.length) {
       return normalizedColumn.value.referencedPks
@@ -567,6 +575,7 @@ export function useSaplingTableColumnFilter(
     rangeStartPlaceholder,
     rangeStartValue,
     referenceEntityHandle,
+    relationDisplayItems,
     relationItems,
     singleValue,
     singleValueLabel,

@@ -126,7 +126,10 @@ const { visibleIncomingInboxPreview, openIncomingInboxPreview } =
   useSaplingHeaderInboxPreview(incomingInboxPreview)
 
 onMounted(() => {
-  window.addEventListener(SAPLING_OPEN_ACCOUNT_DIALOG_EVENT, handleOpenAccountEvent as EventListener)
+  window.addEventListener(
+    SAPLING_OPEN_ACCOUNT_DIALOG_EVENT,
+    handleOpenAccountEvent as EventListener,
+  )
 })
 
 onUnmounted(() => {

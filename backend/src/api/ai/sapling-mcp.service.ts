@@ -587,9 +587,13 @@ export class SaplingMcpService {
       }
     }
 
-    if (Array.isArray(metadata.usageHints)) {
+    const usageHints = metadata.usageHints;
+    if (Array.isArray(usageHints)) {
+      const normalizedUsageHints = usageHints.filter(
+        (hint): hint is unknown => typeof hint !== 'undefined',
+      );
       metadata.usageHints = [
-        ...metadata.usageHints,
+        ...normalizedUsageHints,
         ...SAPLING_MCP_USAGE_HINTS.userFacingValues,
       ];
     }

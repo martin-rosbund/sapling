@@ -5,9 +5,24 @@
     <div
       class="sapling-row-between-md sapling-row-wrap sapling-history-card__header sapling-record-timeline-month-card__header"
     >
-      <div>
-        <h2>{{ month.label }}</h2>
-        <p>{{ month.entities.length }} {{ t('timeline.sections') }}</p>
+      <div class="sapling-record-timeline-month-card__month-title">
+        <span class="sapling-record-timeline-month-card__month-icon">
+          <v-icon size="20">mdi-calendar-month-outline</v-icon>
+        </span>
+        <div>
+          <h2>{{ month.label }}</h2>
+        </div>
+      </div>
+
+      <div class="sapling-record-timeline-month-card__month-stats">
+        <span class="sapling-record-timeline-month-card__metric">
+          <strong>{{ monthRecordCount(month) }}</strong>
+          <span>{{ t('timeline.records') }}</span>
+        </span>
+        <span class="sapling-record-timeline-month-card__metric">
+          <strong>{{ month.entities.length }}</strong>
+          <span>{{ t('timeline.sections') }}</span>
+        </span>
       </div>
     </div>
 
@@ -22,9 +37,14 @@
         <div
           class="sapling-row-between-md sapling-row-wrap sapling-history-card__header sapling-record-timeline-month-card__entity-header"
         >
-          <div>
-            <h3>{{ summaryHeading(summary) }}</h3>
-            <p>{{ summaryDescription(summary) }}</p>
+          <div class="sapling-record-timeline-month-card__entity-heading">
+            <span class="sapling-record-timeline-month-card__entity-icon">
+              <v-icon size="20">{{ summaryIcon(summary) }}</v-icon>
+            </span>
+            <div>
+              <h3>{{ summaryHeading(summary) }}</h3>
+              <p>{{ summaryDescription(summary) }}</p>
+            </div>
           </div>
 
           <div
@@ -32,21 +52,40 @@
           >
             <v-btn
               v-if="summary.startCount > 0"
-              variant="text"
+              variant="tonal"
               color="primary"
+              size="small"
+              prepend-icon="mdi-ray-start-arrow"
               @click="emit('drilldown', summary.entityHandle, summary.startFilter)"
             >
               {{ fieldLabel(summary.entityHandle, summary.startField) }} {{ summary.startCount }}
             </v-btn>
             <v-btn
               v-if="summary.endCount > 0"
-              variant="text"
+              variant="tonal"
               color="primary"
+              size="small"
+              prepend-icon="mdi-ray-end-arrow"
               @click="emit('drilldown', summary.entityHandle, summary.endFilter)"
             >
               {{ fieldLabel(summary.entityHandle, summary.endField) }} {{ summary.endCount }}
             </v-btn>
           </div>
+        </div>
+
+        <div class="sapling-record-timeline-month-card__entity-insights">
+          <span class="sapling-record-timeline-month-card__insight">
+            <v-icon size="15">mdi-format-list-numbered</v-icon>
+            <strong>{{ summary.count }}</strong>
+            <span>{{ t('timeline.records') }}</span>
+          </span>
+          <span
+            v-if="summaryAmountTotal(summary) != null"
+            class="sapling-record-timeline-month-card__insight"
+          >
+            <v-icon size="15">mdi-cash-multiple</v-icon>
+            <strong>{{ formatMoney(summaryAmountTotal(summary) ?? 0) }}</strong>
+          </span>
         </div>
 
         <div
@@ -72,6 +111,7 @@
                 :key="`${group.field}-${item.key}`"
                 class="sapling-soft-chip sapling-soft-chip--button sapling-history-card__chip-button sapling-record-timeline-month-card__chip-button"
                 type="button"
+                :title="`${groupLabel(summary.entityHandle, group.field, group.label)}: ${item.label}`"
                 @click="emit('drilldown', summary.entityHandle, item.drilldownFilter)"
               >
                 <span
@@ -91,6 +131,9 @@
                 >
                   {{ formatMoney(item.amount) }}
                 </span>
+                <v-icon size="13" class="sapling-record-timeline-month-card__chip-action-icon">
+                  mdi-filter-variant
+                </v-icon>
               </button>
             </div>
           </section>
@@ -109,6 +152,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import { useGenericStore } from '@/stores/genericStore'
 import type { TimelineEntitySummary, TimelineMonth } from '@/entity/structure'
 
 defineProps<{
@@ -120,6 +164,7 @@ const emit = defineEmits<{
 }>()
 
 const { t, locale } = useI18n()
+const genericStore = useGenericStore()
 
 function summaryLabel(label: string, entityHandle: string) {
   const translationKey = `navigation.${entityHandle}`
@@ -134,7 +179,7 @@ function summaryHeading(summary: TimelineEntitySummary) {
     return baseLabel
   }
 
-  return `${baseLabel} · ${fieldLabel(summary.entityHandle, summary.relationFields[0])}`
+  return `${baseLabel} - ${fieldLabel(summary.entityHandle, summary.relationFields[0])}`
 }
 
 function groupLabel(entityHandle: string, fieldName: string, fallback: string) {
@@ -158,22 +203,40 @@ function formatFieldLabel(value: string) {
 }
 
 function summaryDescription(summary: TimelineEntitySummary) {
-  const datasetWord = t('timeline.records')
-
   if (summary.relationFields.length === 1) {
-    return `${summary.count} ${datasetWord} · ${t('timeline.referenceField')}: ${fieldLabel(summary.entityHandle, summary.relationFields[0])}`
+    return `${t('timeline.referenceField')}: ${fieldLabel(summary.entityHandle, summary.relationFields[0])}`
   }
 
   if (summary.relationFields.length > 1) {
-    return `${summary.count} ${datasetWord} · ${summary.relationFields.map((field) => fieldLabel(summary.entityHandle, field)).join(', ')}`
+    return summary.relationFields.map((field) => fieldLabel(summary.entityHandle, field)).join(', ')
   }
 
-  return `${summary.count} ${datasetWord}`
+  return t('timeline.records')
 }
 
 function formatMoney(value: number) {
   const currentLocale = locale.value === 'de' ? 'de-DE' : 'en-US'
   const currency = locale.value === 'de' ? 'EUR' : 'USD'
   return value.toLocaleString(currentLocale, { style: 'currency', currency })
+}
+
+function monthRecordCount(month: TimelineMonth) {
+  return month.entities.reduce((total, summary) => total + summary.count, 0)
+}
+
+function summaryIcon(summary: TimelineEntitySummary) {
+  return genericStore.getState(summary.entityHandle).entity?.icon || 'mdi-shape-outline'
+}
+
+function summaryAmountTotal(summary: TimelineEntitySummary) {
+  const moneyGroup = summary.groups.find((group) =>
+    group.items.some((item) => typeof item.amount === 'number'),
+  )
+
+  if (!moneyGroup) {
+    return null
+  }
+
+  return moneyGroup.items.reduce((total, item) => total + (item.amount ?? 0), 0)
 }
 </script>

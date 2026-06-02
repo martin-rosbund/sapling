@@ -17,6 +17,14 @@ vi.mock('@/stores/currentPersonStore', () => ({
   useCurrentPersonStore: () => mockCurrentPersonStore,
 }))
 
+vi.mock('@/layouts/SaplingAuthLayout.vue', () => ({
+  default: {},
+}))
+
+vi.mock('@/layouts/SaplingPublicLayout.vue', () => ({
+  default: {},
+}))
+
 vi.mock('@/views/HomeView.vue', () => ({
   default: {},
 }))

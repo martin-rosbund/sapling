@@ -13,8 +13,8 @@
           <SaplingDialogHero
             v-if="isLoading"
             loading
-            :loading-stats-count="2"
-            :stats-columns="2"
+            :loading-stats-count="4"
+            :stats-columns="4"
             stats-layout="compact"
           />
           <SaplingDialogHero
@@ -22,9 +22,24 @@
             :eyebrow="t('timeline.title')"
             :title="anchor?.label"
             :stats="heroStats"
-            :stats-columns="2"
+            :stats-columns="4"
             stats-layout="compact"
           >
+            <template #title-trailing>
+              <v-tooltip location="bottom">
+                <template #activator="{ props: tooltipProps }">
+                  <v-btn
+                    v-bind="tooltipProps"
+                    icon="mdi-open-in-new"
+                    variant="text"
+                    size="small"
+                    :aria-label="t('timeline.openRecord')"
+                    @click="openMainTable"
+                  />
+                </template>
+                <span>{{ t('timeline.openRecord') }}</span>
+              </v-tooltip>
+            </template>
           </SaplingDialogHero>
         </template>
 
@@ -234,6 +249,7 @@ const {
   isLoading,
   isLoadingMore,
   loadMoreTriggerRef,
+  openMainTable,
   openDrilldown,
 } = useSaplingRecordTimeline({
   entityHandle,
@@ -256,9 +272,33 @@ const timelineSectionCount = computed(() =>
   months.value.reduce((total, month) => total + month.entities.length, 0),
 )
 
+const timelineRecordCount = computed(() =>
+  months.value.reduce(
+    (total, month) =>
+      total + month.entities.reduce((monthTotal, summary) => monthTotal + summary.count, 0),
+    0,
+  ),
+)
+
+const timelineRelationCount = computed(() => {
+  const relationKeys = new Set<string>()
+
+  months.value.forEach((month) => {
+    month.entities.forEach((summary) => {
+      summary.relationFields.forEach((fieldName) => {
+        relationKeys.add(`${summary.entityHandle}.${fieldName}`)
+      })
+    })
+  })
+
+  return relationKeys.size
+})
+
 const heroStats = computed(() => [
   { label: t('timeline.month'), value: months.value.length },
   { label: t('timeline.sections'), value: timelineSectionCount.value },
+  { label: t('timeline.records'), value: timelineRecordCount.value },
+  { label: t('timeline.referenceField'), value: timelineRelationCount.value },
 ])
 
 const summaryCards = computed(() => {

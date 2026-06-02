@@ -14,7 +14,10 @@ export function useSaplingSelectField(props: {
     () => props.modelValue,
     (val) => {
       const nextValue = val ?? []
-      if (!areSameItemCollections(selectedItems.value, nextValue)) {
+      if (
+        !areSameItemCollections(selectedItems.value, nextValue) ||
+        !areSameItemSnapshots(selectedItems.value, nextValue)
+      ) {
         selectedItems.value = nextValue
       }
     },
@@ -32,6 +35,14 @@ function areSameItemCollections(left: SaplingGenericItem[], right: SaplingGeneri
   }
 
   return left.every((item, index) => getItemIdentity(item) === getItemIdentity(right[index]))
+}
+
+function areSameItemSnapshots(left: SaplingGenericItem[], right: SaplingGenericItem[]) {
+  if (left.length !== right.length) {
+    return false
+  }
+
+  return left.every((item, index) => JSON.stringify(item) === JSON.stringify(right[index]))
 }
 
 function getItemIdentity(item?: SaplingGenericItem) {

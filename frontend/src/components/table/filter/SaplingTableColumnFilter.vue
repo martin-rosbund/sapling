@@ -96,7 +96,7 @@
           <SaplingTableFilterRelationValue
             v-else-if="filterVariant === 'relation'"
             :entity-handle="referenceEntityHandle"
-            :model-value="relationItems"
+            :model-value="relationDisplayItems"
             @update:model-value="updateRelationItems"
           />
 
@@ -190,7 +190,7 @@ const {
   rangeStartPlaceholder,
   rangeStartValue,
   referenceEntityHandle,
-  relationItems,
+  relationDisplayItems,
   singleValue,
   singleValueLabel,
   updateOperator,

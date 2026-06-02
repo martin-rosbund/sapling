@@ -148,12 +148,8 @@ export function useSaplingAccount() {
 
   const showPasswordChange = ref(false)
   const { pushMessage } = useSaplingMessageCenter()
-  const {
-    currentLanguage,
-    languageOptions,
-    appearanceActions,
-    setLanguage,
-  } = useSaplingPreferences()
+  const { currentLanguage, languageOptions, appearanceActions, setLanguage } =
+    useSaplingPreferences()
   const currentPersonStore = useCurrentPersonStore()
   const workHours = ref<WorkHourWeekItem | null>(null)
   const profileForm = ref<ProfileForm>({
@@ -269,11 +265,19 @@ export function useSaplingAccount() {
 
   const accountTabs = computed<AccountTabItem[]>(() => [
     { key: 'profile', icon: 'mdi-account-outline', label: i18n.global.t('account.profile') },
-    { key: 'notifications', icon: 'mdi-bell-outline', label: i18n.global.t('account.notifications') },
+    {
+      key: 'notifications',
+      icon: 'mdi-bell-outline',
+      label: i18n.global.t('account.notifications'),
+    },
     { key: 'sync', icon: 'mdi-sync', label: i18n.global.t('account.synchronizations') },
     { key: 'security', icon: 'mdi-shield-key-outline', label: i18n.global.t('account.security') },
     { key: 'sessions', icon: 'mdi-devices', label: i18n.global.t('account.sessions') },
-    { key: 'preferences', icon: 'mdi-palette-outline', label: i18n.global.t('account.preferences') },
+    {
+      key: 'preferences',
+      icon: 'mdi-palette-outline',
+      label: i18n.global.t('account.preferences'),
+    },
     { key: 'songbird', icon: 'mdi-creation-outline', label: i18n.global.t('account.songbird') },
   ])
 
@@ -291,8 +295,7 @@ export function useSaplingAccount() {
   const transcriptionModelOptions = computed(() =>
     mapModelOptions(
       transcriptionModelConfigs.value.filter(
-        (item) =>
-          getModelProviderHandle(item) === aiPreferences.value.transcriptionProviderHandle,
+        (item) => getModelProviderHandle(item) === aiPreferences.value.transcriptionProviderHandle,
       ),
     ),
   )
@@ -426,8 +429,7 @@ export function useSaplingAccount() {
    * Loads the current user's automatic Outlook import settings.
    */
   async function loadCalendarSync() {
-    calendarSync.value =
-      await ApiService.findOne<CalendarSyncSubscription>('current/calendarSync')
+    calendarSync.value = await ApiService.findOne<CalendarSyncSubscription>('current/calendarSync')
   }
 
   /**
@@ -441,11 +443,14 @@ export function useSaplingAccount() {
     isCalendarSyncSaving.value = true
 
     try {
-      calendarSync.value = await ApiService.patch<CalendarSyncSubscription>('current/calendarSync', {
-        isActive: calendarSync.value.isActive,
-        syncRange: calendarSync.value.syncRange,
-        intervalMinutes: calendarSync.value.intervalMinutes,
-      })
+      calendarSync.value = await ApiService.patch<CalendarSyncSubscription>(
+        'current/calendarSync',
+        {
+          isActive: calendarSync.value.isActive,
+          syncRange: calendarSync.value.syncRange,
+          intervalMinutes: calendarSync.value.intervalMinutes,
+        },
+      )
       pushMessage('success', 'calendarSyncSubscription.saveSuccess', '', 'calendarSyncSubscription')
     } finally {
       isCalendarSyncSaving.value = false
@@ -532,7 +537,8 @@ export function useSaplingAccount() {
   }
 
   function updateAiModel(value: unknown) {
-    const model = aiModelConfigs.value.find((item) => item.handle === normalizeHandle(value)) ?? null
+    const model =
+      aiModelConfigs.value.find((item) => item.handle === normalizeHandle(value)) ?? null
 
     aiPreferences.value.chatProviderHandle = getModelProviderHandle(model)
     aiPreferences.value.chatModelHandle = model?.handle ?? null
@@ -646,9 +652,7 @@ export function useSaplingAccount() {
     }
   }
 
-  function mapProviderOptions(
-    providers: AiProviderTypeItem[],
-  ): AccountSelectOption<string>[] {
+  function mapProviderOptions(providers: AiProviderTypeItem[]): AccountSelectOption<string>[] {
     return providers.map((provider) => ({
       title: provider.title || provider.handle || '',
       value: provider.handle || '',
