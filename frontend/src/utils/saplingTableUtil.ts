@@ -98,6 +98,13 @@ function getTemplateConfiguredOrder(
   return normalizeTemplateOrder(template.formConfig?.[key]) ?? normalizeTemplateOrder(template[key])
 }
 
+function getTemplateConfiguredGroupOrder(template: Partial<EntityTemplate>): number | null {
+  return (
+    normalizeTemplateOrder(template.formConfig?.groupOrder) ??
+    normalizeTemplateOrder(template.formGroupOrder)
+  )
+}
+
 export function isSupportedTableTemplate(
   template: EntityTemplate,
   permissions: AccumulatedPermission[] = [],
@@ -129,9 +136,14 @@ export function sortTableHeaders<T extends Partial<EntityTemplate>>(headers: T[]
     .map((header, index) => ({
       header,
       index,
+      groupOrder: getTemplateConfiguredGroupOrder(header) ?? 0,
       order: getTableHeaderOrder(header, index),
     }))
     .sort((left, right) => {
+      if (left.groupOrder !== right.groupOrder) {
+        return left.groupOrder - right.groupOrder
+      }
+
       if (left.order === right.order) {
         return left.index - right.index
       }

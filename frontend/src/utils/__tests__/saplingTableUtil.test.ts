@@ -146,6 +146,37 @@ describe('saplingTableUtil', () => {
     ).toEqual(['title', 'longNotes'])
   })
 
+  it('keeps early entity groups ahead of later groups when sorting table columns', () => {
+    const templates = [
+      createTemplate({
+        name: 'contract',
+        formGroupOrder: 450,
+        tableOrder: 50,
+      }),
+      createTemplate({
+        name: 'number',
+        formGroupOrder: 100,
+        tableOrder: 100,
+      }),
+      createTemplate({
+        name: 'status',
+        formGroupOrder: 100,
+        tableOrder: 400,
+      }),
+      createTemplate({
+        name: 'slaPolicy',
+        formGroupOrder: 500,
+        tableOrder: 100,
+      }),
+    ]
+
+    expect(
+      getTableHeaders(templates, { handle: 'ticket' } as never, (key) => key).map(
+        (header) => header.key,
+      ),
+    ).toEqual(['number', 'status', 'contract', 'slaPolicy'])
+  })
+
   it('builds mobile headers from mobile visibility independently of table visibility', () => {
     const templates = [
       createTemplate({ name: 'summary', tableOrder: 20 }),
