@@ -32,6 +32,7 @@ const vuetifyComponentImports = [
   'VCounter',
   'VDataIterator',
   'VDataTable',
+  'VDateInput',
   'VDatePicker',
   'VDefaultsProvider',
   'VDialog',

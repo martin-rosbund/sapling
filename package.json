@@ -27,6 +27,6 @@
 		"format": "npm run format:backend && npm run format:frontend"
 	},
 	"devDependencies": {
-		"concurrently": "^9.2.1"
+		"concurrently": "^10.0.3"
 	}
 }

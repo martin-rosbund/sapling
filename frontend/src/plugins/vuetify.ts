@@ -1,6 +1,6 @@
 // Styles
 import '@mdi/font/css/materialdesignicons.css'
-import { VDateInput } from 'vuetify/labs/VDateInput'
+import { VDateInput } from 'vuetify/components'
 import 'vuetify/styles'
 import { de, en } from 'vuetify/locale'
 
@@ -8,7 +8,7 @@ import { de, en } from 'vuetify/locale'
 import { createVuetify } from 'vuetify'
 
 // Components and directives are auto-imported on demand by vite-plugin-vuetify
-// (see vite.config.ts). Only labs components must be registered explicitly.
+// (see vite.config.ts). VDateInput is registered here for global defaults.
 export default createVuetify({
   components: {
     VDateInput,
