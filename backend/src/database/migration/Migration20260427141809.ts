@@ -2,7 +2,7 @@ import { Migration } from '@mikro-orm/migrations';
 
 export class Migration20260427141809 extends Migration {
   override up(): void | Promise<void> {
-    this.addSql(`CREATE EXTENSION vector;`);
+    this.addSql(`CREATE EXTENSION IF NOT EXISTS vector;`);
     this.addSql(
       `create table "address_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-map-marker-outline', "color" varchar(32) not null default '#546E7A', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`,
     );
