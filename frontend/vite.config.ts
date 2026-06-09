@@ -195,7 +195,10 @@ export default defineConfig(({ mode }) => {
       allowedHosts: env.VITE_ALLOWED_HOSTS ? env.VITE_ALLOWED_HOSTS.split(',').map(String) : [],
     },
     optimizeDeps: {
-      include: vuetifyComponentImports,
+      // Vuetify's Vite plugin resolves these component entrypoints itself.
+      // Pre-bundling them can leave stale hashed files in node_modules/.vite
+      // during dev, for example VAutocomplete-*.js after dependency changes.
+      exclude: vuetifyComponentImports,
     },
     resolve: {
       alias: {

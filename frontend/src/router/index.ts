@@ -53,6 +53,11 @@ const router = createRouter({
           name: 'salesPipeline',
           component: () => import('@/views/SalesPipelineView.vue'),
         },
+        {
+          path: 'crm-workspace',
+          name: 'crmWorkspace',
+          component: () => import('@/views/CrmWorkspaceView.vue'),
+        },
         // Note view (lazy loaded)
         { path: 'note', name: 'note', component: () => import('@/views/NoteView.vue') },
         // Playground view (lazy loaded)
