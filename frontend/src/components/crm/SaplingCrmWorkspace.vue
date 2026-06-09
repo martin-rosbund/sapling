@@ -70,6 +70,15 @@
           prepend-inner-icon="mdi-magnify"
           :label="t('global.search')"
         />
+        <v-autocomplete
+          v-model="selectedResponsibleHandle"
+          density="comfortable"
+          hide-details
+          clearable
+          prepend-inner-icon="mdi-account-tie-outline"
+          :items="responsiblePersonOptions"
+          :label="t('crmWorkspace.responsiblePerson')"
+        />
         <v-select
           v-model="contactThresholdDays"
           density="comfortable"
@@ -110,17 +119,19 @@
           </header>
 
           <div class="sapling-crm-workspace__stage-grid">
-            <article
+            <button
               v-for="stage in salesStageBreakdown"
               :key="stage.key"
               class="sapling-crm-stage"
+              type="button"
               :style="{ '--sapling-crm-stage-color': stage.color }"
+              @click="openOpportunityStage(stage)"
             >
               <div class="sapling-crm-stage__bar" />
               <span>{{ stage.label }}</span>
               <strong>{{ stage.count }}</strong>
               <small>{{ formatMoney(stage.value) }}</small>
-            </article>
+            </button>
           </div>
 
           <SaplingCrmWorkspaceList
@@ -156,6 +167,10 @@
             >
               <span class="sapling-crm-account-card__title">{{ company.title }}</span>
               <span class="sapling-crm-account-card__meta">{{ company.subtitle }}</span>
+              <span v-if="company.owner" class="sapling-crm-account-card__owner">
+                <v-icon icon="mdi-account-tie-outline" size="14" />
+                {{ company.owner }}
+              </span>
               <span class="sapling-crm-account-card__footer">
                 <span class="sapling-crm-account-card__badge">
                   {{ company.badge }}
@@ -222,11 +237,17 @@
           </header>
 
           <div class="sapling-crm-signal-list">
-            <article v-for="signal in signals" :key="signal.key" class="sapling-crm-signal">
+            <button
+              v-for="signal in signals"
+              :key="signal.key"
+              class="sapling-crm-signal"
+              type="button"
+              @click="openSignal(signal)"
+            >
               <v-icon :icon="signal.icon" size="18" />
               <span>{{ signal.label }}</span>
               <strong>{{ signal.value }}</strong>
-            </article>
+            </button>
           </div>
         </section>
       </aside>
@@ -251,10 +272,12 @@ import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
 import SaplingCrmWorkspaceList, {
   type CrmWorkspaceItem,
 } from '@/components/crm/SaplingCrmWorkspaceList.vue'
+import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { useGenericStore } from '@/stores/genericStore'
 import { pushAppRoute } from '@/utils/routerNavigation'
 
 type CockpitKey = 'sales' | 'account' | 'customerSuccess'
+type SignalKey = 'noActivity' | 'contactGaps' | 'risks'
 
 interface RelationHandle {
   handle?: string | number | null
@@ -315,6 +338,13 @@ interface StageBreakdown {
   color: string
 }
 
+interface CrmSignal {
+  key: SignalKey
+  icon: string
+  label: string
+  value: string
+}
+
 const COMPANY_ENTITY = 'company'
 const PERSON_ENTITY = 'person'
 const OPPORTUNITY_ENTITY = 'salesOpportunity'
@@ -360,10 +390,12 @@ const PHONE_CALL_RELATIONS = ['entity', 'person']
 const { t, d, n, locale } = useI18n()
 const router = useRouter()
 const genericStore = useGenericStore()
+const currentPersonStore = useCurrentPersonStore()
 
 const activeCockpit = ref<CockpitKey>('sales')
 const contactThresholdDays = ref(45)
 const search = ref('')
+const selectedResponsibleHandle = ref<string | null>(null)
 const companies = ref<CrmCompany[]>([])
 const people = ref<CrmPerson[]>([])
 const opportunities = ref<CrmOpportunity[]>([])
@@ -378,6 +410,15 @@ const contactThresholdOptions = computed(() => [
   { title: t('crmWorkspace.days60'), value: 60 },
   { title: t('crmWorkspace.days90'), value: 90 },
 ])
+const responsiblePersonOptions = computed(() =>
+  people.value
+    .filter((person) => person.handle != null)
+    .map((person) => ({
+      title: personLabel(person),
+      value: String(person.handle),
+    }))
+    .sort((left, right) => left.title.localeCompare(right.title)),
+)
 
 const isBootstrapping = computed(() => isLoading.value && !hasLoadedOnce.value)
 const normalizedSearch = computed(() => normalizeText(search.value))
@@ -395,7 +436,16 @@ const personByHandle = computed(
 )
 
 const filteredCompanies = computed(() =>
-  companies.value.filter((company) => matchesSearch(company.name, relationLabel(company.segment))),
+  companies.value.filter(
+    (company) =>
+      matchesSearch(
+        company.name,
+        relationLabel(company.segment),
+        relationLabel(company.industry),
+        accountOwnerLabel(company),
+        csOwnerLabel(company),
+      ) && matchesCompanyResponsibleFilter(company),
+  ),
 )
 const openOpportunities = computed(() => opportunities.value.filter(isOpportunityOpen))
 const filteredOpenOpportunities = computed(() =>
@@ -405,7 +455,7 @@ const filteredOpenOpportunities = computed(() =>
       opportunity.nextStep,
       companyLabel(opportunity.assigneeCompany ?? opportunity.creatorCompany),
       personLabel(opportunity.assigneePerson ?? opportunity.creatorPerson),
-    ),
+    ) && matchesOpportunityResponsibleFilter(opportunity),
   ),
 )
 const opportunityFutureActivity = computed(() => buildFutureActivityByOpportunity())
@@ -450,7 +500,8 @@ const customersWithoutContactItems = computed<CrmWorkspaceItem[]>(() =>
     entity: COMPANY_ENTITY,
     handle: company.handle,
     title: company.name,
-    subtitle: accountOwnerLabel(company),
+    subtitle: relationLabel(company.segment) || relationLabel(company.industry),
+    owner: accountOwnerLabel(company),
     value: Number.isFinite(days) ? t('crmWorkspace.daysAgo', { count: days }) : t('crmWorkspace.noContact'),
     badge: relationLabel(company.segment),
     tone: days >= 90 ? 'error' : 'warning',
@@ -465,6 +516,7 @@ const opportunitiesWithoutNextActivityItems = computed<CrmWorkspaceItem[]>(() =>
     handle: opportunity.handle,
     title: opportunity.title,
     subtitle: companyLabel(opportunity.assigneeCompany ?? opportunity.creatorCompany),
+    owner: opportunityOwnerLabel(opportunity),
     value: formatMoney(opportunity.expectedRevenue),
     badge: formatDate(opportunity.closeDate),
     tone: getOpportunityUrgencyTone(opportunity),
@@ -483,8 +535,9 @@ const atRiskCustomerItems = computed<CrmWorkspaceItem[]>(() =>
       handle: company.handle,
       title: company.name,
       subtitle: relationLabel(company.churnRiskReason) || t('crmWorkspace.contactRisk'),
+      owner: csOwnerLabel(company),
       value: formatMoney(company.annualRecurringRevenue ?? company.contractValue),
-      badge: csOwnerLabel(company),
+      badge: relationLabel(company.segment),
       tone: company.churnRiskReason ? 'error' : 'warning',
       icon: 'mdi-alert-decagram-outline',
     })),
@@ -499,6 +552,7 @@ const todayContactItems = computed<CrmWorkspaceItem[]>(() => {
       handle: person?.handle ?? opportunity.handle,
       title: person ? personLabel(person) : opportunity.title,
       subtitle: companyLabel(opportunity.assigneeCompany ?? opportunity.creatorCompany),
+      owner: opportunityOwnerLabel(opportunity),
       value: formatMoney(opportunity.expectedRevenue),
       badge: t('crmWorkspace.noNextActivity'),
       tone: getOpportunityUrgencyTone(opportunity),
@@ -511,7 +565,8 @@ const todayContactItems = computed<CrmWorkspaceItem[]>(() => {
     entity: COMPANY_ENTITY,
     handle: company.handle,
     title: company.name,
-    subtitle: accountOwnerLabel(company),
+    subtitle: relationLabel(company.segment) || relationLabel(company.industry),
+    owner: accountOwnerLabel(company),
     value: Number.isFinite(days) ? t('crmWorkspace.daysAgo', { count: days }) : t('crmWorkspace.noContact'),
     badge: t('crmWorkspace.customerContactGap'),
     tone: days >= 90 ? 'error' : 'warning',
@@ -533,9 +588,8 @@ const topAccountItems = computed<CrmWorkspaceItem[]>(() =>
       entity: COMPANY_ENTITY,
       handle: company.handle,
       title: company.name,
-      subtitle: [relationLabel(company.industry), accountOwnerLabel(company)]
-        .filter(Boolean)
-        .join(' | '),
+      subtitle: relationLabel(company.industry) || relationLabel(company.segment),
+      owner: accountOwnerLabel(company),
       value: formatMoney(company.annualRecurringRevenue ?? company.contractValue),
       badge: relationLabel(company.size) || relationLabel(company.segment),
       tone: company.churnRiskReason ? 'warning' : 'default',
@@ -586,7 +640,7 @@ const heroMetrics = computed(() => [
   { key: 'contactToday', label: t('crmWorkspace.contactToday'), value: n(todayContactItems.value.length) },
 ])
 
-const signals = computed(() => [
+const signals = computed<CrmSignal[]>(() => [
   {
     key: 'noActivity',
     icon: 'mdi-calendar-alert-outline',
@@ -608,11 +662,15 @@ const signals = computed(() => [
 ])
 
 onMounted(async () => {
-  await genericStore.loadGenericMany([
-    { entityHandle: COMPANY_ENTITY, namespaces: ['global', 'navigation', 'crmWorkspace'] },
-    { entityHandle: PERSON_ENTITY, namespaces: ['global', 'navigation', 'crmWorkspace'] },
-    { entityHandle: OPPORTUNITY_ENTITY, namespaces: ['global', 'navigation', 'crmWorkspace'] },
+  await Promise.all([
+    genericStore.loadGenericMany([
+      { entityHandle: COMPANY_ENTITY, namespaces: ['global', 'navigation', 'crmWorkspace'] },
+      { entityHandle: PERSON_ENTITY, namespaces: ['global', 'navigation', 'crmWorkspace'] },
+      { entityHandle: OPPORTUNITY_ENTITY, namespaces: ['global', 'navigation', 'crmWorkspace'] },
+    ]),
+    currentPersonStore.fetchCurrentPerson(),
   ])
+  applyDefaultResponsibleFilter()
   await loadData()
 })
 
@@ -739,6 +797,14 @@ function updateLatestDate(map: Map<string, Date>, key: string, value: Date | nul
   }
 }
 
+function applyDefaultResponsibleFilter(): void {
+  if (selectedResponsibleHandle.value || currentPersonStore.person?.handle == null) {
+    return
+  }
+
+  selectedResponsibleHandle.value = String(currentPersonStore.person.handle)
+}
+
 function isOpportunityOpen(opportunity: CrmOpportunity): boolean {
   if (opportunity.isActive === false) {
     return false
@@ -846,6 +912,26 @@ function csOwnerLabel(company: CrmCompany): string {
   return personLabel(company.customerSuccessManager) || t('crmWorkspace.noOwner')
 }
 
+function opportunityOwnerLabel(opportunity: CrmOpportunity): string {
+  return personLabel(opportunity.assigneePerson ?? opportunity.creatorPerson) || t('crmWorkspace.noOwner')
+}
+
+function matchesCompanyResponsibleFilter(company: CrmCompany): boolean {
+  return matchesResponsibleFilter(company.accountManager, company.customerSuccessManager)
+}
+
+function matchesOpportunityResponsibleFilter(opportunity: CrmOpportunity): boolean {
+  return matchesResponsibleFilter(opportunity.assigneePerson, opportunity.creatorPerson)
+}
+
+function matchesResponsibleFilter(...values: unknown[]): boolean {
+  if (!selectedResponsibleHandle.value) {
+    return true
+  }
+
+  return values.some((value) => String(getRelationHandle(value) ?? '') === selectedResponsibleHandle.value)
+}
+
 function matchesSearch(...values: unknown[]): boolean {
   if (!normalizedSearch.value) {
     return true
@@ -908,13 +994,65 @@ function formatDate(value: unknown): string {
   return date ? d(date) : t('crmWorkspace.noDate')
 }
 
+async function openOpportunityStage(stage: StageBreakdown): Promise<void> {
+  const stageOpportunities = filteredOpenOpportunities.value.filter((opportunity) => {
+    const opportunityStage = relationObject(opportunity.type)
+    return String(opportunityStage?.handle ?? 'unknown') === stage.key
+  })
+
+  if (stageOpportunities.length === 1) {
+    await openWorkspaceItem({
+      id: `stage-opportunity-${stageOpportunities[0].handle}`,
+      entity: OPPORTUNITY_ENTITY,
+      handle: stageOpportunities[0].handle,
+      title: stageOpportunities[0].title,
+      subtitle: companyLabel(stageOpportunities[0].assigneeCompany ?? stageOpportunities[0].creatorCompany),
+    })
+    return
+  }
+
+  if (stage.key === 'unknown') {
+    await pushAppRoute(router, `/table/${OPPORTUNITY_ENTITY}`)
+    return
+  }
+
+  await openFilteredEntity(OPPORTUNITY_ENTITY, { type: { handle: stage.key } })
+}
+
+async function openSignal(signal: CrmSignal): Promise<void> {
+  if (signal.key === 'noActivity') {
+    activeCockpit.value = 'sales'
+    if (opportunitiesWithoutNextActivityItems.value[0]) {
+      await openWorkspaceItem(opportunitiesWithoutNextActivityItems.value[0])
+    }
+    return
+  }
+
+  if (signal.key === 'contactGaps') {
+    activeCockpit.value = 'account'
+    if (customersWithoutContactItems.value[0]) {
+      await openWorkspaceItem(customersWithoutContactItems.value[0])
+    }
+    return
+  }
+
+  activeCockpit.value = 'customerSuccess'
+  if (atRiskCustomerItems.value[0]) {
+    await openWorkspaceItem(atRiskCustomerItems.value[0])
+  }
+}
+
 async function openWorkspaceItem(item: CrmWorkspaceItem): Promise<void> {
   if (item.handle == null) {
     return
   }
 
-  const filter = encodeURIComponent(JSON.stringify({ handle: item.handle }))
-  await pushAppRoute(router, `/table/${item.entity}?filter=${filter}`)
+  await openFilteredEntity(item.entity, { handle: item.handle })
+}
+
+async function openFilteredEntity(entity: CrmWorkspaceItem['entity'], filter: Record<string, unknown>): Promise<void> {
+  const encodedFilter = encodeURIComponent(JSON.stringify(filter))
+  await pushAppRoute(router, `/table/${entity}?filter=${encodedFilter}`)
 }
 </script>
 
@@ -1010,10 +1148,10 @@ async function openWorkspaceItem(item: CrmWorkspaceItem): Promise<void> {
 
 .sapling-crm-workspace__toolbar-fields {
   display: grid;
-  grid-template-columns: minmax(220px, 360px) minmax(180px, 220px);
+  grid-template-columns: minmax(220px, 1fr) minmax(220px, 280px) minmax(170px, 210px);
   gap: 12px;
   align-items: center;
-  width: min(620px, 100%);
+  width: min(880px, 100%);
 }
 
 .sapling-crm-workspace__progress {
@@ -1092,6 +1230,10 @@ async function openWorkspaceItem(item: CrmWorkspaceItem): Promise<void> {
   gap: 5px;
   padding: 14px;
   overflow: hidden;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
 .sapling-crm-stage__bar {
@@ -1120,13 +1262,15 @@ async function openWorkspaceItem(item: CrmWorkspaceItem): Promise<void> {
 
 .sapling-crm-account-card {
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto auto 1fr auto;
   gap: 10px;
   min-height: 148px;
   padding: 16px;
 }
 
-.sapling-crm-account-card:hover {
+.sapling-crm-stage:hover,
+.sapling-crm-account-card:hover,
+.sapling-crm-signal:hover {
   border-color: rgba(var(--v-theme-primary), 0.45);
   background: rgba(var(--v-theme-primary), 0.1);
 }
@@ -1139,6 +1283,16 @@ async function openWorkspaceItem(item: CrmWorkspaceItem): Promise<void> {
 
 .sapling-crm-account-card__meta {
   line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.sapling-crm-account-card__owner {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  color: rgba(229, 236, 255, 0.82);
+  font-size: 0.82rem;
+  line-height: 1.25;
   overflow-wrap: anywhere;
 }
 
@@ -1180,6 +1334,10 @@ async function openWorkspaceItem(item: CrmWorkspaceItem): Promise<void> {
   gap: 10px;
   align-items: center;
   padding: 10px 12px;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
 .sapling-crm-signal span {

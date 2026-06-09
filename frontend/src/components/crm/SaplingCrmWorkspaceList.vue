@@ -26,6 +26,10 @@
         <span class="sapling-crm-workspace-list-card__copy">
           <strong>{{ item.title }}</strong>
           <span>{{ item.subtitle }}</span>
+          <span v-if="item.owner" class="sapling-crm-workspace-list-card__owner">
+            <v-icon icon="mdi-account-tie-outline" size="14" />
+            {{ item.owner }}
+          </span>
         </span>
 
         <span class="sapling-crm-workspace-list-card__meta">
@@ -50,6 +54,7 @@ export interface CrmWorkspaceItem {
   subtitle: string
   value?: string
   badge?: string
+  owner?: string
   tone?: 'default' | 'info' | 'success' | 'warning' | 'error'
   icon?: string
 }
@@ -159,6 +164,14 @@ const emit = defineEmits<{
 
 .sapling-crm-workspace-list-card__copy span {
   color: var(--crm-list-muted);
+}
+
+.sapling-crm-workspace-list-card__owner {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  color: rgba(229, 236, 255, 0.82);
+  font-size: 0.78rem;
 }
 
 .sapling-crm-workspace-list-card__meta {

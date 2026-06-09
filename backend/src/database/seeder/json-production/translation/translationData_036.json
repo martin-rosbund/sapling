@@ -19,6 +19,7 @@
   { "entity": "crmWorkspace", "property": "weightedPipeline", "de": "Gewichtete Pipeline", "en": "Weighted pipeline" },
   { "entity": "crmWorkspace", "property": "totalArr", "de": "ARR Bestand", "en": "ARR base" },
   { "entity": "crmWorkspace", "property": "contactThreshold", "de": "Kontaktluecke", "en": "Contact gap" },
+  { "entity": "crmWorkspace", "property": "responsiblePerson", "de": "Verantwortliche Person", "en": "Responsible person" },
   { "entity": "crmWorkspace", "property": "days30", "de": "30 Tage", "en": "30 days" },
   { "entity": "crmWorkspace", "property": "days45", "de": "45 Tage", "en": "45 days" },
   { "entity": "crmWorkspace", "property": "days60", "de": "60 Tage", "en": "60 days" },
