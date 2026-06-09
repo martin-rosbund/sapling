@@ -105,15 +105,21 @@ export class TranslationSeeder extends Seeder {
           `Script ${scriptName} for ${entityHandle} executed successfully.`,
         );
       } catch (err) {
+        global.log.error(
+          `Script ${scriptName} for ${entityHandle} failed: ${getErrorMessage(err)}`,
+        );
+
+        if (em.isInTransaction()) {
+          throw err;
+        }
+
         const statusItem = new SeedScriptItem();
         statusItem.scriptName = scriptName;
         statusItem.entityHandle = entityHandle;
         statusItem.executedAt = new Date();
         statusItem.isSuccess = false;
         await em.persist(statusItem).flush();
-        global.log.error(
-          `Script ${scriptName} for ${entityHandle} failed: ${getErrorMessage(err)}`,
-        );
+        throw err;
       }
     }
   }

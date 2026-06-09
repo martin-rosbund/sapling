@@ -14,7 +14,12 @@
     "creatorCompany": 1,
     "creatorPerson": 1,
     "assigneeCompany": 1,
-    "assigneePerson": 1
+    "assigneePerson": 1,
+    "resultStatus": "open",
+    "competitors": [
+      9,
+      15
+    ]
   },
   {
     "title": "Cloud Migration Projekt",
@@ -31,24 +36,35 @@
     "creatorCompany": 2,
     "creatorPerson": 2,
     "assigneeCompany": 2,
-    "assigneePerson": 2
+    "assigneePerson": 2,
+    "resultStatus": "open",
+    "competitors": [
+      10,
+      16
+    ]
   },
   {
     "title": "Website Relaunch",
     "description": "## Ausgangslage\n\nKomplette Überarbeitung der Firmenwebsite.\n\n## Zielbild\n\n- Abnahme und Rollout fuer Website Relaunch strukturiert klaeren und belastbar planen.\n- Naechster Schritt: Designvorschläge präsentieren.\n- Erwartete Wirkung, Budgetrahmen und beteiligte Ansprechpartner transparent machen.\n\n## Umsetzungshinweise\n\n- Erwarteter Umsatz: 12000 EUR.\n- Abschlusswahrscheinlichkeit: 30 %.\n- Geplanter Abschluss: 2026-03-30.",
     "expectedRevenue": 12000,
-    "probability": 30,
+    "probability": 0,
     "closeDate": "2026-03-30",
     "nextStep": "Designvorschläge präsentieren",
     "painPoints": "## Schmerzpunkte\n\n- Veraltetes Design\n\n## Auswirkungen\n\n- Die genannten Punkte beeinflussen Priorisierung, Angebotstext und Einschaetzung fuer Website Relaunch.",
-    "isActive": true,
+    "isActive": false,
     "type": "proposal",
-    "forecast": "bestCase",
+    "forecast": "closed",
     "source": 3,
     "creatorCompany": 3,
     "creatorPerson": 3,
     "assigneeCompany": 3,
-    "assigneePerson": 3
+    "assigneePerson": 3,
+    "resultStatus": "lost",
+    "lossReason": "no_budget",
+    "competitors": [
+      11,
+      17
+    ]
   },
   {
     "title": "ERP System Erweiterung",
@@ -65,7 +81,12 @@
     "creatorCompany": 4,
     "creatorPerson": 4,
     "assigneeCompany": 4,
-    "assigneePerson": 4
+    "assigneePerson": 4,
+    "resultStatus": "open",
+    "competitors": [
+      12,
+      18
+    ]
   },
   {
     "title": "IT-Support Vertrag",
@@ -82,7 +103,12 @@
     "creatorCompany": 5,
     "creatorPerson": 5,
     "assigneeCompany": 5,
-    "assigneePerson": 5
+    "assigneePerson": 5,
+    "resultStatus": "won",
+    "competitors": [
+      13,
+      19
+    ]
   },
   {
     "title": "Digitalisierungsberatung",
@@ -99,7 +125,12 @@
     "creatorCompany": 6,
     "creatorPerson": 6,
     "assigneeCompany": 6,
-    "assigneePerson": 6
+    "assigneePerson": 6,
+    "resultStatus": "open",
+    "competitors": [
+      14,
+      20
+    ]
   },
   {
     "title": "Mobile App Entwicklung",
@@ -116,24 +147,35 @@
     "creatorCompany": 7,
     "creatorPerson": 7,
     "assigneeCompany": 7,
-    "assigneePerson": 7
+    "assigneePerson": 7,
+    "resultStatus": "open",
+    "competitors": [
+      15,
+      21
+    ]
   },
   {
     "title": "Datenschutz-Audit",
     "description": "## Ausgangslage\n\nDurchführung eines DSGVO-Audits.\n\n## Zielbild\n\n- Betrieb und Stabilisierung fuer Datenschutz-Audit strukturiert klaeren und belastbar planen.\n- Naechster Schritt: Audit-Termin abstimmen.\n- Erwartete Wirkung, Budgetrahmen und beteiligte Ansprechpartner transparent machen.\n\n## Umsetzungshinweise\n\n- Erwarteter Umsatz: 9000 EUR.\n- Abschlusswahrscheinlichkeit: 40 %.\n- Geplanter Abschluss: 2026-04-25.",
     "expectedRevenue": 9000,
-    "probability": 40,
+    "probability": 20,
     "closeDate": "2026-04-25",
     "nextStep": "Audit-Termin abstimmen",
     "painPoints": "## Schmerzpunkte\n\n- Rechtliche Unsicherheit\n\n## Auswirkungen\n\n- Die genannten Punkte beeinflussen Priorisierung, Angebotstext und Einschaetzung fuer Datenschutz-Audit.",
-    "isActive": true,
+    "isActive": false,
     "type": "negotiation",
-    "forecast": "commit",
+    "forecast": "closed",
     "source": 8,
     "creatorCompany": 8,
     "creatorPerson": 8,
     "assigneeCompany": 8,
-    "assigneePerson": 8
+    "assigneePerson": 8,
+    "resultStatus": "no_decision",
+    "lossReason": "no_budget",
+    "competitors": [
+      16,
+      22
+    ]
   },
   {
     "title": "E-Commerce Plattform",
@@ -150,7 +192,12 @@
     "creatorCompany": 9,
     "creatorPerson": 9,
     "assigneeCompany": 9,
-    "assigneePerson": 9
+    "assigneePerson": 9,
+    "resultStatus": "open",
+    "competitors": [
+      17,
+      23
+    ]
   },
   {
     "title": "IT-Infrastruktur Upgrade",
@@ -167,24 +214,35 @@
     "creatorCompany": 10,
     "creatorPerson": 10,
     "assigneeCompany": 10,
-    "assigneePerson": 10
+    "assigneePerson": 10,
+    "resultStatus": "open",
+    "competitors": [
+      18,
+      24
+    ]
   },
   {
     "title": "Backup-Lösung",
     "description": "## Ausgangslage\n\nImplementierung einer neuen Backup-Strategie.\n\n## Zielbild\n\n- Abnahme und Rollout fuer Backup-Lösung strukturiert klaeren und belastbar planen.\n- Naechster Schritt: Proof of Concept starten.\n- Erwartete Wirkung, Budgetrahmen und beteiligte Ansprechpartner transparent machen.\n\n## Umsetzungshinweise\n\n- Erwarteter Umsatz: 11000 EUR.\n- Abschlusswahrscheinlichkeit: 25 %.\n- Geplanter Abschluss: 2026-06-15.",
     "expectedRevenue": 11000,
-    "probability": 25,
+    "probability": 0,
     "closeDate": "2026-06-15",
     "nextStep": "Proof of Concept starten",
     "painPoints": "## Schmerzpunkte\n\n- Keine Backups vorhanden\n\n## Auswirkungen\n\n- Die genannten Punkte beeinflussen Priorisierung, Angebotstext und Einschaetzung fuer Backup-Lösung.",
-    "isActive": true,
+    "isActive": false,
     "type": "proposal",
-    "forecast": "bestCase",
+    "forecast": "closed",
     "source": 11,
     "creatorCompany": 1,
     "creatorPerson": 1,
     "assigneeCompany": 11,
-    "assigneePerson": 11
+    "assigneePerson": 11,
+    "resultStatus": "lost",
+    "lossReason": "price",
+    "competitors": [
+      19,
+      25
+    ]
   },
   {
     "title": "Helpdesk Outsourcing",
@@ -201,7 +259,12 @@
     "creatorCompany": 2,
     "creatorPerson": 2,
     "assigneeCompany": 12,
-    "assigneePerson": 12
+    "assigneePerson": 12,
+    "resultStatus": "open",
+    "competitors": [
+      20,
+      26
+    ]
   },
   {
     "title": "IT-Sicherheitsberatung",
@@ -218,24 +281,35 @@
     "creatorCompany": 3,
     "creatorPerson": 3,
     "assigneeCompany": 13,
-    "assigneePerson": 13
+    "assigneePerson": 13,
+    "resultStatus": "open",
+    "competitors": [
+      21,
+      1
+    ]
   },
   {
     "title": "Netzwerkoptimierung",
     "description": "## Ausgangslage\n\nOptimierung des Firmennetzwerks für bessere Performance.\n\n## Zielbild\n\n- Technische Umsetzung fuer Netzwerkoptimierung strukturiert klaeren und belastbar planen.\n- Naechster Schritt: Netzwerkanalyse durchführen.\n- Erwartete Wirkung, Budgetrahmen und beteiligte Ansprechpartner transparent machen.\n\n## Umsetzungshinweise\n\n- Erwarteter Umsatz: 13000 EUR.\n- Abschlusswahrscheinlichkeit: 35 %.\n- Geplanter Abschluss: 2026-09-10.",
     "expectedRevenue": 13000,
-    "probability": 35,
+    "probability": 20,
     "closeDate": "2026-09-10",
     "nextStep": "Netzwerkanalyse durchführen",
     "painPoints": "## Schmerzpunkte\n\n- Langsame Verbindungen\n\n## Auswirkungen\n\n- Die genannten Punkte beeinflussen Priorisierung, Angebotstext und Einschaetzung fuer Netzwerkoptimierung.",
-    "isActive": true,
+    "isActive": false,
     "type": "qualified",
-    "forecast": "pipeline",
+    "forecast": "closed",
     "source": 2,
     "creatorCompany": 4,
     "creatorPerson": 4,
     "assigneeCompany": 14,
-    "assigneePerson": 14
+    "assigneePerson": 14,
+    "resultStatus": "no_decision",
+    "lossReason": "timing",
+    "competitors": [
+      22,
+      2
+    ]
   },
   {
     "title": "SAP Integration",
@@ -252,7 +326,12 @@
     "creatorCompany": 5,
     "creatorPerson": 5,
     "assigneeCompany": 15,
-    "assigneePerson": 15
+    "assigneePerson": 15,
+    "resultStatus": "open",
+    "competitors": [
+      23,
+      3
+    ]
   },
   {
     "title": "Hardware Rollout",
@@ -269,7 +348,12 @@
     "creatorCompany": 6,
     "creatorPerson": 6,
     "assigneeCompany": 16,
-    "assigneePerson": 16
+    "assigneePerson": 16,
+    "resultStatus": "open",
+    "competitors": [
+      24,
+      4
+    ]
   },
   {
     "title": "Office 365 Migration",
@@ -286,24 +370,35 @@
     "creatorCompany": 7,
     "creatorPerson": 7,
     "assigneeCompany": 17,
-    "assigneePerson": 17
+    "assigneePerson": 17,
+    "resultStatus": "won",
+    "competitors": [
+      25,
+      5
+    ]
   },
   {
     "title": "Datenbankoptimierung",
     "description": "## Ausgangslage\n\nOptimierung der bestehenden Datenbank für Performance.\n\n## Zielbild\n\n- Technische Umsetzung fuer Datenbankoptimierung strukturiert klaeren und belastbar planen.\n- Naechster Schritt: Indexierung prüfen.\n- Erwartete Wirkung, Budgetrahmen und beteiligte Ansprechpartner transparent machen.\n\n## Umsetzungshinweise\n\n- Erwarteter Umsatz: 10000 EUR.\n- Abschlusswahrscheinlichkeit: 30 %.\n- Geplanter Abschluss: 2026-06-20.",
     "expectedRevenue": 10000,
-    "probability": 30,
+    "probability": 0,
     "closeDate": "2026-06-20",
     "nextStep": "Indexierung prüfen",
     "painPoints": "## Schmerzpunkte\n\n- Langsame Abfragen\n\n## Auswirkungen\n\n- Die genannten Punkte beeinflussen Priorisierung, Angebotstext und Einschaetzung fuer Datenbankoptimierung.",
-    "isActive": true,
+    "isActive": false,
     "type": "qualified",
-    "forecast": "pipeline",
+    "forecast": "closed",
     "source": 6,
     "creatorCompany": 8,
     "creatorPerson": 8,
     "assigneeCompany": 18,
-    "assigneePerson": 18
+    "assigneePerson": 18,
+    "resultStatus": "lost",
+    "lossReason": "no_budget",
+    "competitors": [
+      26,
+      6
+    ]
   },
   {
     "title": "IT-Strategieberatung",
@@ -320,7 +415,12 @@
     "creatorCompany": 9,
     "creatorPerson": 9,
     "assigneeCompany": 19,
-    "assigneePerson": 19
+    "assigneePerson": 19,
+    "resultStatus": "open",
+    "competitors": [
+      1,
+      7
+    ]
   },
   {
     "title": "Servervirtualisierung",
@@ -337,7 +437,12 @@
     "creatorCompany": 10,
     "creatorPerson": 10,
     "assigneeCompany": 20,
-    "assigneePerson": 20
+    "assigneePerson": 20,
+    "resultStatus": "open",
+    "competitors": [
+      2,
+      8
+    ]
   },
   {
     "title": "IT-Helpdesk Software",
@@ -354,7 +459,12 @@
     "creatorCompany": 1,
     "creatorPerson": 1,
     "assigneeCompany": 1,
-    "assigneePerson": 1
+    "assigneePerson": 1,
+    "resultStatus": "open",
+    "competitors": [
+      9,
+      15
+    ]
   },
   {
     "title": "IT-Asset Management",
@@ -371,24 +481,35 @@
     "creatorCompany": 2,
     "creatorPerson": 2,
     "assigneeCompany": 2,
-    "assigneePerson": 2
+    "assigneePerson": 2,
+    "resultStatus": "open",
+    "competitors": [
+      10,
+      16
+    ]
   },
   {
     "title": "IT-Notfallkonzept",
     "description": "## Ausgangslage\n\nErstellung eines Notfallkonzepts für die IT.\n\n## Zielbild\n\n- Abnahme und Rollout fuer IT-Notfallkonzept strukturiert klaeren und belastbar planen.\n- Naechster Schritt: Risikoanalyse durchführen.\n- Erwartete Wirkung, Budgetrahmen und beteiligte Ansprechpartner transparent machen.\n\n## Umsetzungshinweise\n\n- Erwarteter Umsatz: 13000 EUR.\n- Abschlusswahrscheinlichkeit: 35 %.\n- Geplanter Abschluss: 2026-11-01.",
     "expectedRevenue": 13000,
-    "probability": 35,
+    "probability": 20,
     "closeDate": "2026-11-01",
     "nextStep": "Risikoanalyse durchführen",
     "painPoints": "## Schmerzpunkte\n\n- Keine Notfallpläne\n\n## Auswirkungen\n\n- Die genannten Punkte beeinflussen Priorisierung, Angebotstext und Einschaetzung fuer IT-Notfallkonzept.",
-    "isActive": true,
+    "isActive": false,
     "type": "proposal",
-    "forecast": "bestCase",
+    "forecast": "closed",
     "source": 11,
     "creatorCompany": 3,
     "creatorPerson": 3,
     "assigneeCompany": 3,
-    "assigneePerson": 3
+    "assigneePerson": 3,
+    "resultStatus": "no_decision",
+    "lossReason": "no_budget",
+    "competitors": [
+      11,
+      17
+    ]
   },
   {
     "title": "IT-Compliance Prüfung",
@@ -405,7 +526,12 @@
     "creatorCompany": 4,
     "creatorPerson": 4,
     "assigneeCompany": 4,
-    "assigneePerson": 4
+    "assigneePerson": 4,
+    "resultStatus": "open",
+    "competitors": [
+      12,
+      18
+    ]
   },
   {
     "title": "IT-Servicedesk Optimierung",
@@ -422,6 +548,11 @@
     "creatorCompany": 5,
     "creatorPerson": 5,
     "assigneeCompany": 5,
-    "assigneePerson": 5
+    "assigneePerson": 5,
+    "resultStatus": "won",
+    "competitors": [
+      13,
+      19
+    ]
   }
 ]

@@ -4522,7 +4522,8 @@
             "handle"
           ],
           "referencedTableName": "public.person_item",
-          "deleteRule": "set null"
+          "deleteRule": "set null",
+          "deferMode": "immediate"
         },
         "company_item_annual_revenue_class_handle_foreign": {
           "columnNames": [
@@ -4569,7 +4570,8 @@
             "handle"
           ],
           "referencedTableName": "public.person_item",
-          "deleteRule": "set null"
+          "deleteRule": "set null",
+          "deferMode": "immediate"
         },
         "company_item_holiday_group_handle_foreign": {
           "columnNames": [
@@ -16470,7 +16472,8 @@
             "handle"
           ],
           "referencedTableName": "public.company_item",
-          "deleteRule": "set null"
+          "deleteRule": "set null",
+          "deferMode": "immediate"
         },
         "person_item_decision_role_handle_foreign": {
           "columnNames": [

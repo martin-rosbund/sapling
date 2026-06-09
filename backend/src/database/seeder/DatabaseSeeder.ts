@@ -264,7 +264,25 @@ export class DatabaseSeeder extends Seeder {
         ? GenericSeeder.for(entry)
         : (entry as new () => Seeder),
     );
-    await this.call(em, seeders);
+
+    await em.transactional(async (transactionalEm) => {
+      await transactionalEm
+        .getConnection('write')
+        .execute(
+          'set constraints all deferred',
+          [],
+          'run',
+          transactionalEm.getTransactionContext(),
+        );
+
+      for (const SeederClass of seeders) {
+        const fork = transactionalEm.fork({ keepTransactionContext: true });
+        const seeder = new SeederClass();
+        await seeder.run(fork);
+        await fork.flush();
+        fork.clear();
+      }
+    });
   }
 
   /**

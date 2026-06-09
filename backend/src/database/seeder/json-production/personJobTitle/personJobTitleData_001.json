@@ -1,8 +1,8 @@
 [
-  { "handle": "ceo", "title": "Geschaeftsfuehrung", "icon": "mdi-account-tie", "color": "#5E35B1", "sortOrder": 10 },
-  { "handle": "cfo", "title": "Finanzleitung", "icon": "mdi-finance", "color": "#00897B", "sortOrder": 20 },
-  { "handle": "cto", "title": "Technische Leitung", "icon": "mdi-cog-outline", "color": "#1976D2", "sortOrder": 30 },
-  { "handle": "head_of_it", "title": "IT-Leitung", "icon": "mdi-laptop", "color": "#1E88E5", "sortOrder": 40 },
-  { "handle": "procurement_manager", "title": "Einkaufsleitung", "icon": "mdi-cart-outline", "color": "#F9A825", "sortOrder": 50 },
-  { "handle": "project_manager", "title": "Projektleitung", "icon": "mdi-clipboard-check-outline", "color": "#7CB342", "sortOrder": 60 }
+  { "handle": "ceo", "title": "Geschaeftsfuehrung", "icon": "mdi-account-tie", "color": "#EDE9FE", "sortOrder": 10 },
+  { "handle": "cfo", "title": "Finanzleitung", "icon": "mdi-finance", "color": "#CCFBF1", "sortOrder": 20 },
+  { "handle": "cto", "title": "Technische Leitung", "icon": "mdi-cog-outline", "color": "#DBEAFE", "sortOrder": 30 },
+  { "handle": "head_of_it", "title": "IT-Leitung", "icon": "mdi-laptop", "color": "#BAE6FD", "sortOrder": 40 },
+  { "handle": "procurement_manager", "title": "Einkaufsleitung", "icon": "mdi-cart-outline", "color": "#FEF3C7", "sortOrder": 50 },
+  { "handle": "project_manager", "title": "Projektleitung", "icon": "mdi-clipboard-check-outline", "color": "#DCFCE7", "sortOrder": 60 }
 ]

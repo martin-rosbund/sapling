@@ -1,4 +1,4 @@
-import { Collection, type Rel } from '@mikro-orm/core';
+import { Collection, DeferMode, type Rel } from '@mikro-orm/core';
 import {
   Entity,
   ManyToMany,
@@ -427,7 +427,10 @@ export class CompanyItem {
     mobileOrder: 100,
     mobileVisible: false,
   })
-  @ManyToOne(() => PersonItem, { nullable: true })
+  @ManyToOne(() => PersonItem, {
+    nullable: true,
+    deferMode: DeferMode.INITIALLY_IMMEDIATE,
+  })
   accountManager?: Rel<PersonItem>;
 
   /**
@@ -446,7 +449,10 @@ export class CompanyItem {
     mobileOrder: 400,
     mobileVisible: false,
   })
-  @ManyToOne(() => PersonItem, { nullable: true })
+  @ManyToOne(() => PersonItem, {
+    nullable: true,
+    deferMode: DeferMode.INITIALLY_IMMEDIATE,
+  })
   customerSuccessManager?: Rel<PersonItem>;
 
   /**
