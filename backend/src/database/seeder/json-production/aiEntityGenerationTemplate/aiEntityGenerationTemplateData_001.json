@@ -19,7 +19,7 @@
       "salesOpportunity",
       "effortEstimates"
     ],
-    "promptMarkdown": "Erstelle aus dem Ticket einen internen Wissensartikel. Schreibe auf Deutsch, wenn der Ticketinhalt deutsch ist. Nutze neutrale, wiederverwendbare Formulierungen und entferne Kundennamen, E-Mail-Adressen, Zugangsdaten, Tokens und andere sensible Details, sofern sie fuer das technische Verstaendnis nicht zwingend erforderlich sind. Wenn eine Loesung im Ticket fehlt, markiere den Artikel als Entwurf und formuliere im Feld solutionMarkdown klar, welche Information noch geprueft werden muss. Gib nur Fakten aus dem Ticket wieder und erfinde keine Ursachen, Produkte oder Arbeitsschritte. Tags sollen als kommaseparierte Zeichenkette zur spaeteren Suche geliefert werden.",
+    "promptMarkdown": "Erstelle aus dem Ticket einen internen Wissensartikel. Schreibe auf Deutsch, wenn der Ticketinhalt deutsch ist. Nutze neutrale, wiederverwendbare Formulierungen und entferne Kundennamen, E-Mail-Adressen, Zugangsdaten, Tokens und andere sensible Details, sofern sie für das technische Verständnis nicht zwingend erforderlich sind. Wenn eine Lösung im Ticket fehlt, markiere den Artikel als Entwurf und formuliere im Feld solutionMarkdown klar, welche Information noch geprüft werden muss. Gib nur Fakten aus dem Ticket wieder und erfinde keine Ursachen, Produkte oder Arbeitsschritte. Tags sollen als kommaseparierte Zeichenkette zur späteren Suche geliefert werden.",
     "fieldMapping": {
       "title": "title",
       "summary": "summary",

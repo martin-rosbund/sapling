@@ -3,7 +3,7 @@
     "name": "Ticket Anlage Inbox",
     "description": "Inbox-Benachrichtigung für neu angelegte Tickets.",
     "titleTemplate": "Ticket {{number}} wurde erfasst",
-    "bodyMarkdown": "Das Ticket **{{title}}** wurde neu angelegt.\n\n- Status: {{status.description}}\n- Prioritaet: {{priority.description}}\n- Kunde: {{creatorCompany.name}}\n\nBitte prüfe die naechsten Schritte direkt in Sapling.",
+    "bodyMarkdown": "Das Ticket **{{title}}** wurde neu angelegt.\n\n- Status: {{status.description}}\n- Priorität: {{priority.description}}\n- Kunde: {{creatorCompany.name}}\n\nBitte prüfe die nächsten Schritte direkt in Sapling.",
     "isDefault": true,
     "isActive": true,
     "entity": "ticket"
@@ -12,7 +12,7 @@
     "name": "Ticket Update Inbox",
     "description": "Inbox-Benachrichtigung für geänderte Tickets.",
     "titleTemplate": "Ticket {{number}} wurde aktualisiert",
-    "bodyMarkdown": "Zum Ticket **{{title}}** gibt es ein Update.\n\n- Status: {{status.description}}\n- Prioritaet: {{priority.description}}\n- Zustaendig: {{assigneePerson.firstName}} {{assigneePerson.lastName}}\n\nBitte prüfe die Aenderungen direkt in Sapling.",
+    "bodyMarkdown": "Zum Ticket **{{title}}** gibt es ein Update.\n\n- Status: {{status.description}}\n- Priorität: {{priority.description}}\n- Zuständig: {{assigneePerson.firstName}} {{assigneePerson.lastName}}\n\nBitte prüfe die Änderungen direkt in Sapling.",
     "isDefault": true,
     "isActive": true,
     "entity": "ticket"
@@ -48,7 +48,7 @@
     "name": "Termin Update Inbox",
     "description": "Inbox-Benachrichtigung für geänderte Termine.",
     "titleTemplate": "Termin {{title}} wurde aktualisiert",
-    "bodyMarkdown": "Der Termin **{{title}}** wurde aktualisiert.\n\n- Start: {{startDate | dateTime}}\n- Ende: {{endDate | dateTime}}\n- Status: {{status.description}}\n- Typ: {{type.title}}\n\nBitte prüfe die Aenderungen direkt in Sapling.",
+    "bodyMarkdown": "Der Termin **{{title}}** wurde aktualisiert.\n\n- Start: {{startDate | dateTime}}\n- Ende: {{endDate | dateTime}}\n- Status: {{status.description}}\n- Typ: {{type.title}}\n\nBitte prüfe die Änderungen direkt in Sapling.",
     "isDefault": true,
     "isActive": true,
     "entity": "event"

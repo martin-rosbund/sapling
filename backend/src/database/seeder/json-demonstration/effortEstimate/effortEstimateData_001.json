@@ -1,8 +1,8 @@
 [
   {
-    "title": "Retourenportal fuer Ersatzteile",
+    "title": "Retourenportal für Ersatzteile",
     "status": "new",
-    "requirementsMarkdown": "## Ausgangslage\n\nHaendler sollen Retouren mit Seriennummer, Kaufbeleg und Fehlerbeschreibung erfassen koennen. Die Rueckmeldung an den Innendienst soll automatisch als Ticket und Inbox-Hinweis erscheinen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nHändler sollen Retouren mit Seriennummer, Kaufbeleg und Fehlerbeschreibung erfassen können. Die Rückmeldung an den Innendienst soll automatisch als Ticket und Inbox-Hinweis erscheinen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 1,
     "ticket": 1,
@@ -13,9 +13,9 @@
     "creatorPerson": 1
   },
   {
-    "title": "DATEV Export fuer Monatsabschluss",
+    "title": "DATEV Export für Monatsabschluss",
     "status": "open",
-    "requirementsMarkdown": "## Ausgangslage\n\nDie Buchhaltung benoetigt einen wiederholbaren Export offener Leistungen und Rechnungsdaten fuer DATEV. Abgrenzung: kein direkter DATEV-Upload, nur strukturierte Exportdatei.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nDie Buchhaltung benötigt einen wiederholbaren Export offener Leistungen und Rechnungsdaten für DATEV. Abgrenzung: kein direkter DATEV-Upload, nur strukturierte Exportdatei.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 2,
     "ticket": 2,
@@ -26,9 +26,9 @@
     "creatorPerson": 2
   },
   {
-    "title": "SLA Ampel fuer Premiumkunden",
+    "title": "SLA Ampel für Premiumkunden",
     "status": "in_progress",
-    "requirementsMarkdown": "## Ausgangslage\n\nSupport soll bei Premiumkunden schneller erkennen, welche Tickets kurz vor Fristverletzung stehen. Die Darstellung soll in Tabellen, Detaildialog und Dashboard konsistent sein.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nSupport soll bei Premiumkunden schneller erkennen, welche Tickets kurz vor Fristverletzung stehen. Die Darstellung soll in Tabellen, Detaildialog und Dashboard konsistent sein.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 3,
     "ticket": 3,
@@ -41,7 +41,7 @@
   {
     "title": "Migration Alt-Tickets aus Excel",
     "status": "completed",
-    "requirementsMarkdown": "## Ausgangslage\n\nHistorische Tickets aus einer Excel-Liste sollen importiert werden. Wichtig sind nachvollziehbare Fehlerprotokolle und ein Probelauf mit anonymisierten Daten.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nHistorische Tickets aus einer Excel-Liste sollen importiert werden. Wichtig sind nachvollziehbare Fehlerprotokolle und ein Probelauf mit anonymisierten Daten.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 4,
     "ticket": 4,
@@ -54,7 +54,7 @@
   {
     "title": "Angebotsfreigabe im Vertrieb",
     "status": "cancelled",
-    "requirementsMarkdown": "## Ausgangslage\n\nVertriebsangebote ab einem Schwellwert sollen vor Versand durch eine zweite Person freigegeben werden. Ablehnung und Freigabe sollen in der Historie sichtbar sein.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nVertriebsangebote ab einem Schwellwert sollen vor Versand durch eine zweite Person freigegeben werden. Ablehnung und Freigabe sollen in der Historie sichtbar sein.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": false,
     "salesOpportunity": 5,
     "ticket": 5,
@@ -67,7 +67,7 @@
   {
     "title": "Kundenstamm Dublettencheck",
     "status": "new",
-    "requirementsMarkdown": "## Ausgangslage\n\nBeim Anlegen von Unternehmen und Personen sollen moegliche Dubletten frueh sichtbar werden. Die Suche soll Name, E-Mail und Telefonnummer beruecksichtigen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nBeim Anlegen von Unternehmen und Personen sollen mögliche Dubletten früh sichtbar werden. Die Suche soll Name, E-Mail und Telefonnummer berücksichtigen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 6,
     "ticket": 6,
@@ -80,7 +80,7 @@
   {
     "title": "Wartungsfenster Kalenderintegration",
     "status": "open",
-    "requirementsMarkdown": "## Ausgangslage\n\nGeplante Wartungsfenster sollen als Termine erscheinen und betroffene Ansprechpartner informieren. Wiederkehrende Wartungen muessen korrekt abgebildet werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nGeplante Wartungsfenster sollen als Termine erscheinen und betroffene Ansprechpartner informieren. Wiederkehrende Wartungen müssen korrekt abgebildet werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 7,
     "ticket": 7,
@@ -91,9 +91,9 @@
     "creatorPerson": 7
   },
   {
-    "title": "Lizenzuebersicht fuer SaaS Kunden",
+    "title": "Lizenzübersicht für SaaS Kunden",
     "status": "in_progress",
-    "requirementsMarkdown": "## Ausgangslage\n\nAccount Manager benoetigen eine Uebersicht ueber aktive Module, Laufzeiten und Verlaengerungsoptionen pro Kunde.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nAccount Manager benötigen eine Übersicht über aktive Module, Laufzeiten und Verlängerungsoptionen pro Kunde.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 8,
     "ticket": 8,
@@ -104,9 +104,9 @@
     "creatorPerson": 8
   },
   {
-    "title": "Teams Benachrichtigung fuer Eskalationen",
+    "title": "Teams Benachrichtigung für Eskalationen",
     "status": "completed",
-    "requirementsMarkdown": "## Ausgangslage\n\nBei kritischen Tickets soll ein Teams-Hinweis an das zustaendige Support-Team gesendet werden. Wiederholte Benachrichtigungen sollen vermieden werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nBei kritischen Tickets soll ein Teams-Hinweis an das zuständige Support-Team gesendet werden. Wiederholte Benachrichtigungen sollen vermieden werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 9,
     "ticket": 9,
@@ -117,9 +117,9 @@
     "creatorPerson": 9
   },
   {
-    "title": "KPI Paket fuer Serviceleitung",
+    "title": "KPI Paket für Serviceleitung",
     "status": "cancelled",
-    "requirementsMarkdown": "## Ausgangslage\n\nDie Serviceleitung moechte Kennzahlen zu offenen Tickets, First Response und geloesten Faellen nach Team sehen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nDie Serviceleitung möchte Kennzahlen zu offenen Tickets, First Response und gelösten Fällen nach Team sehen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": false,
     "salesOpportunity": 10,
     "ticket": 10,
@@ -132,7 +132,7 @@
   {
     "title": "Self-Service Passwortprozess",
     "status": "new",
-    "requirementsMarkdown": "## Ausgangslage\n\nKunden sollen Passwortwechsel und vergessene Passwoerter ohne manuelle Supportarbeit abwickeln koennen. Sicherheits- und Audit-Anforderungen sind zu beachten.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nKunden sollen Passwortwechsel und vergessene Passwörter ohne manuelle Supportarbeit abwickeln können. Sicherheits- und Audit-Anforderungen sind zu beachten.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 11,
     "ticket": 11,
@@ -143,9 +143,9 @@
     "creatorPerson": 11
   },
   {
-    "title": "Projektakte fuer Implementierungen",
+    "title": "Projektakte für Implementierungen",
     "status": "open",
-    "requirementsMarkdown": "## Ausgangslage\n\nZu groesseren Implementierungsprojekten sollen Tickets, Dokumente, Termine und Aufwandsschaetzungen gebuendelt sichtbar sein.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nZu größeren Implementierungsprojekten sollen Tickets, Dokumente, Termine und Aufwandsschätzungen gebündelt sichtbar sein.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 12,
     "ticket": 12,
@@ -158,7 +158,7 @@
   {
     "title": "Produktkatalog mit Varianten",
     "status": "in_progress",
-    "requirementsMarkdown": "## Ausgangslage\n\nProdukte sollen Varianten, Versionen und Wartungsinformationen tragen. Vertrieb und Support brauchen unterschiedliche Sichten.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nProdukte sollen Varianten, Versionen und Wartungsinformationen tragen. Vertrieb und Support brauchen unterschiedliche Sichten.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 13,
     "ticket": 13,
@@ -171,7 +171,7 @@
   {
     "title": "Rechnungsvorbereitung aus Zeitbuchungen",
     "status": "completed",
-    "requirementsMarkdown": "## Ausgangslage\n\nZeitbuchungen sollen nach Kunde und Vertrag gruppiert werden, um die Rechnungsvorbereitung zu beschleunigen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nZeitbuchungen sollen nach Kunde und Vertrag gruppiert werden, um die Rechnungsvorbereitung zu beschleunigen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 14,
     "ticket": 14,
@@ -184,7 +184,7 @@
   {
     "title": "Mehrsprachige E-Mail Vorlagen",
     "status": "cancelled",
-    "requirementsMarkdown": "## Ausgangslage\n\nStandardmails fuer Tickets und Angebote sollen deutsch und englisch aus Vorlagen erzeugt werden. Platzhalter muessen robust auf fehlende Daten reagieren.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nStandardmails für Tickets und Angebote sollen deutsch und englisch aus Vorlagen erzeugt werden. Platzhalter müssen robust auf fehlende Daten reagieren.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": false,
     "salesOpportunity": 15,
     "ticket": 15,
@@ -197,7 +197,7 @@
   {
     "title": "Vertragsfristen Monitor",
     "status": "new",
-    "requirementsMarkdown": "## Ausgangslage\n\nAuslaufende Vertraege sollen 90, 30 und 7 Tage vor Ablauf sichtbar werden und eine Aufgabe fuer den Account Manager erzeugen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nAuslaufende Verträge sollen 90, 30 und 7 Tage vor Ablauf sichtbar werden und eine Aufgabe für den Account Manager erzeugen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 16,
     "ticket": 16,
@@ -208,9 +208,9 @@
     "creatorPerson": 16
   },
   {
-    "title": "Geraetehistorie fuer Vor-Ort-Service",
+    "title": "Gerätehistorie für Vor-Ort-Service",
     "status": "open",
-    "requirementsMarkdown": "## Ausgangslage\n\nServicegeraete sollen mit Historie, Standort und letzter Wartung verknuepft werden. Techniker brauchen mobile Lesbarkeit.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nServicegeräte sollen mit Historie, Standort und letzter Wartung verknüpft werden. Techniker brauchen mobile Lesbarkeit.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 17,
     "ticket": 17,
@@ -223,7 +223,7 @@
   {
     "title": "Support Queue Routing",
     "status": "in_progress",
-    "requirementsMarkdown": "## Ausgangslage\n\nNeue Tickets sollen anhand Typ, Kategorie und Kunde automatisch einer Queue zugeordnet werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nNeue Tickets sollen anhand Typ, Kategorie und Kunde automatisch einer Queue zugeordnet werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 18,
     "ticket": 18,
@@ -234,9 +234,9 @@
     "creatorPerson": 18
   },
   {
-    "title": "Auditbericht fuer Rollenrechte",
+    "title": "Auditbericht für Rollenrechte",
     "status": "completed",
-    "requirementsMarkdown": "## Ausgangslage\n\nAdministratoren benoetigen einen Bericht, der Rollen, Rechte und sensible Entitaeten transparent darstellt.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nAdministratoren benötigen einen Bericht, der Rollen, Rechte und sensible Entitäten transparent darstellt.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 19,
     "ticket": 19,
@@ -247,9 +247,9 @@
     "creatorPerson": 19
   },
   {
-    "title": "Webhook fuer ERP Bestellungen",
+    "title": "Webhook für ERP Bestellungen",
     "status": "cancelled",
-    "requirementsMarkdown": "## Ausgangslage\n\nBestellungen aus dem ERP sollen als Webhook eingehen und bei Bedarf Tickets oder Verkaufschancen anlegen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nBestellungen aus dem ERP sollen als Webhook eingehen und bei Bedarf Tickets oder Verkaufschancen anlegen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": false,
     "salesOpportunity": 20,
     "ticket": 20,
@@ -260,9 +260,9 @@
     "creatorPerson": 20
   },
   {
-    "title": "Dokumentenablage fuer Angebote",
+    "title": "Dokumentenablage für Angebote",
     "status": "new",
-    "requirementsMarkdown": "## Ausgangslage\n\nAngebotsunterlagen sollen direkt an Aufwandsschaetzungen und Verkaufschancen haengen und leicht auffindbar sein.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nAngebotsunterlagen sollen direkt an Aufwandsschätzungen und Verkaufschancen hängen und leicht auffindbar sein.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 21,
     "ticket": 21,
@@ -273,9 +273,9 @@
     "creatorPerson": 21
   },
   {
-    "title": "Terminserie fuer Projektstatus",
+    "title": "Terminserie für Projektstatus",
     "status": "open",
-    "requirementsMarkdown": "## Ausgangslage\n\nProjektstatus-Termine sollen als Serie geplant werden und Teilnehmer automatisch informieren.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nProjektstatus-Termine sollen als Serie geplant werden und Teilnehmer automatisch informieren.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 22,
     "ticket": 22,
@@ -288,7 +288,7 @@
   {
     "title": "Kundenfeedback nach Ticketabschluss",
     "status": "in_progress",
-    "requirementsMarkdown": "## Ausgangslage\n\nNach Abschluss bestimmter Tickets soll eine kurze Feedback-Anfrage verschickt und das Ergebnis am Ticket gespeichert werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nNach Abschluss bestimmter Tickets soll eine kurze Feedback-Anfrage verschickt und das Ergebnis am Ticket gespeichert werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 23,
     "ticket": 23,
@@ -301,7 +301,7 @@
   {
     "title": "Migrationscheckliste Cloud Umzug",
     "status": "completed",
-    "requirementsMarkdown": "## Ausgangslage\n\nFuer Cloud-Migrationen soll eine wiederverwendbare Checkliste mit Verantwortlichkeiten entstehen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nFür Cloud-Migrationen soll eine wiederverwendbare Checkliste mit Verantwortlichkeiten entstehen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 24,
     "ticket": 24,
@@ -314,7 +314,7 @@
   {
     "title": "Vertriebsforecast Bereinigung",
     "status": "cancelled",
-    "requirementsMarkdown": "## Ausgangslage\n\nDie Forecast-Pipeline enthaelt uneinheitliche Phasen. Es sollen Regeln und Pflichtfelder fuer belastbare Prognosen eingefuehrt werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nDie Forecast-Pipeline enthält uneinheitliche Phasen. Es sollen Regeln und Pflichtfelder für belastbare Prognosen eingeführt werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": false,
     "salesOpportunity": 25,
     "ticket": 25,
@@ -327,7 +327,7 @@
   {
     "title": "Servicevertrag Modulpreise",
     "status": "new",
-    "requirementsMarkdown": "## Ausgangslage\n\nVertragsleistungen sollen Modulpreise und Sonderkonditionen abbilden, damit Angebote konsistenter kalkuliert werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nVertragsleistungen sollen Modulpreise und Sonderkonditionen abbilden, damit Angebote konsistenter kalkuliert werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 1,
     "ticket": 26,
@@ -338,9 +338,9 @@
     "creatorPerson": 26
   },
   {
-    "title": "Inbox Digest fuer Teamleiter",
+    "title": "Inbox Digest für Teamleiter",
     "status": "open",
-    "requirementsMarkdown": "## Ausgangslage\n\nTeamleiter sollen morgens eine zusammengefasste Inbox-Uebersicht ueber kritische offene Themen erhalten.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nTeamleiter sollen morgens eine zusammengefasste Inbox-Übersicht über kritische offene Themen erhalten.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 2,
     "ticket": 27,
@@ -351,9 +351,9 @@
     "creatorPerson": 27
   },
   {
-    "title": "MCP Werkzeug fuer Stammdatenabfrage",
+    "title": "MCP Werkzeug für Stammdatenabfrage",
     "status": "in_progress",
-    "requirementsMarkdown": "## Ausgangslage\n\nEin internes MCP-Werkzeug soll Stammdaten gezielt abfragen koennen, ohne sensible Felder offenzulegen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nEin internes MCP-Werkzeug soll Stammdaten gezielt abfragen können, ohne sensible Felder offenzulegen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 3,
     "ticket": 28,
@@ -364,9 +364,9 @@
     "creatorPerson": 28
   },
   {
-    "title": "KI Zusammenfassung fuer lange Tickets",
+    "title": "KI Zusammenfassung für lange Tickets",
     "status": "completed",
-    "requirementsMarkdown": "## Ausgangslage\n\nLange Ticketverlaeufe sollen eine kurze Zusammenfassung erhalten, die Support und Vertrieb schnell orientiert.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nLange Ticketverläufe sollen eine kurze Zusammenfassung erhalten, die Support und Vertrieb schnell orientiert.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 4,
     "ticket": 29,
@@ -377,9 +377,9 @@
     "creatorPerson": 29
   },
   {
-    "title": "Fehlerdiagnose fuer API Antworten",
+    "title": "Fehlerdiagnose für API Antworten",
     "status": "cancelled",
-    "requirementsMarkdown": "## Ausgangslage\n\nAPI-Fehler sollen fuer Anwender verstaendlicher dargestellt werden, inklusive Feldbezug und konkreter Handlung.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nAPI-Fehler sollen für Anwender verständlicher dargestellt werden, inklusive Feldbezug und konkreter Handlung.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": false,
     "salesOpportunity": 5,
     "ticket": 30,
@@ -392,7 +392,7 @@
   {
     "title": "Lieferantenkontakte im Kundenkontext",
     "status": "new",
-    "requirementsMarkdown": "## Ausgangslage\n\nBei bestimmten Kunden sollen externe Lieferantenkontakte hinterlegt und bei Tickets schnell erreichbar sein.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nBei bestimmten Kunden sollen externe Lieferantenkontakte hinterlegt und bei Tickets schnell erreichbar sein.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 6,
     "ticket": 31,
@@ -403,9 +403,9 @@
     "creatorPerson": 31
   },
   {
-    "title": "Schulungsplanung fuer Rollout",
+    "title": "Schulungsplanung für Rollout",
     "status": "open",
-    "requirementsMarkdown": "## Ausgangslage\n\nFuer einen groesseren Rollout sollen Schulungstermine, Teilnehmer und Nachfassaufgaben geplant werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nFür einen größeren Rollout sollen Schulungstermine, Teilnehmer und Nachfassaufgaben geplant werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 7,
     "ticket": 32,
@@ -418,7 +418,7 @@
   {
     "title": "Artikelnummern Validierung",
     "status": "in_progress",
-    "requirementsMarkdown": "## Ausgangslage\n\nProdukt- und Ersatzteilnummern sollen beim Import gegen ein definiertes Muster geprueft werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nProdukt- und Ersatzteilnummern sollen beim Import gegen ein definiertes Muster geprüft werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 8,
     "ticket": 33,
@@ -431,7 +431,7 @@
   {
     "title": "Kundenportal Dokumentfreigabe",
     "status": "completed",
-    "requirementsMarkdown": "## Ausgangslage\n\nKunden sollen freigegebene Dokumente im Portal sehen, interne Entwuerfe aber nicht.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nKunden sollen freigegebene Dokumente im Portal sehen, interne Entwürfe aber nicht.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 9,
     "ticket": 34,
@@ -444,7 +444,7 @@
   {
     "title": "Support Vertrag Eskalationsstufen",
     "status": "cancelled",
-    "requirementsMarkdown": "## Ausgangslage\n\nJe Vertrag sollen Eskalationsstufen mit Ansprechpartnern und Reaktionszeiten hinterlegt werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nJe Vertrag sollen Eskalationsstufen mit Ansprechpartnern und Reaktionszeiten hinterlegt werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": false,
     "salesOpportunity": 10,
     "ticket": 35,
@@ -455,9 +455,9 @@
     "creatorPerson": 35
   },
   {
-    "title": "Datenqualitaetsbericht Personen",
+    "title": "Datenqualitätsbericht Personen",
     "status": "new",
-    "requirementsMarkdown": "## Ausgangslage\n\nUnvollstaendige Personenstammsaetze sollen sichtbar werden: fehlende E-Mail, Telefonnummer, Unternehmen oder Rolle.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nUnvollständige Personenstammsätze sollen sichtbar werden: fehlende E-Mail, Telefonnummer, Unternehmen oder Rolle.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 11,
     "ticket": 36,
@@ -470,7 +470,7 @@
   {
     "title": "Opportunity nach Ticket erzeugen",
     "status": "open",
-    "requirementsMarkdown": "## Ausgangslage\n\nAus bestimmten Supportfaellen sollen Verkaufschancen vorgeschlagen werden, wenn Erweiterungsbedarf erkennbar ist.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nAus bestimmten Supportfällen sollen Verkaufschancen vorgeschlagen werden, wenn Erweiterungsbedarf erkennbar ist.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 12,
     "ticket": 37,
@@ -483,7 +483,7 @@
   {
     "title": "Rollenbasierte Formularansichten",
     "status": "in_progress",
-    "requirementsMarkdown": "## Ausgangslage\n\nJe Rolle sollen unterschiedliche Formularfelder sichtbar oder schreibbar sein, ohne eigene Komponenten zu bauen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nJe Rolle sollen unterschiedliche Formularfelder sichtbar oder schreibbar sein, ohne eigene Komponenten zu bauen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 13,
     "ticket": 38,
@@ -496,7 +496,7 @@
   {
     "title": "Projektbudget Warnung",
     "status": "completed",
-    "requirementsMarkdown": "## Ausgangslage\n\nWenn gebuchte Zeiten ein Budget ueberschreiten, sollen Projektverantwortliche gewarnt werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nWenn gebuchte Zeiten ein Budget überschreiten, sollen Projektverantwortliche gewarnt werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 14,
     "ticket": 39,
@@ -509,7 +509,7 @@
   {
     "title": "E-Mail Eingang Klassifikation",
     "status": "cancelled",
-    "requirementsMarkdown": "## Ausgangslage\n\nEingehende E-Mails sollen nach Thema klassifiziert und passenden Tickettypen vorgeschlagen werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nEingehende E-Mails sollen nach Thema klassifiziert und passenden Tickettypen vorgeschlagen werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": false,
     "salesOpportunity": 15,
     "ticket": 40,
@@ -520,9 +520,9 @@
     "creatorPerson": 40
   },
   {
-    "title": "Datenarchiv fuer alte Tickets",
+    "title": "Datenarchiv für alte Tickets",
     "status": "new",
-    "requirementsMarkdown": "## Ausgangslage\n\nSehr alte geschlossene Tickets sollen archiviert werden, aber fuer Recherche auffindbar bleiben.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nSehr alte geschlossene Tickets sollen archiviert werden, aber für Recherche auffindbar bleiben.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 16,
     "ticket": 41,
@@ -533,9 +533,9 @@
     "creatorPerson": 41
   },
   {
-    "title": "Servicekatalog fuer Kundenangebote",
+    "title": "Servicekatalog für Kundenangebote",
     "status": "open",
-    "requirementsMarkdown": "## Ausgangslage\n\nAngebotspositionen sollen aus einem Servicekatalog mit Textbausteinen und Schaetzwerten entstehen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nAngebotspositionen sollen aus einem Servicekatalog mit Textbausteinen und Schätzwerten entstehen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 17,
     "ticket": 42,
@@ -548,7 +548,7 @@
   {
     "title": "Sicherheitsreview API Tokens",
     "status": "in_progress",
-    "requirementsMarkdown": "## Ausgangslage\n\nPersonen-API-Tokens sollen auf Laufzeit, Nutzung und Rotationsbedarf geprueft werden koennen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nPersonen-API-Tokens sollen auf Laufzeit, Nutzung und Rotationsbedarf geprüft werden können.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 18,
     "ticket": 43,
@@ -559,9 +559,9 @@
     "creatorPerson": 43
   },
   {
-    "title": "Kalenderabgleich fuer Feiertage",
+    "title": "Kalenderabgleich für Feiertage",
     "status": "completed",
-    "requirementsMarkdown": "## Ausgangslage\n\nFeiertage sollen je Firma und Person in Termin- und SLA-Berechnungen beruecksichtigt werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nFeiertage sollen je Firma und Person in Termin- und SLA-Berechnungen berücksichtigt werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 19,
     "ticket": 44,
@@ -574,7 +574,7 @@
   {
     "title": "Vertriebskampagne Nachverfolgung",
     "status": "cancelled",
-    "requirementsMarkdown": "## Ausgangslage\n\nNach Kampagnen sollen Kontakte, Opportunities und Rueckmeldungen strukturiert nachverfolgt werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nNach Kampagnen sollen Kontakte, Opportunities und Rückmeldungen strukturiert nachverfolgt werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": false,
     "salesOpportunity": 20,
     "ticket": 45,
@@ -587,7 +587,7 @@
   {
     "title": "Techniker Einsatzplanung",
     "status": "new",
-    "requirementsMarkdown": "## Ausgangslage\n\nVor-Ort-Termine sollen mit Skills, Region und Verfuegbarkeit der Techniker geplant werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nVor-Ort-Termine sollen mit Skills, Region und Verfügbarkeit der Techniker geplant werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 21,
     "ticket": 46,
@@ -600,7 +600,7 @@
   {
     "title": "Kundenwechsel Ansprechpartner",
     "status": "open",
-    "requirementsMarkdown": "## Ausgangslage\n\nWenn ein Ansprechpartner das Unternehmen wechselt, sollen offene Tickets und Angebote geprueft und neu zugeordnet werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nWenn ein Ansprechpartner das Unternehmen wechselt, sollen offene Tickets und Angebote geprüft und neu zugeordnet werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 22,
     "ticket": 47,
@@ -613,7 +613,7 @@
   {
     "title": "Statusbericht Automatisierung",
     "status": "in_progress",
-    "requirementsMarkdown": "## Ausgangslage\n\nWoechentliche Projektstatusberichte sollen aus Tickets, Terminen und offenen Punkten automatisch vorbereitet werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nWöchentliche Projektstatusberichte sollen aus Tickets, Terminen und offenen Punkten automatisch vorbereitet werden.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 23,
     "ticket": 48,
@@ -626,7 +626,7 @@
   {
     "title": "Schnittstelle Lagerbestand",
     "status": "completed",
-    "requirementsMarkdown": "## Ausgangslage\n\nSupport und Vertrieb sollen Lagerbestand zu Ersatzteilen sehen, ohne direkt ins ERP wechseln zu muessen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nSupport und Vertrieb sollen Lagerbestand zu Ersatzteilen sehen, ohne direkt ins ERP wechseln zu müssen.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": true,
     "salesOpportunity": 24,
     "ticket": 49,
@@ -639,7 +639,7 @@
   {
     "title": "Onboarding Paket Neukunde",
     "status": "cancelled",
-    "requirementsMarkdown": "## Ausgangslage\n\nNeukunden sollen automatisch ein Set aus Willkommensmail, Stammdatencheck und Ersttermin erhalten.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberflaeche\n- Fachliche Rueckfragen werden vor Beginn der Implementierung gebuendelt geklaert\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung ausserhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
+    "requirementsMarkdown": "## Ausgangslage\n\nNeukunden sollen automatisch ein Set aus Willkommensmail, Stammdatencheck und Ersttermin erhalten.\n\n## Rahmenbedingungen\n\n- Umsetzung im bestehenden Sapling-Standard, ohne separate Spezialoberfläche\n- Fachliche Rückfragen werden vor Beginn der Implementierung gebündelt geklärt\n- Testdaten und mindestens ein Abnahmeszenario werden durch den Fachbereich bereitgestellt\n\n## Nicht enthalten\n\n- Produktive Datenbereinigung außerhalb der beschriebenen Stichprobe\n- Betrieb externer Systeme oder manuelle Nachpflege nach Abnahme",
     "isActive": false,
     "salesOpportunity": 25,
     "ticket": 50,

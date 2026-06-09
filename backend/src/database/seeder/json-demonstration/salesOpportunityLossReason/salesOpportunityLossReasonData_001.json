@@ -1,6 +1,6 @@
 [
   { "handle": "price", "title": "Preis", "description": "Preis oder kommerzielle Konditionen waren nicht passend.", "icon": "mdi-cash-remove", "color": "#EF6C00", "sortOrder": 10 },
-  { "handle": "competitor", "title": "Wettbewerber", "description": "Der Kunde hat sich fuer einen Wettbewerber entschieden.", "icon": "mdi-account-switch-outline", "color": "#8E24AA", "sortOrder": 20 },
+  { "handle": "competitor", "title": "Wettbewerber", "description": "Der Kunde hat sich für einen Wettbewerber entschieden.", "icon": "mdi-account-switch-outline", "color": "#8E24AA", "sortOrder": 20 },
   { "handle": "no_budget", "title": "Kein Budget", "description": "Budget war nicht vorhanden oder wurde gestrichen.", "icon": "mdi-cash-off", "color": "#F57C00", "sortOrder": 30 },
   { "handle": "timing", "title": "Timing", "description": "Der Zeitpunkt passte nicht.", "icon": "mdi-calendar-clock", "color": "#546E7A", "sortOrder": 40 },
   { "handle": "missing_fit", "title": "Kein Fit", "description": "Anforderungen und Angebot passten nicht ausreichend zusammen.", "icon": "mdi-puzzle-remove-outline", "color": "#E53935", "sortOrder": 50 }

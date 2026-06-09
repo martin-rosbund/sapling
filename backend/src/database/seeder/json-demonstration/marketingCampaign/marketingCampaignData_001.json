@@ -1,7 +1,7 @@
 [
   {
     "name": "Q2 Bestandskunden Newsletter",
-    "description": "Regelmaessiger Newsletter fuer Bestandskunden mit Produktneuigkeiten, Service-Hinweisen und Success Stories.",
+    "description": "Regelmäßiger Newsletter für Bestandskunden mit Produktneuigkeiten, Service-Hinweisen und Success Stories.",
     "startDate": "2026-04-01",
     "endDate": "2026-04-30",
     "isActive": false,
@@ -14,7 +14,7 @@
   },
   {
     "name": "IT-Security Webinar Juni",
-    "description": "Einladungskampagne fuer ein Webinar zu Datenschutz, Audit-Vorbereitung und IT-Sicherheitsprozessen.",
+    "description": "Einladungskampagne für ein Webinar zu Datenschutz, Audit-Vorbereitung und IT-Sicherheitsprozessen.",
     "startDate": "2026-06-03",
     "endDate": "2026-06-20",
     "isActive": true,
@@ -26,8 +26,8 @@
     "opportunitySource": 3
   },
   {
-    "name": "Pipeline Follow-up Fruehjahr",
-    "description": "Nachfasskampagne fuer offene Vertriebschancen mit konkretem naechsten Schritt und Terminangebot.",
+    "name": "Pipeline Follow-up Frühjahr",
+    "description": "Nachfasskampagne für offene Vertriebschancen mit konkretem nächsten Schritt und Terminangebot.",
     "startDate": "2026-03-15",
     "endDate": "2026-04-15",
     "isActive": false,
@@ -40,7 +40,7 @@
   },
   {
     "name": "Servicedesk Produktupdate",
-    "description": "Produktinformation fuer Support- und Servicekontakte zu neuen Helpdesk- und Ticketfunktionen.",
+    "description": "Produktinformation für Support- und Servicekontakte zu neuen Helpdesk- und Ticketfunktionen.",
     "startDate": "2026-05-05",
     "endDate": "2026-05-31",
     "isActive": true,
@@ -66,7 +66,7 @@
   },
   {
     "name": "Reaktivierung ruhender Accounts",
-    "description": "Gezielte Kampagne fuer Accounts mit erhoehtem Churn-Risiko und auslaufender Aktivitaet.",
+    "description": "Gezielte Kampagne für Accounts mit erhöhtem Churn-Risiko und auslaufender Aktivität.",
     "startDate": "2026-02-01",
     "endDate": "2026-02-28",
     "isActive": false,
@@ -79,7 +79,7 @@
   },
   {
     "name": "Partner Enablement Newsletter",
-    "description": "Informationskampagne fuer Partner und Multiplikatoren zu neuen Funktionen und Beratungsangeboten.",
+    "description": "Informationskampagne für Partner und Multiplikatoren zu neuen Funktionen und Beratungsangeboten.",
     "startDate": "2026-08-05",
     "endDate": "2026-08-31",
     "isActive": true,
@@ -92,7 +92,7 @@
   },
   {
     "name": "Abgebrochene Messekampagne",
-    "description": "Demo-Datensatz fuer abgebrochene Kampagnen, damit Status-Filter und Historie sichtbar werden.",
+    "description": "Demo-Datensatz für abgebrochene Kampagnen, damit Status-Filter und Historie sichtbar werden.",
     "startDate": "2026-01-10",
     "endDate": "2026-01-25",
     "isActive": false,

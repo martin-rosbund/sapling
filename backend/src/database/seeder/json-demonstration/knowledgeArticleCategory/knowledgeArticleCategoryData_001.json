@@ -2,7 +2,7 @@
   {
     "handle": "troubleshooting",
     "title": "Fehlerbehebung",
-    "description": "Bekannte Fehlerbilder, Ursachen und Loesungen.",
+    "description": "Bekannte Fehlerbilder, Ursachen und Lösungen.",
     "icon": "mdi-wrench-outline",
     "color": "#F44336",
     "sortOrder": 10
@@ -25,8 +25,8 @@
   },
   {
     "handle": "estimation",
-    "title": "Aufwandsschaetzung",
-    "description": "Wissen zu Schaetzmustern, Positionen und Risiken.",
+    "title": "Aufwandsschätzung",
+    "description": "Wissen zu Schätzmustern, Positionen und Risiken.",
     "icon": "mdi-clipboard-text-clock-outline",
     "color": "#9C27B0",
     "sortOrder": 40

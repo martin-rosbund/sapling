@@ -10,7 +10,7 @@
   },
   {
     "handle": "review",
-    "description": "In Pruefung",
+    "description": "In Prüfung",
     "color": "#FF9800",
     "icon": "mdi-file-search-outline",
     "sortOrder": 20,
@@ -19,7 +19,7 @@
   },
   {
     "handle": "published",
-    "description": "Veroeffentlicht",
+    "description": "Veröffentlicht",
     "color": "#4CAF50",
     "icon": "mdi-check-decagram-outline",
     "sortOrder": 30,

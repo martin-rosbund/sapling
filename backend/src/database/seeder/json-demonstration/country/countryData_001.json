@@ -274,7 +274,7 @@
   },
   {
     "handle": "CI",
-    "name": "Cote D'Ivoire (Elfenbeinkueste)",
+    "name": "Cote D'Ivoire (Elfenbeinküste)",
     "dialingCode": "+225",
     "language": "en",
     "money": "USD"
@@ -470,7 +470,7 @@
   },
   {
     "handle": "GB",
-    "name": "Grossbritannien und Nordirland",
+    "name": "Großbritannien und Nordirland",
     "dialingCode": "+44",
     "language": "en",
     "money": "USD"
