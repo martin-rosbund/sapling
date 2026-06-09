@@ -134,7 +134,7 @@ export class CalendarSyncSubscriptionItem {
     width: 2,
     visible: true,
     tableOrder: 100,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 100,
     mobileVisible: false,
   })

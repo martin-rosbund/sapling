@@ -107,7 +107,7 @@ export class CompanyItem {
     width: 2,
     visible: true,
     tableOrder: 100,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 100,
     mobileVisible: false,
   })
@@ -127,7 +127,7 @@ export class CompanyItem {
     width: 1,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })
@@ -187,7 +187,7 @@ export class CompanyItem {
     width: 2,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })
@@ -227,7 +227,7 @@ export class CompanyItem {
     width: 2,
     visible: true,
     tableOrder: 400,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 400,
     mobileVisible: false,
   })
@@ -265,7 +265,7 @@ export class CompanyItem {
     width: 1,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })
@@ -283,7 +283,7 @@ export class CompanyItem {
     width: 1,
     visible: true,
     tableOrder: 300,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 300,
     mobileVisible: false,
   })
@@ -301,7 +301,7 @@ export class CompanyItem {
     width: 1,
     visible: true,
     tableOrder: 400,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 400,
     mobileVisible: false,
   })
@@ -339,7 +339,7 @@ export class CompanyItem {
     width: 1,
     visible: true,
     tableOrder: 100,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 100,
     mobileVisible: false,
   })
@@ -377,7 +377,7 @@ export class CompanyItem {
     width: 1,
     visible: true,
     tableOrder: 300,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 300,
     mobileVisible: false,
   })
@@ -401,7 +401,7 @@ export class CompanyItem {
     width: 1,
     visible: true,
     tableOrder: 400,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 400,
     mobileVisible: false,
   })
@@ -445,7 +445,7 @@ export class CompanyItem {
     width: 2,
     visible: true,
     tableOrder: 400,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 400,
     mobileVisible: false,
   })
@@ -524,7 +524,7 @@ export class CompanyItem {
     width: 1,
     visible: true,
     tableOrder: 500,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 500,
     mobileVisible: false,
   })
@@ -543,7 +543,7 @@ export class CompanyItem {
     width: 2,
     visible: true,
     tableOrder: 500,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 500,
     mobileVisible: false,
   })
@@ -652,7 +652,7 @@ export class CompanyItem {
     width: 1,
     visible: true,
     tableOrder: 100,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 100,
     mobileVisible: false,
   })
@@ -671,7 +671,7 @@ export class CompanyItem {
     width: 1,
     visible: true,
     tableOrder: 150,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 150,
     mobileVisible: false,
   })
@@ -716,7 +716,7 @@ export class CompanyItem {
     width: 1,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })

@@ -163,7 +163,7 @@ export class PersonItem {
     width: 2,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })
@@ -243,7 +243,7 @@ export class PersonItem {
     width: 1,
     visible: true,
     tableOrder: 100,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 100,
     mobileVisible: false,
   })
@@ -261,7 +261,7 @@ export class PersonItem {
     width: 1,
     visible: true,
     tableOrder: 300,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 300,
     mobileVisible: false,
   })
@@ -297,7 +297,7 @@ export class PersonItem {
     width: 1,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })
@@ -316,7 +316,7 @@ export class PersonItem {
     width: 1,
     visible: true,
     tableOrder: 100,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 100,
     mobileVisible: false,
   })
@@ -359,7 +359,7 @@ export class PersonItem {
     width: 1,
     visible: true,
     tableOrder: 50,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 50,
     mobileVisible: false,
   })
@@ -378,7 +378,7 @@ export class PersonItem {
     width: 1,
     visible: true,
     tableOrder: 75,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 75,
     mobileVisible: false,
   })
@@ -416,7 +416,7 @@ export class PersonItem {
     width: 1,
     visible: true,
     tableOrder: 350,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 350,
     mobileVisible: false,
   })
@@ -435,7 +435,7 @@ export class PersonItem {
     width: 1,
     visible: true,
     tableOrder: 375,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 375,
     mobileVisible: false,
   })
@@ -474,7 +474,7 @@ export class PersonItem {
     width: 1,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })
@@ -511,7 +511,7 @@ export class PersonItem {
     width: 1,
     visible: true,
     tableOrder: 400,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 400,
     mobileVisible: false,
   })
@@ -529,7 +529,7 @@ export class PersonItem {
     width: 1,
     visible: true,
     tableOrder: 500,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 500,
     mobileVisible: false,
   })
@@ -547,7 +547,7 @@ export class PersonItem {
     width: 1,
     visible: true,
     tableOrder: 550,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 550,
     mobileVisible: false,
   })

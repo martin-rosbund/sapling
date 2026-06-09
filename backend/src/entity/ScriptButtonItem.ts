@@ -73,7 +73,7 @@ export class ScriptButtonItem {
     width: 2,
     visible: true,
     tableOrder: 300,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 300,
     mobileVisible: false,
   })

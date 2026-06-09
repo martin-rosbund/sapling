@@ -161,7 +161,7 @@ export class SaplingFormConfigItem {
     width: 4,
     visible: true,
     tableOrder: 800,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 800,
     mobileVisible: false,
   })

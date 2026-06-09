@@ -130,7 +130,7 @@ export class AddressItem {
     width: 1,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })
@@ -170,7 +170,7 @@ export class AddressItem {
     width: 1,
     visible: true,
     tableOrder: 400,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 400,
     mobileVisible: false,
   })

@@ -35,7 +35,7 @@ export class ChangeLogActionItem {
     width: 2,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })

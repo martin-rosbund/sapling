@@ -34,7 +34,7 @@ export class InboxTemplateItem {
     width: 2,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })
@@ -65,7 +65,7 @@ export class InboxTemplateItem {
     width: 4,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })

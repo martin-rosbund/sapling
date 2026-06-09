@@ -67,7 +67,7 @@ export class SocialMediaItem {
     width: 2,
     visible: true,
     tableOrder: 100,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 100,
     mobileVisible: false,
   })
@@ -112,7 +112,7 @@ export class SocialMediaItem {
     width: 4,
     visible: true,
     tableOrder: 100,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 100,
     mobileVisible: false,
   })

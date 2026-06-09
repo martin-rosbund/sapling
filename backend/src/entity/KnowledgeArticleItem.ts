@@ -114,7 +114,7 @@ export class KnowledgeArticleItem {
     width: 4,
     visible: true,
     tableOrder: 500,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 500,
     mobileVisible: false,
   })
@@ -129,7 +129,7 @@ export class KnowledgeArticleItem {
     width: 2,
     visible: true,
     tableOrder: 600,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 600,
     mobileVisible: false,
   })
@@ -145,7 +145,7 @@ export class KnowledgeArticleItem {
     width: 4,
     visible: true,
     tableOrder: 100,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 100,
     mobileVisible: false,
   })
@@ -161,7 +161,7 @@ export class KnowledgeArticleItem {
     width: 4,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })
@@ -223,7 +223,7 @@ export class KnowledgeArticleItem {
     width: 2,
     visible: true,
     tableOrder: 100,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 100,
     mobileVisible: false,
   })
@@ -238,7 +238,7 @@ export class KnowledgeArticleItem {
     width: 2,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })
@@ -253,7 +253,7 @@ export class KnowledgeArticleItem {
     width: 2,
     visible: true,
     tableOrder: 300,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 300,
     mobileVisible: false,
   })

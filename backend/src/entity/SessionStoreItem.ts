@@ -39,7 +39,7 @@ export class SessionStoreItem {
     width: 4,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })
