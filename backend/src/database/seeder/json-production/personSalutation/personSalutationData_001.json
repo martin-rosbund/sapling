@@ -1,0 +1,6 @@
+[
+  { "handle": "mr", "title": "Herr", "icon": "mdi-account-outline", "color": "#546E7A", "sortOrder": 10 },
+  { "handle": "ms", "title": "Frau", "icon": "mdi-account-outline", "color": "#546E7A", "sortOrder": 20 },
+  { "handle": "diverse", "title": "Divers", "icon": "mdi-account-outline", "color": "#546E7A", "sortOrder": 30 },
+  { "handle": "neutral", "title": "Neutral", "icon": "mdi-account-outline", "color": "#78909C", "sortOrder": 40 }
+]

@@ -1,0 +1,7 @@
+[
+  { "handle": "lt_1m", "title": "< 1 Mio.", "icon": "mdi-cash", "color": "#90A4AE", "sortOrder": 10 },
+  { "handle": "m_1_10", "title": "1-10 Mio.", "icon": "mdi-cash-multiple", "color": "#78909C", "sortOrder": 20 },
+  { "handle": "m_10_50", "title": "10-50 Mio.", "icon": "mdi-cash-multiple", "color": "#546E7A", "sortOrder": 30 },
+  { "handle": "m_50_250", "title": "50-250 Mio.", "icon": "mdi-bank-outline", "color": "#455A64", "sortOrder": 40 },
+  { "handle": "gt_250m", "title": "> 250 Mio.", "icon": "mdi-bank", "color": "#37474F", "sortOrder": 50 }
+]

@@ -1,0 +1,7 @@
+[
+  { "handle": "decider", "title": "Entscheider", "icon": "mdi-account-check-outline", "color": "#43A047", "sortOrder": 10 },
+  { "handle": "influencer", "title": "Influencer", "icon": "mdi-account-star-outline", "color": "#1E88E5", "sortOrder": 20 },
+  { "handle": "user", "title": "Nutzer", "icon": "mdi-account-outline", "color": "#546E7A", "sortOrder": 30 },
+  { "handle": "procurement", "title": "Einkauf", "icon": "mdi-cart-outline", "color": "#F9A825", "sortOrder": 40 },
+  { "handle": "technical", "title": "Technik", "icon": "mdi-cog-outline", "color": "#1976D2", "sortOrder": 50 }
+]

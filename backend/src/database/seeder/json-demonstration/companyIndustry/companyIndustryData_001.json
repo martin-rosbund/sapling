@@ -1,0 +1,7 @@
+[
+  { "handle": "software", "title": "Software & IT", "icon": "mdi-laptop", "color": "#1976D2", "sortOrder": 10 },
+  { "handle": "consulting", "title": "Beratung", "icon": "mdi-account-tie", "color": "#5E35B1", "sortOrder": 20 },
+  { "handle": "manufacturing", "title": "Industrie & Fertigung", "icon": "mdi-factory", "color": "#455A64", "sortOrder": 30 },
+  { "handle": "retail", "title": "Handel", "icon": "mdi-storefront-outline", "color": "#00897B", "sortOrder": 40 },
+  { "handle": "public_sector", "title": "Oeffentlicher Sektor", "icon": "mdi-bank-outline", "color": "#6D4C41", "sortOrder": 50 }
+]

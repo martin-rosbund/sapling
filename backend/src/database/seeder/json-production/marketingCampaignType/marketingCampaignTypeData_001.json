@@ -1,0 +1,7 @@
+[
+  { "handle": "newsletter", "title": "Newsletter", "icon": "mdi-email-newsletter", "color": "#1976D2", "sortOrder": 10 },
+  { "handle": "event_invitation", "title": "Event-Einladung", "icon": "mdi-calendar-star", "color": "#7CB342", "sortOrder": 20 },
+  { "handle": "product_info", "title": "Produktinformation", "icon": "mdi-package-variant-closed", "color": "#5E35B1", "sortOrder": 30 },
+  { "handle": "follow_up", "title": "Follow-up", "icon": "mdi-phone-forward-outline", "color": "#F9A825", "sortOrder": 40 },
+  { "handle": "webinar", "title": "Webinar", "icon": "mdi-video-outline", "color": "#00897B", "sortOrder": 50 }
+]

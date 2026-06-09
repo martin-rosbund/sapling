@@ -1,0 +1,20 @@
+[
+  { "handle": "companyIndustry", "canShow": true, "icon": "mdi-factory", "group": "company", "order": 31, "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "companySegment", "canShow": true, "icon": "mdi-account-group-outline", "group": "company", "order": 32, "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "companySize", "canShow": true, "icon": "mdi-office-building", "group": "company", "order": 33, "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "companyAnnualRevenueClass", "canShow": true, "icon": "mdi-cash-multiple", "group": "company", "order": 34, "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "companyChurnRiskReason", "canShow": true, "icon": "mdi-alert-outline", "group": "company", "order": 35, "canInsert": true, "canUpdate": true, "canDelete": true },
+
+  { "handle": "personSalutation", "canShow": true, "icon": "mdi-card-account-details-outline", "group": "person", "order": 70, "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "personTitle", "canShow": true, "icon": "mdi-school-outline", "group": "person", "order": 80, "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "personJobTitle", "canShow": true, "icon": "mdi-briefcase-account-outline", "group": "person", "order": 90, "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "personFunction", "canShow": true, "icon": "mdi-account-tie-outline", "group": "person", "order": 100, "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "personDecisionRole", "canShow": true, "icon": "mdi-account-check-outline", "group": "person", "order": 110, "canInsert": true, "canUpdate": true, "canDelete": true },
+
+  { "handle": "salesOpportunityResultStatus", "canShow": true, "icon": "mdi-circle-outline", "group": "sales", "order": 50, "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "salesOpportunityLossReason", "canShow": true, "icon": "mdi-close-circle-outline", "group": "sales", "order": 60, "canInsert": true, "canUpdate": true, "canDelete": true },
+
+  { "handle": "marketingCampaign", "canShow": true, "icon": "mdi-bullhorn-outline", "group": "mails", "order": 45, "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "marketingCampaignStatus", "canShow": true, "icon": "mdi-calendar-clock", "group": "mails", "order": 46, "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "marketingCampaignType", "canShow": true, "icon": "mdi-bullhorn", "group": "mails", "order": 47, "canInsert": true, "canUpdate": true, "canDelete": true }
+]

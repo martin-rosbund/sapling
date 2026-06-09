@@ -1,0 +1,7 @@
+[
+  { "handle": "low_usage", "title": "Geringe Nutzung", "description": "Produkt oder Leistung wird kaum genutzt.", "icon": "mdi-chart-line-variant", "color": "#EF6C00", "sortOrder": 10 },
+  { "handle": "budget_pressure", "title": "Budgetdruck", "description": "Budgetkuerzung oder Kostendruck beim Kunden.", "icon": "mdi-cash-remove", "color": "#F57C00", "sortOrder": 20 },
+  { "handle": "satisfaction", "title": "Unzufriedenheit", "description": "Qualitaet, Service oder Erwartungserfuellung ist kritisch.", "icon": "mdi-emoticon-sad-outline", "color": "#E53935", "sortOrder": 30 },
+  { "handle": "competitor", "title": "Wettbewerber", "description": "Kunde prueft oder nutzt einen Wettbewerber.", "icon": "mdi-account-switch-outline", "color": "#8E24AA", "sortOrder": 40 },
+  { "handle": "stakeholder_change", "title": "Stakeholder-Wechsel", "description": "Entscheider oder Sponsor hat gewechselt.", "icon": "mdi-account-convert-outline", "color": "#5C6BC0", "sortOrder": 50 }
+]

@@ -1,0 +1,7 @@
+[
+  { "handle": "micro", "title": "1-9 Mitarbeitende", "icon": "mdi-office-building-outline", "color": "#90A4AE", "sortOrder": 10 },
+  { "handle": "small", "title": "10-49 Mitarbeitende", "icon": "mdi-office-building-outline", "color": "#78909C", "sortOrder": 20 },
+  { "handle": "medium", "title": "50-249 Mitarbeitende", "icon": "mdi-office-building", "color": "#546E7A", "sortOrder": 30 },
+  { "handle": "large", "title": "250-999 Mitarbeitende", "icon": "mdi-domain", "color": "#455A64", "sortOrder": 40 },
+  { "handle": "enterprise", "title": "1000+ Mitarbeitende", "icon": "mdi-city-variant-outline", "color": "#37474F", "sortOrder": 50 }
+]

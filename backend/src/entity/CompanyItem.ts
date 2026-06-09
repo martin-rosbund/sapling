@@ -1,4 +1,4 @@
-import { Collection } from '@mikro-orm/core';
+import { Collection, type Rel } from '@mikro-orm/core';
 import {
   Entity,
   ManyToMany,
@@ -19,6 +19,11 @@ import { EventItem } from './EventItem';
 import { ServerLandscapeItem } from './ServerLandscapeItem';
 import { AddressItem } from './AddressItem';
 import { HolidayGroupItem } from './HolidayGroupItem';
+import { CompanyAnnualRevenueClassItem } from './CompanyAnnualRevenueClassItem';
+import { CompanyChurnRiskReasonItem } from './CompanyChurnRiskReasonItem';
+import { CompanyIndustryItem } from './CompanyIndustryItem';
+import { CompanySegmentItem } from './CompanySegmentItem';
+import { CompanySizeItem } from './CompanySizeItem';
 
 import { EMailListItem } from './EMailListItem';
 
@@ -266,6 +271,118 @@ export class CompanyItem {
   })
   @Property({ default: true, nullable: false })
   allowNewsletter?: boolean = true;
+
+  /**
+   * Indicates whether the company granted data privacy consent.
+   */
+  @ApiPropertyOptional({ default: false })
+  @SaplingForm({
+    order: 300,
+    group: 'company.groupConfiguration',
+    groupOrder: 400,
+    width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
+  })
+  @Property({ default: false, nullable: false })
+  dataPrivacyConsentGiven?: boolean = false;
+
+  /**
+   * Date when data privacy consent was granted.
+   */
+  @ApiPropertyOptional({ type: 'string', format: 'date' })
+  @SaplingForm({
+    order: 400,
+    group: 'company.groupConfiguration',
+    groupOrder: 400,
+    width: 1,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
+  })
+  @Property({ nullable: true, type: 'date' })
+  dataPrivacyConsentAt?: Date;
+
+  /**
+   * Number of employees used for CRM segmentation.
+   */
+  @ApiPropertyOptional({ type: 'number' })
+  @Sapling(['isNumeric'])
+  @SaplingForm({
+    order: 100,
+    group: 'company.groupAccount',
+    groupOrder: 450,
+    width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
+  })
+  @Property({ nullable: true, type: 'integer' })
+  employeeCount?: number;
+
+  /**
+   * Total contract value for customer-success/account management.
+   */
+  @ApiPropertyOptional({ type: 'number' })
+  @Sapling(['isMoney'])
+  @SaplingForm({
+    order: 100,
+    group: 'company.groupCustomerSuccess',
+    groupOrder: 460,
+    width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
+  })
+  @Property({ nullable: true, type: 'float' })
+  contractValue?: number;
+
+  /**
+   * Annual recurring revenue for this account.
+   */
+  @ApiPropertyOptional({ type: 'number' })
+  @Sapling(['isMoney'])
+  @SaplingForm({
+    order: 200,
+    group: 'company.groupCustomerSuccess',
+    groupOrder: 460,
+    width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
+  })
+  @Property({ nullable: true, type: 'float' })
+  annualRecurringRevenue?: number;
+
+  /**
+   * Monthly recurring revenue for this account.
+   */
+  @ApiPropertyOptional({ type: 'number' })
+  @Sapling(['isMoney'])
+  @SaplingForm({
+    order: 300,
+    group: 'company.groupCustomerSuccess',
+    groupOrder: 460,
+    width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
+  })
+  @Property({ nullable: true, type: 'float' })
+  monthlyRecurringRevenue?: number;
   // #endregion
 
   // #region Properties: Relation
@@ -293,6 +410,139 @@ export class CompanyItem {
     nullable: false,
   })
   country!: CountryItem;
+
+  /**
+   * Responsible account manager.
+   */
+  @ApiPropertyOptional({ type: () => PersonItem })
+  @Sapling(['isPerson', 'isPartner'])
+  @SaplingForm({
+    order: 100,
+    group: 'company.groupAccount',
+    groupOrder: 450,
+    width: 2,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
+  })
+  @ManyToOne(() => PersonItem, { nullable: true })
+  accountManager?: Rel<PersonItem>;
+
+  /**
+   * Responsible customer success manager.
+   */
+  @ApiPropertyOptional({ type: () => PersonItem })
+  @Sapling(['isPerson', 'isPartner'])
+  @SaplingForm({
+    order: 400,
+    group: 'company.groupCustomerSuccess',
+    groupOrder: 460,
+    width: 2,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
+  })
+  @ManyToOne(() => PersonItem, { nullable: true })
+  customerSuccessManager?: Rel<PersonItem>;
+
+  /**
+   * Industry classification for this company.
+   */
+  @ApiPropertyOptional({ type: () => CompanyIndustryItem })
+  @Sapling(['isChip'])
+  @SaplingForm({
+    order: 200,
+    group: 'company.groupAccount',
+    groupOrder: 450,
+    width: 1,
+    visible: true,
+    tableOrder: 200,
+    tableVisible: true,
+    mobileOrder: 200,
+    mobileVisible: false,
+  })
+  @ManyToOne(() => CompanyIndustryItem, { nullable: true })
+  industry?: Rel<CompanyIndustryItem>;
+
+  /**
+   * Market/customer segment for this company.
+   */
+  @ApiPropertyOptional({ type: () => CompanySegmentItem })
+  @Sapling(['isChip'])
+  @SaplingForm({
+    order: 300,
+    group: 'company.groupAccount',
+    groupOrder: 450,
+    width: 1,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: true,
+    mobileOrder: 300,
+    mobileVisible: false,
+  })
+  @ManyToOne(() => CompanySegmentItem, { nullable: true })
+  segment?: Rel<CompanySegmentItem>;
+
+  /**
+   * Company size class.
+   */
+  @ApiPropertyOptional({ type: () => CompanySizeItem })
+  @Sapling(['isChip'])
+  @SaplingForm({
+    order: 400,
+    group: 'company.groupAccount',
+    groupOrder: 450,
+    width: 1,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
+    mobileVisible: false,
+  })
+  @ManyToOne(() => CompanySizeItem, { nullable: true })
+  size?: Rel<CompanySizeItem>;
+
+  /**
+   * Annual revenue classification.
+   */
+  @ApiPropertyOptional({ type: () => CompanyAnnualRevenueClassItem })
+  @Sapling(['isChip'])
+  @SaplingForm({
+    order: 500,
+    group: 'company.groupAccount',
+    groupOrder: 450,
+    width: 1,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
+  })
+  @ManyToOne(() => CompanyAnnualRevenueClassItem, { nullable: true })
+  annualRevenueClass?: Rel<CompanyAnnualRevenueClassItem>;
+
+  /**
+   * Current churn or account-risk reason.
+   */
+  @ApiPropertyOptional({ type: () => CompanyChurnRiskReasonItem })
+  @Sapling(['isChip'])
+  @SaplingForm({
+    order: 500,
+    group: 'company.groupCustomerSuccess',
+    groupOrder: 460,
+    width: 2,
+    visible: true,
+    tableOrder: 500,
+    tableVisible: true,
+    mobileOrder: 500,
+    mobileVisible: false,
+  })
+  @ManyToOne(() => CompanyChurnRiskReasonItem, { nullable: true })
+  churnRiskReason?: Rel<CompanyChurnRiskReasonItem>;
 
   /**
    * Persons associated with this company.

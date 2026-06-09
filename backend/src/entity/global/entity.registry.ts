@@ -3,8 +3,13 @@ import { TranslationItem } from '../TranslationItem';
 import { AddressItem } from '../AddressItem';
 import { AddressTypeItem } from '../AddressTypeItem';
 import { CompanyItem } from '../CompanyItem';
+import { CompanyAnnualRevenueClassItem } from '../CompanyAnnualRevenueClassItem';
+import { CompanyChurnRiskReasonItem } from '../CompanyChurnRiskReasonItem';
+import { CompanyIndustryItem } from '../CompanyIndustryItem';
 import { CompanyRelationshipItem } from '../CompanyRelationshipItem';
 import { CompanyRelationshipTypeItem } from '../CompanyRelationshipTypeItem';
+import { CompanySegmentItem } from '../CompanySegmentItem';
+import { CompanySizeItem } from '../CompanySizeItem';
 import { ContractServiceItem } from '../ContractServiceItem';
 import { PersonItem } from '../PersonItem';
 import { NoteItem } from '../NoteItem';
@@ -37,7 +42,12 @@ import { KpiTypeItem } from '../KpiTypeItem';
 import { WorkHourItem } from '../WorkHourItem';
 import { WorkHourWeekItem } from '../WorkHourWeekItem';
 import { PersonDepartmentItem } from '../PersonDepartmentItem';
+import { PersonDecisionRoleItem } from '../PersonDecisionRoleItem';
+import { PersonFunctionItem } from '../PersonFunctionItem';
+import { PersonJobTitleItem } from '../PersonJobTitleItem';
+import { PersonSalutationItem } from '../PersonSalutationItem';
 import { PersonTypeItem } from '../PersonTypeItem';
+import { PersonTitleItem } from '../PersonTitleItem';
 import { PersonSessionItem } from '../PersonSessionItem';
 import { WebhookAuthenticationTypeItem } from '../WebhookAuthenticationTypeItem';
 import { WebhookDeliveryStatusItem } from '../WebhookDeliveryStatusItem';
@@ -62,6 +72,8 @@ import { SalesOpportunityItem } from '../SalesOpportunityItem';
 import { SalesOpportunityStageItem } from '../SalesOpportunityStageItem';
 import { SalesOpportunityForecastItem } from '../SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from '../SalesOpportunitySourceItem';
+import { SalesOpportunityLossReasonItem } from '../SalesOpportunityLossReasonItem';
+import { SalesOpportunityResultStatusItem } from '../SalesOpportunityResultStatusItem';
 import { EntityRouteItem } from '../EntityRouteItem';
 import { ChangeLogItem } from '../ChangeLogItem';
 import { ChangeLogDetailItem } from '../ChangeLogDetailItem';
@@ -112,6 +124,9 @@ import { KnowledgeArticleCategoryItem } from '../KnowledgeArticleCategoryItem';
 import { KnowledgeArticleStatusItem } from '../KnowledgeArticleStatusItem';
 import { KnowledgeArticleVisibilityItem } from '../KnowledgeArticleVisibilityItem';
 import { CalendarSyncSubscriptionItem } from '../CalendarSyncSubscriptionItem';
+import { MarketingCampaignItem } from '../MarketingCampaignItem';
+import { MarketingCampaignStatusItem } from '../MarketingCampaignStatusItem';
+import { MarketingCampaignTypeItem } from '../MarketingCampaignTypeItem';
 
 /**
  * @file entity.registry.ts
@@ -145,9 +160,14 @@ const ENTITY_REGISTRY_ENTRIES: { name: string; class: any }[] = [
   { name: 'money', class: MoneyItem },
   { name: 'addressType', class: AddressTypeItem },
   { name: 'company', class: CompanyItem },
+  { name: 'companyAnnualRevenueClass', class: CompanyAnnualRevenueClassItem },
+  { name: 'companyChurnRiskReason', class: CompanyChurnRiskReasonItem },
+  { name: 'companyIndustry', class: CompanyIndustryItem },
   { name: 'address', class: AddressItem },
   { name: 'companyRelationship', class: CompanyRelationshipItem },
   { name: 'companyRelationshipType', class: CompanyRelationshipTypeItem },
+  { name: 'companySegment', class: CompanySegmentItem },
+  { name: 'companySize', class: CompanySizeItem },
   { name: 'contract', class: ContractItem },
   { name: 'contractService', class: ContractServiceItem },
   { name: 'serverLandscapeType', class: ServerLandscapeTypeItem },
@@ -189,10 +209,15 @@ const ENTITY_REGISTRY_ENTRIES: { name: string; class: any }[] = [
   { name: 'phoneCall', class: PhoneCallItem },
   { name: 'permission', class: PermissionItem },
   { name: 'personDepartment', class: PersonDepartmentItem },
+  { name: 'personDecisionRole', class: PersonDecisionRoleItem },
+  { name: 'personFunction', class: PersonFunctionItem },
+  { name: 'personJobTitle', class: PersonJobTitleItem },
+  { name: 'personSalutation', class: PersonSalutationItem },
   { name: 'personSession', class: PersonSessionItem },
   { name: 'personApiToken', class: PersonApiTokenItem },
   { name: 'personPasskey', class: PersonPasskeyItem },
   { name: 'personType', class: PersonTypeItem },
+  { name: 'personTitle', class: PersonTitleItem },
   { name: 'person', class: PersonItem },
   { name: 'socialMediaType', class: SocialMediaTypeItem },
   { name: 'socialMedia', class: SocialMediaItem },
@@ -200,6 +225,9 @@ const ENTITY_REGISTRY_ENTRIES: { name: string; class: any }[] = [
   { name: 'emailDelivery', class: EmailDeliveryItem },
   { name: 'emailDeliveryStatus', class: EmailDeliveryStatusItem },
   { name: 'emailList', class: EMailListItem },
+  { name: 'marketingCampaign', class: MarketingCampaignItem },
+  { name: 'marketingCampaignStatus', class: MarketingCampaignStatusItem },
+  { name: 'marketingCampaignType', class: MarketingCampaignTypeItem },
   { name: 'sharedMailboxGroup', class: SharedMailboxGroupItem },
   { name: 'sharedMailbox', class: SharedMailboxItem },
   { name: 'teamsTemplate', class: TeamsTemplateItem },
@@ -226,6 +254,11 @@ const ENTITY_REGISTRY_ENTRIES: { name: string; class: any }[] = [
   { name: 'salesOpportunity', class: SalesOpportunityItem },
   { name: 'salesOpportunityStage', class: SalesOpportunityStageItem },
   { name: 'salesOpportunityForecast', class: SalesOpportunityForecastItem },
+  { name: 'salesOpportunityLossReason', class: SalesOpportunityLossReasonItem },
+  {
+    name: 'salesOpportunityResultStatus',
+    class: SalesOpportunityResultStatusItem,
+  },
   { name: 'salesOpportunitySource', class: SalesOpportunitySourceItem },
   { name: 'ticket', class: TicketItem },
   { name: 'ticketPriority', class: TicketPriorityItem },

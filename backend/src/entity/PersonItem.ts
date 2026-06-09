@@ -35,6 +35,11 @@ import { SalesOpportunityItem } from './SalesOpportunityItem';
 import { PersonApiTokenItem } from './PersonApiTokenItem';
 import { PersonPasskeyItem } from './PersonPasskeyItem';
 import { HolidayGroupItem } from './HolidayGroupItem';
+import { PersonDecisionRoleItem } from './PersonDecisionRoleItem';
+import { PersonFunctionItem } from './PersonFunctionItem';
+import { PersonJobTitleItem } from './PersonJobTitleItem';
+import { PersonSalutationItem } from './PersonSalutationItem';
+import { PersonTitleItem } from './PersonTitleItem';
 
 import { EMailListItem } from './EMailListItem';
 import { SharedMailboxGroupItem } from './SharedMailboxGroupItem';
@@ -338,6 +343,101 @@ export class PersonItem {
   })
   @ManyToOne(() => CompanyItem, { nullable: true })
   company?: Rel<CompanyItem>;
+
+  /**
+   * Salutation used for addressing this contact.
+   */
+  @ApiPropertyOptional({ type: () => PersonSalutationItem })
+  @Sapling(['isChip'])
+  @SaplingForm({
+    order: 50,
+    group: 'person.groupBasics',
+    groupOrder: 100,
+    width: 1,
+    visible: true,
+    tableOrder: 50,
+    tableVisible: true,
+    mobileOrder: 50,
+    mobileVisible: false,
+  })
+  @ManyToOne(() => PersonSalutationItem, { nullable: true })
+  salutation?: Rel<PersonSalutationItem>;
+
+  /**
+   * Academic or professional title of this contact.
+   */
+  @ApiPropertyOptional({ type: () => PersonTitleItem })
+  @Sapling(['isChip'])
+  @SaplingForm({
+    order: 75,
+    group: 'person.groupBasics',
+    groupOrder: 100,
+    width: 1,
+    visible: true,
+    tableOrder: 75,
+    tableVisible: true,
+    mobileOrder: 75,
+    mobileVisible: false,
+  })
+  @ManyToOne(() => PersonTitleItem, { nullable: true })
+  title?: Rel<PersonTitleItem>;
+
+  /**
+   * Job title of this contact.
+   */
+  @ApiPropertyOptional({ type: () => PersonJobTitleItem })
+  @Sapling(['isChip'])
+  @SaplingForm({
+    order: 325,
+    group: 'person.groupReference',
+    groupOrder: 700,
+    width: 1,
+    visible: true,
+    tableOrder: 325,
+    tableVisible: true,
+    mobileOrder: 325,
+    mobileVisible: false,
+  })
+  @ManyToOne(() => PersonJobTitleItem, { nullable: true })
+  jobTitle?: Rel<PersonJobTitleItem>;
+
+  /**
+   * Business function of this contact.
+   */
+  @ApiPropertyOptional({ type: () => PersonFunctionItem })
+  @Sapling(['isChip'])
+  @SaplingForm({
+    order: 350,
+    group: 'person.groupReference',
+    groupOrder: 700,
+    width: 1,
+    visible: true,
+    tableOrder: 350,
+    tableVisible: true,
+    mobileOrder: 350,
+    mobileVisible: false,
+  })
+  @ManyToOne(() => PersonFunctionItem, { nullable: true })
+  jobFunction?: Rel<PersonFunctionItem>;
+
+  /**
+   * Decision role in sales or account processes.
+   */
+  @ApiPropertyOptional({ type: () => PersonDecisionRoleItem })
+  @Sapling(['isChip'])
+  @SaplingForm({
+    order: 375,
+    group: 'person.groupReference',
+    groupOrder: 700,
+    width: 1,
+    visible: true,
+    tableOrder: 375,
+    tableVisible: true,
+    mobileOrder: 375,
+    mobileVisible: false,
+  })
+  @ManyToOne(() => PersonDecisionRoleItem, { nullable: true })
+  decisionRole?: Rel<PersonDecisionRoleItem>;
 
   /**
    * Mail lists this person is assigned to.

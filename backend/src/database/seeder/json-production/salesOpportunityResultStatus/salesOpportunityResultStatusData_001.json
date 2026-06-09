@@ -1,0 +1,6 @@
+[
+  { "handle": "open", "title": "Offen", "isClosed": false, "isSuccess": false, "icon": "mdi-circle-outline", "color": "#42A5F5", "sortOrder": 10 },
+  { "handle": "won", "title": "Gewonnen", "isClosed": true, "isSuccess": true, "icon": "mdi-trophy-outline", "color": "#43A047", "sortOrder": 20 },
+  { "handle": "lost", "title": "Verloren", "isClosed": true, "isSuccess": false, "icon": "mdi-close-circle-outline", "color": "#E53935", "sortOrder": 30 },
+  { "handle": "no_decision", "title": "Keine Entscheidung", "isClosed": true, "isSuccess": false, "icon": "mdi-timer-sand", "color": "#9E9E9E", "sortOrder": 40 }
+]

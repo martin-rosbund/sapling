@@ -1,0 +1,5 @@
+[
+  { "handle": "dr", "title": "Dr.", "icon": "mdi-school-outline", "color": "#546E7A", "sortOrder": 10 },
+  { "handle": "prof", "title": "Prof.", "icon": "mdi-school-outline", "color": "#546E7A", "sortOrder": 20 },
+  { "handle": "prof_dr", "title": "Prof. Dr.", "icon": "mdi-school-outline", "color": "#455A64", "sortOrder": 30 }
+]
