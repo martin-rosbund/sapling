@@ -242,17 +242,27 @@
           </div>
 
           <section
+            v-if="hasMarkdownText(selectedArticle.problemMarkdown)"
             class="sapling-knowledge-reader__section sapling-knowledge-reader__section--focus glass-panel"
           >
             <h3>{{ t('knowledgeArticle.problemMarkdown') }}</h3>
-            <SaplingMarkdownContent :source="selectedArticle.problemMarkdown || emptyMarkdown" />
+            <SaplingMarkdownContent :source="selectedArticle.problemMarkdown" />
           </section>
 
           <section
+            v-if="hasMarkdownText(selectedArticle.solutionMarkdown)"
             class="sapling-knowledge-reader__section sapling-knowledge-reader__section--focus glass-panel"
           >
             <h3>{{ t('knowledgeArticle.solutionMarkdown') }}</h3>
-            <SaplingMarkdownContent :source="selectedArticle.solutionMarkdown || emptyMarkdown" />
+            <SaplingMarkdownContent :source="selectedArticle.solutionMarkdown" />
+          </section>
+
+          <section
+            v-if="hasMarkdownText(selectedArticle.documentationMarkdown)"
+            class="sapling-knowledge-reader__section sapling-knowledge-reader__section--focus glass-panel"
+          >
+            <h3>{{ t('knowledgeArticle.documentationMarkdown') }}</h3>
+            <SaplingMarkdownContent :source="selectedArticle.documentationMarkdown" />
           </section>
         </div>
       </SaplingSurface>
@@ -270,6 +280,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 import SaplingMarkdownContent from '@/components/common/SaplingMarkdownContent.vue'
 import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingFieldSelect from '@/components/dialog/fields/SaplingFieldSelect.vue'
@@ -277,6 +288,7 @@ import { useTranslationLoader } from '@/composables/generic/useTranslationLoader
 import { useSaplingKnowledgeBase } from '@/composables/knowledge/useSaplingKnowledgeBase'
 
 const { t, locale } = useI18n()
+const route = useRoute()
 const { isLoading: isTranslationLoading } = useTranslationLoader(
   'global',
   'navigation',
@@ -287,7 +299,10 @@ const { isLoading: isTranslationLoading } = useTranslationLoader(
 
 const isFilterPanelOpen = ref(false)
 const activeReferenceFilter = { isActive: true }
-const emptyMarkdown = computed(() => t('global.notAvailable'))
+const contextKey = computed(() => {
+  const value = route.query.context
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null
+})
 const {
   activeLoadArticles,
   formatDate,
@@ -295,6 +310,7 @@ const {
   getArticlePreview,
   getArticleTags,
   getAuthorLabel,
+  hasMarkdownText,
   hasRelationValue,
   isInitialLoadError,
   isInitialLoading,
@@ -314,7 +330,7 @@ const {
   selectedVisibilities,
   totalArticles,
   totalPages,
-} = useSaplingKnowledgeBase({ t, locale })
+} = useSaplingKnowledgeBase({ t, locale, contextKey })
 
 const isPageLoading = computed(() => isInitialLoading.value || isTranslationLoading.value)
 </script>

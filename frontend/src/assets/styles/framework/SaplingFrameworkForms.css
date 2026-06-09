@@ -365,6 +365,40 @@
   color: rgb(var(--v-theme-primary));
 }
 
+.sapling-markdown-document {
+  display: grid;
+  gap: var(--sapling-space-sm);
+  margin: 0 0 var(--sapling-space-md-plus);
+}
+
+.sapling-markdown-document img,
+.sapling-markdown-document video {
+  display: block;
+  max-width: 100%;
+  border-radius: var(--sapling-radius-card);
+  border: 1px solid var(--sapling-surface-border);
+}
+
+.sapling-markdown-document audio {
+  width: 100%;
+}
+
+.sapling-markdown-document figcaption {
+  color: var(--sapling-text-muted);
+  font-size: var(--sapling-text-body-size-sm);
+}
+
+.sapling-markdown-document-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0.25rem 0.7rem;
+  border: 1px solid rgba(var(--v-theme-primary), 0.34);
+  border-radius: var(--sapling-radius-sm);
+  background: rgba(var(--v-theme-primary), 0.08);
+  text-decoration: none;
+}
+
 .sapling-markdown-content input[type='checkbox'] {
   margin-right: 0.45rem;
 }

@@ -137,6 +137,21 @@ export class KnowledgeArticleItem {
   tags?: string;
 
   @ApiPropertyOptional()
+  @SaplingForm({
+    order: 650,
+    group: 'knowledgeArticle.groupBasics',
+    groupOrder: 100,
+    width: 2,
+    visible: true,
+    tableOrder: 650,
+    tableVisible: false,
+    mobileOrder: 650,
+    mobileVisible: false,
+  })
+  @Property({ length: 128, nullable: true })
+  contextKey?: string;
+
+  @ApiPropertyOptional()
   @Sapling(['isMarkdown'])
   @SaplingForm({
     order: 100,
@@ -167,6 +182,22 @@ export class KnowledgeArticleItem {
   })
   @Property({ nullable: true, type: 'text' })
   solutionMarkdown?: string;
+
+  @ApiPropertyOptional()
+  @Sapling(['isMarkdown'])
+  @SaplingForm({
+    order: 300,
+    group: 'knowledgeArticle.groupContent',
+    groupOrder: 200,
+    width: 4,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: false,
+    mobileOrder: 300,
+    mobileVisible: false,
+  })
+  @Property({ nullable: true, type: 'text' })
+  documentationMarkdown?: string;
 
   @ApiPropertyOptional({ default: true })
   @SaplingForm({

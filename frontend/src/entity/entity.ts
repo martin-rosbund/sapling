@@ -1234,10 +1234,14 @@ export interface KnowledgeArticleItem extends SaplingGenericItem {
   summary?: string | null
   /** Comma-separated tags */
   tags?: string | null
+  /** Stable page or workflow key used for contextual help */
+  contextKey?: string | null
   /** Problem or question text written in markdown */
   problemMarkdown?: string | null
   /** Solution or answer text written in markdown */
   solutionMarkdown?: string | null
+  /** Documentation text written in markdown */
+  documentationMarkdown?: string | null
   /** Whether the article is active */
   isActive?: boolean
   /** Publication timestamp */

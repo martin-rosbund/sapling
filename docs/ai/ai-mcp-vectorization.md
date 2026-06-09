@@ -202,7 +202,7 @@ Sections:
 | `salesOpportunity` | `overview`, `description`, `painPoints` |
 | `effortEstimate` | `overview`, `requirements` |
 | `effortEstimatePosition` | `overview`, `offerText` |
-| `knowledgeArticle` | `overview`, `problem`, `solution` |
+| `knowledgeArticle` | `overview`, `problem`, `solution`, `documentation` |
 
 ## Running Vectorization
 

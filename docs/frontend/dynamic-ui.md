@@ -117,6 +117,13 @@ Selection examples:
 
 If a new field behavior is generally useful, add a Sapling option and renderer branch rather than special-casing one entity.
 
+Markdown fields can reference stored Sapling documents without new upload logic.
+Use `sapling-document:<handle>` as a normal markdown link or image URL, or embed
+media inline with `{{sapling-image:123|Screenshot}}`,
+`{{sapling-audio:123|Audio note}}`, `{{sapling-video:123|Demo video}}`, or
+`{{sapling-document:123|Open document}}`. The handle is the existing
+`document` record handle and permissions are enforced by the document API.
+
 ## Tables
 
 Table behavior is split across composables in:

@@ -24,7 +24,7 @@ export const VECTOR_SEARCHABLE_SECTIONS: Record<
   salesOpportunity: ['overview', 'description', 'painPoints'],
   effortEstimate: ['overview', 'requirements'],
   effortEstimatePosition: ['overview', 'offerText'],
-  knowledgeArticle: ['overview', 'problem', 'solution'],
+  knowledgeArticle: ['overview', 'problem', 'solution', 'documentation'],
 };
 
 export const VECTOR_SEARCH_RELATIONS: Record<

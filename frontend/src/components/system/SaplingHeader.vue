@@ -19,6 +19,8 @@
         :more-label="$t('global.more')"
         :inbox-label="$t('global.inbox')"
         :message-center-label="$t('global.messageCenter')"
+        :help-label="$t('global.contextualHelp')"
+        @open-context-help="openContextHelp"
         @open-inbox="openInbox"
         @open-message-center="openMessageCenter"
       />
@@ -57,9 +59,14 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useSaplingHeader } from '@/composables/system/useSaplingHeader'
 import { useSaplingHeaderInboxPreview } from '@/composables/system/useSaplingHeaderInboxPreview'
+import { useSaplingHelp } from '@/composables/system/useSaplingHelp'
+import {
+  openContextHelpArticle,
+  resolveRouteContextHelpKey,
+} from '@/composables/knowledge/useSaplingContextHelp'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useSaplingPreferences } from '@/composables/system/useSaplingPreferences'
 import { useSaplingVectorization } from '@/composables/system/useSaplingVectorization'
@@ -78,6 +85,7 @@ import {
 import type { SaplingProfileAction } from '@/components/system/header/header.types'
 
 const router = useRouter()
+const route = useRoute()
 const showProfileMenu = ref(false)
 const initialAccountTab = ref<SaplingAccountDialogTab>('profile')
 
@@ -95,6 +103,7 @@ const emit = defineEmits<{
 }>()
 
 const { messages, getMessageColor, openDialog: openGlobalMessageCenter } = useSaplingMessageCenter()
+const { openSaplingHelp } = useSaplingHelp()
 const messageCount = computed(() => messages.value.length)
 const messageBadgeColor = computed(() => {
   const latestMessage = messages.value[0]
@@ -145,6 +154,14 @@ function toggleNavigation() {
 
 function openMessageCenter() {
   openGlobalMessageCenter()
+}
+
+async function openContextHelp() {
+  const contextKey = resolveCurrentContextHelpKey()
+
+  if (!(await openContextHelpArticle(router, contextKey))) {
+    openSaplingHelp()
+  }
 }
 
 function openIssueFromProfile() {
@@ -308,5 +325,17 @@ async function returnToOwnAccount() {
   } finally {
     impersonationReturning.value = false
   }
+}
+
+function resolveCurrentContextHelpKey(): string | null {
+  if (showAccount.value) {
+    return 'app.profile'
+  }
+
+  if (showInbox.value) {
+    return 'app.inbox'
+  }
+
+  return resolveRouteContextHelpKey(route)
 }
 </script>

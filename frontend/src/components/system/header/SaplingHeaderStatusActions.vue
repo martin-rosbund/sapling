@@ -1,4 +1,14 @@
 <template>
+  <v-btn
+    class="sapling-header__desktop-action text-none"
+    stacked
+    :aria-label="helpLabel"
+    :title="helpLabel"
+    @click="emit('openContextHelp')"
+  >
+    <v-icon icon="mdi-help-circle-outline" />
+  </v-btn>
+
   <div class="sapling-header__inbox-slot">
     <v-btn class="sapling-header__desktop-action text-none" stacked @click="emit('openInbox')">
       <v-badge
@@ -66,6 +76,12 @@
           />
         </template>
       </v-list-item>
+
+      <v-list-item :title="helpLabel" @click="emit('openContextHelp')">
+        <template #prepend>
+          <v-icon icon="mdi-help-circle-outline" />
+        </template>
+      </v-list-item>
     </SaplingSurface>
   </v-menu>
 </template>
@@ -82,9 +98,11 @@ defineProps<{
   moreLabel: string
   inboxLabel: string
   messageCenterLabel: string
+  helpLabel: string
 }>()
 
 const emit = defineEmits<{
+  openContextHelp: []
   openInbox: []
   openMessageCenter: []
 }>()

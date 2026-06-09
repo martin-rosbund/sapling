@@ -12,7 +12,7 @@
   { "entity": "calendarSyncSubscription", "property": "lastImportedCount", "de": "Importiert", "en": "Imported" },
   { "entity": "calendarSyncSubscription", "property": "lastCreatedCount", "de": "Neu", "en": "Created" },
   { "entity": "calendarSyncSubscription", "property": "lastUpdatedCount", "de": "Aktualisiert", "en": "Updated" },
-  { "entity": "calendarSyncSubscription", "property": "lastSkippedCount", "de": "Uebersprungen", "en": "Skipped" },
+  { "entity": "calendarSyncSubscription", "property": "lastSkippedCount", "de": "Übersprungen", "en": "Skipped" },
   { "entity": "calendarSyncSubscription", "property": "person", "de": "Person", "en": "Person" },
   { "entity": "calendarSyncSubscription", "property": "groupContent", "de": "Inhalt", "en": "Content" },
   { "entity": "calendarSyncSubscription", "property": "groupProvider", "de": "Anbieter", "en": "Provider" },
@@ -27,5 +27,5 @@
   { "entity": "calendarSyncSubscription", "property": "interval240", "de": "4 Stunden", "en": "4 hours" },
   { "entity": "calendarSyncSubscription", "property": "save", "de": "Synchronisation speichern", "en": "Save synchronization" },
   { "entity": "calendarSyncSubscription", "property": "saveSuccess", "de": "Kalender-Synchronisation gespeichert", "en": "Calendar synchronization saved" },
-  { "entity": "calendarSyncSubscription", "property": "notAvailable", "de": "Automatischer Outlook-Abruf ist fuer dieses Konto nicht verfuegbar.", "en": "Automatic Outlook fetch is not available for this account." }
+  { "entity": "calendarSyncSubscription", "property": "notAvailable", "de": "Automatischer Outlook-Abruf ist für dieses Konto nicht verfügbar.", "en": "Automatic Outlook fetch is not available for this account." }
 ]

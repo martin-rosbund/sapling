@@ -18,7 +18,18 @@
             :eyebrow="$t('login.account')"
             :title="accountTitle"
             :subtitle="accountSubtitle"
-          />
+          >
+            <template #title-trailing>
+              <v-btn
+                icon="mdi-help-circle-outline"
+                variant="text"
+                size="small"
+                :aria-label="$t('global.contextualHelp')"
+                :title="$t('global.contextualHelp')"
+                @click="openProfileContextHelp"
+              />
+            </template>
+          </SaplingDialogHero>
         </template>
 
         <template #body>
@@ -558,7 +569,9 @@
 <script setup lang="ts">
 // #region Imports
 import { computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useSaplingAccount, type AccountTab } from '@/composables/account/useSaplingAccount'
+import { openContextHelpArticle } from '@/composables/knowledge/useSaplingContextHelp'
 import SaplingChangePassword from '@/components/account/SaplingChangePassword.vue'
 import SaplingPasskeyManager from '@/components/account/SaplingPasskeyManager.vue'
 import SaplingActionAccount from '@/components/actions/SaplingActionAccount.vue'
@@ -569,6 +582,7 @@ import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue'
 // #endregion
 
 // #region Composable
+const router = useRouter()
 const emit = defineEmits<{
   (event: 'close'): void
 }>()
@@ -667,6 +681,12 @@ const isSaplingAccount = computed(() => {
 
 function handleClose() {
   emit('close')
+}
+
+async function openProfileContextHelp() {
+  if (await openContextHelpArticle(router, 'app.profile')) {
+    handleClose()
+  }
 }
 // #endregion
 </script>
