@@ -1,6 +1,7 @@
 import { Collection } from '@mikro-orm/core';
 import {
   Entity,
+  ManyToMany,
   OneToMany,
   ManyToOne,
   Property,
@@ -20,6 +21,8 @@ import {
 import { SalesOpportunityForecastItem } from './SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from './SalesOpportunitySourceItem';
 import { type Rel } from '@mikro-orm/core';
+import { SalesOpportunityLossReasonItem } from './SalesOpportunityLossReasonItem';
+import { SalesOpportunityResultStatusItem } from './SalesOpportunityResultStatusItem';
 
 /**
  * @class SalesOpportunityItem
@@ -88,7 +91,7 @@ export class SalesOpportunityItem {
     width: 4,
     visible: true,
     tableOrder: 100,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 100,
     mobileVisible: false,
   })
@@ -162,7 +165,7 @@ export class SalesOpportunityItem {
     width: 4,
     visible: true,
     tableOrder: 400,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 400,
     mobileVisible: false,
   })
@@ -181,7 +184,7 @@ export class SalesOpportunityItem {
     width: 4,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })
@@ -271,6 +274,47 @@ export class SalesOpportunityItem {
   source!: SalesOpportunitySourceItem;
 
   /**
+   * Win/loss result status independent of the pipeline stage.
+   */
+  @ApiPropertyOptional({ type: () => SalesOpportunityResultStatusItem })
+  @Sapling(['isChip'])
+  @SaplingForm({
+    order: 780,
+    group: 'salesOpportunity.groupBasics',
+    groupOrder: 100,
+    width: 1,
+    visible: true,
+    tableOrder: 780,
+    tableVisible: true,
+    mobileOrder: 780,
+    mobileVisible: false,
+  })
+  @ManyToOne(() => SalesOpportunityResultStatusItem, {
+    defaultRaw: `'open'`,
+    nullable: false,
+  })
+  resultStatus!: Rel<SalesOpportunityResultStatusItem>;
+
+  /**
+   * Reason why the opportunity was lost.
+   */
+  @ApiPropertyOptional({ type: () => SalesOpportunityLossReasonItem })
+  @Sapling(['isChip'])
+  @SaplingForm({
+    order: 790,
+    group: 'salesOpportunity.groupBasics',
+    groupOrder: 100,
+    width: 1,
+    visible: true,
+    tableOrder: 790,
+    tableVisible: false,
+    mobileOrder: 790,
+    mobileVisible: false,
+  })
+  @ManyToOne(() => SalesOpportunityLossReasonItem, { nullable: true })
+  lossReason?: Rel<SalesOpportunityLossReasonItem>;
+
+  /**
    * Email address of the person who created the ticket.
    * @type {string}
    */
@@ -350,7 +394,7 @@ export class SalesOpportunityItem {
     width: 2,
     visible: true,
     tableOrder: 600,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 600,
     mobileVisible: false,
   })
@@ -376,7 +420,7 @@ export class SalesOpportunityItem {
     width: 2,
     visible: true,
     tableOrder: 700,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 700,
     mobileVisible: false,
   })
@@ -407,6 +451,24 @@ export class SalesOpportunityItem {
   )
   effortEstimates: Collection<EffortEstimateItem> =
     new Collection<EffortEstimateItem>(this);
+
+  /**
+   * Competitors that are relevant for this opportunity.
+   */
+  @ApiPropertyOptional({ type: () => CompanyItem, isArray: true })
+  @SaplingForm({
+    order: 800,
+    group: 'salesOpportunity.groupReference',
+    groupOrder: 400,
+    width: 4,
+    visible: true,
+    tableOrder: 800,
+    tableVisible: false,
+    mobileOrder: 800,
+    mobileVisible: false,
+  })
+  @ManyToMany(() => CompanyItem)
+  competitors: Collection<CompanyItem> = new Collection<CompanyItem>(this);
   //#endregion
 
   //#region Properties: System

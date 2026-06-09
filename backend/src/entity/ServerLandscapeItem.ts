@@ -66,7 +66,7 @@ export class ServerLandscapeItem {
     width: 4,
     visible: true,
     tableOrder: 100,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 100,
     mobileVisible: false,
   })

@@ -1,0 +1,7 @@
+[
+  { "handle": "planned", "title": "Geplant", "icon": "mdi-calendar-clock", "color": "#42A5F5", "sortOrder": 10 },
+  { "handle": "active", "title": "Aktiv", "icon": "mdi-play-circle-outline", "color": "#43A047", "sortOrder": 20 },
+  { "handle": "paused", "title": "Pausiert", "icon": "mdi-pause-circle-outline", "color": "#F9A825", "sortOrder": 30 },
+  { "handle": "completed", "title": "Abgeschlossen", "icon": "mdi-check-circle-outline", "color": "#546E7A", "sortOrder": 40 },
+  { "handle": "canceled", "title": "Abgebrochen", "icon": "mdi-close-circle-outline", "color": "#E53935", "sortOrder": 50 }
+]

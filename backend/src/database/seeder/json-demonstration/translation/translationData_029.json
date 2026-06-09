@@ -2,7 +2,7 @@
   {
     "entity": "formConfig",
     "property": "openForEntity",
-    "de": "Formular-Konfiguration fuer diese Entitaet oeffnen",
+    "de": "Formular-Konfiguration für diese Entität öffnen",
     "en": "Open form configuration for this entity"
   },
   {

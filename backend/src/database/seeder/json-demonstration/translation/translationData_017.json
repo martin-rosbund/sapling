@@ -12,7 +12,7 @@
   { "entity": "global", "property": "csvImportUnsupportedFile", "de": "Datei nicht unterstützt", "en": "Unsupported file" },
   { "entity": "global", "property": "csvImportUnsupportedFileDescription", "de": "Bitte eine CSV-, TXT- oder TSV-Datei hochladen. Excel kann CSV-Dateien direkt speichern.", "en": "Please upload a CSV, TXT or TSV file. Excel can save CSV files directly." },
   
-  { "entity": "exception", "property": "invalidPayload", "de": "Ungueltige Anfrage", "en": "Invalid payload" },
+  { "entity": "exception", "property": "invalidPayload", "de": "Ungültige Anfrage", "en": "Invalid payload" },
   
   { "entity": "inbox", "property": "heroTitle", "de": "Nachrichten", "en": "Messages" }
 ]

@@ -2,7 +2,7 @@
   { "entity": "exception", "property": "concurrentUpdate", "de": "Gleichzeitige Änderung", "en": "Concurrent update" },
   { "entity": "updateConflict", "property": "eyebrow", "de": "Gleichzeitige Änderung", "en": "Concurrent update" },
   { "entity": "updateConflict", "property": "title", "de": "Datensatz wurde geändert", "en": "Record was changed" },
-  { "entity": "updateConflict", "property": "summary", "de": "Eine andere Person hat diesen Datensatz seit dem Öffnen gespeichert. Vergleiche die Werte und wähle, welche Version übernommen werden soll.", "en": "Someone else saved this record after you opened it. Compare the values and choose which version should be kept." },
+  { "entity": "updateConflict", "property": "summary", "de": "Eine andere Person hat diesen Datensatz seit dem öffnen gespeichert. Vergleiche die Werte und wähle, welche Version übernommen werden soll.", "en": "Someone else saved this record after you opened it. Compare the values and choose which version should be kept." },
   { "entity": "updateConflict", "property": "conflict", "de": "Konflikt", "en": "Conflict" },
   { "entity": "updateConflict", "property": "mergeable", "de": "Zusammenführbar", "en": "Mergeable" },
   { "entity": "updateConflict", "property": "currentVersion", "de": "Aktuelle Version", "en": "Current version" },

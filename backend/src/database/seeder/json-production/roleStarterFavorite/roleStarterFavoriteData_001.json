@@ -3,14 +3,14 @@
     "role": "Administrator",
     "templates": [
       "Meine offenen Tickets",
-      "Meine ueberfaelligen Tickets",
-      "Meine heute faelligen Tickets",
+      "Meine überfälligen Tickets",
+      "Meine heute fälligen Tickets",
       "Meine offenen Verkaufschancen",
       "Meine heutigen Termine",
       "Meine Termine diese Woche",
       "Aktive Unternehmen",
       "Aktive Kontakte",
-      "Aktive Vertraege meines Unternehmens",
+      "Aktive Verträge meines Unternehmens",
       "Systeme meines Unternehmens mit Remote Access"
     ]
   },
@@ -20,9 +20,9 @@
       "Meine offenen Tickets",
       "Meine Tickets in Bearbeitung",
       "Meine wartenden Tickets",
-      "Meine Tickets mit hoher Prioritaet",
-      "Meine ueberfaelligen Tickets",
-      "Meine heute faelligen Tickets",
+      "Meine Tickets mit hoher Priorität",
+      "Meine überfälligen Tickets",
+      "Meine heute fälligen Tickets",
       "Offene Tickets Service Desk",
       "Tickets in Queue General Support",
       "Tickets in Queue Application Incidents",
@@ -49,9 +49,9 @@
       "Meine Termine diesen Monat",
       "Aktive Unternehmen",
       "Aktive Kontakte",
-      "Aktive Vertraege meines Unternehmens",
+      "Aktive Verträge meines Unternehmens",
       "Kontakte meines Unternehmens",
-      "Vertraege meines Unternehmens mit Enddatum diesen Monat"
+      "Verträge meines Unternehmens mit Enddatum diesen Monat"
     ]
   },
   {
@@ -61,10 +61,10 @@
       "Meine Termine diese Woche",
       "Meine Termine diesen Monat",
       "Aktive Kontakte",
-      "Aktive Vertraege meines Unternehmens",
-      "Vertraege mit naechstem Service diese Woche",
-      "Vertraege meines Unternehmens mit Updateservice",
-      "Vertraege meines Unternehmens mit Enddatum diesen Monat",
+      "Aktive Verträge meines Unternehmens",
+      "Verträge mit nächstem Service diese Woche",
+      "Verträge meines Unternehmens mit Updateservice",
+      "Verträge meines Unternehmens mit Enddatum diesen Monat",
       "Systeme meines Unternehmens mit Remote Access",
       "Systeme meines Unternehmens ohne Internetzugang",
       "Systeme meines Unternehmens mit Internetzugang",
@@ -76,16 +76,16 @@
     "templates": [
       "Meine offenen Tickets",
       "Meine Tickets in Bearbeitung",
-      "Meine ueberfaelligen Tickets",
-      "Meine heute faelligen Tickets",
+      "Meine überfälligen Tickets",
+      "Meine heute fälligen Tickets",
       "Meine heutigen Termine",
       "Meine Termine diese Woche",
       "Meine geplanten Termine",
       "Meine erstellten Termine",
       "Kontakte meines Unternehmens",
-      "Aktive Vertraege meines Unternehmens",
-      "Vertraege mit naechstem Service diese Woche",
-      "Vertraege meines Unternehmens mit Updateservice",
+      "Aktive Verträge meines Unternehmens",
+      "Verträge mit nächstem Service diese Woche",
+      "Verträge meines Unternehmens mit Updateservice",
       "Systeme meines Unternehmens mit Remote Access"
     ]
   }

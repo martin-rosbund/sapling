@@ -3,13 +3,13 @@
     "sourceCompany": 1,
     "targetCompany": 2,
     "type": "serviceProvider",
-    "description": "Standardfirma betreut Mueller & Partner GmbH als IT-Dienstleister."
+    "description": "Standardfirma betreut Müller & Partner GmbH als IT-Dienstleister."
   },
   {
     "sourceCompany": 1,
     "targetCompany": 3,
     "type": "serviceProvider",
-    "description": "Standardfirma unterstuetzt Schneider Consulting AG im laufenden Betrieb."
+    "description": "Standardfirma unterstützt Schneider Consulting AG im laufenden Betrieb."
   },
   {
     "sourceCompany": 4,

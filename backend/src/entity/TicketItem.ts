@@ -149,7 +149,7 @@ export class TicketItem {
     width: 1,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })
@@ -171,7 +171,7 @@ export class TicketItem {
     width: 4,
     visible: true,
     tableOrder: 100,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 100,
     mobileVisible: false,
   })
@@ -191,7 +191,7 @@ export class TicketItem {
     width: 4,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })
@@ -213,7 +213,7 @@ export class TicketItem {
     width: 1,
     visible: true,
     tableOrder: 100,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 100,
     mobileVisible: false,
   })
@@ -233,7 +233,7 @@ export class TicketItem {
     width: 1,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })
@@ -321,7 +321,7 @@ export class TicketItem {
     width: 2,
     visible: true,
     tableOrder: 700,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 700,
     mobileVisible: false,
   })
@@ -347,7 +347,7 @@ export class TicketItem {
     width: 2,
     visible: true,
     tableOrder: 800,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 800,
     mobileVisible: false,
   })
@@ -366,7 +366,7 @@ export class TicketItem {
     width: 2,
     visible: true,
     tableOrder: 900,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 900,
     mobileVisible: false,
   })
@@ -388,7 +388,7 @@ export class TicketItem {
     width: 1,
     visible: true,
     tableOrder: 100,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 100,
     mobileVisible: false,
   })
@@ -408,7 +408,7 @@ export class TicketItem {
     width: 1,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })
@@ -428,7 +428,7 @@ export class TicketItem {
     width: 1,
     visible: true,
     tableOrder: 300,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 300,
     mobileVisible: false,
   })
@@ -448,7 +448,7 @@ export class TicketItem {
     width: 1,
     visible: true,
     tableOrder: 400,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 400,
     mobileVisible: false,
   })
@@ -468,7 +468,7 @@ export class TicketItem {
     width: 1,
     visible: true,
     tableOrder: 500,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 500,
     mobileVisible: false,
   })
@@ -535,7 +535,7 @@ export class TicketItem {
     width: 1,
     visible: true,
     tableOrder: 300,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 300,
     mobileVisible: false,
   })
@@ -604,7 +604,7 @@ export class TicketItem {
     width: 1,
     visible: true,
     tableOrder: 50,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 50,
     mobileVisible: false,
   })

@@ -1,0 +1,5 @@
+[
+  { "entity": "global", "property": "contextualHelp", "de": "Kontexthilfe", "en": "Context help" },
+  { "entity": "knowledgeArticle", "property": "contextKey", "de": "Kontextschlüssel", "en": "Context key" },
+  { "entity": "knowledgeArticle", "property": "documentationMarkdown", "de": "Dokumentation", "en": "Documentation" }
+]

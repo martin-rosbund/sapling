@@ -97,7 +97,7 @@ export class WebhookSubscriptionItem {
     width: 4,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })
@@ -117,7 +117,7 @@ export class WebhookSubscriptionItem {
     width: 4,
     visible: true,
     tableOrder: 225,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 225,
     mobileVisible: false,
   })
@@ -137,7 +137,7 @@ export class WebhookSubscriptionItem {
     width: 4,
     visible: true,
     tableOrder: 250,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 250,
     mobileVisible: false,
   })
@@ -252,7 +252,7 @@ export class WebhookSubscriptionItem {
     width: 1,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })
@@ -271,7 +271,7 @@ export class WebhookSubscriptionItem {
     width: 1,
     visible: true,
     tableOrder: 300,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 300,
     mobileVisible: false,
   })
@@ -290,7 +290,7 @@ export class WebhookSubscriptionItem {
     width: 1,
     visible: true,
     tableOrder: 400,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 400,
     mobileVisible: false,
   })
@@ -310,7 +310,7 @@ export class WebhookSubscriptionItem {
     width: 4,
     visible: true,
     tableOrder: 500,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 500,
     mobileVisible: false,
   })

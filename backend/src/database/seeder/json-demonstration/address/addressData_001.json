@@ -111,7 +111,7 @@
 
 	{ "company": 23, "type": "invoice", "country": "DE", "street": "Umweltstraße 27", "zip": "01067", "city": "Dresden", "phone": "0351 4455668", "mobile": "0171 1002301", "email": "finance@simon-umwelt.de", "website": "https://www.simon-umwelt.de/finance" },
 	{ "company": 23, "type": "delivery", "country": "DE", "street": "Bremer Straße 65", "zip": "01067", "city": "Dresden", "phone": "0351 4455670", "mobile": "0171 1002302", "email": "logistik@simon-umwelt.de", "website": "https://www.simon-umwelt.de/logistik" },
-	{ "company": 23, "type": "location", "country": "DE", "street": "Grunaer Straße 38", "zip": "01069", "city": "Dresden", "phone": "0351 4455672", "mobile": "0171 1002303", "email": "projektbuero@simon-umwelt.de", "website": "https://www.simon-umwelt.de/projekte" },
+	{ "company": 23, "type": "location", "country": "DE", "street": "Grünaer Straße 38", "zip": "01069", "city": "Dresden", "phone": "0351 4455672", "mobile": "0171 1002303", "email": "projektbuero@simon-umwelt.de", "website": "https://www.simon-umwelt.de/projekte" },
 	{ "company": 23, "type": "location", "country": "DE", "street": "Königsbrücker Straße 96", "zip": "01099", "city": "Dresden", "phone": "0351 4455674", "mobile": "0171 1002304", "email": "ingenieurbuero@simon-umwelt.de", "website": "https://www.simon-umwelt.de/ingenieurbuero" },
 
 	{ "company": 24, "type": "invoice", "country": "DE", "street": "Eventallee 29", "zip": "14467", "city": "Potsdam", "phone": "0331 3344557", "mobile": "0171 1002401", "email": "abrechnung@peters-event.de", "website": "https://www.peters-event.de/abrechnung" },

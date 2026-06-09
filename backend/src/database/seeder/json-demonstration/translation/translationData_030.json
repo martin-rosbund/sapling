@@ -8,7 +8,7 @@
   {
     "entity": "calendar",
     "property": "syncOutlookDescription",
-    "de": "Termine aus Outlook fuer den sichtbaren Zeitraum abrufen und Sapling aktualisieren.",
+    "de": "Termine aus Outlook für den sichtbaren Zeitraum abrufen und Sapling aktualisieren.",
     "en": "Fetch events from Outlook for the visible range and update Sapling."
   },
   {
@@ -26,7 +26,7 @@
   {
     "entity": "calendar",
     "property": "syncGoogleDescription",
-    "de": "Termine aus Google fuer den sichtbaren Zeitraum abrufen und Sapling aktualisieren.",
+    "de": "Termine aus Google für den sichtbaren Zeitraum abrufen und Sapling aktualisieren.",
     "en": "Fetch events from Google for the visible range and update Sapling."
   },
   {
@@ -38,19 +38,19 @@
   {
     "entity": "calendar",
     "property": "syncCalendarSuccessDescription",
-    "de": "{imported} Termine importiert ({created} neu, {updated} aktualisiert, {skipped} uebersprungen).",
+    "de": "{imported} Termine importiert ({created} neu, {updated} aktualisiert, {skipped} übersprungen).",
     "en": "{imported} events imported ({created} new, {updated} updated, {skipped} skipped)."
   },
   {
     "entity": "calendar",
     "property": "azureUserRequired",
-    "de": "Der Outlook-Abruf ist nur fuer Microsoft-Benutzer verfuegbar.",
+    "de": "Der Outlook-Abruf ist nur für Microsoft-Benutzer verfügbar.",
     "en": "Outlook fetch is only available for Microsoft users."
   },
   {
     "entity": "calendar",
     "property": "googleUserRequired",
-    "de": "Der Google-Abruf ist nur fuer Google-Benutzer verfuegbar.",
+    "de": "Der Google-Abruf ist nur für Google-Benutzer verfügbar.",
     "en": "Google fetch is only available for Google users."
   }
 ]

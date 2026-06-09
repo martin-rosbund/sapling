@@ -27,7 +27,7 @@
     "isRecommended": true
   },
   {
-    "name": "Meine Tickets mit hoher Prioritaet",
+    "name": "Meine Tickets mit hoher Priorität",
     "entity": "ticket",
     "filter": {
       "assigneePerson": { "handle": "{{currentUser.handle}}" },
@@ -37,7 +37,7 @@
     "isRecommended": true
   },
   {
-    "name": "Meine ueberfaelligen Tickets",
+    "name": "Meine überfälligen Tickets",
     "entity": "ticket",
     "filter": {
       "assigneePerson": { "handle": "{{currentUser.handle}}" },
@@ -47,7 +47,7 @@
     "isRecommended": true
   },
   {
-    "name": "Meine heute faelligen Tickets",
+    "name": "Meine heute fälligen Tickets",
     "entity": "ticket",
     "filter": {
       "assigneePerson": { "handle": "{{currentUser.handle}}" },
@@ -194,7 +194,7 @@
     "isRecommended": true
   },
   {
-    "name": "Meine bestaetigten Termine heute",
+    "name": "Meine bestätigten Termine heute",
     "entity": "event",
     "filter": {
       "participants": { "handle": "{{currentUser.handle}}" },
@@ -288,7 +288,7 @@
     "isRecommended": false
   },
   {
-    "name": "Newsletter-faehige Unternehmen",
+    "name": "Newsletter-fähige Unternehmen",
     "entity": "company",
     "filter": {
       "isActive": true,
@@ -318,7 +318,7 @@
     "isRecommended": false
   },
   {
-    "name": "Aktive Vertraege meines Unternehmens",
+    "name": "Aktive Verträge meines Unternehmens",
     "entity": "contract",
     "filter": {
       "company": { "handle": "{{currentUser.company.handle}}" },
@@ -327,7 +327,7 @@
     "isRecommended": false
   },
   {
-    "name": "Vertraege mit naechstem Service diese Woche",
+    "name": "Verträge mit nächstem Service diese Woche",
     "entity": "contract",
     "filter": {
       "company": { "handle": "{{currentUser.company.handle}}" },
@@ -339,7 +339,7 @@
     "isRecommended": false
   },
   {
-    "name": "Vertraege meines Unternehmens mit Updateservice",
+    "name": "Verträge meines Unternehmens mit Updateservice",
     "entity": "contract",
     "filter": {
       "company": { "handle": "{{currentUser.company.handle}}" },
@@ -348,7 +348,7 @@
     "isRecommended": false
   },
   {
-    "name": "Vertraege meines Unternehmens mit Enddatum diesen Monat",
+    "name": "Verträge meines Unternehmens mit Enddatum diesen Monat",
     "entity": "contract",
     "filter": {
       "company": { "handle": "{{currentUser.company.handle}}" },

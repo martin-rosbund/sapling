@@ -96,7 +96,7 @@ export class ChangeLogItem {
     width: 2,
     visible: true,
     tableOrder: 300,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 300,
     mobileVisible: false,
   })
@@ -111,7 +111,7 @@ export class ChangeLogItem {
     width: 2,
     visible: true,
     tableOrder: 400,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 400,
     mobileVisible: false,
   })

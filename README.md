@@ -155,8 +155,6 @@ AI-Provider-Credentials werden im laufenden System datengetrieben ueber Provider
 | `VITE_DEFAULT_PAGE_SIZE_OPTIONS` | Auswahlwerte für Tabellen-Pagination, z. B. `10,25,50,100`. |
 | `VITE_DEFAULT_ENTITY_ITEMS_COUNT` | Standardlimit für Entity-Abfragen im Client. |
 | `VITE_DOCUMENT_MAX_FILE_SIZE_MB` | Maximale Uploadgroesse pro Datei im Frontend. |
-| `VITE_MOBILE_CARD_FIELD_LIMIT` | Maximale Feldanzahl in mobilen Kartenansichten. |
-| `VITE_DESKTOP_TABLE_COLUMN_LIMIT` | Maximale Spaltenanzahl in Desktop-Tabellenansichten. |
 | `VITE_DEBUG_USERNAME` / `VITE_DEBUG_PASSWORD` | Komfortwerte für lokale Login-Entwicklung; nicht produktiv verwenden. |
 | `VITE_IS_LOGIN_WITH_AZURE_ENABLED` | Schaltet Microsoft-Login im Frontend sichtbar. |
 | `VITE_IS_LOGIN_WITH_GOOGLE_ENABLED` | Schaltet Google-Login im Frontend sichtbar. |

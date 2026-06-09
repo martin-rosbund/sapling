@@ -114,7 +114,7 @@ export class KnowledgeArticleItem {
     width: 4,
     visible: true,
     tableOrder: 500,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 500,
     mobileVisible: false,
   })
@@ -129,12 +129,27 @@ export class KnowledgeArticleItem {
     width: 2,
     visible: true,
     tableOrder: 600,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 600,
     mobileVisible: false,
   })
   @Property({ length: 512, nullable: true })
   tags?: string;
+
+  @ApiPropertyOptional()
+  @SaplingForm({
+    order: 650,
+    group: 'knowledgeArticle.groupBasics',
+    groupOrder: 100,
+    width: 2,
+    visible: true,
+    tableOrder: 650,
+    tableVisible: false,
+    mobileOrder: 650,
+    mobileVisible: false,
+  })
+  @Property({ length: 128, nullable: true })
+  contextKey?: string;
 
   @ApiPropertyOptional()
   @Sapling(['isMarkdown'])
@@ -145,7 +160,7 @@ export class KnowledgeArticleItem {
     width: 4,
     visible: true,
     tableOrder: 100,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 100,
     mobileVisible: false,
   })
@@ -161,12 +176,28 @@ export class KnowledgeArticleItem {
     width: 4,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })
   @Property({ nullable: true, type: 'text' })
   solutionMarkdown?: string;
+
+  @ApiPropertyOptional()
+  @Sapling(['isMarkdown'])
+  @SaplingForm({
+    order: 300,
+    group: 'knowledgeArticle.groupContent',
+    groupOrder: 200,
+    width: 4,
+    visible: true,
+    tableOrder: 300,
+    tableVisible: false,
+    mobileOrder: 300,
+    mobileVisible: false,
+  })
+  @Property({ nullable: true, type: 'text' })
+  documentationMarkdown?: string;
 
   @ApiPropertyOptional({ default: true })
   @SaplingForm({
@@ -223,7 +254,7 @@ export class KnowledgeArticleItem {
     width: 2,
     visible: true,
     tableOrder: 100,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 100,
     mobileVisible: false,
   })
@@ -238,7 +269,7 @@ export class KnowledgeArticleItem {
     width: 2,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })
@@ -253,7 +284,7 @@ export class KnowledgeArticleItem {
     width: 2,
     visible: true,
     tableOrder: 300,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 300,
     mobileVisible: false,
   })

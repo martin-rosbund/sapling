@@ -67,7 +67,7 @@ export class FavoriteItem {
     width: 2,
     visible: true,
     tableOrder: 150,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 150,
     mobileVisible: false,
   })
@@ -86,7 +86,7 @@ export class FavoriteItem {
     width: 2,
     visible: true,
     tableOrder: 175,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 175,
     mobileVisible: false,
   })
@@ -105,7 +105,7 @@ export class FavoriteItem {
     width: 4,
     visible: true,
     tableOrder: 200,
-    tableVisible: true,
+    tableVisible: false,
     mobileOrder: 200,
     mobileVisible: false,
   })

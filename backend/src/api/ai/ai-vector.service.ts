@@ -712,6 +712,7 @@ export class AiVectorService {
         category: relationLabel(article.category, 'title', 'handle'),
         product: relationLabel(article.product, 'title', 'name', 'handle'),
         tags: article.tags?.trim() || null,
+        contextKey: article.contextKey?.trim() || null,
         publishedAt: formatVectorDate(article.publishedAt),
         validUntil: formatVectorDate(article.validUntil),
         sourceTicket: relationLabel(
@@ -759,6 +760,16 @@ export class AiVectorService {
           sourceRecordHandle,
           'solution',
           buildKnowledgeArticleSectionContent(article, 'solution'),
+          title,
+          metadata,
+          embeddingModel,
+        ),
+      );
+      documents.push(
+        ...createVectorSectionDocuments(
+          sourceRecordHandle,
+          'documentation',
+          buildKnowledgeArticleSectionContent(article, 'documentation'),
           title,
           metadata,
           embeddingModel,
@@ -1060,7 +1071,7 @@ function buildEffortEstimatePositionSectionContent(
 
 function buildKnowledgeArticleSectionContent(
   article: KnowledgeArticleItem,
-  section: 'overview' | 'problem' | 'solution',
+  section: 'overview' | 'problem' | 'solution' | 'documentation',
 ): string {
   const lines = compactVectorLines([
     `Knowledge article: ${article.handle ?? ''}`.trim(),
@@ -1078,6 +1089,7 @@ function buildKnowledgeArticleSectionContent(
       'Product',
       relationLabel(article.product, 'title', 'name', 'handle'),
     ),
+    article.contextKey?.trim() ? `Context key: ${article.contextKey.trim()}` : null,
     article.tags?.trim() ? `Tags: ${article.tags.trim()}` : null,
     vectorLine('Published at', formatVectorDate(article.publishedAt)),
     vectorLine('Valid until', formatVectorDate(article.validUntil)),
@@ -1112,19 +1124,33 @@ function buildKnowledgeArticleSectionContent(
         `Solution summary: ${summarizeVectorText(article.solutionMarkdown)}`,
       );
     }
+    if (article.documentationMarkdown?.trim()) {
+      lines.push(
+        `Documentation summary: ${summarizeVectorText(
+          article.documentationMarkdown,
+        )}`,
+      );
+    }
     return lines.join('\n');
   }
 
-  const body =
-    section === 'problem'
-      ? (article.problemMarkdown?.trim() ?? '')
-      : (article.solutionMarkdown?.trim() ?? '');
+  const sectionBodies = {
+    documentation: article.documentationMarkdown?.trim() ?? '',
+    problem: article.problemMarkdown?.trim() ?? '',
+    solution: article.solutionMarkdown?.trim() ?? '',
+  } satisfies Record<'documentation' | 'problem' | 'solution', string>;
+  const body = sectionBodies[section];
 
   if (!body) {
     return '';
   }
 
-  lines.push(`Section: ${section === 'problem' ? 'Problem' : 'Solution'}`);
+  const sectionLabels = {
+    documentation: 'Documentation',
+    problem: 'Problem',
+    solution: 'Solution',
+  } satisfies Record<'documentation' | 'problem' | 'solution', string>;
+  lines.push(`Section: ${sectionLabels[section]}`);
   lines.push(body);
   return lines.join('\n');
 }

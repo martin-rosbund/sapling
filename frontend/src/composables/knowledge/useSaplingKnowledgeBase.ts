@@ -25,15 +25,23 @@ type TranslateFunction = (key: string) => string
 interface UseSaplingKnowledgeBaseOptions {
   t: TranslateFunction
   locale: Ref<string>
+  contextKey?: Ref<string | null>
 }
 
 const KNOWLEDGE_ARTICLE_PAGE_LIMIT = 10
 const RELATION_SEARCH_PAGE_LIMIT = 25
 const KNOWLEDGE_ARTICLE_LOAD_DEBOUNCE_MS = 250
 const ARTICLE_RELATIONS = ['status', 'visibility', 'category', 'product', 'authorPerson']
-const ARTICLE_SEARCH_FIELDS = ['title', 'summary', 'tags', 'problemMarkdown', 'solutionMarkdown']
+const ARTICLE_SEARCH_FIELDS = [
+  'title',
+  'summary',
+  'tags',
+  'problemMarkdown',
+  'solutionMarkdown',
+  'documentationMarkdown',
+]
 
-export function useSaplingKnowledgeBase({ t, locale }: UseSaplingKnowledgeBaseOptions) {
+export function useSaplingKnowledgeBase({ t, locale, contextKey }: UseSaplingKnowledgeBaseOptions) {
   const articles = ref<KnowledgeArticleItem[]>([])
   const isLoading = ref(true)
   const isInitialLoading = ref(true)
@@ -69,6 +77,7 @@ export function useSaplingKnowledgeBase({ t, locale }: UseSaplingKnowledgeBaseOp
   const filterSignature = computed(() =>
     JSON.stringify({
       search: search.value?.trim() ?? '',
+      contextKey: contextKey?.value?.trim() ?? '',
       products: getSelectedHandles(selectedProducts.value),
       categories: getSelectedHandles(selectedCategories.value),
       visibilities: getSelectedHandles(selectedVisibilities.value),
@@ -192,6 +201,11 @@ export function useSaplingKnowledgeBase({ t, locale }: UseSaplingKnowledgeBaseOp
     addRelationFilter(clauses, 'category', selectedCategories.value)
     addRelationFilter(clauses, 'visibility', selectedVisibilities.value)
     addRelationFilter(clauses, 'authorPerson', selectedAuthors.value)
+
+    const activeContextKey = contextKey?.value?.trim()
+    if (activeContextKey) {
+      clauses.push({ contextKey: activeContextKey })
+    }
 
     if (searchValue) {
       const relationSearchClauses = await buildRelationSearchClauses(searchValue, signal)
@@ -318,6 +332,7 @@ export function useSaplingKnowledgeBase({ t, locale }: UseSaplingKnowledgeBaseOp
       article.summary ||
       stripMarkdown(article.problemMarkdown) ||
       stripMarkdown(article.solutionMarkdown) ||
+      stripMarkdown(article.documentationMarkdown) ||
       t('knowledgeBase.noPreview')
 
     return truncateText(source, 180)
@@ -405,6 +420,10 @@ export function useSaplingKnowledgeBase({ t, locale }: UseSaplingKnowledgeBaseOp
     return getRelationHandle(value) !== ''
   }
 
+  function hasMarkdownText(value?: string | null): boolean {
+    return typeof value === 'string' && value.trim().length > 0
+  }
+
   function getSelectedHandles(values: SaplingGenericItem[]): FilterOptionValue[] {
     return values
       .map((value) => getRelationHandleValue(value as RelationValue))
@@ -456,6 +475,7 @@ export function useSaplingKnowledgeBase({ t, locale }: UseSaplingKnowledgeBaseOp
     getArticlePreview,
     getArticleTags,
     getAuthorLabel,
+    hasMarkdownText,
     hasRelationValue,
     isInitialLoadError,
     isInitialLoading,

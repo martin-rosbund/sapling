@@ -8,14 +8,14 @@
   },
   {
     "handle": "update",
-    "title": "Geaendert",
+    "title": "Geändert",
     "description": "Datensatz wurde aktualisiert.",
     "icon": "mdi-pencil-circle-outline",
     "color": "#FB8C00"
   },
   {
     "handle": "delete",
-    "title": "Geloescht",
+    "title": "Gelöscht",
     "description": "Datensatz wurde entfernt.",
     "icon": "mdi-delete-outline",
     "color": "#F44336"

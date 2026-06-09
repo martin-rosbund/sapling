@@ -6,8 +6,13 @@ import { loadSeedJson } from './utils/load-seed-json';
 import { AddressItem } from '../../entity/AddressItem';
 import { AddressTypeItem } from '../../entity/AddressTypeItem';
 import { CompanyItem } from '../../entity/CompanyItem';
+import { CompanyAnnualRevenueClassItem } from '../../entity/CompanyAnnualRevenueClassItem';
+import { CompanyChurnRiskReasonItem } from '../../entity/CompanyChurnRiskReasonItem';
+import { CompanyIndustryItem } from '../../entity/CompanyIndustryItem';
 import { CompanyRelationshipItem } from '../../entity/CompanyRelationshipItem';
 import { CompanyRelationshipTypeItem } from '../../entity/CompanyRelationshipTypeItem';
+import { CompanySegmentItem } from '../../entity/CompanySegmentItem';
+import { CompanySizeItem } from '../../entity/CompanySizeItem';
 import { DashboardTemplateItem } from '../../entity/DashboardTemplateItem';
 import { PermissionSeeder } from './PermissionSeeder';
 import { ContractItem } from '../../entity/ContractItem';
@@ -36,7 +41,12 @@ import { KpiItem } from '../../entity/KpiItem';
 import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
 import { WorkHourItem } from '../../entity/WorkHourItem';
 import { PersonDepartmentItem } from '../../entity/PersonDepartmentItem';
+import { PersonDecisionRoleItem } from '../../entity/PersonDecisionRoleItem';
+import { PersonFunctionItem } from '../../entity/PersonFunctionItem';
+import { PersonJobTitleItem } from '../../entity/PersonJobTitleItem';
+import { PersonSalutationItem } from '../../entity/PersonSalutationItem';
 import { PersonTypeItem } from '../../entity/PersonTypeItem';
+import { PersonTitleItem } from '../../entity/PersonTitleItem';
 import { WebhookAuthenticationTypeItem } from '../../entity/WebhookAuthenticationTypeItem';
 import { WebhookSubscriptionTypeItem } from '../../entity/WebhookSubscriptionTypeItem';
 import { WebhookSubscriptionMethodItem } from '../../entity/WebhookSubscriptionMethodItem';
@@ -47,6 +57,8 @@ import { CountryItem } from '../../entity/CountryItem';
 import { SalesOpportunityStageItem } from '../../entity/SalesOpportunityStageItem';
 import { SalesOpportunityForecastItem } from '../../entity/SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from '../../entity/SalesOpportunitySourceItem';
+import { SalesOpportunityLossReasonItem } from '../../entity/SalesOpportunityLossReasonItem';
+import { SalesOpportunityResultStatusItem } from '../../entity/SalesOpportunityResultStatusItem';
 import { EntityRouteItem } from '../../entity/EntityRouteItem';
 import { ChangeLogActionItem } from '../../entity/ChangeLogActionItem';
 import { SalesOpportunityItem } from '../../entity/SalesOpportunityItem';
@@ -92,6 +104,9 @@ import { KnowledgeArticleVisibilityItem } from '../../entity/KnowledgeArticleVis
 import { RoleStarterSeeder } from './RoleStarterSeeder';
 import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
 import type { EntityName } from '@mikro-orm/core';
+import { MarketingCampaignItem } from '../../entity/MarketingCampaignItem';
+import { MarketingCampaignStatusItem } from '../../entity/MarketingCampaignStatusItem';
+import { MarketingCampaignTypeItem } from '../../entity/MarketingCampaignTypeItem';
 
 /**
  * Declarative seed order.
@@ -114,6 +129,11 @@ const SEED_ORDER: Array<EntityName<object> | (new () => Seeder)> = [
   WorkHourWeekItem,
   HolidayGroupItem,
   AddressTypeItem,
+  CompanyIndustryItem,
+  CompanySegmentItem,
+  CompanySizeItem,
+  CompanyAnnualRevenueClassItem,
+  CompanyChurnRiskReasonItem,
   CompanyItem,
   AddressItem,
   CompanyRelationshipTypeItem,
@@ -131,6 +151,11 @@ const SEED_ORDER: Array<EntityName<object> | (new () => Seeder)> = [
   RoleItem,
   PermissionSeeder,
   PersonDepartmentItem,
+  PersonDecisionRoleItem,
+  PersonFunctionItem,
+  PersonJobTitleItem,
+  PersonSalutationItem,
+  PersonTitleItem,
   PersonTypeItem,
   PersonItem,
   PhoneCallItem,
@@ -170,6 +195,8 @@ const SEED_ORDER: Array<EntityName<object> | (new () => Seeder)> = [
   SalesOpportunityStageItem,
   SalesOpportunityForecastItem,
   SalesOpportunitySourceItem,
+  SalesOpportunityLossReasonItem,
+  SalesOpportunityResultStatusItem,
   SalesOpportunityItem,
   EffortEstimateStatusItem,
   EffortEstimatePositionTemplateItem,
@@ -182,6 +209,9 @@ const SEED_ORDER: Array<EntityName<object> | (new () => Seeder)> = [
   DocumentTypeItem,
   EmailTemplateItem,
   EMailListItem,
+  MarketingCampaignStatusItem,
+  MarketingCampaignTypeItem,
+  MarketingCampaignItem,
   TeamsTemplateItem,
   TeamsDeliveryStatusItem,
   TeamsSubscriptionItem,
@@ -234,7 +264,25 @@ export class DatabaseSeeder extends Seeder {
         ? GenericSeeder.for(entry)
         : (entry as new () => Seeder),
     );
-    await this.call(em, seeders);
+
+    await em.transactional(async (transactionalEm) => {
+      await transactionalEm
+        .getConnection('write')
+        .execute(
+          'set constraints all deferred',
+          [],
+          'run',
+          transactionalEm.getTransactionContext(),
+        );
+
+      for (const SeederClass of seeders) {
+        const fork = transactionalEm.fork({ keepTransactionContext: true });
+        const seeder = new SeederClass();
+        await seeder.run(fork);
+        await fork.flush();
+        fork.clear();
+      }
+    });
   }
 
   /**

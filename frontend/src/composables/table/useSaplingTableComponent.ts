@@ -9,7 +9,6 @@ import type {
 } from '@/entity/structure'
 import type { SaplingGenericItem } from '@/entity/entity'
 import {
-  DESKTOP_TABLE_COLUMN_LIMIT,
   DEFAULT_SMALL_WINDOW_WIDTH,
 } from '@/constants/project.constants'
 import type { EntityItem, ScriptButtonItem } from '@/entity/entity'
@@ -329,7 +328,6 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
 
   const visibleHeaders = computed<SaplingTableHeaderItem[]>(() => {
     let headers = dataHeaders.value
-      .slice(0, DESKTOP_TABLE_COLUMN_LIMIT)
       .map((header) => withCellClass(header, 'sapling-table__cell--data'))
 
     if (props.multiSelect) {

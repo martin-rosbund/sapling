@@ -1,0 +1,7 @@
+[
+  { "handle": "prospect", "title": "Prospect", "icon": "mdi-account-search-outline", "color": "#42A5F5", "sortOrder": 10 },
+  { "handle": "customer", "title": "Kunde", "icon": "mdi-account-check-outline", "color": "#43A047", "sortOrder": 20 },
+  { "handle": "strategic_customer", "title": "Strategischer Kunde", "icon": "mdi-star-outline", "color": "#F9A825", "sortOrder": 30 },
+  { "handle": "partner", "title": "Partner", "icon": "mdi-handshake-outline", "color": "#7E57C2", "sortOrder": 40 },
+  { "handle": "supplier", "title": "Lieferant", "icon": "mdi-truck-outline", "color": "#78909C", "sortOrder": 50 }
+]

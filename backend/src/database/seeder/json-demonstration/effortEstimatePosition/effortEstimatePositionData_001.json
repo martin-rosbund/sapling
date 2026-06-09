@@ -2,7 +2,7 @@
   {
     "title": "Prozessworkshop Retouren",
     "estimatedHours": 4,
-    "offerTextMarkdown": "## Prozessworkshop Retouren\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschaetzung **Retourenportal fuer Ersatzteile**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Prozessworkshop Retouren\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschätzung **Retourenportal für Ersatzteile**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 1,
@@ -11,25 +11,25 @@
   {
     "title": "Portalformular und Validierung",
     "estimatedHours": 8,
-    "offerTextMarkdown": "## Portalformular und Validierung\n\nUmsetzung in Sapling inklusive Entitaeten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschaetzung **Retourenportal fuer Ersatzteile**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Portalformular und Validierung\n\nUmsetzung in Sapling inklusive Entitäten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschätzung **Retourenportal für Ersatzteile**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 1,
     "template": 3
   },
   {
-    "title": "Benachrichtigung und Testfaelle",
+    "title": "Benachrichtigung und Testfälle",
     "estimatedHours": 14,
-    "offerTextMarkdown": "## Benachrichtigung und Testfaelle\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten fuer die operative Nutzung.\n\nBezug zur Aufwandsschaetzung **Retourenportal fuer Ersatzteile**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Benachrichtigung und Testfälle\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten für die operative Nutzung.\n\nBezug zur Aufwandsschätzung **Retourenportal für Ersatzteile**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 1,
     "template": 3
   },
   {
-    "title": "Exportmapping klaeren",
+    "title": "Exportmapping klären",
     "estimatedHours": 5,
-    "offerTextMarkdown": "## Exportmapping klaeren\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken fuer die Umsetzung.\n\nBezug zur Aufwandsschaetzung **DATEV Export fuer Monatsabschluss**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Exportmapping klären\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken für die Umsetzung.\n\nBezug zur Aufwandsschätzung **DATEV Export für Monatsabschluss**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 2,
@@ -38,7 +38,7 @@
   {
     "title": "CSV/XLSX Export umsetzen",
     "estimatedHours": 12,
-    "offerTextMarkdown": "## CSV/XLSX Export umsetzen\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Pruefung von Fehler- und Wiederholfaellen.\n\nBezug zur Aufwandsschaetzung **DATEV Export fuer Monatsabschluss**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## CSV/XLSX Export umsetzen\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Prüfung von Fehler- und Wiederholfällen.\n\nBezug zur Aufwandsschätzung **DATEV Export für Monatsabschluss**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 2,
@@ -47,7 +47,7 @@
   {
     "title": "Abstimmung mit Buchhaltung",
     "estimatedHours": 15,
-    "offerTextMarkdown": "## Abstimmung mit Buchhaltung\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterpruefung und Empfaengerlogik.\n\nBezug zur Aufwandsschaetzung **DATEV Export fuer Monatsabschluss**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Abstimmung mit Buchhaltung\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterprüfung und Empfängerlogik.\n\nBezug zur Aufwandsschätzung **DATEV Export für Monatsabschluss**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 2,
@@ -56,7 +56,7 @@
   {
     "title": "SLA Regeln analysieren",
     "estimatedHours": 6,
-    "offerTextMarkdown": "## SLA Regeln analysieren\n\nUmsetzung in Sapling inklusive Entitaeten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschaetzung **SLA Ampel fuer Premiumkunden**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## SLA Regeln analysieren\n\nUmsetzung in Sapling inklusive Entitäten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschätzung **SLA Ampel für Premiumkunden**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 3,
@@ -65,7 +65,7 @@
   {
     "title": "Ampellogik implementieren",
     "estimatedHours": 14,
-    "offerTextMarkdown": "## Ampellogik implementieren\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Uebernahme.\n\nBezug zur Aufwandsschaetzung **SLA Ampel fuer Premiumkunden**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Ampellogik implementieren\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Übernahme.\n\nBezug zur Aufwandsschätzung **SLA Ampel für Premiumkunden**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 3,
@@ -74,7 +74,7 @@
   {
     "title": "Dashboard-Kachel und Abnahme",
     "estimatedHours": 16,
-    "offerTextMarkdown": "## Dashboard-Kachel und Abnahme\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Uebergabedokumentation.\n\nBezug zur Aufwandsschaetzung **SLA Ampel fuer Premiumkunden**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Dashboard-Kachel und Abnahme\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Übergabedokumentation.\n\nBezug zur Aufwandsschätzung **SLA Ampel für Premiumkunden**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 3,
@@ -83,7 +83,7 @@
   {
     "title": "Importprofil erstellen",
     "estimatedHours": 10,
-    "offerTextMarkdown": "## Importprofil erstellen\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Pruefung von Fehler- und Wiederholfaellen.\n\nBezug zur Aufwandsschaetzung **Migration Alt-Tickets aus Excel**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Importprofil erstellen\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Prüfung von Fehler- und Wiederholfällen.\n\nBezug zur Aufwandsschätzung **Migration Alt-Tickets aus Excel**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 4,
@@ -92,7 +92,7 @@
   {
     "title": "Datenbereinigung und Probelauf",
     "estimatedHours": 11,
-    "offerTextMarkdown": "## Datenbereinigung und Probelauf\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten fuer die operative Nutzung.\n\nBezug zur Aufwandsschaetzung **Migration Alt-Tickets aus Excel**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Datenbereinigung und Probelauf\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten für die operative Nutzung.\n\nBezug zur Aufwandsschätzung **Migration Alt-Tickets aus Excel**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 4,
@@ -101,7 +101,7 @@
   {
     "title": "Finaler Import und Protokoll",
     "estimatedHours": 17,
-    "offerTextMarkdown": "## Finaler Import und Protokoll\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschaetzung **Migration Alt-Tickets aus Excel**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Finaler Import und Protokoll\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschätzung **Migration Alt-Tickets aus Excel**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 4,
@@ -110,7 +110,7 @@
   {
     "title": "Freigabeprozess modellieren",
     "estimatedHours": 12,
-    "offerTextMarkdown": "## Freigabeprozess modellieren\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Uebernahme.\n\nBezug zur Aufwandsschaetzung **Angebotsfreigabe im Vertrieb**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Freigabeprozess modellieren\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Übernahme.\n\nBezug zur Aufwandsschätzung **Angebotsfreigabe im Vertrieb**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 5,
@@ -119,7 +119,7 @@
   {
     "title": "Status und Berechtigungen",
     "estimatedHours": 12,
-    "offerTextMarkdown": "## Status und Berechtigungen\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterpruefung und Empfaengerlogik.\n\nBezug zur Aufwandsschaetzung **Angebotsfreigabe im Vertrieb**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Status und Berechtigungen\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterprüfung und Empfängerlogik.\n\nBezug zur Aufwandsschätzung **Angebotsfreigabe im Vertrieb**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 5,
@@ -128,7 +128,7 @@
   {
     "title": "Benachrichtigungen und Historie",
     "estimatedHours": 18,
-    "offerTextMarkdown": "## Benachrichtigungen und Historie\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken fuer die Umsetzung.\n\nBezug zur Aufwandsschaetzung **Angebotsfreigabe im Vertrieb**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Benachrichtigungen und Historie\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken für die Umsetzung.\n\nBezug zur Aufwandsschätzung **Angebotsfreigabe im Vertrieb**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": true,
     "estimate": 5,
@@ -137,7 +137,7 @@
   {
     "title": "Dublettenregeln definieren",
     "estimatedHours": 4,
-    "offerTextMarkdown": "## Dublettenregeln definieren\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten fuer die operative Nutzung.\n\nBezug zur Aufwandsschaetzung **Kundenstamm Dublettencheck**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Dublettenregeln definieren\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten für die operative Nutzung.\n\nBezug zur Aufwandsschätzung **Kundenstamm Dublettencheck**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 6,
@@ -146,7 +146,7 @@
   {
     "title": "Suchdialog erweitern",
     "estimatedHours": 8,
-    "offerTextMarkdown": "## Suchdialog erweitern\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Uebergabedokumentation.\n\nBezug zur Aufwandsschaetzung **Kundenstamm Dublettencheck**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Suchdialog erweitern\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Übergabedokumentation.\n\nBezug zur Aufwandsschätzung **Kundenstamm Dublettencheck**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 6,
@@ -155,16 +155,16 @@
   {
     "title": "Test mit Bestandsdaten",
     "estimatedHours": 14,
-    "offerTextMarkdown": "## Test mit Bestandsdaten\n\nUmsetzung in Sapling inklusive Entitaeten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschaetzung **Kundenstamm Dublettencheck**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Test mit Bestandsdaten\n\nUmsetzung in Sapling inklusive Entitäten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschätzung **Kundenstamm Dublettencheck**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 6,
     "template": 3
   },
   {
-    "title": "Datenmodell Wartung pruefen",
+    "title": "Datenmodell Wartung prüfen",
     "estimatedHours": 5,
-    "offerTextMarkdown": "## Datenmodell Wartung pruefen\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterpruefung und Empfaengerlogik.\n\nBezug zur Aufwandsschaetzung **Wartungsfenster Kalenderintegration**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Datenmodell Wartung prüfen\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterprüfung und Empfängerlogik.\n\nBezug zur Aufwandsschätzung **Wartungsfenster Kalenderintegration**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 7,
@@ -173,7 +173,7 @@
   {
     "title": "Kalenderereignisse erzeugen",
     "estimatedHours": 9,
-    "offerTextMarkdown": "## Kalenderereignisse erzeugen\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschaetzung **Wartungsfenster Kalenderintegration**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Kalenderereignisse erzeugen\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschätzung **Wartungsfenster Kalenderintegration**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 7,
@@ -182,7 +182,7 @@
   {
     "title": "Inbox- und Mailvorlagen",
     "estimatedHours": 18,
-    "offerTextMarkdown": "## Inbox- und Mailvorlagen\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Pruefung von Fehler- und Wiederholfaellen.\n\nBezug zur Aufwandsschaetzung **Wartungsfenster Kalenderintegration**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Inbox- und Mailvorlagen\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Prüfung von Fehler- und Wiederholfällen.\n\nBezug zur Aufwandsschätzung **Wartungsfenster Kalenderintegration**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 7,
@@ -191,7 +191,7 @@
   {
     "title": "Bestandsdaten auswerten",
     "estimatedHours": 6,
-    "offerTextMarkdown": "## Bestandsdaten auswerten\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Uebergabedokumentation.\n\nBezug zur Aufwandsschaetzung **Lizenzuebersicht fuer SaaS Kunden**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Bestandsdaten auswerten\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Übergabedokumentation.\n\nBezug zur Aufwandsschätzung **Lizenzübersicht für SaaS Kunden**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 8,
@@ -200,7 +200,7 @@
   {
     "title": "Listenansicht konfigurieren",
     "estimatedHours": 10,
-    "offerTextMarkdown": "## Listenansicht konfigurieren\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken fuer die Umsetzung.\n\nBezug zur Aufwandsschaetzung **Lizenzuebersicht fuer SaaS Kunden**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Listenansicht konfigurieren\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken für die Umsetzung.\n\nBezug zur Aufwandsschätzung **Lizenzübersicht für SaaS Kunden**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 8,
@@ -209,7 +209,7 @@
   {
     "title": "Export und Review",
     "estimatedHours": 20,
-    "offerTextMarkdown": "## Export und Review\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Uebernahme.\n\nBezug zur Aufwandsschaetzung **Lizenzuebersicht fuer SaaS Kunden**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Export und Review\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Übernahme.\n\nBezug zur Aufwandsschätzung **Lizenzübersicht für SaaS Kunden**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 8,
@@ -218,7 +218,7 @@
   {
     "title": "Eskalationsregeln festlegen",
     "estimatedHours": 7,
-    "offerTextMarkdown": "## Eskalationsregeln festlegen\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschaetzung **Teams Benachrichtigung fuer Eskalationen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Eskalationsregeln festlegen\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschätzung **Teams Benachrichtigung für Eskalationen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 9,
@@ -227,7 +227,7 @@
   {
     "title": "Teams Subscription einrichten",
     "estimatedHours": 11,
-    "offerTextMarkdown": "## Teams Subscription einrichten\n\nUmsetzung in Sapling inklusive Entitaeten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschaetzung **Teams Benachrichtigung fuer Eskalationen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Teams Subscription einrichten\n\nUmsetzung in Sapling inklusive Entitäten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschätzung **Teams Benachrichtigung für Eskalationen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 9,
@@ -236,7 +236,7 @@
   {
     "title": "Fehler- und Retryverhalten testen",
     "estimatedHours": 17,
-    "offerTextMarkdown": "## Fehler- und Retryverhalten testen\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten fuer die operative Nutzung.\n\nBezug zur Aufwandsschaetzung **Teams Benachrichtigung fuer Eskalationen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Fehler- und Retryverhalten testen\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten für die operative Nutzung.\n\nBezug zur Aufwandsschätzung **Teams Benachrichtigung für Eskalationen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 9,
@@ -245,7 +245,7 @@
   {
     "title": "KPI Definitionen abstimmen",
     "estimatedHours": 8,
-    "offerTextMarkdown": "## KPI Definitionen abstimmen\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken fuer die Umsetzung.\n\nBezug zur Aufwandsschaetzung **KPI Paket fuer Serviceleitung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## KPI Definitionen abstimmen\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken für die Umsetzung.\n\nBezug zur Aufwandsschätzung **KPI Paket für Serviceleitung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 10,
@@ -254,7 +254,7 @@
   {
     "title": "Aggregation konfigurieren",
     "estimatedHours": 15,
-    "offerTextMarkdown": "## Aggregation konfigurieren\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Pruefung von Fehler- und Wiederholfaellen.\n\nBezug zur Aufwandsschaetzung **KPI Paket fuer Serviceleitung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Aggregation konfigurieren\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Prüfung von Fehler- und Wiederholfällen.\n\nBezug zur Aufwandsschätzung **KPI Paket für Serviceleitung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 10,
@@ -263,16 +263,16 @@
   {
     "title": "Dashboard und Drilldown testen",
     "estimatedHours": 18,
-    "offerTextMarkdown": "## Dashboard und Drilldown testen\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterpruefung und Empfaengerlogik.\n\nBezug zur Aufwandsschaetzung **KPI Paket fuer Serviceleitung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Dashboard und Drilldown testen\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterprüfung und Empfängerlogik.\n\nBezug zur Aufwandsschätzung **KPI Paket für Serviceleitung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": true,
     "estimate": 10,
     "template": 5
   },
   {
-    "title": "Sicherheitsanforderungen pruefen",
+    "title": "Sicherheitsanforderungen prüfen",
     "estimatedHours": 4,
-    "offerTextMarkdown": "## Sicherheitsanforderungen pruefen\n\nUmsetzung in Sapling inklusive Entitaeten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschaetzung **Self-Service Passwortprozess**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Sicherheitsanforderungen prüfen\n\nUmsetzung in Sapling inklusive Entitäten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschätzung **Self-Service Passwortprozess**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 11,
@@ -281,16 +281,16 @@
   {
     "title": "Dialoge und Tokens umsetzen",
     "estimatedHours": 12,
-    "offerTextMarkdown": "## Dialoge und Tokens umsetzen\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Uebernahme.\n\nBezug zur Aufwandsschaetzung **Self-Service Passwortprozess**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Dialoge und Tokens umsetzen\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Übernahme.\n\nBezug zur Aufwandsschätzung **Self-Service Passwortprozess**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 11,
     "template": 3
   },
   {
-    "title": "Audit und Fehlerfaelle testen",
+    "title": "Audit und Fehlerfälle testen",
     "estimatedHours": 14,
-    "offerTextMarkdown": "## Audit und Fehlerfaelle testen\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Uebergabedokumentation.\n\nBezug zur Aufwandsschaetzung **Self-Service Passwortprozess**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Audit und Fehlerfälle testen\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Übergabedokumentation.\n\nBezug zur Aufwandsschätzung **Self-Service Passwortprozess**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 11,
@@ -299,7 +299,7 @@
   {
     "title": "Struktur Projektakte entwerfen",
     "estimatedHours": 8,
-    "offerTextMarkdown": "## Struktur Projektakte entwerfen\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Pruefung von Fehler- und Wiederholfaellen.\n\nBezug zur Aufwandsschaetzung **Projektakte fuer Implementierungen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Struktur Projektakte entwerfen\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Prüfung von Fehler- und Wiederholfällen.\n\nBezug zur Aufwandsschätzung **Projektakte für Implementierungen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 12,
@@ -308,7 +308,7 @@
   {
     "title": "Relationen und Navigation",
     "estimatedHours": 9,
-    "offerTextMarkdown": "## Relationen und Navigation\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten fuer die operative Nutzung.\n\nBezug zur Aufwandsschaetzung **Projektakte fuer Implementierungen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Relationen und Navigation\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten für die operative Nutzung.\n\nBezug zur Aufwandsschätzung **Projektakte für Implementierungen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 12,
@@ -317,7 +317,7 @@
   {
     "title": "Pilotprojekt migrieren",
     "estimatedHours": 15,
-    "offerTextMarkdown": "## Pilotprojekt migrieren\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschaetzung **Projektakte fuer Implementierungen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Pilotprojekt migrieren\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschätzung **Projektakte für Implementierungen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 12,
@@ -326,7 +326,7 @@
   {
     "title": "Produktstruktur definieren",
     "estimatedHours": 10,
-    "offerTextMarkdown": "## Produktstruktur definieren\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Uebernahme.\n\nBezug zur Aufwandsschaetzung **Produktkatalog mit Varianten**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Produktstruktur definieren\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Übernahme.\n\nBezug zur Aufwandsschätzung **Produktkatalog mit Varianten**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 13,
@@ -335,7 +335,7 @@
   {
     "title": "Felder und Ansichten anlegen",
     "estimatedHours": 10,
-    "offerTextMarkdown": "## Felder und Ansichten anlegen\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterpruefung und Empfaengerlogik.\n\nBezug zur Aufwandsschaetzung **Produktkatalog mit Varianten**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Felder und Ansichten anlegen\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterprüfung und Empfängerlogik.\n\nBezug zur Aufwandsschätzung **Produktkatalog mit Varianten**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 13,
@@ -344,16 +344,16 @@
   {
     "title": "Rollenrechte abstimmen",
     "estimatedHours": 16,
-    "offerTextMarkdown": "## Rollenrechte abstimmen\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken fuer die Umsetzung.\n\nBezug zur Aufwandsschaetzung **Produktkatalog mit Varianten**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Rollenrechte abstimmen\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken für die Umsetzung.\n\nBezug zur Aufwandsschätzung **Produktkatalog mit Varianten**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 13,
     "template": 2
   },
   {
-    "title": "Buchungsregeln klaeren",
+    "title": "Buchungsregeln klären",
     "estimatedHours": 7,
-    "offerTextMarkdown": "## Buchungsregeln klaeren\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten fuer die operative Nutzung.\n\nBezug zur Aufwandsschaetzung **Rechnungsvorbereitung aus Zeitbuchungen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Buchungsregeln klären\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten für die operative Nutzung.\n\nBezug zur Aufwandsschätzung **Rechnungsvorbereitung aus Zeitbuchungen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 14,
@@ -362,16 +362,16 @@
   {
     "title": "Gruppierung und Export",
     "estimatedHours": 11,
-    "offerTextMarkdown": "## Gruppierung und Export\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Uebergabedokumentation.\n\nBezug zur Aufwandsschaetzung **Rechnungsvorbereitung aus Zeitbuchungen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Gruppierung und Export\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Übergabedokumentation.\n\nBezug zur Aufwandsschätzung **Rechnungsvorbereitung aus Zeitbuchungen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 14,
     "template": 4
   },
   {
-    "title": "Plausibilitaetspruefung",
+    "title": "Plausibilitätsprüfung",
     "estimatedHours": 17,
-    "offerTextMarkdown": "## Plausibilitaetspruefung\n\nUmsetzung in Sapling inklusive Entitaeten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschaetzung **Rechnungsvorbereitung aus Zeitbuchungen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Plausibilitätsprüfung\n\nUmsetzung in Sapling inklusive Entitäten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschätzung **Rechnungsvorbereitung aus Zeitbuchungen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 14,
@@ -380,7 +380,7 @@
   {
     "title": "Vorlageninventur",
     "estimatedHours": 8,
-    "offerTextMarkdown": "## Vorlageninventur\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterpruefung und Empfaengerlogik.\n\nBezug zur Aufwandsschaetzung **Mehrsprachige E-Mail Vorlagen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Vorlageninventur\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterprüfung und Empfängerlogik.\n\nBezug zur Aufwandsschätzung **Mehrsprachige E-Mail Vorlagen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 15,
@@ -389,7 +389,7 @@
   {
     "title": "Platzhalter und Fallbacks",
     "estimatedHours": 12,
-    "offerTextMarkdown": "## Platzhalter und Fallbacks\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschaetzung **Mehrsprachige E-Mail Vorlagen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Platzhalter und Fallbacks\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschätzung **Mehrsprachige E-Mail Vorlagen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 15,
@@ -398,7 +398,7 @@
   {
     "title": "Redaktionelle Abnahme",
     "estimatedHours": 21,
-    "offerTextMarkdown": "## Redaktionelle Abnahme\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Pruefung von Fehler- und Wiederholfaellen.\n\nBezug zur Aufwandsschaetzung **Mehrsprachige E-Mail Vorlagen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Redaktionelle Abnahme\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Prüfung von Fehler- und Wiederholfällen.\n\nBezug zur Aufwandsschätzung **Mehrsprachige E-Mail Vorlagen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": true,
     "estimate": 15,
@@ -407,7 +407,7 @@
   {
     "title": "Fristenlogik definieren",
     "estimatedHours": 4,
-    "offerTextMarkdown": "## Fristenlogik definieren\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Uebergabedokumentation.\n\nBezug zur Aufwandsschaetzung **Vertragsfristen Monitor**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Fristenlogik definieren\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Übergabedokumentation.\n\nBezug zur Aufwandsschätzung **Vertragsfristen Monitor**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 16,
@@ -416,25 +416,25 @@
   {
     "title": "Monitoring und Inbox",
     "estimatedHours": 8,
-    "offerTextMarkdown": "## Monitoring und Inbox\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken fuer die Umsetzung.\n\nBezug zur Aufwandsschaetzung **Vertragsfristen Monitor**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Monitoring und Inbox\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken für die Umsetzung.\n\nBezug zur Aufwandsschätzung **Vertragsfristen Monitor**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 16,
     "template": 2
   },
   {
-    "title": "Dashboard fuer Erneuerungen",
+    "title": "Dashboard für Erneuerungen",
     "estimatedHours": 18,
-    "offerTextMarkdown": "## Dashboard fuer Erneuerungen\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Uebernahme.\n\nBezug zur Aufwandsschaetzung **Vertragsfristen Monitor**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Dashboard für Erneuerungen\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Übernahme.\n\nBezug zur Aufwandsschätzung **Vertragsfristen Monitor**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 16,
     "template": 3
   },
   {
-    "title": "Datenmodell Geraete",
+    "title": "Datenmodell Geräte",
     "estimatedHours": 5,
-    "offerTextMarkdown": "## Datenmodell Geraete\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschaetzung **Geraetehistorie fuer Vor-Ort-Service**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Datenmodell Geräte\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschätzung **Gerätehistorie für Vor-Ort-Service**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 17,
@@ -443,7 +443,7 @@
   {
     "title": "Mobile Tabellenansicht",
     "estimatedHours": 9,
-    "offerTextMarkdown": "## Mobile Tabellenansicht\n\nUmsetzung in Sapling inklusive Entitaeten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschaetzung **Geraetehistorie fuer Vor-Ort-Service**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Mobile Tabellenansicht\n\nUmsetzung in Sapling inklusive Entitäten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschätzung **Gerätehistorie für Vor-Ort-Service**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 17,
@@ -452,7 +452,7 @@
   {
     "title": "Historienanzeige testen",
     "estimatedHours": 15,
-    "offerTextMarkdown": "## Historienanzeige testen\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten fuer die operative Nutzung.\n\nBezug zur Aufwandsschaetzung **Geraetehistorie fuer Vor-Ort-Service**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Historienanzeige testen\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten für die operative Nutzung.\n\nBezug zur Aufwandsschätzung **Gerätehistorie für Vor-Ort-Service**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 17,
@@ -461,7 +461,7 @@
   {
     "title": "Routingmatrix aufnehmen",
     "estimatedHours": 6,
-    "offerTextMarkdown": "## Routingmatrix aufnehmen\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken fuer die Umsetzung.\n\nBezug zur Aufwandsschaetzung **Support Queue Routing**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Routingmatrix aufnehmen\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken für die Umsetzung.\n\nBezug zur Aufwandsschätzung **Support Queue Routing**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 18,
@@ -470,16 +470,16 @@
   {
     "title": "Regelservice umsetzen",
     "estimatedHours": 13,
-    "offerTextMarkdown": "## Regelservice umsetzen\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Pruefung von Fehler- und Wiederholfaellen.\n\nBezug zur Aufwandsschaetzung **Support Queue Routing**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Regelservice umsetzen\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Prüfung von Fehler- und Wiederholfällen.\n\nBezug zur Aufwandsschätzung **Support Queue Routing**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 18,
     "template": 3
   },
   {
-    "title": "Queue-Uebergaben testen",
+    "title": "Queue-Übergaben testen",
     "estimatedHours": 16,
-    "offerTextMarkdown": "## Queue-Uebergaben testen\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterpruefung und Empfaengerlogik.\n\nBezug zur Aufwandsschaetzung **Support Queue Routing**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Queue-Übergaben testen\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterprüfung und Empfängerlogik.\n\nBezug zur Aufwandsschätzung **Support Queue Routing**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 18,
@@ -488,7 +488,7 @@
   {
     "title": "Rechtekatalog analysieren",
     "estimatedHours": 7,
-    "offerTextMarkdown": "## Rechtekatalog analysieren\n\nUmsetzung in Sapling inklusive Entitaeten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschaetzung **Auditbericht fuer Rollenrechte**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Rechtekatalog analysieren\n\nUmsetzung in Sapling inklusive Entitäten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschätzung **Auditbericht für Rollenrechte**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 19,
@@ -497,25 +497,25 @@
   {
     "title": "Bericht und Filter",
     "estimatedHours": 15,
-    "offerTextMarkdown": "## Bericht und Filter\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Uebernahme.\n\nBezug zur Aufwandsschaetzung **Auditbericht fuer Rollenrechte**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Bericht und Filter\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Übernahme.\n\nBezug zur Aufwandsschätzung **Auditbericht für Rollenrechte**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 19,
     "template": 3
   },
   {
-    "title": "Export fuer Revision",
+    "title": "Export für Revision",
     "estimatedHours": 17,
-    "offerTextMarkdown": "## Export fuer Revision\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Uebergabedokumentation.\n\nBezug zur Aufwandsschaetzung **Auditbericht fuer Rollenrechte**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Export für Revision\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Übergabedokumentation.\n\nBezug zur Aufwandsschätzung **Auditbericht für Rollenrechte**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 19,
     "template": 4
   },
   {
-    "title": "Payload Vertrag klaeren",
+    "title": "Payload Vertrag klären",
     "estimatedHours": 11,
-    "offerTextMarkdown": "## Payload Vertrag klaeren\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Pruefung von Fehler- und Wiederholfaellen.\n\nBezug zur Aufwandsschaetzung **Webhook fuer ERP Bestellungen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Payload Vertrag klären\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Prüfung von Fehler- und Wiederholfällen.\n\nBezug zur Aufwandsschätzung **Webhook für ERP Bestellungen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 20,
@@ -524,7 +524,7 @@
   {
     "title": "Webhook Mapping",
     "estimatedHours": 12,
-    "offerTextMarkdown": "## Webhook Mapping\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten fuer die operative Nutzung.\n\nBezug zur Aufwandsschaetzung **Webhook fuer ERP Bestellungen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Webhook Mapping\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten für die operative Nutzung.\n\nBezug zur Aufwandsschätzung **Webhook für ERP Bestellungen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 20,
@@ -533,7 +533,7 @@
   {
     "title": "End-to-End Test mit ERP",
     "estimatedHours": 18,
-    "offerTextMarkdown": "## End-to-End Test mit ERP\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschaetzung **Webhook fuer ERP Bestellungen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## End-to-End Test mit ERP\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschätzung **Webhook für ERP Bestellungen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": true,
     "estimate": 20,
@@ -542,7 +542,7 @@
   {
     "title": "Dokumenttypen definieren",
     "estimatedHours": 8,
-    "offerTextMarkdown": "## Dokumenttypen definieren\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Uebernahme.\n\nBezug zur Aufwandsschaetzung **Dokumentenablage fuer Angebote**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Dokumenttypen definieren\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Übernahme.\n\nBezug zur Aufwandsschätzung **Dokumentenablage für Angebote**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 21,
@@ -551,25 +551,25 @@
   {
     "title": "Relationen und Uploadflow",
     "estimatedHours": 8,
-    "offerTextMarkdown": "## Relationen und Uploadflow\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterpruefung und Empfaengerlogik.\n\nBezug zur Aufwandsschaetzung **Dokumentenablage fuer Angebote**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Relationen und Uploadflow\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterprüfung und Empfängerlogik.\n\nBezug zur Aufwandsschätzung **Dokumentenablage für Angebote**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 21,
     "template": 5
   },
   {
-    "title": "Such- und Berechtigungspruefung",
+    "title": "Such- und Berechtigungsprüfung",
     "estimatedHours": 14,
-    "offerTextMarkdown": "## Such- und Berechtigungspruefung\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken fuer die Umsetzung.\n\nBezug zur Aufwandsschaetzung **Dokumentenablage fuer Angebote**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Such- und Berechtigungsprüfung\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken für die Umsetzung.\n\nBezug zur Aufwandsschätzung **Dokumentenablage für Angebote**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 21,
     "template": 2
   },
   {
-    "title": "Serienlogik pruefen",
+    "title": "Serienlogik prüfen",
     "estimatedHours": 5,
-    "offerTextMarkdown": "## Serienlogik pruefen\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten fuer die operative Nutzung.\n\nBezug zur Aufwandsschaetzung **Terminserie fuer Projektstatus**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Serienlogik prüfen\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten für die operative Nutzung.\n\nBezug zur Aufwandsschätzung **Terminserie für Projektstatus**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 22,
@@ -578,7 +578,7 @@
   {
     "title": "Teilnehmer und Benachrichtigung",
     "estimatedHours": 9,
-    "offerTextMarkdown": "## Teilnehmer und Benachrichtigung\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Uebergabedokumentation.\n\nBezug zur Aufwandsschaetzung **Terminserie fuer Projektstatus**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Teilnehmer und Benachrichtigung\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Übergabedokumentation.\n\nBezug zur Aufwandsschätzung **Terminserie für Projektstatus**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 22,
@@ -587,7 +587,7 @@
   {
     "title": "Kalenderabgleich testen",
     "estimatedHours": 15,
-    "offerTextMarkdown": "## Kalenderabgleich testen\n\nUmsetzung in Sapling inklusive Entitaeten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschaetzung **Terminserie fuer Projektstatus**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Kalenderabgleich testen\n\nUmsetzung in Sapling inklusive Entitäten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschätzung **Terminserie für Projektstatus**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 22,
@@ -596,16 +596,16 @@
   {
     "title": "Feedbackprozess skizzieren",
     "estimatedHours": 6,
-    "offerTextMarkdown": "## Feedbackprozess skizzieren\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterpruefung und Empfaengerlogik.\n\nBezug zur Aufwandsschaetzung **Kundenfeedback nach Ticketabschluss**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Feedbackprozess skizzieren\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterprüfung und Empfängerlogik.\n\nBezug zur Aufwandsschätzung **Kundenfeedback nach Ticketabschluss**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 23,
     "template": 5
   },
   {
-    "title": "Vorlage und Ausloeser",
+    "title": "Vorlage und Auslöser",
     "estimatedHours": 10,
-    "offerTextMarkdown": "## Vorlage und Ausloeser\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschaetzung **Kundenfeedback nach Ticketabschluss**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Vorlage und Auslöser\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschätzung **Kundenfeedback nach Ticketabschluss**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 23,
@@ -614,7 +614,7 @@
   {
     "title": "Auswertung vorbereiten",
     "estimatedHours": 19,
-    "offerTextMarkdown": "## Auswertung vorbereiten\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Pruefung von Fehler- und Wiederholfaellen.\n\nBezug zur Aufwandsschaetzung **Kundenfeedback nach Ticketabschluss**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Auswertung vorbereiten\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Prüfung von Fehler- und Wiederholfällen.\n\nBezug zur Aufwandsschätzung **Kundenfeedback nach Ticketabschluss**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 23,
@@ -623,7 +623,7 @@
   {
     "title": "Checklistenstruktur",
     "estimatedHours": 7,
-    "offerTextMarkdown": "## Checklistenstruktur\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Uebergabedokumentation.\n\nBezug zur Aufwandsschaetzung **Migrationscheckliste Cloud Umzug**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Checklistenstruktur\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Übergabedokumentation.\n\nBezug zur Aufwandsschätzung **Migrationscheckliste Cloud Umzug**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 24,
@@ -632,7 +632,7 @@
   {
     "title": "Vorlagen und Aufgaben",
     "estimatedHours": 11,
-    "offerTextMarkdown": "## Vorlagen und Aufgaben\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken fuer die Umsetzung.\n\nBezug zur Aufwandsschaetzung **Migrationscheckliste Cloud Umzug**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Vorlagen und Aufgaben\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken für die Umsetzung.\n\nBezug zur Aufwandsschätzung **Migrationscheckliste Cloud Umzug**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 24,
@@ -641,7 +641,7 @@
   {
     "title": "Pilot an Migrationsticket",
     "estimatedHours": 21,
-    "offerTextMarkdown": "## Pilot an Migrationsticket\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Uebernahme.\n\nBezug zur Aufwandsschaetzung **Migrationscheckliste Cloud Umzug**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Pilot an Migrationsticket\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Übernahme.\n\nBezug zur Aufwandsschätzung **Migrationscheckliste Cloud Umzug**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 24,
@@ -650,7 +650,7 @@
   {
     "title": "Pipelineanalyse",
     "estimatedHours": 8,
-    "offerTextMarkdown": "## Pipelineanalyse\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschaetzung **Vertriebsforecast Bereinigung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Pipelineanalyse\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschätzung **Vertriebsforecast Bereinigung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 25,
@@ -659,7 +659,7 @@
   {
     "title": "Pflichtfelder und Validierung",
     "estimatedHours": 12,
-    "offerTextMarkdown": "## Pflichtfelder und Validierung\n\nUmsetzung in Sapling inklusive Entitaeten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschaetzung **Vertriebsforecast Bereinigung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Pflichtfelder und Validierung\n\nUmsetzung in Sapling inklusive Entitäten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschätzung **Vertriebsforecast Bereinigung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 25,
@@ -668,7 +668,7 @@
   {
     "title": "Auswertung vor/nach Umstellung",
     "estimatedHours": 18,
-    "offerTextMarkdown": "## Auswertung vor/nach Umstellung\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten fuer die operative Nutzung.\n\nBezug zur Aufwandsschaetzung **Vertriebsforecast Bereinigung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Auswertung vor/nach Umstellung\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten für die operative Nutzung.\n\nBezug zur Aufwandsschätzung **Vertriebsforecast Bereinigung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": true,
     "estimate": 25,
@@ -677,7 +677,7 @@
   {
     "title": "Preislogik abstimmen",
     "estimatedHours": 4,
-    "offerTextMarkdown": "## Preislogik abstimmen\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken fuer die Umsetzung.\n\nBezug zur Aufwandsschaetzung **Servicevertrag Modulpreise**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Preislogik abstimmen\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken für die Umsetzung.\n\nBezug zur Aufwandsschätzung **Servicevertrag Modulpreise**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 26,
@@ -686,16 +686,16 @@
   {
     "title": "Vertragsfelder erweitern",
     "estimatedHours": 11,
-    "offerTextMarkdown": "## Vertragsfelder erweitern\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Pruefung von Fehler- und Wiederholfaellen.\n\nBezug zur Aufwandsschaetzung **Servicevertrag Modulpreise**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Vertragsfelder erweitern\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Prüfung von Fehler- und Wiederholfällen.\n\nBezug zur Aufwandsschätzung **Servicevertrag Modulpreise**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 26,
     "template": 3
   },
   {
-    "title": "Beispielangebote pruefen",
+    "title": "Beispielangebote prüfen",
     "estimatedHours": 14,
-    "offerTextMarkdown": "## Beispielangebote pruefen\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterpruefung und Empfaengerlogik.\n\nBezug zur Aufwandsschaetzung **Servicevertrag Modulpreise**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Beispielangebote prüfen\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterprüfung und Empfängerlogik.\n\nBezug zur Aufwandsschätzung **Servicevertrag Modulpreise**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 26,
@@ -704,7 +704,7 @@
   {
     "title": "Digest-Inhalte definieren",
     "estimatedHours": 5,
-    "offerTextMarkdown": "## Digest-Inhalte definieren\n\nUmsetzung in Sapling inklusive Entitaeten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschaetzung **Inbox Digest fuer Teamleiter**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Digest-Inhalte definieren\n\nUmsetzung in Sapling inklusive Entitäten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschätzung **Inbox Digest für Teamleiter**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 27,
@@ -713,7 +713,7 @@
   {
     "title": "Aggregation und Versand",
     "estimatedHours": 13,
-    "offerTextMarkdown": "## Aggregation und Versand\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Uebernahme.\n\nBezug zur Aufwandsschaetzung **Inbox Digest fuer Teamleiter**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Aggregation und Versand\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Übernahme.\n\nBezug zur Aufwandsschätzung **Inbox Digest für Teamleiter**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 27,
@@ -722,7 +722,7 @@
   {
     "title": "Pilot mit Support-Team",
     "estimatedHours": 15,
-    "offerTextMarkdown": "## Pilot mit Support-Team\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Uebergabedokumentation.\n\nBezug zur Aufwandsschaetzung **Inbox Digest fuer Teamleiter**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Pilot mit Support-Team\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Übergabedokumentation.\n\nBezug zur Aufwandsschätzung **Inbox Digest für Teamleiter**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 27,
@@ -731,7 +731,7 @@
   {
     "title": "Tool-Schema entwerfen",
     "estimatedHours": 9,
-    "offerTextMarkdown": "## Tool-Schema entwerfen\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Pruefung von Fehler- und Wiederholfaellen.\n\nBezug zur Aufwandsschaetzung **MCP Werkzeug fuer Stammdatenabfrage**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Tool-Schema entwerfen\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Prüfung von Fehler- und Wiederholfällen.\n\nBezug zur Aufwandsschätzung **MCP Werkzeug für Stammdatenabfrage**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 28,
@@ -740,7 +740,7 @@
   {
     "title": "Berechtigungsfilter",
     "estimatedHours": 10,
-    "offerTextMarkdown": "## Berechtigungsfilter\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten fuer die operative Nutzung.\n\nBezug zur Aufwandsschaetzung **MCP Werkzeug fuer Stammdatenabfrage**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Berechtigungsfilter\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten für die operative Nutzung.\n\nBezug zur Aufwandsschätzung **MCP Werkzeug für Stammdatenabfrage**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 28,
@@ -749,7 +749,7 @@
   {
     "title": "Testfragen und Logging",
     "estimatedHours": 16,
-    "offerTextMarkdown": "## Testfragen und Logging\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschaetzung **MCP Werkzeug fuer Stammdatenabfrage**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Testfragen und Logging\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschätzung **MCP Werkzeug für Stammdatenabfrage**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 28,
@@ -758,7 +758,7 @@
   {
     "title": "Prompt und Quellen definieren",
     "estimatedHours": 11,
-    "offerTextMarkdown": "## Prompt und Quellen definieren\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Uebernahme.\n\nBezug zur Aufwandsschaetzung **KI Zusammenfassung fuer lange Tickets**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Prompt und Quellen definieren\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Übernahme.\n\nBezug zur Aufwandsschätzung **KI Zusammenfassung für lange Tickets**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 29,
@@ -767,16 +767,16 @@
   {
     "title": "Speicherung und Anzeige",
     "estimatedHours": 11,
-    "offerTextMarkdown": "## Speicherung und Anzeige\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterpruefung und Empfaengerlogik.\n\nBezug zur Aufwandsschaetzung **KI Zusammenfassung fuer lange Tickets**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Speicherung und Anzeige\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterprüfung und Empfängerlogik.\n\nBezug zur Aufwandsschätzung **KI Zusammenfassung für lange Tickets**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 29,
     "template": 5
   },
   {
-    "title": "Qualitaetspruefung",
+    "title": "Qualitätsprüfung",
     "estimatedHours": 17,
-    "offerTextMarkdown": "## Qualitaetspruefung\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken fuer die Umsetzung.\n\nBezug zur Aufwandsschaetzung **KI Zusammenfassung fuer lange Tickets**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Qualitätsprüfung\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken für die Umsetzung.\n\nBezug zur Aufwandsschätzung **KI Zusammenfassung für lange Tickets**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 29,
@@ -785,7 +785,7 @@
   {
     "title": "Fehlertypen katalogisieren",
     "estimatedHours": 8,
-    "offerTextMarkdown": "## Fehlertypen katalogisieren\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten fuer die operative Nutzung.\n\nBezug zur Aufwandsschaetzung **Fehlerdiagnose fuer API Antworten**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Fehlertypen katalogisieren\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten für die operative Nutzung.\n\nBezug zur Aufwandsschätzung **Fehlerdiagnose für API Antworten**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 30,
@@ -794,7 +794,7 @@
   {
     "title": "Diagnoseausgabe erweitern",
     "estimatedHours": 12,
-    "offerTextMarkdown": "## Diagnoseausgabe erweitern\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Uebergabedokumentation.\n\nBezug zur Aufwandsschaetzung **Fehlerdiagnose fuer API Antworten**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Diagnoseausgabe erweitern\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Übergabedokumentation.\n\nBezug zur Aufwandsschätzung **Fehlerdiagnose für API Antworten**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 30,
@@ -803,7 +803,7 @@
   {
     "title": "Regressionstests",
     "estimatedHours": 18,
-    "offerTextMarkdown": "## Regressionstests\n\nUmsetzung in Sapling inklusive Entitaeten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschaetzung **Fehlerdiagnose fuer API Antworten**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Regressionstests\n\nUmsetzung in Sapling inklusive Entitäten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschätzung **Fehlerdiagnose für API Antworten**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": true,
     "estimate": 30,
@@ -812,7 +812,7 @@
   {
     "title": "Kontaktmodell abstimmen",
     "estimatedHours": 4,
-    "offerTextMarkdown": "## Kontaktmodell abstimmen\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterpruefung und Empfaengerlogik.\n\nBezug zur Aufwandsschaetzung **Lieferantenkontakte im Kundenkontext**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Kontaktmodell abstimmen\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterprüfung und Empfängerlogik.\n\nBezug zur Aufwandsschätzung **Lieferantenkontakte im Kundenkontext**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 31,
@@ -821,7 +821,7 @@
   {
     "title": "Dialog und Relation",
     "estimatedHours": 8,
-    "offerTextMarkdown": "## Dialog und Relation\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschaetzung **Lieferantenkontakte im Kundenkontext**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Dialog und Relation\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschätzung **Lieferantenkontakte im Kundenkontext**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 31,
@@ -830,7 +830,7 @@
   {
     "title": "Suchfilter konfigurieren",
     "estimatedHours": 17,
-    "offerTextMarkdown": "## Suchfilter konfigurieren\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Pruefung von Fehler- und Wiederholfaellen.\n\nBezug zur Aufwandsschaetzung **Lieferantenkontakte im Kundenkontext**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Suchfilter konfigurieren\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Prüfung von Fehler- und Wiederholfällen.\n\nBezug zur Aufwandsschätzung **Lieferantenkontakte im Kundenkontext**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 31,
@@ -839,7 +839,7 @@
   {
     "title": "Schulungsstruktur definieren",
     "estimatedHours": 5,
-    "offerTextMarkdown": "## Schulungsstruktur definieren\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Uebergabedokumentation.\n\nBezug zur Aufwandsschaetzung **Schulungsplanung fuer Rollout**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Schulungsstruktur definieren\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Übergabedokumentation.\n\nBezug zur Aufwandsschätzung **Schulungsplanung für Rollout**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 32,
@@ -848,7 +848,7 @@
   {
     "title": "Termine und Teilnehmerlisten",
     "estimatedHours": 9,
-    "offerTextMarkdown": "## Termine und Teilnehmerlisten\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken fuer die Umsetzung.\n\nBezug zur Aufwandsschaetzung **Schulungsplanung fuer Rollout**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Termine und Teilnehmerlisten\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken für die Umsetzung.\n\nBezug zur Aufwandsschätzung **Schulungsplanung für Rollout**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 32,
@@ -857,7 +857,7 @@
   {
     "title": "Nachfassprozess",
     "estimatedHours": 19,
-    "offerTextMarkdown": "## Nachfassprozess\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Uebernahme.\n\nBezug zur Aufwandsschaetzung **Schulungsplanung fuer Rollout**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Nachfassprozess\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Übernahme.\n\nBezug zur Aufwandsschätzung **Schulungsplanung für Rollout**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 32,
@@ -866,7 +866,7 @@
   {
     "title": "Nummernlogik erfassen",
     "estimatedHours": 6,
-    "offerTextMarkdown": "## Nummernlogik erfassen\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschaetzung **Artikelnummern Validierung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Nummernlogik erfassen\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschätzung **Artikelnummern Validierung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 33,
@@ -875,16 +875,16 @@
   {
     "title": "Validierung im Import",
     "estimatedHours": 10,
-    "offerTextMarkdown": "## Validierung im Import\n\nUmsetzung in Sapling inklusive Entitaeten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschaetzung **Artikelnummern Validierung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Validierung im Import\n\nUmsetzung in Sapling inklusive Entitäten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschätzung **Artikelnummern Validierung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 33,
     "template": 3
   },
   {
-    "title": "Fehlerreport fuer Fachbereich",
+    "title": "Fehlerreport für Fachbereich",
     "estimatedHours": 16,
-    "offerTextMarkdown": "## Fehlerreport fuer Fachbereich\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten fuer die operative Nutzung.\n\nBezug zur Aufwandsschaetzung **Artikelnummern Validierung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Fehlerreport für Fachbereich\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten für die operative Nutzung.\n\nBezug zur Aufwandsschätzung **Artikelnummern Validierung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 33,
@@ -893,7 +893,7 @@
   {
     "title": "Freigabestatus modellieren",
     "estimatedHours": 7,
-    "offerTextMarkdown": "## Freigabestatus modellieren\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken fuer die Umsetzung.\n\nBezug zur Aufwandsschaetzung **Kundenportal Dokumentfreigabe**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Freigabestatus modellieren\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken für die Umsetzung.\n\nBezug zur Aufwandsschätzung **Kundenportal Dokumentfreigabe**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 34,
@@ -902,7 +902,7 @@
   {
     "title": "Portalfilter umsetzen",
     "estimatedHours": 14,
-    "offerTextMarkdown": "## Portalfilter umsetzen\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Pruefung von Fehler- und Wiederholfaellen.\n\nBezug zur Aufwandsschaetzung **Kundenportal Dokumentfreigabe**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Portalfilter umsetzen\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Prüfung von Fehler- und Wiederholfällen.\n\nBezug zur Aufwandsschätzung **Kundenportal Dokumentfreigabe**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 34,
@@ -911,7 +911,7 @@
   {
     "title": "Berechtigungstests",
     "estimatedHours": 17,
-    "offerTextMarkdown": "## Berechtigungstests\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterpruefung und Empfaengerlogik.\n\nBezug zur Aufwandsschaetzung **Kundenportal Dokumentfreigabe**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Berechtigungstests\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterprüfung und Empfängerlogik.\n\nBezug zur Aufwandsschätzung **Kundenportal Dokumentfreigabe**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 34,
@@ -920,7 +920,7 @@
   {
     "title": "Eskalationsmatrix aufnehmen",
     "estimatedHours": 8,
-    "offerTextMarkdown": "## Eskalationsmatrix aufnehmen\n\nUmsetzung in Sapling inklusive Entitaeten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschaetzung **Support Vertrag Eskalationsstufen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Eskalationsmatrix aufnehmen\n\nUmsetzung in Sapling inklusive Entitäten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschätzung **Support Vertrag Eskalationsstufen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 35,
@@ -929,7 +929,7 @@
   {
     "title": "Vertragsrelation erweitern",
     "estimatedHours": 16,
-    "offerTextMarkdown": "## Vertragsrelation erweitern\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Uebernahme.\n\nBezug zur Aufwandsschaetzung **Support Vertrag Eskalationsstufen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Vertragsrelation erweitern\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Übernahme.\n\nBezug zur Aufwandsschätzung **Support Vertrag Eskalationsstufen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 35,
@@ -938,16 +938,16 @@
   {
     "title": "Benachrichtigung testen",
     "estimatedHours": 18,
-    "offerTextMarkdown": "## Benachrichtigung testen\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Uebergabedokumentation.\n\nBezug zur Aufwandsschaetzung **Support Vertrag Eskalationsstufen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Benachrichtigung testen\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Übergabedokumentation.\n\nBezug zur Aufwandsschätzung **Support Vertrag Eskalationsstufen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": true,
     "estimate": 35,
     "template": 4
   },
   {
-    "title": "Qualitaetskriterien definieren",
+    "title": "Qualitätskriterien definieren",
     "estimatedHours": 7,
-    "offerTextMarkdown": "## Qualitaetskriterien definieren\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Pruefung von Fehler- und Wiederholfaellen.\n\nBezug zur Aufwandsschaetzung **Datenqualitaetsbericht Personen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Qualitätskriterien definieren\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Prüfung von Fehler- und Wiederholfällen.\n\nBezug zur Aufwandsschätzung **Datenqualitätsbericht Personen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 36,
@@ -956,7 +956,7 @@
   {
     "title": "Bericht und Filter",
     "estimatedHours": 8,
-    "offerTextMarkdown": "## Bericht und Filter\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten fuer die operative Nutzung.\n\nBezug zur Aufwandsschaetzung **Datenqualitaetsbericht Personen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Bericht und Filter\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten für die operative Nutzung.\n\nBezug zur Aufwandsschätzung **Datenqualitätsbericht Personen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 36,
@@ -965,7 +965,7 @@
   {
     "title": "Bereinigungsliste exportieren",
     "estimatedHours": 14,
-    "offerTextMarkdown": "## Bereinigungsliste exportieren\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschaetzung **Datenqualitaetsbericht Personen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Bereinigungsliste exportieren\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschätzung **Datenqualitätsbericht Personen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 36,
@@ -974,7 +974,7 @@
   {
     "title": "Erkennungskriterien",
     "estimatedHours": 9,
-    "offerTextMarkdown": "## Erkennungskriterien\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Uebernahme.\n\nBezug zur Aufwandsschaetzung **Opportunity nach Ticket erzeugen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Erkennungskriterien\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Übernahme.\n\nBezug zur Aufwandsschätzung **Opportunity nach Ticket erzeugen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 37,
@@ -983,7 +983,7 @@
   {
     "title": "Vorschlagsdialog",
     "estimatedHours": 9,
-    "offerTextMarkdown": "## Vorschlagsdialog\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterpruefung und Empfaengerlogik.\n\nBezug zur Aufwandsschaetzung **Opportunity nach Ticket erzeugen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Vorschlagsdialog\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterprüfung und Empfängerlogik.\n\nBezug zur Aufwandsschätzung **Opportunity nach Ticket erzeugen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 37,
@@ -992,7 +992,7 @@
   {
     "title": "Pilot mit Ticketkategorien",
     "estimatedHours": 15,
-    "offerTextMarkdown": "## Pilot mit Ticketkategorien\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken fuer die Umsetzung.\n\nBezug zur Aufwandsschaetzung **Opportunity nach Ticket erzeugen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Pilot mit Ticketkategorien\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken für die Umsetzung.\n\nBezug zur Aufwandsschätzung **Opportunity nach Ticket erzeugen**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 37,
@@ -1001,7 +1001,7 @@
   {
     "title": "Rollenmatrix aufnehmen",
     "estimatedHours": 6,
-    "offerTextMarkdown": "## Rollenmatrix aufnehmen\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten fuer die operative Nutzung.\n\nBezug zur Aufwandsschaetzung **Rollenbasierte Formularansichten**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Rollenmatrix aufnehmen\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten für die operative Nutzung.\n\nBezug zur Aufwandsschätzung **Rollenbasierte Formularansichten**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 38,
@@ -1010,7 +1010,7 @@
   {
     "title": "Form Configs anlegen",
     "estimatedHours": 10,
-    "offerTextMarkdown": "## Form Configs anlegen\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Uebergabedokumentation.\n\nBezug zur Aufwandsschaetzung **Rollenbasierte Formularansichten**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Form Configs anlegen\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Übergabedokumentation.\n\nBezug zur Aufwandsschätzung **Rollenbasierte Formularansichten**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 38,
@@ -1019,16 +1019,16 @@
   {
     "title": "Abnahme mit Rollenwechsel",
     "estimatedHours": 16,
-    "offerTextMarkdown": "## Abnahme mit Rollenwechsel\n\nUmsetzung in Sapling inklusive Entitaeten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschaetzung **Rollenbasierte Formularansichten**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Abnahme mit Rollenwechsel\n\nUmsetzung in Sapling inklusive Entitäten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschätzung **Rollenbasierte Formularansichten**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 38,
     "template": 3
   },
   {
-    "title": "Budgetquelle klaeren",
+    "title": "Budgetquelle klären",
     "estimatedHours": 7,
-    "offerTextMarkdown": "## Budgetquelle klaeren\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterpruefung und Empfaengerlogik.\n\nBezug zur Aufwandsschaetzung **Projektbudget Warnung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Budgetquelle klären\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterprüfung und Empfängerlogik.\n\nBezug zur Aufwandsschätzung **Projektbudget Warnung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 39,
@@ -1037,7 +1037,7 @@
   {
     "title": "Warnlogik und Inbox",
     "estimatedHours": 11,
-    "offerTextMarkdown": "## Warnlogik und Inbox\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschaetzung **Projektbudget Warnung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Warnlogik und Inbox\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschätzung **Projektbudget Warnung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 39,
@@ -1046,7 +1046,7 @@
   {
     "title": "Test mit Grenzwerten",
     "estimatedHours": 20,
-    "offerTextMarkdown": "## Test mit Grenzwerten\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Pruefung von Fehler- und Wiederholfaellen.\n\nBezug zur Aufwandsschaetzung **Projektbudget Warnung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Test mit Grenzwerten\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Prüfung von Fehler- und Wiederholfällen.\n\nBezug zur Aufwandsschätzung **Projektbudget Warnung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 39,
@@ -1055,7 +1055,7 @@
   {
     "title": "Kategorien definieren",
     "estimatedHours": 8,
-    "offerTextMarkdown": "## Kategorien definieren\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Uebergabedokumentation.\n\nBezug zur Aufwandsschaetzung **E-Mail Eingang Klassifikation**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Kategorien definieren\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Übergabedokumentation.\n\nBezug zur Aufwandsschätzung **E-Mail Eingang Klassifikation**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 40,
@@ -1064,7 +1064,7 @@
   {
     "title": "Klassifikationsservice",
     "estimatedHours": 12,
-    "offerTextMarkdown": "## Klassifikationsservice\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken fuer die Umsetzung.\n\nBezug zur Aufwandsschaetzung **E-Mail Eingang Klassifikation**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Klassifikationsservice\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken für die Umsetzung.\n\nBezug zur Aufwandsschätzung **E-Mail Eingang Klassifikation**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 40,
@@ -1073,16 +1073,16 @@
   {
     "title": "Manuelle Korrektur und Lernen",
     "estimatedHours": 22,
-    "offerTextMarkdown": "## Manuelle Korrektur und Lernen\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Uebernahme.\n\nBezug zur Aufwandsschaetzung **E-Mail Eingang Klassifikation**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Manuelle Korrektur und Lernen\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Übernahme.\n\nBezug zur Aufwandsschätzung **E-Mail Eingang Klassifikation**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": true,
     "estimate": 40,
     "template": 3
   },
   {
-    "title": "Archivregeln klaeren",
+    "title": "Archivregeln klären",
     "estimatedHours": 4,
-    "offerTextMarkdown": "## Archivregeln klaeren\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschaetzung **Datenarchiv fuer alte Tickets**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Archivregeln klären\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschätzung **Datenarchiv für alte Tickets**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 41,
@@ -1091,7 +1091,7 @@
   {
     "title": "Lesemodus und Suche",
     "estimatedHours": 8,
-    "offerTextMarkdown": "## Lesemodus und Suche\n\nUmsetzung in Sapling inklusive Entitaeten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschaetzung **Datenarchiv fuer alte Tickets**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Lesemodus und Suche\n\nUmsetzung in Sapling inklusive Entitäten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschätzung **Datenarchiv für alte Tickets**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 41,
@@ -1100,7 +1100,7 @@
   {
     "title": "Testlauf mit Stichprobe",
     "estimatedHours": 14,
-    "offerTextMarkdown": "## Testlauf mit Stichprobe\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten fuer die operative Nutzung.\n\nBezug zur Aufwandsschaetzung **Datenarchiv fuer alte Tickets**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Testlauf mit Stichprobe\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten für die operative Nutzung.\n\nBezug zur Aufwandsschätzung **Datenarchiv für alte Tickets**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 41,
@@ -1109,7 +1109,7 @@
   {
     "title": "Katalogstruktur",
     "estimatedHours": 5,
-    "offerTextMarkdown": "## Katalogstruktur\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken fuer die Umsetzung.\n\nBezug zur Aufwandsschaetzung **Servicekatalog fuer Kundenangebote**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Katalogstruktur\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken für die Umsetzung.\n\nBezug zur Aufwandsschätzung **Servicekatalog für Kundenangebote**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 42,
@@ -1118,7 +1118,7 @@
   {
     "title": "Vorlagenpflege",
     "estimatedHours": 12,
-    "offerTextMarkdown": "## Vorlagenpflege\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Pruefung von Fehler- und Wiederholfaellen.\n\nBezug zur Aufwandsschaetzung **Servicekatalog fuer Kundenangebote**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Vorlagenpflege\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Prüfung von Fehler- und Wiederholfällen.\n\nBezug zur Aufwandsschätzung **Servicekatalog für Kundenangebote**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 42,
@@ -1127,7 +1127,7 @@
   {
     "title": "Positionserzeugung testen",
     "estimatedHours": 15,
-    "offerTextMarkdown": "## Positionserzeugung testen\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterpruefung und Empfaengerlogik.\n\nBezug zur Aufwandsschaetzung **Servicekatalog fuer Kundenangebote**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Positionserzeugung testen\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterprüfung und Empfängerlogik.\n\nBezug zur Aufwandsschätzung **Servicekatalog für Kundenangebote**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 42,
@@ -1136,7 +1136,7 @@
   {
     "title": "Tokenbestand analysieren",
     "estimatedHours": 6,
-    "offerTextMarkdown": "## Tokenbestand analysieren\n\nUmsetzung in Sapling inklusive Entitaeten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschaetzung **Sicherheitsreview API Tokens**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Tokenbestand analysieren\n\nUmsetzung in Sapling inklusive Entitäten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschätzung **Sicherheitsreview API Tokens**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 43,
@@ -1145,7 +1145,7 @@
   {
     "title": "Reviewansicht",
     "estimatedHours": 14,
-    "offerTextMarkdown": "## Reviewansicht\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Uebernahme.\n\nBezug zur Aufwandsschaetzung **Sicherheitsreview API Tokens**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Reviewansicht\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Übernahme.\n\nBezug zur Aufwandsschätzung **Sicherheitsreview API Tokens**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 43,
@@ -1154,16 +1154,16 @@
   {
     "title": "Rotationshinweise",
     "estimatedHours": 16,
-    "offerTextMarkdown": "## Rotationshinweise\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Uebergabedokumentation.\n\nBezug zur Aufwandsschaetzung **Sicherheitsreview API Tokens**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Rotationshinweise\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Übergabedokumentation.\n\nBezug zur Aufwandsschätzung **Sicherheitsreview API Tokens**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 43,
     "template": 4
   },
   {
-    "title": "Feiertagslogik pruefen",
+    "title": "Feiertagslogik prüfen",
     "estimatedHours": 10,
-    "offerTextMarkdown": "## Feiertagslogik pruefen\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Pruefung von Fehler- und Wiederholfaellen.\n\nBezug zur Aufwandsschaetzung **Kalenderabgleich fuer Feiertage**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Feiertagslogik prüfen\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Prüfung von Fehler- und Wiederholfällen.\n\nBezug zur Aufwandsschätzung **Kalenderabgleich für Feiertage**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 44,
@@ -1172,7 +1172,7 @@
   {
     "title": "Berechnung integrieren",
     "estimatedHours": 11,
-    "offerTextMarkdown": "## Berechnung integrieren\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten fuer die operative Nutzung.\n\nBezug zur Aufwandsschaetzung **Kalenderabgleich fuer Feiertage**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Berechnung integrieren\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten für die operative Nutzung.\n\nBezug zur Aufwandsschätzung **Kalenderabgleich für Feiertage**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 44,
@@ -1181,7 +1181,7 @@
   {
     "title": "Grenzfalltests",
     "estimatedHours": 17,
-    "offerTextMarkdown": "## Grenzfalltests\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschaetzung **Kalenderabgleich fuer Feiertage**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Grenzfalltests\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschätzung **Kalenderabgleich für Feiertage**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 44,
@@ -1190,7 +1190,7 @@
   {
     "title": "Kampagnenfelder definieren",
     "estimatedHours": 12,
-    "offerTextMarkdown": "## Kampagnenfelder definieren\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Uebernahme.\n\nBezug zur Aufwandsschaetzung **Vertriebskampagne Nachverfolgung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Kampagnenfelder definieren\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Übernahme.\n\nBezug zur Aufwandsschätzung **Vertriebskampagne Nachverfolgung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 45,
@@ -1199,16 +1199,16 @@
   {
     "title": "Listen und Filter",
     "estimatedHours": 12,
-    "offerTextMarkdown": "## Listen und Filter\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterpruefung und Empfaengerlogik.\n\nBezug zur Aufwandsschaetzung **Vertriebskampagne Nachverfolgung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Listen und Filter\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterprüfung und Empfängerlogik.\n\nBezug zur Aufwandsschätzung **Vertriebskampagne Nachverfolgung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 45,
     "template": 5
   },
   {
-    "title": "Auswertung der Rueckmeldungen",
+    "title": "Auswertung der Rückmeldungen",
     "estimatedHours": 18,
-    "offerTextMarkdown": "## Auswertung der Rueckmeldungen\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken fuer die Umsetzung.\n\nBezug zur Aufwandsschaetzung **Vertriebskampagne Nachverfolgung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Auswertung der Rückmeldungen\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken für die Umsetzung.\n\nBezug zur Aufwandsschätzung **Vertriebskampagne Nachverfolgung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": true,
     "estimate": 45,
@@ -1217,7 +1217,7 @@
   {
     "title": "Planungskriterien aufnehmen",
     "estimatedHours": 4,
-    "offerTextMarkdown": "## Planungskriterien aufnehmen\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten fuer die operative Nutzung.\n\nBezug zur Aufwandsschaetzung **Techniker Einsatzplanung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Planungskriterien aufnehmen\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten für die operative Nutzung.\n\nBezug zur Aufwandsschätzung **Techniker Einsatzplanung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 46,
@@ -1226,7 +1226,7 @@
   {
     "title": "Filter und Kalenderansicht",
     "estimatedHours": 8,
-    "offerTextMarkdown": "## Filter und Kalenderansicht\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Uebergabedokumentation.\n\nBezug zur Aufwandsschaetzung **Techniker Einsatzplanung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Filter und Kalenderansicht\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Übergabedokumentation.\n\nBezug zur Aufwandsschätzung **Techniker Einsatzplanung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 46,
@@ -1235,7 +1235,7 @@
   {
     "title": "Pilotplanung",
     "estimatedHours": 14,
-    "offerTextMarkdown": "## Pilotplanung\n\nUmsetzung in Sapling inklusive Entitaeten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschaetzung **Techniker Einsatzplanung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Pilotplanung\n\nUmsetzung in Sapling inklusive Entitäten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschätzung **Techniker Einsatzplanung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 46,
@@ -1244,16 +1244,16 @@
   {
     "title": "Wechselprozess definieren",
     "estimatedHours": 5,
-    "offerTextMarkdown": "## Wechselprozess definieren\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterpruefung und Empfaengerlogik.\n\nBezug zur Aufwandsschaetzung **Kundenwechsel Ansprechpartner**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Wechselprozess definieren\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterprüfung und Empfängerlogik.\n\nBezug zur Aufwandsschätzung **Kundenwechsel Ansprechpartner**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 47,
     "template": 5
   },
   {
-    "title": "Pruefliste erzeugen",
+    "title": "Prüfliste erzeugen",
     "estimatedHours": 9,
-    "offerTextMarkdown": "## Pruefliste erzeugen\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschaetzung **Kundenwechsel Ansprechpartner**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Prüfliste erzeugen\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschätzung **Kundenwechsel Ansprechpartner**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 47,
@@ -1262,7 +1262,7 @@
   {
     "title": "Benachrichtigungen",
     "estimatedHours": 18,
-    "offerTextMarkdown": "## Benachrichtigungen\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Pruefung von Fehler- und Wiederholfaellen.\n\nBezug zur Aufwandsschaetzung **Kundenwechsel Ansprechpartner**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Benachrichtigungen\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Prüfung von Fehler- und Wiederholfällen.\n\nBezug zur Aufwandsschätzung **Kundenwechsel Ansprechpartner**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 47,
@@ -1271,16 +1271,16 @@
   {
     "title": "Berichtsstruktur",
     "estimatedHours": 6,
-    "offerTextMarkdown": "## Berichtsstruktur\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Uebergabedokumentation.\n\nBezug zur Aufwandsschaetzung **Statusbericht Automatisierung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Berichtsstruktur\n\nFunktionale Tests, Fehlerkorrekturen, Abnahmesitzung und kurze Übergabedokumentation.\n\nBezug zur Aufwandsschätzung **Statusbericht Automatisierung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 48,
     "template": 4
   },
   {
-    "title": "Datenquellen zusammenfuehren",
+    "title": "Datenquellen zusammenführen",
     "estimatedHours": 10,
-    "offerTextMarkdown": "## Datenquellen zusammenfuehren\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken fuer die Umsetzung.\n\nBezug zur Aufwandsschaetzung **Statusbericht Automatisierung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Datenquellen zusammenführen\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken für die Umsetzung.\n\nBezug zur Aufwandsschätzung **Statusbericht Automatisierung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 48,
@@ -1289,7 +1289,7 @@
   {
     "title": "PDF/Markdown Ausgabe",
     "estimatedHours": 20,
-    "offerTextMarkdown": "## PDF/Markdown Ausgabe\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Uebernahme.\n\nBezug zur Aufwandsschaetzung **Statusbericht Automatisierung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## PDF/Markdown Ausgabe\n\nMapping, Bereinigung, Testimport und Auswertung der Importprotokolle vor produktiver Übernahme.\n\nBezug zur Aufwandsschätzung **Statusbericht Automatisierung**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 48,
@@ -1298,7 +1298,7 @@
   {
     "title": "ERP Feldmapping",
     "estimatedHours": 7,
-    "offerTextMarkdown": "## ERP Feldmapping\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschaetzung **Schnittstelle Lagerbestand**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## ERP Feldmapping\n\nAbstimmung mit Fachbereich, Aufnahme der Ist-Prozesse und Dokumentation messbarer Abnahmekriterien.\n\nBezug zur Aufwandsschätzung **Schnittstelle Lagerbestand**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 49,
@@ -1307,7 +1307,7 @@
   {
     "title": "Bestandsanzeige",
     "estimatedHours": 11,
-    "offerTextMarkdown": "## Bestandsanzeige\n\nUmsetzung in Sapling inklusive Entitaeten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschaetzung **Schnittstelle Lagerbestand**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Bestandsanzeige\n\nUmsetzung in Sapling inklusive Entitäten, Feldern, Dialogverhalten, Rechten und notwendigen Systemkonfigurationen.\n\nBezug zur Aufwandsschätzung **Schnittstelle Lagerbestand**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 49,
@@ -1316,7 +1316,7 @@
   {
     "title": "Fallback bei Schnittstellenfehlern",
     "estimatedHours": 17,
-    "offerTextMarkdown": "## Fallback bei Schnittstellenfehlern\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten fuer die operative Nutzung.\n\nBezug zur Aufwandsschaetzung **Schnittstelle Lagerbestand**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Fallback bei Schnittstellenfehlern\n\nAufbau von Tabellen, Filtern, Kennzahlen und Exporten für die operative Nutzung.\n\nBezug zur Aufwandsschätzung **Schnittstelle Lagerbestand**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": false,
     "estimate": 49,
@@ -1325,7 +1325,7 @@
   {
     "title": "Onboardingprozess",
     "estimatedHours": 8,
-    "offerTextMarkdown": "## Onboardingprozess\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken fuer die Umsetzung.\n\nBezug zur Aufwandsschaetzung **Onboarding Paket Neukunde**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Onboardingprozess\n\nAusarbeitung der Datenstruktur, Integrationspunkte, Randbedingungen und Risiken für die Umsetzung.\n\nBezug zur Aufwandsschätzung **Onboarding Paket Neukunde**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 100,
     "isOptional": false,
     "estimate": 50,
@@ -1334,7 +1334,7 @@
   {
     "title": "Automatische Aufgaben",
     "estimatedHours": 15,
-    "offerTextMarkdown": "## Automatische Aufgaben\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Pruefung von Fehler- und Wiederholfaellen.\n\nBezug zur Aufwandsschaetzung **Onboarding Paket Neukunde**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Automatische Aufgaben\n\nAnbindung der beteiligten Systeme, Verarbeitung von Testdaten und Prüfung von Fehler- und Wiederholfällen.\n\nBezug zur Aufwandsschätzung **Onboarding Paket Neukunde**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 200,
     "isOptional": false,
     "estimate": 50,
@@ -1343,7 +1343,7 @@
   {
     "title": "Pilot mit Neukunde",
     "estimatedHours": 18,
-    "offerTextMarkdown": "## Pilot mit Neukunde\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterpruefung und Empfaengerlogik.\n\nBezug zur Aufwandsschaetzung **Onboarding Paket Neukunde**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
+    "offerTextMarkdown": "## Pilot mit Neukunde\n\nErstellung von Inbox-, Mail- oder Teams-Vorlagen inklusive Platzhalterprüfung und Empfängerlogik.\n\nBezug zur Aufwandsschätzung **Onboarding Paket Neukunde**: Die Leistung wird auf die beschriebenen Rahmenbedingungen zugeschnitten und mit einem kurzen Ergebnisprotokoll abgeschlossen.",
     "sortOrder": 300,
     "isOptional": true,
     "estimate": 50,

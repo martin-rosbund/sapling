@@ -1,0 +1,17 @@
+[
+  { "entity": "companyIndustry", "route": "table/companyIndustry" },
+  { "entity": "companySegment", "route": "table/companySegment" },
+  { "entity": "companySize", "route": "table/companySize" },
+  { "entity": "companyAnnualRevenueClass", "route": "table/companyAnnualRevenueClass" },
+  { "entity": "companyChurnRiskReason", "route": "table/companyChurnRiskReason" },
+  { "entity": "personSalutation", "route": "table/personSalutation" },
+  { "entity": "personTitle", "route": "table/personTitle" },
+  { "entity": "personJobTitle", "route": "table/personJobTitle" },
+  { "entity": "personFunction", "route": "table/personFunction" },
+  { "entity": "personDecisionRole", "route": "table/personDecisionRole" },
+  { "entity": "salesOpportunityResultStatus", "route": "table/salesOpportunityResultStatus" },
+  { "entity": "salesOpportunityLossReason", "route": "table/salesOpportunityLossReason" },
+  { "entity": "marketingCampaign", "route": "table/marketingCampaign" },
+  { "entity": "marketingCampaignStatus", "route": "table/marketingCampaignStatus" },
+  { "entity": "marketingCampaignType", "route": "table/marketingCampaignType" }
+]

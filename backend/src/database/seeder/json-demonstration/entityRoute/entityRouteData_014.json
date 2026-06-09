@@ -1,0 +1,3 @@
+[
+  { "entity": "salesOpportunity", "route": "crm-workspace", "navigation": "crmWorkspace" }
+]
