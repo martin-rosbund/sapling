@@ -204,7 +204,6 @@ export class AiEntityGenerationService {
     const response = await createOpenAiClient(provider).chat.completions.create(
       {
         model,
-        temperature: 0.2,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
@@ -224,9 +223,6 @@ export class AiEntityGenerationService {
     const model = createGeminiClient(provider).getGenerativeModel({
       model: modelName,
       systemInstruction: systemPrompt,
-      generationConfig: {
-        temperature: 0.2,
-      },
     });
     const result = await model.generateContent(userPrompt);
 

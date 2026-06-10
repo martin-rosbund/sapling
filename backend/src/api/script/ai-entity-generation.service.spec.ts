@@ -151,7 +151,6 @@ describe('AiEntityGenerationService', () => {
     expect(createCompletion).toHaveBeenCalledWith(
       expect.objectContaining({
         model: 'gpt-4.1-mini',
-        temperature: 0.2,
       }),
     );
     expect(JSON.stringify(createCompletion.mock.calls[0][0])).not.toContain(
