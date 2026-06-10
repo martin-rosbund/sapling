@@ -123,6 +123,7 @@
         :can-navigate="canNavigate"
         :can-show-information="canShowInformation"
         :show-actions="showActions"
+        :row-interaction="rowInteraction"
         @select-row="emit('select-row', $event)"
         @change-log="emit('change-log', $event)"
         @delete="emit('delete', $event)"
@@ -208,6 +209,7 @@ const props = defineProps<{
   canNavigate: boolean
   canShowInformation: boolean
   showActions: boolean
+  rowInteraction?: boolean
   selectedRows: number[]
   selectedRow: number | null
   isHeaderTranslationLoading: boolean

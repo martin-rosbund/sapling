@@ -30,6 +30,7 @@ import { AiModule } from './api/ai/ai.module';
 import { TeamsModule } from './api/teams/teams.module';
 import { InboxModule } from './api/inbox/inbox.module';
 import { FormConfigModule } from './api/form-config/form-config.module';
+import { ImportModule } from './api/import/import.module';
 
 /**
  * @class AppModule
@@ -90,6 +91,7 @@ import { FormConfigModule } from './api/form-config/form-config.module';
     InboxModule,
     AiModule,
     FormConfigModule,
+    ImportModule,
   ],
   controllers: [AppController],
   providers: [AppService],

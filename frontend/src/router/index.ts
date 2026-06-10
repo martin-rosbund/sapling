@@ -78,6 +78,11 @@ const router = createRouter({
           name: 'formConfig',
           component: () => import('@/views/FormConfigView.vue'),
         },
+        {
+          path: 'import',
+          name: 'import',
+          component: () => import('@/views/ImportView.vue'),
+        },
         // Issue view (lazy loaded)
         { path: 'issue', name: 'issue', component: () => import('@/views/IssueView.vue') },
         // Right view (lazy loaded)

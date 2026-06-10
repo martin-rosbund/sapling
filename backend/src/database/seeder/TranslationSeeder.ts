@@ -68,6 +68,8 @@ export class TranslationSeeder extends Seeder {
       .sort((left, right) => left.localeCompare(right));
     const de = await em.findOne(LanguageItem, { handle: 'de' });
     const en = await em.findOne(LanguageItem, { handle: 'en' });
+    let skippedScripts = 0;
+
     for (const scriptFile of scriptFiles) {
       const scriptName = scriptFile;
       const alreadyRun = await em.findOne(SeedScriptItem, {
@@ -76,9 +78,7 @@ export class TranslationSeeder extends Seeder {
         isSuccess: true,
       });
       if (alreadyRun) {
-        global.log.info(
-          `Script ${scriptName} for ${entityHandle} already executed at ${alreadyRun.executedAt?.toISOString() ?? 'unknown'}. Skipping.`,
-        );
+        skippedScripts += 1;
         continue;
       }
       const filePath = path.join(scriptsDir, scriptFile);
@@ -121,6 +121,12 @@ export class TranslationSeeder extends Seeder {
         await em.persist(statusItem).flush();
         throw err;
       }
+    }
+
+    if (skippedScripts > 0) {
+      global.log.info(
+        `Skipped ${skippedScripts} already executed seed script(s) for ${entityHandle}.`,
+      );
     }
   }
 

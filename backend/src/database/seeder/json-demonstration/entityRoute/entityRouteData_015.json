@@ -1,0 +1,8 @@
+[
+  { "entity": "importBatch", "route": "import", "navigation": "import" },
+  { "entity": "importSource", "route": "table/importSource" },
+  { "entity": "importTemplate", "route": "table/importTemplate" },
+  { "entity": "importBatch", "route": "table/importBatch" },
+  { "entity": "importBatchRow", "route": "table/importBatchRow" },
+  { "entity": "externalRecordLink", "route": "table/externalRecordLink" }
+]

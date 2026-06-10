@@ -1089,7 +1089,9 @@ function buildKnowledgeArticleSectionContent(
       'Product',
       relationLabel(article.product, 'title', 'name', 'handle'),
     ),
-    article.contextKey?.trim() ? `Context key: ${article.contextKey.trim()}` : null,
+    article.contextKey?.trim()
+      ? `Context key: ${article.contextKey.trim()}`
+      : null,
     article.tags?.trim() ? `Tags: ${article.tags.trim()}` : null,
     vectorLine('Published at', formatVectorDate(article.publishedAt)),
     vectorLine('Valid until', formatVectorDate(article.validUntil)),

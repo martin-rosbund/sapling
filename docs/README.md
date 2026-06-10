@@ -29,6 +29,7 @@ The documentation should stay close to the code, but not duplicate every class o
 - [Authentication, Sessions, And Providers](security/auth-sessions-providers.md)
 - [Sapling MCP HTTP API](integrations/sapling-mcp-http.md)
 - [Generic Timeline, Change Log, And Record History](features/generic-timeline-change-log-record-history.md)
+- [Import Batches And External Record Links](features/imports.md)
 - [AI Prompting And Tool Use Guide For Sapling Agents](ai/sapling-agent-tool-use-guide.md)
 - [Operational Runbook](operations/operational-runbook.md)
 

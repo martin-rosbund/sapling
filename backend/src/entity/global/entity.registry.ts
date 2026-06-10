@@ -127,6 +127,11 @@ import { CalendarSyncSubscriptionItem } from '../CalendarSyncSubscriptionItem';
 import { MarketingCampaignItem } from '../MarketingCampaignItem';
 import { MarketingCampaignStatusItem } from '../MarketingCampaignStatusItem';
 import { MarketingCampaignTypeItem } from '../MarketingCampaignTypeItem';
+import { ImportSourceItem } from '../ImportSourceItem';
+import { ImportBatchItem } from '../ImportBatchItem';
+import { ImportBatchRowItem } from '../ImportBatchRowItem';
+import { ImportTemplateItem } from '../ImportTemplateItem';
+import { ExternalRecordLinkItem } from '../ExternalRecordLinkItem';
 
 /**
  * @file entity.registry.ts
@@ -225,6 +230,11 @@ const ENTITY_REGISTRY_ENTRIES: { name: string; class: any }[] = [
   { name: 'emailDelivery', class: EmailDeliveryItem },
   { name: 'emailDeliveryStatus', class: EmailDeliveryStatusItem },
   { name: 'emailList', class: EMailListItem },
+  { name: 'externalRecordLink', class: ExternalRecordLinkItem },
+  { name: 'importBatch', class: ImportBatchItem },
+  { name: 'importBatchRow', class: ImportBatchRowItem },
+  { name: 'importSource', class: ImportSourceItem },
+  { name: 'importTemplate', class: ImportTemplateItem },
   { name: 'marketingCampaign', class: MarketingCampaignItem },
   { name: 'marketingCampaignStatus', class: MarketingCampaignStatusItem },
   { name: 'marketingCampaignType', class: MarketingCampaignTypeItem },

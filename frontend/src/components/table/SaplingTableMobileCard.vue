@@ -3,7 +3,7 @@
     as="article"
     class="sapling-record-card sapling-table-mobile-card"
     variant="subtle"
-    interactive
+    :interactive="rowInteraction !== false"
     :class="{
       'sapling-record-card--selected': isSelected,
       'sapling-table-mobile-card--with-controls': hasHeaderControls,
@@ -320,6 +320,10 @@ const hasHeaderControls = computed(() => props.multiSelect || hasRowActions.valu
 const isSelected = computed(() => Boolean(props.isSelected))
 
 function handleCardClick() {
+  if (props.rowInteraction === false) {
+    return
+  }
+
   if (props.multiSelect) {
     return
   }

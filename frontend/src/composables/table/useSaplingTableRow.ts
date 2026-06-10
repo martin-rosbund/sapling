@@ -41,6 +41,7 @@ export interface UseSaplingTableRowProps {
   canNavigate: boolean
   canShowInformation: boolean
   showActions: boolean
+  rowInteraction?: boolean
 }
 
 export type UseSaplingTableRowEmit = {
@@ -221,6 +222,10 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
   }
 
   function openContextMenu(event: MouseEvent, item: SaplingGenericItem, index: number) {
+    if (props.rowInteraction === false) {
+      return
+    }
+
     emit('open-context-menu', {
       item,
       index,
@@ -234,12 +239,20 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
   }
 
   function onRowMouseDown(event: MouseEvent, index: number) {
+    if (props.rowInteraction === false) {
+      return
+    }
+
     if (event.button === 0 && !props.multiSelect && !isInteractiveRowTarget(event.target)) {
       emit('select-row', index)
     }
   }
 
   function onRowDoubleClick(event: MouseEvent) {
+    if (props.rowInteraction === false) {
+      return
+    }
+
     if (event.button !== 0 || isInteractiveRowTarget(event.target)) {
       return
     }
@@ -259,6 +272,10 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
    * still propagate their native behavior.
    */
   function onRowKeydown(event: KeyboardEvent, index: number) {
+    if (props.rowInteraction === false) {
+      return
+    }
+
     if (event.repeat || isInteractiveRowTarget(event.target)) {
       return
     }
@@ -282,6 +299,10 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
   }
 
   function toggleRowSelection(index: number) {
+    if (props.rowInteraction === false) {
+      return
+    }
+
     emit('select-row', index)
   }
 

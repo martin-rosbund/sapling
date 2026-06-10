@@ -62,6 +62,7 @@ export class GenericSeeder extends Seeder {
       .readdirSync(scriptsDir)
       .filter((f) => f.endsWith('.json'))
       .sort((left, right) => left.localeCompare(right));
+    let skippedScripts = 0;
 
     for (const scriptFile of scriptFiles) {
       const scriptName = scriptFile;
@@ -72,9 +73,7 @@ export class GenericSeeder extends Seeder {
         isSuccess: true,
       });
       if (alreadyRun) {
-        global.log.info(
-          `Script ${scriptName} for ${entityHandle} already executed at ${alreadyRun.executedAt?.toISOString() ?? 'unknown'}. Skipping.`,
-        );
+        skippedScripts += 1;
         continue;
       }
       // Lade Daten
@@ -118,6 +117,12 @@ export class GenericSeeder extends Seeder {
         await em.persist(statusItem).flush();
         throw err;
       }
+    }
+
+    if (skippedScripts > 0) {
+      global.log.info(
+        `Skipped ${skippedScripts} already executed seed script(s) for ${entityHandle}.`,
+      );
     }
   }
 

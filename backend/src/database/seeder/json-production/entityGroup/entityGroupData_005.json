@@ -1,0 +1,9 @@
+[
+  {
+    "handle": "import",
+    "icon": "mdi-database-import-outline",
+    "isExpanded": false,
+    "sortOrder": 60,
+    "parent": "platform"
+  }
+]

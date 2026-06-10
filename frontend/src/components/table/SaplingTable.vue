@@ -15,6 +15,7 @@
     }"
   >
     <div
+      v-if="showToolbar"
       class="sapling-toolbar-shell sapling-table-toolbar"
       :class="{ 'sapling-table-toolbar--mobile': isMobileTable }"
     >
@@ -139,6 +140,7 @@
         :can-navigate="canNavigate"
         :can-show-information="canShowInformation"
         :show-actions="showActions"
+        :row-interaction="rowInteraction"
         :selected-rows="selectedRows"
         :selected-row="selectedRow"
         :is-header-translation-loading="isHeaderTranslationLoading"
@@ -181,6 +183,7 @@
         :can-navigate="canNavigate"
         :can-show-information="canShowInformation"
         :show-actions="showActions"
+        :row-interaction="rowInteraction"
         :selected-rows="selectedRows"
         :selected-row="selectedRow"
         :is-header-translation-loading="isHeaderTranslationLoading"
@@ -287,7 +290,11 @@ import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 type SaplingTableProps = UseSaplingTableProps & {
   showFavorite?: boolean
   showAdd?: boolean
+  showImport?: boolean
   showSearch?: boolean
+  showFormConfig?: boolean
+  showToolbar?: boolean
+  rowInteraction?: boolean
   showSidePanelToggle?: boolean
   sidePanelVisible?: boolean
   sidePanelToggleLabel?: string
@@ -300,6 +307,7 @@ type SaplingTableEmit = UseSaplingTableEmit & {
 
 const props = withDefaults(defineProps<SaplingTableProps>(), {
   showSearch: true,
+  rowInteraction: true,
 })
 const emit = defineEmits<SaplingTableEmit>()
 const { t } = useI18n()
@@ -338,13 +346,18 @@ const showAddButton = computed(
 )
 const showImportButton = computed(
   () =>
+    props.showImport !== false &&
     currentPersonStore.isAdministrator &&
     (Boolean(props.entityPermission?.allowInsert) || Boolean(props.entityPermission?.allowUpdate)),
 )
 const showFormConfigButton = computed(
-  () => currentPersonStore.isAdministrator && Boolean(props.entityHandle),
+  () =>
+    props.showFormConfig !== false &&
+    currentPersonStore.isAdministrator &&
+    Boolean(props.entityHandle),
 )
 const showSearchField = computed(() => props.showSearch !== false)
+const showToolbar = computed(() => props.showToolbar !== false)
 const showSidePanelToggleButton = computed(() => props.showSidePanelToggle === true)
 const sidePanelVisible = computed(() => props.sidePanelVisible === true)
 const sidePanelToggleLabel = computed(

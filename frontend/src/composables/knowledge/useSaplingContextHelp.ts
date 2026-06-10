@@ -24,7 +24,7 @@ export function resolveRouteContextHelpKey(route: RouteLocationNormalizedLoaded)
     system: 'app.system',
   }
 
-  return typeof route.name === 'string' ? routeContextKeys[route.name] ?? null : null
+  return typeof route.name === 'string' ? (routeContextKeys[route.name] ?? null) : null
 }
 
 export async function openContextHelpArticle(

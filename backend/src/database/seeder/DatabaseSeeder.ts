@@ -107,6 +107,7 @@ import type { EntityName } from '@mikro-orm/core';
 import { MarketingCampaignItem } from '../../entity/MarketingCampaignItem';
 import { MarketingCampaignStatusItem } from '../../entity/MarketingCampaignStatusItem';
 import { MarketingCampaignTypeItem } from '../../entity/MarketingCampaignTypeItem';
+import { ImportSourceItem } from '../../entity/ImportSourceItem';
 
 /**
  * Declarative seed order.
@@ -224,6 +225,7 @@ const SEED_ORDER: Array<EntityName<object> | (new () => Seeder)> = [
   AiProviderModelItem,
   AiEntityGenerationTemplateItem,
   McpServerConfigItem,
+  ImportSourceItem,
 ];
 
 function isEntityClass(

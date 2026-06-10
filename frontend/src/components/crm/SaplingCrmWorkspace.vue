@@ -67,6 +67,7 @@
           density="comfortable"
           hide-details
           clearable
+          autocomplete="off"
           prepend-inner-icon="mdi-magnify"
           :label="t('global.search')"
         />
@@ -228,7 +229,9 @@
           @open="openWorkspaceItem"
         />
 
-        <section class="sapling-crm-workspace-panel sapling-crm-workspace-panel--compact glass-panel">
+        <section
+          class="sapling-crm-workspace-panel sapling-crm-workspace-panel--compact glass-panel"
+        >
           <header class="sapling-crm-workspace-panel__header">
             <div>
               <p class="sapling-eyebrow">{{ t('crmWorkspace.signalOverview') }}</p>
@@ -361,7 +364,14 @@ const COMPANY_RELATIONS = [
   'churnRiskReason',
   'persons',
 ]
-const PERSON_RELATIONS = ['company', 'salutation', 'title', 'jobTitle', 'jobFunction', 'decisionRole']
+const PERSON_RELATIONS = [
+  'company',
+  'salutation',
+  'title',
+  'jobTitle',
+  'jobFunction',
+  'decisionRole',
+]
 const OPPORTUNITY_RELATIONS = [
   'type',
   'forecast',
@@ -449,13 +459,14 @@ const filteredCompanies = computed(() =>
 )
 const openOpportunities = computed(() => opportunities.value.filter(isOpportunityOpen))
 const filteredOpenOpportunities = computed(() =>
-  openOpportunities.value.filter((opportunity) =>
-    matchesSearch(
-      opportunity.title,
-      opportunity.nextStep,
-      companyLabel(opportunity.assigneeCompany ?? opportunity.creatorCompany),
-      personLabel(opportunity.assigneePerson ?? opportunity.creatorPerson),
-    ) && matchesOpportunityResponsibleFilter(opportunity),
+  openOpportunities.value.filter(
+    (opportunity) =>
+      matchesSearch(
+        opportunity.title,
+        opportunity.nextStep,
+        companyLabel(opportunity.assigneeCompany ?? opportunity.creatorCompany),
+        personLabel(opportunity.assigneePerson ?? opportunity.creatorPerson),
+      ) && matchesOpportunityResponsibleFilter(opportunity),
   ),
 )
 const opportunityFutureActivity = computed(() => buildFutureActivityByOpportunity())
@@ -475,7 +486,10 @@ const customersWithoutContact = computed(() => {
       days: lastContact ? diffInDays(today, startOfDay(lastContact)) : Number.POSITIVE_INFINITY,
     }))
     .filter((entry) => entry.days >= contactThresholdDays.value)
-    .sort((left, right) => right.days - left.days || companyValue(right.company) - companyValue(left.company))
+    .sort(
+      (left, right) =>
+        right.days - left.days || companyValue(right.company) - companyValue(left.company),
+    )
 })
 
 const opportunitiesWithoutNextActivity = computed(() =>
@@ -490,7 +504,10 @@ const opportunitiesWithoutNextActivity = computed(() =>
     .sort((left, right) => {
       const leftDate = parseDate(left.closeDate)?.getTime() ?? Number.MAX_SAFE_INTEGER
       const rightDate = parseDate(right.closeDate)?.getTime() ?? Number.MAX_SAFE_INTEGER
-      return leftDate - rightDate || normalizeMoney(right.expectedRevenue) - normalizeMoney(left.expectedRevenue)
+      return (
+        leftDate - rightDate ||
+        normalizeMoney(right.expectedRevenue) - normalizeMoney(left.expectedRevenue)
+      )
     }),
 )
 
@@ -502,7 +519,9 @@ const customersWithoutContactItems = computed<CrmWorkspaceItem[]>(() =>
     title: company.name,
     subtitle: relationLabel(company.segment) || relationLabel(company.industry),
     owner: accountOwnerLabel(company),
-    value: Number.isFinite(days) ? t('crmWorkspace.daysAgo', { count: days }) : t('crmWorkspace.noContact'),
+    value: Number.isFinite(days)
+      ? t('crmWorkspace.daysAgo', { count: days })
+      : t('crmWorkspace.noContact'),
     badge: relationLabel(company.segment),
     tone: days >= 90 ? 'error' : 'warning',
     icon: 'mdi-account-clock-outline',
@@ -526,7 +545,10 @@ const opportunitiesWithoutNextActivityItems = computed<CrmWorkspaceItem[]>(() =>
 
 const atRiskCustomerItems = computed<CrmWorkspaceItem[]>(() =>
   filteredCompanies.value
-    .filter((company) => isCustomerCompany(company) && (company.churnRiskReason || isCompanyContactOverdue(company)))
+    .filter(
+      (company) =>
+        isCustomerCompany(company) && (company.churnRiskReason || isCompanyContactOverdue(company)),
+    )
     .sort((left, right) => companyRiskScore(right) - companyRiskScore(left))
     .slice(0, 12)
     .map((company) => ({
@@ -544,37 +566,47 @@ const atRiskCustomerItems = computed<CrmWorkspaceItem[]>(() =>
 )
 
 const todayContactItems = computed<CrmWorkspaceItem[]>(() => {
-  const urgentOpportunityItems = opportunitiesWithoutNextActivity.value.slice(0, 7).map((opportunity) => {
-    const person = resolvePerson(opportunity.assigneePerson ?? opportunity.creatorPerson)
-    return {
-      id: `contact-opportunity-${opportunity.handle}`,
-      entity: person?.handle ? PERSON_ENTITY : OPPORTUNITY_ENTITY,
-      handle: person?.handle ?? opportunity.handle,
-      title: person ? personLabel(person) : opportunity.title,
-      subtitle: companyLabel(opportunity.assigneeCompany ?? opportunity.creatorCompany),
-      owner: opportunityOwnerLabel(opportunity),
-      value: formatMoney(opportunity.expectedRevenue),
-      badge: t('crmWorkspace.noNextActivity'),
-      tone: getOpportunityUrgencyTone(opportunity),
-      icon: 'mdi-phone-outgoing-outline',
-    } satisfies CrmWorkspaceItem
-  })
+  const urgentOpportunityItems = opportunitiesWithoutNextActivity.value
+    .slice(0, 7)
+    .map((opportunity) => {
+      const person = resolvePerson(opportunity.assigneePerson ?? opportunity.creatorPerson)
+      return {
+        id: `contact-opportunity-${opportunity.handle}`,
+        entity: person?.handle ? PERSON_ENTITY : OPPORTUNITY_ENTITY,
+        handle: person?.handle ?? opportunity.handle,
+        title: person ? personLabel(person) : opportunity.title,
+        subtitle: companyLabel(opportunity.assigneeCompany ?? opportunity.creatorCompany),
+        owner: opportunityOwnerLabel(opportunity),
+        value: formatMoney(opportunity.expectedRevenue),
+        badge: t('crmWorkspace.noNextActivity'),
+        tone: getOpportunityUrgencyTone(opportunity),
+        icon: 'mdi-phone-outgoing-outline',
+      } satisfies CrmWorkspaceItem
+    })
 
-  const accountItems = customersWithoutContact.value.slice(0, 7).map(({ company, days }) => ({
-    id: `contact-account-${company.handle}`,
-    entity: COMPANY_ENTITY,
-    handle: company.handle,
-    title: company.name,
-    subtitle: relationLabel(company.segment) || relationLabel(company.industry),
-    owner: accountOwnerLabel(company),
-    value: Number.isFinite(days) ? t('crmWorkspace.daysAgo', { count: days }) : t('crmWorkspace.noContact'),
-    badge: t('crmWorkspace.customerContactGap'),
-    tone: days >= 90 ? 'error' : 'warning',
-    icon: 'mdi-phone-sync-outline',
-  }) satisfies CrmWorkspaceItem)
+  const accountItems = customersWithoutContact.value.slice(0, 7).map(
+    ({ company, days }) =>
+      ({
+        id: `contact-account-${company.handle}`,
+        entity: COMPANY_ENTITY,
+        handle: company.handle,
+        title: company.name,
+        subtitle: relationLabel(company.segment) || relationLabel(company.industry),
+        owner: accountOwnerLabel(company),
+        value: Number.isFinite(days)
+          ? t('crmWorkspace.daysAgo', { count: days })
+          : t('crmWorkspace.noContact'),
+        badge: t('crmWorkspace.customerContactGap'),
+        tone: days >= 90 ? 'error' : 'warning',
+        icon: 'mdi-phone-sync-outline',
+      }) satisfies CrmWorkspaceItem,
+  )
 
   return [...urgentOpportunityItems, ...accountItems]
-    .filter((item, index, allItems) => allItems.findIndex((candidate) => candidate.id === item.id) === index)
+    .filter(
+      (item, index, allItems) =>
+        allItems.findIndex((candidate) => candidate.id === item.id) === index,
+    )
     .slice(0, 10)
 })
 
@@ -619,25 +651,45 @@ const salesStageBreakdown = computed<StageBreakdown[]>(() => {
 })
 
 const openPipelineValue = computed(() =>
-  filteredOpenOpportunities.value.reduce((sum, opportunity) => sum + normalizeMoney(opportunity.expectedRevenue), 0),
+  filteredOpenOpportunities.value.reduce(
+    (sum, opportunity) => sum + normalizeMoney(opportunity.expectedRevenue),
+    0,
+  ),
 )
 const weightedPipelineValue = computed(() =>
   filteredOpenOpportunities.value.reduce(
     (sum, opportunity) =>
-      sum + normalizeMoney(opportunity.expectedRevenue) * (normalizeProbability(opportunity.probability) / 100),
+      sum +
+      normalizeMoney(opportunity.expectedRevenue) *
+        (normalizeProbability(opportunity.probability) / 100),
     0,
   ),
 )
 const totalArr = computed(() =>
-  filteredCompanies.value.reduce((sum, company) => sum + normalizeMoney(company.annualRecurringRevenue), 0),
+  filteredCompanies.value.reduce(
+    (sum, company) => sum + normalizeMoney(company.annualRecurringRevenue),
+    0,
+  ),
 )
 const riskCustomerCount = computed(() => atRiskCustomerItems.value.length)
 
 const heroMetrics = computed(() => [
-  { key: 'openPipeline', label: t('crmWorkspace.openPipeline'), value: formatMoney(openPipelineValue.value) },
-  { key: 'weightedPipeline', label: t('crmWorkspace.weightedPipeline'), value: formatMoney(weightedPipelineValue.value) },
+  {
+    key: 'openPipeline',
+    label: t('crmWorkspace.openPipeline'),
+    value: formatMoney(openPipelineValue.value),
+  },
+  {
+    key: 'weightedPipeline',
+    label: t('crmWorkspace.weightedPipeline'),
+    value: formatMoney(weightedPipelineValue.value),
+  },
   { key: 'totalArr', label: t('crmWorkspace.totalArr'), value: formatMoney(totalArr.value) },
-  { key: 'contactToday', label: t('crmWorkspace.contactToday'), value: n(todayContactItems.value.length) },
+  {
+    key: 'contactToday',
+    label: t('crmWorkspace.contactToday'),
+    value: n(todayContactItems.value.length),
+  },
 ])
 
 const signals = computed<CrmSignal[]>(() => [
@@ -777,7 +829,10 @@ function buildLastContactByCompany(): Map<string, Date> {
     }
 
     phoneCalls.value.forEach((phoneCall) => {
-      if (getRelationHandle(phoneCall.entity) === PERSON_ENTITY && String(phoneCall.reference) === String(person.handle)) {
+      if (
+        getRelationHandle(phoneCall.entity) === PERSON_ENTITY &&
+        String(phoneCall.reference) === String(person.handle)
+      ) {
         updateLatestDate(result, String(companyHandle), parseDate(phoneCall.createdAt))
       }
     })
@@ -845,7 +900,9 @@ function companyRiskScore(company: CrmCompany): number {
 }
 
 function companyValue(company: CrmCompany): number {
-  return normalizeMoney(company.annualRecurringRevenue ?? company.contractValue ?? company.monthlyRecurringRevenue)
+  return normalizeMoney(
+    company.annualRecurringRevenue ?? company.contractValue ?? company.monthlyRecurringRevenue,
+  )
 }
 
 function getOpportunityUrgencyTone(opportunity: CrmOpportunity): CrmWorkspaceItem['tone'] {
@@ -876,7 +933,9 @@ function getRelationHandle(value: unknown): string | number | null {
 
 function resolvePerson(value: unknown): CrmPerson | null {
   const handle = getRelationHandle(value)
-  return handle == null ? null : personByHandle.value.get(String(handle)) ?? (relationObject(value) as CrmPerson | null)
+  return handle == null
+    ? null
+    : (personByHandle.value.get(String(handle)) ?? (relationObject(value) as CrmPerson | null))
 }
 
 function relationLabel(value: unknown): string {
@@ -913,7 +972,10 @@ function csOwnerLabel(company: CrmCompany): string {
 }
 
 function opportunityOwnerLabel(opportunity: CrmOpportunity): string {
-  return personLabel(opportunity.assigneePerson ?? opportunity.creatorPerson) || t('crmWorkspace.noOwner')
+  return (
+    personLabel(opportunity.assigneePerson ?? opportunity.creatorPerson) ||
+    t('crmWorkspace.noOwner')
+  )
 }
 
 function matchesCompanyResponsibleFilter(company: CrmCompany): boolean {
@@ -929,7 +991,9 @@ function matchesResponsibleFilter(...values: unknown[]): boolean {
     return true
   }
 
-  return values.some((value) => String(getRelationHandle(value) ?? '') === selectedResponsibleHandle.value)
+  return values.some(
+    (value) => String(getRelationHandle(value) ?? '') === selectedResponsibleHandle.value,
+  )
 }
 
 function matchesSearch(...values: unknown[]): boolean {
@@ -1006,7 +1070,9 @@ async function openOpportunityStage(stage: StageBreakdown): Promise<void> {
       entity: OPPORTUNITY_ENTITY,
       handle: stageOpportunities[0].handle,
       title: stageOpportunities[0].title,
-      subtitle: companyLabel(stageOpportunities[0].assigneeCompany ?? stageOpportunities[0].creatorCompany),
+      subtitle: companyLabel(
+        stageOpportunities[0].assigneeCompany ?? stageOpportunities[0].creatorCompany,
+      ),
     })
     return
   }
@@ -1050,7 +1116,10 @@ async function openWorkspaceItem(item: CrmWorkspaceItem): Promise<void> {
   await openFilteredEntity(item.entity, { handle: item.handle })
 }
 
-async function openFilteredEntity(entity: CrmWorkspaceItem['entity'], filter: Record<string, unknown>): Promise<void> {
+async function openFilteredEntity(
+  entity: CrmWorkspaceItem['entity'],
+  filter: Record<string, unknown>,
+): Promise<void> {
   const encodedFilter = encodeURIComponent(JSON.stringify(filter))
   await pushAppRoute(router, `/table/${entity}?filter=${encodedFilter}`)
 }

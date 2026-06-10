@@ -67,10 +67,8 @@ const SAPLING_DOCUMENT_URL_RE = /^sapling-document:(\d+)$/
 function saplingDocumentMarkdownPlugin(markdown: MarkdownParserLike): void {
   markdown.inline.ruler.before('emphasis', 'sapling_document_embed', parseSaplingDocumentEmbed)
 
-  markdown.renderer.rules.sapling_document_embed = (
-    tokens: MarkdownTokenLike[],
-    index: number,
-  ) => renderSaplingDocumentEmbed(tokens[index]?.meta)
+  markdown.renderer.rules.sapling_document_embed = (tokens: MarkdownTokenLike[], index: number) =>
+    renderSaplingDocumentEmbed(tokens[index]?.meta)
 
   const defaultLinkOpenRule = markdown.renderer.rules.link_open
   markdown.renderer.rules.link_open = (
@@ -167,7 +165,10 @@ function renderSaplingDocumentEmbed(meta: unknown): string {
   ].join('')
 }
 
-function rewriteSaplingDocumentUrl(token: MarkdownTokenLike | undefined, attributeName: string): void {
+function rewriteSaplingDocumentUrl(
+  token: MarkdownTokenLike | undefined,
+  attributeName: string,
+): void {
   const value = token?.attrGet?.(attributeName)
   const handle = value?.match(SAPLING_DOCUMENT_URL_RE)?.[1]
   if (!handle) {
@@ -200,9 +201,7 @@ function isSaplingDocumentEmbedMeta(value: unknown): value is SaplingDocumentEmb
     'handle' in value &&
     'kind' in value &&
     typeof (value as SaplingDocumentEmbedMeta).handle === 'string' &&
-    ['document', 'image', 'audio', 'video'].includes(
-      (value as SaplingDocumentEmbedMeta).kind,
-    )
+    ['document', 'image', 'audio', 'video'].includes((value as SaplingDocumentEmbedMeta).kind)
   )
 }
 

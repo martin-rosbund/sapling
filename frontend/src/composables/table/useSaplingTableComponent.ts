@@ -8,9 +8,7 @@ import type {
   SortItem,
 } from '@/entity/structure'
 import type { SaplingGenericItem } from '@/entity/entity'
-import {
-  DEFAULT_SMALL_WINDOW_WIDTH,
-} from '@/constants/project.constants'
+import { DEFAULT_SMALL_WINDOW_WIDTH } from '@/constants/project.constants'
 import type { EntityItem, ScriptButtonItem } from '@/entity/entity'
 import type { FilterQuery } from '@/services/api.generic.service'
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
@@ -45,6 +43,7 @@ export interface UseSaplingTableProps {
   columnFilters?: Record<string, ColumnFilterItem>
   activeFilter?: FilterQuery
   showActions: boolean
+  rowInteraction?: boolean
   tableKey: string
   headers?: SaplingTableHeaderItem[]
   multiSelect?: boolean
@@ -327,8 +326,9 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   })
 
   const visibleHeaders = computed<SaplingTableHeaderItem[]>(() => {
-    let headers = dataHeaders.value
-      .map((header) => withCellClass(header, 'sapling-table__cell--data'))
+    let headers = dataHeaders.value.map((header) =>
+      withCellClass(header, 'sapling-table__cell--data'),
+    )
 
     if (props.multiSelect) {
       headers = [
