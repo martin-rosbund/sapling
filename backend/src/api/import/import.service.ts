@@ -607,9 +607,6 @@ export class ImportService {
     const model = createGeminiClient(provider).getGenerativeModel({
       model: modelName,
       systemInstruction: systemPrompt,
-      generationConfig: {
-        temperature: 0.1,
-      },
     });
     const result = await model.generateContent(userPrompt);
 
