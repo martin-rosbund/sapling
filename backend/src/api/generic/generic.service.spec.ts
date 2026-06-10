@@ -2,6 +2,10 @@ import { describe, expect, it, jest } from '@jest/globals';
 import { ConflictException } from '@nestjs/common';
 
 jest.mock('@mikro-orm/core', () => ({
+  DeferMode: {
+    INITIALLY_DEFERRED: 'deferred',
+    INITIALLY_IMMEDIATE: 'immediate',
+  },
   EntityManager: class {},
 }));
 jest.mock('../../entity/global/entity.decorator', () => ({

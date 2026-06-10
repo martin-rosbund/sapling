@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { EntityManager, type EntityName, wrap } from '@mikro-orm/core';
+import { EntityManager, wrap } from '@mikro-orm/core';
 import { createHash } from 'crypto';
 import { EntityItem } from '../../entity/EntityItem';
 import { ExternalRecordLinkItem } from '../../entity/ExternalRecordLinkItem';
@@ -367,9 +367,13 @@ export class ImportService {
     await this.syncTemplateValueMappings(template, dto.valueMappings ?? []);
 
     await this.em.flush();
-    await this.em.populate(template, ['source', 'targetEntity', 'valueMappings'], {
-      refresh: true,
-    });
+    await this.em.populate(
+      template,
+      ['source', 'targetEntity', 'valueMappings'],
+      {
+        refresh: true,
+      },
+    );
     return this.toTemplateSummary(template);
   }
 
@@ -569,7 +573,7 @@ export class ImportService {
           );
 
     return {
-      raw: this.parseJsonObject(rawText) as ImportAiSuggestionRaw,
+      raw: this.parseJsonObject(rawText),
       providerHandle: runtimeTarget.provider.handle ?? null,
       modelHandle: runtimeTarget.model.handle ?? null,
     };
@@ -777,7 +781,9 @@ export class ImportService {
     mappings: ImportAiSuggestedFieldMappingDto[],
     referenceFieldMap: Map<string, ImportReferenceCandidate>,
   ): ImportAiSuggestedValueMappingDto[] {
-    const mappedTargets = new Set(mappings.map((mapping) => mapping.targetField));
+    const mappedTargets = new Set(
+      mappings.map((mapping) => mapping.targetField),
+    );
     const valueMappings: ImportAiSuggestedValueMappingDto[] = [];
 
     for (const entry of this.toRecordArray(value)) {
@@ -795,18 +801,15 @@ export class ImportService {
         Object.entries(rawValues)
           .map(([sourceValue, targetValue]) => {
             const sourceKey = this.normalizeValueMappingKey(sourceValue);
-            const normalizedTarget =
-              this.normalizeSuggestedValueMappingTarget(
-                targetValue,
-                referenceValueLookup,
-              );
+            const normalizedTarget = this.normalizeSuggestedValueMappingTarget(
+              targetValue,
+              referenceValueLookup,
+            );
 
             return [sourceKey, normalizedTarget] as const;
           })
           .filter(
-            (
-              entry,
-            ): entry is readonly [string, string | number | boolean] =>
+            (entry): entry is readonly [string, string | number | boolean] =>
               entry[0].length > 0 && typeof entry[1] !== 'undefined',
           ),
       );
@@ -838,7 +841,11 @@ export class ImportService {
     }
 
     if (referenceValueLookup) {
-      const normalized = String(value).trim();
+      const normalized = this.normalizeScalarString(value);
+      if (!normalized) {
+        return undefined;
+      }
+
       return referenceValueLookup.get(normalized);
     }
 
@@ -896,16 +903,18 @@ export class ImportService {
         field.referenceName,
       );
       const valueField =
-        referenceTemplate.find((entry) =>
-          entry.options?.includes('isValue'),
-        ) ?? referenceTemplate.find((entry) => entry.name === 'handle');
+        referenceTemplate.find((entry) => entry.options?.includes('isValue')) ??
+        referenceTemplate.find((entry) => entry.name === 'handle');
       const entityClass = this.genericQueryService.getEntityClass(
         field.referenceName,
       );
       const records = await this.em.find(
-        entityClass as EntityName<object>,
+        entityClass,
         {},
-        { orderBy: { handle: 'ASC' } as never, limit: AI_REFERENCE_CANDIDATE_LIMIT },
+        {
+          orderBy: { handle: 'ASC' } as never,
+          limit: AI_REFERENCE_CANDIDATE_LIMIT,
+        },
       );
 
       candidates.push({
@@ -915,7 +924,9 @@ export class ImportService {
           .map((record) => this.toPlainRecord(record))
           .map((record) => ({
             handle: record.handle,
-            label: String(record[valueField?.name ?? 'handle'] ?? record.handle),
+            label: String(
+              record[valueField?.name ?? 'handle'] ?? record.handle,
+            ),
           }))
           .filter(
             (record): record is { handle: string | number; label: string } =>
@@ -928,7 +939,9 @@ export class ImportService {
     return candidates;
   }
 
-  private getImportableFields(template: EntityTemplateDto[]): EntityTemplateDto[] {
+  private getImportableFields(
+    template: EntityTemplateDto[],
+  ): EntityTemplateDto[] {
     return template.filter((field) => {
       if (!field.name) {
         return false;
@@ -1212,7 +1225,7 @@ export class ImportService {
     entityHandle: string,
     value: unknown,
   ): Promise<string | number | null> {
-    const normalizedValue = String(value ?? '').trim();
+    const normalizedValue = this.normalizeScalarString(value);
     if (!normalizedValue) {
       return null;
     }
@@ -1228,7 +1241,7 @@ export class ImportService {
 
     const entityClass = this.genericQueryService.getEntityClass(entityHandle);
     const matches = await this.em.find(
-      entityClass as EntityName<object>,
+      entityClass,
       { [valueField.name]: normalizedValue },
       { limit: 2 },
     );
@@ -1245,9 +1258,7 @@ export class ImportService {
     value: unknown,
     mappings: ImportValueMappingDto[],
   ): unknown {
-    const mapping = mappings.find(
-      (entry) => entry.targetField === targetField,
-    );
+    const mapping = mappings.find((entry) => entry.targetField === targetField);
 
     if (!mapping) {
       return value;
@@ -1277,7 +1288,7 @@ export class ImportService {
   }
 
   private normalizeValueMappingKey(value: unknown): string {
-    return String(value ?? '').trim();
+    return this.normalizeScalarString(value);
   }
 
   private normalizeValueMappingFallback(
@@ -1306,7 +1317,7 @@ export class ImportService {
         valueMapping.importTemplate = template;
         valueMapping.targetField = mapping.targetField;
         valueMapping.sourceValue = sourceValue;
-        valueMapping.targetValue = String(targetValue ?? '');
+        valueMapping.targetValue = this.normalizeScalarString(targetValue);
         valueMapping.fallback = this.normalizeValueMappingFallback(
           mapping.fallback,
         );
@@ -1322,24 +1333,26 @@ export class ImportService {
 
     for (const mapping of mappings) {
       const targetField = this.normalizeOptionalString(mapping.targetField);
-      if (!targetField || !mapping.values || typeof mapping.values !== 'object') {
+      if (
+        !targetField ||
+        !mapping.values ||
+        typeof mapping.values !== 'object'
+      ) {
         continue;
       }
 
-      const values = Object.fromEntries(
-        Object.entries(mapping.values)
-          .map(([sourceValue, targetValue]) => [
-            this.normalizeValueMappingKey(sourceValue),
-            targetValue,
-          ])
-          .filter(
-            ([sourceValue, targetValue]) =>
-              sourceValue &&
-              targetValue !== null &&
-              typeof targetValue !== 'undefined' &&
-              String(targetValue).trim().length > 0,
-          ),
-      );
+      const values: Record<string, unknown> = {};
+
+      for (const [sourceValue, targetValue] of Object.entries(mapping.values)) {
+        const sourceKey = this.normalizeValueMappingKey(sourceValue);
+        const normalizedTargetValue = this.normalizeScalarString(targetValue);
+
+        if (!sourceKey || !normalizedTargetValue) {
+          continue;
+        }
+
+        values[sourceKey] = targetValue;
+      }
 
       if (Object.keys(values).length === 0) {
         continue;
@@ -1375,9 +1388,7 @@ export class ImportService {
     template: ImportTemplateItem,
   ): ImportValueMappingDto[] {
     const groupedMappings = new Map<string, ImportValueMappingDto>();
-    const valueMappings = template.valueMappings?.isInitialized()
-      ? template.valueMappings.getItems()
-      : [];
+    const valueMappings = this.getInitializedTemplateValueMappings(template);
 
     for (const valueMapping of valueMappings) {
       if (!valueMapping.targetField || !valueMapping.sourceValue) {
@@ -1401,6 +1412,33 @@ export class ImportService {
     return [...groupedMappings.values()];
   }
 
+  private getInitializedTemplateValueMappings(
+    template: ImportTemplateItem,
+  ): ImportTemplateValueMappingItem[] {
+    const valueMappings = template.valueMappings as unknown;
+
+    if (!this.isImportTemplateValueMappingCollection(valueMappings)) {
+      return [];
+    }
+
+    return valueMappings.isInitialized() ? valueMappings.getItems() : [];
+  }
+
+  private isImportTemplateValueMappingCollection(value: unknown): value is {
+    isInitialized: () => boolean;
+    getItems: () => ImportTemplateValueMappingItem[];
+  } {
+    if (!value || typeof value !== 'object') {
+      return false;
+    }
+
+    const candidate = value as Record<string, unknown>;
+    return (
+      typeof candidate.isInitialized === 'function' &&
+      typeof candidate.getItems === 'function'
+    );
+  }
+
   private assertRequiredFields(
     template: EntityTemplateDto[],
     payload: Record<string, unknown>,
@@ -1416,7 +1454,7 @@ export class ImportService {
       }
 
       const value = payload[field.name];
-      return value == null || String(value).trim().length === 0;
+      return value == null || this.normalizeScalarString(value).length === 0;
     });
 
     if (missingField) {
@@ -1517,7 +1555,7 @@ export class ImportService {
     const parts = Object.fromEntries(
       normalizedColumns.map((column) => [
         column,
-        String(rawData[column] ?? '').trim(),
+        this.normalizeScalarString(rawData[column]),
       ]),
     );
 
@@ -1609,6 +1647,18 @@ export class ImportService {
     return typeof value === 'string' && value.trim().length > 0
       ? value.trim()
       : null;
+  }
+
+  private normalizeScalarString(value: unknown): string {
+    if (typeof value === 'string') {
+      return value.trim();
+    }
+
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      return value.toString().trim();
+    }
+
+    return '';
   }
 
   private extractHandle(value: unknown): string | null {

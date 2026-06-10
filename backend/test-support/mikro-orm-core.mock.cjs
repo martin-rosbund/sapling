@@ -51,6 +51,10 @@ const coreExports = {
       get: (_, property) => property,
     },
   ),
+  DeferMode: {
+    INITIALLY_DEFERRED: 'deferred',
+    INITIALLY_IMMEDIATE: 'immediate',
+  },
   raw: (value) => value,
 };
 

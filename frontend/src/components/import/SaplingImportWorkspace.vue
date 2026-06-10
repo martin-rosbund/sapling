@@ -150,14 +150,12 @@
               <v-chip v-if="field.isRequired" size="x-small" color="primary" variant="tonal">
                 *
               </v-chip>
-              <v-tooltip v-if="aiSuggestionFieldDetails[field.name]" :text="aiSuggestionReason(field.name)">
+              <v-tooltip
+                v-if="aiSuggestionFieldDetails[field.name]"
+                :text="aiSuggestionReason(field.name)"
+              >
                 <template #activator="{ props: tooltipProps }">
-                  <v-chip
-                    v-bind="tooltipProps"
-                    size="x-small"
-                    color="info"
-                    variant="tonal"
-                  >
+                  <v-chip v-bind="tooltipProps" size="x-small" color="info" variant="tonal">
                     AI {{ confidencePercent(aiSuggestionFieldDetails[field.name].confidence) }}
                   </v-chip>
                 </template>
@@ -241,11 +239,7 @@
             <v-chip size="small" variant="tonal">
               {{ aiSuggestion.mappings.length }} {{ $t('import.aiSuggestedFields') }}
             </v-chip>
-            <v-chip
-              v-if="aiSuggestion.externalKey?.columns.length"
-              size="small"
-              variant="tonal"
-            >
+            <v-chip v-if="aiSuggestion.externalKey?.columns.length" size="small" variant="tonal">
               {{ $t('import.externalKeyColumns') }}:
               {{ aiSuggestion.externalKey.columns.join(', ') }}
             </v-chip>
@@ -485,11 +479,14 @@ type ValueMappingState = {
   values: Record<string, unknown>
   fallback: ImportValueMappingFallback
 }
-type ImportMappingConfiguration = {
-  mappings?: ImportFieldMapping[]
-  relationMappings?: unknown[]
-  valueMappings?: ImportValueMapping[]
-} | null | undefined
+type ImportMappingConfiguration =
+  | {
+      mappings?: ImportFieldMapping[]
+      relationMappings?: unknown[]
+      valueMappings?: ImportValueMapping[]
+    }
+  | null
+  | undefined
 
 const { t, te } = useI18n()
 const genericStore = useGenericStore()
@@ -526,7 +523,9 @@ const isSuggesting = ref(false)
 const aiSuggestion = ref<ImportAiSuggestion | null>(null)
 const fieldMappings = reactive<Record<string, string | null>>({})
 const valueMappings = reactive<Record<string, ValueMappingState>>({})
-const aiSuggestionFieldDetails = reactive<Record<string, { confidence: number; reason: string | null }>>({})
+const aiSuggestionFieldDetails = reactive<
+  Record<string, { confidence: number; reason: string | null }>
+>({})
 const referenceValueItems = reactive<Record<string, SaplingGenericItem[]>>({})
 const valueMappingDialog = reactive<{
   visible: boolean
@@ -835,7 +834,10 @@ function applyAiSuggestion(suggestion: ImportAiSuggestion): void {
   aiSuggestion.value = suggestion
 
   for (const mapping of suggestion.mappings) {
-    if (!headerOptions.value.includes(mapping.sourceColumn) || !(mapping.targetField in fieldMappings)) {
+    if (
+      !headerOptions.value.includes(mapping.sourceColumn) ||
+      !(mapping.targetField in fieldMappings)
+    ) {
       continue
     }
 

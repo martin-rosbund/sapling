@@ -126,8 +126,8 @@ export class ImportTemplateItem {
     () => ImportTemplateValueMappingItem,
     (valueMapping) => valueMapping.importTemplate,
   )
-  valueMappings: Collection<Rel<ImportTemplateValueMappingItem>> =
-    new Collection<Rel<ImportTemplateValueMappingItem>>(this);
+  valueMappings: Collection<ImportTemplateValueMappingItem> =
+    new Collection<ImportTemplateValueMappingItem>(this);
 
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])

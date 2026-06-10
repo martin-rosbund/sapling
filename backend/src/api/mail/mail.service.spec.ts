@@ -1,6 +1,10 @@
 import { describe, expect, it, jest } from '@jest/globals';
 
 jest.mock('@mikro-orm/core', () => ({
+  DeferMode: {
+    INITIALLY_DEFERRED: 'deferred',
+    INITIALLY_IMMEDIATE: 'immediate',
+  },
   EntityManager: class EntityManager {},
   Type: class Type {},
 }));
