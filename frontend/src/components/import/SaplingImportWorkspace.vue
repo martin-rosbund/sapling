@@ -150,6 +150,18 @@
               <v-chip v-if="field.isRequired" size="x-small" color="primary" variant="tonal">
                 *
               </v-chip>
+              <v-tooltip v-if="aiSuggestionFieldDetails[field.name]" :text="aiSuggestionReason(field.name)">
+                <template #activator="{ props: tooltipProps }">
+                  <v-chip
+                    v-bind="tooltipProps"
+                    size="x-small"
+                    color="info"
+                    variant="tonal"
+                  >
+                    AI {{ confidencePercent(aiSuggestionFieldDetails[field.name].confidence) }}
+                  </v-chip>
+                </template>
+              </v-tooltip>
             </div>
             <v-select
               v-model="fieldMappings[field.name]"
@@ -180,7 +192,16 @@
         <div v-if="batch" class="sapling-import__actions">
           <v-btn
             variant="tonal"
-            prepend-icon="mdi-"
+            prepend-icon="mdi-auto-fix"
+            :disabled="!canSuggestWithAi"
+            :loading="isSuggesting"
+            @click="createAiSuggestion"
+          >
+            {{ $t('import.createAiSuggestion') }}
+          </v-btn>
+          <v-btn
+            variant="tonal"
+            prepend-icon="mdi-table-cog"
             :disabled="!selectedTemplate"
             @click="applySelectedTemplate"
           >
@@ -205,6 +226,51 @@
             {{ $t('import.configure') }}
           </v-btn>
         </div>
+
+        <v-alert
+          v-if="aiSuggestion"
+          type="info"
+          variant="tonal"
+          density="comfortable"
+          class="sapling-import__ai-suggestion"
+        >
+          <div class="sapling-import__ai-suggestion-title">
+            {{ $t('import.aiSuggestionApplied') }}
+          </div>
+          <div class="sapling-import__ai-suggestion-chips">
+            <v-chip size="small" variant="tonal">
+              {{ aiSuggestion.mappings.length }} {{ $t('import.aiSuggestedFields') }}
+            </v-chip>
+            <v-chip
+              v-if="aiSuggestion.externalKey?.columns.length"
+              size="small"
+              variant="tonal"
+            >
+              {{ $t('import.externalKeyColumns') }}:
+              {{ aiSuggestion.externalKey.columns.join(', ') }}
+            </v-chip>
+            <v-chip
+              v-for="reference in aiSuggestion.referenceFields"
+              :key="`${reference.targetField}-${reference.sourceColumn ?? ''}`"
+              size="small"
+              variant="tonal"
+            >
+              {{ fieldLabel(reference.targetField) }}
+            </v-chip>
+            <v-chip
+              v-for="mapping in aiSuggestion.valueMappings"
+              :key="mapping.targetField"
+              size="small"
+              color="primary"
+              variant="tonal"
+            >
+              {{ fieldLabel(mapping.targetField) }}: {{ $t('import.valueMapping') }}
+            </v-chip>
+          </div>
+          <div v-if="aiSuggestion.warnings.length" class="sapling-import__ai-warnings">
+            <span v-for="warning in aiSuggestion.warnings" :key="warning">{{ warning }}</span>
+          </div>
+        </v-alert>
       </SaplingSurface>
 
       <SaplingSurface class="sapling-panel-shell sapling-section-panel sapling-import__panel">
@@ -395,6 +461,7 @@ import SaplingTable from '@/components/table/SaplingTable.vue'
 import { useGenericStore } from '@/stores/genericStore'
 import ApiGenericService from '@/services/api.generic.service'
 import ApiImportService, {
+  type ImportAiSuggestion,
   type ImportBatchSummary,
   type ImportFieldMapping,
   type ImportGenericReferenceMapping,
@@ -455,8 +522,11 @@ const isConfiguring = ref(false)
 const isExecuting = ref(false)
 const isLoadingTemplates = ref(false)
 const isSavingTemplate = ref(false)
+const isSuggesting = ref(false)
+const aiSuggestion = ref<ImportAiSuggestion | null>(null)
 const fieldMappings = reactive<Record<string, string | null>>({})
 const valueMappings = reactive<Record<string, ValueMappingState>>({})
+const aiSuggestionFieldDetails = reactive<Record<string, { confidence: number; reason: string | null }>>({})
 const referenceValueItems = reactive<Record<string, SaplingGenericItem[]>>({})
 const valueMappingDialog = reactive<{
   visible: boolean
@@ -589,6 +659,9 @@ const canSaveTemplate = computed(
     Object.values(fieldMappings).some(Boolean) &&
     !isSavingTemplate.value,
 )
+const canSuggestWithAi = computed(
+  () => Boolean(batch.value?.handle && selectedEntityHandle.value) && !isSuggesting.value,
+)
 const canExecute = computed(
   () =>
     Boolean(batch.value?.handle) &&
@@ -685,6 +758,7 @@ async function onEntityChange(): Promise<void> {
 }
 
 function initializeMappings(): void {
+  resetAiSuggestion()
   Object.keys(fieldMappings).forEach((key) => delete fieldMappings[key])
   Object.keys(valueMappings).forEach((key) => delete valueMappings[key])
 
@@ -707,6 +781,7 @@ function applySelectedTemplate(): void {
 }
 
 function applyTemplate(template: ImportTemplateSummary): void {
+  resetAiSuggestion()
   Object.keys(fieldMappings).forEach((key) => delete fieldMappings[key])
   Object.keys(valueMappings).forEach((key) => delete valueMappings[key])
 
@@ -733,6 +808,64 @@ function applyTemplate(template: ImportTemplateSummary): void {
     genericReferenceMapping?.keyColumns ?? [],
   )
   templateTitle.value = template.title
+}
+
+async function createAiSuggestion(): Promise<void> {
+  if (!batch.value?.handle || !selectedEntityHandle.value) {
+    return
+  }
+
+  try {
+    isSuggesting.value = true
+    const suggestion = await ApiImportService.suggestBatchConfiguration(batch.value.handle, {
+      entityHandle: selectedEntityHandle.value,
+      sourceHandle: selectedSourceHandle.value,
+    })
+    applyAiSuggestion(suggestion)
+    pushMessage('success', t('import.aiSuggestionCreated'), batch.value.filename, 'import')
+  } catch {
+    // shared API errors already surface through the message center
+  } finally {
+    isSuggesting.value = false
+  }
+}
+
+function applyAiSuggestion(suggestion: ImportAiSuggestion): void {
+  resetAiSuggestion()
+  aiSuggestion.value = suggestion
+
+  for (const mapping of suggestion.mappings) {
+    if (!headerOptions.value.includes(mapping.sourceColumn) || !(mapping.targetField in fieldMappings)) {
+      continue
+    }
+
+    fieldMappings[mapping.targetField] = mapping.sourceColumn
+    aiSuggestionFieldDetails[mapping.targetField] = {
+      confidence: mapping.confidence,
+      reason: mapping.reason ?? null,
+    }
+  }
+
+  if (selectedSourceHandle.value && suggestion.externalKey?.columns.length) {
+    externalKeyColumns.value = filterExistingColumns(suggestion.externalKey.columns)
+  }
+
+  for (const mapping of suggestion.valueMappings) {
+    if (!fieldMappings[mapping.targetField]) {
+      continue
+    }
+
+    valueMappings[mapping.targetField] = {
+      targetField: mapping.targetField,
+      values: { ...(mapping.values ?? {}) },
+      fallback: normalizeValueMappingFallback(mapping.fallback),
+    }
+  }
+}
+
+function resetAiSuggestion(): void {
+  aiSuggestion.value = null
+  Object.keys(aiSuggestionFieldDetails).forEach((key) => delete aiSuggestionFieldDetails[key])
 }
 
 async function configureBatch(): Promise<void> {
@@ -876,6 +1009,7 @@ function buildGenericReferenceMapping(): ImportGenericReferenceMapping | null {
 }
 
 function onFieldMappingChange(targetField: string): void {
+  delete aiSuggestionFieldDetails[targetField]
   const field = importableFields.value.find((entry) => entry.name === targetField)
   const mapping = valueMappings[targetField]
   if (!field || !mapping) {
@@ -1031,6 +1165,19 @@ function importActionLabel(action: string): string {
   return te(key) ? t(key) : humanizeHandle(action)
 }
 
+function aiSuggestionReason(targetField: string): string {
+  const details = aiSuggestionFieldDetails[targetField]
+  if (!details?.reason) {
+    return t('import.aiSuggestion')
+  }
+
+  return details.reason
+}
+
+function confidencePercent(confidence: number): string {
+  return `${Math.round(Math.max(0, Math.min(1, confidence)) * 100)}%`
+}
+
 function humanizeHandle(value: string): string {
   return value
     .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
@@ -1099,6 +1246,22 @@ function normalizeName(value: string): string {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.sapling-import__ai-suggestion {
+  border-radius: 8px;
+}
+
+.sapling-import__ai-suggestion-title {
+  font-weight: 600;
+}
+
+.sapling-import__ai-suggestion-chips,
+.sapling-import__ai-warnings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .sapling-import__table {

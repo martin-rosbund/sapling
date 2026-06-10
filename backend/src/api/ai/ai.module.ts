@@ -57,6 +57,11 @@ import { SaplingMcpPermissionService } from './sapling-mcp-permission.service';
     SaplingMcpPermissionService,
   ],
   controllers: [AiController],
-  exports: [AiService, McpService, SaplingMcpService],
+  exports: [
+    AiService,
+    AiProviderRegistryService,
+    McpService,
+    SaplingMcpService,
+  ],
 })
 export class AiModule {}

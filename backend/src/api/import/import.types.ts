@@ -27,6 +27,50 @@ export type ImportValueMappingDto = {
   fallback?: ImportValueMappingFallback;
 };
 
+export type ImportAiSuggestDto = {
+  entityHandle?: string | null;
+  sourceHandle?: string | null;
+  providerHandle?: string | null;
+  modelHandle?: string | null;
+  maxSampleRows?: number | null;
+};
+
+export type ImportAiSuggestionConfidence = number;
+
+export type ImportAiSuggestedFieldMappingDto = ImportFieldMappingDto & {
+  confidence: ImportAiSuggestionConfidence;
+  reason?: string | null;
+};
+
+export type ImportAiSuggestedExternalKeyDto = {
+  columns: string[];
+  confidence: ImportAiSuggestionConfidence;
+  reason?: string | null;
+};
+
+export type ImportAiSuggestedReferenceFieldDto = {
+  targetField: string;
+  referenceName: string;
+  sourceColumn?: string | null;
+  confidence: ImportAiSuggestionConfidence;
+  reason?: string | null;
+};
+
+export type ImportAiSuggestedValueMappingDto = ImportValueMappingDto & {
+  confidence: ImportAiSuggestionConfidence;
+  reason?: string | null;
+};
+
+export type ImportAiSuggestionDto = {
+  mappings: ImportAiSuggestedFieldMappingDto[];
+  externalKey: ImportAiSuggestedExternalKeyDto | null;
+  referenceFields: ImportAiSuggestedReferenceFieldDto[];
+  valueMappings: ImportAiSuggestedValueMappingDto[];
+  warnings: string[];
+  providerHandle?: string | null;
+  modelHandle?: string | null;
+};
+
 export type ConfigureImportBatchDto = {
   entityHandle: string;
   sourceHandle?: string | null;

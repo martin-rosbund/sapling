@@ -20,6 +20,8 @@ import { PersonItem } from '../../entity/PersonItem';
 import { ImportService } from './import.service';
 import type {
   ConfigureImportBatchDto,
+  ImportAiSuggestDto,
+  ImportAiSuggestionDto,
   ImportBatchSummaryDto,
   ImportTemplateSummaryDto,
   SaveImportTemplateDto,
@@ -81,6 +83,14 @@ export class ImportController {
     @Body() body: ConfigureImportBatchDto,
   ): Promise<ImportBatchSummaryDto> {
     return this.importService.configureBatch(Number(handle), body, req.user);
+  }
+
+  @Post('batches/:handle/suggest')
+  async suggestBatchConfiguration(
+    @Param('handle') handle: number,
+    @Body() body: ImportAiSuggestDto = {},
+  ): Promise<ImportAiSuggestionDto> {
+    return this.importService.suggestBatchConfiguration(Number(handle), body);
   }
 
   @Post('batches/:handle/execute')

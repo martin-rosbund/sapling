@@ -21,6 +21,40 @@ export interface ImportValueMapping {
   fallback?: ImportValueMappingFallback
 }
 
+export interface ImportAiSuggestionFieldMapping extends ImportFieldMapping {
+  confidence: number
+  reason?: string | null
+}
+
+export interface ImportAiSuggestionExternalKey {
+  columns: string[]
+  confidence: number
+  reason?: string | null
+}
+
+export interface ImportAiSuggestionReferenceField {
+  targetField: string
+  referenceName: string
+  sourceColumn?: string | null
+  confidence: number
+  reason?: string | null
+}
+
+export interface ImportAiSuggestionValueMapping extends ImportValueMapping {
+  confidence: number
+  reason?: string | null
+}
+
+export interface ImportAiSuggestion {
+  mappings: ImportAiSuggestionFieldMapping[]
+  externalKey: ImportAiSuggestionExternalKey | null
+  referenceFields: ImportAiSuggestionReferenceField[]
+  valueMappings: ImportAiSuggestionValueMapping[]
+  warnings: string[]
+  providerHandle?: string | null
+  modelHandle?: string | null
+}
+
 export interface ConfigureImportBatchPayload {
   entityHandle: string
   sourceHandle?: string | null
@@ -154,6 +188,25 @@ class ApiImportService {
     try {
       const response = await axios.patch<ImportBatchSummary>(
         `${BACKEND_URL}import/batches/${handle}/configure`,
+        payload,
+      )
+      return response.data
+    } catch (error: unknown) {
+      pushApiErrorMessage(error, 'exception.unknownError', 'import')
+      throw error
+    }
+  }
+
+  static async suggestBatchConfiguration(
+    handle: number,
+    payload: {
+      entityHandle: string
+      sourceHandle?: string | null
+    },
+  ): Promise<ImportAiSuggestion> {
+    try {
+      const response = await axios.post<ImportAiSuggestion>(
+        `${BACKEND_URL}import/batches/${handle}/suggest`,
         payload,
       )
       return response.data

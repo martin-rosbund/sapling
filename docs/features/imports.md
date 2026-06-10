@@ -80,12 +80,17 @@ generic target types.
 4. Load an existing import template or map CSV columns to Sapling fields.
 5. Optionally configure value mappings for mapped fields, for example `1`
    from the file becomes status `5` or a referenced Sapling record handle.
-6. Optionally choose one or more external key columns.
-7. Save the current mapping as an import template for later batches.
-8. Optionally configure a generic target reference for entities such as
+6. Optionally ask the AI to suggest a configuration. The backend sends only
+   CSV headers, a few sample rows, target entity metadata, reference
+   candidates, and matching templates to the configured chat model. The
+   returned suggestion is normalized server-side and then applied in the UI as
+   an editable proposal.
+7. Optionally choose one or more external key columns.
+8. Save the current mapping as an import template for later batches.
+9. Optionally configure a generic target reference for entities such as
    `information` that use `entity + reference`.
-9. Validate the batch.
-10. Execute the batch.
+10. Validate the batch.
+11. Execute the batch.
 
 Value mappings are stored as `ImportTemplateValueMappingItem` rows for reusable
 templates and are also copied into the batch `mapping` JSON when a batch is
@@ -95,6 +100,26 @@ execution, so users can inspect the Sapling preview before anything is written.
 
 During execution, rows with an existing external record link update the linked
 Sapling record. Rows without a link create a new record and store the link.
+
+## AI Suggestions
+
+`POST /api/import/batches/:handle/suggest` builds a constrained prompt for the
+configured/default chat provider. The request can pass the currently selected
+target entity and source system because a freshly analyzed batch is not yet
+validated and may not have those relations persisted.
+
+The endpoint returns structured proposals for:
+
+- CSV column to Sapling field mappings
+- one or more recommended external key columns
+- detected reference fields
+- conservative value mapping candidates
+- confidence and short reasoning per proposal
+
+The UI applies the proposal to the same editable mapping state used for manual
+configuration. Users can correct fields, open the value mapping dialog, save
+the result as an import template, and then validate the batch through the
+normal import path.
 
 ## Extension Points
 
