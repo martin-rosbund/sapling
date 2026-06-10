@@ -1,5 +1,5 @@
 [
-  { "entity": "navigation", "property": "import", "de": "Importe", "en": "Imports" },
+  { "entity": "navigation", "property": "import", "de": "Importstrategien", "en": "Import strategies" },
   { "entity": "navigation", "property": "importSource", "de": "Fremdsysteme", "en": "External systems" },
   { "entity": "navigation", "property": "importTemplate", "de": "Importvorlagen", "en": "Import templates" },
   { "entity": "navigation", "property": "importTemplateValueMapping", "de": "Vorlagen-Wertmappings", "en": "Template value mappings" },
