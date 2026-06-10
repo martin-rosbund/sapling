@@ -283,89 +283,91 @@
           </v-chip>
         </div>
 
-        <div v-if="saplingPreviewItems.length > 0" class="sapling-import__sapling-preview">
-          <div class="sapling-section-header">
-            <div>
-              <p class="sapling-eyebrow">{{ $t('import.saplingPreview') }}</p>
-              <h2 class="sapling-section-title">{{ entityPreviewTitle }}</h2>
+        <div class="sapling-import__preview-scroll">
+          <div v-if="saplingPreviewItems.length > 0" class="sapling-import__sapling-preview">
+            <div class="sapling-section-header">
+              <div>
+                <p class="sapling-eyebrow">{{ $t('import.saplingPreview') }}</p>
+                <h2 class="sapling-section-title">{{ entityPreviewTitle }}</h2>
+              </div>
             </div>
+            <SaplingTable
+              :items="saplingPreviewItems"
+              search=""
+              :page="1"
+              :items-per-page="3"
+              :total-items="saplingPreviewItems.length"
+              :is-loading="false"
+              :sort-by="[]"
+              :column-filters="{}"
+              :entity-handle="selectedEntityHandle ?? ''"
+              :entity="selectedEntity"
+              :entity-permission="selectedEntityPermission"
+              :entity-templates="selectedEntityTemplates"
+              :show-actions="false"
+              :show-add="false"
+              :show-favorite="false"
+              :show-import="false"
+              :show-form-config="false"
+              :show-search="false"
+              :show-toolbar="false"
+              :row-interaction="false"
+              :table-key="`import-preview-${selectedEntityHandle ?? 'none'}-${batch?.handle ?? 'new'}`"
+              disable-mobile-view
+              @update:search="noop"
+              @update:page="noop"
+              @update:items-per-page="noop"
+              @update:sort-by="noop"
+              @update:column-filters="noop"
+              @reload="noop"
+              @update:selected="noop"
+            />
           </div>
-          <SaplingTable
-            :items="saplingPreviewItems"
-            search=""
-            :page="1"
-            :items-per-page="3"
-            :total-items="saplingPreviewItems.length"
-            :is-loading="false"
-            :sort-by="[]"
-            :column-filters="{}"
-            :entity-handle="selectedEntityHandle ?? ''"
-            :entity="selectedEntity"
-            :entity-permission="selectedEntityPermission"
-            :entity-templates="selectedEntityTemplates"
-            :show-actions="false"
-            :show-add="false"
-            :show-favorite="false"
-            :show-import="false"
-            :show-form-config="false"
-            :show-search="false"
-            :show-toolbar="false"
-            :row-interaction="false"
-            :table-key="`import-preview-${selectedEntityHandle ?? 'none'}-${batch?.handle ?? 'new'}`"
-            disable-mobile-view
-            @update:search="noop"
-            @update:page="noop"
-            @update:items-per-page="noop"
-            @update:sort-by="noop"
-            @update:column-filters="noop"
-            @reload="noop"
-            @update:selected="noop"
-          />
+
+          <v-table v-if="previewRows.length > 0" density="compact" class="sapling-import__table">
+            <thead>
+              <tr>
+                <th>{{ $t('importBatchRow.rowNumber') }}</th>
+                <th>{{ $t('importBatchRow.status') }}</th>
+                <th>{{ $t('importBatchRow.action') }}</th>
+                <th>{{ $t('importBatchRow.targetReference') }}</th>
+                <th>{{ $t('importBatchRow.message') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="row in previewRows" :key="row.rowNumber">
+                <td>{{ row.rowNumber }}</td>
+                <td>
+                  <v-chip size="small" :color="row.status === 'error' ? 'warning' : 'primary'">
+                    {{ importStatusLabel(row.status) }}
+                  </v-chip>
+                </td>
+                <td>{{ row.action ? importActionLabel(row.action) : '-' }}</td>
+                <td>{{ row.targetReference ?? '-' }}</td>
+                <td>{{ importMessageLabel(row.message) }}</td>
+              </tr>
+            </tbody>
+          </v-table>
+
+          <v-table
+            v-else-if="sampleHeaders.length > 0"
+            density="compact"
+            class="sapling-import__table"
+          >
+            <thead>
+              <tr>
+                <th v-for="header in sampleHeaders" :key="header">{{ header }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(row, index) in batch?.sampleRows ?? []" :key="index">
+                <td v-for="header in sampleHeaders" :key="header">
+                  {{ row[header] ?? '' }}
+                </td>
+              </tr>
+            </tbody>
+          </v-table>
         </div>
-
-        <v-table v-if="previewRows.length > 0" density="compact" class="sapling-import__table">
-          <thead>
-            <tr>
-              <th>{{ $t('importBatchRow.rowNumber') }}</th>
-              <th>{{ $t('importBatchRow.status') }}</th>
-              <th>{{ $t('importBatchRow.action') }}</th>
-              <th>{{ $t('importBatchRow.targetReference') }}</th>
-              <th>{{ $t('importBatchRow.message') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="row in previewRows" :key="row.rowNumber">
-              <td>{{ row.rowNumber }}</td>
-              <td>
-                <v-chip size="small" :color="row.status === 'error' ? 'warning' : 'primary'">
-                  {{ importStatusLabel(row.status) }}
-                </v-chip>
-              </td>
-              <td>{{ row.action ? importActionLabel(row.action) : '-' }}</td>
-              <td>{{ row.targetReference ?? '-' }}</td>
-              <td>{{ row.message ?? '-' }}</td>
-            </tr>
-          </tbody>
-        </v-table>
-
-        <v-table
-          v-else-if="sampleHeaders.length > 0"
-          density="compact"
-          class="sapling-import__table"
-        >
-          <thead>
-            <tr>
-              <th v-for="header in sampleHeaders" :key="header">{{ header }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(row, index) in batch?.sampleRows ?? []" :key="index">
-              <td v-for="header in sampleHeaders" :key="header">
-                {{ row[header] ?? '' }}
-              </td>
-            </tr>
-          </tbody>
-        </v-table>
       </SaplingSurface>
     </section>
 
@@ -1167,6 +1169,14 @@ function importActionLabel(action: string): string {
   return te(key) ? t(key) : humanizeHandle(action)
 }
 
+function importMessageLabel(message: string | null | undefined): string {
+  if (!message) {
+    return '-'
+  }
+
+  return te(message) ? t(message) : message
+}
+
 function aiSuggestionReason(targetField: string): string {
   const details = aiSuggestionFieldDetails[targetField]
   if (!details?.reason) {
@@ -1203,14 +1213,17 @@ function normalizeName(value: string): string {
   grid-template-columns: minmax(320px, 0.95fr) minmax(360px, 1.05fr);
   gap: 16px;
   align-items: stretch;
-  min-height: max(500px, calc(100vh - 320px));
+  height: max(500px, calc(100vh - 320px));
+  min-height: 500px;
 }
 
 .sapling-import__panel {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  min-height: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .sapling-import__toolbar,
@@ -1222,7 +1235,12 @@ function normalizeName(value: string): string {
 
 .sapling-import__mapping {
   display: grid;
+  flex: 1 1 auto;
   gap: 8px;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .sapling-import__mapping-row {
@@ -1273,6 +1291,16 @@ function normalizeName(value: string): string {
   overflow: auto;
 }
 
+.sapling-import__preview-scroll {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 4px;
+}
+
 .sapling-import__sapling-preview {
   display: flex;
   flex-direction: column;
@@ -1293,7 +1321,19 @@ function normalizeName(value: string): string {
 @media (max-width: 1100px) {
   .sapling-import__workspace {
     grid-template-columns: 1fr;
+    height: auto;
     min-height: auto;
+  }
+
+  .sapling-import__panel {
+    overflow: visible;
+  }
+
+  .sapling-import__mapping,
+  .sapling-import__preview-scroll {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
   }
 
   .sapling-import__toolbar,
