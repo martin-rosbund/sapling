@@ -1202,19 +1202,21 @@ function normalizeName(value: string): string {
   display: grid;
   grid-template-columns: minmax(320px, 0.95fr) minmax(360px, 1.05fr);
   gap: 16px;
-  align-items: start;
+  align-items: stretch;
+  min-height: max(500px, calc(100vh - 320px));
 }
 
 .sapling-import__panel {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-height: 100%;
 }
 
 .sapling-import__toolbar,
 .sapling-import__settings {
   display: grid;
-  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
   gap: 12px;
 }
 
@@ -1291,6 +1293,7 @@ function normalizeName(value: string): string {
 @media (max-width: 1100px) {
   .sapling-import__workspace {
     grid-template-columns: 1fr;
+    min-height: auto;
   }
 
   .sapling-import__toolbar,

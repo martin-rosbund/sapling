@@ -15,6 +15,7 @@ export function resolveRouteContextHelpKey(route: RouteLocationNormalizedLoaded)
     crmWorkspace: 'app.crmWorkspace',
     formConfig: 'app.formConfig',
     home: 'app.dashboard',
+    import: 'app.import',
     issue: 'app.issue',
     knowledgeBase: 'app.knowledgeBase',
     note: 'app.notes',
