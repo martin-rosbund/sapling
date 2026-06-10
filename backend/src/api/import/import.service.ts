@@ -588,7 +588,6 @@ export class ImportService {
     const response = await createOpenAiClient(provider).chat.completions.create(
       {
         model,
-        temperature: 0.1,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
