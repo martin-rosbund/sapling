@@ -1,8 +1,14 @@
-import { type Rel } from '@mikro-orm/core';
-import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
+import { Collection, type Rel } from '@mikro-orm/core';
+import {
+  Entity,
+  ManyToOne,
+  OneToMany,
+  Property,
+} from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EntityItem } from './EntityItem';
 import { ImportSourceItem } from './ImportSourceItem';
+import { ImportTemplateValueMappingItem } from './ImportTemplateValueMappingItem';
 import { Sapling, SaplingForm } from './global/entity.decorator';
 
 @Entity()
@@ -111,6 +117,17 @@ export class ImportTemplateItem {
   @ApiPropertyOptional()
   @Property({ type: 'json', nullable: true })
   genericReferenceMapping?: object | null;
+
+  @ApiPropertyOptional({
+    type: () => ImportTemplateValueMappingItem,
+    isArray: true,
+  })
+  @OneToMany(
+    () => ImportTemplateValueMappingItem,
+    (valueMapping) => valueMapping.importTemplate,
+  )
+  valueMappings: Collection<Rel<ImportTemplateValueMappingItem>> =
+    new Collection<Rel<ImportTemplateValueMappingItem>>(this);
 
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])

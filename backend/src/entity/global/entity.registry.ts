@@ -131,6 +131,7 @@ import { ImportSourceItem } from '../ImportSourceItem';
 import { ImportBatchItem } from '../ImportBatchItem';
 import { ImportBatchRowItem } from '../ImportBatchRowItem';
 import { ImportTemplateItem } from '../ImportTemplateItem';
+import { ImportTemplateValueMappingItem } from '../ImportTemplateValueMappingItem';
 import { ExternalRecordLinkItem } from '../ExternalRecordLinkItem';
 
 /**
@@ -235,6 +236,7 @@ const ENTITY_REGISTRY_ENTRIES: { name: string; class: any }[] = [
   { name: 'importBatchRow', class: ImportBatchRowItem },
   { name: 'importSource', class: ImportSourceItem },
   { name: 'importTemplate', class: ImportTemplateItem },
+  { name: 'importTemplateValueMapping', class: ImportTemplateValueMappingItem },
   { name: 'marketingCampaign', class: MarketingCampaignItem },
   { name: 'marketingCampaignStatus', class: MarketingCampaignStatusItem },
   { name: 'marketingCampaignType', class: MarketingCampaignTypeItem },

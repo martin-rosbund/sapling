@@ -15,6 +15,7 @@ and can link Sapling records back to stable keys from external systems.
 backend/src/api/import/
 backend/src/entity/ImportSourceItem.ts
 backend/src/entity/ImportTemplateItem.ts
+backend/src/entity/ImportTemplateValueMappingItem.ts
 backend/src/entity/ImportBatchItem.ts
 backend/src/entity/ImportBatchRowItem.ts
 backend/src/entity/ExternalRecordLinkItem.ts
@@ -31,6 +32,7 @@ frontend/src/views/ImportView.vue
 and one target entity:
 
 - field mappings
+- value mappings
 - external key columns
 - relation mapping metadata
 - optional generic reference mapping
@@ -38,12 +40,18 @@ and one target entity:
 The import workspace filters templates by selected source system and target
 entity, so users only see templates that fit the current import context.
 
+`ImportTemplateValueMappingItem` stores user-maintainable value conversions for
+an import template. Each row maps one source value for one target field to the
+value Sapling should receive. This keeps template maintenance available through
+the generic table UI instead of forcing users to edit a JSON blob.
+
 `ImportBatchItem` stores one uploaded CSV analysis and the selected mapping:
 
 - target entity
 - source system
 - original headers and sample rows
 - field mappings
+- value mappings
 - external key columns
 - generic reference mapping
 - selected import template
@@ -70,12 +78,20 @@ generic target types.
 2. The backend parses headers, delimiter, rows, and sample rows.
 3. Choose target entity and optional source system.
 4. Load an existing import template or map CSV columns to Sapling fields.
-5. Optionally choose one or more external key columns.
-6. Save the current mapping as an import template for later batches.
-7. Optionally configure a generic target reference for entities such as
+5. Optionally configure value mappings for mapped fields, for example `1`
+   from the file becomes status `5` or a referenced Sapling record handle.
+6. Optionally choose one or more external key columns.
+7. Save the current mapping as an import template for later batches.
+8. Optionally configure a generic target reference for entities such as
    `information` that use `entity + reference`.
-8. Validate the batch.
-9. Execute the batch.
+9. Validate the batch.
+10. Execute the batch.
+
+Value mappings are stored as `ImportTemplateValueMappingItem` rows for reusable
+templates and are also copied into the batch `mapping` JSON when a batch is
+validated. They are applied while the batch is validated, before the row payload
+is normalized for the target entity. The validated payload is then used for
+execution, so users can inspect the Sapling preview before anything is written.
 
 During execution, rows with an existing external record link update the linked
 Sapling record. Rows without a link create a new record and store the link.

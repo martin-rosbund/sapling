@@ -13,12 +13,21 @@ export interface ImportGenericReferenceMapping {
   keyColumns: string[]
 }
 
+export type ImportValueMappingFallback = 'keep' | 'empty' | 'error'
+
+export interface ImportValueMapping {
+  targetField: string
+  values: Record<string, unknown>
+  fallback?: ImportValueMappingFallback
+}
+
 export interface ConfigureImportBatchPayload {
   entityHandle: string
   sourceHandle?: string | null
   templateHandle?: number | null
   keyColumns?: string[]
   mappings: ImportFieldMapping[]
+  valueMappings?: ImportValueMapping[]
   genericReferenceMapping?: ImportGenericReferenceMapping | null
 }
 
@@ -32,6 +41,7 @@ export interface ImportTemplateSummary {
   mapping: {
     mappings?: ImportFieldMapping[]
     relationMappings?: unknown[]
+    valueMappings?: ImportValueMapping[]
   } | null
   externalKeyColumns: string[] | null
   genericReferenceMapping: ImportGenericReferenceMapping | null
@@ -76,7 +86,11 @@ export interface ImportBatchSummary {
   delimiter?: string | null
   headers: string[]
   sampleRows: Record<string, unknown>[]
-  mapping?: object | null
+  mapping?: {
+    mappings?: ImportFieldMapping[]
+    relationMappings?: unknown[]
+    valueMappings?: ImportValueMapping[]
+  } | null
   externalKeyColumns?: string[] | null
   genericReferenceMapping?: object | null
   executedAt?: string | Date | null

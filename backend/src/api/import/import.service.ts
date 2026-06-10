@@ -11,6 +11,7 @@ import { ImportBatchItem } from '../../entity/ImportBatchItem';
 import { ImportBatchRowItem } from '../../entity/ImportBatchRowItem';
 import { ImportSourceItem } from '../../entity/ImportSourceItem';
 import { ImportTemplateItem } from '../../entity/ImportTemplateItem';
+import { ImportTemplateValueMappingItem } from '../../entity/ImportTemplateValueMappingItem';
 import { PersonItem } from '../../entity/PersonItem';
 import { GenericService } from '../generic/generic.service';
 import {
@@ -28,6 +29,8 @@ import type {
   ImportGenericReferenceMappingDto,
   ImportTemplateSummaryDto,
   ImportRelationMappingDto,
+  ImportValueMappingDto,
+  ImportValueMappingFallback,
   SaveImportTemplateDto,
 } from './import.types';
 
@@ -139,23 +142,37 @@ export class ImportService {
         ? Math.trunc(dto.templateHandle)
         : null;
     const importTemplate = templateHandle
-      ? await this.em.findOne(ImportTemplateItem, {
-          handle: templateHandle,
-          ...(source ? { source: { handle: source.handle } } : {}),
-          targetEntity: { handle: entityHandle },
-        })
+      ? await this.em.findOne(
+          ImportTemplateItem,
+          {
+            handle: templateHandle,
+            ...(source ? { source: { handle: source.handle } } : {}),
+            targetEntity: { handle: entityHandle },
+          },
+          { populate: ['valueMappings'] },
+        )
       : null;
 
     if (templateHandle && !importTemplate) {
       throw new NotFoundException('import.templateNotFound');
     }
 
+    const valueMappings =
+      dto.valueMappings?.length || !importTemplate
+        ? (dto.valueMappings ?? [])
+        : this.getTemplateConfiguredValueMappings(importTemplate);
+    const effectiveDto: ConfigureImportBatchDto = {
+      ...dto,
+      valueMappings,
+    };
+
     batch.targetEntity = targetEntity;
     batch.source = source;
     batch.importTemplate = importTemplate;
     batch.mapping = {
-      mappings: dto.mappings ?? [],
-      relationMappings: dto.relationMappings ?? [],
+      mappings: effectiveDto.mappings ?? [],
+      relationMappings: effectiveDto.relationMappings ?? [],
+      valueMappings: effectiveDto.valueMappings ?? [],
     };
     batch.externalKeyColumns = keyColumns;
     batch.genericReferenceMapping = dto.genericReferenceMapping ?? null;
@@ -193,7 +210,7 @@ export class ImportService {
         const payload = await this.buildPayload(
           template,
           row.rawData,
-          dto,
+          effectiveDto,
           entityHandle,
           currentUser,
         );
@@ -247,7 +264,7 @@ export class ImportService {
     }
 
     const templates = await this.em.find(ImportTemplateItem, filter, {
-      populate: ['source', 'targetEntity'],
+      populate: ['source', 'targetEntity', 'valueMappings'],
       orderBy: { title: 'ASC' },
     });
 
@@ -283,7 +300,7 @@ export class ImportService {
       ? await this.em.findOne(
           ImportTemplateItem,
           { handle },
-          { populate: ['source', 'targetEntity'] },
+          { populate: ['source', 'targetEntity', 'valueMappings'] },
         )
       : new ImportTemplateItem();
 
@@ -307,8 +324,12 @@ export class ImportService {
     };
     template.externalKeyColumns = this.normalizeColumns(dto.keyColumns ?? []);
     template.genericReferenceMapping = dto.genericReferenceMapping ?? null;
+    await this.syncTemplateValueMappings(template, dto.valueMappings ?? []);
 
     await this.em.flush();
+    await this.em.populate(template, ['source', 'targetEntity', 'valueMappings'], {
+      refresh: true,
+    });
     return this.toTemplateSummary(template);
   }
 
@@ -426,7 +447,11 @@ export class ImportService {
       if (!sourceColumn || !targetField) {
         continue;
       }
-      mapped[targetField] = rawData[sourceColumn] ?? '';
+      mapped[targetField] = this.applyValueMapping(
+        targetField,
+        rawData[sourceColumn] ?? '',
+        dto.valueMappings ?? [],
+      );
     }
 
     const payload = normalizeImportRow(template, mapped);
@@ -604,6 +629,167 @@ export class ImportService {
     }
 
     return this.extractResultHandle(matches[0]);
+  }
+
+  private applyValueMapping(
+    targetField: string,
+    value: unknown,
+    mappings: ImportValueMappingDto[],
+  ): unknown {
+    const mapping = mappings.find(
+      (entry) => entry.targetField === targetField,
+    );
+
+    if (!mapping) {
+      return value;
+    }
+
+    const sourceKey = this.normalizeValueMappingKey(value);
+    if (!sourceKey) {
+      return value;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(mapping.values, sourceKey)) {
+      return mapping.values[sourceKey];
+    }
+
+    switch (this.normalizeValueMappingFallback(mapping.fallback)) {
+      case 'empty':
+        return '';
+      case 'error':
+        throw new BadRequestException(
+          'import.valueMappingMissing',
+          targetField,
+        );
+      case 'keep':
+      default:
+        return value;
+    }
+  }
+
+  private normalizeValueMappingKey(value: unknown): string {
+    return String(value ?? '').trim();
+  }
+
+  private normalizeValueMappingFallback(
+    fallback: ImportValueMappingFallback | undefined,
+  ): ImportValueMappingFallback {
+    return fallback === 'empty' || fallback === 'error' ? fallback : 'keep';
+  }
+
+  private async syncTemplateValueMappings(
+    template: ImportTemplateItem,
+    mappings: ImportValueMappingDto[],
+  ): Promise<void> {
+    const existingMappings = template.handle
+      ? await this.em.find(ImportTemplateValueMappingItem, {
+          importTemplate: { handle: template.handle },
+        })
+      : [];
+
+    for (const existingMapping of existingMappings) {
+      this.em.remove(existingMapping);
+    }
+
+    for (const mapping of this.normalizeValueMappings(mappings)) {
+      for (const [sourceValue, targetValue] of Object.entries(mapping.values)) {
+        const valueMapping = new ImportTemplateValueMappingItem();
+        valueMapping.importTemplate = template;
+        valueMapping.targetField = mapping.targetField;
+        valueMapping.sourceValue = sourceValue;
+        valueMapping.targetValue = String(targetValue ?? '');
+        valueMapping.fallback = this.normalizeValueMappingFallback(
+          mapping.fallback,
+        );
+        this.em.persist(valueMapping);
+      }
+    }
+  }
+
+  private normalizeValueMappings(
+    mappings: ImportValueMappingDto[],
+  ): ImportValueMappingDto[] {
+    const normalized: ImportValueMappingDto[] = [];
+
+    for (const mapping of mappings) {
+      const targetField = this.normalizeOptionalString(mapping.targetField);
+      if (!targetField || !mapping.values || typeof mapping.values !== 'object') {
+        continue;
+      }
+
+      const values = Object.fromEntries(
+        Object.entries(mapping.values)
+          .map(([sourceValue, targetValue]) => [
+            this.normalizeValueMappingKey(sourceValue),
+            targetValue,
+          ])
+          .filter(
+            ([sourceValue, targetValue]) =>
+              sourceValue &&
+              targetValue !== null &&
+              typeof targetValue !== 'undefined' &&
+              String(targetValue).trim().length > 0,
+          ),
+      );
+
+      if (Object.keys(values).length === 0) {
+        continue;
+      }
+
+      normalized.push({
+        targetField,
+        values,
+        fallback: this.normalizeValueMappingFallback(mapping.fallback),
+      });
+    }
+
+    return normalized;
+  }
+
+  private getTemplateConfiguredValueMappings(
+    template: ImportTemplateItem,
+  ): ImportValueMappingDto[] {
+    const entityMappings = this.getTemplateEntityValueMappings(template);
+    if (entityMappings.length > 0) {
+      return entityMappings;
+    }
+
+    const mapping = template.mapping as { valueMappings?: unknown };
+    return Array.isArray(mapping?.valueMappings)
+      ? this.normalizeValueMappings(
+          mapping.valueMappings as ImportValueMappingDto[],
+        )
+      : [];
+  }
+
+  private getTemplateEntityValueMappings(
+    template: ImportTemplateItem,
+  ): ImportValueMappingDto[] {
+    const groupedMappings = new Map<string, ImportValueMappingDto>();
+    const valueMappings = template.valueMappings?.isInitialized()
+      ? template.valueMappings.getItems()
+      : [];
+
+    for (const valueMapping of valueMappings) {
+      if (!valueMapping.targetField || !valueMapping.sourceValue) {
+        continue;
+      }
+
+      const fallback = this.normalizeValueMappingFallback(
+        valueMapping.fallback as ImportValueMappingFallback,
+      );
+      const key = `${valueMapping.targetField}|${fallback}`;
+      const existing = groupedMappings.get(key) ?? {
+        targetField: valueMapping.targetField,
+        values: {},
+        fallback,
+      };
+
+      existing.values[valueMapping.sourceValue] = valueMapping.targetValue;
+      groupedMappings.set(key, existing);
+    }
+
+    return [...groupedMappings.values()];
   }
 
   private assertRequiredFields(
@@ -844,7 +1030,10 @@ export class ImportService {
       sourceHandle: this.extractHandle(template.source) ?? '',
       entityHandle: this.extractHandle(template.targetEntity) ?? '',
       isActive: template.isActive,
-      mapping: template.mapping,
+      mapping: {
+        ...(template.mapping ?? {}),
+        valueMappings: this.getTemplateConfiguredValueMappings(template),
+      },
       externalKeyColumns: template.externalKeyColumns ?? null,
       genericReferenceMapping: template.genericReferenceMapping ?? null,
     };

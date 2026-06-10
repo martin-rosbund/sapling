@@ -19,6 +19,14 @@ export type ImportGenericReferenceMappingDto = {
   keyColumns: string[];
 };
 
+export type ImportValueMappingFallback = 'keep' | 'empty' | 'error';
+
+export type ImportValueMappingDto = {
+  targetField: string;
+  values: Record<string, unknown>;
+  fallback?: ImportValueMappingFallback;
+};
+
 export type ConfigureImportBatchDto = {
   entityHandle: string;
   sourceHandle?: string | null;
@@ -26,6 +34,7 @@ export type ConfigureImportBatchDto = {
   keyColumns?: string[];
   mappings?: ImportFieldMappingDto[];
   relationMappings?: ImportRelationMappingDto[];
+  valueMappings?: ImportValueMappingDto[];
   genericReferenceMapping?: ImportGenericReferenceMappingDto | null;
 };
 

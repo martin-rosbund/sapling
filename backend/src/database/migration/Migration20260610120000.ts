@@ -20,6 +20,16 @@ export class Migration20260610120000 extends Migration {
     );
 
     this.addSql(
+      `create table "import_template_value_mapping_item" ("handle" serial primary key, "import_template_handle" int not null, "target_field" varchar(128) not null, "source_value" text not null, "target_value" text not null, "fallback" varchar(16) not null default 'keep', "created_at" timestamptz not null, "updated_at" timestamptz not null);`,
+    );
+    this.addSql(
+      `alter table "import_template_value_mapping_item" add constraint "import_template_value_mapping_item_import_template_handle_foreign" foreign key ("import_template_handle") references "import_template_item" ("handle") on update cascade on delete cascade;`,
+    );
+    this.addSql(
+      `create unique index "import_template_value_mapping_item_template_field_source_unique" on "import_template_value_mapping_item" ("import_template_handle", "target_field", "source_value");`,
+    );
+
+    this.addSql(
       `create table "import_batch_item" ("handle" serial primary key, "source_handle" varchar(64) null, "target_entity_handle" varchar(64) null, "import_template_handle" int null, "created_by_handle" int not null, "filename" varchar(256) not null, "mimetype" varchar(128) null, "file_size" int null, "status" varchar(32) not null default 'analyzed', "row_count" int null, "ready_count" int not null default 0, "error_count" int not null default 0, "created_count" int not null default 0, "updated_count" int not null default 0, "skipped_count" int not null default 0, "failed_count" int not null default 0, "delimiter" varchar(8) null, "headers" jsonb null, "sample_rows" jsonb null, "mapping" jsonb null, "external_key_columns" jsonb null, "generic_reference_mapping" jsonb null, "executed_at" timestamptz null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`,
     );
     this.addSql(
@@ -72,6 +82,9 @@ export class Migration20260610120000 extends Migration {
     this.addSql(`drop table if exists "external_record_link_item" cascade;`);
     this.addSql(`drop table if exists "import_batch_row_item" cascade;`);
     this.addSql(`drop table if exists "import_batch_item" cascade;`);
+    this.addSql(
+      `drop table if exists "import_template_value_mapping_item" cascade;`,
+    );
     this.addSql(`drop table if exists "import_template_item" cascade;`);
     this.addSql(`drop table if exists "import_source_item" cascade;`);
   }

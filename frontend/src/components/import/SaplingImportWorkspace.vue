@@ -25,13 +25,6 @@
       <template #side>
         <div class="sapling-action-cluster">
           <v-btn
-            prepend-icon="mdi-database-import-outline"
-            variant="tonal"
-            to="/table/importSource"
-          >
-            {{ $t('import.source') }}
-          </v-btn>
-          <v-btn
             color="primary"
             prepend-icon="mdi-play"
             :disabled="!canExecute"
@@ -165,14 +158,29 @@
               hide-details
               clearable
               :placeholder="field.name"
+              @update:model-value="onFieldMappingChange(field.name)"
             />
+            <v-tooltip :text="$t('import.valueMapping')">
+              <template #activator="{ props: tooltipProps }">
+                <v-btn
+                  v-bind="tooltipProps"
+                  icon="mdi-swap-horizontal"
+                  size="small"
+                  variant="tonal"
+                  :color="hasValueMapping(field.name) ? 'primary' : undefined"
+                  :disabled="!fieldMappings[field.name]"
+                  :aria-label="$t('import.valueMapping')"
+                  @click="openValueMapping(field)"
+                />
+              </template>
+            </v-tooltip>
           </div>
         </div>
 
         <div v-if="batch" class="sapling-import__actions">
           <v-btn
             variant="tonal"
-            prepend-icon="mdi-table-import"
+            prepend-icon="mdi-"
             :disabled="!selectedTemplate"
             @click="applySelectedTemplate"
           >
@@ -180,7 +188,7 @@
           </v-btn>
           <v-btn
             variant="tonal"
-            prepend-icon="mdi-content-save-cog-outline"
+            prepend-icon="mdi-content-save-check-outline"
             :disabled="!canSaveTemplate"
             :loading="isSavingTemplate"
             @click="saveTemplate"
@@ -195,9 +203,6 @@
             @click="configureBatch"
           >
             {{ $t('import.configure') }}
-          </v-btn>
-          <v-btn variant="tonal" prepend-icon="mdi-table-eye" to="/table/importBatch">
-            {{ $t('navigation.importBatch') }}
           </v-btn>
         </div>
       </SaplingSurface>
@@ -303,6 +308,81 @@
         </v-table>
       </SaplingSurface>
     </section>
+
+    <v-dialog v-model="valueMappingDialog.visible" max-width="900">
+      <v-card
+        v-if="currentValueMapping && currentValueMappingField"
+        class="sapling-import__value-mapping-dialog glass-panel"
+      >
+        <v-card-title class="sapling-section-header">
+          <div>
+            <p class="sapling-eyebrow">{{ $t('import.valueMapping') }}</p>
+            <h2 class="sapling-section-title">{{ fieldLabel(currentValueMappingField.name) }}</h2>
+          </div>
+        </v-card-title>
+        <v-card-text class="sapling-import__value-mapping-body">
+          <v-select
+            v-model="currentValueMapping.fallback"
+            :items="valueMappingFallbackOptions"
+            item-title="title"
+            item-value="value"
+            density="comfortable"
+            prepend-inner-icon="mdi-call-split"
+            :label="$t('import.valueMappingFallback')"
+          />
+
+          <v-table density="compact" class="sapling-import__table">
+            <thead>
+              <tr>
+                <th>{{ $t('import.sourceValue') }}</th>
+                <th>{{ $t('import.targetValue') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="sourceValue in currentValueMappingSourceValues" :key="sourceValue">
+                <td>{{ sourceValue }}</td>
+                <td>
+                  <v-autocomplete
+                    v-if="isCurrentValueMappingReference"
+                    v-model="currentValueMapping.values[sourceValue]"
+                    :items="currentValueMappingReferenceOptions"
+                    item-title="title"
+                    item-value="value"
+                    density="compact"
+                    hide-details
+                    clearable
+                    :loading="valueMappingDialog.isLoadingReferenceItems"
+                    :placeholder="$t('import.targetValue')"
+                  />
+                  <v-text-field
+                    v-else
+                    v-model="currentValueMapping.values[sourceValue]"
+                    density="compact"
+                    hide-details
+                    clearable
+                    :placeholder="$t('import.targetValue')"
+                    autocomplete="off"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </v-table>
+
+          <p v-if="currentValueMappingSourceValues.length === 0" class="sapling-muted-text">
+            {{ $t('import.valueMappingNoValues') }}
+          </p>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn variant="text" prepend-icon="mdi-delete-outline" @click="clearCurrentValueMapping">
+            {{ $t('import.clearValueMapping') }}
+          </v-btn>
+          <v-spacer />
+          <v-btn color="primary" variant="flat" @click="closeValueMapping">
+            {{ $t('global.close') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -319,6 +399,8 @@ import ApiImportService, {
   type ImportFieldMapping,
   type ImportGenericReferenceMapping,
   type ImportTemplateSummary,
+  type ImportValueMapping,
+  type ImportValueMappingFallback,
   type SaveImportTemplatePayload,
 } from '@/services/api.import.service'
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity'
@@ -326,9 +408,21 @@ import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure'
 import { DEFAULT_ENTITY_ITEMS_COUNT } from '@/constants/project.constants'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
+import { getEntityValueLabel } from '@/utils/saplingTableUtil'
 
 type Option = { title: string; value: string }
+type ValueOption = { title: string; value: unknown }
 type ImportSource = SaplingGenericItem & { handle: string; title?: string; isActive?: boolean }
+type ValueMappingState = {
+  targetField: string
+  values: Record<string, unknown>
+  fallback: ImportValueMappingFallback
+}
+type ImportMappingConfiguration = {
+  mappings?: ImportFieldMapping[]
+  relationMappings?: unknown[]
+  valueMappings?: ImportValueMapping[]
+} | null | undefined
 
 const { t, te } = useI18n()
 const genericStore = useGenericStore()
@@ -347,7 +441,7 @@ const { loadTranslations } = useTranslationLoader(
 const selectedFile = ref<File | File[] | null>(null)
 const selectedEntityHandle = ref<string | null>(null)
 const selectedSourceHandle = ref<string | null>(null)
-const selectedTemplateHandle = ref<number | null>(null)
+const selectedTemplateHandle = ref<number | string | null>(null)
 const templateTitle = ref('')
 const externalKeyColumns = ref<string[]>([])
 const genericReferenceEntityHandle = ref<string | null>(null)
@@ -362,6 +456,17 @@ const isExecuting = ref(false)
 const isLoadingTemplates = ref(false)
 const isSavingTemplate = ref(false)
 const fieldMappings = reactive<Record<string, string | null>>({})
+const valueMappings = reactive<Record<string, ValueMappingState>>({})
+const referenceValueItems = reactive<Record<string, SaplingGenericItem[]>>({})
+const valueMappingDialog = reactive<{
+  visible: boolean
+  targetField: string | null
+  isLoadingReferenceItems: boolean
+}>({
+  visible: false,
+  targetField: null,
+  isLoadingReferenceItems: false,
+})
 
 const selectedEntityTemplates = computed<EntityTemplate[]>(() => {
   if (!selectedEntityHandle.value) {
@@ -421,7 +526,12 @@ const templateOptions = computed(() =>
 
 const selectedTemplate = computed(
   () =>
-    templates.value.find((template) => template.handle === selectedTemplateHandle.value) ?? null,
+    templates.value.find(
+      (template) =>
+        template.handle != null &&
+        selectedTemplateHandle.value != null &&
+        String(template.handle) === String(selectedTemplateHandle.value),
+    ) ?? null,
 )
 
 const headerOptions = computed(() => batch.value?.headers ?? [])
@@ -442,6 +552,30 @@ const entityPreviewTitle = computed(() =>
 const hasGenericReference = computed(() =>
   selectedEntityTemplates.value.some((template) => template.genericReference),
 )
+const currentValueMappingField = computed(() =>
+  importableFields.value.find((field) => field.name === valueMappingDialog.targetField),
+)
+const currentValueMapping = computed(() =>
+  valueMappingDialog.targetField ? valueMappings[valueMappingDialog.targetField] : null,
+)
+const currentValueMappingSourceValues = computed(() =>
+  currentValueMappingField.value ? sourceValuesForField(currentValueMappingField.value) : [],
+)
+const currentValueMappingReferenceOptions = computed(() =>
+  currentValueMappingField.value
+    ? referenceOptionsForField(currentValueMappingField.value)
+    : ([] as ValueOption[]),
+)
+const isCurrentValueMappingReference = computed(
+  () =>
+    Boolean(currentValueMappingField.value?.isReference) &&
+    Boolean(currentValueMappingField.value?.referenceName),
+)
+const valueMappingFallbackOptions = computed(() => [
+  { title: t('import.valueMappingFallback.keep'), value: 'keep' },
+  { title: t('import.valueMappingFallback.empty'), value: 'empty' },
+  { title: t('import.valueMappingFallback.error'), value: 'error' },
+])
 const canConfigure = computed(
   () => Boolean(batch.value?.handle && selectedEntityHandle.value) && !isConfiguring.value,
 )
@@ -483,7 +617,9 @@ watch(selectedSourceHandle, async () => {
 })
 
 watch(selectedTemplate, (template) => {
-  templateTitle.value = template?.title ?? templateTitle.value
+  if (template) {
+    applyTemplate(template)
+  }
 })
 
 async function loadEntities(): Promise<void> {
@@ -550,6 +686,7 @@ async function onEntityChange(): Promise<void> {
 
 function initializeMappings(): void {
   Object.keys(fieldMappings).forEach((key) => delete fieldMappings[key])
+  Object.keys(valueMappings).forEach((key) => delete valueMappings[key])
 
   for (const field of importableFields.value) {
     const matchedHeader = headerOptions.value.find(
@@ -571,6 +708,7 @@ function applySelectedTemplate(): void {
 
 function applyTemplate(template: ImportTemplateSummary): void {
   Object.keys(fieldMappings).forEach((key) => delete fieldMappings[key])
+  Object.keys(valueMappings).forEach((key) => delete valueMappings[key])
 
   for (const field of importableFields.value) {
     fieldMappings[field.name] = null
@@ -585,6 +723,8 @@ function applyTemplate(template: ImportTemplateSummary): void {
       ? mapping.sourceColumn
       : null
   }
+
+  applyValueMappings(template.mapping)
 
   externalKeyColumns.value = filterExistingColumns(template.externalKeyColumns ?? [])
   const genericReferenceMapping = template.genericReferenceMapping
@@ -603,6 +743,7 @@ async function configureBatch(): Promise<void> {
   try {
     isConfiguring.value = true
     batch.value = await ApiImportService.configureBatch(batch.value.handle, buildTemplatePayload())
+    applyValueMappings(batch.value.mapping)
     pushMessage('success', t('import.validationCompleted'), batch.value.filename, 'import')
   } catch {
     // shared API errors already surface through the message center
@@ -618,7 +759,7 @@ async function saveTemplate(): Promise<void> {
 
   const payload: SaveImportTemplatePayload = {
     ...buildTemplatePayload(),
-    handle: selectedTemplateHandle.value,
+    handle: getSelectedTemplateHandleNumber(),
     title: templateTitle.value.trim(),
     isActive: true,
   }
@@ -629,6 +770,7 @@ async function saveTemplate(): Promise<void> {
     await loadTemplates()
     selectedTemplateHandle.value = savedTemplate.handle
     templateTitle.value = savedTemplate.title
+    applyValueMappings(savedTemplate.mapping)
     pushMessage('success', t('import.templateSaved'), savedTemplate.title, 'import')
   } catch {
     // shared API errors already surface through the message center
@@ -665,12 +807,18 @@ function buildTemplatePayload(): SaveImportTemplatePayload {
   return {
     entityHandle: selectedEntityHandle.value ?? '',
     sourceHandle: selectedSourceHandle.value,
-    templateHandle: selectedTemplateHandle.value,
+    templateHandle: getSelectedTemplateHandleNumber(),
     keyColumns: externalKeyColumns.value,
     mappings: buildFieldMappings(),
+    valueMappings: buildValueMappings(),
     genericReferenceMapping: buildGenericReferenceMapping(),
     title: templateTitle.value.trim(),
   }
+}
+
+function getSelectedTemplateHandleNumber(): number | null {
+  const handle = Number(selectedTemplateHandle.value)
+  return Number.isFinite(handle) ? Math.trunc(handle) : null
 }
 
 function buildFieldMappings(): ImportFieldMapping[] {
@@ -680,6 +828,34 @@ function buildFieldMappings(): ImportFieldMapping[] {
       targetField,
       sourceColumn: sourceColumn as string,
     }))
+}
+
+function buildValueMappings(): ImportValueMapping[] {
+  return Object.values(valueMappings)
+    .map((mapping) => ({
+      targetField: mapping.targetField,
+      values: Object.fromEntries(
+        Object.entries(mapping.values).filter(([, value]) => value !== null && value !== ''),
+      ),
+      fallback: normalizeValueMappingFallback(mapping.fallback),
+    }))
+    .filter((mapping) => Object.keys(mapping.values).length > 0)
+}
+
+function applyValueMappings(mappingConfiguration: ImportMappingConfiguration): void {
+  Object.keys(valueMappings).forEach((key) => delete valueMappings[key])
+
+  for (const mapping of mappingConfiguration?.valueMappings ?? []) {
+    if (!mapping.targetField || !fieldMappings[mapping.targetField]) {
+      continue
+    }
+
+    valueMappings[mapping.targetField] = {
+      targetField: mapping.targetField,
+      values: { ...(mapping.values ?? {}) },
+      fallback: normalizeValueMappingFallback(mapping.fallback),
+    }
+  }
 }
 
 function buildGenericReferenceMapping(): ImportGenericReferenceMapping | null {
@@ -697,6 +873,126 @@ function buildGenericReferenceMapping(): ImportGenericReferenceMapping | null {
     sourceHandle: selectedSourceHandle.value,
     keyColumns: genericReferenceKeyColumns.value,
   }
+}
+
+function onFieldMappingChange(targetField: string): void {
+  const field = importableFields.value.find((entry) => entry.name === targetField)
+  const mapping = valueMappings[targetField]
+  if (!field || !mapping) {
+    return
+  }
+
+  const validSourceValues = new Set(sourceValuesForField(field))
+  mapping.values = Object.fromEntries(
+    Object.entries(mapping.values).filter(([sourceValue]) => validSourceValues.has(sourceValue)),
+  )
+
+  if (Object.keys(mapping.values).length === 0) {
+    delete valueMappings[targetField]
+  }
+}
+
+async function openValueMapping(field: EntityTemplate): Promise<void> {
+  if (!field.name || !fieldMappings[field.name]) {
+    return
+  }
+
+  ensureValueMapping(field.name)
+  valueMappingDialog.targetField = field.name
+  valueMappingDialog.visible = true
+
+  if (field.isReference && field.referenceName) {
+    await loadReferenceValueItems(field.referenceName)
+  }
+}
+
+function closeValueMapping(): void {
+  valueMappingDialog.visible = false
+  valueMappingDialog.targetField = null
+}
+
+function clearCurrentValueMapping(): void {
+  if (!valueMappingDialog.targetField) {
+    return
+  }
+
+  delete valueMappings[valueMappingDialog.targetField]
+  closeValueMapping()
+}
+
+function ensureValueMapping(targetField: string): ValueMappingState {
+  if (!valueMappings[targetField]) {
+    valueMappings[targetField] = {
+      targetField,
+      values: {},
+      fallback: 'keep',
+    }
+  }
+
+  return valueMappings[targetField]
+}
+
+function hasValueMapping(targetField: string): boolean {
+  const mapping = valueMappings[targetField]
+  return Boolean(mapping && Object.keys(mapping.values).length > 0)
+}
+
+function sourceValuesForField(field: EntityTemplate): string[] {
+  const sourceColumn = fieldMappings[field.name]
+  if (!sourceColumn) {
+    return []
+  }
+
+  const rows = [
+    ...(batch.value?.rows.map((row) => row.rawData) ?? []),
+    ...(batch.value?.sampleRows ?? []),
+  ]
+  const values = rows
+    .map((row) => normalizeValueMappingKey(row[sourceColumn]))
+    .filter((value) => value.length > 0)
+
+  return Array.from(new Set(values)).sort((left, right) => left.localeCompare(right))
+}
+
+function referenceOptionsForField(field: EntityTemplate): ValueOption[] {
+  if (!field.referenceName) {
+    return []
+  }
+
+  const referenceTemplates = genericStore.getState(field.referenceName).entityTemplates
+  return (referenceValueItems[field.referenceName] ?? []).map((item) => ({
+    title: getEntityValueLabel(item, referenceTemplates) || String(item.handle ?? ''),
+    value: item.handle,
+  }))
+}
+
+async function loadReferenceValueItems(referenceName: string): Promise<void> {
+  if (referenceValueItems[referenceName]) {
+    return
+  }
+
+  try {
+    valueMappingDialog.isLoadingReferenceItems = true
+    await genericStore.loadGeneric(referenceName, 'global', 'import')
+    const response = await ApiGenericService.find<SaplingGenericItem>(referenceName, {
+      limit: DEFAULT_ENTITY_ITEMS_COUNT,
+      orderBy: { handle: 'ASC' },
+      relations: ['m:1'],
+    })
+    referenceValueItems[referenceName] = response.data
+  } finally {
+    valueMappingDialog.isLoadingReferenceItems = false
+  }
+}
+
+function normalizeValueMappingKey(value: unknown): string {
+  return String(value ?? '').trim()
+}
+
+function normalizeValueMappingFallback(
+  fallback: ImportValueMappingFallback | undefined,
+): ImportValueMappingFallback {
+  return fallback === 'empty' || fallback === 'error' ? fallback : 'keep'
 }
 
 function filterExistingColumns(columns: string[]): string[] {
@@ -780,7 +1076,7 @@ function normalizeName(value: string): string {
 
 .sapling-import__mapping-row {
   display: grid;
-  grid-template-columns: minmax(160px, 0.8fr) minmax(180px, 1.2fr);
+  grid-template-columns: minmax(160px, 0.8fr) minmax(180px, 1.2fr) auto;
   gap: 12px;
   align-items: center;
 }
@@ -817,6 +1113,16 @@ function normalizeName(value: string): string {
   gap: 12px;
 }
 
+.sapling-import__value-mapping-dialog {
+  border-radius: 8px;
+}
+
+.sapling-import__value-mapping-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 @media (max-width: 1100px) {
   .sapling-import__workspace {
     grid-template-columns: 1fr;
@@ -825,6 +1131,14 @@ function normalizeName(value: string): string {
   .sapling-import__toolbar,
   .sapling-import__settings {
     grid-template-columns: 1fr;
+  }
+
+  .sapling-import__mapping-row {
+    grid-template-columns: 1fr auto;
+  }
+
+  .sapling-import__mapping-label {
+    grid-column: 1 / -1;
   }
 }
 </style>

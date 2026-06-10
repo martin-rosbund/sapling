@@ -307,6 +307,7 @@ type SaplingTableEmit = UseSaplingTableEmit & {
 
 const props = withDefaults(defineProps<SaplingTableProps>(), {
   showSearch: true,
+  showToolbar: true,
   rowInteraction: true,
 })
 const emit = defineEmits<SaplingTableEmit>()
