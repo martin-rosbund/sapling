@@ -128,10 +128,7 @@ export class GenericCustomFieldService {
     recordReference: string | number | null,
     customFields: CustomFieldPayload,
   ): Promise<void> {
-    if (
-      recordReference == null ||
-      Object.keys(customFields).length === 0
-    ) {
+    if (recordReference == null || Object.keys(customFields).length === 0) {
       return;
     }
 
@@ -182,10 +179,7 @@ export class GenericCustomFieldService {
     await this.em.flush();
   }
 
-  async hydrateRecords<T>(
-    entityHandle: string,
-    input: T,
-  ): Promise<T> {
+  async hydrateRecords<T>(entityHandle: string, input: T): Promise<T> {
     const records = Array.isArray(input) ? input : [input];
     const plainRecords = records.filter(
       (record): record is Record<string, unknown> =>
@@ -340,7 +334,9 @@ export class GenericCustomFieldService {
   ): Record<string, unknown> {
     const column = this.getValueColumn(this.getDefinitionFieldType(definition));
     if (this.isPlainRecord(condition)) {
-      return { [column]: this.normalizeOperatorCriteria(definition, condition) };
+      return {
+        [column]: this.normalizeOperatorCriteria(definition, condition),
+      };
     }
 
     return { [column]: this.normalizeValue(definition, condition) };
@@ -639,7 +635,9 @@ export class GenericCustomFieldService {
     }
   }
 
-  private getValueColumn(fieldType: CustomFieldType): keyof CustomFieldValueItem {
+  private getValueColumn(
+    fieldType: CustomFieldType,
+  ): keyof CustomFieldValueItem {
     switch (fieldType) {
       case 'number':
         return 'valueNumber';

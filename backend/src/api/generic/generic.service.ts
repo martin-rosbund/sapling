@@ -175,8 +175,10 @@ export class GenericService {
     private readonly genericTimelineService: GenericTimelineService,
     private readonly openTaskEventsService: OpenTaskEventsService,
     private readonly genericCustomFieldService: GenericCustomFieldService = {
-      applyCustomFieldFilters: async (_entityHandle: string, criteria: object) =>
-        criteria,
+      applyCustomFieldFilters: async (
+        _entityHandle: string,
+        criteria: object,
+      ) => criteria,
       hydrateRecords: async <T>(_entityHandle: string, input: T) => input,
       splitPayload: <T extends Record<string, unknown>>(payload: T) => ({
         data: payload,

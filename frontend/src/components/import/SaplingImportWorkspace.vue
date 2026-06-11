@@ -184,7 +184,36 @@
               clearable
               :placeholder="field.name"
               @update:model-value="onFieldMappingChange(field.name)"
-            />
+            >
+              <template #item="{ props: itemProps, item }">
+                <v-list-item v-bind="itemProps" class="sapling-import__source-option-item">
+                  <template #title>
+                    <div class="sapling-import__source-option">
+                      <span class="sapling-import__source-option-title">
+                        {{ getSourceColumnOptionTitle(item) }}
+                      </span>
+                      <v-chip
+                        v-if="sourceColumnUsageLabels(getSourceColumnOptionValue(item)).length > 0"
+                        size="x-small"
+                        color="primary"
+                        variant="tonal"
+                        prepend-icon="mdi-check-circle-outline"
+                      >
+                        {{ sourceColumnUsageSummary(getSourceColumnOptionValue(item)) }}
+                      </v-chip>
+                    </div>
+                  </template>
+                  <template
+                    v-if="sourceColumnUsageLabels(getSourceColumnOptionValue(item)).length > 0"
+                    #subtitle
+                  >
+                    <span class="sapling-import__source-option-subtitle">
+                      {{ sourceColumnUsageLabels(getSourceColumnOptionValue(item)).join(', ') }}
+                    </span>
+                  </template>
+                </v-list-item>
+              </template>
+            </v-select>
             <v-autocomplete
               v-if="field.isReference && field.referenceName"
               v-model="fieldDefaults[field.name]"
@@ -579,6 +608,7 @@ const { pushMessage } = useSaplingMessageCenter()
 const { loadTranslations } = useTranslationLoader(
   'global',
   'navigation',
+  'system',
   'import',
   'importBatch',
   'importBatchRow',
@@ -1367,6 +1397,51 @@ function hasValueMapping(targetField: string): boolean {
   return Boolean(mapping && Object.keys(mapping.values).length > 0)
 }
 
+function getSourceColumnOptionValue(item: unknown): string {
+  if (typeof item === 'string') {
+    return item
+  }
+
+  if (item && typeof item === 'object') {
+    const source = item as { raw?: unknown; value?: unknown; title?: unknown }
+    if (typeof source.raw === 'string') {
+      return source.raw
+    }
+    if (typeof source.value === 'string') {
+      return source.value
+    }
+    if (typeof source.title === 'string') {
+      return source.title
+    }
+  }
+
+  return ''
+}
+
+function getSourceColumnOptionTitle(item: unknown): string {
+  const value = getSourceColumnOptionValue(item)
+  return value || String(item ?? '')
+}
+
+function sourceColumnUsageLabels(sourceColumn: string): string[] {
+  if (!sourceColumn) {
+    return []
+  }
+
+  return Object.entries(fieldMappings)
+    .filter(([, mappedSourceColumn]) => mappedSourceColumn === sourceColumn)
+    .map(([targetField]) => fieldLabel(targetField))
+}
+
+function sourceColumnUsageSummary(sourceColumn: string): string {
+  const usageLabels = sourceColumnUsageLabels(sourceColumn)
+  if (usageLabels.length <= 1) {
+    return t('system.used')
+  }
+
+  return `${t('system.used')} ${usageLabels.length}x`
+}
+
 function sourceValuesForField(field: EntityTemplate): string[] {
   const sourceColumn = fieldMappings[field.name]
   if (!sourceColumn) {
@@ -1396,7 +1471,9 @@ function referenceOptionsForField(field: EntityTemplate): ValueOption[] {
   }))
 }
 
-function customFieldOptionsForField(field: EntityTemplate): Array<{ label: string; value: string }> {
+function customFieldOptionsForField(
+  field: EntityTemplate,
+): Array<{ label: string; value: string }> {
   return field.customField?.options ?? []
 }
 

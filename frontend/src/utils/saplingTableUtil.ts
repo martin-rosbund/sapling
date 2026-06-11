@@ -205,12 +205,12 @@ export function getRelationTableHeaders(
       (relationTableStates[key]?.entityTemplates ?? [])
         .filter((template) => isVisibleTableTemplate(template, permissions))
         .map((tpl: EntityTemplate) => ({
-        ...tpl,
-        key: tpl.name,
-        title:
-          tpl.formConfig?.label?.trim() ||
-          t(`${relationTableStates[key]?.entity?.handle}.${tpl.name}`),
-      })),
+          ...tpl,
+          key: tpl.name,
+          title:
+            tpl.formConfig?.label?.trim() ||
+            t(`${relationTableStates[key]?.entity?.handle}.${tpl.name}`),
+        })),
     )
   }
   return result

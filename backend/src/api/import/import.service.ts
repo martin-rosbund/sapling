@@ -250,10 +250,11 @@ export class ImportService {
       { batch: { handle: batch.handle } },
       { orderBy: { rowNumber: 'ASC' } },
     );
-    const template = await this.genericCustomFieldService.appendCustomFieldTemplates(
-      entityHandle,
-      this.templateService.getEntityTemplate(entityHandle),
-    );
+    const template =
+      await this.genericCustomFieldService.appendCustomFieldTemplates(
+        entityHandle,
+        this.templateService.getEntityTemplate(entityHandle),
+      );
     const duplicateKeys = new Set<string>();
     let readyCount = 0;
     let errorCount = 0;
@@ -483,10 +484,11 @@ export class ImportService {
       throw new BadRequestException('import.headerRequired');
     }
 
-    const template = await this.genericCustomFieldService.appendCustomFieldTemplates(
-      entityHandle,
-      this.templateService.getEntityTemplate(entityHandle),
-    );
+    const template =
+      await this.genericCustomFieldService.appendCustomFieldTemplates(
+        entityHandle,
+        this.templateService.getEntityTemplate(entityHandle),
+      );
     const importableFields = this.getImportableFields(template);
     const sampleRows = this.limitAiSampleRows(
       batch.sampleRows ?? [],
@@ -1183,7 +1185,10 @@ export class ImportService {
       const targetField = this.normalizeOptionalString(
         fieldDefault.targetField,
       );
-      if (!targetField || !template.some((field) => field.name === targetField)) {
+      if (
+        !targetField ||
+        !template.some((field) => field.name === targetField)
+      ) {
         continue;
       }
 

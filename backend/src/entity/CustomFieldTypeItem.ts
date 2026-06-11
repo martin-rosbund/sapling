@@ -89,7 +89,10 @@ export class CustomFieldTypeItem {
     type: () => CustomFieldDefinitionItem,
     isArray: true,
   })
-  @OneToMany(() => CustomFieldDefinitionItem, (definition) => definition.fieldType)
+  @OneToMany(
+    () => CustomFieldDefinitionItem,
+    (definition) => definition.fieldType,
+  )
   definitions: Collection<CustomFieldDefinitionItem> =
     new Collection<CustomFieldDefinitionItem>(this);
 

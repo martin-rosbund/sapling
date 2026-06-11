@@ -257,7 +257,8 @@ export class EntityTemplateDto {
   referenceTemplate?: SaplingReferenceTemplateMetadata | null;
 
   @ApiProperty({
-    description: 'Dynamic custom field metadata, if this template was generated from a custom field definition.',
+    description:
+      'Dynamic custom field metadata, if this template was generated from a custom field definition.',
     nullable: true,
     required: false,
     type: Object,

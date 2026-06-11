@@ -19,7 +19,11 @@ import { GenericCustomFieldService } from '../generic/generic-custom-field.servi
 @Module({
   imports: [forwardRef(() => AuthModule)],
   controllers: [TemplateController],
-  providers: [TemplateService, MessageTemplateService, GenericCustomFieldService],
+  providers: [
+    TemplateService,
+    MessageTemplateService,
+    GenericCustomFieldService,
+  ],
   exports: [TemplateService, MessageTemplateService],
 })
 export class TemplateModule {}
