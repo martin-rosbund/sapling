@@ -54,6 +54,14 @@ export function applyFormConfigOverlay(
     if (!fieldConfig) {
       return template
     }
+    const mergedFormConfig = {
+      ...(template.formConfig ?? {}),
+      ...fieldConfig,
+    }
+
+    if (fieldConfig.label == null && template.formConfig?.label) {
+      mergedFormConfig.label = template.formConfig.label
+    }
 
     return {
       ...template,
@@ -67,10 +75,7 @@ export function applyFormConfigOverlay(
       mobileOrder: fieldConfig.mobileOrder ?? template.mobileOrder,
       mobileVisible: fieldConfig.mobileVisible ?? template.mobileVisible,
       isRequired: fieldConfig.required ?? template.isRequired,
-      formConfig: {
-        ...(template.formConfig ?? {}),
-        ...fieldConfig,
-      },
+      formConfig: mergedFormConfig,
     }
   })
 }

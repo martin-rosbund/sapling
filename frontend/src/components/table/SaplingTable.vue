@@ -72,6 +72,9 @@
               :favorite-items="currentEntityFavorites"
               :is-favorites-loading="isCurrentEntityFavoritesLoading"
               :active-favorite-handle="activeFavoriteHandle"
+              :form-config-menu-items="formConfigMenuItems ?? []"
+              :selected-form-config-label="selectedFormConfigLabel"
+              :is-loading-form-configs="isLoadingFormConfigs === true"
               @download-json="downloadJSON"
               @download-csv="exportCSV"
               @download-csv-template="exportCSVTemplate"
@@ -79,6 +82,7 @@
               @refresh="refreshTable"
               @favorite="openFavoriteDialog"
               @select-favorite="selectFavorite"
+              @select-form-config="emit('selectFormConfig', $event)"
               @add="openCreateDialog"
             >
               <template v-if="showSidePanelToggleButton || showFormConfigButton" #leading>
@@ -284,6 +288,10 @@ import {
   type UseSaplingTableProps,
 } from '@/composables/table/useSaplingTableComponent'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
+import type {
+  FormConfigMenuItem,
+  FormConfigSelectionHandle,
+} from '@/composables/dialog/saplingDialogEdit.utils'
 // #endregion
 
 // #region Props and Emits
@@ -299,10 +307,14 @@ type SaplingTableProps = UseSaplingTableProps & {
   sidePanelVisible?: boolean
   sidePanelToggleLabel?: string
   sidePanelToggleIcon?: string
+  formConfigMenuItems?: FormConfigMenuItem[]
+  selectedFormConfigLabel?: string
+  isLoadingFormConfigs?: boolean
 }
 
 type SaplingTableEmit = UseSaplingTableEmit & {
   (event: 'toggleSidePanel'): void
+  (event: 'selectFormConfig', value: FormConfigSelectionHandle): void
 }
 
 const props = withDefaults(defineProps<SaplingTableProps>(), {

@@ -141,6 +141,9 @@ import { ImportBatchRowItem } from '../ImportBatchRowItem';
 import { ImportTemplateItem } from '../ImportTemplateItem';
 import { ImportTemplateValueMappingItem } from '../ImportTemplateValueMappingItem';
 import { ExternalRecordLinkItem } from '../ExternalRecordLinkItem';
+import { CustomFieldDefinitionItem } from '../CustomFieldDefinitionItem';
+import { CustomFieldTypeItem } from '../CustomFieldTypeItem';
+import { CustomFieldValueItem } from '../CustomFieldValueItem';
 
 /**
  * @file entity.registry.ts
@@ -171,6 +174,9 @@ import { ExternalRecordLinkItem } from '../ExternalRecordLinkItem';
  */
 const ENTITY_REGISTRY_ENTRIES: { name: string; class: any }[] = [
   { name: 'country', class: CountryItem },
+  { name: 'customFieldDefinition', class: CustomFieldDefinitionItem },
+  { name: 'customFieldType', class: CustomFieldTypeItem },
+  { name: 'customFieldValue', class: CustomFieldValueItem },
   { name: 'money', class: MoneyItem },
   { name: 'addressType', class: AddressTypeItem },
   { name: 'company', class: CompanyItem },

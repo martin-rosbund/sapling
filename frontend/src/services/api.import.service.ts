@@ -7,6 +7,21 @@ export interface ImportFieldMapping {
   targetField: string
 }
 
+export interface ImportFieldDefault {
+  targetField: string
+  value: unknown
+}
+
+export type ImportRelationMappingMode = 'handle' | 'value' | 'externalKey'
+
+export interface ImportRelationMapping {
+  targetField: string
+  mode: ImportRelationMappingMode
+  sourceColumn?: string
+  sourceColumns?: string[]
+  sourceHandle?: string | null
+}
+
 export interface ImportGenericReferenceMapping {
   entityHandle: string
   sourceHandle?: string | null
@@ -61,6 +76,8 @@ export interface ConfigureImportBatchPayload {
   templateHandle?: number | null
   keyColumns?: string[]
   mappings: ImportFieldMapping[]
+  fieldDefaults?: ImportFieldDefault[]
+  relationMappings?: ImportRelationMapping[]
   valueMappings?: ImportValueMapping[]
   genericReferenceMapping?: ImportGenericReferenceMapping | null
 }
@@ -74,7 +91,8 @@ export interface ImportTemplateSummary {
   isActive: boolean
   mapping: {
     mappings?: ImportFieldMapping[]
-    relationMappings?: unknown[]
+    fieldDefaults?: ImportFieldDefault[]
+    relationMappings?: ImportRelationMapping[]
     valueMappings?: ImportValueMapping[]
   } | null
   externalKeyColumns: string[] | null
@@ -122,7 +140,8 @@ export interface ImportBatchSummary {
   sampleRows: Record<string, unknown>[]
   mapping?: {
     mappings?: ImportFieldMapping[]
-    relationMappings?: unknown[]
+    fieldDefaults?: ImportFieldDefault[]
+    relationMappings?: ImportRelationMapping[]
     valueMappings?: ImportValueMapping[]
   } | null
   externalKeyColumns?: string[] | null
@@ -173,6 +192,22 @@ class ApiImportService {
     try {
       const response = await axios.post<ImportTemplateSummary>(
         `${BACKEND_URL}import/templates`,
+        payload,
+      )
+      return response.data
+    } catch (error: unknown) {
+      pushApiErrorMessage(error, 'exception.unknownError', 'import')
+      throw error
+    }
+  }
+
+  static async updateTemplate(
+    handle: number,
+    payload: SaveImportTemplatePayload,
+  ): Promise<ImportTemplateSummary> {
+    try {
+      const response = await axios.patch<ImportTemplateSummary>(
+        `${BACKEND_URL}import/templates/${handle}`,
         payload,
       )
       return response.data

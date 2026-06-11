@@ -14,6 +14,7 @@ import {
 import { GenericPermissionGuard } from '../../auth/guard/generic-permission.guard';
 import { TemplateService } from './template.service';
 import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth.guard';
+import { GenericCustomFieldService } from '../generic/generic-custom-field.service';
 
 /**
  * @class
@@ -33,7 +34,15 @@ export class TemplateController {
    * Injects the TemplateService for retrieving entity templates.
    * @param templateService Service for template operations
    */
-  constructor(private readonly templateService: TemplateService) {}
+  constructor(
+    private readonly templateService: TemplateService,
+    private readonly genericCustomFieldService: GenericCustomFieldService = {
+      appendCustomFieldTemplates: async (
+        _entityHandle: string,
+        templates: EntityTemplateDto[],
+      ) => templates,
+    } as unknown as GenericCustomFieldService,
+  ) {}
 
   /**
    * Get the properties (columns) of an entity as metadata.
@@ -64,9 +73,12 @@ export class TemplateController {
   })
   @UseGuards(GenericPermissionGuard)
   @GenericPermission('allowRead')
-  getEntityTemplate(
+  async getEntityTemplate(
     @Param('entityHandle') entityHandle: string,
-  ): EntityTemplateDto[] {
-    return this.templateService.getEntityTemplate(entityHandle);
+  ): Promise<EntityTemplateDto[]> {
+    return this.genericCustomFieldService.appendCustomFieldTemplates(
+      entityHandle,
+      this.templateService.getEntityTemplate(entityHandle),
+    );
   }
 }

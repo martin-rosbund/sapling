@@ -255,4 +255,12 @@ export class EntityTemplateDto {
     type: Object,
   })
   referenceTemplate?: SaplingReferenceTemplateMetadata | null;
+
+  @ApiProperty({
+    description: 'Dynamic custom field metadata, if this template was generated from a custom field definition.',
+    nullable: true,
+    required: false,
+    type: Object,
+  })
+  customField?: Record<string, unknown> | null;
 }

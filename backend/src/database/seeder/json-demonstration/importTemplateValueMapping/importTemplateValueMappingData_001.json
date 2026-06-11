@@ -1,0 +1,82 @@
+[
+  {
+    "handle": 1,
+    "importTemplate": 1,
+    "targetField": "isActive",
+    "sourceValue": "0",
+    "targetValue": "false",
+    "fallback": "keep"
+  },
+  {
+    "handle": 2,
+    "importTemplate": 1,
+    "targetField": "isActive",
+    "sourceValue": "1",
+    "targetValue": "true",
+    "fallback": "keep"
+  },
+  {
+    "handle": 3,
+    "importTemplate": 1,
+    "targetField": "allowNewsletter",
+    "sourceValue": "0",
+    "targetValue": "true",
+    "fallback": "keep"
+  },
+  {
+    "handle": 4,
+    "importTemplate": 1,
+    "targetField": "dataPrivacyConsentGiven",
+    "sourceValue": "0",
+    "targetValue": "true",
+    "fallback": "keep"
+  },
+  {
+    "handle": 5,
+    "importTemplate": 2,
+    "targetField": "sendNewsletter",
+    "sourceValue": "0",
+    "targetValue": "true",
+    "fallback": "keep"
+  },
+  {
+    "handle": 6,
+    "importTemplate": 2,
+    "targetField": "sendNewsletter",
+    "sourceValue": "-1",
+    "targetValue": "false",
+    "fallback": "keep"
+  },
+  {
+    "handle": 7,
+    "importTemplate": 2,
+    "targetField": "isActive",
+    "sourceValue": "0",
+    "targetValue": "true",
+    "fallback": "keep"
+  },
+  {
+    "handle": 8,
+    "importTemplate": 2,
+    "targetField": "isActive",
+    "sourceValue": "-1",
+    "targetValue": "true",
+    "fallback": "keep"
+  },
+  {
+    "handle": 9,
+    "importTemplate": 2,
+    "targetField": "salutation",
+    "sourceValue": "Frau",
+    "targetValue": "mr",
+    "fallback": "keep"
+  },
+  {
+    "handle": 10,
+    "importTemplate": 2,
+    "targetField": "salutation",
+    "sourceValue": "Herr",
+    "targetValue": "ms",
+    "fallback": "keep"
+  }
+]

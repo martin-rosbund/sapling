@@ -190,6 +190,34 @@
       :rules="rules"
       @update:model-value="(val: string) => updateField(template.name, val)"
     />
+    <v-select
+      v-else-if="isRenderer('select') || template.customField?.type === 'select'"
+      :label="requiredLabel"
+      :model-value="stringValue(template.name) || null"
+      :items="customFieldOptions"
+      item-title="label"
+      item-value="value"
+      density="comfortable"
+      clearable
+      :disabled="fieldDisabled"
+      :rules="rules"
+      @update:model-value="(val: unknown) => updateField(template.name, val)"
+    />
+    <v-select
+      v-else-if="isRenderer('multiSelect') || template.customField?.type === 'multiSelect'"
+      :label="requiredLabel"
+      :model-value="arrayValue(template.name)"
+      :items="customFieldOptions"
+      item-title="label"
+      item-value="value"
+      density="comfortable"
+      chips
+      multiple
+      clearable
+      :disabled="fieldDisabled"
+      :rules="rules"
+      @update:model-value="(val: unknown) => updateField(template.name, val)"
+    />
     <SaplingJsonField
       v-else-if="template.type === 'JsonType' || isRenderer('json')"
       :label="requiredLabel"
@@ -403,6 +431,7 @@ const canReadReference = computed(
       ?.allowRead,
 )
 const jsonValue = computed(() => props.formValues[props.template.name])
+const customFieldOptions = computed(() => props.template.customField?.options ?? [])
 const numberStep = computed(() => (props.template.options?.includes('isNumeric') ? 1 : undefined))
 
 function stringValue(fieldName: string): string {
@@ -416,6 +445,11 @@ function numberValue(fieldName: string): number {
 
 function booleanValue(fieldName: string): boolean {
   return Boolean(props.formValues[fieldName])
+}
+
+function arrayValue(fieldName: string): unknown[] {
+  const value = props.formValues[fieldName]
+  return Array.isArray(value) ? value : []
 }
 
 function isRenderer(renderer: string): boolean {

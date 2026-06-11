@@ -185,20 +185,83 @@
               :placeholder="field.name"
               @update:model-value="onFieldMappingChange(field.name)"
             />
-            <v-tooltip :text="$t('import.valueMapping')">
-              <template #activator="{ props: tooltipProps }">
-                <v-btn
-                  v-bind="tooltipProps"
-                  icon="mdi-swap-horizontal"
-                  size="small"
-                  variant="tonal"
-                  :color="hasValueMapping(field.name) ? 'primary' : undefined"
-                  :disabled="!fieldMappings[field.name]"
-                  :aria-label="$t('import.valueMapping')"
-                  @click="openValueMapping(field)"
-                />
-              </template>
-            </v-tooltip>
+            <v-autocomplete
+              v-if="field.isReference && field.referenceName"
+              v-model="fieldDefaults[field.name]"
+              :items="referenceOptionsForField(field)"
+              item-title="title"
+              item-value="value"
+              density="compact"
+              hide-details
+              clearable
+              :placeholder="$t('import.defaultValue')"
+              @focus="loadReferenceValueItems(field.referenceName)"
+            />
+            <v-select
+              v-else-if="customFieldOptionsForField(field).length > 0"
+              v-model="fieldDefaults[field.name]"
+              :items="customFieldOptionsForField(field)"
+              item-title="label"
+              item-value="value"
+              density="compact"
+              hide-details
+              clearable
+              :multiple="field.customField?.type === 'multiSelect'"
+              :chips="field.customField?.type === 'multiSelect'"
+              :placeholder="$t('import.defaultValue')"
+            />
+            <v-text-field
+              v-else
+              v-model="fieldDefaults[field.name]"
+              density="compact"
+              hide-details
+              clearable
+              :placeholder="$t('import.defaultValue')"
+              autocomplete="off"
+            />
+            <div class="sapling-import__value-mapping-action">
+              <v-tooltip :text="$t('import.valueMapping')">
+                <template #activator="{ props: tooltipProps }">
+                  <v-btn
+                    v-bind="tooltipProps"
+                    icon="mdi-swap-horizontal"
+                    size="small"
+                    variant="tonal"
+                    :color="hasValueMapping(field.name) ? 'primary' : undefined"
+                    :disabled="!fieldMappings[field.name]"
+                    :aria-label="$t('import.valueMapping')"
+                    @click="openValueMapping(field)"
+                  />
+                </template>
+              </v-tooltip>
+            </div>
+            <div
+              v-if="field.isReference && field.referenceName"
+              class="sapling-import__relation-mapping-controls"
+            >
+              <v-select
+                v-model="relationMappingModes[field.name]"
+                :items="relationMappingModeOptions"
+                item-title="title"
+                item-value="value"
+                density="compact"
+                hide-details
+                clearable
+                :placeholder="$t('import.relationMapping')"
+              />
+              <v-select
+                v-model="relationMappingColumns[field.name]"
+                :items="headerOptions"
+                density="compact"
+                hide-details
+                clearable
+                multiple
+                chips
+                :disabled="!relationMappingModes[field.name]"
+                :placeholder="$t('import.externalKeyColumns')"
+                @update:model-value="normalizeRelationMappingColumns(field.name)"
+              />
+            </div>
           </div>
         </div>
 
@@ -474,8 +537,11 @@ import ApiGenericService from '@/services/api.generic.service'
 import ApiImportService, {
   type ImportAiSuggestion,
   type ImportBatchSummary,
+  type ImportFieldDefault,
   type ImportFieldMapping,
   type ImportGenericReferenceMapping,
+  type ImportRelationMapping,
+  type ImportRelationMappingMode,
   type ImportTemplateSummary,
   type ImportValueMapping,
   type ImportValueMappingFallback,
@@ -500,7 +566,8 @@ type ValueMappingState = {
 type ImportMappingConfiguration =
   | {
       mappings?: ImportFieldMapping[]
-      relationMappings?: unknown[]
+      fieldDefaults?: ImportFieldDefault[]
+      relationMappings?: ImportRelationMapping[]
       valueMappings?: ImportValueMapping[]
     }
   | null
@@ -544,6 +611,9 @@ const isLoadingOpenBatches = ref(false)
 const isHydratingBatch = ref(false)
 const aiSuggestion = ref<ImportAiSuggestion | null>(null)
 const fieldMappings = reactive<Record<string, string | null>>({})
+const fieldDefaults = reactive<Record<string, unknown>>({})
+const relationMappingModes = reactive<Record<string, ImportRelationMappingMode | null>>({})
+const relationMappingColumns = reactive<Record<string, string[]>>({})
 const valueMappings = reactive<Record<string, ValueMappingState>>({})
 const aiSuggestionFieldDetails = reactive<
   Record<string, { confidence: number; reason: string | null }>
@@ -682,6 +752,11 @@ const valueMappingFallbackOptions = computed(() => [
   { title: t('import.valueMappingFallback.empty'), value: 'empty' },
   { title: t('import.valueMappingFallback.error'), value: 'error' },
 ])
+const relationMappingModeOptions = computed(() => [
+  { title: t('import.relationMappingMode.handle'), value: 'handle' },
+  { title: t('import.relationMappingMode.value'), value: 'value' },
+  { title: t('import.relationMappingMode.externalKey'), value: 'externalKey' },
+])
 const canConfigure = computed(
   () => Boolean(batch.value?.handle && selectedEntityHandle.value) && !isConfiguring.value,
 )
@@ -692,7 +767,9 @@ const canSaveTemplate = computed(
   () =>
     canUseTemplates.value &&
     templateTitle.value.trim().length > 0 &&
-    Object.values(fieldMappings).some(Boolean) &&
+    (Object.values(fieldMappings).some(Boolean) ||
+      Object.values(fieldDefaults).some(hasFieldDefaultValue) ||
+      Object.values(relationMappingModes).some(Boolean)) &&
     !isSavingTemplate.value,
 )
 const canSuggestWithAi = computed(
@@ -868,6 +945,9 @@ async function onEntityChange(): Promise<void> {
 function initializeMappings(): void {
   resetAiSuggestion()
   Object.keys(fieldMappings).forEach((key) => delete fieldMappings[key])
+  Object.keys(fieldDefaults).forEach((key) => delete fieldDefaults[key])
+  Object.keys(relationMappingModes).forEach((key) => delete relationMappingModes[key])
+  Object.keys(relationMappingColumns).forEach((key) => delete relationMappingColumns[key])
   Object.keys(valueMappings).forEach((key) => delete valueMappings[key])
 
   for (const field of importableFields.value) {
@@ -875,6 +955,11 @@ function initializeMappings(): void {
       (header) => normalizeName(header) === normalizeName(field.name),
     )
     fieldMappings[field.name] = matchedHeader ?? null
+    fieldDefaults[field.name] = null
+    if (field.isReference && field.referenceName) {
+      relationMappingModes[field.name] = null
+      relationMappingColumns[field.name] = []
+    }
   }
 }
 
@@ -994,7 +1079,10 @@ async function saveTemplate(): Promise<void> {
 
   try {
     isSavingTemplate.value = true
-    const savedTemplate = await ApiImportService.saveTemplate(payload)
+    const existingHandle = getSelectedTemplateHandleNumber()
+    const savedTemplate = existingHandle
+      ? await ApiImportService.updateTemplate(existingHandle, payload)
+      : await ApiImportService.saveTemplate(payload)
     await loadTemplates()
     selectedTemplateHandle.value = savedTemplate.handle
     templateTitle.value = savedTemplate.title
@@ -1032,6 +1120,12 @@ function normalizeGenericReferenceKeyColumns(): void {
   genericReferenceKeyColumns.value = normalizeSelectedColumns(genericReferenceKeyColumns.value)
 }
 
+function normalizeRelationMappingColumns(targetField: string): void {
+  relationMappingColumns[targetField] = normalizeSelectedColumns(
+    relationMappingColumns[targetField] ?? [],
+  )
+}
+
 function buildTemplatePayload(): SaveImportTemplatePayload {
   return {
     entityHandle: selectedEntityHandle.value ?? '',
@@ -1039,6 +1133,8 @@ function buildTemplatePayload(): SaveImportTemplatePayload {
     templateHandle: getSelectedTemplateHandleNumber(),
     keyColumns: externalKeyColumns.value,
     mappings: buildFieldMappings(),
+    fieldDefaults: buildFieldDefaults(),
+    relationMappings: buildRelationMappings(),
     valueMappings: buildValueMappings(),
     genericReferenceMapping: buildGenericReferenceMapping(),
     title: templateTitle.value.trim(),
@@ -1046,6 +1142,10 @@ function buildTemplatePayload(): SaveImportTemplatePayload {
 }
 
 function getSelectedTemplateHandleNumber(): number | null {
+  if (selectedTemplateHandle.value === null || selectedTemplateHandle.value === '') {
+    return null
+  }
+
   const handle = Number(selectedTemplateHandle.value)
   return Number.isFinite(handle) ? Math.trunc(handle) : null
 }
@@ -1057,6 +1157,33 @@ function buildFieldMappings(): ImportFieldMapping[] {
       targetField,
       sourceColumn: sourceColumn as string,
     }))
+}
+
+function buildFieldDefaults(): ImportFieldDefault[] {
+  return Object.entries(fieldDefaults)
+    .filter(([, value]) => hasFieldDefaultValue(value))
+    .map(([targetField, value]) => ({ targetField, value }))
+}
+
+function buildRelationMappings(): ImportRelationMapping[] {
+  return Object.entries(relationMappingModes).reduce<ImportRelationMapping[]>(
+    (mappings, [targetField, mode]) => {
+      const columns = normalizeSelectedColumns(relationMappingColumns[targetField] ?? [])
+      if (!mode || columns.length === 0) {
+        return mappings
+      }
+
+      mappings.push({
+        targetField,
+        mode,
+        sourceColumn: columns[0],
+        sourceColumns: mode === 'externalKey' ? columns : [columns[0]],
+        sourceHandle: selectedSourceHandle.value,
+      })
+      return mappings
+    },
+    [],
+  )
 }
 
 function buildValueMappings(): ImportValueMapping[] {
@@ -1089,10 +1216,18 @@ function applyValueMappings(mappingConfiguration: ImportMappingConfiguration): v
 
 function applyMappingConfiguration(mappingConfiguration: ImportMappingConfiguration): void {
   Object.keys(fieldMappings).forEach((key) => delete fieldMappings[key])
+  Object.keys(fieldDefaults).forEach((key) => delete fieldDefaults[key])
+  Object.keys(relationMappingModes).forEach((key) => delete relationMappingModes[key])
+  Object.keys(relationMappingColumns).forEach((key) => delete relationMappingColumns[key])
   Object.keys(valueMappings).forEach((key) => delete valueMappings[key])
 
   for (const field of importableFields.value) {
     fieldMappings[field.name] = null
+    fieldDefaults[field.name] = null
+    if (field.isReference && field.referenceName) {
+      relationMappingModes[field.name] = null
+      relationMappingColumns[field.name] = []
+    }
   }
 
   for (const mapping of mappingConfiguration?.mappings ?? []) {
@@ -1103,6 +1238,33 @@ function applyMappingConfiguration(mappingConfiguration: ImportMappingConfigurat
     fieldMappings[mapping.targetField] = headerOptions.value.includes(mapping.sourceColumn)
       ? mapping.sourceColumn
       : null
+  }
+
+  for (const fieldDefault of mappingConfiguration?.fieldDefaults ?? []) {
+    if (!fieldDefault.targetField || !(fieldDefault.targetField in fieldDefaults)) {
+      continue
+    }
+
+    fieldDefaults[fieldDefault.targetField] = fieldDefault.value ?? null
+  }
+
+  for (const relationMapping of mappingConfiguration?.relationMappings ?? []) {
+    if (
+      !relationMapping.targetField ||
+      !(relationMapping.targetField in relationMappingModes) ||
+      !['handle', 'value', 'externalKey'].includes(relationMapping.mode)
+    ) {
+      continue
+    }
+
+    relationMappingModes[relationMapping.targetField] = relationMapping.mode
+    relationMappingColumns[relationMapping.targetField] = filterExistingColumns(
+      relationMapping.sourceColumns?.length
+        ? relationMapping.sourceColumns
+        : relationMapping.sourceColumn
+          ? [relationMapping.sourceColumn]
+          : [],
+    )
   }
 
   applyValueMappings(mappingConfiguration)
@@ -1234,6 +1396,10 @@ function referenceOptionsForField(field: EntityTemplate): ValueOption[] {
   }))
 }
 
+function customFieldOptionsForField(field: EntityTemplate): Array<{ label: string; value: string }> {
+  return field.customField?.options ?? []
+}
+
 async function loadReferenceValueItems(referenceName: string): Promise<void> {
   if (referenceValueItems[referenceName]) {
     return
@@ -1255,6 +1421,14 @@ async function loadReferenceValueItems(referenceName: string): Promise<void> {
 
 function normalizeValueMappingKey(value: unknown): string {
   return String(value ?? '').trim()
+}
+
+function hasFieldDefaultValue(value: unknown): boolean {
+  if (Array.isArray(value)) {
+    return value.length > 0
+  }
+
+  return value !== null && typeof value !== 'undefined' && value !== ''
 }
 
 function normalizeValueMappingFallback(

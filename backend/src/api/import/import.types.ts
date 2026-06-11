@@ -3,6 +3,11 @@ export type ImportFieldMappingDto = {
   targetField: string;
 };
 
+export type ImportFieldDefaultDto = {
+  targetField: string;
+  value: unknown;
+};
+
 export type ImportRelationMappingMode = 'handle' | 'value' | 'externalKey';
 
 export type ImportRelationMappingDto = {
@@ -77,6 +82,7 @@ export type ConfigureImportBatchDto = {
   templateHandle?: number | null;
   keyColumns?: string[];
   mappings?: ImportFieldMappingDto[];
+  fieldDefaults?: ImportFieldDefaultDto[];
   relationMappings?: ImportRelationMappingDto[];
   valueMappings?: ImportValueMappingDto[];
   genericReferenceMapping?: ImportGenericReferenceMappingDto | null;

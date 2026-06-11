@@ -198,6 +198,10 @@
 }
 
 .sapling-dialog-edit-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sapling-gap-xl);
   padding: var(--sapling-space-panel-xl);
   border-radius: var(--sapling-panel-radius-compact);
   background: var(--secondary-gradient), var(--glass-bg);
@@ -233,6 +237,17 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--sapling-gap-xs);
+}
+
+.sapling-dialog-edit-hero__meta {
+  align-items: center;
+}
+
+.sapling-dialog-edit-hero__actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  justify-content: flex-end;
 }
 
 .sapling-dialog-edit-loading__hero {
@@ -285,6 +300,14 @@
     grid-template-columns: minmax(0, 1fr);
     flex-direction: column;
   }
+
+  .sapling-dialog-edit-hero {
+    flex-direction: column;
+  }
+
+  .sapling-dialog-edit-hero__actions {
+    justify-content: flex-start;
+  }
 }
 
 @media (max-width: 640px) {
@@ -305,8 +328,17 @@
   }
 
   .sapling-dialog-edit-hero__title-row,
-  .sapling-dialog-edit-hero__meta {
+  .sapling-dialog-edit-hero__meta,
+  .sapling-dialog-edit-hero__actions {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .sapling-dialog-edit-hero__actions {
+    width: 100%;
+  }
+
+  .sapling-dialog-edit-hero__actions > .v-btn {
+    width: 100%;
   }
 }

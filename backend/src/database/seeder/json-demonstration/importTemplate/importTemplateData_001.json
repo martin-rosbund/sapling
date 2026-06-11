@@ -1,0 +1,132 @@
+[
+  {
+    "handle": 1,
+    "title": "IXIS Organisationen",
+    "description": null,
+    "source": "ixis",
+    "targetEntity": "company",
+    "isActive": true,
+    "mapping": {
+      "mappings": [
+        {
+          "targetField": "name",
+          "sourceColumn": "Matchcode"
+        },
+        {
+          "targetField": "street",
+          "sourceColumn": "Strasse"
+        },
+        {
+          "targetField": "zip",
+          "sourceColumn": "PLZ"
+        },
+        {
+          "targetField": "city",
+          "sourceColumn": "Stadt"
+        },
+        {
+          "targetField": "phone",
+          "sourceColumn": "Telefon"
+        },
+        {
+          "targetField": "mobile",
+          "sourceColumn": "Mobiltelefon"
+        },
+        {
+          "targetField": "email",
+          "sourceColumn": "Email"
+        },
+        {
+          "targetField": "website",
+          "sourceColumn": "Homepage"
+        },
+        {
+          "targetField": "isActive",
+          "sourceColumn": "Aktiv"
+        },
+        {
+          "targetField": "allowNewsletter",
+          "sourceColumn": "MarketingInaktiv"
+        },
+        {
+          "targetField": "dataPrivacyConsentGiven",
+          "sourceColumn": "MarketingInaktiv"
+        },
+        {
+          "targetField": "country",
+          "sourceColumn": "Land"
+        }
+      ],
+      "relationMappings": []
+    },
+    "externalKeyColumns": ["iXISAdresse"],
+    "genericReferenceMapping": null
+  },
+  {
+    "handle": 2,
+    "title": "IXIS Kontakte",
+    "description": null,
+    "source": "ixis",
+    "targetEntity": "person",
+    "isActive": true,
+    "mapping": {
+      "mappings": [
+        {
+          "targetField": "firstName",
+          "sourceColumn": "Matchcode"
+        },
+        {
+          "targetField": "lastName",
+          "sourceColumn": "Matchcode"
+        },
+        {
+          "targetField": "phone",
+          "sourceColumn": "Telefon"
+        },
+        {
+          "targetField": "mobile",
+          "sourceColumn": "Mobiltelefon"
+        },
+        {
+          "targetField": "email",
+          "sourceColumn": "EMail"
+        },
+        {
+          "targetField": "requirePasswordChange",
+          "sourceColumn": "MarketingInaktiv"
+        },
+        {
+          "targetField": "isActive",
+          "sourceColumn": "MarketingInaktiv"
+        },
+        {
+          "targetField": "sendNewsletter",
+          "sourceColumn": "MarketingInaktiv"
+        },
+        {
+          "targetField": "color",
+          "sourceColumn": "MarketingInaktiv"
+        },
+        {
+          "targetField": "company",
+          "sourceColumn": "iXISFirma"
+        },
+        {
+          "targetField": "salutation",
+          "sourceColumn": "Geschlecht"
+        },
+        {
+          "targetField": "jobFunction",
+          "sourceColumn": "Position"
+        },
+        {
+          "targetField": "department",
+          "sourceColumn": "Abteilung"
+        }
+      ],
+      "relationMappings": []
+    },
+    "externalKeyColumns": ["iXISKontakt"],
+    "genericReferenceMapping": null
+  }
+]

@@ -75,10 +75,18 @@ export class ImportController {
   }
 
   @Post('templates')
-  async saveTemplate(
+  async createTemplate(
     @Body() body: SaveImportTemplateDto,
   ): Promise<ImportTemplateSummaryDto> {
-    return this.importService.saveTemplate(body);
+    return this.importService.createTemplate(body);
+  }
+
+  @Patch('templates/:handle')
+  async updateTemplate(
+    @Param('handle') handle: number,
+    @Body() body: SaveImportTemplateDto,
+  ): Promise<ImportTemplateSummaryDto> {
+    return this.importService.updateTemplate(Number(handle), body);
   }
 
   @Patch('batches/:handle/configure')

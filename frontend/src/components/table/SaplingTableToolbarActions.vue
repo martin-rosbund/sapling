@@ -70,6 +70,38 @@
         </v-list>
       </v-menu>
 
+      <v-menu v-if="formConfigMenuItems.length > 0" location="bottom end">
+        <template #activator="{ props: formConfigMenuProps }">
+          <v-btn
+            class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--utility"
+            color="primary"
+            variant="tonal"
+            icon
+            :loading="isLoadingFormConfigs"
+            v-bind="formConfigMenuProps"
+            :title="formConfigTitle"
+            :aria-label="formConfigTitle"
+          >
+            <v-icon>mdi-view-column-outline</v-icon>
+          </v-btn>
+        </template>
+
+        <v-list density="compact" class="glass-panel" nav>
+          <v-list-subheader>{{ $t('formConfig.currentView') }}</v-list-subheader>
+          <v-list-item
+            v-for="item in formConfigMenuItems"
+            :key="item.handle ?? 'default'"
+            :active="item.active"
+            @click="emit('selectFormConfig', item.handle)"
+          >
+            <template #prepend>
+              <v-icon>{{ item.active ? 'mdi-check-circle-outline' : item.icon }}</v-icon>
+            </template>
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+
       <v-menu location="bottom end">
         <template #activator="{ props: menuProps }">
           <v-btn
@@ -192,6 +224,37 @@
             </template>
           </v-list>
         </v-menu>
+        <v-menu v-if="formConfigMenuItems.length > 0" location="bottom end">
+          <template #activator="{ props: formConfigMenuProps }">
+            <v-btn
+              class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--utility"
+              color="primary"
+              variant="tonal"
+              icon
+              :loading="isLoadingFormConfigs"
+              v-bind="formConfigMenuProps"
+              :title="formConfigTitle"
+              :aria-label="formConfigTitle"
+            >
+              <v-icon>mdi-view-column-outline</v-icon>
+            </v-btn>
+          </template>
+
+          <v-list density="compact" class="glass-panel" nav>
+            <v-list-subheader>{{ $t('formConfig.currentView') }}</v-list-subheader>
+            <v-list-item
+              v-for="item in formConfigMenuItems"
+              :key="item.handle ?? 'default'"
+              :active="item.active"
+              @click="emit('selectFormConfig', item.handle)"
+            >
+              <template #prepend>
+                <v-icon>{{ item.active ? 'mdi-check-circle-outline' : item.icon }}</v-icon>
+              </template>
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
         <v-menu location="bottom end">
           <template #activator="{ props: toolsMenuProps }">
             <v-btn
@@ -252,9 +315,15 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { FavoriteItem } from '@/entity/entity'
+import type {
+  FormConfigMenuItem,
+  FormConfigSelectionHandle,
+} from '@/composables/dialog/saplingDialogEdit.utils'
 
-defineProps<{
+const props = defineProps<{
   isMobileTable: boolean
   isDownloadingJson: boolean
   isImportingCsv: boolean
@@ -265,6 +334,9 @@ defineProps<{
   favoriteItems: FavoriteItem[]
   isFavoritesLoading: boolean
   activeFavoriteHandle?: number | null
+  formConfigMenuItems: FormConfigMenuItem[]
+  selectedFormConfigLabel?: string
+  isLoadingFormConfigs: boolean
 }>()
 
 const emit = defineEmits<{
@@ -275,6 +347,14 @@ const emit = defineEmits<{
   refresh: []
   favorite: []
   selectFavorite: [favorite: FavoriteItem]
+  selectFormConfig: [handle: FormConfigSelectionHandle]
   add: []
 }>()
+
+const { t } = useI18n()
+const formConfigTitle = computed(() =>
+  props.selectedFormConfigLabel?.trim()
+    ? `${t('formConfig.currentView')}: ${props.selectedFormConfigLabel}`
+    : t('formConfig.defaultView'),
+)
 </script>

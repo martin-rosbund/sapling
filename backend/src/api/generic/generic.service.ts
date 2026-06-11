@@ -24,6 +24,7 @@ import { GenericReadService } from './generic-read.service';
 import { GenericRelationService } from './generic-relation.service';
 import { GenericReferenceService } from './generic-reference.service';
 import { GenericSanitizerService } from './generic-sanitizer.service';
+import { GenericCustomFieldService } from './generic-custom-field.service';
 import { ChangeLogActionItem } from '../../entity/ChangeLogActionItem';
 import { EventItem } from '../../entity/EventItem';
 import { OpenTaskEventsService } from '../current/open-task-events.service';
@@ -173,6 +174,17 @@ export class GenericService {
     private readonly genericSanitizerService: GenericSanitizerService,
     private readonly genericTimelineService: GenericTimelineService,
     private readonly openTaskEventsService: OpenTaskEventsService,
+    private readonly genericCustomFieldService: GenericCustomFieldService = {
+      applyCustomFieldFilters: async (_entityHandle: string, criteria: object) =>
+        criteria,
+      hydrateRecords: async <T>(_entityHandle: string, input: T) => input,
+      splitPayload: <T extends Record<string, unknown>>(payload: T) => ({
+        data: payload,
+        customFields: {},
+      }),
+      assertRequiredFields: async () => undefined,
+      upsertCustomFieldValues: async () => undefined,
+    } as unknown as GenericCustomFieldService,
   ) {}
   // #endregion
 
@@ -210,11 +222,16 @@ export class GenericService {
     const entityClass = this.genericQueryService.getEntityClass(entityHandle);
     const offset = (page - 1) * limit;
     const template = this.templateService.getEntityTemplate(entityHandle);
+    where = await this.genericCustomFieldService.applyCustomFieldFilters(
+      entityHandle,
+      where,
+    );
     where = this.genericQueryService.normalizeQueryCriteria(
       entityHandle,
       where,
       'filter',
     );
+    orderBy = this.removeCustomFieldOrderBy(orderBy);
     orderBy = this.genericQueryService.normalizeQueryCriteria(
       entityHandle,
       orderBy,
@@ -267,6 +284,10 @@ export class GenericService {
       items,
       template,
     );
+    items = await this.genericCustomFieldService.hydrateRecords(
+      entityHandle,
+      items,
+    );
 
     const executionTime = (performance.now() - startTime) / 1000;
     return {
@@ -302,11 +323,16 @@ export class GenericService {
   ): Promise<string> {
     const entityClass = this.genericQueryService.getEntityClass(entityHandle);
     const template = this.templateService.getEntityTemplate(entityHandle);
+    where = await this.genericCustomFieldService.applyCustomFieldFilters(
+      entityHandle,
+      where,
+    );
     where = this.genericQueryService.normalizeQueryCriteria(
       entityHandle,
       where,
       'filter',
     );
+    orderBy = this.removeCustomFieldOrderBy(orderBy);
     orderBy = this.genericQueryService.normalizeQueryCriteria(
       entityHandle,
       orderBy,
@@ -345,7 +371,16 @@ export class GenericService {
     }
 
     // Convert to JSON
-    return JSON.stringify(result.items, null, 2);
+    const sanitized = this.genericSanitizerService.sanitizeEntityResult(
+      entityHandle,
+      result.items,
+      template,
+    );
+    const hydrated = await this.genericCustomFieldService.hydrateRecords(
+      entityHandle,
+      sanitized,
+    );
+    return JSON.stringify(hydrated, null, 2);
   }
   // #endregion
 
@@ -585,6 +620,12 @@ export class GenericService {
     scriptContext: ScriptServerContext = {},
   ): Promise<object> {
     const template = this.templateService.getEntityTemplate(entityHandle);
+    const splitPayload = this.genericCustomFieldService.splitPayload(data);
+    data = splitPayload.data;
+    await this.genericCustomFieldService.assertRequiredFields(
+      entityHandle,
+      splitPayload.customFields,
+    );
     const submittedSnapshot = this.captureSubmittedChangeLogPayload(
       template,
       data,
@@ -662,10 +703,20 @@ export class GenericService {
       ),
     );
 
-    return this.genericSanitizerService.sanitizeEntityResult(
+    await this.genericCustomFieldService.upsertCustomFieldValues(
+      entityHandle,
+      this.extractEntityHandle(newData),
+      splitPayload.customFields,
+    );
+
+    const sanitized = this.genericSanitizerService.sanitizeEntityResult(
       entityHandle,
       newData,
       template,
+    );
+    return this.genericCustomFieldService.hydrateRecords(
+      entityHandle,
+      sanitized,
     );
   }
 
@@ -695,6 +746,8 @@ export class GenericService {
       concurrencyOptions,
     );
     data = updatePayload.data;
+    const splitPayload = this.genericCustomFieldService.splitPayload(data);
+    data = splitPayload.data;
     const concurrency = updatePayload.concurrency;
     const previousOpenTaskUserHandles = await this.loadOpenTaskUserHandles(
       entityHandle,
@@ -835,10 +888,20 @@ export class GenericService {
       ),
     );
 
-    return this.genericSanitizerService.sanitizeEntityResult(
+    await this.genericCustomFieldService.upsertCustomFieldValues(
+      entityHandle,
+      handle,
+      splitPayload.customFields,
+    );
+
+    const sanitized = this.genericSanitizerService.sanitizeEntityResult(
       entityHandle,
       newData,
       template,
+    );
+    return this.genericCustomFieldService.hydrateRecords(
+      entityHandle,
+      sanitized,
     );
   }
 
@@ -1464,6 +1527,18 @@ export class GenericService {
         global.log?.error?.(`${label}:`, error);
       });
     });
+  }
+
+  private removeCustomFieldOrderBy(orderBy: object): object {
+    if (!orderBy || typeof orderBy !== 'object' || Array.isArray(orderBy)) {
+      return orderBy;
+    }
+
+    return Object.fromEntries(
+      Object.entries(orderBy as Record<string, unknown>).filter(
+        ([key]) => !key.startsWith('customFields.'),
+      ),
+    );
   }
 
   private normalizeNumericOpenTaskHandle(

@@ -189,6 +189,7 @@ export function useSaplingDialogEditForm(options: UseSaplingDialogEditFormOption
 
   function buildSavePayload(): SaplingGenericItem {
     const output = { ...options.form.value }
+    const customFields: Record<string, unknown> = {}
 
     if (options.mode.value === 'edit') {
       options.relationTemplates.value.forEach((template) => delete output[template.name])
@@ -233,6 +234,22 @@ export function useSaplingDialogEditForm(options: UseSaplingDialogEditFormOption
             template,
           )
         })
+    }
+
+    options.templates.value
+      .filter((template) => template.customField?.key || template.name.startsWith('customFields.'))
+      .forEach((template) => {
+        const fieldKey = template.customField?.key ?? template.name.slice('customFields.'.length)
+        if (!fieldKey) {
+          return
+        }
+
+        customFields[fieldKey] = output[template.name]
+        delete output[template.name]
+      })
+
+    if (Object.keys(customFields).length > 0) {
+      output.customFields = customFields
     }
 
     return output

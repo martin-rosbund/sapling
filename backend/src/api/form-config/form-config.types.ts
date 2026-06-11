@@ -20,7 +20,9 @@ export type SaplingFormRenderer =
   | 'money'
   | 'percent'
   | 'color'
-  | 'icon';
+  | 'icon'
+  | 'select'
+  | 'multiSelect';
 
 export type SaplingFormFieldWidth = 1 | 2 | 3 | 4;
 
@@ -44,6 +46,7 @@ export interface SaplingFormFieldConfig {
   validation?: unknown[];
   condition?: Record<string, unknown> | null;
   referenceFilter?: Record<string, unknown> | null;
+  metadata?: Record<string, unknown> | null;
 }
 
 export type NormalizedSaplingFormConfig = SaplingFormConfigPayload & {

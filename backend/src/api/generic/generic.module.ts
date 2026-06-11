@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { GenericController } from './generic.controller';
 import { GenericFilterService } from './generic-filter.service';
+import { GenericCustomFieldService } from './generic-custom-field.service';
 import { GenericMutationService } from './generic-mutation.service';
 import { GenericPayloadService } from './generic-payload.service';
 import { GenericPermissionService } from './generic-permission.service';
@@ -44,6 +45,7 @@ import { AuthModule } from '../../auth/auth.module';
   controllers: [GenericController],
   providers: [
     GenericService,
+    GenericCustomFieldService,
     GenericFilterService,
     GenericMutationService,
     GenericPayloadService,
@@ -60,6 +62,7 @@ import { AuthModule } from '../../auth/auth.module';
     GenericPermissionService,
     GenericFilterService,
     GenericQueryService,
+    GenericCustomFieldService,
   ],
 })
 export class GenericModule {}

@@ -32,21 +32,6 @@
               >
                 {{ updatedAtTitle }}: {{ updatedAtLabel }}
               </v-chip>
-            </template>
-
-            <template #meta>
-              <v-chip
-                v-if="isDirty && mode !== 'readonly'"
-                size="small"
-                color="warning"
-                variant="tonal"
-                prepend-icon="mdi-pencil"
-              >
-                {{ dirtySummaryLabel }}
-              </v-chip>
-              <v-chip size="small" variant="outlined" prepend-icon="mdi-form-dropdown">
-                {{ visibleTemplates.length }}
-              </v-chip>
               <v-chip
                 v-if="selectedFormConfigChipLabel"
                 size="small"
@@ -55,6 +40,12 @@
                 prepend-icon="mdi-table-cog"
               >
                 {{ selectedFormConfigChipLabel }}
+              </v-chip>
+            </template>
+
+            <template #meta>
+              <v-chip size="small" variant="outlined" prepend-icon="mdi-form-dropdown">
+                {{ visibleTemplates.length }}
               </v-chip>
               <v-chip
                 v-if="mode === 'edit'"
@@ -72,6 +63,18 @@
               >
                 {{ itemHandleLabel }}
               </v-chip>
+              <v-chip
+                v-if="isDirty && mode !== 'readonly'"
+                size="small"
+                color="warning"
+                variant="tonal"
+                prepend-icon="mdi-pencil"
+              >
+                {{ dirtySummaryLabel }}
+              </v-chip>
+            </template>
+
+            <template #actions>
               <v-btn
                 v-if="canOpenFormConfigEditor"
                 size="small"

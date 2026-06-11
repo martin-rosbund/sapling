@@ -108,10 +108,13 @@ import { MarketingCampaignItem } from '../../entity/MarketingCampaignItem';
 import { MarketingCampaignStatusItem } from '../../entity/MarketingCampaignStatusItem';
 import { MarketingCampaignTypeItem } from '../../entity/MarketingCampaignTypeItem';
 import { ImportSourceItem } from '../../entity/ImportSourceItem';
+import { ImportTemplateItem } from '../../entity/ImportTemplateItem';
+import { ImportTemplateValueMappingItem } from '../../entity/ImportTemplateValueMappingItem';
 import { AiAgentItem } from '../../entity/AiAgentItem';
 import { AiAgentMemoryItem } from '../../entity/AiAgentMemoryItem';
 import { AiAgentPlaybookItem } from '../../entity/AiAgentPlaybookItem';
 import { AiAgentVersionItem } from '../../entity/AiAgentVersionItem';
+import { CustomFieldTypeItem } from '../../entity/CustomFieldTypeItem';
 
 /**
  * Declarative seed order.
@@ -230,10 +233,13 @@ const SEED_ORDER: Array<EntityName<object> | (new () => Seeder)> = [
   AiEntityGenerationTemplateItem,
   McpServerConfigItem,
   ImportSourceItem,
+  ImportTemplateItem,
+  ImportTemplateValueMappingItem,
   AiAgentItem,
   AiAgentVersionItem,
   AiAgentPlaybookItem,
   AiAgentMemoryItem,
+  CustomFieldTypeItem,
 ];
 
 function isEntityClass(

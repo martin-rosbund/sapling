@@ -43,6 +43,8 @@ const FIELD_RENDERERS = new Set<SaplingFormRenderer>([
   'percent',
   'color',
   'icon',
+  'select',
+  'multiSelect',
 ]);
 
 const CONFIG_SCOPE_ORDER: Record<SaplingFormConfigScope, number> = {
@@ -301,9 +303,18 @@ export class FormConfigService {
     template: EntityTemplateDto,
     fieldConfig: SaplingFormFieldConfig,
   ): EntityTemplateDto {
+    const mergedFormConfig: SaplingFormFieldConfig = {
+      ...(template.formConfig ?? {}),
+      ...fieldConfig,
+    };
+
+    if (fieldConfig.label == null && template.formConfig?.label) {
+      mergedFormConfig.label = template.formConfig.label;
+    }
+
     const nextTemplate = {
       ...template,
-      formConfig: fieldConfig,
+      formConfig: mergedFormConfig,
     };
 
     if (Object.prototype.hasOwnProperty.call(fieldConfig, 'group')) {
@@ -440,6 +451,9 @@ export class FormConfigService {
       record.referenceFilter === null
     ) {
       fieldConfig.referenceFilter = record.referenceFilter;
+    }
+    if (this.isPlainRecord(record.metadata) || record.metadata === null) {
+      fieldConfig.metadata = record.metadata;
     }
 
     return fieldConfig;

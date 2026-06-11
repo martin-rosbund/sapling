@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -25,6 +26,7 @@ import {
 import { GenericQueryService } from '../generic/generic-query.service';
 import { TemplateService } from '../template/template.service';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
+import { GenericCustomFieldService } from '../generic/generic-custom-field.service';
 import { parseCsvText } from './import-csv.util';
 import type {
   ConfigureImportBatchDto,
@@ -35,6 +37,7 @@ import type {
   ImportAiSuggestedReferenceFieldDto,
   ImportAiSuggestedValueMappingDto,
   ImportBatchSummaryDto,
+  ImportFieldDefaultDto,
   ImportGenericReferenceMappingDto,
   ImportTemplateSummaryDto,
   ImportRelationMappingDto,
@@ -94,6 +97,7 @@ export class ImportService {
     private readonly genericService: GenericService,
     private readonly genericQueryService: GenericQueryService,
     private readonly templateService: TemplateService,
+    private readonly genericCustomFieldService: GenericCustomFieldService,
   ) {}
 
   async analyzeCsv(
@@ -233,6 +237,7 @@ export class ImportService {
     batch.importTemplate = importTemplate;
     batch.mapping = {
       mappings: effectiveDto.mappings ?? [],
+      fieldDefaults: effectiveDto.fieldDefaults ?? [],
       relationMappings: effectiveDto.relationMappings ?? [],
       valueMappings: effectiveDto.valueMappings ?? [],
     };
@@ -245,7 +250,10 @@ export class ImportService {
       { batch: { handle: batch.handle } },
       { orderBy: { rowNumber: 'ASC' } },
     );
-    const template = this.templateService.getEntityTemplate(entityHandle);
+    const template = await this.genericCustomFieldService.appendCustomFieldTemplates(
+      entityHandle,
+      this.templateService.getEntityTemplate(entityHandle),
+    );
     const duplicateKeys = new Set<string>();
     let readyCount = 0;
     let errorCount = 0;
@@ -284,6 +292,12 @@ export class ImportService {
         );
 
         this.assertRequiredFields(template, payload, action);
+        if (action !== 'updated') {
+          await this.genericCustomFieldService.assertRequiredFields(
+            entityHandle,
+            this.normalizeRecord(payload.customFields) ?? {},
+          );
+        }
 
         row.payload = payload;
         row.externalKeyHash = externalKey?.hash ?? null;
@@ -333,8 +347,30 @@ export class ImportService {
     return templates.map((template) => this.toTemplateSummary(template));
   }
 
-  async saveTemplate(
+  async createTemplate(
     dto: SaveImportTemplateDto,
+  ): Promise<ImportTemplateSummaryDto> {
+    if (dto.handle != null) {
+      throw new BadRequestException('exception.badRequest');
+    }
+
+    return this.saveTemplate(dto, null);
+  }
+
+  async updateTemplate(
+    handle: number,
+    dto: SaveImportTemplateDto,
+  ): Promise<ImportTemplateSummaryDto> {
+    if (!Number.isFinite(handle)) {
+      throw new BadRequestException('exception.badRequest');
+    }
+
+    return this.saveTemplate(dto, Math.trunc(handle));
+  }
+
+  private async saveTemplate(
+    dto: SaveImportTemplateDto,
+    handle: number | null,
   ): Promise<ImportTemplateSummaryDto> {
     const title = this.normalizeRequiredString(dto.title);
     const entityHandle = this.normalizeRequiredString(dto.entityHandle);
@@ -354,10 +390,18 @@ export class ImportService {
       throw new NotFoundException('import.sourceNotFound');
     }
 
-    const handle =
-      typeof dto.handle === 'number' && Number.isFinite(dto.handle)
-        ? Math.trunc(dto.handle)
-        : null;
+    const existingByTitle = await this.em.findOne(ImportTemplateItem, {
+      source: { handle: sourceHandle },
+      targetEntity: { handle: entityHandle },
+      title,
+    });
+    if (
+      existingByTitle &&
+      (handle == null || existingByTitle.handle !== handle)
+    ) {
+      throw new ConflictException('import.templateAlreadyExists');
+    }
+
     const template = handle
       ? await this.em.findOne(
           ImportTemplateItem,
@@ -382,6 +426,7 @@ export class ImportService {
     template.isActive = dto.isActive ?? true;
     template.mapping = {
       mappings: dto.mappings ?? [],
+      fieldDefaults: dto.fieldDefaults ?? [],
       relationMappings: dto.relationMappings ?? [],
     };
     template.externalKeyColumns = this.normalizeColumns(dto.keyColumns ?? []);
@@ -438,7 +483,10 @@ export class ImportService {
       throw new BadRequestException('import.headerRequired');
     }
 
-    const template = this.templateService.getEntityTemplate(entityHandle);
+    const template = await this.genericCustomFieldService.appendCustomFieldTemplates(
+      entityHandle,
+      this.templateService.getEntityTemplate(entityHandle),
+    );
     const importableFields = this.getImportableFields(template);
     const sampleRows = this.limitAiSampleRows(
       batch.sampleRows ?? [],
@@ -1112,6 +1160,7 @@ export class ImportService {
       rawData,
       dto.relationMappings ?? [],
     );
+    this.applyFieldDefaults(template, payload, dto.fieldDefaults ?? []);
     await this.applyGenericReferenceMapping(
       template,
       payload,
@@ -1120,8 +1169,31 @@ export class ImportService {
       dto.genericReferenceMapping ?? null,
     );
     this.applyCurrentPersonDefaults(template, payload, currentUser);
+    this.genericCustomFieldService.collectCustomFieldsFromFlatPayload(payload);
 
     return payload;
+  }
+
+  private applyFieldDefaults(
+    template: EntityTemplateDto[],
+    payload: Record<string, unknown>,
+    defaults: ImportFieldDefaultDto[],
+  ): void {
+    for (const fieldDefault of defaults) {
+      const targetField = this.normalizeOptionalString(
+        fieldDefault.targetField,
+      );
+      if (!targetField || !template.some((field) => field.name === targetField)) {
+        continue;
+      }
+
+      const currentValue = payload[targetField];
+      if (currentValue != null && this.normalizeScalarString(currentValue)) {
+        continue;
+      }
+
+      payload[targetField] = fieldDefault.value;
+    }
   }
 
   private applyCurrentPersonDefaults(
@@ -1479,6 +1551,9 @@ export class ImportService {
 
     const missingField = template.find((field) => {
       if (!field.isRequired || field.name === 'handle') {
+        return false;
+      }
+      if (field.name.startsWith('customFields.') || field.customField) {
         return false;
       }
 

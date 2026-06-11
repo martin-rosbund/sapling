@@ -573,6 +573,8 @@ const rendererOptions: Array<{ title: string; value: SaplingFormRenderer }> = [
   { title: 'Percent', value: 'percent' },
   { title: 'Color', value: 'color' },
   { title: 'Icon', value: 'icon' },
+  { title: 'Select', value: 'select' },
+  { title: 'Multi select', value: 'multiSelect' },
 ]
 
 const previewModeOptions = computed<Array<{ title: string; value: PreviewMode; icon: string }>>(
@@ -869,7 +871,7 @@ function buildFieldRows(configFields: SaplingFormConfigPayload['fields']): void 
         name: template.name,
         type: template.type,
         visible,
-        label: fieldConfig.label ?? '',
+        label: fieldConfig.label ?? getTemplateDefaultLabel(template),
         group: fieldConfig.group ?? template.formGroup ?? '',
         order: fieldConfig.order ?? template.formOrder ?? index + 1,
         width: fieldConfig.width ?? template.formWidth ?? getDialogTemplateWidth(template),
@@ -1060,6 +1062,16 @@ function resolveFieldLabel(fieldName: string): string {
 
   const key = `${selectedEntityHandle.value}.${fieldName}`
   return te(key) ? t(key) : fieldName
+}
+
+function getTemplateDefaultLabel(template: EntityTemplate): string {
+  const configuredLabel = template.formConfig?.label?.trim()
+  if (configuredLabel) {
+    return configuredLabel
+  }
+
+  const key = `${selectedEntityHandle.value}.${template.name}`
+  return te(key) ? t(key) : ''
 }
 
 function translateGroup(groupKey: string): string {

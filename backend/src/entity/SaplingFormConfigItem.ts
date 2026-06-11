@@ -32,6 +32,7 @@ export interface SaplingFormConfigPayload {
       validation?: unknown[];
       condition?: Record<string, unknown> | null;
       referenceFilter?: Record<string, unknown> | null;
+      metadata?: Record<string, unknown> | null;
     }
   >;
   groups?: Record<string, unknown>;

@@ -128,6 +128,8 @@ Rules:
 - Do not send autoincrement primary keys.
 - Required fields come from template metadata.
 - Relation fields can usually be sent as handles or relation-like values accepted by the payload service.
+- Custom fields can be sent in a nested `customFields` object, for example
+  `{ "customFields": { "externalCompanyName": "Acme GmbH" } }`.
 - Security/system/read-only fields may be ignored or rejected depending on metadata.
 
 ## Update
@@ -143,8 +145,40 @@ The generic mutation service handles:
 - scalar fields
 - many-to-one references
 - nullable relations
+- custom fields in `customFields`
 - special payload normalization
 - change log creation
+
+## Custom Fields
+
+Sapling supports generic custom fields through `customFieldDefinition`,
+`customFieldType`, and `customFieldValue` records. Active definitions are
+appended to entity template metadata as fields named `customFields.<fieldKey>`,
+and read responses include both a nested `customFields` object and flattened
+preview values for generated tables.
+
+Supported first-pass custom field types are seeded as reference records in
+`customFieldType`:
+
+```text
+text
+longText
+number
+boolean
+date
+dateTime
+select
+multiSelect
+```
+
+Filters can target custom fields with dotted paths, for example:
+
+```json
+{ "customFields.externalCompanyName": { "$ilike": "%Acme%" } }
+```
+
+Backend sorting on custom fields is intentionally ignored for now; tables can
+still display hydrated values.
 
 ## Delete
 

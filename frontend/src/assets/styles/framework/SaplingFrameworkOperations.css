@@ -712,7 +712,7 @@
 
 .sapling-import__mapping-row {
   display: grid;
-  grid-template-columns: minmax(160px, 0.8fr) minmax(180px, 1.2fr) auto;
+  grid-template-columns: minmax(9rem, 0.9fr) minmax(8.5rem, 1fr) minmax(8.5rem, 1fr) auto;
   gap: 12px;
   align-items: center;
 }
@@ -728,6 +728,19 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.sapling-import__value-mapping-action {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.sapling-import__relation-mapping-controls {
+  display: grid;
+  grid-column: 2 / -1;
+  grid-template-columns: minmax(8.5rem, 1fr) minmax(8.5rem, 1fr);
+  gap: 12px;
+  min-width: 0;
 }
 
 .sapling-import__actions,
@@ -842,14 +855,6 @@
     grid-template-columns: 1fr;
   }
 
-  .sapling-import__mapping-row {
-    grid-template-columns: 1fr auto;
-  }
-
-  .sapling-import__mapping-label {
-    grid-column: 1 / -1;
-  }
-
   .sapling-system-layout,
   .sapling-system-skeleton__sections {
     grid-template-columns: 1fr;
@@ -857,6 +862,25 @@
 
   .sapling-system-skeleton__metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .sapling-import__mapping-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sapling-import__value-mapping-action {
+    justify-content: flex-start;
+  }
+
+  .sapling-import__mapping-label,
+  .sapling-import__relation-mapping-controls {
+    grid-column: 1 / -1;
+  }
+
+  .sapling-import__relation-mapping-controls {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

@@ -34,6 +34,7 @@ frontend/src/components/system/ai-chat/SaplingAiChatConversation.vue
 and one target entity:
 
 - field mappings
+- field defaults for required values that are not present in the source file
 - value mappings
 - external key columns
 - relation mapping metadata
@@ -82,17 +83,21 @@ generic target types.
 4. Load an existing import template or map CSV columns to Sapling fields.
 5. Optionally configure value mappings for mapped fields, for example `1`
    from the file becomes status `5` or a referenced Sapling record handle.
-6. Optionally ask the AI to suggest a configuration. The backend sends only
+6. Optionally configure defaults for fields that are required in Sapling but
+   not present in the file, for example a default country or status.
+7. Optionally ask the AI to suggest a configuration. The backend sends only
    CSV headers, a few sample rows, target entity metadata, reference
    candidates, and matching templates to the configured chat model. The
    returned suggestion is normalized server-side and then applied in the UI as
    an editable proposal.
-7. Optionally choose one or more external key columns.
-8. Save the current mapping as an import template for later batches.
-9. Optionally configure a generic target reference for entities such as
+8. Optionally choose one or more external key columns.
+9. Save the current mapping as an import template for later batches.
+10. Optionally configure relation mappings by handle, by displayed value, or
+    by external key links from previous imports.
+11. Optionally configure a generic target reference for entities such as
    `information` that use `entity + reference`.
-10. Validate the batch.
-11. Execute the batch.
+12. Validate the batch.
+13. Execute the batch.
 
 Value mappings are stored as `ImportTemplateValueMappingItem` rows for reusable
 templates and are also copied into the batch `mapping` JSON when a batch is
@@ -102,6 +107,20 @@ execution, so users can inspect the Sapling preview before anything is written.
 
 During execution, rows with an existing external record link update the linked
 Sapling record. Rows without a link create a new record and store the link.
+
+Relation mappings with mode `externalKey` resolve target references through
+`ExternalRecordLinkItem`. This supports staged imports such as importing
+companies first and then importing persons whose company column contains the
+same external company key. The lookup uses:
+
+```text
+source system + referenced entity + configured key columns -> Sapling handle
+```
+
+Import templates are created through `POST /api/import/templates` and updated
+through `PATCH /api/import/templates/:handle`. Re-saving an existing template
+must keep using its returned handle so the backend updates instead of trying to
+insert another row with the same source/entity/title uniqueness key.
 
 ## AI Chat Import Agent
 
@@ -151,7 +170,6 @@ extensions should add to the batch configuration shape instead of replacing it:
 - XLSX parsing
 - fuzzy reference matching
 - multi-file imports
-- relation mappings by external keys
 - staged imports with explicit publish/rollback behavior
 - richer document binary ingestion
 

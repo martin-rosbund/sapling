@@ -2,6 +2,10 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue'
 import { useRoute } from 'vue-router'
 import ApiGenericService from '@/services/api.generic.service'
+import ApiFormConfigService, {
+  type SaplingFormConfigItem,
+} from '@/services/api.form-config.service'
+import ApiService from '@/services/api.service'
 import { i18n } from '@/i18n'
 import type {
   ColumnFilterItem,
@@ -23,6 +27,12 @@ import {
   getReadableReferenceRelationNames,
   getTableHeaders,
 } from '@/utils/saplingTableUtil'
+import {
+  applyFormConfigOverlay,
+  getDefaultFormConfigHandle,
+  type FormConfigMenuItem,
+  type FormConfigSelectionHandle,
+} from '@/composables/dialog/saplingDialogEdit.utils'
 // #endregion
 
 const TABLE_LOAD_DEBOUNCE_MS = 250
@@ -54,6 +64,10 @@ export function useSaplingTable(
   const parentFilter = ref<Record<string, unknown>>({})
   const isResettingEntityState = ref(false)
   const isInitialized = ref(false)
+  const systemTemplates = ref<EntityTemplate[]>([])
+  const formConfigs = ref<SaplingFormConfigItem[]>([])
+  const selectedFormConfigHandle = ref<FormConfigSelectionHandle>(null)
+  const isLoadingFormConfigs = ref(false)
 
   const route = useRoute()
   const currentPermissionStore = useCurrentPermissionStore()
@@ -69,8 +83,47 @@ export function useSaplingTable(
   const entityPermission = computed(
     () => genericStore.getState(entityHandle.value).entityPermission,
   )
-  const entityTemplates = computed(() => genericStore.getState(entityHandle.value).entityTemplates)
+  const baseTemplates = computed(() =>
+    systemTemplates.value.length > 0
+      ? systemTemplates.value
+      : genericStore.getState(entityHandle.value).entityTemplates,
+  )
+  const selectedFormConfig = computed(
+    () =>
+      formConfigs.value.find(
+        (config) =>
+          typeof config.handle === 'number' && config.handle === selectedFormConfigHandle.value,
+      ) ?? null,
+  )
+  const entityTemplates = computed(() =>
+    applyFormConfigOverlay(baseTemplates.value, selectedFormConfig.value?.config ?? null),
+  )
   const isLoading = computed(() => genericStore.getState(entityHandle.value).isLoading)
+  const formConfigMenuItems = computed<FormConfigMenuItem[]>(() => {
+    const selectableConfigs = formConfigs.value.filter(
+      (config) => config.isActive !== false && typeof config.handle === 'number',
+    )
+
+    if (selectableConfigs.length === 0) {
+      return []
+    }
+
+    return [
+      {
+        handle: null,
+        title: i18n.global.t('formConfig.defaultView'),
+        icon: 'mdi-view-dashboard-outline',
+        active: selectedFormConfigHandle.value === null,
+      },
+      ...selectableConfigs.map((config) => ({
+        handle: config.handle ?? null,
+        title: config.name,
+        icon: config.isDefault ? 'mdi-table-star' : 'mdi-table-cog',
+        active: selectedFormConfigHandle.value === config.handle,
+      })),
+    ]
+  })
+  const selectedFormConfigLabel = computed(() => selectedFormConfig.value?.name ?? '')
   const readableReferenceRelations = computed(() =>
     getReadableReferenceRelationNames(
       entityTemplates.value,
@@ -281,11 +334,10 @@ export function useSaplingTable(
   }
 
   function generateHeaders(nextEntityHandle = entityHandle.value) {
-    const nextEntityTemplates = genericStore.getState(nextEntityHandle).entityTemplates
     const nextEntity = genericStore.getState(nextEntityHandle).entity
 
     headers.value = getTableHeaders(
-      nextEntityTemplates,
+      entityTemplates.value,
       nextEntity,
       i18n.global.t,
       currentPermissionStore.accumulatedPermission ?? [],
@@ -313,6 +365,41 @@ export function useSaplingTable(
       removeRestoredColumnFiltersFromFilterQuery(nextEntityTemplates, urlFilter) ?? {}
   }
 
+  function selectDefaultFormConfig(): void {
+    selectedFormConfigHandle.value = getDefaultFormConfigHandle(formConfigs.value)
+  }
+
+  async function loadFormConfigContext(nextEntityHandle: string): Promise<void> {
+    if (!nextEntityHandle) {
+      systemTemplates.value = []
+      formConfigs.value = []
+      selectedFormConfigHandle.value = null
+      return
+    }
+
+    isLoadingFormConfigs.value = true
+
+    try {
+      const [templates, configs] = await Promise.all([
+        ApiService.findAll<EntityTemplate[]>(`template/${nextEntityHandle}`),
+        ApiFormConfigService.list(nextEntityHandle),
+      ])
+      systemTemplates.value = templates
+      formConfigs.value = configs
+      selectDefaultFormConfig()
+    } catch {
+      systemTemplates.value = []
+      formConfigs.value = []
+      selectedFormConfigHandle.value = null
+    } finally {
+      isLoadingFormConfigs.value = false
+    }
+  }
+
+  function selectFormConfig(handle: FormConfigSelectionHandle): void {
+    selectedFormConfigHandle.value = handle
+  }
+
   async function initializeEntityState(options?: InitializeEntityStateOptions) {
     const currentEntityHandle = entityHandle.value
     const initializationId = ++latestInitializationId
@@ -336,6 +423,7 @@ export function useSaplingTable(
       await Promise.all([
         genericStore.loadGeneric(currentEntityHandle, 'global', 'filter', 'exception'),
         currentPermissionStore.fetchCurrentPermission(),
+        loadFormConfigContext(currentEntityHandle),
       ])
 
       if (
@@ -345,7 +433,7 @@ export function useSaplingTable(
         return
       }
 
-      const nextEntityTemplates = genericStore.getState(currentEntityHandle).entityTemplates
+      const nextEntityTemplates = entityTemplates.value
       generateHeaders(currentEntityHandle)
       initialSort(nextEntityTemplates)
       restoreQueryFilterState(nextEntityTemplates)
@@ -419,6 +507,19 @@ export function useSaplingTable(
 
     void initializeEntityState()
   })
+
+  watch(
+    () => selectedFormConfigHandle.value,
+    () => {
+      if (isResettingEntityState.value || !isInitialized.value) {
+        return
+      }
+
+      generateHeaders()
+      page.value = 1
+      scheduleLoadData()
+    },
+  )
   // #endregion
 
   // #region URL Sync
@@ -536,6 +637,10 @@ export function useSaplingTable(
     activeFilter,
     entity,
     entityPermission,
+    formConfigMenuItems,
+    selectedFormConfigLabel,
+    selectedFormConfigHandle,
+    isLoadingFormConfigs,
     parentFilter,
     isInitialized,
     initializeEntityState,
@@ -545,6 +650,7 @@ export function useSaplingTable(
     onItemsPerPageUpdate,
     onColumnFiltersUpdate,
     onSortByUpdate,
+    selectFormConfig,
     generateHeaders,
     initialSort,
   }

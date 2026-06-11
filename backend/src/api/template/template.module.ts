@@ -3,6 +3,7 @@ import { TemplateController } from './template.controller';
 import { MessageTemplateService } from './message-template.service';
 import { TemplateService } from './template.service';
 import { AuthModule } from '../../auth/auth.module';
+import { GenericCustomFieldService } from '../generic/generic-custom-field.service';
 
 /**
  * @class
@@ -18,7 +19,7 @@ import { AuthModule } from '../../auth/auth.module';
 @Module({
   imports: [forwardRef(() => AuthModule)],
   controllers: [TemplateController],
-  providers: [TemplateService, MessageTemplateService],
+  providers: [TemplateService, MessageTemplateService, GenericCustomFieldService],
   exports: [TemplateService, MessageTemplateService],
 })
 export class TemplateModule {}

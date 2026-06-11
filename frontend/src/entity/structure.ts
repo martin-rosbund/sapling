@@ -76,6 +76,8 @@ export type SaplingFormRenderer =
   | 'percent'
   | 'color'
   | 'icon'
+  | 'select'
+  | 'multiSelect'
 
 export interface SaplingFormFieldConfig {
   visible?: boolean
@@ -97,6 +99,7 @@ export interface SaplingFormFieldConfig {
   validation?: unknown[]
   condition?: Record<string, unknown> | null
   referenceFilter?: Record<string, unknown> | null
+  metadata?: Record<string, unknown> | null
 }
 
 export interface SaplingFormConfigPayload {
@@ -128,6 +131,12 @@ export interface EntityTemplateReferenceTemplateMapping {
 
 export interface EntityTemplateReferenceTemplate {
   mappings: EntityTemplateReferenceTemplateMapping[]
+}
+
+export interface EntityTemplateCustomField {
+  key: string
+  type: 'text' | 'longText' | 'number' | 'boolean' | 'date' | 'dateTime' | 'select' | 'multiSelect'
+  options?: Array<{ label: string; value: string }>
 }
 
 export type DialogState = 'create' | 'edit' | 'readonly'
@@ -211,6 +220,8 @@ export interface EntityTemplate {
   genericReference?: EntityTemplateGenericReference | null
   /** Declarative metadata for applying values from selected reference records */
   referenceTemplate?: EntityTemplateReferenceTemplate | null
+  /** Dynamic custom field metadata */
+  customField?: EntityTemplateCustomField | null
 }
 
 export type AccumulatedPermission = {

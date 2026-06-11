@@ -24,6 +24,9 @@
           <slot name="meta" />
         </div>
       </div>
+      <div v-if="$slots.actions" class="sapling-dialog-edit-hero__actions">
+        <slot name="actions" />
+      </div>
     </template>
   </section>
 </template>

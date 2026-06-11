@@ -1,0 +1,17 @@
+[
+  {
+    "handle": "sage100",
+    "title": "Sage 100",
+    "isActive": true
+  },
+  {
+    "handle": "ixis",
+    "title": "IXIS",
+    "isActive": true
+  },
+  {
+    "handle": "sapling",
+    "title": "Sapling",
+    "isActive": true
+  }
+]

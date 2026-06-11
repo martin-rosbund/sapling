@@ -117,6 +117,14 @@ Selection examples:
 
 If a new field behavior is generally useful, add a Sapling option and renderer branch rather than special-casing one entity.
 
+Active custom field definitions are appended to the same template metadata as
+generated fields named `customFields.<fieldKey>`. The edit dialog renders the
+supported primitive/select custom field types with the normal field renderer
+pipeline and saves them back as a nested `customFields` payload. The definition
+itself selects its type through the `customFieldType` reference entity, so users
+choose from seeded type records instead of entering raw type strings. Generic
+table rows receive flattened hydrated values for display.
+
 Markdown fields can reference stored Sapling documents without new upload logic.
 Use `sapling-document:<handle>` as a normal markdown link or image URL, or embed
 media inline with `{{sapling-image:123|Screenshot}}`,

@@ -49,6 +49,17 @@ export class EntityItem {
    */
   @ApiProperty()
   @Sapling(['isValue', 'isOrderASC', 'isEntity'])
+  @SaplingForm({
+    order: 50,
+    group: 'entity.groupAppearance',
+    groupOrder: 100,
+    width: 1,
+    visible: true,
+    tableOrder: 50,
+    tableVisible: true,
+    mobileOrder: 50,
+    mobileVisible: true,
+  })
   @Property({ primary: true, length: 64 })
   handle!: string;
 

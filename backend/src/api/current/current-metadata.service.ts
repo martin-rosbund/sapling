@@ -6,6 +6,7 @@ import { TemplateService } from '../template/template.service';
 import { CurrentService } from './current.service';
 import { CurrentEntityMetadataDto } from './dto/current-entity-metadata.dto';
 import { FormConfigService } from '../form-config/form-config.service';
+import { GenericCustomFieldService } from '../generic/generic-custom-field.service';
 
 /**
  * Loads batched entity metadata required by generic frontend workspaces.
@@ -18,6 +19,7 @@ export class CurrentMetadataService {
     private readonly templateService: TemplateService,
     private readonly currentService: CurrentService,
     private readonly formConfigService: FormConfigService,
+    private readonly genericCustomFieldService: GenericCustomFieldService,
   ) {}
   //#endregion
 
@@ -46,7 +48,10 @@ export class CurrentMetadataService {
   ): Promise<CurrentEntityMetadataDto> {
     const [entity, baseTemplates] = await Promise.all([
       this.em.findOne(EntityItem, { handle: entityHandle }),
-      Promise.resolve(this.templateService.getEntityTemplate(entityHandle)),
+      this.genericCustomFieldService.appendCustomFieldTemplates(
+        entityHandle,
+        this.templateService.getEntityTemplate(entityHandle),
+      ),
     ]);
     const entityTemplates = await this.formConfigService.getEffectiveTemplate(
       entityHandle,

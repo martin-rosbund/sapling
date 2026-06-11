@@ -14,6 +14,9 @@
     :entity-templates="entityTemplates"
     :entity="entity"
     :entity-permission="entityPermission"
+    :form-config-menu-items="formConfigMenuItems"
+    :selected-form-config-label="selectedFormConfigLabel"
+    :is-loading-form-configs="isLoadingFormConfigs"
     :show-actions="true"
     :multi-select="true"
     :show-favorite="true"
@@ -24,6 +27,7 @@
     @update:sort-by="onSortByUpdate"
     @update:column-filters="onColumnFiltersUpdate"
     @update:search="onSearchUpdate"
+    @select-form-config="selectFormConfig"
     @reload="loadData"
   />
 </template>
@@ -53,11 +57,15 @@ const {
   entityTemplates,
   entity,
   entityPermission,
+  formConfigMenuItems,
+  selectedFormConfigLabel,
+  isLoadingFormConfigs,
   loadData,
   onSearchUpdate,
   onPageUpdate,
   onItemsPerPageUpdate,
   onColumnFiltersUpdate,
   onSortByUpdate,
+  selectFormConfig,
 } = useSaplingTable(entityHandle, DEFAULT_PAGE_SIZE_MEDIUM, true)
 </script>
