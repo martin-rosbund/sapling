@@ -7,12 +7,15 @@ import { CurrentModule } from '../current/current.module';
 import { TemplateModule } from '../template/template.module';
 import { AiService } from './ai.service';
 import { AiChatRuntimeService } from './ai-chat-runtime.service';
+import { AiAgentPolicyService } from './ai-agent-policy.service';
 import { AiProviderRegistryService } from './ai-provider-registry.service';
 import { AiVectorService } from './ai-vector.service';
 import { AiController } from './ai.controller';
+import { AiAgentItem } from '../../entity/AiAgentItem';
 import { AiChatSessionItem } from '../../entity/AiChatSessionItem';
 import { AiChatMessageItem } from '../../entity/AiChatMessageItem';
 import { AiChatTranscriptionItem } from '../../entity/AiChatTranscriptionItem';
+import { AiChatToolActionItem } from '../../entity/AiChatToolActionItem';
 import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
 import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import { McpServerConfigItem } from '../../entity/McpServerConfigItem';
@@ -41,6 +44,8 @@ import { SaplingMcpPermissionService } from './sapling-mcp-permission.service';
       AiChatSessionItem,
       AiChatMessageItem,
       AiChatTranscriptionItem,
+      AiChatToolActionItem,
+      AiAgentItem,
       AiProviderTypeItem,
       AiProviderModelItem,
       AiVectorDocumentItem,
@@ -50,6 +55,7 @@ import { SaplingMcpPermissionService } from './sapling-mcp-permission.service';
   providers: [
     AiService,
     AiChatRuntimeService,
+    AiAgentPolicyService,
     AiProviderRegistryService,
     AiVectorService,
     McpService,

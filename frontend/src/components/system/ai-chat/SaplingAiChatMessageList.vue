@@ -46,6 +46,49 @@
         <SaplingMarkdownContent :source="getMessageDisplayContent(message)" />
       </div>
       <div
+        v-if="getMessageToolActions(message).length > 0"
+        class="sapling-stack-sm sapling-ai-chat__tool-actions"
+      >
+        <div
+          v-for="action in getMessageToolActions(message)"
+          :key="action.handle ?? `${action.serverName}.${action.toolName}`"
+          class="sapling-ai-chat__tool-action"
+        >
+          <div class="sapling-row-between-md sapling-ai-chat__tool-action-header">
+            <div class="sapling-stack-xs">
+              <strong>{{ t('aiChat.toolActionTitle') }}</strong>
+              <span>{{ action.serverName }}.{{ action.toolName }}</span>
+            </div>
+            <v-chip size="small" variant="tonal">{{ getToolActionStatusLabel(action) }}</v-chip>
+          </div>
+          <pre class="sapling-ai-chat__tool-action-arguments">{{
+            formatToolActionArguments(action)
+          }}</pre>
+          <div
+            v-if="action.status === 'pending'"
+            class="sapling-row-xs sapling-ai-chat__tool-action-actions"
+          >
+            <v-btn
+              size="small"
+              color="primary"
+              variant="tonal"
+              prepend-icon="mdi-check"
+              @click="emit('confirm-tool-action', action)"
+            >
+              {{ t('aiChat.confirmToolAction') }}
+            </v-btn>
+            <v-btn
+              size="small"
+              variant="text"
+              prepend-icon="mdi-close"
+              @click="emit('reject-tool-action', action)"
+            >
+              {{ t('aiChat.rejectToolAction') }}
+            </v-btn>
+          </div>
+        </div>
+      </div>
+      <div
         v-if="shouldShowMessageActions(message)"
         class="sapling-chip-row sapling-chat-message__actions sapling-ai-chat__message-links"
       >
@@ -79,7 +122,7 @@ import { nextTick, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import SaplingMarkdownContent from '@/components/common/SaplingMarkdownContent.vue'
-import type { AiChatMessageItem } from '@/entity/entity'
+import type { AiChatMessageItem, AiChatToolActionItem } from '@/entity/entity'
 
 interface ChatNavigationLink {
   path: string
@@ -103,6 +146,8 @@ const emit = defineEmits<{
   (event: 'close'): void
   (event: 'load-older-messages'): void
   (event: 'toggle-message-speech', message: AiChatMessageItem): void
+  (event: 'confirm-tool-action', action: AiChatToolActionItem): void
+  (event: 'reject-tool-action', action: AiChatToolActionItem): void
 }>()
 
 const { t, te } = useI18n()
@@ -116,6 +161,37 @@ function getLastItem<T>(items: readonly T[]): T | undefined {
 
 function shouldShowMessageActions(message: AiChatMessageItem) {
   return canPlayMessageSpeech(message) || getMessageNavigationLinks(message).length > 0
+}
+
+function getMessageToolActions(message: AiChatMessageItem): AiChatToolActionItem[] {
+  const responsePayload =
+    message.responsePayload && typeof message.responsePayload === 'object'
+      ? (message.responsePayload as Record<string, unknown>)
+      : null
+  const pendingActions = responsePayload?.pendingToolActions
+
+  return Array.isArray(pendingActions) ? pendingActions.filter(isToolAction) : []
+}
+
+function isToolAction(value: unknown): value is AiChatToolActionItem {
+  return (
+    !!value &&
+    typeof value === 'object' &&
+    typeof (value as { serverName?: unknown }).serverName === 'string' &&
+    typeof (value as { toolName?: unknown }).toolName === 'string' &&
+    typeof (value as { status?: unknown }).status === 'string'
+  )
+}
+
+function getToolActionStatusLabel(action: AiChatToolActionItem) {
+  const key = `aiChat.toolActionStatus.${action.status}`
+  return te(key) ? t(key) : action.status
+}
+
+function formatToolActionArguments(action: AiChatToolActionItem) {
+  const args = action.arguments ?? {}
+  const text = JSON.stringify(args, null, 2)
+  return text.length > 800 ? `${text.slice(0, 797)}...` : text
 }
 
 function canPlayMessageSpeech(message: AiChatMessageItem) {

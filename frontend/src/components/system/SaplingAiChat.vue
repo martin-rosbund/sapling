@@ -1,6 +1,6 @@
 <template>
   <Teleport to="body">
-    <div class="sapling-overlay-shell sapling-ai-chat-shell">
+    <div class="sapling-overlay-shell">
       <v-btn
         v-if="hasSaplingAiChatAccess && !isOpen"
         class="sapling-ai-chat-fab"
@@ -17,7 +17,7 @@
 
       <div
         v-if="isOpen && hasSaplingAiChatAccess"
-        class="sapling-overlay-backdrop sapling-ai-chat__backdrop"
+        class="sapling-overlay-backdrop"
         @click="closePanel"
       ></div>
 
@@ -71,6 +71,9 @@
 
               <SaplingAiChatConversation
                 :active-conversation-title="activeConversationTitle"
+                :agent-options="agentOptions"
+                :selected-agent-handle="selectedAgentHandle"
+                :is-agent-locked="!!activeSession?.handle"
                 :has-configured-providers="hasConfiguredProviders"
                 :has-configured-transcription-providers="hasConfiguredTranscriptionProviders"
                 :can-send-message="canSendMessage"
@@ -89,9 +92,12 @@
                 :speech-state-by-handle="speechStateByHandle"
                 :title-preview-limit="TITLE_PREVIEW_LIMIT"
                 @update:draft-message="updateDraftMessage"
+                @update:selected-agent="updateSelectedAgent"
                 @close="closePanel"
                 @load-older-messages="loadOlderMessages"
                 @toggle-message-speech="toggleMessageSpeech"
+                @confirm-tool-action="confirmToolAction"
+                @reject-tool-action="rejectToolAction"
                 @toggle-voice-input="toggleVoiceInput"
                 @send="sendMessage"
               />
@@ -108,7 +114,13 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
-import type { AiChatSessionItem, AiProviderModelItem, AiProviderTypeItem } from '@/entity/entity'
+import type {
+  AiAgentItem,
+  AiChatSessionItem,
+  AiChatToolActionItem,
+  AiProviderModelItem,
+  AiProviderTypeItem,
+} from '@/entity/entity'
 import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingSongbirdIcon from '@/components/common/SaplingSongbirdIcon.vue'
 import SaplingAiChatConversation from '@/components/system/ai-chat/SaplingAiChatConversation.vue'
@@ -169,6 +181,7 @@ const {
 const includeArchived = ref(false)
 const isLoadingProviders = ref(false)
 const isLoadingModels = ref(false)
+const isLoadingAgents = ref(false)
 const isLoadingTranscriptionProviders = ref(false)
 const isLoadingTranscriptionModels = ref(false)
 const isLoadingSpeechProviders = ref(false)
@@ -178,6 +191,7 @@ const isLoadingMessages = ref(false)
 const isSending = ref(false)
 const providerConfigs = ref<AiProviderTypeItem[]>([])
 const modelConfigs = ref<AiProviderModelItem[]>([])
+const agentConfigs = ref<AiAgentItem[]>([])
 const transcriptionProviderConfigs = ref<AiProviderTypeItem[]>([])
 const transcriptionModelConfigs = ref<AiProviderModelItem[]>([])
 const speechProviderConfigs = ref<AiProviderTypeItem[]>([])
@@ -186,6 +200,7 @@ const sessions = ref<AiChatSessionItem[]>([])
 const activeSession = ref<AiChatSessionItem | null>(null)
 const selectedProviderHandle = ref<string | null>(storedAiPreferences.chatProviderHandle)
 const selectedModelHandle = ref<string | null>(storedAiPreferences.chatModelHandle)
+const selectedAgentHandle = ref<string | null>(null)
 const selectedTranscriptionProviderHandle = ref<string | null>(
   storedAiPreferences.transcriptionProviderHandle,
 )
@@ -237,6 +252,7 @@ const isBusy = computed(
   () =>
     isLoadingProviders.value ||
     isLoadingModels.value ||
+    isLoadingAgents.value ||
     isLoadingSessions.value ||
     isLoadingMessages.value ||
     isSending.value,
@@ -287,6 +303,13 @@ const isVoiceOutputAvailable = computed(
 
 const activeConversationTitle = computed(
   () => activeSession.value?.title || t('aiChat.draftConversation'),
+)
+
+const agentOptions = computed(() =>
+  agentConfigs.value.map((agent) => ({
+    label: agent.title,
+    value: agent.handle,
+  })),
 )
 
 const {
@@ -469,6 +492,7 @@ async function ensureChatInitialized() {
       loadTranslations(),
       loadProviders(),
       loadModels(),
+      loadAgents(),
       loadTranscriptionProviders(),
       loadTranscriptionModels(),
       loadSpeechProviders(),
@@ -486,6 +510,18 @@ async function ensureChatInitialized() {
     await initializationPromise
   } finally {
     initializationPromise = null
+  }
+}
+
+async function loadAgents() {
+  isLoadingAgents.value = true
+
+  try {
+    agentConfigs.value = await ApiAiService.listAgents()
+    syncSelectedAgent()
+    syncSelectedRuntimeTarget()
+  } finally {
+    isLoadingAgents.value = false
   }
 }
 
@@ -568,6 +604,7 @@ async function reloadSessions() {
       activeSession.value = matchedSession ?? null
 
       if (matchedSession) {
+        syncSelectedAgent()
         await loadMessages(matchedSession.handle)
       } else {
         messages.value = []
@@ -642,6 +679,7 @@ async function selectSession(session: AiChatSessionItem) {
   cancelVoiceInput()
   stopSpeechPlayback()
   activeSession.value = session
+  selectedAgentHandle.value = getAgentHandle(session.agent)
   activeTranscriptionHandle.value = null
   editingSessionHandle.value = null
   isOpen.value = true
@@ -662,6 +700,7 @@ function startNewChat() {
   activeTranscriptionHandle.value = null
   editingSessionHandle.value = null
   isOpen.value = true
+  syncSelectedAgent()
   syncSelectedRuntimeTarget()
 
   if (isMobileLayout.value) {
@@ -692,6 +731,15 @@ function updateDraftMessage(value: string) {
   if (!value.trim()) {
     activeTranscriptionHandle.value = null
   }
+}
+
+function updateSelectedAgent(value: string) {
+  if (activeSession.value?.handle) {
+    return
+  }
+
+  selectedAgentHandle.value = value || null
+  syncSelectedRuntimeTarget()
 }
 
 function beginRename(session: AiChatSessionItem) {
@@ -777,6 +825,7 @@ async function sendMessage() {
         pageTitle: document.title || undefined,
         providerHandle: selectedProviderHandle.value ?? undefined,
         modelHandle: selectedModelHandle.value ?? undefined,
+        agentHandle: selectedAgentHandle.value ?? undefined,
         transcriptionHandle: activeTranscriptionHandle.value ?? undefined,
         contextPayload: {
           params: route.params,
@@ -1110,10 +1159,69 @@ function handleStreamEvent(event: AiChatStreamEvent) {
         appendMessageDelta(event.handle, event.delta ?? '')
       }
       break
+    case 'tool.action.pending':
+      if (event.action) {
+        upsertToolAction(event.action)
+      }
+      break
     case 'error':
       handleChatRequestFailure(event.messageText ?? event.type)
       break
   }
+}
+
+async function confirmToolAction(action: AiChatToolActionItem) {
+  if (!action.handle) {
+    return
+  }
+
+  const updatedAction = await ApiAiService.confirmToolAction(action.handle)
+  upsertToolAction(updatedAction)
+}
+
+async function rejectToolAction(action: AiChatToolActionItem) {
+  if (!action.handle) {
+    return
+  }
+
+  const updatedAction = await ApiAiService.rejectToolAction(action.handle)
+  upsertToolAction(updatedAction)
+}
+
+function upsertToolAction(action: AiChatToolActionItem) {
+  const messageHandle =
+    typeof action.message === 'number'
+      ? action.message
+      : action.message && typeof action.message === 'object'
+        ? action.message.handle
+        : null
+
+  if (!messageHandle) {
+    return
+  }
+
+  const message = messages.value.find((item) => item.handle === messageHandle)
+  if (!message) {
+    return
+  }
+
+  const responsePayload =
+    message.responsePayload && typeof message.responsePayload === 'object'
+      ? { ...(message.responsePayload as Record<string, unknown>) }
+      : {}
+  const existingActions = Array.isArray(responsePayload.pendingToolActions)
+    ? responsePayload.pendingToolActions.filter(isToolAction)
+    : []
+  const actionIndex = existingActions.findIndex((item) => item.handle === action.handle)
+
+  if (actionIndex >= 0) {
+    existingActions.splice(actionIndex, 1, action)
+  } else {
+    existingActions.push(action)
+  }
+
+  responsePayload.pendingToolActions = existingActions
+  message.responsePayload = responsePayload
 }
 
 function replaceSession(session: AiChatSessionItem) {
@@ -1135,16 +1243,54 @@ function replaceSession(session: AiChatSessionItem) {
 function syncSelectedRuntimeTarget() {
   const sessionProviderHandle = getProviderHandle(activeSession.value?.provider)
   const sessionModelHandle = getModelHandle(activeSession.value?.model)
+  const selectedAgent = agentConfigs.value.find(
+    (agent) => agent.handle === selectedAgentHandle.value,
+  )
   const target = resolveRuntimeTarget({
     providerConfigs: providerConfigs.value,
     modelConfigs: modelConfigs.value,
-    requestedProviderHandle: sessionProviderHandle,
-    requestedModelHandle: sessionModelHandle,
+    requestedProviderHandle: sessionProviderHandle ?? getProviderHandle(selectedAgent?.provider),
+    requestedModelHandle: sessionModelHandle ?? getModelHandle(selectedAgent?.model),
     preferredModelHandle: selectedModelHandle.value,
   })
 
   selectedProviderHandle.value = target.providerHandle
   selectedModelHandle.value = target.modelHandle
+}
+
+function syncSelectedAgent() {
+  const sessionAgentHandle = getAgentHandle(activeSession.value?.agent)
+  const availableHandles = new Set(agentConfigs.value.map((agent) => agent.handle))
+
+  if (sessionAgentHandle && availableHandles.has(sessionAgentHandle)) {
+    selectedAgentHandle.value = sessionAgentHandle
+    return
+  }
+
+  if (selectedAgentHandle.value && availableHandles.has(selectedAgentHandle.value)) {
+    return
+  }
+
+  selectedAgentHandle.value =
+    agentConfigs.value.find((agent) => agent.isDefault)?.handle ??
+    agentConfigs.value[0]?.handle ??
+    null
+}
+
+function getAgentHandle(agent?: AiAgentItem | string | null) {
+  if (!agent) {
+    return null
+  }
+
+  return typeof agent === 'string' ? agent : agent.handle
+}
+
+function isToolAction(value: unknown): value is AiChatToolActionItem {
+  return (
+    !!value &&
+    typeof value === 'object' &&
+    typeof (value as { toolName?: unknown }).toolName === 'string'
+  )
 }
 
 function syncSelectedTranscriptionTarget() {

@@ -1,7 +1,9 @@
 import axios from 'axios'
 import type {
+  AiAgentItem,
   AiChatMessageItem,
   AiChatSessionItem,
+  AiChatToolActionItem,
   AiProviderModelItem,
   AiProviderTypeItem,
 } from '@/entity/entity'
@@ -12,6 +14,7 @@ export interface CreateAiChatSessionPayload {
   title?: string
   providerHandle?: string
   modelHandle?: string
+  agentHandle?: string
 }
 
 export interface UpdateAiChatSessionPayload {
@@ -19,6 +22,7 @@ export interface UpdateAiChatSessionPayload {
   isArchived?: boolean
   providerHandle?: string
   modelHandle?: string
+  agentHandle?: string
 }
 
 export interface CreateAiChatMessagePayload {
@@ -30,6 +34,7 @@ export interface CreateAiChatMessagePayload {
   pageTitle?: string
   providerHandle?: string
   modelHandle?: string
+  agentHandle?: string
   transcriptionHandle?: number
   contextPayload?: Record<string, unknown>
   clientCurrentDateTime?: string
@@ -90,9 +95,18 @@ export interface AiChatStreamEvent {
   type: string
   session?: AiChatSessionItem
   message?: AiChatMessageItem
+  action?: AiChatToolActionItem
   handle?: number
   delta?: string
   messageText?: string
+}
+
+export interface AiMcpToolDescriptor {
+  serverHandle: number
+  serverName: string
+  toolName: string
+  description?: string
+  inputSchema?: Record<string, unknown> | null
 }
 
 export interface AiChatMessageListMeta {
@@ -128,6 +142,26 @@ class ApiAiService {
       return response.data
     } catch (error: unknown) {
       this.handleError(error, 'ai.chat.modelListFailed')
+      throw error
+    }
+  }
+
+  static async listAgents(): Promise<AiAgentItem[]> {
+    try {
+      const response = await axios.get<AiAgentItem[]>(`${BACKEND_URL}ai/chat/agents`)
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'ai.chat.agentListFailed')
+      throw error
+    }
+  }
+
+  static async listMcpTools(): Promise<AiMcpToolDescriptor[]> {
+    try {
+      const response = await axios.get<AiMcpToolDescriptor[]>(`${BACKEND_URL}ai/chat/tools`)
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'ai.chat.toolListFailed')
       throw error
     }
   }
@@ -327,6 +361,30 @@ class ApiAiService {
       if (!options?.suppressErrorMessage) {
         this.handleError(error, 'ai.speech.createFailed')
       }
+      throw error
+    }
+  }
+
+  static async confirmToolAction(handle: number): Promise<AiChatToolActionItem> {
+    try {
+      const response = await axios.post<AiChatToolActionItem>(
+        `${BACKEND_URL}ai/chat/tool-actions/${handle}/confirm`,
+      )
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'ai.chat.toolActionConfirmFailed')
+      throw error
+    }
+  }
+
+  static async rejectToolAction(handle: number): Promise<AiChatToolActionItem> {
+    try {
+      const response = await axios.post<AiChatToolActionItem>(
+        `${BACKEND_URL}ai/chat/tool-actions/${handle}/reject`,
+      )
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'ai.chat.toolActionRejectFailed')
       throw error
     }
   }

@@ -46,13 +46,17 @@ export function buildSystemInstruction(options?: {
   user?: PersonItem;
   clientTimeContext?: AiClientTimeContext;
   referenceDate?: Date;
+  agentInstruction?: string | null;
 }): string {
   const referenceDate = options?.referenceDate ?? new Date();
   const toolInstruction = options?.includeToolGuidance
     ? ` ${AI_SYSTEM_PROMPT_TOOL_GUIDANCE} ${AI_SYSTEM_PROMPT_VECTOR_GUIDANCE} ${AI_SYSTEM_PROMPT_KNOWLEDGE_GUIDANCE}`
     : '';
+  const agentInstruction = options?.agentInstruction?.trim()
+    ? ` Agent-specific instructions: ${options.agentInstruction.trim()}`
+    : '';
 
-  return `${AI_SYSTEM_PROMPT_BASE}${toolInstruction} ${buildCurrentDateInstruction(
+  return `${AI_SYSTEM_PROMPT_BASE}${agentInstruction}${toolInstruction} ${buildCurrentDateInstruction(
     referenceDate,
     options?.user,
     options?.clientTimeContext,

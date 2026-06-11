@@ -35,6 +35,13 @@ import {
   buildToolFailureAssistantMessage,
 } from './prompts/ai.prompts';
 
+type AiRuntimeToolExecutor = (
+  entry: AiToolRegistryEntry,
+  args: Record<string, unknown>,
+) => Promise<
+  Awaited<ReturnType<AiChatRuntimeService['executeAutomaticToolCall']>>
+>;
+
 @Injectable()
 export class AiChatRuntimeService {
   constructor(private readonly mcpService: McpService) {}
@@ -49,6 +56,8 @@ export class AiChatRuntimeService {
     clientTimeContext: AiClientTimeContext | undefined,
     onDelta: (delta: string) => Promise<void>,
     supportsTools = true,
+    agentInstruction?: string | null,
+    toolExecutor?: AiRuntimeToolExecutor,
   ): Promise<AiStreamResult> {
     const toolRegistry = supportsTools ? buildToolRegistry(availableTools) : [];
     const messages = this.buildOpenAiMessages(
@@ -56,6 +65,7 @@ export class AiChatRuntimeService {
       user,
       clientTimeContext,
       toolRegistry.length > 0,
+      agentInstruction,
     );
     const executedToolCalls: AiExecutedToolCall[] = [];
 
@@ -99,12 +109,23 @@ export class AiChatRuntimeService {
         }
 
         const args = parseToolArguments(toolCall.function.arguments);
-        const toolExecution = await this.executeAutomaticToolCall(
+        const registryEntry = resolveToolRegistryEntry(
           toolRegistry,
           toolCall.function.name,
-          args,
-          user,
         );
+
+        if (!registryEntry) {
+          throw new Error(`ai.toolNotFound:${toolCall.function.name}`);
+        }
+
+        const toolExecution = toolExecutor
+          ? await toolExecutor(registryEntry, args)
+          : await this.executeAutomaticToolCall(
+              toolRegistry,
+              toolCall.function.name,
+              args,
+              user,
+            );
 
         executedToolCalls.push({
           serverHandle: toolExecution.serverHandle,
@@ -136,6 +157,8 @@ export class AiChatRuntimeService {
     clientTimeContext: AiClientTimeContext | undefined,
     onDelta: (delta: string) => Promise<void>,
     supportsTools = true,
+    agentInstruction?: string | null,
+    toolExecutor?: AiRuntimeToolExecutor,
   ): Promise<AiStreamResult> {
     const toolRegistry = supportsTools ? buildToolRegistry(availableTools) : [];
     const conversation = this.buildGeminiConversation(history);
@@ -154,6 +177,7 @@ export class AiChatRuntimeService {
         user,
         clientTimeContext,
         onDelta,
+        agentInstruction,
       );
     }
 
@@ -172,6 +196,8 @@ export class AiChatRuntimeService {
         maxToolCallIterations,
         clientTimeContext,
         onDelta,
+        agentInstruction,
+        toolExecutor,
       );
     } catch (error) {
       this.logGeminiToolModeError(
@@ -188,6 +214,7 @@ export class AiChatRuntimeService {
         user,
         clientTimeContext,
         onDelta,
+        agentInstruction,
       );
     }
   }
@@ -196,11 +223,13 @@ export class AiChatRuntimeService {
     includeToolGuidance?: boolean;
     user?: PersonItem;
     clientTimeContext?: AiClientTimeContext;
+    agentInstruction?: string | null;
   }): string {
     return buildSystemInstruction({
       includeToolGuidance: options?.includeToolGuidance,
       user: options?.user,
       clientTimeContext: options?.clientTimeContext,
+      agentInstruction: options?.agentInstruction,
       referenceDate: new Date(),
     });
   }
@@ -236,6 +265,8 @@ export class AiChatRuntimeService {
     maxToolCallIterations: number,
     clientTimeContext: AiClientTimeContext | undefined,
     onDelta: (delta: string) => Promise<void>,
+    agentInstruction?: string | null,
+    toolExecutor?: AiRuntimeToolExecutor,
   ): Promise<AiStreamResult> {
     const generativeModel = createGeminiClient(provider).getGenerativeModel({
       model: modelName,
@@ -252,6 +283,7 @@ export class AiChatRuntimeService {
         includeToolGuidance: true,
         user,
         clientTimeContext,
+        agentInstruction,
       }),
     });
 
@@ -289,12 +321,23 @@ export class AiChatRuntimeService {
           return { toolCalls: executedToolCalls };
         }
 
-        const toolExecution = await this.executeAutomaticToolCall(
+        const registryEntry = resolveToolRegistryEntry(
           toolRegistry,
           functionCall.name,
-          args,
-          user,
         );
+
+        if (!registryEntry) {
+          throw new Error(`ai.toolNotFound:${functionCall.name}`);
+        }
+
+        const toolExecution = toolExecutor
+          ? await toolExecutor(registryEntry, args)
+          : await this.executeAutomaticToolCall(
+              toolRegistry,
+              functionCall.name,
+              args,
+              user,
+            );
 
         executedToolCalls.push({
           serverHandle: toolExecution.serverHandle,
@@ -345,12 +388,14 @@ export class AiChatRuntimeService {
     user: PersonItem,
     clientTimeContext: AiClientTimeContext | undefined,
     onDelta: (delta: string) => Promise<void>,
+    agentInstruction?: string | null,
   ): Promise<AiStreamResult> {
     const generativeModel = createGeminiClient(provider).getGenerativeModel({
       model: modelName,
       systemInstruction: this.buildSystemInstruction({
         user,
         clientTimeContext,
+        agentInstruction,
       }),
     });
 
@@ -389,6 +434,7 @@ export class AiChatRuntimeService {
     user?: PersonItem,
     clientTimeContext?: AiClientTimeContext,
     includeToolGuidance = true,
+    agentInstruction?: string | null,
   ) {
     const messages: Array<Record<string, unknown>> = [
       {
@@ -398,6 +444,7 @@ export class AiChatRuntimeService {
           user,
           clientTimeContext:
             clientTimeContext ?? extractClientTimeContextFromHistory(history),
+          agentInstruction,
         }),
       },
     ];

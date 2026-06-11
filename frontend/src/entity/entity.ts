@@ -1710,12 +1710,62 @@ export interface AiChatSessionItem extends SaplingGenericItem {
   provider?: AiProviderTypeItem | string | null
   /** Preferred model */
   model?: AiProviderModelItem | string | null
+  /** Selected AI agent */
+  agent?: AiAgentItem | string | null
   /** Timestamp of the latest message */
   lastMessageAt?: Date | null
   /** Owning person */
   person: PersonItem | number
   /** Optional loaded messages */
   messages?: AiChatMessageItem[]
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a configurable AI chat agent.
+ */
+export interface AiAgentItem extends SaplingGenericItem {
+  /** String primary key */
+  handle: string
+  /** Visible agent title */
+  title: string
+  /** Optional description */
+  description?: string | null
+  /** Optional icon */
+  icon?: string | null
+  /** Optional color */
+  color?: string | null
+  /** Agent-specific system prompt */
+  promptMarkdown: string
+  /** Optional welcome message */
+  welcomeMessage?: string | null
+  /** Optional starter prompts */
+  conversationStarters?: string[] | null
+  /** Optional provider override */
+  provider?: AiProviderTypeItem | string | null
+  /** Optional model override */
+  model?: AiProviderModelItem | string | null
+  /** Allowed Sapling entity handles */
+  allowedEntityHandles?: string[] | null
+  /** Allowed semantic knowledge sources */
+  allowedKnowledgeEntityHandles?: string[] | null
+  /** Allowed internal Sapling MCP tools */
+  allowedInternalTools?: string[] | null
+  /** Allowed external MCP tools */
+  allowedExternalTools?: string[] | null
+  /** Mutation behavior */
+  mutationMode: string
+  /** Roles allowed to use the agent; empty means all chat users */
+  roles?: RoleItem[] | number[] | null
+  /** Whether the agent is active */
+  isActive: boolean
+  /** Default chat agent */
+  isDefault: boolean
+  /** Sort order */
+  sortOrder: number
   /** Creation date */
   createdAt?: Date | null
   /** Last update date */
@@ -1758,6 +1808,42 @@ export interface AiChatMessageItem extends SaplingGenericItem {
   routeName?: string | null
   /** Page title at message creation time */
   pageTitle?: string | null
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a pending or executed AI tool action.
+ */
+export interface AiChatToolActionItem extends SaplingGenericItem {
+  /** Numeric primary key */
+  handle?: number | null
+  /** Owning chat session */
+  session: AiChatSessionItem | number
+  /** Related assistant message */
+  message?: AiChatMessageItem | number | null
+  /** Owning person */
+  person: PersonItem | number
+  /** Agent that prepared the action */
+  agent?: AiAgentItem | string | null
+  /** MCP server name */
+  serverName: string
+  /** Tool name */
+  toolName: string
+  /** Tool arguments */
+  arguments?: Record<string, unknown> | null
+  /** Action status */
+  status: string
+  /** Execution result payload */
+  resultPayload?: Record<string, unknown> | null
+  /** Execution error payload */
+  errorPayload?: Record<string, unknown> | null
+  /** Expiration timestamp */
+  expiresAt?: Date | null
+  /** Execution timestamp */
+  executedAt?: Date | null
   /** Creation date */
   createdAt?: Date | null
   /** Last update date */

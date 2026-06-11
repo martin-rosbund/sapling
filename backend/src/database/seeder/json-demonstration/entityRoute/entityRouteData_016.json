@@ -1,0 +1,5 @@
+[
+  { "entity": "aiAgent", "route": "ai-agents", "navigation": "aiAgents" },
+  { "entity": "aiAgent", "route": "table/aiAgent" },
+  { "entity": "aiChatToolAction", "route": "table/aiChatToolAction" }
+]

@@ -1,11 +1,12 @@
 import { EntityManager } from '@mikro-orm/core';
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Client } from '@modelcontextprotocol/sdk/client';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import { McpServerConfigItem } from '../../entity/McpServerConfigItem';
 import { PersonItem } from '../../entity/PersonItem';
 import { SaplingMcpService } from './sapling-mcp.service';
+import type { McpToolPolicy } from './mcp-policy.types';
 
 export interface McpToolDescriptor {
   serverHandle: number;
@@ -32,7 +33,10 @@ export class McpService {
     private readonly saplingMcpService: SaplingMcpService,
   ) {}
 
-  async listActiveTools(user?: PersonItem): Promise<McpToolDescriptor[]> {
+  async listActiveTools(
+    user?: PersonItem,
+    policy?: McpToolPolicy,
+  ): Promise<McpToolDescriptor[]> {
     const configs = await this.em.find(
       McpServerConfigItem,
       { isActive: true },
@@ -40,19 +44,23 @@ export class McpService {
     );
 
     const descriptors: McpToolDescriptor[] = user
-      ? (await this.saplingMcpService.listTools()).map((tool) => ({
-          serverHandle: 0,
-          serverName: this.saplingMcpService.getServerName(),
-          toolName: tool.toolName,
-          description: tool.description,
-          inputSchema: tool.inputSchema,
-        }))
+      ? (await this.saplingMcpService.listTools())
+          .map((tool) => ({
+            serverHandle: 0,
+            serverName: this.saplingMcpService.getServerName(),
+            toolName: tool.toolName,
+            description: tool.description,
+            inputSchema: tool.inputSchema,
+          }))
+          .filter((tool) => this.isToolAllowedByPolicy(tool, policy))
       : [];
 
     for (const config of configs) {
       try {
         const tools = await this.listToolsForConfig(config);
-        descriptors.push(...tools);
+        descriptors.push(
+          ...tools.filter((tool) => this.isToolAllowedByPolicy(tool, policy)),
+        );
       } catch {
         continue;
       }
@@ -64,6 +72,7 @@ export class McpService {
   async tryExecuteInlineToolCommand(
     content: string,
     user?: PersonItem,
+    policy?: McpToolPolicy,
   ): Promise<McpInlineToolExecution | null> {
     const parsedCommand = this.parseInlineToolCommand(content);
     if (!parsedCommand) {
@@ -94,6 +103,7 @@ export class McpService {
         parsedCommand.toolName,
         parsedCommand.arguments,
         user,
+        policy,
       );
     } catch {
       // Fall through to the user-facing not-found result below.
@@ -121,6 +131,7 @@ export class McpService {
     toolName: string,
     args: Record<string, unknown>,
     user?: PersonItem,
+    policy?: McpToolPolicy,
   ): Promise<McpInlineToolExecution> {
     if (user) {
       const internalServerName = this.saplingMcpService.getServerName();
@@ -132,10 +143,19 @@ export class McpService {
         !serverName || serverName.trim().toLowerCase() === internalServerName;
 
       if (targetsInternal && internalTool) {
+        this.assertToolAllowed(
+          {
+            serverName: internalServerName,
+            toolName,
+          },
+          policy,
+        );
+
         const result = await this.saplingMcpService.executeTool(
           toolName,
           args,
           user,
+          policy,
         );
 
         return {
@@ -175,6 +195,14 @@ export class McpService {
 
     for (const config of candidateConfigs) {
       try {
+        this.assertServerConfigAllowsTool(config, toolName);
+        this.assertToolAllowed(
+          {
+            serverName: config.name,
+            toolName,
+          },
+          policy,
+        );
         const result = await this.callTool(config, toolName, args);
         return {
           serverHandle: config.handle ?? 0,
@@ -200,16 +228,20 @@ export class McpService {
 
     try {
       const response = await client.listTools();
-      return response.tools.map((tool) => ({
-        serverHandle: config.handle ?? 0,
-        serverName: config.name,
-        toolName: tool.name,
-        description: tool.description,
-        inputSchema:
-          typeof tool.inputSchema === 'object' && tool.inputSchema != null
-            ? (tool.inputSchema as Record<string, unknown>)
-            : null,
-      }));
+      return response.tools
+        .map((tool) => ({
+          serverHandle: config.handle ?? 0,
+          serverName: config.name,
+          toolName: tool.name,
+          description: tool.description,
+          inputSchema:
+            typeof tool.inputSchema === 'object' && tool.inputSchema != null
+              ? (tool.inputSchema as Record<string, unknown>)
+              : null,
+        }))
+        .filter((tool) =>
+          this.isToolAllowedByServerConfig(config, tool.toolName),
+        );
     } finally {
       await client.close();
       await transport.close();
@@ -350,5 +382,91 @@ export class McpService {
       toolName,
       arguments: parsedArguments,
     };
+  }
+
+  private assertToolAllowed(
+    descriptor: Pick<McpToolDescriptor, 'serverName' | 'toolName'>,
+    policy?: McpToolPolicy,
+  ): void {
+    if (
+      policy?.blockMutatingTools &&
+      this.isMutatingTool(descriptor.toolName)
+    ) {
+      throw new ForbiddenException('ai.agentToolRequiresConfirmation');
+    }
+
+    if (!this.isToolAllowedByPolicy(descriptor, policy)) {
+      throw new ForbiddenException('ai.agentToolNotAllowed');
+    }
+  }
+
+  private isToolAllowedByPolicy(
+    descriptor: Pick<McpToolDescriptor, 'serverName' | 'toolName'>,
+    policy?: McpToolPolicy,
+  ): boolean {
+    if (!policy) {
+      return true;
+    }
+
+    const internalServerName = this.saplingMcpService.getServerName();
+    const serverName = descriptor.serverName.trim().toLowerCase();
+    const toolName = descriptor.toolName.trim();
+
+    if (serverName === internalServerName) {
+      return this.matchesAllowList(policy.allowedInternalTools, toolName);
+    }
+
+    return this.matchesAllowList(policy.allowedExternalTools, [
+      toolName,
+      `${descriptor.serverName}.${toolName}`,
+    ]);
+  }
+
+  private assertServerConfigAllowsTool(
+    config: McpServerConfigItem,
+    toolName: string,
+  ): void {
+    if (!this.isToolAllowedByServerConfig(config, toolName)) {
+      throw new ForbiddenException('ai.mcpToolNotAllowed');
+    }
+  }
+
+  private isToolAllowedByServerConfig(
+    config: McpServerConfigItem,
+    toolName: string,
+  ): boolean {
+    return this.matchesAllowList(config.allowedTools, [
+      toolName,
+      `${config.name}.${toolName}`,
+    ]);
+  }
+
+  private matchesAllowList(
+    allowList: string[] | null | undefined,
+    candidates: string | string[],
+  ): boolean {
+    const normalizedAllowList = (allowList ?? [])
+      .map((item) => item.trim().toLowerCase())
+      .filter(Boolean);
+
+    if (normalizedAllowList.length === 0) {
+      return true;
+    }
+
+    const normalizedCandidates = (
+      Array.isArray(candidates) ? candidates : [candidates]
+    )
+      .map((item) => item.trim().toLowerCase())
+      .filter(Boolean);
+
+    return normalizedCandidates.some((candidate) =>
+      normalizedAllowList.includes(candidate),
+    );
+  }
+
+  private isMutatingTool(toolName: string): boolean {
+    return ['generic_create', 'generic_update', 'generic_delete'].includes(
+      toolName,
+    );
   }
 }

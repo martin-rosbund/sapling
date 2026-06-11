@@ -1,5 +1,7 @@
+import type { AiAgentItem } from '../../entity/AiAgentItem';
 import type { AiChatMessageItem } from '../../entity/AiChatMessageItem';
 import type { AiChatSessionItem } from '../../entity/AiChatSessionItem';
+import type { AiChatToolActionItem } from '../../entity/AiChatToolActionItem';
 import type { AiChatTranscriptionItem } from '../../entity/AiChatTranscriptionItem';
 import type { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import type { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
@@ -193,6 +195,37 @@ export function sanitizeModel(model: AiProviderModelItem): AiProviderModelItem {
   } as AiProviderModelItem;
 }
 
+export function sanitizeAgent(agent: AiAgentItem): AiAgentItem {
+  return {
+    handle: agent.handle,
+    title: agent.title,
+    description: agent.description ?? null,
+    icon: agent.icon ?? null,
+    color: agent.color ?? null,
+    promptMarkdown: agent.promptMarkdown,
+    welcomeMessage: agent.welcomeMessage ?? null,
+    conversationStarters: agent.conversationStarters ?? null,
+    provider:
+      agent.provider && typeof agent.provider !== 'string'
+        ? sanitizeProvider(agent.provider)
+        : agent.provider,
+    model:
+      agent.model && typeof agent.model !== 'string'
+        ? sanitizeModel(agent.model)
+        : agent.model,
+    allowedEntityHandles: agent.allowedEntityHandles ?? null,
+    allowedKnowledgeEntityHandles: agent.allowedKnowledgeEntityHandles ?? null,
+    allowedInternalTools: agent.allowedInternalTools ?? null,
+    allowedExternalTools: agent.allowedExternalTools ?? null,
+    mutationMode: agent.mutationMode,
+    isActive: agent.isActive,
+    isDefault: agent.isDefault,
+    sortOrder: agent.sortOrder,
+    createdAt: agent.createdAt,
+    updatedAt: agent.updatedAt,
+  } as AiAgentItem;
+}
+
 export function sanitizeChatSession(
   session: AiChatSessionItem,
 ): AiChatSessionItem {
@@ -208,11 +241,46 @@ export function sanitizeChatSession(
       session.model && typeof session.model !== 'string'
         ? sanitizeModel(session.model)
         : session.model,
+    agent:
+      session.agent && typeof session.agent !== 'string'
+        ? sanitizeAgent(session.agent)
+        : session.agent,
     lastMessageAt: session.lastMessageAt,
     person: extractPersonReference(session.person),
     createdAt: session.createdAt,
     updatedAt: session.updatedAt,
   } as AiChatSessionItem;
+}
+
+export function sanitizeToolAction(
+  action: AiChatToolActionItem,
+): AiChatToolActionItem {
+  return {
+    handle: action.handle,
+    session:
+      action.session && typeof action.session !== 'number'
+        ? (action.session.handle ?? 0)
+        : action.session,
+    message:
+      action.message && typeof action.message !== 'number'
+        ? (action.message.handle ?? null)
+        : (action.message ?? null),
+    person: extractPersonReference(action.person),
+    agent:
+      action.agent && typeof action.agent !== 'string'
+        ? sanitizeAgent(action.agent)
+        : (action.agent ?? null),
+    serverName: action.serverName,
+    toolName: action.toolName,
+    arguments: action.arguments ?? null,
+    status: action.status,
+    resultPayload: action.resultPayload ?? null,
+    errorPayload: action.errorPayload ?? null,
+    expiresAt: action.expiresAt ?? null,
+    executedAt: action.executedAt ?? null,
+    createdAt: action.createdAt,
+    updatedAt: action.updatedAt,
+  } as unknown as AiChatToolActionItem;
 }
 
 export function buildTranscriptionResponse(

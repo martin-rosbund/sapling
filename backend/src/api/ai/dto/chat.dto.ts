@@ -36,6 +36,14 @@ export class CreateAiChatSessionDto {
   @IsString()
   @MaxLength(128)
   modelHandle?: string;
+
+  @ApiPropertyOptional({
+    description: 'Optional AI agent handle for this chat session',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  agentHandle?: string;
 }
 
 export class UpdateAiChatSessionDto {
@@ -67,6 +75,14 @@ export class UpdateAiChatSessionDto {
   @IsString()
   @MaxLength(128)
   modelHandle?: string;
+
+  @ApiPropertyOptional({
+    description: 'Optional AI agent handle for this chat session',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  agentHandle?: string;
 }
 
 export class CreateAiChatMessageDto {
@@ -132,6 +148,14 @@ export class CreateAiChatMessageDto {
   @IsString()
   @MaxLength(128)
   modelHandle?: string;
+
+  @ApiPropertyOptional({
+    description: 'Optional AI agent handle for this message/session',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  agentHandle?: string;
 
   @ApiPropertyOptional({
     description: 'Optional transcription handle linked to this message',

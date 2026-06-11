@@ -19,6 +19,7 @@ import { AiService } from './ai.service';
 import { SAPLING_MCP_TOOL_DEFINITIONS } from './sapling-mcp-tool-definitions';
 import { SAPLING_MCP_USAGE_HINTS } from './prompts/sapling-mcp.prompts';
 import { SaplingMcpPermissionService } from './sapling-mcp-permission.service';
+import type { McpToolPolicy } from './mcp-policy.types';
 
 type SaplingMcpSession = {
   transport: StreamableHTTPServerTransport;
@@ -66,49 +67,52 @@ export class SaplingMcpService {
     toolName: string,
     args: Record<string, unknown>,
     user: PersonItem,
+    policy?: McpToolPolicy,
   ): Promise<{ content: string; modelResult: unknown; rawResult: unknown }> {
     let payload: unknown;
 
     try {
+      this.assertInternalToolAllowed(toolName, policy);
+
       switch (toolName) {
         case 'current_person':
           payload = await this.executeCurrentPerson(user);
           break;
         case 'entity_catalog':
-          payload = this.executeEntityCatalog();
+          payload = this.executeEntityCatalog(policy);
           break;
         case 'entity_schema':
-          payload = this.executeEntitySchema(args);
+          payload = this.executeEntitySchema(args, policy);
           break;
         case 'entity_search':
-          payload = this.executeEntitySearch(args);
+          payload = this.executeEntitySearch(args, policy);
           break;
         case 'generic_list':
-          payload = await this.executeGenericList(args, user);
+          payload = await this.executeGenericList(args, user, policy);
           break;
         case 'generic_get':
-          payload = await this.executeGenericGet(args, user);
+          payload = await this.executeGenericGet(args, user, policy);
           break;
         case 'generic_timeline':
-          payload = await this.executeGenericTimeline(args, user);
+          payload = await this.executeGenericTimeline(args, user, policy);
           break;
         case 'ticket_search':
-          payload = await this.executeTicketSearch(args, user);
+          payload = await this.executeTicketSearch(args, user, policy);
           break;
         case 'semantic_search':
-          payload = await this.executeSemanticSearch(args, user);
+          payload = await this.executeSemanticSearch(args, user, policy);
           break;
         case 'knowledge_search':
-          payload = await this.executeKnowledgeSearch(args, user);
+          payload = await this.executeKnowledgeSearch(args, user, policy);
           break;
         case 'generic_create':
-          payload = await this.executeGenericCreate(args, user);
+          payload = await this.executeGenericCreate(args, user, policy);
           break;
         case 'generic_update':
-          payload = await this.executeGenericUpdate(args, user);
+          payload = await this.executeGenericUpdate(args, user, policy);
           break;
         case 'generic_delete':
-          payload = await this.executeGenericDelete(args, user);
+          payload = await this.executeGenericDelete(args, user, policy);
           break;
         default:
           throw new ForbiddenException('ai.mcpToolNotFound');
@@ -627,11 +631,13 @@ export class SaplingMcpService {
   private async executeGenericList(
     args: Record<string, unknown>,
     user: PersonItem,
+    policy?: McpToolPolicy,
   ): Promise<unknown> {
     const entityHandle = this.requireStringArg(
       args.entityHandle,
       'entityHandle',
     );
+    this.assertEntityAllowed(entityHandle, policy);
     await this.permissionService.assertEntityPermission(
       user,
       entityHandle,
@@ -740,15 +746,19 @@ export class SaplingMcpService {
     };
   }
 
-  private executeEntityCatalog(): { entities: string[] } {
+  private executeEntityCatalog(policy?: McpToolPolicy): { entities: string[] } {
     return {
-      entities: [...ENTITY_HANDLES].sort((left, right) =>
-        left.localeCompare(right),
-      ),
+      entities: this.filterPolicyEntityHandles(
+        [...ENTITY_HANDLES],
+        policy,
+      ).sort((left, right) => left.localeCompare(right)),
     };
   }
 
-  private executeEntitySchema(args: Record<string, unknown>): {
+  private executeEntitySchema(
+    args: Record<string, unknown>,
+    policy?: McpToolPolicy,
+  ): {
     entityHandle: string;
     fields: Array<{
       name: string;
@@ -774,6 +784,7 @@ export class SaplingMcpService {
       args.entityHandle,
       'entityHandle',
     );
+    this.assertEntityAllowed(entityHandle, policy);
     const template = this.getEntityTemplate(entityHandle);
 
     return {
@@ -819,7 +830,10 @@ export class SaplingMcpService {
     };
   }
 
-  private executeEntitySearch(args: Record<string, unknown>): {
+  private executeEntitySearch(
+    args: Record<string, unknown>,
+    policy?: McpToolPolicy,
+  ): {
     query: string;
     matches: Array<{
       entityHandle: string;
@@ -835,7 +849,7 @@ export class SaplingMcpService {
     const normalizedQuery = query.toLowerCase();
     const limit = Math.min(this.asPositiveNumber(args.limit) ?? 10, 50);
 
-    const matches = [...ENTITY_HANDLES]
+    const matches = this.filterPolicyEntityHandles([...ENTITY_HANDLES], policy)
       .map((entityHandle) => {
         const template = this.getEntityTemplate(entityHandle);
         const matchedOn = new Set<string>();
@@ -1006,11 +1020,13 @@ export class SaplingMcpService {
   private async executeGenericGet(
     args: Record<string, unknown>,
     user: PersonItem,
+    policy?: McpToolPolicy,
   ): Promise<unknown> {
     const entityHandle = this.requireStringArg(
       args.entityHandle,
       'entityHandle',
     );
+    this.assertEntityAllowed(entityHandle, policy);
     await this.permissionService.assertEntityPermission(
       user,
       entityHandle,
@@ -1050,11 +1066,13 @@ export class SaplingMcpService {
   private async executeGenericTimeline(
     args: Record<string, unknown>,
     user: PersonItem,
+    policy?: McpToolPolicy,
   ): Promise<unknown> {
     const entityHandle = this.requireStringArg(
       args.entityHandle,
       'entityHandle',
     );
+    this.assertEntityAllowed(entityHandle, policy);
     await this.permissionService.assertEntityPermission(
       user,
       entityHandle,
@@ -1079,7 +1097,9 @@ export class SaplingMcpService {
   private async executeTicketSearch(
     args: Record<string, unknown>,
     user: PersonItem,
+    policy?: McpToolPolicy,
   ): Promise<unknown> {
+    this.assertEntityAllowed('ticket', policy);
     await this.permissionService.assertEntityPermission(
       user,
       'ticket',
@@ -1119,11 +1139,13 @@ export class SaplingMcpService {
   private async executeSemanticSearch(
     args: Record<string, unknown>,
     user: PersonItem,
+    policy?: McpToolPolicy,
   ): Promise<unknown> {
     const entityHandle = this.requireStringArg(
       args.entityHandle,
       'entityHandle',
     );
+    this.assertEntityAllowed(entityHandle, policy);
     await this.permissionService.assertEntityPermission(
       user,
       entityHandle,
@@ -1147,12 +1169,14 @@ export class SaplingMcpService {
   private async executeKnowledgeSearch(
     args: Record<string, unknown>,
     user: PersonItem,
+    policy?: McpToolPolicy,
   ): Promise<unknown> {
     const query = this.requireStringArg(args.query, 'query');
     const limit = Math.min(this.asPositiveNumber(args.limit) ?? 8, 30);
     const requestedEntityHandles = this.asStringArray(args.entityHandles);
     const entityHandles = this.normalizeKnowledgeSearchEntityHandles(
       requestedEntityHandles,
+      policy,
     );
     const perEntityLimit = Math.min(Math.max(limit, 5), 20);
     const skippedEntityHandles: string[] = [];
@@ -1246,6 +1270,7 @@ export class SaplingMcpService {
 
   private normalizeKnowledgeSearchEntityHandles(
     requestedEntityHandles: string[],
+    policy?: McpToolPolicy,
   ): string[] {
     const requested = requestedEntityHandles
       .map((handle) => handle.trim())
@@ -1254,11 +1279,29 @@ export class SaplingMcpService {
       requested.length > 0
         ? requested
         : this.defaultKnowledgeSearchEntityHandles;
-    const allowed = new Set(this.defaultKnowledgeSearchEntityHandles);
+    const defaultAllowed = new Set(this.defaultKnowledgeSearchEntityHandles);
+    const policyKnowledgeHandles = this.normalizeStringList(
+      policy?.allowedKnowledgeEntityHandles,
+    );
+    const policyEntityHandles = this.normalizeStringList(
+      policy?.allowedEntityHandles,
+    );
+    const policyAllowedHandles =
+      policyKnowledgeHandles.length > 0
+        ? new Set(policyKnowledgeHandles)
+        : policyEntityHandles.length > 0
+          ? new Set(policyEntityHandles)
+          : null;
     const normalized: string[] = [];
 
     for (const entityHandle of candidates) {
-      if (!allowed.has(entityHandle) || normalized.includes(entityHandle)) {
+      const normalizedEntityHandle = entityHandle.toLowerCase();
+      if (
+        !defaultAllowed.has(entityHandle) ||
+        (policyAllowedHandles &&
+          !policyAllowedHandles.has(normalizedEntityHandle)) ||
+        normalized.includes(entityHandle)
+      ) {
         continue;
       }
 
@@ -1626,11 +1669,13 @@ export class SaplingMcpService {
   private async executeGenericCreate(
     args: Record<string, unknown>,
     user: PersonItem,
+    policy?: McpToolPolicy,
   ): Promise<unknown> {
     const entityHandle = this.requireStringArg(
       args.entityHandle,
       'entityHandle',
     );
+    this.assertEntityAllowed(entityHandle, policy);
     await this.permissionService.assertEntityPermission(
       user,
       entityHandle,
@@ -1646,11 +1691,13 @@ export class SaplingMcpService {
   private async executeGenericUpdate(
     args: Record<string, unknown>,
     user: PersonItem,
+    policy?: McpToolPolicy,
   ): Promise<unknown> {
     const entityHandle = this.requireStringArg(
       args.entityHandle,
       'entityHandle',
     );
+    this.assertEntityAllowed(entityHandle, policy);
     await this.permissionService.assertEntityPermission(
       user,
       entityHandle,
@@ -1675,11 +1722,13 @@ export class SaplingMcpService {
   private async executeGenericDelete(
     args: Record<string, unknown>,
     user: PersonItem,
+    policy?: McpToolPolicy,
   ): Promise<unknown> {
     const entityHandle = this.requireStringArg(
       args.entityHandle,
       'entityHandle',
     );
+    this.assertEntityAllowed(entityHandle, policy);
     await this.permissionService.assertEntityPermission(
       user,
       entityHandle,
@@ -1706,6 +1755,63 @@ export class SaplingMcpService {
     return Array.isArray(value)
       ? value.filter((item): item is string => typeof item === 'string')
       : [];
+  }
+
+  private assertInternalToolAllowed(
+    toolName: string,
+    policy?: McpToolPolicy,
+  ): void {
+    if (this.matchesAllowList(policy?.allowedInternalTools, toolName)) {
+      return;
+    }
+
+    throw new ForbiddenException('ai.agentToolNotAllowed');
+  }
+
+  private assertEntityAllowed(
+    entityHandle: string,
+    policy?: McpToolPolicy,
+  ): void {
+    if (this.isEntityAllowed(entityHandle, policy)) {
+      return;
+    }
+
+    throw new ForbiddenException(`ai.agentEntityNotAllowed:${entityHandle}`);
+  }
+
+  private isEntityAllowed(
+    entityHandle: string,
+    policy?: McpToolPolicy,
+  ): boolean {
+    return this.matchesAllowList(policy?.allowedEntityHandles, entityHandle);
+  }
+
+  private filterPolicyEntityHandles(
+    entityHandles: string[],
+    policy?: McpToolPolicy,
+  ): string[] {
+    return entityHandles.filter((entityHandle) =>
+      this.isEntityAllowed(entityHandle, policy),
+    );
+  }
+
+  private matchesAllowList(
+    allowList: string[] | null | undefined,
+    candidate: string,
+  ): boolean {
+    const normalizedAllowList = this.normalizeStringList(allowList);
+
+    if (normalizedAllowList.length === 0) {
+      return true;
+    }
+
+    return normalizedAllowList.includes(candidate.trim().toLowerCase());
+  }
+
+  private normalizeStringList(value: string[] | null | undefined): string[] {
+    return (value ?? [])
+      .map((item) => item.trim().toLowerCase())
+      .filter(Boolean);
   }
 
   private asPositiveNumber(value: unknown): number | null {

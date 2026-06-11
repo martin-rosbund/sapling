@@ -7,8 +7,10 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { PersonItem } from '../../entity/PersonItem';
+import { AiAgentItem } from '../../entity/AiAgentItem';
 import { AiChatSessionItem } from '../../entity/AiChatSessionItem';
 import { AiChatMessageItem } from '../../entity/AiChatMessageItem';
+import { AiChatToolActionItem } from '../../entity/AiChatToolActionItem';
 import { AiChatTranscriptionItem } from '../../entity/AiChatTranscriptionItem';
 import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
 import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
@@ -22,7 +24,7 @@ import {
   ListAiChatMessagesQueryDto,
   UpdateAiChatSessionDto,
 } from './dto/chat.dto';
-import { McpService } from './mcp.service';
+import { McpService, type McpInlineToolExecution } from './mcp.service';
 import { DocumentService } from '../document/document.service';
 import {
   VectorizeEntityDto,
@@ -71,12 +73,15 @@ import {
   extractProviderHandle,
   sanitizeChatMessage,
   sanitizeChatSession,
+  sanitizeToolAction,
   shouldReuseAssistantSpeech,
   withMessageSpeechPayload,
 } from './ai-response.utils';
 import { AiProviderRegistryService } from './ai-provider-registry.service';
 import { AiVectorService } from './ai-vector.service';
 import { AiChatRuntimeService } from './ai-chat-runtime.service';
+import { AiAgentPolicyService } from './ai-agent-policy.service';
+import type { McpToolPolicy } from './mcp-policy.types';
 
 type AiChatMessagePage = {
   messages: AiChatMessageItem[];
@@ -115,6 +120,7 @@ export class AiService {
     private readonly providerRegistry: AiProviderRegistryService,
     private readonly vectorService: AiVectorService,
     private readonly chatRuntime: AiChatRuntimeService,
+    private readonly agentPolicy: AiAgentPolicyService,
   ) {}
 
   async listActiveProviders(
@@ -159,6 +165,10 @@ export class AiService {
     );
   }
 
+  async listAccessibleAgents(user: PersonItem): Promise<AiAgentItem[]> {
+    return this.agentPolicy.listAccessibleAgents(user);
+  }
+
   async streamChatMessage(
     dto: CreateAiChatMessageDto,
     user: PersonItem,
@@ -176,16 +186,30 @@ export class AiService {
             title: dto.sessionTitle ?? this.buildSessionTitle(dto.content),
             providerHandle: dto.providerHandle,
             modelHandle: dto.modelHandle,
+            agentHandle: dto.agentHandle,
           },
           user,
         );
 
     const nextSequence = await this.getNextSequence(session.handle ?? 0);
-    const runtimeTarget = await this.providerRegistry.resolveRuntimeTarget(
-      dto.providerHandle ?? extractProviderHandle(session.provider),
-      dto.modelHandle ?? extractModelHandle(session.model),
+    const agent = await this.agentPolicy.resolveAgentForChat(
+      dto.agentHandle,
+      session.agent,
+      user,
     );
-    const availableTools = await this.mcpService.listActiveTools(user);
+    const toolPolicy = this.agentPolicy.buildToolPolicy(agent);
+    const runtimeTarget = await this.providerRegistry.resolveRuntimeTarget(
+      dto.providerHandle ??
+        extractProviderHandle(agent?.provider) ??
+        extractProviderHandle(session.provider),
+      dto.modelHandle ??
+        extractModelHandle(agent?.model) ??
+        extractModelHandle(session.model),
+    );
+    const availableTools = await this.mcpService.listActiveTools(
+      user,
+      toolPolicy,
+    );
     const clientTimeContext = extractClientTimeContext(dto);
 
     const userMessage = this.em.create(AiChatMessageItem, {
@@ -232,6 +256,7 @@ export class AiService {
 
     session.provider = runtimeTarget.provider;
     session.model = runtimeTarget.model;
+    session.agent = agent;
     session.lastMessageAt = new Date();
     this.em.persist([userMessage, assistantMessage]);
     await this.em.flush();
@@ -258,7 +283,11 @@ export class AiService {
     await onEvent({ type: 'mcp.tools', tools: availableTools });
 
     const inlineToolExecution =
-      await this.mcpService.tryExecuteInlineToolCommand(dto.content, user);
+      await this.mcpService.tryExecuteInlineToolCommand(
+        dto.content,
+        user,
+        toolPolicy,
+      );
 
     if (inlineToolExecution) {
       const navigationLinks = buildNavigationLinks([
@@ -331,6 +360,19 @@ export class AiService {
             });
           },
           runtimeTarget.model.supportsTools,
+          this.agentPolicy.buildAgentInstruction(agent),
+          (entry, args) =>
+            this.executePolicyAwareToolCall(
+              entry,
+              args,
+              user,
+              person,
+              session,
+              assistantMessage,
+              agent,
+              toolPolicy,
+              onEvent,
+            ),
         );
       } else {
         streamResult = await this.chatRuntime.streamOpenAi(
@@ -354,6 +396,19 @@ export class AiService {
             });
           },
           runtimeTarget.model.supportsTools,
+          this.agentPolicy.buildAgentInstruction(agent),
+          (entry, args) =>
+            this.executePolicyAwareToolCall(
+              entry,
+              args,
+              user,
+              person,
+              session,
+              assistantMessage,
+              agent,
+              toolPolicy,
+              onEvent,
+            ),
         );
       }
 
@@ -366,6 +421,10 @@ export class AiService {
 
       assistantMessage.status = 'completed';
       const navigationLinks = buildNavigationLinks(streamResult.toolCalls);
+      const pendingToolActions = await this.loadPendingToolActionsForMessage(
+        assistantMessage,
+        user,
+      );
       assistantMessage.content = alignAssistantContentWithNavigationLinks(
         assistantMessage.content,
         navigationLinks,
@@ -383,6 +442,9 @@ export class AiService {
           arguments: toolCall.arguments,
           rawResult: toolCall.rawResult,
         })),
+        pendingToolActions: pendingToolActions.map((action) =>
+          sanitizeToolAction(action),
+        ),
       };
       await this.em.flush();
 
@@ -417,7 +479,15 @@ export class AiService {
         isArchived: includeArchived,
       },
       {
-        populate: ['provider', 'model', 'model.provider'],
+        populate: [
+          'provider',
+          'model',
+          'model.provider',
+          'agent',
+          'agent.provider',
+          'agent.model',
+          'agent.model.provider',
+        ],
         orderBy: { updatedAt: 'DESC' },
       },
     );
@@ -438,9 +508,14 @@ export class AiService {
     user: PersonItem,
   ): Promise<AiChatSessionItem> {
     const person = await this.requireManagedUser(user);
+    const agent = await this.agentPolicy.resolveAgentForChat(
+      dto.agentHandle,
+      null,
+      user,
+    );
     const runtimeTarget = await this.providerRegistry.resolveRuntimeTarget(
-      dto.providerHandle ?? null,
-      dto.modelHandle ?? null,
+      dto.providerHandle ?? extractProviderHandle(agent?.provider) ?? null,
+      dto.modelHandle ?? extractModelHandle(agent?.model) ?? null,
     );
 
     const session = this.em.create(AiChatSessionItem, {
@@ -448,6 +523,7 @@ export class AiService {
       isArchived: false,
       provider: runtimeTarget.provider,
       model: runtimeTarget.model,
+      agent,
       person,
       lastMessageAt: null,
     });
@@ -480,6 +556,28 @@ export class AiService {
       );
       session.provider = runtimeTarget.provider;
       session.model = runtimeTarget.model;
+    }
+
+    if (dto.agentHandle !== undefined) {
+      const agent = await this.agentPolicy.resolveAgentForChat(
+        dto.agentHandle,
+        session.agent,
+        user,
+      );
+      session.agent = agent;
+      if (
+        agent &&
+        dto.providerHandle === undefined &&
+        dto.modelHandle === undefined
+      ) {
+        const runtimeTarget = await this.providerRegistry.resolveRuntimeTarget(
+          extractProviderHandle(agent.provider) ??
+            extractProviderHandle(session.provider),
+          extractModelHandle(agent.model) ?? extractModelHandle(session.model),
+        );
+        session.provider = runtimeTarget.provider;
+        session.model = runtimeTarget.model;
+      }
     }
 
     await this.em.flush();
@@ -519,13 +617,23 @@ export class AiService {
             title: dto.sessionTitle ?? this.buildSessionTitle(dto.content),
             providerHandle: dto.providerHandle,
             modelHandle: dto.modelHandle,
+            agentHandle: dto.agentHandle,
           },
           user,
         );
 
+    const agent = await this.agentPolicy.resolveAgentForChat(
+      dto.agentHandle,
+      session.agent,
+      user,
+    );
     const runtimeTarget = await this.providerRegistry.resolveRuntimeTarget(
-      dto.providerHandle ?? extractProviderHandle(session.provider),
-      dto.modelHandle ?? extractModelHandle(session.model),
+      dto.providerHandle ??
+        extractProviderHandle(agent?.provider) ??
+        extractProviderHandle(session.provider),
+      dto.modelHandle ??
+        extractModelHandle(agent?.model) ??
+        extractModelHandle(session.model),
     );
     const clientTimeContext = extractClientTimeContext(dto);
 
@@ -565,6 +673,7 @@ export class AiService {
     session.lastMessageAt = new Date();
     session.provider = runtimeTarget.provider;
     session.model = runtimeTarget.model;
+    session.agent = agent;
     if (!session.title?.trim()) {
       session.title = this.buildSessionTitle(dto.content);
     }
@@ -703,6 +812,220 @@ export class AiService {
     }
   }
 
+  async confirmToolAction(
+    handle: number,
+    user: PersonItem,
+  ): Promise<AiChatToolActionItem> {
+    const action = await this.findOwnedToolAction(handle, user);
+
+    if (action.status !== 'pending') {
+      throw new BadRequestException('ai.toolActionNotPending');
+    }
+
+    if (action.expiresAt && action.expiresAt.getTime() < Date.now()) {
+      action.status = 'expired';
+      action.errorPayload = { error: 'ai.toolActionExpired' };
+      await this.em.flush();
+      throw new BadRequestException('ai.toolActionExpired');
+    }
+
+    try {
+      const basePolicy =
+        this.agentPolicy.buildToolPolicy(
+          action.agent && typeof action.agent !== 'string'
+            ? action.agent
+            : null,
+        ) ?? {};
+      const policy = {
+        ...basePolicy,
+        blockMutatingTools: false,
+      };
+      const result = await this.mcpService.executeTool(
+        action.serverName,
+        action.toolName,
+        action.arguments ?? {},
+        user,
+        policy,
+      );
+
+      action.status = 'executed';
+      action.resultPayload = {
+        content: result.content,
+        modelResult: result.modelResult,
+        rawResult: result.rawResult,
+      };
+      action.executedAt = new Date();
+      await this.em.flush();
+      return sanitizeToolAction(action);
+    } catch (error) {
+      action.status = 'failed';
+      action.errorPayload = {
+        error: error instanceof Error ? error.message : String(error),
+      };
+      action.executedAt = new Date();
+      await this.em.flush();
+      throw error;
+    }
+  }
+
+  async rejectToolAction(
+    handle: number,
+    user: PersonItem,
+  ): Promise<AiChatToolActionItem> {
+    const action = await this.findOwnedToolAction(handle, user);
+
+    if (action.status !== 'pending') {
+      throw new BadRequestException('ai.toolActionNotPending');
+    }
+
+    action.status = 'rejected';
+    action.executedAt = new Date();
+    await this.em.flush();
+    return sanitizeToolAction(action);
+  }
+
+  private async executePolicyAwareToolCall(
+    entry: AiToolRegistryEntry,
+    args: Record<string, unknown>,
+    user: PersonItem,
+    person: PersonItem,
+    session: AiChatSessionItem,
+    message: AiChatMessageItem,
+    agent: AiAgentItem | null,
+    policy: McpToolPolicy | undefined,
+    onEvent: (event: Record<string, unknown>) => Promise<void> | void,
+  ): Promise<McpInlineToolExecution> {
+    const descriptor = entry.descriptor;
+
+    if (agent && this.agentPolicy.isMutatingTool(descriptor.toolName)) {
+      if (agent.mutationMode === 'readOnly') {
+        return {
+          serverHandle: descriptor.serverHandle,
+          serverName: descriptor.serverName,
+          toolName: descriptor.toolName,
+          arguments: args,
+          content: JSON.stringify(
+            {
+              ok: false,
+              error: 'ai.agentReadOnly',
+            },
+            null,
+            2,
+          ),
+          modelResult: {
+            ok: false,
+            error: 'ai.agentReadOnly',
+          },
+          rawResult: {
+            ok: false,
+            error: 'ai.agentReadOnly',
+          },
+        };
+      }
+
+      const action = await this.createPendingToolAction(
+        descriptor.serverName,
+        descriptor.toolName,
+        args,
+        person,
+        session,
+        message,
+        agent,
+      );
+      const sanitizedAction = sanitizeToolAction(action);
+
+      await onEvent({
+        type: 'tool.action.pending',
+        action: sanitizedAction,
+      });
+
+      return {
+        serverHandle: descriptor.serverHandle,
+        serverName: descriptor.serverName,
+        toolName: descriptor.toolName,
+        arguments: args,
+        content: JSON.stringify(
+          {
+            pendingToolAction: true,
+            actionHandle: action.handle,
+            serverName: descriptor.serverName,
+            toolName: descriptor.toolName,
+            status: 'pending',
+            message:
+              'The action has been prepared and is waiting for explicit user confirmation in Sapling.',
+          },
+          null,
+          2,
+        ),
+        modelResult: {
+          pendingToolAction: true,
+          actionHandle: action.handle,
+          serverName: descriptor.serverName,
+          toolName: descriptor.toolName,
+          status: 'pending',
+        },
+        rawResult: {
+          pendingToolAction: true,
+          actionHandle: action.handle,
+          action: sanitizedAction,
+        },
+      };
+    }
+
+    return this.mcpService.executeTool(
+      descriptor.serverName,
+      descriptor.toolName,
+      args,
+      user,
+      policy,
+    );
+  }
+
+  private async createPendingToolAction(
+    serverName: string,
+    toolName: string,
+    args: Record<string, unknown>,
+    person: PersonItem,
+    session: AiChatSessionItem,
+    message: AiChatMessageItem,
+    agent: AiAgentItem,
+  ): Promise<AiChatToolActionItem> {
+    const action = this.em.create(AiChatToolActionItem, {
+      session,
+      message,
+      person,
+      agent,
+      serverName,
+      toolName,
+      arguments: args,
+      status: 'pending',
+      expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+    });
+
+    this.em.persist(action);
+    await this.em.flush();
+    return action;
+  }
+
+  private async loadPendingToolActionsForMessage(
+    message: AiChatMessageItem,
+    user: PersonItem,
+  ): Promise<AiChatToolActionItem[]> {
+    if (message.handle == null) {
+      return [];
+    }
+
+    return this.em.find(
+      AiChatToolActionItem,
+      {
+        message: { handle: message.handle },
+        person: { handle: this.requireUserHandle(user) },
+        status: 'pending',
+      },
+      { populate: ['session', 'message', 'person', 'agent'] },
+    );
+  }
+
   private async findOwnedSession(
     handle: number,
     user: PersonItem,
@@ -715,7 +1038,17 @@ export class AiService {
         handle,
         person: { handle: userHandle },
       },
-      { populate: ['provider', 'model', 'model.provider'] },
+      {
+        populate: [
+          'provider',
+          'model',
+          'model.provider',
+          'agent',
+          'agent.provider',
+          'agent.model',
+          'agent.model.provider',
+        ],
+      },
     );
 
     if (!session) {
@@ -744,6 +1077,37 @@ export class AiService {
     }
 
     return message;
+  }
+
+  private async findOwnedToolAction(
+    handle: number,
+    user: PersonItem,
+  ): Promise<AiChatToolActionItem> {
+    const userHandle = this.requireUserHandle(user);
+    const action = await this.em.findOne(
+      AiChatToolActionItem,
+      {
+        handle,
+        person: { handle: userHandle },
+      },
+      {
+        populate: [
+          'session',
+          'message',
+          'person',
+          'agent',
+          'agent.provider',
+          'agent.model',
+          'agent.model.provider',
+        ],
+      },
+    );
+
+    if (!action) {
+      throw new NotFoundException('ai.toolActionNotFound');
+    }
+
+    return action;
   }
 
   private buildSessionTitle(content: string): string {
@@ -875,7 +1239,15 @@ export class AiService {
   }
 
   private async populateChatSession(session: AiChatSessionItem): Promise<void> {
-    await this.em.populate(session, ['provider', 'model', 'model.provider']);
+    await this.em.populate(session, [
+      'provider',
+      'model',
+      'model.provider',
+      'agent',
+      'agent.provider',
+      'agent.model',
+      'agent.model.provider',
+    ]);
   }
 
   private async getNextSequence(sessionHandle: number): Promise<number> {

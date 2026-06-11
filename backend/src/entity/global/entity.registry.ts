@@ -94,9 +94,11 @@ import { SupportQueueItem } from '../SupportQueueItem';
 import { SlaPolicyItem } from '../SlaPolicyItem';
 import { PersonApiTokenItem } from '../PersonApiTokenItem';
 import { PersonPasskeyItem } from '../PersonPasskeyItem';
+import { AiAgentItem } from '../AiAgentItem';
 import { AiChatSessionItem } from '../AiChatSessionItem';
 import { AiChatMessageItem } from '../AiChatMessageItem';
 import { AiChatTranscriptionItem } from '../AiChatTranscriptionItem';
+import { AiChatToolActionItem } from '../AiChatToolActionItem';
 import { AiEntityGenerationTemplateItem } from '../AiEntityGenerationTemplateItem';
 import { AiProviderTypeItem } from '../AiProviderTypeItem';
 import { AiProviderModelItem } from '../AiProviderModelItem';
@@ -249,9 +251,11 @@ const ENTITY_REGISTRY_ENTRIES: { name: string; class: any }[] = [
   { name: 'inboxTemplate', class: InboxTemplateItem },
   { name: 'inboxSubscription', class: InboxSubscriptionItem },
   { name: 'inboxNotification', class: InboxNotificationItem },
+  { name: 'aiAgent', class: AiAgentItem },
   { name: 'aiChatSession', class: AiChatSessionItem },
   { name: 'aiChatMessage', class: AiChatMessageItem },
   { name: 'aiChatTranscription', class: AiChatTranscriptionItem },
+  { name: 'aiChatToolAction', class: AiChatToolActionItem },
   {
     name: 'aiEntityGenerationTemplate',
     class: AiEntityGenerationTemplateItem,

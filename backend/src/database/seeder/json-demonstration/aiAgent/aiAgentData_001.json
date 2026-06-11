@@ -1,0 +1,77 @@
+[
+  {
+    "handle": "songbirdGeneral",
+    "title": "Songbird",
+    "description": "Allgemeiner Sapling Assistent fuer CRM, Service, Wissen und Navigation.",
+    "icon": "mdi-bird",
+    "color": "#2563eb",
+    "promptMarkdown": "Hilf als allgemeiner Sapling Assistent. Nutze Sapling-Datenwerkzeuge, wenn aktuelle CRM-, Service-, Wissens- oder Navigationsdaten gebraucht werden. Frage nach, wenn eine Aktion fachlich mehrdeutig ist.",
+    "welcomeMessage": "Womit kann ich dir in Sapling helfen?",
+    "conversationStarters": [
+      "Welche offenen Tickets brauchen heute Aufmerksamkeit?",
+      "Finde Wissen zu einem technischen Problem.",
+      "Wo finde ich eine bestimmte Funktion in Sapling?"
+    ],
+    "allowedInternalTools": [
+      "current_person",
+      "entity_catalog",
+      "entity_search",
+      "entity_schema",
+      "generic_list",
+      "generic_get",
+      "generic_timeline",
+      "ticket_search",
+      "semantic_search",
+      "knowledge_search",
+      "generic_create",
+      "generic_update",
+      "generic_delete"
+    ],
+    "mutationMode": "confirm",
+    "isActive": true,
+    "isDefault": true,
+    "sortOrder": 10
+  },
+  {
+    "handle": "ticketSupportAgent",
+    "title": "Ticket Support Agent",
+    "description": "Spezialist fuer Support-Tickets, bekannte Fehlerbilder und wiederverwendbare Loesungen.",
+    "icon": "mdi-lifebuoy",
+    "color": "#0f766e",
+    "promptMarkdown": "Fokussiere dich auf Support-Tickets, Fehlerbilder, Workarounds und Wissensartikel. Suche zuerst nach vorhandenen Loesungen, bevor du neue Schritte vorschlaegst. Erfinde keine Ursachen oder Kundendetails.",
+    "allowedEntityHandles": ["ticket", "knowledgeArticle", "company", "person", "contract", "product", "event", "document"],
+    "allowedKnowledgeEntityHandles": ["knowledgeArticle", "ticket", "effortEstimate", "effortEstimatePosition"],
+    "allowedInternalTools": ["current_person", "entity_search", "entity_schema", "generic_list", "generic_get", "generic_timeline", "ticket_search", "semantic_search", "knowledge_search", "generic_create", "generic_update"],
+    "mutationMode": "confirm",
+    "isActive": true,
+    "sortOrder": 20
+  },
+  {
+    "handle": "salesOpportunityAgent",
+    "title": "Sales Opportunity Agent",
+    "description": "Spezialist fuer Verkaufschancen, Pain Points und Angebotsargumentation.",
+    "icon": "mdi-chart-line",
+    "color": "#7c3aed",
+    "promptMarkdown": "Hilf bei Verkaufschancen, Bedarfsklaerung, Pain Points, Referenzfaellen und Angebotsargumenten. Nutze vorhandene Chancen, Schaetzungen und Wissensartikel als Vergleich.",
+    "allowedEntityHandles": ["salesOpportunity", "company", "person", "effortEstimate", "effortEstimatePosition", "knowledgeArticle", "ticket"],
+    "allowedKnowledgeEntityHandles": ["salesOpportunity", "effortEstimate", "effortEstimatePosition", "knowledgeArticle", "ticket"],
+    "allowedInternalTools": ["current_person", "entity_search", "entity_schema", "generic_list", "generic_get", "generic_timeline", "semantic_search", "knowledge_search", "generic_update"],
+    "mutationMode": "confirm",
+    "isActive": true,
+    "sortOrder": 30
+  },
+  {
+    "handle": "knowledgeAgent",
+    "title": "Knowledge Agent",
+    "description": "Spezialist fuer Wissensartikel, Recherche und redaktionelle Aufbereitung.",
+    "icon": "mdi-book-open-page-variant",
+    "color": "#b45309",
+    "promptMarkdown": "Fokussiere dich auf Wissenssuche, Zusammenfassung, Lueckenanalyse und Entwurfsqualitaet. Markiere Annahmen klar und trenne Fakten aus Sapling von Vorschlaegen.",
+    "allowedEntityHandles": ["knowledgeArticle", "ticket", "effortEstimate", "effortEstimatePosition", "salesOpportunity", "document"],
+    "allowedKnowledgeEntityHandles": ["knowledgeArticle", "ticket", "effortEstimate", "effortEstimatePosition", "salesOpportunity"],
+    "allowedInternalTools": ["current_person", "entity_search", "entity_schema", "generic_list", "generic_get", "semantic_search", "knowledge_search", "generic_create", "generic_update"],
+    "mutationMode": "confirm",
+    "isActive": true,
+    "sortOrder": 40
+  }
+]

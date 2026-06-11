@@ -7,6 +7,7 @@ This guide describes how an AI agent should work with Sapling data through MCP a
 ```text
 backend/src/api/ai/sapling-mcp.service.ts
 backend/src/api/ai/sapling-mcp-tool-definitions.ts
+backend/src/api/ai/ai-agent-policy.service.ts
 backend/src/api/ai/prompts/sapling-mcp.prompts.ts
 backend/src/api/ai/sapling-mcp-permission.service.ts
 backend/src/api/ai/ai.service.ts
@@ -35,6 +36,8 @@ docs/security/permissions.md
 6. Do not expose passwords, token secrets, provider secrets, or security fields.
 7. Summarize business meaning, not raw JSON, unless the user asks for JSON.
 8. Mutate only when the user clearly asked for a change.
+9. Respect the selected chat agent's data and tool scope.
+10. For confirm-gated agents, treat create/update/delete tool calls as prepared actions until the user confirms them in Sapling.
 
 ## Available Internal MCP Tools
 
@@ -180,6 +183,13 @@ Good agent prompts should include:
 - whether the task is read-only or may mutate data
 - output style, such as concise summary, table, or action list
 - any business constraints, such as "only open tickets" or "current user's records"
+
+Configurable Sapling agents add these constraints through `AiAgentItem`:
+
+- `promptMarkdown` for role-specific behavior
+- `allowedEntityHandles` and `allowedKnowledgeEntityHandles` for data scope
+- `allowedInternalTools` and `allowedExternalTools` for tool scope
+- `mutationMode` for read-only or confirm-gated write behavior
 
 Avoid prompts that ask the agent to:
 

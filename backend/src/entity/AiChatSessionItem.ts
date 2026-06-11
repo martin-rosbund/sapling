@@ -7,6 +7,7 @@ import {
 } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PersonItem } from './PersonItem';
+import { AiAgentItem } from './AiAgentItem';
 import { AiProviderModelItem } from './AiProviderModelItem';
 import { AiProviderTypeItem } from './AiProviderTypeItem';
 import {
@@ -90,13 +91,8 @@ export class AiChatSessionItem {
   @ManyToOne(() => AiProviderModelItem, { nullable: true })
   model?: Rel<AiProviderModelItem> | null;
 
-  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
-  @Sapling(['isReadOnly', 'isSystem'])
-  @Property({ nullable: true, type: 'datetime' })
-  lastMessageAt?: Date | null;
-
-  @ApiProperty({ type: () => PersonItem })
-  @Sapling(['isPerson', 'isCurrentPerson'])
+  @ApiPropertyOptional({ type: () => AiAgentItem })
+  @Sapling(['isChip'])
   @SaplingForm({
     order: 300,
     group: 'aiChatSession.groupReference',
@@ -106,6 +102,27 @@ export class AiChatSessionItem {
     tableOrder: 300,
     tableVisible: true,
     mobileOrder: 300,
+    mobileVisible: false,
+  })
+  @ManyToOne(() => AiAgentItem, { nullable: true })
+  agent?: Rel<AiAgentItem> | null;
+
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
+  @Sapling(['isReadOnly', 'isSystem'])
+  @Property({ nullable: true, type: 'datetime' })
+  lastMessageAt?: Date | null;
+
+  @ApiProperty({ type: () => PersonItem })
+  @Sapling(['isPerson', 'isCurrentPerson'])
+  @SaplingForm({
+    order: 400,
+    group: 'aiChatSession.groupReference',
+    groupOrder: 200,
+    width: 2,
+    visible: true,
+    tableOrder: 400,
+    tableVisible: true,
+    mobileOrder: 400,
     mobileVisible: false,
   })
   @ManyToOne(() => PersonItem, { nullable: false })

@@ -25,6 +25,12 @@ jest.mock('../../entity/AiChatMessageItem', () => ({
 jest.mock('../../entity/AiChatTranscriptionItem', () => ({
   AiChatTranscriptionItem: class {},
 }));
+jest.mock('../../entity/AiAgentItem', () => ({
+  AiAgentItem: class {},
+}));
+jest.mock('../../entity/AiChatToolActionItem', () => ({
+  AiChatToolActionItem: class {},
+}));
 jest.mock('../../entity/AiProviderTypeItem', () => ({
   AiProviderTypeItem: class {},
 }));
@@ -88,6 +94,7 @@ const createService = (
   providerRegistry: unknown = {},
   vectorService: unknown = {},
   chatRuntime: unknown = new AiChatRuntimeService(mcpService as never),
+  agentPolicy: unknown = {},
 ) =>
   new AiService(
     em as never,
@@ -96,6 +103,7 @@ const createService = (
     providerRegistry as never,
     vectorService as never,
     chatRuntime as never,
+    agentPolicy as never,
   );
 
 describe('AiService', () => {

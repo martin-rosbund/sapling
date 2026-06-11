@@ -83,6 +83,11 @@ const router = createRouter({
           name: 'import',
           component: () => import('@/views/ImportView.vue'),
         },
+        {
+          path: 'ai-agents',
+          name: 'aiAgents',
+          component: () => import('@/views/AiAgentBuilderView.vue'),
+        },
         // Issue view (lazy loaded)
         { path: 'issue', name: 'issue', component: () => import('@/views/IssueView.vue') },
         // Right view (lazy loaded)

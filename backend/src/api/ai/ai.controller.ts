@@ -27,13 +27,16 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request, Response } from 'express';
 import { AiService } from './ai.service';
+import { McpService, type McpToolDescriptor } from './mcp.service';
 import { SaplingMcpService } from './sapling-mcp.service';
 import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth.guard';
 import { AdminPermissionGuard } from '../../auth/guard/admin-permission.guard';
 import { AdminPermission } from '../../auth/admin-permission';
 import { PersonItem } from '../../entity/PersonItem';
+import { AiAgentItem } from '../../entity/AiAgentItem';
 import { AiChatSessionItem } from '../../entity/AiChatSessionItem';
 import { AiChatMessageItem } from '../../entity/AiChatMessageItem';
+import { AiChatToolActionItem } from '../../entity/AiChatToolActionItem';
 import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
 import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import {
@@ -75,6 +78,7 @@ export class AiController {
    */
   constructor(
     private readonly aiService: AiService,
+    private readonly mcpService: McpService,
     private readonly saplingMcpService: SaplingMcpService,
   ) {}
 
@@ -156,6 +160,36 @@ export class AiController {
     @Query('providerHandle') providerHandle?: string,
   ): Promise<AiProviderModelItem[]> {
     return this.aiService.listActiveModels(providerHandle, 'chat', true);
+  }
+
+  @Get('chat/agents')
+  @ApiOperation({
+    summary: 'List available chat agents',
+    description:
+      'Returns active AI agents visible to the authenticated user based on role assignments.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Active AI agents available to the current user.',
+    type: AiAgentItem,
+    isArray: true,
+  })
+  async listAgents(
+    @Req() req: Request & { user: PersonItem },
+  ): Promise<AiAgentItem[]> {
+    return this.aiService.listAccessibleAgents(req.user);
+  }
+
+  @Get('chat/tools')
+  @ApiOperation({
+    summary: 'List active MCP tools',
+    description:
+      'Returns internal and configured external MCP tools available for agent configuration.',
+  })
+  async listChatTools(
+    @Req() req: Request & { user: PersonItem },
+  ): Promise<McpToolDescriptor[]> {
+    return this.mcpService.listActiveTools(req.user);
   }
 
   @Get('transcription/providers')
@@ -578,6 +612,52 @@ export class AiController {
     @Body() body: CreateAiChatMessageSpeechDto,
   ): Promise<AiChatMessageItem> {
     return this.aiService.ensureAssistantMessageSpeech(handle, req.user, body);
+  }
+
+  @Post('chat/tool-actions/:handle/confirm')
+  @ApiOperation({
+    summary: 'Confirm a pending AI tool action',
+    description:
+      'Executes a pending mutating tool action that was prepared by an AI agent.',
+  })
+  @ApiParam({
+    name: 'handle',
+    type: 'number',
+    description: 'Numeric handle of the pending tool action.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Updated tool action with execution result metadata.',
+    type: AiChatToolActionItem,
+  })
+  async confirmToolAction(
+    @Req() req: Request & { user: PersonItem },
+    @Param('handle') handle: number,
+  ): Promise<AiChatToolActionItem> {
+    return this.aiService.confirmToolAction(Number(handle), req.user);
+  }
+
+  @Post('chat/tool-actions/:handle/reject')
+  @ApiOperation({
+    summary: 'Reject a pending AI tool action',
+    description:
+      'Marks a pending mutating tool action as rejected without executing it.',
+  })
+  @ApiParam({
+    name: 'handle',
+    type: 'number',
+    description: 'Numeric handle of the pending tool action.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Rejected tool action.',
+    type: AiChatToolActionItem,
+  })
+  async rejectToolAction(
+    @Req() req: Request & { user: PersonItem },
+    @Param('handle') handle: number,
+  ): Promise<AiChatToolActionItem> {
+    return this.aiService.rejectToolAction(Number(handle), req.user);
   }
 
   @Post('chat/stream')

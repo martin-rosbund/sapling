@@ -24,8 +24,10 @@ frontend/src/components/system/SaplingVectorizationDialog.vue
 Relevant entities:
 
 ```text
+AiAgentItem
 AiChatSessionItem
 AiChatMessageItem
+AiChatToolActionItem
 AiChatTranscriptionItem
 AiProviderTypeItem
 AiProviderModelItem
@@ -34,6 +36,12 @@ McpServerConfigItem
 ```
 
 Provider/model records are stored in the database. Runtime credentials and provider behavior are resolved by backend AI provider services.
+
+`AiAgentItem` stores configurable Songbird profiles with an agent prompt,
+optional provider/model overrides, data scopes, tool scopes, and mutation
+behavior. `AiChatSessionItem.agent` keeps the chosen agent for a conversation.
+Mutating generic tools are confirm-gated through `AiChatToolActionItem` when an
+agent uses `mutationMode = confirm`.
 
 ### OpenAI-Compatible Local Providers
 
@@ -139,6 +147,9 @@ This lists and executes:
 - configured external MCP servers from `McpServerConfigItem`
 
 External MCP server configs can use HTTP or `stdio`.
+`McpServerConfig.allowedTools` is enforced when listing and executing external
+tools. Agent policies add a second allow-list layer for both internal and
+external tools.
 
 ## Permissions
 

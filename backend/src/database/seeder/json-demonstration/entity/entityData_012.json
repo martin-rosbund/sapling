@@ -1,0 +1,24 @@
+[
+  {
+    "handle": "aiAgent",
+    "canShow": true,
+    "icon": "mdi-creation",
+    "group": "ai",
+    "order": 25,
+    "canRead": true,
+    "canInsert": true,
+    "canUpdate": true,
+    "canDelete": true
+  },
+  {
+    "handle": "aiChatToolAction",
+    "canShow": true,
+    "icon": "mdi-check-decagram-outline",
+    "group": "chat",
+    "order": 40,
+    "canRead": true,
+    "canInsert": false,
+    "canUpdate": false,
+    "canDelete": false
+  }
+]

@@ -5,6 +5,20 @@
         :title="activeConversationTitle"
         :title-preview-limit="titlePreviewLimit"
       />
+      <v-select
+        v-if="agentOptions.length > 0"
+        :model-value="selectedAgentHandle"
+        class="sapling-ai-chat__agent-select"
+        density="compact"
+        hide-details
+        item-title="label"
+        item-value="value"
+        :disabled="isSending || isAgentLocked"
+        :items="agentOptions"
+        :label="t('aiChat.agent')"
+        variant="outlined"
+        @update:model-value="emit('update:selectedAgent', String($event || ''))"
+      />
     </div>
 
     <SaplingAiChatMessageList
@@ -20,6 +34,8 @@
       @close="emit('close')"
       @load-older-messages="emit('load-older-messages')"
       @toggle-message-speech="emit('toggle-message-speech', $event)"
+      @confirm-tool-action="emit('confirm-tool-action', $event)"
+      @reject-tool-action="emit('reject-tool-action', $event)"
     />
 
     <div class="sapling-stack-xl sapling-chat-composer sapling-ai-chat__composer">
@@ -73,11 +89,19 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SaplingAiChatConversationTitle from '@/components/system/ai-chat/SaplingAiChatConversationTitle.vue'
 import SaplingAiChatMessageList from '@/components/system/ai-chat/SaplingAiChatMessageList.vue'
-import type { AiChatMessageItem } from '@/entity/entity'
+import type { AiChatMessageItem, AiChatToolActionItem } from '@/entity/entity'
+
+type SelectOption = {
+  label: string
+  value: string
+}
 
 const props = withDefaults(
   defineProps<{
     activeConversationTitle: string
+    agentOptions: SelectOption[]
+    selectedAgentHandle: string | null
+    isAgentLocked: boolean
     hasConfiguredProviders: boolean
     hasConfiguredTranscriptionProviders: boolean
     canSendMessage: boolean
@@ -103,10 +127,13 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (event: 'update:draftMessage', value: string): void
+  (event: 'update:selectedAgent', value: string): void
   (event: 'send'): void
   (event: 'close'): void
   (event: 'load-older-messages'): void
   (event: 'toggle-message-speech', message: AiChatMessageItem): void
+  (event: 'confirm-tool-action', action: AiChatToolActionItem): void
+  (event: 'reject-tool-action', action: AiChatToolActionItem): void
   (event: 'toggle-voice-input'): void
 }>()
 
