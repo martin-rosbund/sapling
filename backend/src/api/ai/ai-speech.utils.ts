@@ -72,9 +72,18 @@ export function buildAssistantSpeechDescription(
   message: AiChatMessageItem,
 ): string {
   const pageTitle = message.pageTitle?.trim();
-  return pageTitle
-    ? `Songbird audio reply for ${pageTitle}`
-    : 'Songbird audio reply';
+  const parts = [
+    'Songbird audio reply',
+    message.handle ? `message ${message.handle}` : null,
+    message.session?.handle ? `session ${message.session.handle}` : null,
+    pageTitle ? `page ${pageTitle}` : null,
+    new Date().toISOString(),
+  ];
+
+  return parts
+    .filter((part): part is string => !!part)
+    .join(' | ')
+    .slice(0, 256);
 }
 
 export function buildAssistantSpeechPayload(

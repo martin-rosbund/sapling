@@ -229,7 +229,7 @@ export class AiService {
       String(batchHandle),
       'document',
       person,
-      'AI chat import upload',
+      this.buildImportAttachmentDocumentDescription(file, importBatch, session),
     );
     const attachment = this.em.create(AiChatAttachmentItem, {
       session,
@@ -414,7 +414,7 @@ export class AiService {
         contextPayload: { mode: 'agent-test-run' },
       },
       user,
-      async () => undefined,
+      () => Promise.resolve(),
     );
 
     const run = await this.em.findOne(
@@ -634,7 +634,7 @@ export class AiService {
         navigationLinks,
         agentRun: sanitizeAgentRun(run),
       };
-      await this.completeAgentRun(run, {
+      this.completeAgentRun(run, {
         status: 'completed',
         responseText: assistantMessage.content,
         toolCalls: assistantMessage.toolCalls as Record<string, unknown>[],
@@ -777,7 +777,7 @@ export class AiService {
           : null,
         sources: navigationLinks,
       };
-      await this.completeAgentRun(run, {
+      this.completeAgentRun(run, {
         status: 'completed',
         responseText: assistantMessage.content,
         toolCalls: assistantMessage.toolCalls as Record<string, unknown>[],
@@ -806,7 +806,7 @@ export class AiService {
         error: error instanceof Error ? error.message : 'ai.unknownError',
         agentRun: sanitizeAgentRun(run),
       };
-      await this.completeAgentRun(run, {
+      this.completeAgentRun(run, {
         status: 'failed',
         errorPayload: {
           error: error instanceof Error ? error.message : 'ai.unknownError',
@@ -1580,7 +1580,7 @@ export class AiService {
       contextInstruction,
       agent.mutationMode === 'readOnly'
         ? 'This agent is read-only. Do not create, update, or delete Sapling records.'
-        : 'For create, update, or delete operations, prepare the action and wait for explicit user confirmation in Sapling.',
+        : 'When the user clearly requests a create, update, delete, or import execution, call the matching mutating tool directly and let Sapling create the confirmation dialog. Do not ask an extra text confirmation before preparing the tool action unless the target record or required payload is ambiguous. Treat the action as executed only after Sapling reports user confirmation.',
     ].filter((line): line is string => !!line);
 
     return lines.join('\n\n');
@@ -1767,7 +1767,7 @@ export class AiService {
     return run;
   }
 
-  private async completeAgentRun(
+  private completeAgentRun(
     run: AiAgentRunItem,
     patch: {
       status: string;
@@ -1778,7 +1778,7 @@ export class AiService {
       usagePayload?: Record<string, unknown> | null;
       errorPayload?: Record<string, unknown> | null;
     },
-  ): Promise<void> {
+  ): void {
     const completedAt = new Date();
     run.status = patch.status;
     run.completedAt = completedAt;
@@ -2047,9 +2047,8 @@ export class AiService {
     const batchHandle =
       this.asPositiveInteger(batchSummary?.handle) ??
       this.asPositiveInteger(action.arguments?.batchHandle);
-    const status = typeof batchSummary?.status === 'string'
-      ? batchSummary.status
-      : null;
+    const status =
+      typeof batchSummary?.status === 'string' ? batchSummary.status : null;
     const readyCount = this.asPositiveInteger(batchSummary?.readyCount) ?? 0;
     const isValidated =
       status === 'validated' || status === 'validatedWithErrors';
@@ -2335,7 +2334,14 @@ export class AiService {
         String(transcription.handle ?? ''),
         'aiChatAudio',
         person,
-        dto.pageTitle?.trim() || undefined,
+        this.buildTranscriptionDocumentDescription(
+          file,
+          dto,
+          transcription,
+          session,
+          target.provider.handle,
+          target.model.handle,
+        ),
       );
 
       transcription.document = document;
@@ -2513,6 +2519,53 @@ export class AiService {
     }
 
     return batch.handle;
+  }
+
+  private buildImportAttachmentDocumentDescription(
+    file: Express.Multer.File,
+    batch: ImportBatchSummaryDto,
+    session: AiChatSessionItem | null,
+  ): string {
+    return this.compactDocumentDescription([
+      `AI Chat import: ${file.originalname}`,
+      `batch ${batch.handle}`,
+      `status ${batch.status}`,
+      batch.entityHandle ? `entity ${batch.entityHandle}` : null,
+      batch.sourceHandle ? `source ${batch.sourceHandle}` : null,
+      batch.templateHandle ? `template ${batch.templateHandle}` : null,
+      session?.handle ? `session ${session.handle}` : 'session new',
+      new Date().toISOString(),
+    ]);
+  }
+
+  private buildTranscriptionDocumentDescription(
+    file: Express.Multer.File,
+    dto: CreateAiChatTranscriptionDto,
+    transcription: AiChatTranscriptionItem,
+    session: AiChatSessionItem | null,
+    providerHandle: string,
+    modelHandle: string,
+  ): string {
+    return this.compactDocumentDescription([
+      `AI Chat transcription: ${file.originalname}`,
+      transcription.handle ? `transcription ${transcription.handle}` : null,
+      session?.handle ? `session ${session.handle}` : 'session new',
+      dto.pageTitle?.trim() ? `page ${dto.pageTitle.trim()}` : null,
+      dto.routeName?.trim() ? `route ${dto.routeName.trim()}` : null,
+      `provider ${providerHandle}`,
+      `model ${modelHandle}`,
+      new Date().toISOString(),
+    ]);
+  }
+
+  private compactDocumentDescription(
+    parts: Array<string | null | undefined>,
+  ): string {
+    return parts
+      .map((part) => part?.trim())
+      .filter((part): part is string => !!part)
+      .join(' | ')
+      .slice(0, 256);
   }
 
   private buildImportAttachmentSummary(

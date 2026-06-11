@@ -9,11 +9,11 @@ describe('i18n configuration', () => {
     i18n.global.setLocaleMessage('en', {})
   })
 
-  it('returns the translation key without emitting warnings for missing messages', () => {
+  it('hides missing messages without emitting warnings', () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
 
     try {
-      expect(i18n.global.t('missing.translation.key')).toBe('missing.translation.key')
+      expect(i18n.global.t('missing.translation.key')).toBe('')
       expect(warnSpy).not.toHaveBeenCalled()
     } finally {
       warnSpy.mockRestore()
@@ -25,6 +25,6 @@ describe('i18n configuration', () => {
       'global.availableInEnglishOnly': 'Available in English only',
     })
 
-    expect(i18n.global.t('global.availableInEnglishOnly')).toBe('global.availableInEnglishOnly')
+    expect(i18n.global.t('global.availableInEnglishOnly')).toBe('')
   })
 })

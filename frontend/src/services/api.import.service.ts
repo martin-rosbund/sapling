@@ -134,6 +134,26 @@ export interface ImportBatchSummary {
 }
 
 class ApiImportService {
+  static async listOpenBatches(): Promise<ImportBatchSummary[]> {
+    try {
+      const response = await axios.get<ImportBatchSummary[]>(`${BACKEND_URL}import/batches/open`)
+      return response.data
+    } catch (error: unknown) {
+      pushApiErrorMessage(error, 'exception.unknownError', 'import')
+      throw error
+    }
+  }
+
+  static async getBatch(handle: number): Promise<ImportBatchSummary> {
+    try {
+      const response = await axios.get<ImportBatchSummary>(`${BACKEND_URL}import/batches/${handle}`)
+      return response.data
+    } catch (error: unknown) {
+      pushApiErrorMessage(error, 'exception.unknownError', 'import')
+      throw error
+    }
+  }
+
   static async listTemplates(params: {
     entityHandle?: string | null
     sourceHandle?: string | null

@@ -1,0 +1,26 @@
+[
+  {
+    "entity": "import",
+    "property": "openBatch",
+    "de": "Vorhandenen Stapel laden",
+    "en": "Load existing batch"
+  },
+  {
+    "entity": "import",
+    "property": "openBatchLoaded",
+    "de": "Importstapel wurde geladen.",
+    "en": "Import batch was loaded."
+  },
+  {
+    "entity": "importBatch",
+    "property": "rows",
+    "de": "Importzeilen",
+    "en": "Import rows"
+  },
+  {
+    "entity": "navigation",
+    "property": "importBatchRow",
+    "de": "Importzeilen",
+    "en": "Import rows"
+  }
+]

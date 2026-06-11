@@ -52,6 +52,21 @@
             @update:model-value="analyzeSelectedFile"
           />
           <v-autocomplete
+            v-model="selectedOpenBatchHandle"
+            class="sapling-import__batch-select"
+            :items="openBatchOptions"
+            item-title="title"
+            item-value="value"
+            prepend-inner-icon="mdi-tray-arrow-down"
+            density="comfortable"
+            clearable
+            :label="$t('import.openBatch')"
+            :disabled="isAnalyzing || isLoadingOpenBatches"
+            :loading="isLoadingOpenBatches"
+            autocomplete="off"
+            @update:model-value="loadSelectedOpenBatch"
+          />
+          <v-autocomplete
             v-model="selectedEntityHandle"
             :items="entityOptions"
             item-title="title"
@@ -474,6 +489,7 @@ import { useTranslationLoader } from '@/composables/generic/useTranslationLoader
 import { getEntityValueLabel } from '@/utils/saplingTableUtil'
 
 type Option = { title: string; value: string }
+type BatchOption = { title: string; value: number }
 type ValueOption = { title: string; value: unknown }
 type ImportSource = SaplingGenericItem & { handle: string; title?: string; isActive?: boolean }
 type ValueMappingState = {
@@ -508,11 +524,13 @@ const selectedFile = ref<File | File[] | null>(null)
 const selectedEntityHandle = ref<string | null>(null)
 const selectedSourceHandle = ref<string | null>(null)
 const selectedTemplateHandle = ref<number | string | null>(null)
+const selectedOpenBatchHandle = ref<number | null>(null)
 const templateTitle = ref('')
 const externalKeyColumns = ref<string[]>([])
 const genericReferenceEntityHandle = ref<string | null>(null)
 const genericReferenceKeyColumns = ref<string[]>([])
 const batch = ref<ImportBatchSummary | null>(null)
+const openBatches = ref<ImportBatchSummary[]>([])
 const entities = ref<EntityItem[]>([])
 const sources = ref<ImportSource[]>([])
 const templates = ref<ImportTemplateSummary[]>([])
@@ -522,6 +540,8 @@ const isExecuting = ref(false)
 const isLoadingTemplates = ref(false)
 const isSavingTemplate = ref(false)
 const isSuggesting = ref(false)
+const isLoadingOpenBatches = ref(false)
+const isHydratingBatch = ref(false)
 const aiSuggestion = ref<ImportAiSuggestion | null>(null)
 const fieldMappings = reactive<Record<string, string | null>>({})
 const valueMappings = reactive<Record<string, ValueMappingState>>({})
@@ -593,6 +613,21 @@ const templateOptions = computed(() =>
     title: template.title,
     value: template.handle,
   })),
+)
+const openBatchOptions = computed<BatchOption[]>(() =>
+  openBatches.value
+    .filter((entry) => typeof entry.handle === 'number')
+    .map((entry) => ({
+      title: [
+        `#${entry.handle}`,
+        entry.filename,
+        importStatusLabel(entry.status),
+        entry.entityHandle ? entityLabel(entry.entityHandle) : null,
+      ]
+        .filter(Boolean)
+        .join(' - '),
+      value: entry.handle as number,
+    })),
 )
 
 const selectedTemplate = computed(
@@ -672,10 +707,14 @@ const canExecute = computed(
 )
 
 onMounted(async () => {
-  await Promise.all([loadTranslations(), loadEntities(), loadSources()])
+  await Promise.all([loadTranslations(), loadEntities(), loadSources(), loadOpenBatches()])
 })
 
 watch(selectedEntityHandle, async (entityHandle) => {
+  if (isHydratingBatch.value) {
+    return
+  }
+
   if (!entityHandle) {
     templates.value = []
     return
@@ -686,12 +725,16 @@ watch(selectedEntityHandle, async (entityHandle) => {
 })
 
 watch(selectedSourceHandle, async () => {
+  if (isHydratingBatch.value) {
+    return
+  }
+
   selectedTemplateHandle.value = null
   await loadTemplates()
 })
 
 watch(selectedTemplate, (template) => {
-  if (template) {
+  if (!isHydratingBatch.value && template) {
     applyTemplate(template)
   }
 })
@@ -730,6 +773,15 @@ async function loadTemplates(): Promise<void> {
   }
 }
 
+async function loadOpenBatches(): Promise<void> {
+  try {
+    isLoadingOpenBatches.value = true
+    openBatches.value = await ApiImportService.listOpenBatches()
+  } finally {
+    isLoadingOpenBatches.value = false
+  }
+}
+
 async function analyzeSelectedFile(value: File | File[] | null): Promise<void> {
   const file = Array.isArray(value) ? value[0] : value
   if (!file) {
@@ -738,13 +790,68 @@ async function analyzeSelectedFile(value: File | File[] | null): Promise<void> {
 
   try {
     isAnalyzing.value = true
+    selectedOpenBatchHandle.value = null
     batch.value = await ApiImportService.analyzeCsv(file)
     initializeMappings()
+    await loadOpenBatches()
     pushMessage('success', t('import.analysisCompleted'), file.name, 'import')
   } catch {
     // shared API errors already surface through the message center
   } finally {
     isAnalyzing.value = false
+  }
+}
+
+async function loadSelectedOpenBatch(value: number | string | null): Promise<void> {
+  const handle = Number(value)
+  if (!Number.isFinite(handle)) {
+    return
+  }
+
+  try {
+    isLoadingOpenBatches.value = true
+    const loadedBatch = await ApiImportService.getBatch(Math.trunc(handle))
+    await hydrateBatchState(loadedBatch)
+    pushMessage('success', t('import.openBatchLoaded'), loadedBatch.filename, 'import')
+  } catch {
+    // shared API errors already surface through the message center
+  } finally {
+    isLoadingOpenBatches.value = false
+  }
+}
+
+async function hydrateBatchState(loadedBatch: ImportBatchSummary): Promise<void> {
+  isHydratingBatch.value = true
+
+  try {
+    batch.value = loadedBatch
+    selectedFile.value = null
+    selectedEntityHandle.value = loadedBatch.entityHandle ?? null
+    selectedSourceHandle.value = loadedBatch.sourceHandle ?? null
+    selectedTemplateHandle.value = loadedBatch.templateHandle ?? null
+    templateTitle.value = ''
+
+    if (selectedEntityHandle.value) {
+      await Promise.all([
+        genericStore.loadGeneric(selectedEntityHandle.value, 'global', 'import'),
+        loadTranslations(),
+      ])
+    }
+
+    await loadTemplates()
+    initializeMappings()
+    applyMappingConfiguration(loadedBatch.mapping)
+    externalKeyColumns.value = filterExistingColumns(loadedBatch.externalKeyColumns ?? [])
+
+    const genericReferenceMapping = normalizeGenericReferenceMapping(
+      loadedBatch.genericReferenceMapping,
+    )
+    genericReferenceEntityHandle.value = genericReferenceMapping?.entityHandle ?? null
+    genericReferenceKeyColumns.value = filterExistingColumns(
+      genericReferenceMapping?.keyColumns ?? [],
+    )
+  } finally {
+    isHydratingBatch.value = false
   }
 }
 
@@ -783,24 +890,7 @@ function applySelectedTemplate(): void {
 
 function applyTemplate(template: ImportTemplateSummary): void {
   resetAiSuggestion()
-  Object.keys(fieldMappings).forEach((key) => delete fieldMappings[key])
-  Object.keys(valueMappings).forEach((key) => delete valueMappings[key])
-
-  for (const field of importableFields.value) {
-    fieldMappings[field.name] = null
-  }
-
-  for (const mapping of template.mapping?.mappings ?? []) {
-    if (!mapping.targetField || !mapping.sourceColumn) {
-      continue
-    }
-
-    fieldMappings[mapping.targetField] = headerOptions.value.includes(mapping.sourceColumn)
-      ? mapping.sourceColumn
-      : null
-  }
-
-  applyValueMappings(template.mapping)
+  applyMappingConfiguration(template.mapping)
 
   externalKeyColumns.value = filterExistingColumns(template.externalKeyColumns ?? [])
   const genericReferenceMapping = template.genericReferenceMapping
@@ -881,6 +971,7 @@ async function configureBatch(): Promise<void> {
     isConfiguring.value = true
     batch.value = await ApiImportService.configureBatch(batch.value.handle, buildTemplatePayload())
     applyValueMappings(batch.value.mapping)
+    await loadOpenBatches()
     pushMessage('success', t('import.validationCompleted'), batch.value.filename, 'import')
   } catch {
     // shared API errors already surface through the message center
@@ -924,6 +1015,7 @@ async function executeBatch(): Promise<void> {
   try {
     isExecuting.value = true
     batch.value = await ApiImportService.executeBatch(batch.value.handle)
+    await loadOpenBatches()
     pushMessage('success', t('import.executionCompleted'), batch.value.filename, 'import')
   } catch {
     // shared API errors already surface through the message center
@@ -992,6 +1084,44 @@ function applyValueMappings(mappingConfiguration: ImportMappingConfiguration): v
       values: { ...(mapping.values ?? {}) },
       fallback: normalizeValueMappingFallback(mapping.fallback),
     }
+  }
+}
+
+function applyMappingConfiguration(mappingConfiguration: ImportMappingConfiguration): void {
+  Object.keys(fieldMappings).forEach((key) => delete fieldMappings[key])
+  Object.keys(valueMappings).forEach((key) => delete valueMappings[key])
+
+  for (const field of importableFields.value) {
+    fieldMappings[field.name] = null
+  }
+
+  for (const mapping of mappingConfiguration?.mappings ?? []) {
+    if (!mapping.targetField || !mapping.sourceColumn) {
+      continue
+    }
+
+    fieldMappings[mapping.targetField] = headerOptions.value.includes(mapping.sourceColumn)
+      ? mapping.sourceColumn
+      : null
+  }
+
+  applyValueMappings(mappingConfiguration)
+}
+
+function normalizeGenericReferenceMapping(value: unknown): ImportGenericReferenceMapping | null {
+  if (!value || typeof value !== 'object') {
+    return null
+  }
+
+  const mapping = value as Partial<ImportGenericReferenceMapping>
+  if (!mapping.entityHandle || !Array.isArray(mapping.keyColumns)) {
+    return null
+  }
+
+  return {
+    entityHandle: mapping.entityHandle,
+    sourceHandle: mapping.sourceHandle ?? null,
+    keyColumns: mapping.keyColumns,
   }
 }
 
@@ -1206,146 +1336,3 @@ function normalizeName(value: string): string {
     .replace(/[^a-z0-9]/g, '')
 }
 </script>
-
-<style scoped>
-.sapling-import__workspace {
-  display: grid;
-  grid-template-columns: minmax(320px, 0.95fr) minmax(360px, 1.05fr);
-  gap: 16px;
-  align-items: stretch;
-  height: max(1200px, calc(100vh - 320px));
-}
-
-.sapling-import__panel {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.sapling-import__toolbar,
-.sapling-import__settings {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(180px, 1fr));
-  gap: 12px;
-}
-
-.sapling-import__mapping {
-  display: grid;
-  flex: 1 1 auto;
-  gap: 8px;
-  min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.sapling-import__mapping-row {
-  display: grid;
-  grid-template-columns: minmax(160px, 0.8fr) minmax(180px, 1.2fr) auto;
-  gap: 12px;
-  align-items: center;
-}
-
-.sapling-import__mapping-label {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  gap: 8px;
-}
-
-.sapling-import__mapping-label span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.sapling-import__actions,
-.sapling-import__summary {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.sapling-import__ai-suggestion {
-  border-radius: 8px;
-}
-
-.sapling-import__ai-suggestion-title {
-  font-weight: 600;
-}
-
-.sapling-import__ai-suggestion-chips,
-.sapling-import__ai-warnings {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.sapling-import__table {
-  max-width: 100%;
-  overflow: auto;
-}
-
-.sapling-import__preview-scroll {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  gap: 16px;
-  min-height: 0;
-  overflow: auto;
-  padding-right: 4px;
-}
-
-.sapling-import__sapling-preview {
-  display: flex;
-  flex-direction: column;
-  min-height: 260px;
-  gap: 12px;
-}
-
-.sapling-import__value-mapping-dialog {
-  border-radius: 8px;
-}
-
-.sapling-import__value-mapping-body {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-@media (max-width: 1100px) {
-  .sapling-import__workspace {
-    grid-template-columns: 1fr;
-    height: auto;
-    min-height: auto;
-  }
-
-  .sapling-import__panel {
-    overflow: visible;
-  }
-
-  .sapling-import__mapping,
-  .sapling-import__preview-scroll {
-    max-height: none;
-    overflow: visible;
-    padding-right: 0;
-  }
-
-  .sapling-import__toolbar,
-  .sapling-import__settings {
-    grid-template-columns: 1fr;
-  }
-
-  .sapling-import__mapping-row {
-    grid-template-columns: 1fr auto;
-  }
-
-  .sapling-import__mapping-label {
-    grid-column: 1 / -1;
-  }
-}
-</style>

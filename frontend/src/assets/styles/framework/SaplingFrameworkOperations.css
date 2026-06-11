@@ -672,6 +672,119 @@
   gap: var(--sapling-gap-xs);
 }
 
+.sapling-import__workspace {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.95fr) minmax(360px, 1.05fr);
+  gap: 16px;
+  align-items: stretch;
+  height: max(1200px, calc(100vh - 320px));
+}
+
+.sapling-import__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sapling-import__toolbar,
+.sapling-import__settings {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.sapling-import__batch-select {
+  grid-column: 1 / -1;
+}
+
+.sapling-import__mapping {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 8px;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.sapling-import__mapping-row {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.8fr) minmax(180px, 1.2fr) auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.sapling-import__mapping-label {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 8px;
+}
+
+.sapling-import__mapping-label span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sapling-import__actions,
+.sapling-import__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sapling-import__ai-suggestion {
+  border-radius: 8px;
+}
+
+.sapling-import__ai-suggestion-title {
+  font-weight: 600;
+}
+
+.sapling-import__ai-suggestion-chips,
+.sapling-import__ai-warnings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.sapling-import__table {
+  max-width: 100%;
+  overflow: auto;
+}
+
+.sapling-import__preview-scroll {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.sapling-import__sapling-preview {
+  display: flex;
+  flex-direction: column;
+  min-height: 260px;
+  gap: 12px;
+}
+
+.sapling-import__value-mapping-dialog {
+  border-radius: 8px;
+}
+
+.sapling-import__value-mapping-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 @media (max-width: 1440px) {
   .sapling-admin-hero,
   .sapling-admin-overview-row {
@@ -707,6 +820,36 @@
 }
 
 @media (max-width: 1100px) {
+  .sapling-import__workspace {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: auto;
+  }
+
+  .sapling-import__panel {
+    overflow: visible;
+  }
+
+  .sapling-import__mapping,
+  .sapling-import__preview-scroll {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .sapling-import__toolbar,
+  .sapling-import__settings {
+    grid-template-columns: 1fr;
+  }
+
+  .sapling-import__mapping-row {
+    grid-template-columns: 1fr auto;
+  }
+
+  .sapling-import__mapping-label {
+    grid-column: 1 / -1;
+  }
+
   .sapling-system-layout,
   .sapling-system-skeleton__sections {
     grid-template-columns: 1fr;

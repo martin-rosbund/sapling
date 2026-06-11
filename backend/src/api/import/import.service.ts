@@ -80,6 +80,11 @@ const SAMPLE_ROW_LIMIT = 5;
 const RESPONSE_ROW_LIMIT = 200;
 const AI_REFERENCE_CANDIDATE_LIMIT = 50;
 const AI_TEMPLATE_CONTEXT_LIMIT = 5;
+const OPEN_IMPORT_BATCH_STATUSES = [
+  'analyzed',
+  'validated',
+  'validatedWithErrors',
+] as const;
 
 @Injectable()
 export class ImportService {
@@ -145,6 +150,23 @@ export class ImportService {
     );
 
     return this.toBatchSummary(batch, rows);
+  }
+
+  async listOpenBatches(): Promise<ImportBatchSummaryDto[]> {
+    const batches = await this.em.find(
+      ImportBatchItem,
+      {
+        status: { $in: [...OPEN_IMPORT_BATCH_STATUSES] },
+        executedAt: null,
+      },
+      {
+        populate: ['source', 'targetEntity', 'importTemplate', 'createdBy'],
+        orderBy: { updatedAt: 'DESC' },
+        limit: 100,
+      },
+    );
+
+    return batches.map((batch) => this.toBatchSummary(batch, []));
   }
 
   async configureBatch(

@@ -123,7 +123,7 @@ export class AiAgentPolicyService {
       this.buildScopeInstruction(agent),
       agent.mutationMode === 'readOnly'
         ? 'This agent is read-only. Do not create, update, or delete Sapling records.'
-        : 'For create, update, or delete operations, prepare the action and wait for the user to confirm it in Sapling before treating it as executed.',
+        : 'When the user clearly requests a create, update, delete, or import execution, call the matching mutating tool directly and let Sapling create the confirmation dialog. Do not ask an extra text confirmation before preparing the tool action unless the target record or required payload is ambiguous. Treat the action as executed only after Sapling reports user confirmation.',
     ].filter((line): line is string => !!line);
 
     return lines.join('\n\n');

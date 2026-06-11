@@ -6,8 +6,10 @@ const initialMessages: Record<string, Record<string, string>> = {
   en: {},
 }
 
-function fallbackToTranslationKey(_locale: string, key: string) {
-  return key
+function hideMissingTranslation(_locale: string, _key: string) {
+  void _locale
+  void _key
+  return ''
 }
 
 export const i18n = createI18n({
@@ -16,6 +18,6 @@ export const i18n = createI18n({
   fallbackLocale: false,
   missingWarn: false,
   fallbackWarn: false,
-  missing: fallbackToTranslationKey,
+  missing: hideMissingTranslation,
   messages: initialMessages,
 })

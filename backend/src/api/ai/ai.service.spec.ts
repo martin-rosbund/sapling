@@ -534,18 +534,22 @@ describe('AiService', () => {
       updatedAt: new Date('2026-04-20T08:15:30.000Z'),
     };
     const em = {
-      findOne: jest.fn<() => Promise<typeof action | null>>().mockResolvedValue(action),
+      findOne: jest
+        .fn<() => Promise<typeof action | null>>()
+        .mockResolvedValue(action),
       flush: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
     };
     const mcpService = {
-      executeTool: jest.fn<() => Promise<ExecuteToolResult>>().mockResolvedValue({
-        serverHandle: 0,
-        serverName: 'sapling',
-        toolName: 'import_execute_batch',
-        content: '{"ok":false,"error":"import.failed"}',
-        rawResult: { ok: false, error: 'import.failed' },
-        modelResult: { ok: false, error: 'import.failed' },
-      } as ExecuteToolResult),
+      executeTool: jest
+        .fn<() => Promise<ExecuteToolResult>>()
+        .mockResolvedValue({
+          serverHandle: 0,
+          serverName: 'sapling',
+          toolName: 'import_execute_batch',
+          content: '{"ok":false,"error":"import.failed"}',
+          rawResult: { ok: false, error: 'import.failed' },
+          modelResult: { ok: false, error: 'import.failed' },
+        }),
     };
     const agentPolicy = {
       buildToolPolicy: jest.fn().mockReturnValue({}),
@@ -583,7 +587,9 @@ describe('AiService', () => {
       updatedAt: new Date('2026-04-20T08:15:30.000Z'),
     };
     const em = {
-      findOne: jest.fn<() => Promise<typeof action | null>>().mockResolvedValue(action),
+      findOne: jest
+        .fn<() => Promise<typeof action | null>>()
+        .mockResolvedValue(action),
       flush: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
     };
     const mcpService = {
@@ -677,29 +683,34 @@ describe('AiService', () => {
         createdAt: new Date('2026-04-20T08:15:30.000Z'),
         updatedAt: new Date('2026-04-20T08:15:30.000Z'),
       })),
-      findOne: jest.fn<() => Promise<typeof action | null>>().mockResolvedValue(action),
+      findOne: jest
+        .fn<() => Promise<typeof action | null>>()
+        .mockResolvedValue(action),
       flush: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
       persist: jest.fn(),
     };
     const mcpService = {
-      executeTool: jest.fn<() => Promise<ExecuteToolResult>>().mockResolvedValue({
-        serverHandle: 0,
-        serverName: 'sapling',
-        toolName: 'import_configure_batch',
-        content: '{"handle":4,"status":"validated","entityHandle":"product","readyCount":2}',
-        rawResult: {
-          handle: 4,
-          status: 'validated',
-          entityHandle: 'product',
-          readyCount: 2,
-        },
-        modelResult: {
-          handle: 4,
-          status: 'validated',
-          entityHandle: 'product',
-          readyCount: 2,
-        },
-      } as ExecuteToolResult),
+      executeTool: jest
+        .fn<() => Promise<ExecuteToolResult>>()
+        .mockResolvedValue({
+          serverHandle: 0,
+          serverName: 'sapling',
+          toolName: 'import_configure_batch',
+          content:
+            '{"handle":4,"status":"validated","entityHandle":"product","readyCount":2}',
+          rawResult: {
+            handle: 4,
+            status: 'validated',
+            entityHandle: 'product',
+            readyCount: 2,
+          },
+          modelResult: {
+            handle: 4,
+            status: 'validated',
+            entityHandle: 'product',
+            readyCount: 2,
+          },
+        }),
     };
     const agentPolicy = {
       buildToolPolicy: jest.fn().mockReturnValue({}),

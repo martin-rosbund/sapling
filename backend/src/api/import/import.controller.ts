@@ -54,6 +54,11 @@ export class ImportController {
     return this.importService.analyzeCsv(file, req.user);
   }
 
+  @Get('batches/open')
+  async listOpenBatches(): Promise<ImportBatchSummaryDto[]> {
+    return this.importService.listOpenBatches();
+  }
+
   @Get('batches/:handle')
   async getBatch(
     @Param('handle') handle: number,

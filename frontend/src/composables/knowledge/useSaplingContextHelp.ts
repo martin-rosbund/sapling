@@ -11,6 +11,7 @@ export function resolveRouteContextHelpKey(route: RouteLocationNormalizedLoaded)
   }
 
   const routeContextKeys: Record<string, string> = {
+    aiAgents: 'app.aiAgents',
     calendar: 'app.calendar',
     crmWorkspace: 'app.crmWorkspace',
     formConfig: 'app.formConfig',

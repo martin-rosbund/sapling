@@ -182,7 +182,11 @@ const messageCenter = useSaplingMessageCenter()
 const storedAiPreferences = loadSaplingAiPreferences()
 const { t } = useI18n()
 const { mdAndDown } = useDisplay()
-const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoader('aiChat', 'ai', 'import')
+const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoader(
+  'aiChat',
+  'ai',
+  'import',
+)
 const assistantName = 'Songbird'
 const TITLE_PREVIEW_LIMIT = 30
 const MESSAGE_PAGE_SIZE = 100

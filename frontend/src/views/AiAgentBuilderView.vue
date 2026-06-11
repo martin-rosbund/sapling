@@ -601,8 +601,9 @@ onMounted(async () => {
   selectAgent(agents.value.find((agent) => agent.isDefault) ?? agents.value[0] ?? null)
 })
 
-function tr(key: string, fallback: string): string {
-  return te(key) ? t(key) : fallback
+function tr(key: string, _fallback: string): string {
+  void _fallback
+  return te(key) ? t(key) : ''
 }
 
 async function loadAgents() {
@@ -867,112 +868,3 @@ function formatDate(value?: Date | string | null): string {
   return new Date(value).toLocaleString()
 }
 </script>
-
-<style scoped>
-.sapling-ai-agent-builder__workspace {
-  display: grid;
-  grid-template-columns: minmax(16rem, 20rem) minmax(0, 1fr);
-  gap: var(--sapling-gap-lg);
-  align-items: stretch;
-  height: max(1200px, calc(100vh - 320px));
-}
-
-.sapling-ai-agent-builder__hero {
-  margin: 0px;
-}
-
-.sapling-ai-agent-builder__hero-actions {
-  justify-content: flex-end;
-}
-
-.sapling-ai-agent-builder__rail {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sapling-gap-md);
-  min-width: 0;
-  min-height: 32rem;
-  padding: var(--sapling-space-lg);
-}
-
-.sapling-ai-agent-builder__rail-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sapling-gap-md);
-  font-weight: 700;
-}
-
-.sapling-ai-agent-builder__editor {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 32rem;
-  padding: var(--sapling-space-lg);
-}
-
-.sapling-ai-agent-builder__list {
-  min-height: 0;
-  overflow: auto;
-  background: transparent;
-}
-
-.sapling-ai-agent-builder__tabs {
-  flex: 0 0 auto;
-}
-
-.sapling-ai-agent-builder__window {
-  min-width: 0;
-  flex: 1 1 auto;
-}
-
-.sapling-ai-agent-builder__grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--sapling-gap-md);
-  padding-top: var(--sapling-space-lg);
-}
-
-.sapling-ai-agent-builder__wide {
-  grid-column: 1 / -1;
-}
-
-.sapling-ai-agent-builder__panel-stack {
-  display: grid;
-  gap: var(--sapling-gap-md);
-  padding-top: var(--sapling-space-lg);
-  min-width: 0;
-}
-
-.sapling-ai-agent-builder__mini-card {
-  display: grid;
-  gap: var(--sapling-gap-sm);
-  padding: var(--sapling-space-md);
-  min-width: 0;
-}
-
-.sapling-ai-agent-builder__stats {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--sapling-gap-sm);
-}
-
-.sapling-ai-agent-builder__actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--sapling-gap-sm);
-  padding-top: var(--sapling-space-md);
-}
-
-@media (max-width: 960px) {
-  .sapling-ai-agent-builder__workspace,
-  .sapling-ai-agent-builder__grid {
-    grid-template-columns: 1fr;
-  }
-
-  .sapling-ai-agent-builder__rail,
-  .sapling-ai-agent-builder__editor {
-    min-height: auto;
-  }
-}
-</style>

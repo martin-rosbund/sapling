@@ -1,10 +1,11 @@
 .sapling-ai-chat {
-  --sapling-floating-panel-top: calc(var(--v-layout-top, 0px) + var(--sapling-space-sm-plus));
-  --sapling-floating-panel-width: var(--sapling-chat-panel-width);
-  --sapling-floating-panel-max-width: calc(100vw - var(--sapling-space-2xl));
+  --sapling-floating-panel-top: calc(var(--v-layout-top, 0px) + var(--sapling-space-sm));
+  --sapling-chat-rail-width: clamp(18rem, 22vw, 24rem);
+  --sapling-floating-panel-width: min(96vw, 1180px);
+  --sapling-floating-panel-max-width: calc(100vw - var(--sapling-space-xl));
   --sapling-floating-panel-height: min(
-    var(--sapling-chat-panel-height),
-    calc(100dvh - var(--v-layout-top, 0px) - var(--sapling-space-sm-plus) - var(--sapling-space-lg))
+    88vh,
+    calc(100dvh - var(--v-layout-top, 0px) - var(--sapling-space-sm) - var(--sapling-space-md))
   );
 }
 
@@ -606,8 +607,12 @@
 
 @media (min-width: 1280px) {
   .sapling-ai-chat {
-    --sapling-floating-panel-width: 50vw;
-    --sapling-floating-panel-max-width: 50vw;
+    --sapling-floating-panel-width: min(72vw, 1320px);
+    --sapling-floating-panel-max-width: calc(100vw - var(--sapling-space-2xl));
+    --sapling-floating-panel-height: min(
+      90vh,
+      calc(100dvh - var(--v-layout-top, 0px) - var(--sapling-space-md))
+    );
   }
 }
 
@@ -630,6 +635,15 @@
 }
 
 @media (max-width: 960px) {
+  .sapling-ai-chat {
+    --sapling-floating-panel-width: calc(100vw - (var(--sapling-space-md) * 2));
+    --sapling-floating-panel-max-width: calc(100vw - (var(--sapling-space-md) * 2));
+    --sapling-floating-panel-height: min(
+      92vh,
+      calc(100dvh - var(--v-layout-top, 0px) - var(--sapling-space-md))
+    );
+  }
+
   .sapling-ai-chat__header {
     align-items: flex-start;
     padding: var(--sapling-space-lg);
