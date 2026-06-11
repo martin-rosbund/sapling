@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { AuthModule } from '../../auth/auth.module';
 import { DocumentModule } from '../document/document.module';
@@ -28,6 +28,8 @@ import { AiAgentMemoryItem } from '../../entity/AiAgentMemoryItem';
 import { AiAgentPlaybookItem } from '../../entity/AiAgentPlaybookItem';
 import { AiAgentRunItem } from '../../entity/AiAgentRunItem';
 import { AiAgentVersionItem } from '../../entity/AiAgentVersionItem';
+import { AiChatAttachmentItem } from '../../entity/AiChatAttachmentItem';
+import { ImportModule } from '../import/import.module';
 
 /**
  * @class
@@ -45,9 +47,11 @@ import { AiAgentVersionItem } from '../../entity/AiAgentVersionItem';
     GenericModule,
     TemplateModule,
     CurrentModule,
+    forwardRef(() => ImportModule),
     MikroOrmModule.forFeature([
       AiChatSessionItem,
       AiChatMessageItem,
+      AiChatAttachmentItem,
       AiChatTranscriptionItem,
       AiChatToolActionItem,
       AiAgentItem,

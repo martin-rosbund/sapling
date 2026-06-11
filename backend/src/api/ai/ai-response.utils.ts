@@ -6,6 +6,7 @@ import type { AiAgentRunItem } from '../../entity/AiAgentRunItem';
 import type { AiAgentVersionItem } from '../../entity/AiAgentVersionItem';
 import type { AiChatMessageItem } from '../../entity/AiChatMessageItem';
 import type { AiChatSessionItem } from '../../entity/AiChatSessionItem';
+import type { AiChatAttachmentItem } from '../../entity/AiChatAttachmentItem';
 import type { AiChatToolActionItem } from '../../entity/AiChatToolActionItem';
 import type { AiChatTranscriptionItem } from '../../entity/AiChatTranscriptionItem';
 import type { AiProviderModelItem } from '../../entity/AiProviderModelItem';
@@ -456,6 +457,40 @@ export function sanitizeToolAction(
     createdAt: action.createdAt,
     updatedAt: action.updatedAt,
   } as unknown as AiChatToolActionItem;
+}
+
+export function sanitizeChatAttachment(
+  attachment: AiChatAttachmentItem,
+): AiChatAttachmentItem {
+  return {
+    handle: attachment.handle,
+    session:
+      attachment.session && typeof attachment.session !== 'number'
+        ? (attachment.session.handle ?? null)
+        : (attachment.session ?? null),
+    message:
+      attachment.message && typeof attachment.message !== 'number'
+        ? (attachment.message.handle ?? null)
+        : (attachment.message ?? null),
+    person: extractPersonReference(attachment.person),
+    document:
+      attachment.document && typeof attachment.document !== 'number'
+        ? (attachment.document.handle ?? 0)
+        : attachment.document,
+    importBatch:
+      attachment.importBatch && typeof attachment.importBatch !== 'number'
+        ? (attachment.importBatch.handle ?? null)
+        : (attachment.importBatch ?? null),
+    purpose: attachment.purpose,
+    filename: attachment.filename,
+    mimeType: attachment.mimeType ?? null,
+    byteLength: attachment.byteLength ?? null,
+    status: attachment.status,
+    summaryPayload: attachment.summaryPayload ?? null,
+    errorPayload: attachment.errorPayload ?? null,
+    createdAt: attachment.createdAt,
+    updatedAt: attachment.updatedAt,
+  } as unknown as AiChatAttachmentItem;
 }
 
 export function buildTranscriptionResponse(

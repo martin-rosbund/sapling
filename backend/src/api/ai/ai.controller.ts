@@ -389,6 +389,58 @@ export class AiController {
     return this.aiService.createChatTranscription(body, file, req.user);
   }
 
+  @Post('chat/attachments')
+  @UseGuards(AdminPermissionGuard)
+  @AdminPermission()
+  @ApiOperation({
+    summary: 'Upload an import candidate file for AI chat',
+    description:
+      'Uploads a CSV, TSV, or TXT file, analyzes it through the import batch pipeline, and returns a chat attachment handle.',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: { type: 'string', format: 'binary' },
+        sessionHandle: {
+          type: 'number',
+          nullable: true,
+          description: 'Optional chat session to attach the file to.',
+        },
+        purpose: {
+          type: 'string',
+          nullable: true,
+          description: 'Attachment purpose, defaults to importAnalysis.',
+        },
+      },
+      required: ['file'],
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  async createChatAttachment(
+    @Req() req: Request & { user: PersonItem },
+    @UploadedFile() file: Express.Multer.File,
+    @Body()
+    body: {
+      sessionHandle?: number | string | null;
+      purpose?: string | null;
+    },
+  ): Promise<Record<string, unknown>> {
+    const sessionHandle =
+      body.sessionHandle != null && String(body.sessionHandle).trim()
+        ? Number(body.sessionHandle)
+        : null;
+
+    return this.aiService.createChatAttachment(file, req.user, {
+      sessionHandle:
+        sessionHandle != null && Number.isFinite(sessionHandle)
+          ? sessionHandle
+          : null,
+      purpose: body.purpose ?? null,
+    });
+  }
+
   @Get('vectorization/providers')
   @AdminPermission()
   @UseGuards(AdminPermissionGuard)

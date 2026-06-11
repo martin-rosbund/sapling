@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { AuthModule } from '../../auth/auth.module';
 import { EntityItem } from '../../entity/EntityItem';
@@ -17,7 +17,7 @@ import { ImportService } from './import.service';
 
 @Module({
   imports: [
-    AiModule,
+    forwardRef(() => AiModule),
     AuthModule,
     GenericModule,
     TemplateModule,
@@ -34,5 +34,6 @@ import { ImportService } from './import.service';
   ],
   controllers: [ImportController],
   providers: [ImportService],
+  exports: [ImportService],
 })
 export class ImportModule {}

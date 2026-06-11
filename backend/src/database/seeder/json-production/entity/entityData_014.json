@@ -1,0 +1,13 @@
+[
+  {
+    "handle": "aiChatAttachment",
+    "canShow": false,
+    "icon": "mdi-paperclip",
+    "group": "chat",
+    "order": 45,
+    "canRead": true,
+    "canInsert": false,
+    "canUpdate": false,
+    "canDelete": false
+  }
+]

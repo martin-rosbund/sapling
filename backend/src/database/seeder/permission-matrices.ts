@@ -111,6 +111,7 @@ export const supportPermissionsInput: PermissionMatrixInput = {
     'aiChatSession',
     'aiChatMessage',
     'aiChatToolAction',
+    'aiChatAttachment',
     'aiChatTranscription',
   ],
   insert: [
@@ -321,6 +322,7 @@ export const supportPermissionsInput: PermissionMatrixInput = {
     'aiChatSession',
     'aiChatMessage',
     'aiChatToolAction',
+    'aiChatAttachment',
     'aiChatTranscription',
     'favoriteTemplate',
   ],
@@ -409,6 +411,7 @@ export const salesPermissionsInput: PermissionMatrixInput = {
     'aiChatSession',
     'aiChatMessage',
     'aiChatToolAction',
+    'aiChatAttachment',
   ],
   insert: [
     'company',
@@ -606,6 +609,7 @@ export const salesPermissionsInput: PermissionMatrixInput = {
     'aiChatSession',
     'aiChatMessage',
     'aiChatToolAction',
+    'aiChatAttachment',
     'favoriteTemplate',
   ],
 };

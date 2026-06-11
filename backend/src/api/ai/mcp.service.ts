@@ -465,8 +465,12 @@ export class McpService {
   }
 
   private isMutatingTool(toolName: string): boolean {
-    return ['generic_create', 'generic_update', 'generic_delete'].includes(
-      toolName,
-    );
+    return [
+      'generic_create',
+      'generic_update',
+      'generic_delete',
+      'import_configure_batch',
+      'import_execute_batch',
+    ].includes(toolName);
   }
 }

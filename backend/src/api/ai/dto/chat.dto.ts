@@ -1,8 +1,10 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
   IsBoolean,
   IsInt,
+  IsArray,
   IsObject,
   IsOptional,
   IsString,
@@ -261,6 +263,20 @@ export class CreateAiChatMessageDto {
   @IsInt()
   @Min(1)
   transcriptionHandle?: number;
+
+  @ApiPropertyOptional({
+    description:
+      'Optional uploaded chat attachment handles linked to this message',
+    type: Number,
+    isArray: true,
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(10)
+  @Type(() => Number)
+  @IsInt({ each: true })
+  @Min(1, { each: true })
+  attachmentHandles?: number[];
 
   @ApiPropertyOptional({
     description: 'Optional structured context payload from the frontend',

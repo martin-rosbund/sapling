@@ -55,9 +55,17 @@ export function extractImportHandle(
   payload: Record<string, unknown>,
 ): string | number | null {
   const handle = payload.handle;
-  return typeof handle === 'string' || typeof handle === 'number'
-    ? handle
-    : null;
+
+  if (typeof handle === 'number') {
+    return Number.isFinite(handle) ? handle : null;
+  }
+
+  if (typeof handle !== 'string') {
+    return null;
+  }
+
+  const trimmedHandle = handle.trim();
+  return trimmedHandle ? trimmedHandle : null;
 }
 
 export function getImportErrorMessage(error: unknown): string {

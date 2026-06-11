@@ -15,11 +15,13 @@ import { AiAgentRunItem } from '../../entity/AiAgentRunItem';
 import { AiAgentVersionItem } from '../../entity/AiAgentVersionItem';
 import { AiChatSessionItem } from '../../entity/AiChatSessionItem';
 import { AiChatMessageItem } from '../../entity/AiChatMessageItem';
+import { AiChatAttachmentItem } from '../../entity/AiChatAttachmentItem';
 import { AiChatToolActionItem } from '../../entity/AiChatToolActionItem';
 import { AiChatTranscriptionItem } from '../../entity/AiChatTranscriptionItem';
 import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
 import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import { DocumentItem } from '../../entity/DocumentItem';
+import { ImportBatchItem } from '../../entity/ImportBatchItem';
 import {
   AiChatMessageListResponseDto,
   AiChatMessageListMetaDto,
@@ -87,6 +89,7 @@ import {
   sanitizeAgentPlaybook,
   sanitizeAgentRun,
   sanitizeAgentVersion,
+  sanitizeChatAttachment,
   sanitizeToolAction,
   shouldReuseAssistantSpeech,
   withMessageSpeechPayload,
@@ -96,6 +99,8 @@ import { AiVectorService } from './ai-vector.service';
 import { AiChatRuntimeService } from './ai-chat-runtime.service';
 import { AiAgentPolicyService } from './ai-agent-policy.service';
 import type { McpToolPolicy } from './mcp-policy.types';
+import { ImportService } from '../import/import.service';
+import type { ImportBatchSummaryDto } from '../import/import.types';
 
 type AiChatMessagePage = {
   messages: AiChatMessageItem[];
@@ -113,6 +118,11 @@ type AgentRuntimeContext = {
   memories: AiAgentMemoryItem[];
   toolPolicy: McpToolPolicy | undefined;
   instruction: string | null;
+};
+
+type AiChatAttachmentUploadResponse = {
+  attachment: AiChatAttachmentItem;
+  importBatch: ImportBatchSummaryDto;
 };
 
 /**
@@ -144,6 +154,8 @@ export class AiService {
     private readonly vectorService: AiVectorService,
     private readonly chatRuntime: AiChatRuntimeService,
     private readonly agentPolicy: AiAgentPolicyService,
+    @Inject(forwardRef(() => ImportService))
+    private readonly importService: ImportService,
   ) {}
 
   async listActiveProviders(
@@ -190,6 +202,57 @@ export class AiService {
 
   async listAccessibleAgents(user: PersonItem): Promise<AiAgentItem[]> {
     return this.agentPolicy.listAccessibleAgents(user);
+  }
+
+  async createChatAttachment(
+    file: Express.Multer.File | undefined,
+    user: PersonItem,
+    options: {
+      sessionHandle?: number | null;
+      purpose?: string | null;
+    } = {},
+  ): Promise<AiChatAttachmentUploadResponse> {
+    if (!file?.buffer?.length) {
+      throw new BadRequestException('ai.chatAttachmentFileRequired');
+    }
+
+    this.assertSupportedImportAttachmentFile(file);
+    const person = await this.requireManagedUser(user);
+    const session = options.sessionHandle
+      ? await this.findOwnedSession(options.sessionHandle, user)
+      : null;
+    const importBatch = await this.importService.analyzeCsv(file, person);
+    const batchHandle = this.requireImportBatchHandle(importBatch);
+    const document = await this.documentService.uploadDocument(
+      file,
+      'importBatch',
+      String(batchHandle),
+      'document',
+      person,
+      'AI chat import upload',
+    );
+    const attachment = this.em.create(AiChatAttachmentItem, {
+      session,
+      message: null,
+      person,
+      document,
+      importBatch: { handle: batchHandle } as ImportBatchItem,
+      purpose: options.purpose?.trim() || 'importAnalysis',
+      filename: file.originalname,
+      mimeType: file.mimetype || null,
+      byteLength: file.size,
+      status: 'analyzed',
+      summaryPayload: this.buildImportAttachmentSummary(importBatch),
+      errorPayload: null,
+    });
+
+    this.em.persist(attachment);
+    await this.em.flush();
+
+    return {
+      attachment: sanitizeChatAttachment(attachment),
+      importBatch,
+    };
   }
 
   async getAgentWorkbench(
@@ -418,6 +481,12 @@ export class AiService {
       runtimeContext.toolPolicy,
     );
     const clientTimeContext = extractClientTimeContext(dto);
+    const attachments = await this.resolveChatAttachmentsForMessage(
+      dto.attachmentHandles,
+      session,
+      user,
+    );
+    const attachmentContext = this.buildChatAttachmentContext(attachments);
 
     const userMessage = this.em.create(AiChatMessageItem, {
       session,
@@ -426,7 +495,10 @@ export class AiService {
       status: 'persisted',
       sequence: nextSequence,
       content: dto.content,
-      contextPayload: dto.contextPayload ?? null,
+      contextPayload: this.mergeMessageContextPayload(
+        dto.contextPayload,
+        attachmentContext,
+      ),
       provider: runtimeTarget.provider.handle,
       model: runtimeTarget.model.providerModel,
       url: dto.url ?? null,
@@ -437,6 +509,10 @@ export class AiService {
         url: dto.url ?? null,
         pageTitle: dto.pageTitle ?? null,
         transcriptionHandle: dto.transcriptionHandle ?? null,
+        attachmentHandles: attachments.map(
+          (attachment) => attachment.handle ?? 0,
+        ),
+        importAttachments: attachmentContext,
         clientCurrentDateTime:
           clientTimeContext?.currentDate?.toISOString() ?? null,
         clientTimeZone: clientTimeContext?.timeZone ?? null,
@@ -444,6 +520,7 @@ export class AiService {
         clientUtcOffsetMinutes: clientTimeContext?.utcOffsetMinutes ?? null,
         contextPayload: {
           ...(dto.contextPayload ?? {}),
+          importAttachments: attachmentContext,
           contextEntityHandle:
             dto.contextEntityHandle ?? session.contextEntityHandle ?? null,
           contextRecordHandle:
@@ -463,7 +540,10 @@ export class AiService {
       content: '',
       provider: runtimeTarget.provider.handle,
       model: runtimeTarget.model.providerModel,
-      contextPayload: dto.contextPayload ?? null,
+      contextPayload: this.mergeMessageContextPayload(
+        dto.contextPayload,
+        attachmentContext,
+      ),
       url: dto.url ?? null,
       routeName: dto.routeName ?? null,
       pageTitle: dto.pageTitle ?? null,
@@ -481,6 +561,7 @@ export class AiService {
     session.lastMessageAt = new Date();
     this.em.persist([userMessage, assistantMessage]);
     await this.em.flush();
+    await this.linkAttachmentsToMessage(attachments, session, userMessage);
     await this.linkTranscriptionToMessage(
       dto.transcriptionHandle,
       session,
@@ -1001,6 +1082,12 @@ export class AiService {
         extractModelHandle(session.model),
     );
     const clientTimeContext = extractClientTimeContext(dto);
+    const attachments = await this.resolveChatAttachmentsForMessage(
+      dto.attachmentHandles,
+      session,
+      user,
+    );
+    const attachmentContext = this.buildChatAttachmentContext(attachments);
 
     const latestMessage = await this.em.find(
       AiChatMessageItem,
@@ -1015,7 +1102,10 @@ export class AiService {
       status: 'persisted',
       sequence: (latestMessage[0]?.sequence ?? 0) + 1,
       content: dto.content,
-      contextPayload: dto.contextPayload ?? null,
+      contextPayload: this.mergeMessageContextPayload(
+        dto.contextPayload,
+        attachmentContext,
+      ),
       provider: runtimeTarget.provider.handle,
       model: runtimeTarget.model.providerModel,
       url: dto.url ?? null,
@@ -1026,12 +1116,19 @@ export class AiService {
         url: dto.url ?? null,
         pageTitle: dto.pageTitle ?? null,
         transcriptionHandle: dto.transcriptionHandle ?? null,
+        attachmentHandles: attachments.map(
+          (attachment) => attachment.handle ?? 0,
+        ),
+        importAttachments: attachmentContext,
         clientCurrentDateTime:
           clientTimeContext?.currentDate?.toISOString() ?? null,
         clientTimeZone: clientTimeContext?.timeZone ?? null,
         clientLocale: clientTimeContext?.locale ?? null,
         clientUtcOffsetMinutes: clientTimeContext?.utcOffsetMinutes ?? null,
-        contextPayload: dto.contextPayload ?? null,
+        contextPayload: this.mergeMessageContextPayload(
+          dto.contextPayload,
+          attachmentContext,
+        ),
       },
     });
 
@@ -1051,6 +1148,7 @@ export class AiService {
 
     this.em.persist(message);
     await this.em.flush();
+    await this.linkAttachmentsToMessage(attachments, session, message);
     await this.linkTranscriptionToMessage(
       dto.transcriptionHandle,
       session,
@@ -1190,7 +1288,7 @@ export class AiService {
     const action = await this.findOwnedToolAction(handle, user);
 
     if (action.status !== 'pending') {
-      throw new BadRequestException('ai.toolActionNotPending');
+      return sanitizeToolAction(action);
     }
 
     if (action.expiresAt && action.expiresAt.getTime() < Date.now()) {
@@ -1218,12 +1316,32 @@ export class AiService {
         user,
         policy,
       );
+      const failureMessage = this.getConfirmedToolExecutionFailure(result);
+
+      if (failureMessage) {
+        action.status = 'failed';
+        action.resultPayload = {
+          content: result.content,
+          modelResult: result.modelResult,
+          rawResult: result.rawResult,
+        };
+        action.errorPayload = { error: failureMessage };
+        action.executedAt = new Date();
+        await this.em.flush();
+        return sanitizeToolAction(action);
+      }
+
+      const followUpAction =
+        await this.createFollowUpToolActionForConfirmedAction(action, result);
 
       action.status = 'executed';
       action.resultPayload = {
         content: result.content,
         modelResult: result.modelResult,
         rawResult: result.rawResult,
+        ...(followUpAction
+          ? { followUpToolAction: sanitizeToolAction(followUpAction) }
+          : {}),
       };
       action.executedAt = new Date();
       await this.em.flush();
@@ -1235,7 +1353,7 @@ export class AiService {
       };
       action.executedAt = new Date();
       await this.em.flush();
-      throw error;
+      return sanitizeToolAction(action);
     }
   }
 
@@ -1712,7 +1830,7 @@ export class AiService {
     user: PersonItem,
     person: PersonItem,
     session: AiChatSessionItem,
-    message: AiChatMessageItem,
+    message: AiChatMessageItem | null,
     agent: AiAgentItem | null,
     policy: McpToolPolicy | undefined,
     onEvent: (event: Record<string, unknown>) => Promise<void> | void,
@@ -1743,6 +1861,15 @@ export class AiService {
             error: 'ai.agentReadOnly',
           },
         };
+      }
+
+      const preflightFailure = await this.preflightPendingToolAction(
+        descriptor,
+        args,
+      );
+
+      if (preflightFailure) {
+        return preflightFailure;
       }
 
       const action = await this.createPendingToolAction(
@@ -1803,14 +1930,86 @@ export class AiService {
     );
   }
 
+  private async preflightPendingToolAction(
+    descriptor: AiToolRegistryEntry['descriptor'],
+    args: Record<string, unknown>,
+  ): Promise<McpInlineToolExecution | null> {
+    if (descriptor.toolName !== 'import_execute_batch') {
+      return null;
+    }
+
+    const batchHandle = this.asPositiveInteger(args.batchHandle);
+
+    if (!batchHandle) {
+      return this.buildPendingToolPreflightFailure(descriptor, args, {
+        error: 'import.batchHandleRequired',
+      });
+    }
+
+    try {
+      const batch = await this.importService.getBatch(batchHandle);
+      const isValidated =
+        batch.status === 'validated' || batch.status === 'validatedWithErrors';
+
+      if (!batch.entityHandle) {
+        return this.buildPendingToolPreflightFailure(descriptor, args, {
+          error: 'import.targetEntityRequired',
+          batch,
+        });
+      }
+
+      if (!isValidated || batch.readyCount <= 0) {
+        return this.buildPendingToolPreflightFailure(descriptor, args, {
+          error: 'import.batchNotReadyForExecution',
+          message:
+            'Configure and validate this import batch before preparing an execution action.',
+          batch,
+        });
+      }
+
+      return null;
+    } catch (error) {
+      return this.buildPendingToolPreflightFailure(descriptor, args, {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  private buildPendingToolPreflightFailure(
+    descriptor: AiToolRegistryEntry['descriptor'],
+    args: Record<string, unknown>,
+    payload: Record<string, unknown>,
+  ): McpInlineToolExecution {
+    const result = {
+      ok: false,
+      pendingToolAction: false,
+      toolName: descriptor.toolName,
+      ...payload,
+      nextStep:
+        descriptor.toolName === 'import_execute_batch'
+          ? 'Call import_configure_batch with a target entity and field mappings, wait for user confirmation, then re-check the batch before executing.'
+          : undefined,
+    };
+
+    return {
+      serverHandle: descriptor.serverHandle,
+      serverName: descriptor.serverName,
+      toolName: descriptor.toolName,
+      arguments: args,
+      content: JSON.stringify(result, null, 2),
+      modelResult: result,
+      rawResult: result,
+    };
+  }
+
   private async createPendingToolAction(
     serverName: string,
     toolName: string,
     args: Record<string, unknown>,
     person: PersonItem,
     session: AiChatSessionItem,
-    message: AiChatMessageItem,
-    agent: AiAgentItem,
+    message: AiChatMessageItem | null,
+    agent: AiAgentItem | null,
   ): Promise<AiChatToolActionItem> {
     const action = this.em.create(AiChatToolActionItem, {
       session,
@@ -1827,6 +2026,115 @@ export class AiService {
     this.em.persist(action);
     await this.em.flush();
     return action;
+  }
+
+  private async createFollowUpToolActionForConfirmedAction(
+    action: AiChatToolActionItem,
+    result: {
+      modelResult?: unknown;
+      rawResult?: unknown;
+      content?: string;
+    },
+  ): Promise<AiChatToolActionItem | null> {
+    if (action.toolName !== 'import_configure_batch') {
+      return null;
+    }
+
+    const batchSummary =
+      this.asRecordOrNull(result.modelResult) ??
+      this.asRecordOrNull(result.rawResult) ??
+      this.parseRecordOrNull(result.content);
+    const batchHandle =
+      this.asPositiveInteger(batchSummary?.handle) ??
+      this.asPositiveInteger(action.arguments?.batchHandle);
+    const status = typeof batchSummary?.status === 'string'
+      ? batchSummary.status
+      : null;
+    const readyCount = this.asPositiveInteger(batchSummary?.readyCount) ?? 0;
+    const isValidated =
+      status === 'validated' || status === 'validatedWithErrors';
+
+    if (!batchHandle || !isValidated || readyCount <= 0) {
+      return null;
+    }
+
+    return this.createPendingToolAction(
+      action.serverName,
+      'import_execute_batch',
+      { batchHandle },
+      action.person,
+      action.session,
+      action.message ?? null,
+      action.agent && typeof action.agent !== 'string' ? action.agent : null,
+    );
+  }
+
+  private asRecordOrNull(value: unknown): Record<string, unknown> | null {
+    return value && typeof value === 'object' && !Array.isArray(value)
+      ? (value as Record<string, unknown>)
+      : null;
+  }
+
+  private parseRecordOrNull(value: unknown): Record<string, unknown> | null {
+    if (typeof value !== 'string' || !value.trim()) {
+      return null;
+    }
+
+    try {
+      return this.asRecordOrNull(JSON.parse(value));
+    } catch {
+      return null;
+    }
+  }
+
+  private getConfirmedToolExecutionFailure(result: {
+    content?: string;
+    modelResult?: unknown;
+    rawResult?: unknown;
+  }): string | null {
+    const structuredFailure =
+      this.extractToolFailureMessage(result.modelResult) ??
+      this.extractToolFailureMessage(result.rawResult);
+
+    if (structuredFailure) {
+      return structuredFailure;
+    }
+
+    if (typeof result.content !== 'string' || !result.content.trim()) {
+      return null;
+    }
+
+    try {
+      return this.extractToolFailureMessage(JSON.parse(result.content));
+    } catch {
+      return null;
+    }
+  }
+
+  private extractToolFailureMessage(value: unknown): string | null {
+    if (!value || typeof value !== 'object') {
+      return null;
+    }
+
+    const record = value as Record<string, unknown>;
+
+    if (record.ok !== false) {
+      return null;
+    }
+
+    const message = record.error ?? record.message;
+    return typeof message === 'string' && message.trim()
+      ? message.trim()
+      : 'ai.toolActionExecutionFailed';
+  }
+
+  private asPositiveInteger(value: unknown): number | null {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric) || numeric <= 0) {
+      return null;
+    }
+
+    return Math.trunc(numeric);
   }
 
   private async loadPendingToolActionsForMessage(
@@ -2185,6 +2493,158 @@ export class AiService {
       args,
       user,
     );
+  }
+
+  private assertSupportedImportAttachmentFile(file: Express.Multer.File): void {
+    const filename = file.originalname?.trim().toLowerCase() ?? '';
+    const extension = filename.includes('.')
+      ? filename.slice(filename.lastIndexOf('.') + 1)
+      : '';
+    const allowedExtensions = new Set(['csv', 'tsv', 'txt']);
+
+    if (!allowedExtensions.has(extension)) {
+      throw new BadRequestException('ai.chatAttachmentUnsupportedFileType');
+    }
+  }
+
+  private requireImportBatchHandle(batch: ImportBatchSummaryDto): number {
+    if (typeof batch.handle !== 'number' || !Number.isFinite(batch.handle)) {
+      throw new BadRequestException('import.batchNotFound');
+    }
+
+    return batch.handle;
+  }
+
+  private buildImportAttachmentSummary(
+    batch: ImportBatchSummaryDto,
+  ): Record<string, unknown> {
+    return {
+      importBatchHandle: batch.handle,
+      status: batch.status,
+      filename: batch.filename,
+      mimetype: batch.mimetype ?? null,
+      fileSize: batch.fileSize ?? null,
+      rowCount: batch.rowCount,
+      readyCount: batch.readyCount,
+      errorCount: batch.errorCount,
+      delimiter: batch.delimiter ?? null,
+      headers: batch.headers,
+      sampleRows: batch.sampleRows,
+      entityHandle: batch.entityHandle ?? null,
+      sourceHandle: batch.sourceHandle ?? null,
+      templateHandle: batch.templateHandle ?? null,
+    };
+  }
+
+  private async resolveChatAttachmentsForMessage(
+    attachmentHandles: number[] | null | undefined,
+    session: AiChatSessionItem,
+    user: PersonItem,
+  ): Promise<AiChatAttachmentItem[]> {
+    const handles = [...new Set(attachmentHandles ?? [])]
+      .map((handle) => Number(handle))
+      .filter((handle) => Number.isFinite(handle) && handle > 0)
+      .map((handle) => Math.trunc(handle));
+
+    if (handles.length === 0) {
+      return [];
+    }
+
+    const userHandle = this.requireUserHandle(user);
+    const attachments = await this.em.find(
+      AiChatAttachmentItem,
+      {
+        handle: { $in: handles },
+        person: { handle: userHandle },
+      },
+      {
+        populate: ['session', 'message', 'document', 'importBatch', 'person'],
+        orderBy: { handle: 'ASC' },
+      },
+    );
+    const foundHandles = new Set(attachments.map((item) => item.handle));
+    const missingHandle = handles.find((handle) => !foundHandles.has(handle));
+
+    if (missingHandle != null) {
+      throw new NotFoundException('ai.chatAttachmentNotFound');
+    }
+
+    for (const attachment of attachments) {
+      const attachedSessionHandle =
+        attachment.session && typeof attachment.session !== 'number'
+          ? attachment.session.handle
+          : attachment.session;
+      const attachedMessageHandle =
+        attachment.message && typeof attachment.message !== 'number'
+          ? attachment.message.handle
+          : attachment.message;
+
+      if (
+        attachedSessionHandle != null &&
+        attachedSessionHandle !== session.handle
+      ) {
+        throw new BadRequestException('ai.chatAttachmentSessionMismatch');
+      }
+
+      if (attachedMessageHandle != null) {
+        throw new BadRequestException('ai.chatAttachmentAlreadyUsed');
+      }
+    }
+
+    return attachments;
+  }
+
+  private buildChatAttachmentContext(
+    attachments: AiChatAttachmentItem[],
+  ): Record<string, unknown>[] {
+    return attachments.map((attachment) => ({
+      attachmentHandle: attachment.handle ?? null,
+      filename: attachment.filename,
+      mimeType: attachment.mimeType ?? null,
+      byteLength: attachment.byteLength ?? null,
+      purpose: attachment.purpose,
+      status: attachment.status,
+      documentHandle:
+        attachment.document && typeof attachment.document !== 'number'
+          ? (attachment.document.handle ?? null)
+          : (attachment.document ?? null),
+      importBatchHandle:
+        attachment.importBatch && typeof attachment.importBatch !== 'number'
+          ? (attachment.importBatch.handle ?? null)
+          : (attachment.importBatch ?? null),
+      summary: attachment.summaryPayload ?? null,
+    }));
+  }
+
+  private mergeMessageContextPayload(
+    contextPayload: Record<string, unknown> | undefined,
+    importAttachments: Record<string, unknown>[],
+  ): Record<string, unknown> | null {
+    if (importAttachments.length === 0) {
+      return contextPayload ?? null;
+    }
+
+    return {
+      ...(contextPayload ?? {}),
+      importAttachments,
+    };
+  }
+
+  private async linkAttachmentsToMessage(
+    attachments: AiChatAttachmentItem[],
+    session: AiChatSessionItem,
+    message: AiChatMessageItem,
+  ): Promise<void> {
+    if (attachments.length === 0) {
+      return;
+    }
+
+    for (const attachment of attachments) {
+      attachment.session = session;
+      attachment.message = message;
+    }
+
+    await this.em.flush();
   }
 
   private async findOwnedTranscription(

@@ -91,6 +91,10 @@
                 :is-voice-output-available="isVoiceOutputAvailable"
                 :is-recording-voice-input="isRecordingVoiceInput"
                 :is-transcribing-voice-input="isTranscribingVoiceInput"
+                :can-upload-import-attachment="canUploadImportAttachment"
+                :is-uploading-import-attachment="isUploadingImportAttachment"
+                :pending-attachments="pendingAttachments"
+                :active-tool-action-handles="activeToolActionHandles"
                 :speech-state-by-handle="speechStateByHandle"
                 :title-preview-limit="TITLE_PREVIEW_LIMIT"
                 @update:draft-message="updateDraftMessage"
@@ -102,6 +106,8 @@
                 @confirm-tool-action="confirmToolAction"
                 @reject-tool-action="rejectToolAction"
                 @toggle-voice-input="toggleVoiceInput"
+                @upload-import-attachment="uploadImportAttachment"
+                @remove-import-attachment="removeImportAttachment"
                 @send="sendMessage"
               />
             </div>
@@ -139,6 +145,7 @@ import { useSaplingAiChatMessages } from '@/components/system/ai-chat/useSapling
 import { useSaplingAiChatSpeechPlayback } from '@/components/system/ai-chat/useSaplingAiChatSpeechPlayback'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import ApiAiService, { type AiChatStreamEvent } from '@/services/api.ai.service'
+import type { AiChatAttachmentUploadResponse } from '@/services/api.ai.service'
 import { useSaplingAiChat } from '@/composables/system/useSaplingAiChat'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
@@ -161,13 +168,21 @@ interface SaplingAiChatPromptEventDetail {
   contextRecordHandle?: string
 }
 
+interface PendingImportAttachment {
+  handle: number
+  filename: string
+  rowCount: number
+  headerCount: number
+  status: string
+}
+
 const route = useRoute()
 const currentPersonStore = useCurrentPersonStore()
 const messageCenter = useSaplingMessageCenter()
 const storedAiPreferences = loadSaplingAiPreferences()
 const { t } = useI18n()
 const { mdAndDown } = useDisplay()
-const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoader('aiChat', 'ai')
+const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoader('aiChat', 'ai', 'import')
 const assistantName = 'Songbird'
 const TITLE_PREVIEW_LIMIT = 30
 const MESSAGE_PAGE_SIZE = 100
@@ -226,9 +241,12 @@ const isSessionRailCollapsed = ref(false)
 const isLoadingOlderMessages = ref(false)
 const isRecordingVoiceInput = ref(false)
 const isTranscribingVoiceInput = ref(false)
+const isUploadingImportAttachment = ref(false)
 const streamAbortController = ref<AbortController | null>(null)
 const hasInitialized = ref(false)
 const activeTranscriptionHandle = ref<number | null>(null)
+const pendingAttachments = ref<PendingImportAttachment[]>([])
+const activeToolActionHandles = ref<Record<number, boolean>>({})
 const activeVoiceRecorder = ref<MediaRecorder | null>(null)
 const activeVoiceStream = ref<MediaStream | null>(null)
 const activeVoiceAudioContext = ref<AudioContext | null>(null)
@@ -309,6 +327,18 @@ const isVoiceInputAvailable = computed(
 
 const isVoiceOutputAvailable = computed(
   () => typeof Audio !== 'undefined' && hasConfiguredSpeechProviders.value,
+)
+
+const canUploadImportAttachment = computed(() =>
+  (selectedAgentConfig.value?.allowedInternalTools ?? []).some((tool) =>
+    [
+      'import_get_batch',
+      'import_suggest_mapping',
+      'import_match_existing_records',
+      'import_configure_batch',
+      'import_execute_batch',
+    ].includes(tool),
+  ),
 )
 
 const activeConversationTitle = computed(
@@ -707,6 +737,7 @@ async function selectSession(session: AiChatSessionItem) {
   selectedAgentHandle.value = getAgentHandle(session.agent)
   selectedPlaybookHandle.value = getPlaybookHandle(session.playbook)
   activeTranscriptionHandle.value = null
+  pendingAttachments.value = []
   editingSessionHandle.value = null
   isOpen.value = true
   await loadMessages(session.handle)
@@ -724,6 +755,7 @@ function startNewChat() {
   resetMessageWindow()
   draftMessage.value = ''
   activeTranscriptionHandle.value = null
+  pendingAttachments.value = []
   editingSessionHandle.value = null
   selectedContextEntityHandle.value = null
   selectedContextRecordHandle.value = null
@@ -798,6 +830,49 @@ function applyPromptContext(detail?: SaplingAiChatPromptEventDetail) {
   selectedContextRecordHandle.value = detail?.contextRecordHandle?.trim() || null
 }
 
+async function uploadImportAttachment(file: File) {
+  if (!canUploadImportAttachment.value || isUploadingImportAttachment.value) {
+    return
+  }
+
+  isUploadingImportAttachment.value = true
+
+  try {
+    const response = await ApiAiService.createChatAttachment(file, {
+      sessionHandle: activeSession.value?.handle ?? undefined,
+      purpose: 'importAnalysis',
+    })
+    pendingAttachments.value = [
+      ...pendingAttachments.value.filter(
+        (attachment) => attachment.handle !== response.attachment.handle,
+      ),
+      buildPendingImportAttachment(response),
+    ]
+  } catch {
+    // The API service already reports the localized upload error.
+  } finally {
+    isUploadingImportAttachment.value = false
+  }
+}
+
+function removeImportAttachment(handle: number) {
+  pendingAttachments.value = pendingAttachments.value.filter(
+    (attachment) => attachment.handle !== handle,
+  )
+}
+
+function buildPendingImportAttachment(
+  response: AiChatAttachmentUploadResponse,
+): PendingImportAttachment {
+  return {
+    handle: response.attachment.handle ?? 0,
+    filename: response.attachment.filename,
+    rowCount: response.importBatch.rowCount,
+    headerCount: response.importBatch.headers.length,
+    status: response.importBatch.status,
+  }
+}
+
 function beginRename(session: AiChatSessionItem) {
   editingSessionHandle.value = session.handle ?? null
   editingSessionTitle.value = session.title
@@ -843,7 +918,10 @@ async function toggleArchive(session: AiChatSessionItem) {
 }
 
 async function sendMessage() {
-  const content = draftMessage.value.trim()
+  const hasPendingAttachments = pendingAttachments.value.length > 0
+  const content =
+    draftMessage.value.trim() ||
+    (hasPendingAttachments ? t('aiChat.defaultImportAttachmentPrompt') : '')
 
   if (!content || isSending.value) {
     return
@@ -869,6 +947,8 @@ async function sendMessage() {
     shouldAutoPlaySpeech: activeTranscriptionHandle.value != null,
   }
   draftMessage.value = ''
+  const attachmentHandles = pendingAttachments.value.map((attachment) => attachment.handle)
+  let didSendSuccessfully = false
 
   try {
     await ApiAiService.streamMessage(
@@ -886,6 +966,7 @@ async function sendMessage() {
         contextEntityHandle: selectedContextEntityHandle.value ?? undefined,
         contextRecordHandle: selectedContextRecordHandle.value ?? undefined,
         transcriptionHandle: activeTranscriptionHandle.value ?? undefined,
+        attachmentHandles: attachmentHandles.length > 0 ? attachmentHandles : undefined,
         contextPayload: {
           params: route.params,
           query: route.query,
@@ -895,6 +976,7 @@ async function sendMessage() {
       handleStreamEvent,
       streamAbortController.value.signal,
     )
+    didSendSuccessfully = true
   } catch (error) {
     if ((error as Error).name !== 'AbortError') {
       const shouldReportToMessageCenter = !(
@@ -907,6 +989,9 @@ async function sendMessage() {
     isSending.value = false
     activeSendAttempt.value = null
     activeTranscriptionHandle.value = null
+    if (didSendSuccessfully) {
+      pendingAttachments.value = []
+    }
   }
 }
 
@@ -1234,8 +1319,23 @@ async function confirmToolAction(action: AiChatToolActionItem) {
     return
   }
 
-  const updatedAction = await ApiAiService.confirmToolAction(action.handle)
-  upsertToolAction(updatedAction)
+  const handle = action.handle
+
+  if (activeToolActionHandles.value[handle]) {
+    return
+  }
+
+  activeToolActionHandles.value = { ...activeToolActionHandles.value, [handle]: true }
+
+  try {
+    const updatedAction = await ApiAiService.confirmToolAction(handle)
+    upsertToolAction(updatedAction)
+    upsertFollowUpToolAction(updatedAction)
+  } finally {
+    const remainingActions = { ...activeToolActionHandles.value }
+    delete remainingActions[handle]
+    activeToolActionHandles.value = remainingActions
+  }
 }
 
 async function rejectToolAction(action: AiChatToolActionItem) {
@@ -1243,8 +1343,22 @@ async function rejectToolAction(action: AiChatToolActionItem) {
     return
   }
 
-  const updatedAction = await ApiAiService.rejectToolAction(action.handle)
-  upsertToolAction(updatedAction)
+  const handle = action.handle
+
+  if (activeToolActionHandles.value[handle]) {
+    return
+  }
+
+  activeToolActionHandles.value = { ...activeToolActionHandles.value, [handle]: true }
+
+  try {
+    const updatedAction = await ApiAiService.rejectToolAction(handle)
+    upsertToolAction(updatedAction)
+  } finally {
+    const remainingActions = { ...activeToolActionHandles.value }
+    delete remainingActions[handle]
+    activeToolActionHandles.value = remainingActions
+  }
 }
 
 function upsertToolAction(action: AiChatToolActionItem) {
@@ -1281,6 +1395,25 @@ function upsertToolAction(action: AiChatToolActionItem) {
 
   responsePayload.pendingToolActions = existingActions
   message.responsePayload = responsePayload
+}
+
+function upsertFollowUpToolAction(action: AiChatToolActionItem) {
+  const followUpAction = getFollowUpToolAction(action)
+
+  if (followUpAction) {
+    upsertToolAction(followUpAction)
+  }
+}
+
+function getFollowUpToolAction(action: AiChatToolActionItem): AiChatToolActionItem | null {
+  const payload = action.resultPayload
+
+  if (!payload || typeof payload !== 'object') {
+    return null
+  }
+
+  const followUpAction = (payload as Record<string, unknown>).followUpToolAction
+  return isToolAction(followUpAction) ? followUpAction : null
 }
 
 function replaceSession(session: AiChatSessionItem) {

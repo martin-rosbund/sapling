@@ -55,6 +55,12 @@ The internal server currently registers these tools:
 | `ticket_search` | Keyword search across ticket text fields. |
 | `semantic_search` | Vector search across indexed long-text entities. |
 | `knowledge_search` | Combined semantic knowledge search across articles, tickets, estimates, estimate positions, and opportunities. |
+| `import_get_batch` | Inspect an analyzed import batch, including headers, sample rows, mapping, counters, and row previews. |
+| `import_list_templates` | List reusable import templates for a target entity and optional source. |
+| `import_suggest_mapping` | Create a structured mapping proposal for an analyzed import batch. |
+| `import_match_existing_records` | Check sampled import row values against existing readable Sapling records. |
+| `import_configure_batch` | Configure and validate an import batch; confirm-gated. |
+| `import_execute_batch` | Execute a validated import batch; confirm-gated. |
 | `generic_create` | Create a generic record. |
 | `generic_update` | Update a generic record. |
 | `generic_delete` | Delete a generic record. |
@@ -112,6 +118,28 @@ Use `generic_list` when:
 - the user asks for structured filters, counts, statuses, dates, or assigned records
 - exact relation fields are known
 - the answer depends on current field values rather than long text similarity
+
+## Working With Import Files
+
+The Import-Agent can receive CSV, TSV, and TXT files through the AI Chat
+composer. Upload creates a normal `ImportBatchItem` and links it to the chat
+message through `AiChatAttachmentItem`; the agent sees a compact file summary
+and can inspect the full batch with `import_get_batch`.
+
+Use the import tools in this order:
+
+1. Use `import_get_batch` to inspect headers, row count, delimiter, sample rows,
+   current mapping, and validation counters.
+2. Use `import_list_templates` when a target entity or source system is known.
+3. Use `import_match_existing_records` for questions such as whether uploaded
+   rows already exist in Sapling.
+4. Use `import_suggest_mapping` for conservative field and key-column proposals.
+5. Use `import_configure_batch` only when the user wants to apply a mapping.
+6. Use `import_execute_batch` only after validation has been reviewed.
+
+`import_configure_batch` and `import_execute_batch` are mutating tools. For
+confirm-gated agents they create pending tool actions and are not complete until
+the user confirms the action in Sapling.
 
 ## Working With Schemas
 

@@ -6,6 +6,7 @@ import type {
   AiAgentPlaybookItem,
   AiAgentRunItem,
   AiAgentVersionItem,
+  AiChatAttachmentItem,
   AiChatMessageItem,
   AiChatSessionItem,
   AiChatToolActionItem,
@@ -53,11 +54,34 @@ export interface CreateAiChatMessagePayload {
   contextEntityHandle?: string
   contextRecordHandle?: string
   transcriptionHandle?: number
+  attachmentHandles?: number[]
   contextPayload?: Record<string, unknown>
   clientCurrentDateTime?: string
   clientTimeZone?: string
   clientLocale?: string
   clientUtcOffsetMinutes?: number
+}
+
+export interface AiChatImportBatchSummary {
+  handle: number | null
+  status: string
+  filename: string
+  mimetype?: string | null
+  fileSize?: number | null
+  sourceHandle?: string | null
+  entityHandle?: string | null
+  templateHandle?: number | null
+  rowCount: number
+  readyCount: number
+  errorCount: number
+  delimiter?: string | null
+  headers: string[]
+  sampleRows: Record<string, unknown>[]
+}
+
+export interface AiChatAttachmentUploadResponse {
+  attachment: AiChatAttachmentItem
+  importBatch: AiChatImportBatchSummary
 }
 
 export interface CreateAiChatTranscriptionPayload {
@@ -540,6 +564,36 @@ class ApiAiService {
       if (!options?.suppressErrorMessage) {
         this.handleError(error, 'ai.speech.playbackFailed')
       }
+      throw error
+    }
+  }
+
+  static async createChatAttachment(
+    file: File,
+    payload: {
+      sessionHandle?: number
+      purpose?: string
+    } = {},
+  ): Promise<AiChatAttachmentUploadResponse> {
+    try {
+      const formData = new FormData()
+      formData.append('file', file, file.name)
+
+      for (const [key, value] of Object.entries(payload)) {
+        if (value == null) {
+          continue
+        }
+
+        formData.append(key, String(value))
+      }
+
+      const response = await axios.post<AiChatAttachmentUploadResponse>(
+        `${BACKEND_URL}ai/chat/attachments`,
+        formData,
+      )
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'aiChat.attachmentUploadFailed')
       throw error
     }
   }

@@ -46,6 +46,20 @@
         <SaplingMarkdownContent :source="getMessageDisplayContent(message)" />
       </div>
       <div
+        v-if="getMessageImportAttachments(message).length > 0"
+        class="sapling-chip-row sapling-ai-chat__attachment-chips"
+      >
+        <v-chip
+          v-for="attachment in getMessageImportAttachments(message)"
+          :key="`${message.handle ?? message.sequence}-${attachment.attachmentHandle}`"
+          size="small"
+          variant="tonal"
+          prepend-icon="mdi-file-delimited-outline"
+        >
+          {{ formatImportAttachmentChip(attachment) }}
+        </v-chip>
+      </div>
+      <div
         v-if="getMessageToolActions(message).length > 0"
         class="sapling-stack-sm sapling-ai-chat__tool-actions"
       >
@@ -64,6 +78,15 @@
           <pre class="sapling-ai-chat__tool-action-arguments">{{
             formatToolActionArguments(action)
           }}</pre>
+          <v-alert
+            v-if="getToolActionError(action)"
+            class="sapling-ai-chat__tool-action-error"
+            density="compact"
+            type="error"
+            variant="tonal"
+          >
+            {{ getToolActionError(action) }}
+          </v-alert>
           <div
             v-if="action.status === 'pending'"
             class="sapling-row-xs sapling-ai-chat__tool-action-actions"
@@ -73,6 +96,8 @@
               color="primary"
               variant="tonal"
               prepend-icon="mdi-check"
+              :disabled="isToolActionSubmitting(action)"
+              :loading="isToolActionSubmitting(action)"
               @click="emit('confirm-tool-action', action)"
             >
               {{ t('aiChat.confirmToolAction') }}
@@ -81,6 +106,7 @@
               size="small"
               variant="text"
               prepend-icon="mdi-close"
+              :disabled="isToolActionSubmitting(action)"
               @click="emit('reject-tool-action', action)"
             >
               {{ t('aiChat.rejectToolAction') }}
@@ -144,6 +170,17 @@ interface ChatNavigationLink {
   kind: 'list' | 'record' | 'route'
 }
 
+interface ChatImportAttachment {
+  attachmentHandle: number | null
+  filename: string
+  importBatchHandle: number | null
+  summary?: {
+    rowCount?: number
+    headers?: unknown[]
+    status?: string
+  } | null
+}
+
 const props = defineProps<{
   messages: AiChatMessageItem[]
   hasConfiguredProviders: boolean
@@ -153,6 +190,7 @@ const props = defineProps<{
   assistantName: string
   currentPersonDisplayName: string
   streamingDurationByHandle: Record<number, number>
+  activeToolActionHandles: Record<number, boolean>
   speechStateByHandle: Record<number, string>
 }>()
 
@@ -187,6 +225,48 @@ function getMessageToolActions(message: AiChatMessageItem): AiChatToolActionItem
   return Array.isArray(pendingActions) ? pendingActions.filter(isToolAction) : []
 }
 
+function isToolActionSubmitting(action: AiChatToolActionItem) {
+  return !!action.handle && !!props.activeToolActionHandles[action.handle]
+}
+
+function getMessageImportAttachments(message: AiChatMessageItem): ChatImportAttachment[] {
+  const requestPayload =
+    message.requestPayload && typeof message.requestPayload === 'object'
+      ? (message.requestPayload as Record<string, unknown>)
+      : null
+  const contextPayload =
+    message.contextPayload && typeof message.contextPayload === 'object'
+      ? (message.contextPayload as Record<string, unknown>)
+      : null
+  const attachments = Array.isArray(requestPayload?.importAttachments)
+    ? requestPayload?.importAttachments
+    : Array.isArray(contextPayload?.importAttachments)
+      ? contextPayload?.importAttachments
+      : []
+
+  return attachments.filter(isChatImportAttachment)
+}
+
+function isChatImportAttachment(value: unknown): value is ChatImportAttachment {
+  return (
+    !!value &&
+    typeof value === 'object' &&
+    typeof (value as { filename?: unknown }).filename === 'string'
+  )
+}
+
+function formatImportAttachmentChip(attachment: ChatImportAttachment) {
+  const rowCount =
+    typeof attachment.summary?.rowCount === 'number'
+      ? t('aiChat.attachmentRows', { count: attachment.summary.rowCount })
+      : null
+  const headerCount = Array.isArray(attachment.summary?.headers)
+    ? t('aiChat.attachmentHeaders', { count: attachment.summary.headers.length })
+    : null
+
+  return [attachment.filename, rowCount, headerCount].filter(Boolean).join(' · ')
+}
+
 function isToolAction(value: unknown): value is AiChatToolActionItem {
   return (
     !!value &&
@@ -206,6 +286,25 @@ function formatToolActionArguments(action: AiChatToolActionItem) {
   const args = action.arguments ?? {}
   const text = JSON.stringify(args, null, 2)
   return text.length > 800 ? `${text.slice(0, 797)}...` : text
+}
+
+function getToolActionError(action: AiChatToolActionItem) {
+  const payload = action.errorPayload
+
+  if (!payload || typeof payload !== 'object') {
+    return null
+  }
+
+  const error = (payload as Record<string, unknown>).error
+  const message = (payload as Record<string, unknown>).message
+  const value = typeof error === 'string' && error.trim() ? error : message
+
+  if (typeof value !== 'string' || !value.trim()) {
+    return null
+  }
+
+  const key = value.trim()
+  return te(key) ? t(key) : key
 }
 
 function getTransparencyChips(message: AiChatMessageItem): string[] {
@@ -236,6 +335,9 @@ function getTransparencyChips(message: AiChatMessageItem): string[] {
   return [
     toolResults.length > 0 ? `${toolResults.length} ${t('aiChat.toolsUsed')}` : null,
     sources.length > 0 ? `${sources.length} ${t('aiChat.sourcesUsed')}` : null,
+    getMessageImportAttachments(message).length > 0
+      ? `${getMessageImportAttachments(message).length} ${t('aiChat.attachmentsUsed')}`
+      : null,
     typeof agentVersion?.version === 'number' ? `v${agentVersion.version}` : null,
     typeof playbook?.title === 'string' ? playbook.title : null,
   ].filter((chip): chip is string => !!chip)

@@ -2475,6 +2475,358 @@
       "comment": null
     },
     {
+      "name": "ai_chat_attachment_item",
+      "schema": "public",
+      "columns": {
+        "byte_length": {
+          "name": "byte_length",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "document_handle": {
+          "name": "document_handle",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "error_payload": {
+          "name": "error_payload",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "json"
+        },
+        "filename": {
+          "name": "filename",
+          "type": "varchar(256)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 256,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "handle": {
+          "name": "handle",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "import_batch_handle": {
+          "name": "import_batch_handle",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "message_handle": {
+          "name": "message_handle",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "mime_type": {
+          "name": "mime_type",
+          "type": "varchar(128)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 128,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "person_handle": {
+          "name": "person_handle",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "purpose": {
+          "name": "purpose",
+          "type": "varchar(64)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 64,
+          "precision": null,
+          "scale": null,
+          "default": "'importAnalysis'",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "session_handle": {
+          "name": "session_handle",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(32)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 32,
+          "precision": null,
+          "scale": null,
+          "default": "'analyzed'",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "summary_payload": {
+          "name": "summary_payload",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "json"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "person_handle",
+            "session_handle"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "ai_chat_attachment_item_person_session_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "ai_chat_attachment_item_pkey",
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "triggers": [],
+      "foreignKeys": {
+        "ai_chat_attachment_item_document_handle_foreign": {
+          "columnNames": [
+            "document_handle"
+          ],
+          "constraintName": "ai_chat_attachment_item_document_handle_foreign",
+          "localTableName": "public.ai_chat_attachment_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "public.document_item",
+          "updateRule": "cascade"
+        },
+        "ai_chat_attachment_item_import_batch_handle_foreign": {
+          "columnNames": [
+            "import_batch_handle"
+          ],
+          "constraintName": "ai_chat_attachment_item_import_batch_handle_foreign",
+          "localTableName": "public.ai_chat_attachment_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "public.import_batch_item",
+          "updateRule": "cascade",
+          "deleteRule": "set null"
+        },
+        "ai_chat_attachment_item_message_handle_foreign": {
+          "columnNames": [
+            "message_handle"
+          ],
+          "constraintName": "ai_chat_attachment_item_message_handle_foreign",
+          "localTableName": "public.ai_chat_attachment_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "public.ai_chat_message_item",
+          "updateRule": "cascade",
+          "deleteRule": "set null"
+        },
+        "ai_chat_attachment_item_person_handle_foreign": {
+          "columnNames": [
+            "person_handle"
+          ],
+          "constraintName": "ai_chat_attachment_item_person_handle_foreign",
+          "localTableName": "public.ai_chat_attachment_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "public.person_item",
+          "updateRule": "cascade"
+        },
+        "ai_chat_attachment_item_session_handle_foreign": {
+          "columnNames": [
+            "session_handle"
+          ],
+          "constraintName": "ai_chat_attachment_item_session_handle_foreign",
+          "localTableName": "public.ai_chat_attachment_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "public.ai_chat_session_item",
+          "updateRule": "cascade",
+          "deleteRule": "set null"
+        }
+      },
+      "comment": null
+    },
+    {
       "name": "ai_chat_message_item",
       "schema": "public",
       "columns": {

@@ -31,6 +31,9 @@
   { "entity": "aiAgentVersion", "property": "groupBasics", "de": "Version", "en": "Version" },
   { "entity": "aiAgentVersion", "property": "groupPrompt", "de": "Prompt", "en": "Prompt" },
   { "entity": "aiAgentVersion", "property": "groupRuntime", "de": "Laufzeit", "en": "Runtime" },
+  { "entity": "aiAgentVersion", "property": "sessions", "de": "Sitzungen", "en": "Sessions" },
+  { "entity": "aiAgentVersion", "property": "runs", "de": "Durchläufe", "en": "Runs" },
+  { "entity": "aiAgentVersion", "property": "evaluations", "de": "Bewertungen", "en": "Evaluations" },
 
   { "entity": "aiAgentPlaybook", "property": "aiAgentPlaybook", "de": "Agent-Playbook", "en": "Agent playbook" },
   { "entity": "aiAgentPlaybook", "property": "handle", "de": "Kennung", "en": "Handle" },
@@ -43,6 +46,7 @@
   { "entity": "aiAgentPlaybook", "property": "isActive", "de": "Aktiv", "en": "Active" },
   { "entity": "aiAgentPlaybook", "property": "sortOrder", "de": "Sortierung", "en": "Sort order" },
   { "entity": "aiAgentPlaybook", "property": "groupBasics", "de": "Playbook", "en": "Playbook" },
+  { "entity": "aiAgentPlaybook", "property": "runs", "de": "Durchläufe", "en": "Runs" },
 
   { "entity": "aiAgentMemory", "property": "aiAgentMemory", "de": "Agent-Memory", "en": "Agent memory" },
   { "entity": "aiAgentMemory", "property": "handle", "de": "Kennung", "en": "Handle" },

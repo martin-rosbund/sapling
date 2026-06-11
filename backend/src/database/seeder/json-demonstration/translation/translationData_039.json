@@ -29,6 +29,12 @@
   { "entity": "aiAgent", "property": "groupScope", "de": "Daten und Tools", "en": "Data and tools" },
   { "entity": "aiAgent", "property": "groupGovernance", "de": "Freigabe", "en": "Governance" },
   { "entity": "aiAgent", "property": "groupConfiguration", "de": "Konfiguration", "en": "Configuration" },
+  { "entity": "aiAgent", "property": "toolActions", "de": "Tool-Aktionen", "en": "Tool Actions" },
+  { "entity": "aiAgent", "property": "versions", "de": "Versionen", "en": "Versions" },
+  { "entity": "aiAgent", "property": "runs", "de": "Durchläufe", "en": "Runs" },
+  { "entity": "aiAgent", "property": "evaluations", "de": "Bewertungen", "en": "Evaluations" },
+  { "entity": "aiAgent", "property": "playbooks", "de": "Playbooks", "en": "Playbooks" },
+  { "entity": "aiAgent", "property": "memories", "de": "Erinnerungen", "en": "Memories" },
 
   { "entity": "aiChatSession", "property": "agent", "de": "Agent", "en": "Agent" },
 

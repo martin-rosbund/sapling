@@ -12,6 +12,11 @@ import type { Request, Response } from 'express';
 import { GenericService } from '../generic/generic.service';
 import { CurrentService } from '../current/current.service';
 import { TemplateService } from '../template/template.service';
+import { ImportService } from '../import/import.service';
+import type {
+  ConfigureImportBatchDto,
+  ImportAiSuggestDto,
+} from '../import/import.types';
 import { PersonItem } from '../../entity/PersonItem';
 import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
@@ -42,6 +47,7 @@ export class SaplingMcpService {
     private readonly genericService: GenericService,
     private readonly currentService: CurrentService,
     private readonly templateService: TemplateService,
+    private readonly importService: ImportService,
     @Inject(forwardRef(() => AiService))
     private readonly aiService: AiService,
     private readonly permissionService: SaplingMcpPermissionService,
@@ -104,6 +110,28 @@ export class SaplingMcpService {
           break;
         case 'knowledge_search':
           payload = await this.executeKnowledgeSearch(args, user, policy);
+          break;
+        case 'import_get_batch':
+          payload = await this.executeImportGetBatch(args, user, policy);
+          break;
+        case 'import_list_templates':
+          payload = await this.executeImportListTemplates(args, user, policy);
+          break;
+        case 'import_suggest_mapping':
+          payload = await this.executeImportSuggestMapping(args, user, policy);
+          break;
+        case 'import_match_existing_records':
+          payload = await this.executeImportMatchExistingRecords(
+            args,
+            user,
+            policy,
+          );
+          break;
+        case 'import_configure_batch':
+          payload = await this.executeImportConfigureBatch(args, user, policy);
+          break;
+        case 'import_execute_batch':
+          payload = await this.executeImportExecuteBatch(args, user, policy);
           break;
         case 'generic_create':
           payload = await this.executeGenericCreate(args, user, policy);
@@ -270,6 +298,15 @@ export class SaplingMcpService {
         return this.createModelSemanticSearchResult(payload);
       case 'knowledge_search':
         return this.createModelKnowledgeSearchResult(payload);
+      case 'import_get_batch':
+      case 'import_suggest_mapping':
+      case 'import_configure_batch':
+      case 'import_execute_batch':
+        return this.createModelImportBatchResult(payload);
+      case 'import_list_templates':
+        return this.createModelImportTemplateListResult(payload);
+      case 'import_match_existing_records':
+        return this.createModelImportMatchResult(payload);
       case 'generic_create':
       case 'generic_update':
         return this.createModelMutationResult(payload, args);
@@ -391,6 +428,75 @@ export class SaplingMcpService {
           };
         })
         .filter((item) => item != null),
+    };
+  }
+
+  private createModelImportBatchResult(payload: unknown): unknown {
+    const record = this.asRecord(payload);
+
+    return {
+      ...this.copyModelResultMetadata(record, [
+        'handle',
+        'status',
+        'filename',
+        'mimetype',
+        'fileSize',
+        'sourceHandle',
+        'entityHandle',
+        'templateHandle',
+        'rowCount',
+        'readyCount',
+        'errorCount',
+        'createdCount',
+        'updatedCount',
+        'skippedCount',
+        'failedCount',
+        'delimiter',
+        'headers',
+        'sampleRows',
+        'mapping',
+        'externalKeyColumns',
+        'genericReferenceMapping',
+        'executedAt',
+        'warnings',
+        'providerHandle',
+        'modelHandle',
+      ]),
+      rows: Array.isArray(record.rows)
+        ? record.rows.slice(0, 20).map((row) => this.sanitizeUnknownValue(row))
+        : [],
+      usageHints: [...SAPLING_MCP_USAGE_HINTS.importTools],
+    };
+  }
+
+  private createModelImportTemplateListResult(payload: unknown): unknown {
+    const templates = Array.isArray(payload) ? payload : [];
+
+    return {
+      templates: templates.map((template) =>
+        this.sanitizeUnknownValue(template),
+      ),
+      usageHints: [...SAPLING_MCP_USAGE_HINTS.importTools],
+    };
+  }
+
+  private createModelImportMatchResult(payload: unknown): unknown {
+    const record = this.asRecord(payload);
+
+    return {
+      ...this.copyModelResultMetadata(record, [
+        'batchHandle',
+        'entityHandle',
+        'sourceColumns',
+        'targetFields',
+        'sampledRows',
+        'checkedValues',
+        'matchCount',
+      ]),
+      matches: Array.isArray(record.matches)
+        ? record.matches.map((item) => this.sanitizeUnknownValue(item))
+        : [],
+      usageHints: [...SAPLING_MCP_USAGE_HINTS.importTools],
     };
   }
 
@@ -1268,6 +1374,265 @@ export class SaplingMcpService {
     };
   }
 
+  private async executeImportGetBatch(
+    args: Record<string, unknown>,
+    user: PersonItem,
+    policy?: McpToolPolicy,
+  ): Promise<unknown> {
+    await this.assertImportAdministrator(user);
+    const batchHandle = this.requirePositiveIntArg(
+      args.batchHandle,
+      'batchHandle',
+    );
+    const batch = await this.importService.getBatch(batchHandle);
+
+    if (batch.entityHandle) {
+      this.assertEntityAllowed(batch.entityHandle, policy);
+    }
+
+    return batch;
+  }
+
+  private async executeImportListTemplates(
+    args: Record<string, unknown>,
+    user: PersonItem,
+    policy?: McpToolPolicy,
+  ): Promise<unknown> {
+    await this.assertImportAdministrator(user);
+    const entityHandle = this.asStringValue(args.entityHandle);
+
+    if (entityHandle) {
+      this.assertEntityAllowed(entityHandle, policy);
+      await this.permissionService.assertEntityPermission(
+        user,
+        entityHandle,
+        'allowRead',
+      );
+    }
+
+    return this.importService.listTemplates(
+      entityHandle ?? undefined,
+      this.asStringValue(args.sourceHandle) ?? undefined,
+    );
+  }
+
+  private async executeImportSuggestMapping(
+    args: Record<string, unknown>,
+    user: PersonItem,
+    policy?: McpToolPolicy,
+  ): Promise<unknown> {
+    await this.assertImportAdministrator(user);
+    const batchHandle = this.requirePositiveIntArg(
+      args.batchHandle,
+      'batchHandle',
+    );
+    const batch = await this.importService.getBatch(batchHandle);
+    const entityHandle =
+      this.asStringValue(args.entityHandle) ?? batch.entityHandle;
+
+    if (entityHandle) {
+      this.assertEntityAllowed(entityHandle, policy);
+      await this.permissionService.assertEntityPermission(
+        user,
+        entityHandle,
+        'allowRead',
+      );
+    }
+
+    const dto: ImportAiSuggestDto = {
+      entityHandle,
+      sourceHandle: this.asStringValue(args.sourceHandle),
+      maxSampleRows: this.asPositiveNumber(args.maxSampleRows),
+    };
+
+    return this.importService.suggestBatchConfiguration(batchHandle, dto);
+  }
+
+  private async executeImportConfigureBatch(
+    args: Record<string, unknown>,
+    user: PersonItem,
+    policy?: McpToolPolicy,
+  ): Promise<unknown> {
+    await this.assertImportAdministrator(user);
+    const batchHandle = this.requirePositiveIntArg(
+      args.batchHandle,
+      'batchHandle',
+    );
+    const entityHandle = this.requireStringArg(
+      args.entityHandle,
+      'entityHandle',
+    );
+    this.assertEntityAllowed(entityHandle, policy);
+    await this.permissionService.assertEntityPermission(
+      user,
+      entityHandle,
+      'allowInsert',
+    );
+    const sourceHandle = this.asStringValue(args.sourceHandle);
+    const batch = await this.importService.getBatch(batchHandle);
+
+    const dto: ConfigureImportBatchDto = {
+      entityHandle,
+      sourceHandle,
+      templateHandle: this.asPositiveNumber(args.templateHandle),
+      keyColumns: sourceHandle ? this.asStringArray(args.keyColumns) : [],
+      mappings: this.withImplicitHandleMapping(
+        this.asFieldMappingArray(args.mappings),
+        batch.headers,
+      ) as ConfigureImportBatchDto['mappings'],
+      relationMappings: this.asRecordArray(
+        args.relationMappings,
+      ) as ConfigureImportBatchDto['relationMappings'],
+      valueMappings: this.asRecordArray(
+        args.valueMappings,
+      ) as ConfigureImportBatchDto['valueMappings'],
+      genericReferenceMapping:
+        Object.keys(this.asRecord(args.genericReferenceMapping)).length > 0
+          ? (this.asRecord(
+              args.genericReferenceMapping,
+            ) as ConfigureImportBatchDto['genericReferenceMapping'])
+          : null,
+    };
+
+    return this.importService.configureBatch(batchHandle, dto, user);
+  }
+
+  private async executeImportExecuteBatch(
+    args: Record<string, unknown>,
+    user: PersonItem,
+    policy?: McpToolPolicy,
+  ): Promise<unknown> {
+    await this.assertImportAdministrator(user);
+    const batchHandle = this.requirePositiveIntArg(
+      args.batchHandle,
+      'batchHandle',
+    );
+    const batch = await this.importService.getBatch(batchHandle);
+
+    if (batch.entityHandle) {
+      this.assertEntityAllowed(batch.entityHandle, policy);
+      await this.permissionService.assertEntityPermission(
+        user,
+        batch.entityHandle,
+        'allowInsert',
+      );
+    }
+
+    return this.importService.executeBatch(batchHandle, user);
+  }
+
+  private async executeImportMatchExistingRecords(
+    args: Record<string, unknown>,
+    user: PersonItem,
+    policy?: McpToolPolicy,
+  ): Promise<unknown> {
+    await this.assertImportAdministrator(user);
+    const batchHandle = this.requirePositiveIntArg(
+      args.batchHandle,
+      'batchHandle',
+    );
+    const entityHandle = this.requireStringArg(
+      args.entityHandle,
+      'entityHandle',
+    );
+    this.assertEntityAllowed(entityHandle, policy);
+    await this.permissionService.assertEntityPermission(
+      user,
+      entityHandle,
+      'allowRead',
+    );
+
+    const batch = await this.importService.getBatch(batchHandle);
+    const sourceColumns = this.resolveImportMatchSourceColumns(
+      batch,
+      this.asStringArray(args.sourceColumns),
+    );
+    const targetFields = this.resolveImportMatchTargetFields(
+      entityHandle,
+      this.asStringArray(args.targetFields),
+    );
+
+    if (targetFields.length === 0) {
+      throw new ForbiddenException('ai.importNoSearchableFields');
+    }
+    const sampleLimit = Math.min(
+      this.asPositiveNumber(args.sampleLimit) ?? 10,
+      50,
+    );
+    const limitPerValue = Math.min(
+      this.asPositiveNumber(args.limitPerValue) ?? 3,
+      10,
+    );
+    const rows = batch.rows.length > 0 ? batch.rows : [];
+    const sampledRows = rows.slice(0, sampleLimit);
+    const matches: unknown[] = [];
+    let checkedValues = 0;
+
+    for (const row of sampledRows) {
+      for (const sourceColumn of sourceColumns) {
+        const rawValue = row.rawData?.[sourceColumn];
+        const value = this.formatDisplayValuePart(rawValue);
+
+        if (!value || value.length < 2) {
+          continue;
+        }
+
+        checkedValues += 1;
+        const filter = {
+          $or: targetFields.map((targetField) => ({
+            [targetField]: { $ilike: `%${value}%` },
+          })),
+        };
+
+        try {
+          const result = await this.genericService.findAndCount(
+            entityHandle,
+            filter,
+            1,
+            limitPerValue,
+            {},
+            user,
+            [],
+          );
+
+          if (result.data.length > 0) {
+            matches.push({
+              rowNumber: row.rowNumber,
+              sourceColumn,
+              value,
+              total: result.meta.total,
+              records: result.data.map((record) => ({
+                displayValue: this.buildRecordDisplayValue(
+                  entityHandle,
+                  record as Record<string, unknown>,
+                ),
+                record: this.sanitizeEntityRecord(entityHandle, record),
+              })),
+            });
+          }
+        } catch (error) {
+          matches.push({
+            rowNumber: row.rowNumber,
+            sourceColumn,
+            value,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+      }
+    }
+
+    return {
+      batchHandle,
+      entityHandle,
+      sourceColumns,
+      targetFields,
+      sampledRows: sampledRows.length,
+      checkedValues,
+      matchCount: matches.length,
+      matches,
+    };
+  }
+
   private normalizeKnowledgeSearchEntityHandles(
     requestedEntityHandles: string[],
     policy?: McpToolPolicy,
@@ -1745,10 +2110,156 @@ export class SaplingMcpService {
     };
   }
 
+  private async assertImportAdministrator(user: PersonItem): Promise<void> {
+    const person = await this.currentService.getPerson(user);
+    const rolesSource = person?.roles as
+      | Array<{ isAdministrator?: boolean }>
+      | { getItems?: () => Array<{ isAdministrator?: boolean }> }
+      | undefined;
+    const roles = Array.isArray(rolesSource)
+      ? rolesSource
+      : (rolesSource?.getItems?.() ?? []);
+
+    if (!roles.some((role) => role.isAdministrator === true)) {
+      throw new ForbiddenException('global.permissionDenied');
+    }
+  }
+
+  private resolveImportMatchSourceColumns(
+    batch: { headers: string[]; mapping?: object | null },
+    requestedColumns: string[],
+  ): string[] {
+    const headerSet = new Set(batch.headers);
+    const requested = requestedColumns.filter((column) =>
+      headerSet.has(column),
+    );
+
+    if (requested.length > 0) {
+      return requested;
+    }
+
+    const mapping = this.asRecord(batch.mapping);
+    const mappedColumns = Array.isArray(mapping.mappings)
+      ? mapping.mappings
+          .map((entry) => this.asStringValue(this.asRecord(entry).sourceColumn))
+          .filter(
+            (column): column is string => !!column && headerSet.has(column),
+          )
+      : [];
+
+    return mappedColumns.length > 0
+      ? [...new Set(mappedColumns)]
+      : batch.headers;
+  }
+
+  private resolveImportMatchTargetFields(
+    entityHandle: string,
+    requestedFields: string[],
+  ): string[] {
+    const fields = this.getEntityTemplate(entityHandle).filter(
+      (field) =>
+        !field.isReference &&
+        !field.isPrimaryKey &&
+        field.type === 'string' &&
+        !field.options?.includes('isSecurity'),
+    );
+    const fieldNames = new Set(fields.map((field) => field.name));
+    const requested = requestedFields.filter((field) => fieldNames.has(field));
+
+    if (requested.length > 0) {
+      return requested;
+    }
+
+    const preferredFields = [
+      'number',
+      'externalNumber',
+      'title',
+      'name',
+      'firstName',
+      'lastName',
+      'email',
+      'subject',
+      'description',
+    ].filter((field) => fieldNames.has(field));
+
+    if (preferredFields.length > 0) {
+      return preferredFields;
+    }
+
+    return fields
+      .filter((field) => field.options?.includes('isValue'))
+      .map((field) => field.name)
+      .slice(0, 5);
+  }
+
   private asRecord(value: unknown): Record<string, unknown> {
     return value && typeof value === 'object' && !Array.isArray(value)
       ? (value as Record<string, unknown>)
       : {};
+  }
+
+  private asRecordArray(value: unknown): Record<string, unknown>[] {
+    return Array.isArray(value)
+      ? value
+          .map((item) => this.asRecord(item))
+          .filter((item) => Object.keys(item).length > 0)
+      : [];
+  }
+
+  private asFieldMappingArray(value: unknown): Record<string, unknown>[] {
+    const arrayValue = this.asRecordArray(value);
+
+    if (arrayValue.length > 0) {
+      return arrayValue;
+    }
+
+    const recordValue = this.asRecord(value);
+
+    const mappings: Record<string, unknown>[] = [];
+
+    for (const [left, right] of Object.entries(recordValue)) {
+      if (typeof right !== 'string' || !right.trim()) {
+        continue;
+      }
+
+      const sourceColumn = left.trim();
+      const targetField = right.trim();
+
+      if (!sourceColumn || !targetField) {
+        continue;
+      }
+
+      mappings.push({ sourceColumn, targetField });
+    }
+
+    return mappings;
+  }
+
+  private withImplicitHandleMapping(
+    mappings: Record<string, unknown>[],
+    headers: unknown,
+  ): Record<string, unknown>[] {
+    const headerNames = this.asStringArray(headers);
+    const hasHandleHeader = headerNames.some(
+      (header) => header.trim().toLowerCase() === 'handle',
+    );
+
+    if (!hasHandleHeader) {
+      return mappings;
+    }
+
+    const hasHandleMapping = mappings.some((mapping) => {
+      const sourceColumn = this.asStringValue(mapping.sourceColumn);
+      const targetField = this.asStringValue(mapping.targetField);
+      return (
+        sourceColumn?.toLowerCase() === 'handle' ||
+        targetField?.toLowerCase() === 'handle'
+      );
+    });
+
+    return hasHandleMapping
+      ? mappings
+      : [{ sourceColumn: 'handle', targetField: 'handle' }, ...mappings];
   }
 
   private asStringArray(value: unknown): string[] {
@@ -1838,6 +2349,16 @@ export class SaplingMcpService {
     }
 
     throw new ForbiddenException(`ai.mcp${fieldName}Missing`);
+  }
+
+  private requirePositiveIntArg(value: unknown, fieldName: string): number {
+    const normalized = this.asPositiveNumber(value);
+
+    if (normalized == null) {
+      throw new ForbiddenException(`ai.mcp${fieldName}Missing`);
+    }
+
+    return normalized;
   }
 
   private handleTransportError(error: unknown, res: Response) {

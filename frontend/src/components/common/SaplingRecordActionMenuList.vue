@@ -1,5 +1,5 @@
 <template>
-  <v-list class="sapling-record-action-menu-list">
+  <v-list class="sapling-record-action-menu-list glass-panel">
     <template v-for="(group, groupIdx) in visibleMenuItems" :key="`group-${groupIdx}`">
       <v-list-item
         v-for="(menuItem, itemIdx) in group"

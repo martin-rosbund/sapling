@@ -22,6 +22,7 @@ jest.mock('../current/current.service', () => ({ CurrentService: class {} }));
 jest.mock('../template/template.service', () => ({
   TemplateService: class {},
 }));
+jest.mock('../import/import.service', () => ({ ImportService: class {} }));
 jest.mock('./ai.service', () => ({ AiService: class {} }));
 jest.mock('../../entity/PersonItem', () => ({ PersonItem: class {} }));
 jest.mock('../../entity/global/entity.registry', () => ({
@@ -72,12 +73,14 @@ const createService = ({
   },
   currentService = { getPerson: jest.fn() },
   templateService = { getEntityTemplate: jest.fn().mockReturnValue([]) },
+  importService = {},
   aiService = { searchVectorDocuments: jest.fn() },
   permissionService = { assertEntityPermission: jest.fn() },
 }: {
   genericService?: Record<string, jest.Mock>;
   currentService?: Record<string, jest.Mock>;
   templateService?: { getEntityTemplate: jest.Mock<any> };
+  importService?: Record<string, jest.Mock> | Record<string, unknown>;
   aiService?: { searchVectorDocuments: jest.Mock };
   permissionService?: { assertEntityPermission: jest.Mock };
 } = {}) =>
@@ -85,6 +88,7 @@ const createService = ({
     genericService as never,
     currentService as never,
     templateService as never,
+    importService as never,
     aiService as never,
     permissionService as never,
   );
@@ -610,5 +614,72 @@ describe('SaplingMcpService', () => {
       ],
     });
     expect(JSON.stringify(result.modelResult)).not.toContain('"handle"');
+  });
+
+  it('normalizes AI import configure payloads and ignores external keys without a source', async () => {
+    const currentService = {
+      getPerson: jest.fn().mockResolvedValue({
+        handle: 1,
+        roles: [{ isAdministrator: true }],
+      } as never),
+    };
+    const importService = {
+      getBatch: jest.fn().mockResolvedValue({
+        handle: 3,
+        headers: ['handle', 'title', 'name', 'version', 'description'],
+      } as never),
+      configureBatch: jest.fn().mockResolvedValue({
+        handle: 3,
+        status: 'validated',
+        entityHandle: 'product',
+        readyCount: 2,
+      } as never),
+    };
+    const permissionService = {
+      assertEntityPermission: jest.fn().mockResolvedValue(undefined as never),
+    };
+    const service = createService({
+      currentService,
+      importService,
+      permissionService,
+    });
+    const user = { handle: 1 } as never;
+
+    await service.executeTool(
+      'import_configure_batch',
+      {
+        batchHandle: 3,
+        entityHandle: 'product',
+        mappings: {
+          name: 'name',
+          title: 'title',
+          version: 'version',
+          description: 'description',
+        },
+        keyColumns: ['name'],
+      },
+      user,
+    );
+
+    expect(importService.configureBatch).toHaveBeenCalledWith(
+      3,
+      {
+        entityHandle: 'product',
+        sourceHandle: null,
+        templateHandle: null,
+        keyColumns: [],
+        mappings: [
+          { sourceColumn: 'handle', targetField: 'handle' },
+          { sourceColumn: 'name', targetField: 'name' },
+          { sourceColumn: 'title', targetField: 'title' },
+          { sourceColumn: 'version', targetField: 'version' },
+          { sourceColumn: 'description', targetField: 'description' },
+        ],
+        relationMappings: [],
+        valueMappings: [],
+        genericReferenceMapping: null,
+      },
+      user,
+    );
   });
 });

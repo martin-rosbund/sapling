@@ -22,6 +22,8 @@ backend/src/entity/ExternalRecordLinkItem.ts
 frontend/src/components/import/SaplingImportWorkspace.vue
 frontend/src/services/api.import.service.ts
 frontend/src/views/ImportView.vue
+backend/src/api/ai/sapling-mcp.service.ts
+frontend/src/components/system/ai-chat/SaplingAiChatConversation.vue
 ```
 
 ## Core Model
@@ -100,6 +102,26 @@ execution, so users can inspect the Sapling preview before anything is written.
 
 During execution, rows with an existing external record link update the linked
 Sapling record. Rows without a link create a new record and store the link.
+
+## AI Chat Import Agent
+
+The AI Chat can expose an Import-Agent for CSV, TSV, and TXT files. The chat
+upload endpoint stores the original file as a `DocumentItem`, analyzes it
+through the same import parser, creates an `ImportBatchItem`, and links the
+result to the chat with `AiChatAttachmentItem`.
+
+The chat does not introduce a second import engine. It uses the existing batch,
+template, validation, and execution services:
+
+- uploaded files become auditable import batches
+- the agent receives only a compact file summary in chat context
+- `import_get_batch` can inspect the batch when more detail is needed
+- `import_list_templates` and `import_suggest_mapping` prepare strategies
+- `import_match_existing_records` checks sampled values against readable data
+- `import_configure_batch` and `import_execute_batch` remain confirm-gated
+
+The V1 upload surface is deliberately CSV-first. XLSX, multi-file imports, and
+richer binary ingestion remain extension points.
 
 ## AI Suggestions
 

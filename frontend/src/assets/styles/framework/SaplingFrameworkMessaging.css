@@ -298,6 +298,19 @@
   max-width: 100%;
 }
 
+.sapling-ai-chat__attachment-input {
+  display: none;
+}
+
+.sapling-ai-chat__attachment-chips {
+  align-items: center;
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-ai-chat__attachment-chips .v-chip {
+  max-width: 100%;
+}
+
 .sapling-chat-composer {
   padding: var(--sapling-space-lg);
   border-top: 1px solid var(--sapling-surface-border);

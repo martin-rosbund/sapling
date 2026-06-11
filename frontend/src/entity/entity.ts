@@ -1912,6 +1912,42 @@ export interface AiChatMessageItem extends SaplingGenericItem {
 }
 
 /**
+ * Represents a file uploaded into the AI chat.
+ */
+export interface AiChatAttachmentItem extends SaplingGenericItem {
+  /** Numeric primary key */
+  handle?: number | null
+  /** Owning chat session */
+  session?: AiChatSessionItem | number | null
+  /** Related chat message */
+  message?: AiChatMessageItem | number | null
+  /** Owning person */
+  person: PersonItem | number
+  /** Persisted document handle */
+  document: number
+  /** Optional import batch handle */
+  importBatch?: number | null
+  /** Attachment purpose */
+  purpose: string
+  /** Original filename */
+  filename: string
+  /** MIME type */
+  mimeType?: string | null
+  /** File size in bytes */
+  byteLength?: number | null
+  /** Attachment processing status */
+  status: string
+  /** Structured analysis summary */
+  summaryPayload?: Record<string, unknown> | null
+  /** Error payload */
+  errorPayload?: Record<string, unknown> | null
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
  * Represents a pending or executed AI tool action.
  */
 export interface AiChatToolActionItem extends SaplingGenericItem {

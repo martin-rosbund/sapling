@@ -469,6 +469,17 @@ export class ImportService {
       throw new BadRequestException('import.targetEntityRequired');
     }
 
+    if (
+      batch.status !== 'validated' &&
+      batch.status !== 'validatedWithErrors'
+    ) {
+      throw new BadRequestException('import.batchNotReadyForExecution');
+    }
+
+    if ((batch.readyCount ?? 0) <= 0) {
+      throw new BadRequestException('import.noReadyRows');
+    }
+
     const rows = await this.em.find(
       ImportBatchRowItem,
       { batch: { handle: batch.handle } },
