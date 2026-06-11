@@ -1,5 +1,10 @@
 [
   { "entity": "aiAgent", "route": "ai-agents", "navigation": "aiAgents" },
   { "entity": "aiAgent", "route": "table/aiAgent" },
+  { "entity": "aiAgentVersion", "route": "table/aiAgentVersion" },
+  { "entity": "aiAgentPlaybook", "route": "table/aiAgentPlaybook" },
+  { "entity": "aiAgentMemory", "route": "table/aiAgentMemory" },
+  { "entity": "aiAgentRun", "route": "table/aiAgentRun" },
+  { "entity": "aiAgentEvaluation", "route": "table/aiAgentEvaluation" },
   { "entity": "aiChatToolAction", "route": "table/aiChatToolAction" }
 ]

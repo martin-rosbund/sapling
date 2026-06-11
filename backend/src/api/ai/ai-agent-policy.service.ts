@@ -15,17 +15,21 @@ export class AiAgentPolicyService {
 
   async listAccessibleAgents(user: PersonItem): Promise<AiAgentItem[]> {
     const userRoleHandles = await this.getUserRoleHandles(user);
+    const isAdministrator = this.isAdministrator(user);
     const agents = await this.em.find(
       AiAgentItem,
       { isActive: true },
       {
-        populate: ['roles', 'provider', 'model', 'model.provider'],
+        populate: ['roles', 'provider', 'model', 'model.provider', 'playbooks'],
         orderBy: { sortOrder: 'ASC', title: 'ASC' },
       },
     );
 
     return agents
-      .filter((agent) => this.isAgentVisibleToRoles(agent, userRoleHandles))
+      .filter(
+        (agent) =>
+          isAdministrator || this.isAgentVisibleToRoles(agent, userRoleHandles),
+      )
       .map((agent) => sanitizeAgent(agent));
   }
 
@@ -58,17 +62,23 @@ export class AiAgentPolicyService {
     user: PersonItem,
   ): Promise<AiAgentItem> {
     const userRoleHandles = await this.getUserRoleHandles(user);
+    const isAdministrator = this.isAdministrator(user);
     const agent = await this.em.findOne(
       AiAgentItem,
       { handle: agentHandle, isActive: true },
-      { populate: ['roles', 'provider', 'model', 'model.provider'] },
+      {
+        populate: ['roles', 'provider', 'model', 'model.provider', 'playbooks'],
+      },
     );
 
     if (!agent) {
       throw new NotFoundException('ai.agentNotFound');
     }
 
-    if (!this.isAgentVisibleToRoles(agent, userRoleHandles)) {
+    if (
+      !isAdministrator &&
+      !this.isAgentVisibleToRoles(agent, userRoleHandles)
+    ) {
       throw new ForbiddenException('global.permissionDenied');
     }
 
@@ -183,6 +193,18 @@ export class AiAgentPolicyService {
     return agentRoles.some(
       (role) => role.handle != null && userRoleHandles.has(role.handle),
     );
+  }
+
+  private isAdministrator(user: PersonItem): boolean {
+    const rolesSource = user.roles as
+      | Array<{ isAdministrator?: boolean }>
+      | { getItems?: () => Array<{ isAdministrator?: boolean }> }
+      | undefined;
+    const roles = Array.isArray(rolesSource)
+      ? rolesSource
+      : (rolesSource?.getItems?.() ?? []);
+
+    return roles.some((role) => role.isAdministrator === true);
   }
 
   private normalizeStringArray(value: string[] | null | undefined): string[] {

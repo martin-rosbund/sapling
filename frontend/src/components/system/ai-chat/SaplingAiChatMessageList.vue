@@ -89,6 +89,20 @@
         </div>
       </div>
       <div
+        v-if="getTransparencyChips(message).length > 0"
+        class="sapling-chip-row sapling-ai-chat__transparency"
+      >
+        <v-chip
+          v-for="chip in getTransparencyChips(message)"
+          :key="chip"
+          size="small"
+          variant="tonal"
+          prepend-icon="mdi-eye-outline"
+        >
+          {{ chip }}
+        </v-chip>
+      </div>
+      <div
         v-if="shouldShowMessageActions(message)"
         class="sapling-chip-row sapling-chat-message__actions sapling-ai-chat__message-links"
       >
@@ -192,6 +206,39 @@ function formatToolActionArguments(action: AiChatToolActionItem) {
   const args = action.arguments ?? {}
   const text = JSON.stringify(args, null, 2)
   return text.length > 800 ? `${text.slice(0, 797)}...` : text
+}
+
+function getTransparencyChips(message: AiChatMessageItem): string[] {
+  const payload =
+    message.responsePayload && typeof message.responsePayload === 'object'
+      ? (message.responsePayload as Record<string, unknown>)
+      : null
+
+  if (!payload || message.role !== 'assistant') {
+    return []
+  }
+
+  const toolResults = Array.isArray(payload.toolResults) ? payload.toolResults : []
+  const sources = Array.isArray(payload.sources)
+    ? payload.sources
+    : Array.isArray(payload.navigationLinks)
+      ? payload.navigationLinks
+      : []
+  const agentVersion =
+    payload.agentVersion && typeof payload.agentVersion === 'object'
+      ? (payload.agentVersion as { version?: unknown })
+      : null
+  const playbook =
+    payload.playbook && typeof payload.playbook === 'object'
+      ? (payload.playbook as { title?: unknown })
+      : null
+
+  return [
+    toolResults.length > 0 ? `${toolResults.length} ${t('aiChat.toolsUsed')}` : null,
+    sources.length > 0 ? `${sources.length} ${t('aiChat.sourcesUsed')}` : null,
+    typeof agentVersion?.version === 'number' ? `v${agentVersion.version}` : null,
+    typeof playbook?.title === 'string' ? playbook.title : null,
+  ].filter((chip): chip is string => !!chip)
 }
 
 function canPlayMessageSpeech(message: AiChatMessageItem) {

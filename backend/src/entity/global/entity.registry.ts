@@ -95,6 +95,11 @@ import { SlaPolicyItem } from '../SlaPolicyItem';
 import { PersonApiTokenItem } from '../PersonApiTokenItem';
 import { PersonPasskeyItem } from '../PersonPasskeyItem';
 import { AiAgentItem } from '../AiAgentItem';
+import { AiAgentEvaluationItem } from '../AiAgentEvaluationItem';
+import { AiAgentMemoryItem } from '../AiAgentMemoryItem';
+import { AiAgentPlaybookItem } from '../AiAgentPlaybookItem';
+import { AiAgentRunItem } from '../AiAgentRunItem';
+import { AiAgentVersionItem } from '../AiAgentVersionItem';
 import { AiChatSessionItem } from '../AiChatSessionItem';
 import { AiChatMessageItem } from '../AiChatMessageItem';
 import { AiChatTranscriptionItem } from '../AiChatTranscriptionItem';
@@ -252,6 +257,11 @@ const ENTITY_REGISTRY_ENTRIES: { name: string; class: any }[] = [
   { name: 'inboxSubscription', class: InboxSubscriptionItem },
   { name: 'inboxNotification', class: InboxNotificationItem },
   { name: 'aiAgent', class: AiAgentItem },
+  { name: 'aiAgentVersion', class: AiAgentVersionItem },
+  { name: 'aiAgentRun', class: AiAgentRunItem },
+  { name: 'aiAgentEvaluation', class: AiAgentEvaluationItem },
+  { name: 'aiAgentPlaybook', class: AiAgentPlaybookItem },
+  { name: 'aiAgentMemory', class: AiAgentMemoryItem },
   { name: 'aiChatSession', class: AiChatSessionItem },
   { name: 'aiChatMessage', class: AiChatMessageItem },
   { name: 'aiChatTranscription', class: AiChatTranscriptionItem },

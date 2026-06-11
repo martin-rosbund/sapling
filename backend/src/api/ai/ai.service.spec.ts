@@ -28,6 +28,21 @@ jest.mock('../../entity/AiChatTranscriptionItem', () => ({
 jest.mock('../../entity/AiAgentItem', () => ({
   AiAgentItem: class {},
 }));
+jest.mock('../../entity/AiAgentVersionItem', () => ({
+  AiAgentVersionItem: class {},
+}));
+jest.mock('../../entity/AiAgentRunItem', () => ({
+  AiAgentRunItem: class {},
+}));
+jest.mock('../../entity/AiAgentEvaluationItem', () => ({
+  AiAgentEvaluationItem: class {},
+}));
+jest.mock('../../entity/AiAgentPlaybookItem', () => ({
+  AiAgentPlaybookItem: class {},
+}));
+jest.mock('../../entity/AiAgentMemoryItem', () => ({
+  AiAgentMemoryItem: class {},
+}));
 jest.mock('../../entity/AiChatToolActionItem', () => ({
   AiChatToolActionItem: class {},
 }));
@@ -41,6 +56,9 @@ jest.mock('../../entity/DocumentItem', () => ({ DocumentItem: class {} }));
 jest.mock('./dto/chat.dto', () => ({
   AiChatMessageListMetaDto: class {},
   AiChatMessageListResponseDto: class {},
+  ApplyAiChatSessionPlaybookDto: class {},
+  CreateAiAgentEvaluationDto: class {},
+  CreateAiAgentTestRunDto: class {},
   CreateAiChatMessageDto: class {},
   CreateAiChatSessionDto: class {},
   ListAiChatMessagesQueryDto: class {},

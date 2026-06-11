@@ -288,6 +288,16 @@
   gap: var(--sapling-gap-sm);
 }
 
+.sapling-ai-chat__transparency {
+  gap: var(--sapling-gap-xs);
+  margin-top: var(--sapling-space-sm-plus);
+  color: var(--sapling-text-muted);
+}
+
+.sapling-ai-chat__transparency .v-chip {
+  max-width: 100%;
+}
+
 .sapling-chat-composer {
   padding: var(--sapling-space-lg);
   border-top: 1px solid var(--sapling-surface-border);

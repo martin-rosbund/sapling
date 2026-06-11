@@ -23,6 +23,11 @@ import { AiVectorDocumentItem } from '../../entity/AiVectorDocumentItem';
 import { McpService } from './mcp.service';
 import { SaplingMcpService } from './sapling-mcp.service';
 import { SaplingMcpPermissionService } from './sapling-mcp-permission.service';
+import { AiAgentEvaluationItem } from '../../entity/AiAgentEvaluationItem';
+import { AiAgentMemoryItem } from '../../entity/AiAgentMemoryItem';
+import { AiAgentPlaybookItem } from '../../entity/AiAgentPlaybookItem';
+import { AiAgentRunItem } from '../../entity/AiAgentRunItem';
+import { AiAgentVersionItem } from '../../entity/AiAgentVersionItem';
 
 /**
  * @class
@@ -46,6 +51,11 @@ import { SaplingMcpPermissionService } from './sapling-mcp-permission.service';
       AiChatTranscriptionItem,
       AiChatToolActionItem,
       AiAgentItem,
+      AiAgentVersionItem,
+      AiAgentRunItem,
+      AiAgentEvaluationItem,
+      AiAgentPlaybookItem,
+      AiAgentMemoryItem,
       AiProviderTypeItem,
       AiProviderModelItem,
       AiVectorDocumentItem,

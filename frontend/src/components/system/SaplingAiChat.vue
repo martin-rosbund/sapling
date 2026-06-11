@@ -73,6 +73,8 @@
                 :active-conversation-title="activeConversationTitle"
                 :agent-options="agentOptions"
                 :selected-agent-handle="selectedAgentHandle"
+                :playbook-options="playbookOptions"
+                :selected-playbook-handle="selectedPlaybookHandle"
                 :is-agent-locked="!!activeSession?.handle"
                 :has-configured-providers="hasConfiguredProviders"
                 :has-configured-transcription-providers="hasConfiguredTranscriptionProviders"
@@ -93,6 +95,7 @@
                 :title-preview-limit="TITLE_PREVIEW_LIMIT"
                 @update:draft-message="updateDraftMessage"
                 @update:selected-agent="updateSelectedAgent"
+                @update:selected-playbook="updateSelectedPlaybook"
                 @close="closePanel"
                 @load-older-messages="loadOlderMessages"
                 @toggle-message-speech="toggleMessageSpeech"
@@ -152,6 +155,10 @@ interface SaplingAiChatPromptEventDetail {
   autoSend?: boolean
   newChat?: boolean
   title?: string
+  agentHandle?: string
+  playbookHandle?: string
+  contextEntityHandle?: string
+  contextRecordHandle?: string
 }
 
 const route = useRoute()
@@ -201,6 +208,9 @@ const activeSession = ref<AiChatSessionItem | null>(null)
 const selectedProviderHandle = ref<string | null>(storedAiPreferences.chatProviderHandle)
 const selectedModelHandle = ref<string | null>(storedAiPreferences.chatModelHandle)
 const selectedAgentHandle = ref<string | null>(null)
+const selectedPlaybookHandle = ref<string | null>(null)
+const selectedContextEntityHandle = ref<string | null>(null)
+const selectedContextRecordHandle = ref<string | null>(null)
 const selectedTranscriptionProviderHandle = ref<string | null>(
   storedAiPreferences.transcriptionProviderHandle,
 )
@@ -309,6 +319,17 @@ const agentOptions = computed(() =>
   agentConfigs.value.map((agent) => ({
     label: agent.title,
     value: agent.handle,
+  })),
+)
+
+const selectedAgentConfig = computed(
+  () => agentConfigs.value.find((agent) => agent.handle === selectedAgentHandle.value) ?? null,
+)
+
+const playbookOptions = computed(() =>
+  (selectedAgentConfig.value?.playbooks ?? []).map((playbook) => ({
+    label: playbook.title,
+    value: playbook.handle,
   })),
 )
 
@@ -458,6 +479,7 @@ async function openPromptFromScriptButton(detail?: SaplingAiChatPromptEventDetai
     startNewChat()
   }
 
+  applyPromptContext(detail)
   draftMessage.value = prompt
 
   if (detail?.autoSend !== false) {
@@ -519,6 +541,7 @@ async function loadAgents() {
   try {
     agentConfigs.value = await ApiAiService.listAgents()
     syncSelectedAgent()
+    syncSelectedPlaybook()
     syncSelectedRuntimeTarget()
   } finally {
     isLoadingAgents.value = false
@@ -605,6 +628,8 @@ async function reloadSessions() {
 
       if (matchedSession) {
         syncSelectedAgent()
+        selectedPlaybookHandle.value = getPlaybookHandle(matchedSession.playbook)
+        syncSelectedPlaybook()
         await loadMessages(matchedSession.handle)
       } else {
         messages.value = []
@@ -680,6 +705,7 @@ async function selectSession(session: AiChatSessionItem) {
   stopSpeechPlayback()
   activeSession.value = session
   selectedAgentHandle.value = getAgentHandle(session.agent)
+  selectedPlaybookHandle.value = getPlaybookHandle(session.playbook)
   activeTranscriptionHandle.value = null
   editingSessionHandle.value = null
   isOpen.value = true
@@ -699,8 +725,11 @@ function startNewChat() {
   draftMessage.value = ''
   activeTranscriptionHandle.value = null
   editingSessionHandle.value = null
+  selectedContextEntityHandle.value = null
+  selectedContextRecordHandle.value = null
   isOpen.value = true
   syncSelectedAgent()
+  syncSelectedPlaybook()
   syncSelectedRuntimeTarget()
 
   if (isMobileLayout.value) {
@@ -739,7 +768,34 @@ function updateSelectedAgent(value: string) {
   }
 
   selectedAgentHandle.value = value || null
+  syncSelectedPlaybook()
   syncSelectedRuntimeTarget()
+}
+
+function updateSelectedPlaybook(value: string | null) {
+  selectedPlaybookHandle.value = value || null
+}
+
+function applyPromptContext(detail?: SaplingAiChatPromptEventDetail) {
+  const requestedAgent = detail?.agentHandle?.trim()
+  const requestedPlaybook = detail?.playbookHandle?.trim()
+
+  if (requestedAgent && agentConfigs.value.some((agent) => agent.handle === requestedAgent)) {
+    selectedAgentHandle.value = requestedAgent
+    syncSelectedRuntimeTarget()
+  }
+
+  if (
+    requestedPlaybook &&
+    playbookOptions.value.some((playbook) => playbook.value === requestedPlaybook)
+  ) {
+    selectedPlaybookHandle.value = requestedPlaybook
+  } else {
+    syncSelectedPlaybook()
+  }
+
+  selectedContextEntityHandle.value = detail?.contextEntityHandle?.trim() || null
+  selectedContextRecordHandle.value = detail?.contextRecordHandle?.trim() || null
 }
 
 function beginRename(session: AiChatSessionItem) {
@@ -826,6 +882,9 @@ async function sendMessage() {
         providerHandle: selectedProviderHandle.value ?? undefined,
         modelHandle: selectedModelHandle.value ?? undefined,
         agentHandle: selectedAgentHandle.value ?? undefined,
+        playbookHandle: selectedPlaybookHandle.value ?? undefined,
+        contextEntityHandle: selectedContextEntityHandle.value ?? undefined,
+        contextRecordHandle: selectedContextRecordHandle.value ?? undefined,
         transcriptionHandle: activeTranscriptionHandle.value ?? undefined,
         contextPayload: {
           params: route.params,
@@ -1277,12 +1336,30 @@ function syncSelectedAgent() {
     null
 }
 
+function syncSelectedPlaybook() {
+  const availableHandles = new Set(playbookOptions.value.map((playbook) => playbook.value))
+
+  if (selectedPlaybookHandle.value && availableHandles.has(selectedPlaybookHandle.value)) {
+    return
+  }
+
+  selectedPlaybookHandle.value = null
+}
+
 function getAgentHandle(agent?: AiAgentItem | string | null) {
   if (!agent) {
     return null
   }
 
   return typeof agent === 'string' ? agent : agent.handle
+}
+
+function getPlaybookHandle(playbook?: { handle?: string | null } | string | null) {
+  if (!playbook) {
+    return null
+  }
+
+  return typeof playbook === 'string' ? playbook : (playbook.handle ?? null)
 }
 
 function isToolAction(value: unknown): value is AiChatToolActionItem {

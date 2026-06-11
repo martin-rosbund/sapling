@@ -7,6 +7,11 @@ import {
   Property,
 } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { AiAgentEvaluationItem } from './AiAgentEvaluationItem';
+import { AiAgentMemoryItem } from './AiAgentMemoryItem';
+import { AiAgentPlaybookItem } from './AiAgentPlaybookItem';
+import { AiAgentRunItem } from './AiAgentRunItem';
+import { AiAgentVersionItem } from './AiAgentVersionItem';
 import { AiChatSessionItem } from './AiChatSessionItem';
 import { AiChatToolActionItem } from './AiChatToolActionItem';
 import { AiProviderModelItem } from './AiProviderModelItem';
@@ -330,6 +335,32 @@ export class AiAgentItem {
   @OneToMany(() => AiChatToolActionItem, (action) => action.agent)
   toolActions: Collection<AiChatToolActionItem> =
     new Collection<AiChatToolActionItem>(this);
+
+  @ApiPropertyOptional({ type: () => AiAgentVersionItem, isArray: true })
+  @OneToMany(() => AiAgentVersionItem, (version) => version.agent)
+  versions: Collection<AiAgentVersionItem> = new Collection<AiAgentVersionItem>(
+    this,
+  );
+
+  @ApiPropertyOptional({ type: () => AiAgentRunItem, isArray: true })
+  @OneToMany(() => AiAgentRunItem, (run) => run.agent)
+  runs: Collection<AiAgentRunItem> = new Collection<AiAgentRunItem>(this);
+
+  @ApiPropertyOptional({ type: () => AiAgentEvaluationItem, isArray: true })
+  @OneToMany(() => AiAgentEvaluationItem, (evaluation) => evaluation.agent)
+  evaluations: Collection<AiAgentEvaluationItem> =
+    new Collection<AiAgentEvaluationItem>(this);
+
+  @ApiPropertyOptional({ type: () => AiAgentPlaybookItem, isArray: true })
+  @OneToMany(() => AiAgentPlaybookItem, (playbook) => playbook.agent)
+  playbooks: Collection<AiAgentPlaybookItem> =
+    new Collection<AiAgentPlaybookItem>(this);
+
+  @ApiPropertyOptional({ type: () => AiAgentMemoryItem, isArray: true })
+  @OneToMany(() => AiAgentMemoryItem, (memory) => memory.agent)
+  memories: Collection<AiAgentMemoryItem> = new Collection<AiAgentMemoryItem>(
+    this,
+  );
 
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])

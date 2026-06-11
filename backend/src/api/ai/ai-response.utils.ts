@@ -1,4 +1,9 @@
 import type { AiAgentItem } from '../../entity/AiAgentItem';
+import type { AiAgentEvaluationItem } from '../../entity/AiAgentEvaluationItem';
+import type { AiAgentMemoryItem } from '../../entity/AiAgentMemoryItem';
+import type { AiAgentPlaybookItem } from '../../entity/AiAgentPlaybookItem';
+import type { AiAgentRunItem } from '../../entity/AiAgentRunItem';
+import type { AiAgentVersionItem } from '../../entity/AiAgentVersionItem';
 import type { AiChatMessageItem } from '../../entity/AiChatMessageItem';
 import type { AiChatSessionItem } from '../../entity/AiChatSessionItem';
 import type { AiChatToolActionItem } from '../../entity/AiChatToolActionItem';
@@ -196,6 +201,13 @@ export function sanitizeModel(model: AiProviderModelItem): AiProviderModelItem {
 }
 
 export function sanitizeAgent(agent: AiAgentItem): AiAgentItem {
+  const playbooks = isInitializedCollection(agent.playbooks)
+    ? agent.playbooks
+        .getItems()
+        .filter((playbook) => playbook.isActive)
+        .map((playbook) => sanitizeAgentPlaybook(playbook))
+    : undefined;
+
   return {
     handle: agent.handle,
     title: agent.title,
@@ -221,9 +233,162 @@ export function sanitizeAgent(agent: AiAgentItem): AiAgentItem {
     isActive: agent.isActive,
     isDefault: agent.isDefault,
     sortOrder: agent.sortOrder,
+    playbooks,
     createdAt: agent.createdAt,
     updatedAt: agent.updatedAt,
-  } as AiAgentItem;
+  } as unknown as AiAgentItem;
+}
+
+function isInitializedCollection<T>(value: {
+  isInitialized?: () => boolean;
+  getItems?: () => T[];
+}): value is { isInitialized: () => boolean; getItems: () => T[] } {
+  return (
+    typeof value?.isInitialized === 'function' &&
+    typeof value?.getItems === 'function' &&
+    value.isInitialized()
+  );
+}
+
+export function sanitizeAgentVersion(
+  version: AiAgentVersionItem,
+): AiAgentVersionItem {
+  return {
+    handle: version.handle,
+    agent:
+      version.agent && typeof version.agent !== 'string'
+        ? version.agent.handle
+        : version.agent,
+    version: version.version,
+    status: version.status,
+    promptMarkdown: version.promptMarkdown,
+    changelog: version.changelog ?? null,
+    provider:
+      version.provider && typeof version.provider !== 'string'
+        ? sanitizeProvider(version.provider)
+        : version.provider,
+    model:
+      version.model && typeof version.model !== 'string'
+        ? sanitizeModel(version.model)
+        : version.model,
+    allowedEntityHandles: version.allowedEntityHandles ?? null,
+    allowedKnowledgeEntityHandles:
+      version.allowedKnowledgeEntityHandles ?? null,
+    allowedInternalTools: version.allowedInternalTools ?? null,
+    allowedExternalTools: version.allowedExternalTools ?? null,
+    activatedAt: version.activatedAt ?? null,
+    createdAt: version.createdAt,
+    updatedAt: version.updatedAt,
+  } as unknown as AiAgentVersionItem;
+}
+
+export function sanitizeAgentPlaybook(
+  playbook: AiAgentPlaybookItem,
+): AiAgentPlaybookItem {
+  return {
+    handle: playbook.handle,
+    agent:
+      playbook.agent && typeof playbook.agent !== 'string'
+        ? playbook.agent.handle
+        : playbook.agent,
+    title: playbook.title,
+    description: playbook.description ?? null,
+    triggerEntityHandles: playbook.triggerEntityHandles ?? null,
+    steps: playbook.steps ?? [],
+    expectedOutput: playbook.expectedOutput ?? null,
+    isActive: playbook.isActive,
+    sortOrder: playbook.sortOrder,
+    createdAt: playbook.createdAt,
+    updatedAt: playbook.updatedAt,
+  } as unknown as AiAgentPlaybookItem;
+}
+
+export function sanitizeAgentMemory(
+  memory: AiAgentMemoryItem,
+): AiAgentMemoryItem {
+  return {
+    handle: memory.handle,
+    agent:
+      memory.agent && typeof memory.agent !== 'string'
+        ? memory.agent.handle
+        : memory.agent,
+    type: memory.type,
+    title: memory.title,
+    contentMarkdown: memory.contentMarkdown,
+    entityScopeHandles: memory.entityScopeHandles ?? null,
+    isActive: memory.isActive,
+    sortOrder: memory.sortOrder,
+    createdAt: memory.createdAt,
+    updatedAt: memory.updatedAt,
+  } as unknown as AiAgentMemoryItem;
+}
+
+export function sanitizeAgentRun(run: AiAgentRunItem): AiAgentRunItem {
+  return {
+    handle: run.handle,
+    session:
+      run.session && typeof run.session !== 'number'
+        ? (run.session.handle ?? null)
+        : (run.session ?? null),
+    message:
+      run.message && typeof run.message !== 'number'
+        ? (run.message.handle ?? null)
+        : (run.message ?? null),
+    person: extractPersonReference(run.person),
+    agent:
+      run.agent && typeof run.agent !== 'string'
+        ? sanitizeAgent(run.agent)
+        : (run.agent ?? null),
+    agentVersion:
+      run.agentVersion && typeof run.agentVersion !== 'number'
+        ? sanitizeAgentVersion(run.agentVersion)
+        : (run.agentVersion ?? null),
+    playbook:
+      run.playbook && typeof run.playbook !== 'string'
+        ? sanitizeAgentPlaybook(run.playbook)
+        : (run.playbook ?? null),
+    status: run.status,
+    provider: run.provider ?? null,
+    model: run.model ?? null,
+    contextEntityHandle: run.contextEntityHandle ?? null,
+    contextRecordHandle: run.contextRecordHandle ?? null,
+    durationMs: run.durationMs ?? null,
+    toolCalls: run.toolCalls ?? null,
+    sources: run.sources ?? null,
+    pendingActions: run.pendingActions ?? null,
+    usagePayload: run.usagePayload ?? null,
+    responseText: run.responseText ?? null,
+    errorPayload: run.errorPayload ?? null,
+    startedAt: run.startedAt,
+    completedAt: run.completedAt ?? null,
+    updatedAt: run.updatedAt,
+  } as unknown as AiAgentRunItem;
+}
+
+export function sanitizeAgentEvaluation(
+  evaluation: AiAgentEvaluationItem,
+): AiAgentEvaluationItem {
+  return {
+    handle: evaluation.handle,
+    agent:
+      evaluation.agent && typeof evaluation.agent !== 'string'
+        ? evaluation.agent.handle
+        : evaluation.agent,
+    agentVersion:
+      evaluation.agentVersion && typeof evaluation.agentVersion !== 'number'
+        ? sanitizeAgentVersion(evaluation.agentVersion)
+        : (evaluation.agentVersion ?? null),
+    title: evaluation.title,
+    prompt: evaluation.prompt,
+    expectedCriteria: evaluation.expectedCriteria ?? null,
+    targetEntityHandle: evaluation.targetEntityHandle ?? null,
+    targetRecordHandle: evaluation.targetRecordHandle ?? null,
+    status: evaluation.status,
+    rating: evaluation.rating ?? null,
+    comment: evaluation.comment ?? null,
+    createdAt: evaluation.createdAt,
+    updatedAt: evaluation.updatedAt,
+  } as unknown as AiAgentEvaluationItem;
 }
 
 export function sanitizeChatSession(
@@ -245,6 +410,16 @@ export function sanitizeChatSession(
       session.agent && typeof session.agent !== 'string'
         ? sanitizeAgent(session.agent)
         : session.agent,
+    agentVersion:
+      session.agentVersion && typeof session.agentVersion !== 'number'
+        ? sanitizeAgentVersion(session.agentVersion)
+        : (session.agentVersion ?? null),
+    playbook:
+      session.playbook && typeof session.playbook !== 'string'
+        ? sanitizeAgentPlaybook(session.playbook)
+        : (session.playbook ?? null),
+    contextEntityHandle: session.contextEntityHandle ?? null,
+    contextRecordHandle: session.contextRecordHandle ?? null,
     lastMessageAt: session.lastMessageAt,
     person: extractPersonReference(session.person),
     createdAt: session.createdAt,

@@ -33,6 +33,7 @@ export class TicketController extends ScriptClass {
         buildAiChatPromptUrl(
           buildTicketReferencePrompt(handle, item),
           'Ticket mit Referenzen analysieren',
+          handle,
         ),
       );
     }
@@ -525,7 +526,7 @@ function buildTicketReferencePrompt(
   const solutionDescription = normalizeString(item.solutionDescription);
 
   return [
-    'Bitte analysiere dieses Sapling-Ticket und finde passende Faelle, Loesungen und Referenzen.',
+    'Bitte analysiere dieses Sapling-Ticket und finde passende Faelle, Lösungen und Referenzen.',
     '',
     `Aktuelles Ticket: ${String(handle)}${number ? ` - ${number}` : ''}${title ? ` - ${title}` : ''}`,
     externalNumber ? `Externe Referenz aus der Liste: ${externalNumber}` : null,
@@ -533,22 +534,22 @@ function buildTicketReferencePrompt(
       ? `Bekannte Problembeschreibung aus der Liste: ${problemDescription}`
       : null,
     solutionDescription
-      ? `Bekannte Loesung aus der Liste: ${solutionDescription}`
+      ? `Bekannte Lösung aus der Liste: ${solutionDescription}`
       : null,
     '',
     'Arbeitsweise:',
     '1. Lade das aktuelle Ticket mit generic_get.',
     `   entityHandle: ticket, handle: ${JSON.stringify(handle)}, relations: ["status", "priority", "type", "category", "source", "contract", "supportTeam", "supportQueue", "creatorCompany", "creatorPerson", "assigneeCompany", "assigneePerson", "salesOpportunity", "events", "effortEstimates"]`,
-    '2. Baue aus Titel, Problem, Loesung, Status, Prioritaet, Kunde, Vertrag und verknuepften Datensaetzen eine Suchanfrage.',
+    '2. Baue aus Titel, Problem, Lösung, Status, Priorität, Kunde, Vertrag und verknüpften Datensätzen eine Suchanfrage.',
     '3. Nutze knowledge_search mit entityHandles ["ticket", "knowledgeArticle", "effortEstimate", "effortEstimatePosition", "salesOpportunity"].',
-    '4. Nutze ticket_search ergaenzend, wenn Ticketnummern, externe Referenzen oder exakte Begriffe relevant sind.',
-    '5. Wenn ein Vektorindex fehlt, nenne ihn kurz und nutze die verfuegbaren Quellen weiter.',
+    '4. Nutze ticket_search ergänzend, wenn Ticketnummern, externe Referenzen oder exakte Begriffe relevant sind.',
+    '5. Wenn ein Vektorindex fehlt, nenne ihn kurz und nutze die verfügbaren Quellen weiter.',
     '',
     'Gib mir kompakt:',
-    '- aehnliche Tickets und deren Loesungen oder Workarounds',
-    '- passende Wissensartikel und wiederverwendbare Loesungsschritte',
-    '- verwandte Schaetzungen, Positionen oder Verkaufschancen, falls sie fachlich passen',
-    '- Risiken, offene Rueckfragen und naechste sinnvolle Support-Schritte',
+    '- ähnliche Tickets und deren Lösungen oder Workarounds',
+    '- passende Wissensartikel und wiederverwendbare Lösungsschritte',
+    '- verwandte Schätzungen, Positionen oder Verkaufschancen, falls sie fachlich passen',
+    '- Risiken, offene Rückfragen und nächste sinnvolle Support-Schritte',
     '- eine kurze Antwort auf: Welche Faelle passen zu diesem Ticket?',
   ]
     .filter(
@@ -557,13 +558,24 @@ function buildTicketReferencePrompt(
     .join('\n');
 }
 
-function buildAiChatPromptUrl(prompt: string, title: string): string {
+function buildAiChatPromptUrl(
+  prompt: string,
+  title: string,
+  handle?: string | number,
+): string {
   const params = new URLSearchParams({
     prompt,
     title,
     autoSend: 'true',
     newChat: 'true',
+    agentHandle: 'ticketSupportAgent',
+    playbookHandle: 'supportTicketResolution',
+    contextEntityHandle: 'ticket',
   });
+
+  if (handle != null) {
+    params.set('contextRecordHandle', String(handle));
+  }
 
   return `sapling-ai-chat://prompt?${params.toString()}`;
 }

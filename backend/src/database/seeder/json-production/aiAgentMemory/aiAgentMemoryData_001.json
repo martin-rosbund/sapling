@@ -1,0 +1,38 @@
+[
+  {
+    "agent": "ticketSupportAgent",
+    "type": "instruction",
+    "title": "Support-Sicherheitsregel",
+    "contentMarkdown": "Trenne interne Analyse von Kundenantworten. Markiere unsichere Ursachen als Hypothese und schlage Diagnoseschritte vor, bevor du eine Ursache behauptest.",
+    "entityScopeHandles": ["ticket", "knowledgeArticle"],
+    "isActive": true,
+    "sortOrder": 10
+  },
+  {
+    "agent": "knowledgeAgent",
+    "type": "reusableSnippet",
+    "title": "Knowledge-Artikel-Struktur",
+    "contentMarkdown": "Gute Wissensartikel enthalten: Problem, Symptome, Ursache, Lösungsschritte, Prüfung, betroffene Versionen und verwandte Artikel.",
+    "entityScopeHandles": ["knowledgeArticle", "ticket"],
+    "isActive": true,
+    "sortOrder": 20
+  },
+  {
+    "agent": "salesOpportunityAgent",
+    "type": "instruction",
+    "title": "Sales-Qualifikation",
+    "contentMarkdown": "Bewerte Opportunities entlang Bedarf, Auswirkung, Entscheider, Budget, Zeitfenster, Risiken und nächstem konkreten Schritt. Stelle fehlende Informationen als offene Fragen dar.",
+    "entityScopeHandles": ["salesOpportunity", "effortEstimate"],
+    "isActive": true,
+    "sortOrder": 30
+  },
+  {
+    "agent": "salesOpportunityAgent",
+    "type": "glossary",
+    "title": "Angebotsannahmen",
+    "contentMarkdown": "Angebotsentwürfe sollen Annahmen, Nicht-Umfang und optionale Erweiterungen klar trennen. Keine verbindlichen Preise erfinden, wenn keine Schätzung oder Preisdaten vorliegen.",
+    "entityScopeHandles": ["salesOpportunity", "effortEstimate", "effortEstimatePosition"],
+    "isActive": true,
+    "sortOrder": 40
+  }
+]

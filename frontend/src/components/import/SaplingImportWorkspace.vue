@@ -1213,8 +1213,7 @@ function normalizeName(value: string): string {
   grid-template-columns: minmax(320px, 0.95fr) minmax(360px, 1.05fr);
   gap: 16px;
   align-items: stretch;
-  height: max(500px, calc(100vh - 320px));
-  min-height: 500px;
+  height: max(1200px, calc(100vh - 320px));
 }
 
 .sapling-import__panel {

@@ -1,6 +1,11 @@
 import axios from 'axios'
 import type {
   AiAgentItem,
+  AiAgentEvaluationItem,
+  AiAgentMemoryItem,
+  AiAgentPlaybookItem,
+  AiAgentRunItem,
+  AiAgentVersionItem,
   AiChatMessageItem,
   AiChatSessionItem,
   AiChatToolActionItem,
@@ -15,6 +20,10 @@ export interface CreateAiChatSessionPayload {
   providerHandle?: string
   modelHandle?: string
   agentHandle?: string
+  agentVersionHandle?: number
+  playbookHandle?: string
+  contextEntityHandle?: string
+  contextRecordHandle?: string
 }
 
 export interface UpdateAiChatSessionPayload {
@@ -23,6 +32,10 @@ export interface UpdateAiChatSessionPayload {
   providerHandle?: string
   modelHandle?: string
   agentHandle?: string
+  agentVersionHandle?: number
+  playbookHandle?: string
+  contextEntityHandle?: string
+  contextRecordHandle?: string
 }
 
 export interface CreateAiChatMessagePayload {
@@ -35,6 +48,10 @@ export interface CreateAiChatMessagePayload {
   providerHandle?: string
   modelHandle?: string
   agentHandle?: string
+  agentVersionHandle?: number
+  playbookHandle?: string
+  contextEntityHandle?: string
+  contextRecordHandle?: string
   transcriptionHandle?: number
   contextPayload?: Record<string, unknown>
   clientCurrentDateTime?: string
@@ -109,6 +126,40 @@ export interface AiMcpToolDescriptor {
   inputSchema?: Record<string, unknown> | null
 }
 
+export interface AiAgentWorkbenchResponse {
+  agent: AiAgentItem
+  versions: AiAgentVersionItem[]
+  playbooks: AiAgentPlaybookItem[]
+  memories: AiAgentMemoryItem[]
+  runs: AiAgentRunItem[]
+  evaluations: AiAgentEvaluationItem[]
+  stats: {
+    runsTotal?: number
+    failedRuns?: number
+    pendingActions?: number
+    evaluationTotal?: number
+    evaluationPassed?: number
+    evaluationPassRate?: number | null
+  }
+}
+
+export interface CreateAiAgentTestRunPayload {
+  prompt: string
+  agentVersionHandle?: number
+  playbookHandle?: string
+  contextEntityHandle?: string
+  contextRecordHandle?: string
+}
+
+export interface CreateAiAgentEvaluationPayload {
+  title: string
+  prompt: string
+  expectedCriteria?: string
+  agentVersionHandle?: number
+  targetEntityHandle?: string
+  targetRecordHandle?: string
+}
+
 export interface AiChatMessageListMeta {
   limit: number
   hasMore: boolean
@@ -162,6 +213,74 @@ class ApiAiService {
       return response.data
     } catch (error: unknown) {
       this.handleError(error, 'ai.chat.toolListFailed')
+      throw error
+    }
+  }
+
+  static async getAgentWorkbench(agentHandle: string): Promise<AiAgentWorkbenchResponse> {
+    try {
+      const response = await axios.get<AiAgentWorkbenchResponse>(
+        `${BACKEND_URL}ai/agents/${agentHandle}/workbench`,
+      )
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'aiAgentBuilder.workbenchLoadFailed')
+      throw error
+    }
+  }
+
+  static async createAgentTestRun(
+    agentHandle: string,
+    payload: CreateAiAgentTestRunPayload,
+  ): Promise<AiAgentRunItem> {
+    try {
+      const response = await axios.post<AiAgentRunItem>(
+        `${BACKEND_URL}ai/agents/${agentHandle}/test-runs`,
+        payload,
+      )
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'aiAgentBuilder.testRunFailed')
+      throw error
+    }
+  }
+
+  static async listAgentRuns(agentHandle: string): Promise<AiAgentRunItem[]> {
+    try {
+      const response = await axios.get<AiAgentRunItem[]>(
+        `${BACKEND_URL}ai/agents/${agentHandle}/runs`,
+      )
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'aiAgentBuilder.runListFailed')
+      throw error
+    }
+  }
+
+  static async listAgentEvaluations(agentHandle: string): Promise<AiAgentEvaluationItem[]> {
+    try {
+      const response = await axios.get<AiAgentEvaluationItem[]>(
+        `${BACKEND_URL}ai/agents/${agentHandle}/evaluations`,
+      )
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'aiAgentBuilder.evaluationListFailed')
+      throw error
+    }
+  }
+
+  static async createAgentEvaluation(
+    agentHandle: string,
+    payload: CreateAiAgentEvaluationPayload,
+  ): Promise<AiAgentEvaluationItem> {
+    try {
+      const response = await axios.post<AiAgentEvaluationItem>(
+        `${BACKEND_URL}ai/agents/${agentHandle}/evaluations`,
+        payload,
+      )
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'aiAgentBuilder.evaluationCreateFailed')
       throw error
     }
   }
@@ -301,6 +420,22 @@ class ApiAiService {
       return response.data
     } catch (error: unknown) {
       this.handleError(error, 'ai.chat.sessionUpdateFailed')
+      throw error
+    }
+  }
+
+  static async applySessionPlaybook(
+    handle: number,
+    playbookHandle: string,
+  ): Promise<AiChatSessionItem> {
+    try {
+      const response = await axios.post<AiChatSessionItem>(
+        `${BACKEND_URL}ai/chat/sessions/${handle}/playbook`,
+        { playbookHandle },
+      )
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'ai.chat.playbookApplyFailed')
       throw error
     }
   }

@@ -19,6 +19,21 @@
         variant="outlined"
         @update:model-value="emit('update:selectedAgent', String($event || ''))"
       />
+      <v-select
+        v-if="playbookOptions.length > 0"
+        :model-value="selectedPlaybookHandle"
+        class="sapling-ai-chat__agent-select"
+        density="compact"
+        hide-details
+        item-title="label"
+        item-value="value"
+        :disabled="isSending"
+        :items="playbookOptions"
+        :label="t('aiChat.playbook')"
+        clearable
+        variant="outlined"
+        @update:model-value="emit('update:selectedPlaybook', $event ? String($event) : null)"
+      />
     </div>
 
     <SaplingAiChatMessageList
@@ -101,6 +116,8 @@ const props = withDefaults(
     activeConversationTitle: string
     agentOptions: SelectOption[]
     selectedAgentHandle: string | null
+    playbookOptions: SelectOption[]
+    selectedPlaybookHandle: string | null
     isAgentLocked: boolean
     hasConfiguredProviders: boolean
     hasConfiguredTranscriptionProviders: boolean
@@ -128,6 +145,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   (event: 'update:draftMessage', value: string): void
   (event: 'update:selectedAgent', value: string): void
+  (event: 'update:selectedPlaybook', value: string | null): void
   (event: 'send'): void
   (event: 'close'): void
   (event: 'load-older-messages'): void

@@ -37,10 +37,15 @@ import { AiAgentItem } from '../../entity/AiAgentItem';
 import { AiChatSessionItem } from '../../entity/AiChatSessionItem';
 import { AiChatMessageItem } from '../../entity/AiChatMessageItem';
 import { AiChatToolActionItem } from '../../entity/AiChatToolActionItem';
+import { AiAgentEvaluationItem } from '../../entity/AiAgentEvaluationItem';
+import { AiAgentRunItem } from '../../entity/AiAgentRunItem';
 import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
 import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import {
   AiChatMessageListResponseDto,
+  ApplyAiChatSessionPlaybookDto,
+  CreateAiAgentEvaluationDto,
+  CreateAiAgentTestRunDto,
   CreateAiChatMessageSpeechDto,
   CreateAiChatMessageDto,
   CreateAiChatSessionDto,
@@ -658,6 +663,102 @@ export class AiController {
     @Param('handle') handle: number,
   ): Promise<AiChatToolActionItem> {
     return this.aiService.rejectToolAction(Number(handle), req.user);
+  }
+
+  @Get('agents/:handle/workbench')
+  @UseGuards(AdminPermissionGuard)
+  @AdminPermission()
+  @ApiOperation({
+    summary: 'Load AI agent workbench data',
+    description:
+      'Returns the selected agent with versions, playbooks, memory, runs, evaluations, and summary stats for administration.',
+  })
+  async getAgentWorkbench(
+    @Req() req: Request & { user: PersonItem },
+    @Param('handle') handle: string,
+  ): Promise<Record<string, unknown>> {
+    return this.aiService.getAgentWorkbench(handle, req.user);
+  }
+
+  @Post('agents/:handle/test-runs')
+  @UseGuards(AdminPermissionGuard)
+  @AdminPermission()
+  @ApiOperation({
+    summary: 'Run an AI agent test prompt',
+    description:
+      'Creates a managed test chat run for an agent and returns the captured run metadata.',
+  })
+  @ApiBody({ type: CreateAiAgentTestRunDto })
+  async createAgentTestRun(
+    @Req() req: Request & { user: PersonItem },
+    @Param('handle') handle: string,
+    @Body() body: CreateAiAgentTestRunDto,
+  ): Promise<AiAgentRunItem> {
+    return this.aiService.createAgentTestRun(handle, body, req.user);
+  }
+
+  @Get('agents/:handle/runs')
+  @UseGuards(AdminPermissionGuard)
+  @AdminPermission()
+  @ApiOperation({
+    summary: 'List AI agent runs',
+    description: 'Returns recent execution runs for one AI agent.',
+  })
+  async listAgentRuns(
+    @Req() req: Request & { user: PersonItem },
+    @Param('handle') handle: string,
+  ): Promise<AiAgentRunItem[]> {
+    return this.aiService.listAgentRuns(handle, req.user);
+  }
+
+  @Get('agents/:handle/evaluations')
+  @UseGuards(AdminPermissionGuard)
+  @AdminPermission()
+  @ApiOperation({
+    summary: 'List AI agent evaluations',
+    description:
+      'Returns manual quality evaluation test cases for one AI agent.',
+  })
+  async listAgentEvaluations(
+    @Req() req: Request & { user: PersonItem },
+    @Param('handle') handle: string,
+  ): Promise<AiAgentEvaluationItem[]> {
+    return this.aiService.listAgentEvaluations(handle, req.user);
+  }
+
+  @Post('agents/:handle/evaluations')
+  @UseGuards(AdminPermissionGuard)
+  @AdminPermission()
+  @ApiOperation({
+    summary: 'Create an AI agent evaluation',
+    description: 'Creates a manual evaluation test case for one AI agent.',
+  })
+  @ApiBody({ type: CreateAiAgentEvaluationDto })
+  async createAgentEvaluation(
+    @Req() req: Request & { user: PersonItem },
+    @Param('handle') handle: string,
+    @Body() body: CreateAiAgentEvaluationDto,
+  ): Promise<AiAgentEvaluationItem> {
+    return this.aiService.createAgentEvaluation(handle, body, req.user);
+  }
+
+  @Post('chat/sessions/:handle/playbook')
+  @ApiOperation({
+    summary: 'Apply an AI playbook to a chat session',
+    description:
+      'Stores the selected playbook on an existing chat session. Future messages include the playbook instructions.',
+  })
+  @ApiBody({ type: ApplyAiChatSessionPlaybookDto })
+  async applySessionPlaybook(
+    @Req() req: Request & { user: PersonItem },
+    @Param('handle') handle: number,
+    @Body() body: ApplyAiChatSessionPlaybookDto,
+  ): Promise<AiChatSessionItem> {
+    return this.aiService.applyChatSessionPlaybook(
+      Number(handle),
+      body,
+      req.user,
+    );
   }
 
   @Post('chat/stream')

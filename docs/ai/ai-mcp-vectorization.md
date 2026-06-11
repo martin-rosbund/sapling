@@ -25,6 +25,11 @@ Relevant entities:
 
 ```text
 AiAgentItem
+AiAgentVersionItem
+AiAgentRunItem
+AiAgentEvaluationItem
+AiAgentPlaybookItem
+AiAgentMemoryItem
 AiChatSessionItem
 AiChatMessageItem
 AiChatToolActionItem
@@ -39,9 +44,13 @@ Provider/model records are stored in the database. Runtime credentials and provi
 
 `AiAgentItem` stores configurable Songbird profiles with an agent prompt,
 optional provider/model overrides, data scopes, tool scopes, and mutation
-behavior. `AiChatSessionItem.agent` keeps the chosen agent for a conversation.
-Mutating generic tools are confirm-gated through `AiChatToolActionItem` when an
-agent uses `mutationMode = confirm`.
+behavior. `AiAgentVersionItem` snapshots prompts and scope for traceable
+production chats. `AiChatSessionItem.agent` and
+`AiChatSessionItem.agentVersion` keep the chosen runtime for a conversation.
+`AiAgentPlaybookItem` and `AiAgentMemoryItem` add controlled workflow and
+instruction context. `AiAgentRunItem` records tool/source transparency and
+runtime metadata. Mutating generic tools are confirm-gated through
+`AiChatToolActionItem` when an agent uses `mutationMode = confirm`.
 
 ### OpenAI-Compatible Local Providers
 
@@ -116,6 +125,7 @@ generic_get
 generic_timeline
 ticket_search
 semantic_search
+knowledge_search
 generic_create
 generic_update
 generic_delete

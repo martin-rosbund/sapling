@@ -21,7 +21,7 @@ describe('saplingScriptResultUtil', () => {
           method: ScriptResultClientMethod.callURL,
           parameter: `sapling-ai-chat://prompt?prompt=${encodeURIComponent(
             prompt,
-          )}&autoSend=false&newChat=false`,
+          )}&autoSend=false&newChat=false&agentHandle=salesOpportunityAgent&playbookHandle=salesOpportunityBriefing&contextEntityHandle=salesOpportunity&contextRecordHandle=12`,
           item: {},
         },
         {
@@ -40,6 +40,10 @@ describe('saplingScriptResultUtil', () => {
       autoSend: false,
       newChat: false,
       title: undefined,
+      agentHandle: 'salesOpportunityAgent',
+      playbookHandle: 'salesOpportunityBriefing',
+      contextEntityHandle: 'salesOpportunity',
+      contextRecordHandle: '12',
     })
   })
 })

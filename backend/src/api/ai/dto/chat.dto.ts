@@ -44,6 +44,38 @@ export class CreateAiChatSessionDto {
   @IsString()
   @MaxLength(64)
   agentHandle?: string;
+
+  @ApiPropertyOptional({
+    description: 'Optional fixed agent version handle for this chat session',
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  agentVersionHandle?: number;
+
+  @ApiPropertyOptional({
+    description: 'Optional agent playbook handle for this chat session',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  playbookHandle?: string;
+
+  @ApiPropertyOptional({
+    description: 'Optional context entity handle for the chat session',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  contextEntityHandle?: string;
+
+  @ApiPropertyOptional({
+    description: 'Optional context record handle for the chat session',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(128)
+  contextRecordHandle?: string;
 }
 
 export class UpdateAiChatSessionDto {
@@ -83,6 +115,38 @@ export class UpdateAiChatSessionDto {
   @IsString()
   @MaxLength(64)
   agentHandle?: string;
+
+  @ApiPropertyOptional({
+    description: 'Optional fixed agent version handle for this chat session',
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  agentVersionHandle?: number;
+
+  @ApiPropertyOptional({
+    description: 'Optional agent playbook handle for this chat session',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  playbookHandle?: string;
+
+  @ApiPropertyOptional({
+    description: 'Optional context entity handle for this chat session',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  contextEntityHandle?: string;
+
+  @ApiPropertyOptional({
+    description: 'Optional context record handle for this chat session',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(128)
+  contextRecordHandle?: string;
 }
 
 export class CreateAiChatMessageDto {
@@ -156,6 +220,38 @@ export class CreateAiChatMessageDto {
   @IsString()
   @MaxLength(64)
   agentHandle?: string;
+
+  @ApiPropertyOptional({
+    description: 'Optional fixed agent version handle for this message/session',
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  agentVersionHandle?: number;
+
+  @ApiPropertyOptional({
+    description: 'Optional playbook handle for this message/session',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  playbookHandle?: string;
+
+  @ApiPropertyOptional({
+    description: 'Optional context entity handle for this message/session',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  contextEntityHandle?: string;
+
+  @ApiPropertyOptional({
+    description: 'Optional context record handle for this message/session',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(128)
+  contextRecordHandle?: string;
 
   @ApiPropertyOptional({
     description: 'Optional transcription handle linked to this message',
@@ -283,4 +379,82 @@ export class AiChatMessageListResponseDto {
     description: 'Pagination metadata for requesting older messages.',
   })
   meta: AiChatMessageListMetaDto = new AiChatMessageListMetaDto();
+}
+
+export class CreateAiAgentTestRunDto {
+  @ApiProperty({
+    description: 'Prompt that should be tested against the agent',
+  })
+  @IsString()
+  @MaxLength(16384)
+  prompt!: string;
+
+  @ApiPropertyOptional({ description: 'Optional agent version to test' })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  agentVersionHandle?: number;
+
+  @ApiPropertyOptional({
+    description: 'Optional playbook handle for the test run',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  playbookHandle?: string;
+
+  @ApiPropertyOptional({ description: 'Optional context entity handle' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  contextEntityHandle?: string;
+
+  @ApiPropertyOptional({ description: 'Optional context record handle' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(128)
+  contextRecordHandle?: string;
+}
+
+export class CreateAiAgentEvaluationDto {
+  @ApiProperty()
+  @IsString()
+  @MaxLength(160)
+  title!: string;
+
+  @ApiProperty()
+  @IsString()
+  @MaxLength(16384)
+  prompt!: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(4096)
+  expectedCriteria?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  agentVersionHandle?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  targetEntityHandle?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(128)
+  targetRecordHandle?: string;
+}
+
+export class ApplyAiChatSessionPlaybookDto {
+  @ApiProperty({ description: 'Playbook handle to apply to the chat session' })
+  @IsString()
+  @MaxLength(64)
+  playbookHandle!: string;
 }

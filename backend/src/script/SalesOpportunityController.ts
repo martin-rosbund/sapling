@@ -23,6 +23,7 @@ export class SalesOpportunityController extends ScriptClass {
       buildAiChatPromptUrl(
         buildSalesOpportunityPrompt(handle, item),
         'Verkaufschance mit Referenzen analysieren',
+        handle,
       ),
     );
   }
@@ -69,16 +70,16 @@ function buildSalesOpportunityPrompt(
     'Arbeitsweise:',
     '1. Lade die aktuelle Verkaufschance mit generic_get.',
     `   entityHandle: salesOpportunity, handle: ${JSON.stringify(handle)}, relations: ["type", "forecast", "source", "tickets", "effortEstimates"]`,
-    '2. Baue aus Titel, Beschreibung, Pain Points, Kundensituation und verknuepften Datensaetzen eine Suchanfrage.',
+    '2. Baue aus Titel, Beschreibung, Pain Points, Kundensituation und verknüpften Datensätzen eine Suchanfrage.',
     '3. Nutze knowledge_search mit entityHandles ["salesOpportunity", "ticket", "effortEstimate", "effortEstimatePosition", "knowledgeArticle"].',
-    '4. Wenn ein Vektorindex fehlt, nenne ihn kurz und nutze die verfuegbaren Quellen weiter.',
+    '4. Wenn ein Vektorindex fehlt, nenne ihn kurz und nutze die verfügbaren Quellen weiter.',
     '',
     'Gib mir kompakt:',
-    '- aehnliche Pain Points und wie sie geloest wurden',
-    '- passende Tickets, Schaetzungen und Positionen',
-    '- Argumente, Referenzloesungen und wiederverwendbare Angebotsbausteine',
-    '- Risiken, Einwaende und naechste Fragen fuer Sales',
-    '- eine kurze Antwort auf: Welche Tickets/Schaetzungen passen zu dieser Chance?',
+    '- ähnliche Pain Points und wie sie gelöst wurden',
+    '- passende Tickets, Schätzungen und Positionen',
+    '- Argumente, Referenzlösungen und wiederverwendbare Angebotsbausteine',
+    '- Risiken, Einwände und nächste Fragen für Sales',
+    '- eine kurze Antwort auf: Welche Tickets/Schätzungen passen zu dieser Chance?',
   ]
     .filter(
       (line): line is string => typeof line === 'string' && line.length > 0,
@@ -86,13 +87,24 @@ function buildSalesOpportunityPrompt(
     .join('\n');
 }
 
-function buildAiChatPromptUrl(prompt: string, title: string): string {
+function buildAiChatPromptUrl(
+  prompt: string,
+  title: string,
+  handle?: string | number,
+): string {
   const params = new URLSearchParams({
     prompt,
     title,
     autoSend: 'true',
     newChat: 'true',
+    agentHandle: 'salesOpportunityAgent',
+    playbookHandle: 'salesOpportunityBriefing',
+    contextEntityHandle: 'salesOpportunity',
   });
+
+  if (handle != null) {
+    params.set('contextRecordHandle', String(handle));
+  }
 
   return `sapling-ai-chat://prompt?${params.toString()}`;
 }

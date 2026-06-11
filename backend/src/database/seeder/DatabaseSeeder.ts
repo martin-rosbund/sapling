@@ -109,6 +109,9 @@ import { MarketingCampaignStatusItem } from '../../entity/MarketingCampaignStatu
 import { MarketingCampaignTypeItem } from '../../entity/MarketingCampaignTypeItem';
 import { ImportSourceItem } from '../../entity/ImportSourceItem';
 import { AiAgentItem } from '../../entity/AiAgentItem';
+import { AiAgentMemoryItem } from '../../entity/AiAgentMemoryItem';
+import { AiAgentPlaybookItem } from '../../entity/AiAgentPlaybookItem';
+import { AiAgentVersionItem } from '../../entity/AiAgentVersionItem';
 
 /**
  * Declarative seed order.
@@ -228,6 +231,9 @@ const SEED_ORDER: Array<EntityName<object> | (new () => Seeder)> = [
   McpServerConfigItem,
   ImportSourceItem,
   AiAgentItem,
+  AiAgentVersionItem,
+  AiAgentPlaybookItem,
+  AiAgentMemoryItem,
 ];
 
 function isEntityClass(

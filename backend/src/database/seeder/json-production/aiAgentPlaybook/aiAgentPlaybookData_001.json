@@ -1,0 +1,66 @@
+[
+  {
+    "handle": "supportTicketResolution",
+    "agent": "ticketSupportAgent",
+    "title": "Ticket lösen",
+    "description": "Strukturierte Analyse eines Support-Tickets mit Lösungsvorschlag und optionalen Folgeaktionen.",
+    "triggerEntityHandles": ["ticket"],
+    "steps": [
+      "Lade den Ticket-Kontext inklusive Timeline, Kunde, Produkt und Priorität.",
+      "Suche ähnliche Tickets und passende Knowledge Articles.",
+      "Fasse Ursache, nächste Schritte und offene Fragen getrennt zusammen.",
+      "Bereite schreibende Änderungen nur als bestätigungspflichtige Aktionen vor."
+    ],
+    "expectedOutput": "Interne Analyse, Kundenantwort-Entwurf und Liste der vorbereiteten Aktionen.",
+    "isActive": true,
+    "sortOrder": 10
+  },
+  {
+    "handle": "supportKnowledgeDraft",
+    "agent": "knowledgeAgent",
+    "title": "Knowledge Draft",
+    "description": "Aus Ticket- oder Lösungskontext einen wiederverwendbaren Wissensartikel entwerfen.",
+    "triggerEntityHandles": ["ticket", "knowledgeArticle"],
+    "steps": [
+      "Identifiziere Problem, Umgebung, Symptome, Ursache und Lösungsschritte.",
+      "Prüfe vorhandene Knowledge Articles auf Duplikate oder Ergänzungen.",
+      "Formuliere einen Artikelentwurf mit klarer Struktur und Annahmen.",
+      "Erzeuge neue Artikel oder Updates nur als Pending Action."
+    ],
+    "expectedOutput": "Titel, Kurzbeschreibung, Lösungsschritte, Tags und offene Prüfpunkte.",
+    "isActive": true,
+    "sortOrder": 20
+  },
+  {
+    "handle": "salesOpportunityBriefing",
+    "agent": "salesOpportunityAgent",
+    "title": "Opportunity Briefing",
+    "description": "Schnelle Vertriebszusammenfassung mit Risiken, nächsten Schritten und Vergleichsfällen.",
+    "triggerEntityHandles": ["salesOpportunity"],
+    "steps": [
+      "Lade Opportunity, Kunde, Ansprechpartner, Timeline und relevante Schätzungen.",
+      "Suche ähnliche Opportunities, Schätzungen und Wissensartikel.",
+      "Bewerte Pain Points, Chancen, Risiken und nächste Schritte.",
+      "Bereite Follow-ups oder Notizen nur als Pending Action vor."
+    ],
+    "expectedOutput": "Deal-Zusammenfassung, Risiken, offene Fragen und empfohlene nächste Schritte.",
+    "isActive": true,
+    "sortOrder": 30
+  },
+  {
+    "handle": "salesEstimatePreparation",
+    "agent": "salesOpportunityAgent",
+    "title": "Angebot vorbereiten",
+    "description": "Aus Opportunity-Kontext eine Angebotsstruktur und Aufwandshinweise vorbereiten.",
+    "triggerEntityHandles": ["salesOpportunity", "effortEstimate"],
+    "steps": [
+      "Lade Opportunity- und Estimate-Kontext, falls vorhanden.",
+      "Suche vergleichbare Schätzungen und Angebotspositionen.",
+      "Entwirf eine sinnvolle Angebotsstruktur mit Annahmen und Nicht-Umfang.",
+      "Erzeuge Estimate-Drafts oder Updates nur nach expliziter Bestätigung."
+    ],
+    "expectedOutput": "Angebotsgliederung, Aufwandstreiber, Annahmen, Risiken und vorbereitete Aktionen.",
+    "isActive": true,
+    "sortOrder": 40
+  }
+]

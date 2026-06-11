@@ -1712,6 +1712,14 @@ export interface AiChatSessionItem extends SaplingGenericItem {
   model?: AiProviderModelItem | string | null
   /** Selected AI agent */
   agent?: AiAgentItem | string | null
+  /** Fixed AI agent version for the session */
+  agentVersion?: AiAgentVersionItem | number | null
+  /** Selected AI playbook */
+  playbook?: AiAgentPlaybookItem | string | null
+  /** Optional context entity handle */
+  contextEntityHandle?: string | null
+  /** Optional context record handle */
+  contextRecordHandle?: string | null
   /** Timestamp of the latest message */
   lastMessageAt?: Date | null
   /** Owning person */
@@ -1766,9 +1774,98 @@ export interface AiAgentItem extends SaplingGenericItem {
   isDefault: boolean
   /** Sort order */
   sortOrder: number
+  /** Active playbooks available for this agent */
+  playbooks?: AiAgentPlaybookItem[] | null
   /** Creation date */
   createdAt?: Date | null
   /** Last update date */
+  updatedAt?: Date | null
+}
+
+export interface AiAgentVersionItem extends SaplingGenericItem {
+  handle?: number | null
+  agent: AiAgentItem | string
+  version: number
+  status: string
+  promptMarkdown: string
+  changelog?: string | null
+  provider?: AiProviderTypeItem | string | null
+  model?: AiProviderModelItem | string | null
+  allowedEntityHandles?: string[] | null
+  allowedKnowledgeEntityHandles?: string[] | null
+  allowedInternalTools?: string[] | null
+  allowedExternalTools?: string[] | null
+  activatedAt?: Date | null
+  createdAt?: Date | null
+  updatedAt?: Date | null
+}
+
+export interface AiAgentPlaybookItem extends SaplingGenericItem {
+  handle: string
+  agent: AiAgentItem | string
+  title: string
+  description?: string | null
+  triggerEntityHandles?: string[] | null
+  steps: string[]
+  expectedOutput?: string | null
+  isActive: boolean
+  sortOrder: number
+  createdAt?: Date | null
+  updatedAt?: Date | null
+}
+
+export interface AiAgentMemoryItem extends SaplingGenericItem {
+  handle?: number | null
+  agent: AiAgentItem | string
+  type: string
+  title: string
+  contentMarkdown: string
+  entityScopeHandles?: string[] | null
+  roles?: RoleItem[] | number[] | null
+  isActive: boolean
+  sortOrder: number
+  createdAt?: Date | null
+  updatedAt?: Date | null
+}
+
+export interface AiAgentRunItem extends SaplingGenericItem {
+  handle?: number | null
+  session?: AiChatSessionItem | number | null
+  message?: AiChatMessageItem | number | null
+  person: PersonItem | number
+  agent?: AiAgentItem | string | null
+  agentVersion?: AiAgentVersionItem | number | null
+  playbook?: AiAgentPlaybookItem | string | null
+  status: string
+  provider?: string | null
+  model?: string | null
+  contextEntityHandle?: string | null
+  contextRecordHandle?: string | null
+  durationMs?: number | null
+  toolCalls?: Record<string, unknown>[] | null
+  sources?: Record<string, unknown>[] | null
+  pendingActions?: Record<string, unknown>[] | null
+  usagePayload?: Record<string, unknown> | null
+  responseText?: string | null
+  errorPayload?: Record<string, unknown> | null
+  startedAt?: Date | null
+  completedAt?: Date | null
+  updatedAt?: Date | null
+}
+
+export interface AiAgentEvaluationItem extends SaplingGenericItem {
+  handle?: number | null
+  agent: AiAgentItem | string
+  agentVersion?: AiAgentVersionItem | number | null
+  title: string
+  prompt: string
+  expectedCriteria?: string | null
+  targetEntityHandle?: string | null
+  targetRecordHandle?: string | null
+  status: string
+  rating?: number | null
+  comment?: string | null
+  createdAt?: Date | null
   updatedAt?: Date | null
 }
 

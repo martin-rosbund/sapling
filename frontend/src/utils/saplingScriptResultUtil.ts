@@ -32,6 +32,10 @@ type AiChatPromptDetail = {
   autoSend: boolean
   newChat: boolean
   title?: string
+  agentHandle?: string
+  playbookHandle?: string
+  contextEntityHandle?: string
+  contextRecordHandle?: string
 }
 
 export const SAPLING_AI_CHAT_PROMPT_EVENT = 'sapling-ai-chat-prompt'
@@ -144,6 +148,10 @@ function parseAiChatPromptUrl(url: string): AiChatPromptDetail | null {
       autoSend: parseBooleanSearchParam(parsedUrl.searchParams.get('autoSend'), true),
       newChat: parseBooleanSearchParam(parsedUrl.searchParams.get('newChat'), true),
       title: parsedUrl.searchParams.get('title')?.trim() || undefined,
+      agentHandle: parsedUrl.searchParams.get('agentHandle')?.trim() || undefined,
+      playbookHandle: parsedUrl.searchParams.get('playbookHandle')?.trim() || undefined,
+      contextEntityHandle: parsedUrl.searchParams.get('contextEntityHandle')?.trim() || undefined,
+      contextRecordHandle: parsedUrl.searchParams.get('contextRecordHandle')?.trim() || undefined,
     }
   } catch {
     return null

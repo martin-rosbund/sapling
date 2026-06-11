@@ -1,0 +1,57 @@
+[
+  {
+    "handle": "aiAgentVersion",
+    "canShow": true,
+    "icon": "mdi-source-branch",
+    "group": "ai",
+    "order": 26,
+    "canRead": true,
+    "canInsert": true,
+    "canUpdate": true,
+    "canDelete": true
+  },
+  {
+    "handle": "aiAgentPlaybook",
+    "canShow": true,
+    "icon": "mdi-format-list-checks",
+    "group": "ai",
+    "order": 27,
+    "canRead": true,
+    "canInsert": true,
+    "canUpdate": true,
+    "canDelete": true
+  },
+  {
+    "handle": "aiAgentMemory",
+    "canShow": true,
+    "icon": "mdi-brain",
+    "group": "ai",
+    "order": 28,
+    "canRead": true,
+    "canInsert": true,
+    "canUpdate": true,
+    "canDelete": true
+  },
+  {
+    "handle": "aiAgentRun",
+    "canShow": true,
+    "icon": "mdi-chart-timeline-variant",
+    "group": "ai",
+    "order": 29,
+    "canRead": true,
+    "canInsert": false,
+    "canUpdate": false,
+    "canDelete": false
+  },
+  {
+    "handle": "aiAgentEvaluation",
+    "canShow": true,
+    "icon": "mdi-clipboard-check-outline",
+    "group": "ai",
+    "order": 30,
+    "canRead": true,
+    "canInsert": true,
+    "canUpdate": true,
+    "canDelete": true
+  }
+]

@@ -8,6 +8,11 @@ import {
 } from '@nestjs/common';
 import { PersonItem } from '../../entity/PersonItem';
 import { AiAgentItem } from '../../entity/AiAgentItem';
+import { AiAgentEvaluationItem } from '../../entity/AiAgentEvaluationItem';
+import { AiAgentMemoryItem } from '../../entity/AiAgentMemoryItem';
+import { AiAgentPlaybookItem } from '../../entity/AiAgentPlaybookItem';
+import { AiAgentRunItem } from '../../entity/AiAgentRunItem';
+import { AiAgentVersionItem } from '../../entity/AiAgentVersionItem';
 import { AiChatSessionItem } from '../../entity/AiChatSessionItem';
 import { AiChatMessageItem } from '../../entity/AiChatMessageItem';
 import { AiChatToolActionItem } from '../../entity/AiChatToolActionItem';
@@ -18,6 +23,9 @@ import { DocumentItem } from '../../entity/DocumentItem';
 import {
   AiChatMessageListResponseDto,
   AiChatMessageListMetaDto,
+  ApplyAiChatSessionPlaybookDto,
+  CreateAiAgentEvaluationDto,
+  CreateAiAgentTestRunDto,
   CreateAiChatMessageSpeechDto,
   CreateAiChatMessageDto,
   CreateAiChatSessionDto,
@@ -73,6 +81,12 @@ import {
   extractProviderHandle,
   sanitizeChatMessage,
   sanitizeChatSession,
+  sanitizeAgent,
+  sanitizeAgentEvaluation,
+  sanitizeAgentMemory,
+  sanitizeAgentPlaybook,
+  sanitizeAgentRun,
+  sanitizeAgentVersion,
   sanitizeToolAction,
   shouldReuseAssistantSpeech,
   withMessageSpeechPayload,
@@ -90,6 +104,15 @@ type AiChatMessagePage = {
     hasMore: boolean;
     nextBeforeSequence: number | null;
   };
+};
+
+type AgentRuntimeContext = {
+  agent: AiAgentItem | null;
+  version: AiAgentVersionItem | null;
+  playbook: AiAgentPlaybookItem | null;
+  memories: AiAgentMemoryItem[];
+  toolPolicy: McpToolPolicy | undefined;
+  instruction: string | null;
 };
 
 /**
@@ -169,6 +192,181 @@ export class AiService {
     return this.agentPolicy.listAccessibleAgents(user);
   }
 
+  async getAgentWorkbench(
+    agentHandle: string,
+    user: PersonItem,
+  ): Promise<Record<string, unknown>> {
+    const agent = await this.agentPolicy.requireAccessibleAgent(
+      agentHandle,
+      user,
+    );
+    const [versions, playbooks, memories, runs, evaluations] =
+      await Promise.all([
+        this.em.find(
+          AiAgentVersionItem,
+          { agent: { handle: agent.handle } },
+          {
+            populate: ['agent', 'provider', 'model', 'model.provider'],
+            orderBy: { version: 'DESC' },
+            limit: 20,
+          },
+        ),
+        this.em.find(
+          AiAgentPlaybookItem,
+          { agent: { handle: agent.handle } },
+          { populate: ['agent'], orderBy: { sortOrder: 'ASC', title: 'ASC' } },
+        ),
+        this.loadAccessibleMemories(agent, user),
+        this.em.find(
+          AiAgentRunItem,
+          { agent: { handle: agent.handle } },
+          {
+            populate: ['agent', 'agentVersion', 'playbook', 'person'],
+            orderBy: { startedAt: 'DESC' },
+            limit: 25,
+          },
+        ),
+        this.em.find(
+          AiAgentEvaluationItem,
+          { agent: { handle: agent.handle } },
+          {
+            populate: ['agent', 'agentVersion'],
+            orderBy: { updatedAt: 'DESC' },
+            limit: 50,
+          },
+        ),
+      ]);
+
+    return {
+      agent: sanitizeAgent(agent),
+      versions: versions.map((version) => sanitizeAgentVersion(version)),
+      playbooks: playbooks.map((playbook) => sanitizeAgentPlaybook(playbook)),
+      memories: memories.map((memory) => sanitizeAgentMemory(memory)),
+      runs: runs.map((run) => sanitizeAgentRun(run)),
+      evaluations: evaluations.map((evaluation) =>
+        sanitizeAgentEvaluation(evaluation),
+      ),
+      stats: this.buildAgentWorkbenchStats(runs, evaluations),
+    };
+  }
+
+  async listAgentRuns(
+    agentHandle: string,
+    user: PersonItem,
+  ): Promise<AiAgentRunItem[]> {
+    const agent = await this.agentPolicy.requireAccessibleAgent(
+      agentHandle,
+      user,
+    );
+
+    const runs = await this.em.find(
+      AiAgentRunItem,
+      { agent: { handle: agent.handle } },
+      {
+        populate: ['agent', 'agentVersion', 'playbook', 'person'],
+        orderBy: { startedAt: 'DESC' },
+        limit: 100,
+      },
+    );
+
+    return runs.map((run) => sanitizeAgentRun(run));
+  }
+
+  async listAgentEvaluations(
+    agentHandle: string,
+    user: PersonItem,
+  ): Promise<AiAgentEvaluationItem[]> {
+    const agent = await this.agentPolicy.requireAccessibleAgent(
+      agentHandle,
+      user,
+    );
+    const evaluations = await this.em.find(
+      AiAgentEvaluationItem,
+      { agent: { handle: agent.handle } },
+      {
+        populate: ['agent', 'agentVersion'],
+        orderBy: { updatedAt: 'DESC' },
+      },
+    );
+
+    return evaluations.map((evaluation) => sanitizeAgentEvaluation(evaluation));
+  }
+
+  async createAgentEvaluation(
+    agentHandle: string,
+    dto: CreateAiAgentEvaluationDto,
+    user: PersonItem,
+  ): Promise<AiAgentEvaluationItem> {
+    const agent = await this.agentPolicy.requireAccessibleAgent(
+      agentHandle,
+      user,
+    );
+    const version = await this.resolveAgentVersionForChat(
+      agent,
+      dto.agentVersionHandle,
+      null,
+    );
+    const evaluation = this.em.create(AiAgentEvaluationItem, {
+      agent,
+      agentVersion: version,
+      title: dto.title.trim(),
+      prompt: dto.prompt.trim(),
+      expectedCriteria: dto.expectedCriteria?.trim() || null,
+      targetEntityHandle: dto.targetEntityHandle?.trim() || null,
+      targetRecordHandle: dto.targetRecordHandle?.trim() || null,
+      status: 'needsReview',
+    });
+
+    this.em.persist(evaluation);
+    await this.em.flush();
+    return sanitizeAgentEvaluation(evaluation);
+  }
+
+  async createAgentTestRun(
+    agentHandle: string,
+    dto: CreateAiAgentTestRunDto,
+    user: PersonItem,
+  ): Promise<AiAgentRunItem> {
+    const session = await this.createManagedChatSession(
+      {
+        title: `Test: ${this.buildSessionTitle(dto.prompt)}`,
+        agentHandle,
+        agentVersionHandle: dto.agentVersionHandle,
+        playbookHandle: dto.playbookHandle,
+        contextEntityHandle: dto.contextEntityHandle,
+        contextRecordHandle: dto.contextRecordHandle,
+      },
+      user,
+    );
+
+    const result = await this.streamChatMessage(
+      {
+        sessionHandle: session.handle,
+        content: dto.prompt,
+        agentHandle,
+        agentVersionHandle: dto.agentVersionHandle,
+        playbookHandle: dto.playbookHandle,
+        contextEntityHandle: dto.contextEntityHandle,
+        contextRecordHandle: dto.contextRecordHandle,
+        contextPayload: { mode: 'agent-test-run' },
+      },
+      user,
+      async () => undefined,
+    );
+
+    const run = await this.em.findOne(
+      AiAgentRunItem,
+      { message: { handle: result.assistantMessage.handle } },
+      { populate: ['agent', 'agentVersion', 'playbook', 'person'] },
+    );
+
+    if (!run) {
+      throw new NotFoundException('ai.agentRunNotFound');
+    }
+
+    return sanitizeAgentRun(run);
+  }
+
   async streamChatMessage(
     dto: CreateAiChatMessageDto,
     user: PersonItem,
@@ -187,28 +385,37 @@ export class AiService {
             providerHandle: dto.providerHandle,
             modelHandle: dto.modelHandle,
             agentHandle: dto.agentHandle,
+            agentVersionHandle: dto.agentVersionHandle,
+            playbookHandle: dto.playbookHandle,
+            contextEntityHandle: dto.contextEntityHandle,
+            contextRecordHandle: dto.contextRecordHandle,
           },
           user,
         );
 
     const nextSequence = await this.getNextSequence(session.handle ?? 0);
-    const agent = await this.agentPolicy.resolveAgentForChat(
+    const runtimeContext = await this.resolveAgentRuntimeContext(
       dto.agentHandle,
-      session.agent,
+      dto.agentVersionHandle,
+      dto.playbookHandle,
+      dto.contextEntityHandle ?? session.contextEntityHandle ?? null,
+      dto.contextRecordHandle ?? session.contextRecordHandle ?? null,
+      session,
       user,
     );
-    const toolPolicy = this.agentPolicy.buildToolPolicy(agent);
     const runtimeTarget = await this.providerRegistry.resolveRuntimeTarget(
       dto.providerHandle ??
-        extractProviderHandle(agent?.provider) ??
+        extractProviderHandle(runtimeContext.version?.provider) ??
+        extractProviderHandle(runtimeContext.agent?.provider) ??
         extractProviderHandle(session.provider),
       dto.modelHandle ??
-        extractModelHandle(agent?.model) ??
+        extractModelHandle(runtimeContext.version?.model) ??
+        extractModelHandle(runtimeContext.agent?.model) ??
         extractModelHandle(session.model),
     );
     const availableTools = await this.mcpService.listActiveTools(
       user,
-      toolPolicy,
+      runtimeContext.toolPolicy,
     );
     const clientTimeContext = extractClientTimeContext(dto);
 
@@ -235,7 +442,15 @@ export class AiService {
         clientTimeZone: clientTimeContext?.timeZone ?? null,
         clientLocale: clientTimeContext?.locale ?? null,
         clientUtcOffsetMinutes: clientTimeContext?.utcOffsetMinutes ?? null,
-        contextPayload: dto.contextPayload ?? null,
+        contextPayload: {
+          ...(dto.contextPayload ?? {}),
+          contextEntityHandle:
+            dto.contextEntityHandle ?? session.contextEntityHandle ?? null,
+          contextRecordHandle:
+            dto.contextRecordHandle ?? session.contextRecordHandle ?? null,
+          playbookHandle: runtimeContext.playbook?.handle ?? null,
+          agentVersionHandle: runtimeContext.version?.handle ?? null,
+        },
       },
     });
 
@@ -256,7 +471,13 @@ export class AiService {
 
     session.provider = runtimeTarget.provider;
     session.model = runtimeTarget.model;
-    session.agent = agent;
+    session.agent = runtimeContext.agent;
+    session.agentVersion = runtimeContext.version;
+    session.playbook = runtimeContext.playbook;
+    session.contextEntityHandle =
+      dto.contextEntityHandle ?? session.contextEntityHandle ?? null;
+    session.contextRecordHandle =
+      dto.contextRecordHandle ?? session.contextRecordHandle ?? null;
     session.lastMessageAt = new Date();
     this.em.persist([userMessage, assistantMessage]);
     await this.em.flush();
@@ -282,11 +503,24 @@ export class AiService {
     });
     await onEvent({ type: 'mcp.tools', tools: availableTools });
 
+    const run = await this.createAgentRun({
+      session,
+      message: assistantMessage,
+      person,
+      agent: runtimeContext.agent,
+      version: runtimeContext.version,
+      playbook: runtimeContext.playbook,
+      provider: runtimeTarget.provider.handle,
+      model: runtimeTarget.model.providerModel,
+      contextEntityHandle: session.contextEntityHandle ?? null,
+      contextRecordHandle: session.contextRecordHandle ?? null,
+    });
+
     const inlineToolExecution =
       await this.mcpService.tryExecuteInlineToolCommand(
         dto.content,
         user,
-        toolPolicy,
+        runtimeContext.toolPolicy,
       );
 
     if (inlineToolExecution) {
@@ -317,7 +551,15 @@ export class AiService {
         model: runtimeTarget.model.providerModel,
         rawResult: inlineToolExecution.rawResult,
         navigationLinks,
+        agentRun: sanitizeAgentRun(run),
       };
+      await this.completeAgentRun(run, {
+        status: 'completed',
+        responseText: assistantMessage.content,
+        toolCalls: assistantMessage.toolCalls as Record<string, unknown>[],
+        sources: navigationLinks,
+        pendingActions: [],
+      });
       await this.em.flush();
       await onEvent({
         type: 'message.completed',
@@ -360,7 +602,7 @@ export class AiService {
             });
           },
           runtimeTarget.model.supportsTools,
-          this.agentPolicy.buildAgentInstruction(agent),
+          runtimeContext.instruction,
           (entry, args) =>
             this.executePolicyAwareToolCall(
               entry,
@@ -369,8 +611,8 @@ export class AiService {
               person,
               session,
               assistantMessage,
-              agent,
-              toolPolicy,
+              runtimeContext.agent,
+              runtimeContext.toolPolicy,
               onEvent,
             ),
         );
@@ -396,7 +638,7 @@ export class AiService {
             });
           },
           runtimeTarget.model.supportsTools,
-          this.agentPolicy.buildAgentInstruction(agent),
+          runtimeContext.instruction,
           (entry, args) =>
             this.executePolicyAwareToolCall(
               entry,
@@ -405,8 +647,8 @@ export class AiService {
               person,
               session,
               assistantMessage,
-              agent,
-              toolPolicy,
+              runtimeContext.agent,
+              runtimeContext.toolPolicy,
               onEvent,
             ),
         );
@@ -445,7 +687,28 @@ export class AiService {
         pendingToolActions: pendingToolActions.map((action) =>
           sanitizeToolAction(action),
         ),
+        agentRun: sanitizeAgentRun(run),
+        agentVersion: runtimeContext.version
+          ? sanitizeAgentVersion(runtimeContext.version)
+          : null,
+        playbook: runtimeContext.playbook
+          ? sanitizeAgentPlaybook(runtimeContext.playbook)
+          : null,
+        sources: navigationLinks,
       };
+      await this.completeAgentRun(run, {
+        status: 'completed',
+        responseText: assistantMessage.content,
+        toolCalls: assistantMessage.toolCalls as Record<string, unknown>[],
+        sources: navigationLinks,
+        pendingActions: pendingToolActions.map((action) =>
+          sanitizeToolAction(action),
+        ) as unknown as Record<string, unknown>[],
+        usagePayload: {
+          provider: runtimeTarget.provider.handle,
+          model: runtimeTarget.model.providerModel,
+        },
+      });
       await this.em.flush();
 
       await onEvent({
@@ -460,7 +723,14 @@ export class AiService {
         provider: runtimeTarget.provider.handle,
         model: runtimeTarget.model.providerModel,
         error: error instanceof Error ? error.message : 'ai.unknownError',
+        agentRun: sanitizeAgentRun(run),
       };
+      await this.completeAgentRun(run, {
+        status: 'failed',
+        errorPayload: {
+          error: error instanceof Error ? error.message : 'ai.unknownError',
+        },
+      });
       await this.em.flush();
       throw error;
     }
@@ -487,6 +757,11 @@ export class AiService {
           'agent.provider',
           'agent.model',
           'agent.model.provider',
+          'agentVersion',
+          'agentVersion.provider',
+          'agentVersion.model',
+          'agentVersion.model.provider',
+          'playbook',
         ],
         orderBy: { updatedAt: 'DESC' },
       },
@@ -513,9 +788,25 @@ export class AiService {
       null,
       user,
     );
+    const agentVersion = await this.resolveAgentVersionForChat(
+      agent,
+      dto.agentVersionHandle,
+      null,
+    );
+    const playbook = await this.resolveAgentPlaybookForChat(
+      agent,
+      dto.playbookHandle,
+      null,
+    );
     const runtimeTarget = await this.providerRegistry.resolveRuntimeTarget(
-      dto.providerHandle ?? extractProviderHandle(agent?.provider) ?? null,
-      dto.modelHandle ?? extractModelHandle(agent?.model) ?? null,
+      dto.providerHandle ??
+        extractProviderHandle(agentVersion?.provider) ??
+        extractProviderHandle(agent?.provider) ??
+        null,
+      dto.modelHandle ??
+        extractModelHandle(agentVersion?.model) ??
+        extractModelHandle(agent?.model) ??
+        null,
     );
 
     const session = this.em.create(AiChatSessionItem, {
@@ -524,6 +815,13 @@ export class AiService {
       provider: runtimeTarget.provider,
       model: runtimeTarget.model,
       agent,
+      agentVersion,
+      playbook,
+      contextEntityHandle: dto.contextEntityHandle?.trim() || null,
+      contextRecordHandle:
+        dto.contextRecordHandle != null
+          ? String(dto.contextRecordHandle).trim() || null
+          : null,
       person,
       lastMessageAt: null,
     });
@@ -565,6 +863,16 @@ export class AiService {
         user,
       );
       session.agent = agent;
+      session.agentVersion = await this.resolveAgentVersionForChat(
+        agent,
+        dto.agentVersionHandle,
+        session.agentVersion,
+      );
+      session.playbook = await this.resolveAgentPlaybookForChat(
+        agent,
+        dto.playbookHandle,
+        session.playbook,
+      );
       if (
         agent &&
         dto.providerHandle === undefined &&
@@ -580,6 +888,53 @@ export class AiService {
       }
     }
 
+    if (dto.agentVersionHandle !== undefined && dto.agentHandle === undefined) {
+      session.agentVersion = await this.resolveAgentVersionForChat(
+        session.agent && typeof session.agent !== 'string'
+          ? session.agent
+          : null,
+        dto.agentVersionHandle,
+        session.agentVersion,
+      );
+    }
+
+    if (dto.playbookHandle !== undefined && dto.agentHandle === undefined) {
+      session.playbook = await this.resolveAgentPlaybookForChat(
+        session.agent && typeof session.agent !== 'string'
+          ? session.agent
+          : null,
+        dto.playbookHandle,
+        session.playbook,
+      );
+    }
+
+    if (dto.contextEntityHandle !== undefined) {
+      session.contextEntityHandle = dto.contextEntityHandle?.trim() || null;
+    }
+
+    if (dto.contextRecordHandle !== undefined) {
+      session.contextRecordHandle =
+        dto.contextRecordHandle != null
+          ? String(dto.contextRecordHandle).trim() || null
+          : null;
+    }
+
+    await this.em.flush();
+    await this.populateChatSession(session);
+    return sanitizeChatSession(session);
+  }
+
+  async applyChatSessionPlaybook(
+    handle: number,
+    dto: ApplyAiChatSessionPlaybookDto,
+    user: PersonItem,
+  ): Promise<AiChatSessionItem> {
+    const session = await this.findOwnedSession(handle, user);
+    session.playbook = await this.resolveAgentPlaybookForChat(
+      session.agent && typeof session.agent !== 'string' ? session.agent : null,
+      dto.playbookHandle,
+      session.playbook,
+    );
     await this.em.flush();
     await this.populateChatSession(session);
     return sanitizeChatSession(session);
@@ -618,21 +973,31 @@ export class AiService {
             providerHandle: dto.providerHandle,
             modelHandle: dto.modelHandle,
             agentHandle: dto.agentHandle,
+            agentVersionHandle: dto.agentVersionHandle,
+            playbookHandle: dto.playbookHandle,
+            contextEntityHandle: dto.contextEntityHandle,
+            contextRecordHandle: dto.contextRecordHandle,
           },
           user,
         );
 
-    const agent = await this.agentPolicy.resolveAgentForChat(
+    const runtimeContext = await this.resolveAgentRuntimeContext(
       dto.agentHandle,
-      session.agent,
+      dto.agentVersionHandle,
+      dto.playbookHandle,
+      dto.contextEntityHandle ?? session.contextEntityHandle ?? null,
+      dto.contextRecordHandle ?? session.contextRecordHandle ?? null,
+      session,
       user,
     );
     const runtimeTarget = await this.providerRegistry.resolveRuntimeTarget(
       dto.providerHandle ??
-        extractProviderHandle(agent?.provider) ??
+        extractProviderHandle(runtimeContext.version?.provider) ??
+        extractProviderHandle(runtimeContext.agent?.provider) ??
         extractProviderHandle(session.provider),
       dto.modelHandle ??
-        extractModelHandle(agent?.model) ??
+        extractModelHandle(runtimeContext.version?.model) ??
+        extractModelHandle(runtimeContext.agent?.model) ??
         extractModelHandle(session.model),
     );
     const clientTimeContext = extractClientTimeContext(dto);
@@ -673,7 +1038,13 @@ export class AiService {
     session.lastMessageAt = new Date();
     session.provider = runtimeTarget.provider;
     session.model = runtimeTarget.model;
-    session.agent = agent;
+    session.agent = runtimeContext.agent;
+    session.agentVersion = runtimeContext.version;
+    session.playbook = runtimeContext.playbook;
+    session.contextEntityHandle =
+      dto.contextEntityHandle ?? session.contextEntityHandle ?? null;
+    session.contextRecordHandle =
+      dto.contextRecordHandle ?? session.contextRecordHandle ?? null;
     if (!session.title?.trim()) {
       session.title = this.buildSessionTitle(dto.content);
     }
@@ -884,6 +1255,457 @@ export class AiService {
     return sanitizeToolAction(action);
   }
 
+  private async resolveAgentRuntimeContext(
+    requestedAgentHandle: string | null | undefined,
+    requestedVersionHandle: number | null | undefined,
+    requestedPlaybookHandle: string | null | undefined,
+    contextEntityHandle: string | null | undefined,
+    contextRecordHandle: string | number | null | undefined,
+    session: AiChatSessionItem,
+    user: PersonItem,
+  ): Promise<AgentRuntimeContext> {
+    const agent = await this.agentPolicy.resolveAgentForChat(
+      requestedAgentHandle,
+      session.agent,
+      user,
+    );
+    const version = await this.resolveAgentVersionForChat(
+      agent,
+      requestedVersionHandle,
+      session.agentVersion,
+    );
+    const playbook = await this.resolveAgentPlaybookForChat(
+      agent,
+      requestedPlaybookHandle,
+      session.playbook,
+    );
+    const memories = agent
+      ? await this.loadAccessibleMemories(
+          agent,
+          user,
+          contextEntityHandle?.trim() || null,
+        )
+      : [];
+    const toolPolicy = this.buildVersionedToolPolicy(agent, version);
+    const contextInstruction = await this.buildContextInstruction(
+      contextEntityHandle,
+      contextRecordHandle,
+      user,
+      toolPolicy,
+    );
+
+    return {
+      agent,
+      version,
+      playbook,
+      memories,
+      toolPolicy,
+      instruction: this.buildRuntimeInstruction(
+        agent,
+        version,
+        playbook,
+        memories,
+        contextInstruction,
+      ),
+    };
+  }
+
+  private async resolveAgentVersionForChat(
+    agent: AiAgentItem | null,
+    requestedVersionHandle: number | null | undefined,
+    fallbackVersion: AiAgentVersionItem | number | null | undefined,
+  ): Promise<AiAgentVersionItem | null> {
+    if (!agent) {
+      return null;
+    }
+
+    const fallbackHandle =
+      typeof fallbackVersion === 'number'
+        ? fallbackVersion
+        : (fallbackVersion?.handle ?? null);
+    const versionHandle = requestedVersionHandle ?? fallbackHandle;
+
+    if (versionHandle != null) {
+      const version = await this.em.findOne(
+        AiAgentVersionItem,
+        { handle: versionHandle, agent: { handle: agent.handle } },
+        { populate: ['agent', 'provider', 'model', 'model.provider'] },
+      );
+
+      if (!version) {
+        throw new NotFoundException('ai.agentVersionNotFound');
+      }
+
+      return version;
+    }
+
+    const activeVersion = await this.em.findOne(
+      AiAgentVersionItem,
+      { agent: { handle: agent.handle }, status: 'active' },
+      {
+        populate: ['agent', 'provider', 'model', 'model.provider'],
+        orderBy: { version: 'DESC' },
+      },
+    );
+
+    if (activeVersion) {
+      return activeVersion;
+    }
+
+    const latestVersion = await this.em.findOne(
+      AiAgentVersionItem,
+      { agent: { handle: agent.handle } },
+      {
+        populate: ['agent', 'provider', 'model', 'model.provider'],
+        orderBy: { version: 'DESC' },
+      },
+    );
+
+    return latestVersion ?? null;
+  }
+
+  private async resolveAgentPlaybookForChat(
+    agent: AiAgentItem | null,
+    requestedPlaybookHandle: string | null | undefined,
+    fallbackPlaybook: AiAgentPlaybookItem | string | null | undefined,
+  ): Promise<AiAgentPlaybookItem | null> {
+    if (!agent) {
+      return null;
+    }
+
+    const fallbackHandle =
+      typeof fallbackPlaybook === 'string'
+        ? fallbackPlaybook
+        : (fallbackPlaybook?.handle ?? null);
+    const playbookHandle = requestedPlaybookHandle ?? fallbackHandle;
+
+    if (!playbookHandle) {
+      return null;
+    }
+
+    const playbook = await this.em.findOne(
+      AiAgentPlaybookItem,
+      {
+        handle: playbookHandle,
+        agent: { handle: agent.handle },
+        isActive: true,
+      },
+      { populate: ['agent'] },
+    );
+
+    if (!playbook) {
+      throw new NotFoundException('ai.agentPlaybookNotFound');
+    }
+
+    return playbook;
+  }
+
+  private buildVersionedToolPolicy(
+    agent: AiAgentItem | null,
+    version: AiAgentVersionItem | null,
+  ): McpToolPolicy | undefined {
+    const basePolicy = this.agentPolicy.buildToolPolicy(agent);
+
+    if (!basePolicy || !version) {
+      return basePolicy;
+    }
+
+    return {
+      ...basePolicy,
+      allowedEntityHandles:
+        this.normalizeStringArray(version.allowedEntityHandles).length > 0
+          ? this.normalizeStringArray(version.allowedEntityHandles)
+          : basePolicy.allowedEntityHandles,
+      allowedKnowledgeEntityHandles:
+        this.normalizeStringArray(version.allowedKnowledgeEntityHandles)
+          .length > 0
+          ? this.normalizeStringArray(version.allowedKnowledgeEntityHandles)
+          : basePolicy.allowedKnowledgeEntityHandles,
+      allowedInternalTools:
+        this.normalizeStringArray(version.allowedInternalTools).length > 0
+          ? this.normalizeStringArray(version.allowedInternalTools)
+          : basePolicy.allowedInternalTools,
+      allowedExternalTools:
+        this.normalizeStringArray(version.allowedExternalTools).length > 0
+          ? this.normalizeStringArray(version.allowedExternalTools)
+          : basePolicy.allowedExternalTools,
+      blockMutatingTools: true,
+    };
+  }
+
+  private buildRuntimeInstruction(
+    agent: AiAgentItem | null,
+    version: AiAgentVersionItem | null,
+    playbook: AiAgentPlaybookItem | null,
+    memories: AiAgentMemoryItem[],
+    contextInstruction: string | null,
+  ): string | null {
+    if (!agent) {
+      return contextInstruction;
+    }
+
+    const promptMarkdown = version?.promptMarkdown?.trim()
+      ? version.promptMarkdown.trim()
+      : agent.promptMarkdown?.trim();
+    const lines = [
+      `You are currently acting as the Sapling AI agent "${agent.title}".`,
+      agent.description?.trim()
+        ? `Agent description: ${agent.description.trim()}`
+        : null,
+      version
+        ? `Agent version: v${version.version} (${version.status}).`
+        : null,
+      promptMarkdown || null,
+      this.buildRuntimeScopeInstruction(agent, version),
+      playbook ? this.buildPlaybookInstruction(playbook) : null,
+      memories.length > 0 ? this.buildMemoryInstruction(memories) : null,
+      contextInstruction,
+      agent.mutationMode === 'readOnly'
+        ? 'This agent is read-only. Do not create, update, or delete Sapling records.'
+        : 'For create, update, or delete operations, prepare the action and wait for explicit user confirmation in Sapling.',
+    ].filter((line): line is string => !!line);
+
+    return lines.join('\n\n');
+  }
+
+  private buildRuntimeScopeInstruction(
+    agent: AiAgentItem,
+    version: AiAgentVersionItem | null,
+  ): string | null {
+    const entityHandles =
+      this.normalizeStringArray(version?.allowedEntityHandles).length > 0
+        ? this.normalizeStringArray(version?.allowedEntityHandles)
+        : this.normalizeStringArray(agent.allowedEntityHandles);
+    const knowledgeHandles =
+      this.normalizeStringArray(version?.allowedKnowledgeEntityHandles).length >
+      0
+        ? this.normalizeStringArray(version?.allowedKnowledgeEntityHandles)
+        : this.normalizeStringArray(agent.allowedKnowledgeEntityHandles);
+
+    if (entityHandles.length === 0 && knowledgeHandles.length === 0) {
+      return null;
+    }
+
+    return [
+      entityHandles.length > 0
+        ? `Allowed Sapling entities: ${entityHandles.join(', ')}.`
+        : null,
+      knowledgeHandles.length > 0
+        ? `Allowed knowledge search sources: ${knowledgeHandles.join(', ')}.`
+        : null,
+    ]
+      .filter((line): line is string => !!line)
+      .join(' ');
+  }
+
+  private buildPlaybookInstruction(playbook: AiAgentPlaybookItem): string {
+    const steps = (playbook.steps ?? [])
+      .map((step, index) => `${index + 1}. ${step}`)
+      .join('\n');
+
+    return [
+      `Selected playbook: ${playbook.title}.`,
+      playbook.description?.trim()
+        ? `Playbook description: ${playbook.description.trim()}`
+        : null,
+      steps ? `Follow these steps:\n${steps}` : null,
+      playbook.expectedOutput?.trim()
+        ? `Expected output: ${playbook.expectedOutput.trim()}`
+        : null,
+    ]
+      .filter((line): line is string => !!line)
+      .join('\n\n');
+  }
+
+  private buildMemoryInstruction(memories: AiAgentMemoryItem[]): string {
+    const memoryLines = memories.map(
+      (memory) =>
+        `- [${memory.type}] ${memory.title}: ${memory.contentMarkdown.trim()}`,
+    );
+
+    return `Relevant admin-managed agent memory:\n${memoryLines.join('\n')}`;
+  }
+
+  private async buildContextInstruction(
+    contextEntityHandle: string | null | undefined,
+    contextRecordHandle: string | number | null | undefined,
+    user: PersonItem,
+    policy: McpToolPolicy | undefined,
+  ): Promise<string | null> {
+    const entityHandle = contextEntityHandle?.trim();
+    const recordHandle =
+      contextRecordHandle != null ? String(contextRecordHandle).trim() : '';
+
+    if (!entityHandle || !recordHandle) {
+      return null;
+    }
+
+    try {
+      const result = await this.mcpService.executeTool(
+        'sapling',
+        'generic_get',
+        {
+          entityHandle,
+          handle: Number.isFinite(Number(recordHandle))
+            ? Number(recordHandle)
+            : recordHandle,
+        },
+        user,
+        policy,
+      );
+
+      return `Current record context (${entityHandle} ${recordHandle}):\n${JSON.stringify(
+        result.modelResult ?? result.rawResult,
+        null,
+        2,
+      )}`;
+    } catch (error) {
+      return `Current record context was requested for ${entityHandle} ${recordHandle}, but Sapling could not load it with the current user's permissions. Error: ${
+        error instanceof Error ? error.message : 'unknown'
+      }`;
+    }
+  }
+
+  private async loadAccessibleMemories(
+    agent: AiAgentItem,
+    user: PersonItem,
+    contextEntityHandle?: string | null,
+  ): Promise<AiAgentMemoryItem[]> {
+    const userRoleHandles = await this.getUserRoleHandles(user);
+    const memories = await this.em.find(
+      AiAgentMemoryItem,
+      { agent: { handle: agent.handle }, isActive: true },
+      {
+        populate: ['agent', 'roles'],
+        orderBy: { sortOrder: 'ASC', title: 'ASC' },
+      },
+    );
+
+    return memories.filter((memory) => {
+      const memoryRoles = memory.roles.getItems();
+      const roleMatches =
+        memoryRoles.length === 0 ||
+        memoryRoles.some(
+          (role) => role.handle != null && userRoleHandles.has(role.handle),
+        );
+      const entityScopes = this.normalizeStringArray(memory.entityScopeHandles);
+      const entityMatches =
+        entityScopes.length === 0 ||
+        (contextEntityHandle != null &&
+          entityScopes.includes(contextEntityHandle));
+
+      return roleMatches && entityMatches;
+    });
+  }
+
+  private async getUserRoleHandles(user: PersonItem): Promise<Set<number>> {
+    const person = await this.em.findOne(
+      PersonItem,
+      { handle: this.requireUserHandle(user) },
+      { populate: ['roles'] },
+    );
+
+    if (!person) {
+      throw new NotFoundException('auth.userNotFound');
+    }
+
+    return new Set(
+      person.roles
+        .getItems()
+        .map((role) => role.handle)
+        .filter((handle): handle is number => typeof handle === 'number'),
+    );
+  }
+
+  private async createAgentRun(input: {
+    session: AiChatSessionItem;
+    message: AiChatMessageItem;
+    person: PersonItem;
+    agent: AiAgentItem | null;
+    version: AiAgentVersionItem | null;
+    playbook: AiAgentPlaybookItem | null;
+    provider: string;
+    model: string;
+    contextEntityHandle: string | null;
+    contextRecordHandle: string | null;
+  }): Promise<AiAgentRunItem> {
+    const run = this.em.create(AiAgentRunItem, {
+      session: input.session,
+      message: input.message,
+      person: input.person,
+      agent: input.agent,
+      agentVersion: input.version,
+      playbook: input.playbook,
+      status: 'running',
+      provider: input.provider,
+      model: input.model,
+      contextEntityHandle: input.contextEntityHandle,
+      contextRecordHandle: input.contextRecordHandle,
+      startedAt: new Date(),
+    });
+
+    this.em.persist(run);
+    await this.em.flush();
+    return run;
+  }
+
+  private async completeAgentRun(
+    run: AiAgentRunItem,
+    patch: {
+      status: string;
+      responseText?: string | null;
+      toolCalls?: Record<string, unknown>[] | null;
+      sources?: Record<string, unknown>[] | null;
+      pendingActions?: Record<string, unknown>[] | null;
+      usagePayload?: Record<string, unknown> | null;
+      errorPayload?: Record<string, unknown> | null;
+    },
+  ): Promise<void> {
+    const completedAt = new Date();
+    run.status = patch.status;
+    run.completedAt = completedAt;
+    run.durationMs = Math.max(
+      0,
+      completedAt.getTime() -
+        (run.startedAt?.getTime() ?? completedAt.getTime()),
+    );
+    run.responseText = patch.responseText ?? run.responseText ?? null;
+    run.toolCalls = patch.toolCalls ?? run.toolCalls ?? null;
+    run.sources = patch.sources ?? run.sources ?? null;
+    run.pendingActions = patch.pendingActions ?? run.pendingActions ?? null;
+    run.usagePayload = patch.usagePayload ?? run.usagePayload ?? null;
+    run.errorPayload = patch.errorPayload ?? run.errorPayload ?? null;
+  }
+
+  private buildAgentWorkbenchStats(
+    runs: AiAgentRunItem[],
+    evaluations: AiAgentEvaluationItem[],
+  ): Record<string, unknown> {
+    const evaluationTotal = evaluations.length;
+    const evaluationPassed = evaluations.filter(
+      (evaluation) => evaluation.status === 'passed',
+    ).length;
+
+    return {
+      runsTotal: runs.length,
+      failedRuns: runs.filter((run) => run.status === 'failed').length,
+      pendingActions: runs.reduce(
+        (total, run) => total + (run.pendingActions?.length ?? 0),
+        0,
+      ),
+      evaluationTotal,
+      evaluationPassed,
+      evaluationPassRate:
+        evaluationTotal > 0
+          ? Math.round((evaluationPassed / evaluationTotal) * 100)
+          : null,
+    };
+  }
+
+  private normalizeStringArray(value: string[] | null | undefined): string[] {
+    return (value ?? []).map((item) => item.trim()).filter(Boolean);
+  }
+
   private async executePolicyAwareToolCall(
     entry: AiToolRegistryEntry,
     args: Record<string, unknown>,
@@ -1047,6 +1869,11 @@ export class AiService {
           'agent.provider',
           'agent.model',
           'agent.model.provider',
+          'agentVersion',
+          'agentVersion.provider',
+          'agentVersion.model',
+          'agentVersion.model.provider',
+          'playbook',
         ],
       },
     );
@@ -1247,6 +2074,11 @@ export class AiService {
       'agent.provider',
       'agent.model',
       'agent.model.provider',
+      'agentVersion',
+      'agentVersion.provider',
+      'agentVersion.model',
+      'agentVersion.model.provider',
+      'playbook',
     ]);
   }
 

@@ -2,7 +2,7 @@
   {
     "handle": "songbirdGeneral",
     "title": "Songbird",
-    "description": "Allgemeiner Sapling Assistent fuer CRM, Service, Wissen und Navigation.",
+    "description": "Allgemeiner Sapling Assistent für CRM, Service, Wissen und Navigation.",
     "icon": "mdi-bird",
     "color": "#2563eb",
     "promptMarkdown": "Hilf als allgemeiner Sapling Assistent. Nutze Sapling-Datenwerkzeuge, wenn aktuelle CRM-, Service-, Wissens- oder Navigationsdaten gebraucht werden. Frage nach, wenn eine Aktion fachlich mehrdeutig ist.",
@@ -35,14 +35,14 @@
   {
     "handle": "ticketSupportAgent",
     "title": "Ticket Support Agent",
-    "description": "Spezialist fuer Support-Tickets, bekannte Fehlerbilder und wiederverwendbare Loesungen.",
+    "description": "Spezialist für Support-Tickets, bekannte Fehlerbilder und wiederverwendbare Lösungen.",
     "icon": "mdi-lifebuoy",
     "color": "#0f766e",
-    "promptMarkdown": "Fokussiere dich auf Support-Tickets, Fehlerbilder, Workarounds und Wissensartikel. Suche zuerst nach vorhandenen Loesungen, bevor du neue Schritte vorschlaegst. Erfinde keine Ursachen oder Kundendetails.",
+    "promptMarkdown": "Fokussiere dich auf Support-Tickets, Fehlerbilder, Workarounds und Wissensartikel. Suche zuerst nach vorhandenen Lösungen, bevor du neue Schritte vorschlägst. Erfinde keine Ursachen oder Kundendetails.",
     "welcomeMessage": "Beschreibe das Ticket oder Fehlerbild, ich suche passende Sapling-Kontexte.",
     "conversationStarters": [
-      "Finde aehnliche Tickets zu diesem Problem.",
-      "Welche bekannte Loesung passt zu diesem Fehler?",
+      "Finde ähnliche Tickets zu diesem Problem.",
+      "Welche bekannte Lösung passt zu diesem Fehler?",
       "Bereite aus dem Ticket einen Wissensartikel vor."
     ],
     "allowedEntityHandles": [
@@ -82,15 +82,15 @@
   {
     "handle": "salesOpportunityAgent",
     "title": "Sales Opportunity Agent",
-    "description": "Spezialist fuer Verkaufschancen, Pain Points und Angebotsargumentation.",
+    "description": "Spezialist für Verkaufschancen, Pain Points und Angebotsargumentation.",
     "icon": "mdi-chart-line",
     "color": "#7c3aed",
-    "promptMarkdown": "Hilf bei Verkaufschancen, Bedarfsklaerung, Pain Points, Referenzfaellen und Angebotsargumenten. Nutze vorhandene Chancen, Schaetzungen und Wissensartikel als Vergleich.",
+    "promptMarkdown": "Hilf bei Verkaufschancen, Bedarfsklärung, Pain Points, Referenzfällen und Angebotsargumenten. Nutze vorhandene Chancen, Schätzungen und Wissensartikel als Vergleich.",
     "welcomeMessage": "Welche Opportunity oder Kundensituation soll ich analysieren?",
     "conversationStarters": [
-      "Finde aehnliche Opportunities.",
+      "Finde ähnliche Opportunities.",
       "Welche Argumente passen zu diesen Pain Points?",
-      "Vergleiche diese Chance mit frueheren Schaetzungen."
+      "Vergleiche diese Chance mit früheren Schätzungen."
     ],
     "allowedEntityHandles": [
       "salesOpportunity",
@@ -127,15 +127,15 @@
   {
     "handle": "knowledgeAgent",
     "title": "Knowledge Agent",
-    "description": "Spezialist fuer Wissensartikel, Recherche und redaktionelle Aufbereitung.",
+    "description": "Spezialist für Wissensartikel, Recherche und redaktionelle Aufbereitung.",
     "icon": "mdi-book-open-page-variant",
     "color": "#b45309",
-    "promptMarkdown": "Fokussiere dich auf Wissenssuche, Zusammenfassung, Lueckenanalyse und Entwurfsqualitaet. Markiere Annahmen klar und trenne Fakten aus Sapling von Vorschlaegen.",
+    "promptMarkdown": "Fokussiere dich auf Wissenssuche, Zusammenfassung, Lückenanalyse und Entwurfsqualität. Markiere Annahmen klar und trenne Fakten aus Sapling von Vorschlägen.",
     "welcomeMessage": "Welche Wissensfrage oder welcher Artikel soll verbessert werden?",
     "conversationStarters": [
       "Suche Wissen zu diesem Thema.",
-      "Welche Informationen fehlen fuer einen guten Artikel?",
-      "Formuliere eine kurze Loesungszusammenfassung."
+      "Welche Informationen fehlen für einen guten Artikel?",
+      "Formuliere eine kurze Lösungszusammenfassung."
     ],
     "allowedEntityHandles": [
       "knowledgeArticle",

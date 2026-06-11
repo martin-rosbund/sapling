@@ -46,7 +46,7 @@ import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import { SAPLING_DIALOG_MAX_WIDTH, SAPLING_DIALOG_HEIGHT } from '@/constants/dialog.constants'
 
 const props = defineProps<{
-  modelValue: Record<string, unknown> | unknown[] | null
+  modelValue: unknown
   label: string
   disabled?: boolean
 }>()
@@ -58,8 +58,16 @@ const error = ref('')
 const jsonString = ref('')
 
 function formatJsonValue(value: unknown): string {
-  if (value === undefined) {
+  if (value === undefined || value === null || value === '') {
     return 'null'
+  }
+
+  if (typeof value === 'string') {
+    try {
+      return JSON.stringify(JSON.parse(value), null, 2)
+    } catch {
+      return JSON.stringify(value, null, 2)
+    }
   }
 
   return JSON.stringify(value, null, 2)

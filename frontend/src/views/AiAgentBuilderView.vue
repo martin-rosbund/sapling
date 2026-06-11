@@ -7,9 +7,12 @@
       class="sapling-config-hero sapling-ai-agent-builder__hero"
       variant="system"
       :eyebrow="tr('aiAgentBuilder.eyebrow', 'KI Agents')"
-      :title="tr('aiAgentBuilder.title', 'AI Agent Builder')"
+      :title="tr('aiAgentBuilder.title', 'Agent Workbench')"
       :subtitle="
-        tr('aiAgentBuilder.subtitle', 'Erstelle zugeschnittene Agents fuer den Sapling Chat.')
+        tr(
+          'aiAgentBuilder.subtitle',
+          'Konfiguriere, versioniere und prüfe zugeschnittene Agents für den Sapling Chat.',
+        )
       "
     >
       <template #meta>
@@ -74,6 +77,11 @@
           <v-tab value="tools">{{ tr('aiAgentBuilder.tabTools', 'Tools') }}</v-tab>
           <v-tab value="runtime">{{ tr('aiAgentBuilder.tabRuntime', 'Modell') }}</v-tab>
           <v-tab value="release">{{ tr('aiAgentBuilder.tabRelease', 'Freigabe') }}</v-tab>
+          <v-tab value="versions">{{ tr('aiAgentBuilder.tabVersions', 'Versionen') }}</v-tab>
+          <v-tab value="test">{{ tr('aiAgentBuilder.tabTestRuns', 'Testläufe') }}</v-tab>
+          <v-tab value="memory">{{ tr('aiAgentBuilder.tabMemory', 'Quellen/Memory') }}</v-tab>
+          <v-tab value="quality">{{ tr('aiAgentBuilder.tabQuality', 'Qualität') }}</v-tab>
+          <v-tab value="usage">{{ tr('aiAgentBuilder.tabUsage', 'Nutzung') }}</v-tab>
         </v-tabs>
 
         <v-window v-model="activeTab" class="sapling-ai-agent-builder__window">
@@ -123,7 +131,7 @@
               <v-textarea
                 v-model="draft.welcomeMessage"
                 class="sapling-ai-agent-builder__wide"
-                :label="tr('aiAgentBuilder.fieldWelcome', 'Begruessung')"
+                :label="tr('aiAgentBuilder.fieldWelcome', 'Begrüßung')"
                 rows="4"
               />
             </div>
@@ -224,6 +232,217 @@
               />
             </div>
           </v-window-item>
+
+          <v-window-item value="versions">
+            <div class="sapling-ai-agent-builder__panel-stack">
+              <div class="sapling-row-between-xs">
+                <div>
+                  <strong>{{ tr('aiAgentBuilder.versionsTitle', 'Agent-Versionen') }}</strong>
+                  <p>
+                    {{
+                      tr(
+                        'aiAgentBuilder.versionsSubtitle',
+                        'Versionen halten produktive Chats nachvollziehbar.',
+                      )
+                    }}
+                  </p>
+                </div>
+                <v-btn
+                  color="primary"
+                  variant="tonal"
+                  prepend-icon="mdi-source-branch-plus"
+                  :disabled="!selectedAgent"
+                  @click="createVersionFromDraft"
+                >
+                  {{ tr('aiAgentBuilder.createVersion', 'Version aus Entwurf') }}
+                </v-btn>
+              </div>
+              <v-table density="comfortable">
+                <thead>
+                  <tr>
+                    <th>Version</th>
+                    <th>Status</th>
+                    <th>{{ tr('aiAgentBuilder.fieldProvider', 'Provider') }}</th>
+                    <th>{{ tr('aiAgentBuilder.fieldModel', 'Modell') }}</th>
+                    <th>{{ tr('aiAgentBuilder.updatedAt', 'Aktualisiert') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="version in workbenchVersions" :key="version.handle ?? version.version">
+                    <td>v{{ version.version }}</td>
+                    <td>
+                      <v-chip size="small" variant="tonal">{{ version.status }}</v-chip>
+                    </td>
+                    <td>{{ getProviderHandle(version.provider) || '-' }}</td>
+                    <td>{{ getModelHandle(version.model) || '-' }}</td>
+                    <td>{{ formatDate(version.updatedAt) }}</td>
+                  </tr>
+                </tbody>
+              </v-table>
+            </div>
+          </v-window-item>
+
+          <v-window-item value="test">
+            <div class="sapling-ai-agent-builder__panel-stack">
+              <v-textarea
+                v-model="testPrompt"
+                :label="tr('aiAgentBuilder.testPrompt', 'Testprompt')"
+                rows="5"
+              />
+              <div class="sapling-row-md">
+                <v-select
+                  v-model="selectedTestVersionHandle"
+                  :items="versionOptions"
+                  item-title="title"
+                  item-value="value"
+                  clearable
+                  :label="tr('aiAgentBuilder.testVersion', 'Version')"
+                />
+                <v-select
+                  v-model="selectedTestPlaybookHandle"
+                  :items="playbookOptions"
+                  item-title="title"
+                  item-value="value"
+                  clearable
+                  :label="tr('aiAgentBuilder.testPlaybook', 'Playbook')"
+                />
+                <v-btn
+                  color="primary"
+                  prepend-icon="mdi-play-circle-outline"
+                  :disabled="!selectedAgent || !testPrompt.trim()"
+                  :loading="isRunningTest"
+                  @click="runAgentTest"
+                >
+                  {{ tr('aiAgentBuilder.runTest', 'Testlauf starten') }}
+                </v-btn>
+              </div>
+              <v-alert v-if="latestTestRun" type="info" variant="tonal">
+                {{ latestTestRun.status }} - {{ latestTestRun.durationMs ?? '-' }} ms
+              </v-alert>
+            </div>
+          </v-window-item>
+
+          <v-window-item value="memory">
+            <div class="sapling-ai-agent-builder__panel-stack">
+              <strong>{{ tr('aiAgentBuilder.memoryTitle', 'Quellen und Memory') }}</strong>
+              <article
+                v-for="memory in workbenchMemories"
+                :key="memory.handle ?? memory.title"
+                class="sapling-section-panel sapling-ai-agent-builder__mini-card"
+              >
+                <div class="sapling-row-between-xs">
+                  <strong>{{ memory.title }}</strong>
+                  <v-chip size="small" variant="tonal">{{ memory.type }}</v-chip>
+                </div>
+                <p>{{ memory.contentMarkdown }}</p>
+              </article>
+              <v-alert v-if="workbenchMemories.length === 0" type="info" variant="tonal">
+                {{ tr('aiAgentBuilder.noMemory', 'Noch kein Memory für diesen Agent gepflegt.') }}
+              </v-alert>
+            </div>
+          </v-window-item>
+
+          <v-window-item value="quality">
+            <div class="sapling-ai-agent-builder__panel-stack">
+              <div class="sapling-ai-agent-builder__grid">
+                <v-text-field
+                  v-model="evaluationDraft.title"
+                  :label="tr('aiAgentBuilder.evaluationTitle', 'Testfall')"
+                />
+                <v-select
+                  v-model="evaluationDraft.agentVersionHandle"
+                  :items="versionOptions"
+                  item-title="title"
+                  item-value="value"
+                  clearable
+                  :label="tr('aiAgentBuilder.testVersion', 'Version')"
+                />
+                <v-textarea
+                  v-model="evaluationDraft.prompt"
+                  class="sapling-ai-agent-builder__wide"
+                  :label="tr('aiAgentBuilder.testPrompt', 'Testprompt')"
+                  rows="4"
+                />
+                <v-textarea
+                  v-model="evaluationDraft.expectedCriteria"
+                  class="sapling-ai-agent-builder__wide"
+                  :label="tr('aiAgentBuilder.expectedCriteria', 'Erwartete Kriterien')"
+                  rows="3"
+                />
+              </div>
+              <v-btn
+                color="primary"
+                variant="tonal"
+                prepend-icon="mdi-clipboard-check-outline"
+                :disabled="
+                  !selectedAgent || !evaluationDraft.title.trim() || !evaluationDraft.prompt.trim()
+                "
+                @click="createEvaluation"
+              >
+                {{ tr('aiAgentBuilder.createEvaluation', 'Testfall anlegen') }}
+              </v-btn>
+              <v-table density="comfortable">
+                <thead>
+                  <tr>
+                    <th>{{ tr('aiAgentBuilder.evaluationTitle', 'Testfall') }}</th>
+                    <th>Status</th>
+                    <th>{{ tr('aiAgentBuilder.updatedAt', 'Aktualisiert') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="evaluation in workbenchEvaluations"
+                    :key="evaluation.handle ?? evaluation.title"
+                  >
+                    <td>{{ evaluation.title }}</td>
+                    <td>
+                      <v-chip size="small" variant="tonal">{{ evaluation.status }}</v-chip>
+                    </td>
+                    <td>{{ formatDate(evaluation.updatedAt) }}</td>
+                  </tr>
+                </tbody>
+              </v-table>
+            </div>
+          </v-window-item>
+
+          <v-window-item value="usage">
+            <div class="sapling-ai-agent-builder__panel-stack">
+              <div class="sapling-ai-agent-builder__stats">
+                <v-chip color="primary" variant="tonal"
+                  >{{ workbenchStats.runsTotal ?? 0 }} Runs</v-chip
+                >
+                <v-chip variant="tonal">{{ workbenchStats.failedRuns ?? 0 }} Fehler</v-chip>
+                <v-chip variant="tonal">{{ workbenchStats.pendingActions ?? 0 }} Actions</v-chip>
+                <v-chip variant="tonal">
+                  {{ workbenchStats.evaluationPassRate ?? '-' }}%
+                  {{ tr('aiAgentBuilder.tabQuality', 'Qualität') }}
+                </v-chip>
+              </div>
+              <v-table density="comfortable">
+                <thead>
+                  <tr>
+                    <th>Status</th>
+                    <th>{{ tr('aiAgentBuilder.fieldModel', 'Modell') }}</th>
+                    <th>ms</th>
+                    <th>{{ tr('aiAgentBuilder.updatedAt', 'Aktualisiert') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(run, runIndex) in workbenchRuns"
+                    :key="run.handle ?? `run-${run.startedAt ?? runIndex}`"
+                  >
+                    <td>
+                      <v-chip size="small" variant="tonal">{{ run.status }}</v-chip>
+                    </td>
+                    <td>{{ run.model || '-' }}</td>
+                    <td>{{ run.durationMs ?? '-' }}</td>
+                    <td>{{ formatDate(run.completedAt || run.startedAt) }}</td>
+                  </tr>
+                </tbody>
+              </v-table>
+            </div>
+          </v-window-item>
         </v-window>
 
         <div class="sapling-ai-agent-builder__actions">
@@ -250,6 +469,11 @@ import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
 import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import type {
   AiAgentItem,
+  AiAgentEvaluationItem,
+  AiAgentMemoryItem,
+  AiAgentPlaybookItem,
+  AiAgentRunItem,
+  AiAgentVersionItem,
   AiProviderModelItem,
   AiProviderTypeItem,
   EntityItem,
@@ -298,9 +522,26 @@ const models = ref<AiProviderModelItem[]>([])
 const entities = ref<EntityItem[]>([])
 const roles = ref<RoleItem[]>([])
 const tools = ref<AiMcpToolDescriptor[]>([])
+const workbenchVersions = ref<AiAgentVersionItem[]>([])
+const workbenchPlaybooks = ref<AiAgentPlaybookItem[]>([])
+const workbenchMemories = ref<AiAgentMemoryItem[]>([])
+const workbenchRuns = ref<AiAgentRunItem[]>([])
+const workbenchEvaluations = ref<AiAgentEvaluationItem[]>([])
+const workbenchStats = ref<Record<string, number | null | undefined>>({})
 const isSaving = ref(false)
+const isRunningTest = ref(false)
 const translationService = new TranslationService()
 const draft = ref(createEmptyDraft())
+const testPrompt = ref('')
+const selectedTestVersionHandle = ref<number | null>(null)
+const selectedTestPlaybookHandle = ref<string | null>(null)
+const latestTestRun = ref<AiAgentRunItem | null>(null)
+const evaluationDraft = ref({
+  title: '',
+  prompt: '',
+  expectedCriteria: '',
+  agentVersionHandle: null as number | null,
+})
 
 const isEditingExisting = computed(() => !!selectedAgent.value?.handle)
 const activeAgentCount = computed(() => agents.value.filter((agent) => agent.isActive).length)
@@ -331,9 +572,21 @@ const filteredModels = computed(() => {
 
   return models.value.filter((model) => getProviderHandle(model.provider) === draft.value.provider)
 })
+const versionOptions = computed(() =>
+  workbenchVersions.value.map((version) => ({
+    title: `v${version.version} (${version.status})`,
+    value: version.handle ?? null,
+  })),
+)
+const playbookOptions = computed(() =>
+  workbenchPlaybooks.value.map((playbook) => ({
+    title: playbook.title,
+    value: playbook.handle,
+  })),
+)
 const mutationModeOptions = computed(() => [
   {
-    title: tr('aiAgentBuilder.mutationConfirm', 'Aenderungen bestaetigen lassen'),
+    title: tr('aiAgentBuilder.mutationConfirm', 'Änderungen bestätigen lassen'),
     value: 'confirm',
   },
   { title: tr('aiAgentBuilder.mutationReadOnly', 'Nur lesen'), value: 'readOnly' },
@@ -375,6 +628,12 @@ async function loadReferenceData() {
 function selectAgent(agent: AiAgentItem | null) {
   selectedAgent.value = agent
   draft.value = agent ? toDraft(agent) : createEmptyDraft()
+  latestTestRun.value = null
+  if (agent) {
+    void loadWorkbench(agent.handle)
+  } else {
+    resetWorkbench()
+  }
 }
 
 function startNewAgent() {
@@ -390,7 +649,7 @@ function getAgentSubtitle(agent: AiAgentItem): string {
 
   return agent.mutationMode === 'readOnly'
     ? tr('aiAgentBuilder.mutationReadOnly', 'Nur lesen')
-    : tr('aiAgentBuilder.mutationConfirm', 'Aenderungen bestaetigen lassen')
+    : tr('aiAgentBuilder.mutationConfirm', 'Änderungen bestätigen lassen')
 }
 
 function resetDraft() {
@@ -415,6 +674,87 @@ async function saveAgent() {
   } finally {
     isSaving.value = false
   }
+}
+
+async function loadWorkbench(agentHandle: string) {
+  const workbench = await ApiAiService.getAgentWorkbench(agentHandle)
+  workbenchVersions.value = workbench.versions
+  workbenchPlaybooks.value = workbench.playbooks
+  workbenchMemories.value = workbench.memories
+  workbenchRuns.value = workbench.runs
+  workbenchEvaluations.value = workbench.evaluations
+  workbenchStats.value = workbench.stats
+}
+
+function resetWorkbench() {
+  workbenchVersions.value = []
+  workbenchPlaybooks.value = []
+  workbenchMemories.value = []
+  workbenchRuns.value = []
+  workbenchEvaluations.value = []
+  workbenchStats.value = {}
+}
+
+async function createVersionFromDraft() {
+  if (!selectedAgent.value || !canSaveAgent.value) {
+    return
+  }
+
+  const nextVersion =
+    Math.max(0, ...workbenchVersions.value.map((version) => version.version ?? 0)) + 1
+  await ApiGenericService.create<AiAgentVersionItem>('aiAgentVersion', {
+    agent: selectedAgent.value.handle,
+    version: nextVersion,
+    status: workbenchVersions.value.length === 0 ? 'active' : 'draft',
+    promptMarkdown: draft.value.promptMarkdown.trim(),
+    changelog: 'Snapshot from Agent Workbench',
+    provider: draft.value.provider || null,
+    model: draft.value.model || null,
+    allowedEntityHandles: draft.value.allowedEntityHandles,
+    allowedKnowledgeEntityHandles: draft.value.allowedKnowledgeEntityHandles,
+    allowedInternalTools: draft.value.allowedInternalTools,
+    allowedExternalTools: draft.value.allowedExternalTools,
+    activatedAt: workbenchVersions.value.length === 0 ? new Date().toISOString() : null,
+  } as Partial<AiAgentVersionItem>)
+  await loadWorkbench(selectedAgent.value.handle)
+}
+
+async function runAgentTest() {
+  if (!selectedAgent.value || !testPrompt.value.trim()) {
+    return
+  }
+
+  isRunningTest.value = true
+  try {
+    latestTestRun.value = await ApiAiService.createAgentTestRun(selectedAgent.value.handle, {
+      prompt: testPrompt.value.trim(),
+      agentVersionHandle: selectedTestVersionHandle.value ?? undefined,
+      playbookHandle: selectedTestPlaybookHandle.value ?? undefined,
+    })
+    await loadWorkbench(selectedAgent.value.handle)
+  } finally {
+    isRunningTest.value = false
+  }
+}
+
+async function createEvaluation() {
+  if (!selectedAgent.value) {
+    return
+  }
+
+  await ApiAiService.createAgentEvaluation(selectedAgent.value.handle, {
+    title: evaluationDraft.value.title.trim(),
+    prompt: evaluationDraft.value.prompt.trim(),
+    expectedCriteria: evaluationDraft.value.expectedCriteria.trim() || undefined,
+    agentVersionHandle: evaluationDraft.value.agentVersionHandle ?? undefined,
+  })
+  evaluationDraft.value = {
+    title: '',
+    prompt: '',
+    expectedCriteria: '',
+    agentVersionHandle: null,
+  }
+  await loadWorkbench(selectedAgent.value.handle)
 }
 
 function createEmptyDraft(): AgentDraft {
@@ -518,6 +858,14 @@ function normalizeRoleHandles(value: unknown): number[] {
         .filter((handle): handle is number => typeof handle === 'number')
     : []
 }
+
+function formatDate(value?: Date | string | null): string {
+  if (!value) {
+    return '-'
+  }
+
+  return new Date(value).toLocaleString()
+}
 </script>
 
 <style scoped>
@@ -525,7 +873,12 @@ function normalizeRoleHandles(value: unknown): number[] {
   display: grid;
   grid-template-columns: minmax(16rem, 20rem) minmax(0, 1fr);
   gap: var(--sapling-gap-lg);
-  min-height: 0;
+  align-items: stretch;
+  height: max(1200px, calc(100vh - 320px));
+}
+
+.sapling-ai-agent-builder__hero {
+  margin: 0px;
 }
 
 .sapling-ai-agent-builder__hero-actions {
@@ -581,6 +934,27 @@ function normalizeRoleHandles(value: unknown): number[] {
 
 .sapling-ai-agent-builder__wide {
   grid-column: 1 / -1;
+}
+
+.sapling-ai-agent-builder__panel-stack {
+  display: grid;
+  gap: var(--sapling-gap-md);
+  padding-top: var(--sapling-space-lg);
+  min-width: 0;
+}
+
+.sapling-ai-agent-builder__mini-card {
+  display: grid;
+  gap: var(--sapling-gap-sm);
+  padding: var(--sapling-space-md);
+  min-width: 0;
+}
+
+.sapling-ai-agent-builder__stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sapling-gap-sm);
 }
 
 .sapling-ai-agent-builder__actions {

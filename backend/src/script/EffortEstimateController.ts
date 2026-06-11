@@ -22,7 +22,8 @@ export class EffortEstimateController extends ScriptClass {
       true,
       buildAiChatPromptUrl(
         buildEffortEstimatePrompt(handle, item),
-        'Aufwandsschaetzung analysieren',
+        'Aufwandsschätzung analysieren',
+        handle,
       ),
     );
   }
@@ -59,26 +60,26 @@ function buildEffortEstimatePrompt(
   const requirements = normalizeString(item.requirementsMarkdown);
 
   return [
-    'Bitte analysiere diese Sapling-Aufwandsschaetzung und mache Phase-4-Vorschlaege.',
+    'Bitte analysiere diese Sapling-Aufwandsschätzung und mache Phase-4-Vorschläge.',
     '',
-    `Aktuelle Aufwandsschaetzung: ${String(handle)}${title ? ` - ${title}` : ''}`,
+    `Aktuelle Aufwandsschätzung: ${String(handle)}${title ? ` - ${title}` : ''}`,
     requirements
       ? `Bekannte Anforderungen aus der Liste: ${requirements}`
       : null,
     '',
     'Arbeitsweise:',
-    '1. Lade die aktuelle Aufwandsschaetzung mit generic_get.',
+    '1. Lade die aktuelle Aufwandsschätzung mit generic_get.',
     `   entityHandle: effortEstimate, handle: ${JSON.stringify(handle)}, relations: ["status", "ticket", "salesOpportunity", "positions"]`,
     '2. Baue aus Titel, Anforderungen, Ticket, Verkaufschance und vorhandenen Positionen eine Suchanfrage.',
     '3. Nutze knowledge_search mit entityHandles ["effortEstimate", "effortEstimatePosition", "knowledgeArticle", "ticket"].',
-    '4. Wenn ein Vektorindex fehlt, nenne ihn kurz und nutze die verfuegbaren Quellen weiter.',
+    '4. Wenn ein Vektorindex fehlt, nenne ihn kurz und nutze die verfügbaren Quellen weiter.',
     '',
     'Gib mir kompakt:',
-    '- aehnliche vergangene Schaetzungen und passende Positionen',
+    '- ähnliche vergangene Schätzungen und passende Positionen',
     '- typische Positionen, die hier wahrscheinlich gebraucht werden',
     '- sinnvolle Stundenbereiche je Position und insgesamt',
     '- Risiken, Annahmen und offene Fragen',
-    '- welche Treffer als Referenz fuer Angebotstext oder Scope besonders taugen',
+    '- welche Treffer als Referenz für Angebotstext oder Scope besonders taugen',
   ]
     .filter(
       (line): line is string => typeof line === 'string' && line.length > 0,
@@ -86,13 +87,24 @@ function buildEffortEstimatePrompt(
     .join('\n');
 }
 
-function buildAiChatPromptUrl(prompt: string, title: string): string {
+function buildAiChatPromptUrl(
+  prompt: string,
+  title: string,
+  handle?: string | number,
+): string {
   const params = new URLSearchParams({
     prompt,
     title,
     autoSend: 'true',
     newChat: 'true',
+    agentHandle: 'salesOpportunityAgent',
+    playbookHandle: 'salesEstimatePreparation',
+    contextEntityHandle: 'effortEstimate',
   });
+
+  if (handle != null) {
+    params.set('contextRecordHandle', String(handle));
+  }
 
   return `sapling-ai-chat://prompt?${params.toString()}`;
 }

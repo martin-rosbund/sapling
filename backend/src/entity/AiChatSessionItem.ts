@@ -8,6 +8,8 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PersonItem } from './PersonItem';
 import { AiAgentItem } from './AiAgentItem';
+import { AiAgentPlaybookItem } from './AiAgentPlaybookItem';
+import { AiAgentVersionItem } from './AiAgentVersionItem';
 import { AiProviderModelItem } from './AiProviderModelItem';
 import { AiProviderTypeItem } from './AiProviderTypeItem';
 import {
@@ -106,6 +108,46 @@ export class AiChatSessionItem {
   })
   @ManyToOne(() => AiAgentItem, { nullable: true })
   agent?: Rel<AiAgentItem> | null;
+
+  @ApiPropertyOptional({ type: () => AiAgentVersionItem })
+  @Sapling(['isChip'])
+  @SaplingForm({
+    order: 325,
+    group: 'aiChatSession.groupReference',
+    groupOrder: 200,
+    width: 2,
+    visible: true,
+    tableOrder: 325,
+    tableVisible: false,
+    mobileOrder: 325,
+    mobileVisible: false,
+  })
+  @ManyToOne(() => AiAgentVersionItem, { nullable: true })
+  agentVersion?: Rel<AiAgentVersionItem> | null;
+
+  @ApiPropertyOptional({ type: () => AiAgentPlaybookItem })
+  @Sapling(['isChip'])
+  @SaplingForm({
+    order: 350,
+    group: 'aiChatSession.groupReference',
+    groupOrder: 200,
+    width: 2,
+    visible: true,
+    tableOrder: 350,
+    tableVisible: false,
+    mobileOrder: 350,
+    mobileVisible: false,
+  })
+  @ManyToOne(() => AiAgentPlaybookItem, { nullable: true })
+  playbook?: Rel<AiAgentPlaybookItem> | null;
+
+  @ApiPropertyOptional()
+  @Property({ length: 64, nullable: true })
+  contextEntityHandle?: string | null;
+
+  @ApiPropertyOptional()
+  @Property({ length: 128, nullable: true })
+  contextRecordHandle?: string | null;
 
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])

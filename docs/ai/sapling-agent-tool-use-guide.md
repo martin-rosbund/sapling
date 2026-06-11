@@ -191,6 +191,17 @@ Configurable Sapling agents add these constraints through `AiAgentItem`:
 - `allowedInternalTools` and `allowedExternalTools` for tool scope
 - `mutationMode` for read-only or confirm-gated write behavior
 
+Agent Workbench context can add:
+
+- `AiAgentVersionItem.promptMarkdown` as the pinned production prompt for a chat
+- `AiAgentPlaybookItem.steps` when the user selected a structured workflow
+- `AiAgentMemoryItem.contentMarkdown` for controlled reusable guidance
+- `contextEntityHandle` and `contextRecordHandle` when chat was opened from a
+  record-specific action
+
+Treat this context as policy and task guidance. It does not expand allowed
+tools, allowed entities, or write permissions.
+
 Avoid prompts that ask the agent to:
 
 - guess entity names without metadata lookup
