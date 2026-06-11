@@ -25,13 +25,22 @@
       <template #side>
         <div class="sapling-action-cluster">
           <v-btn
-            color="primary"
+            :color="executeButtonColor"
             prepend-icon="mdi-play"
             :disabled="!canExecute"
             :loading="isExecuting"
             @click="executeBatch"
           >
-            {{ $t('import.execute') }}
+            {{ executeButtonLabel }}
+          </v-btn>
+          <v-btn
+            v-if="hasErrorReportRows"
+            color="warning"
+            variant="tonal"
+            prepend-icon="mdi-file-download-outline"
+            @click="downloadErrorReport"
+          >
+            {{ $t('import.downloadErrorReport') }}
           </v-btn>
         </div>
       </template>
@@ -53,7 +62,6 @@
           />
           <v-autocomplete
             v-model="selectedOpenBatchHandle"
-            class="sapling-import__batch-select"
             :items="openBatchOptions"
             item-title="title"
             item-value="value"
@@ -124,6 +132,7 @@
             prepend-inner-icon="mdi-key-chain"
             :label="$t('import.externalKeyColumns')"
             :disabled="!selectedSourceHandle"
+            autocomplete="off"
             counter
             @update:model-value="normalizeExternalKeyColumns"
           />
@@ -136,6 +145,7 @@
               density="comfortable"
               prepend-inner-icon="mdi-link-variant"
               :label="$t('import.genericReferenceTarget')"
+              autocomplete="off"
             />
             <v-select
               v-model="genericReferenceKeyColumns"
@@ -147,6 +157,7 @@
               prepend-inner-icon="mdi-key"
               :label="$t('import.externalKeyColumns')"
               :disabled="!genericReferenceEntityHandle || !selectedSourceHandle"
+              autocomplete="off"
               counter
               @update:model-value="normalizeGenericReferenceKeyColumns"
             />
@@ -183,6 +194,7 @@
               hide-details
               clearable
               :placeholder="field.name"
+              autocomplete="off"
               @update:model-value="onFieldMappingChange(field.name)"
             >
               <template #item="{ props: itemProps, item }">
@@ -224,6 +236,7 @@
               hide-details
               clearable
               :placeholder="$t('import.defaultValue')"
+              autocomplete="off"
               @focus="loadReferenceValueItems(field.referenceName)"
             />
             <v-select
@@ -238,6 +251,7 @@
               :multiple="field.customField?.type === 'multiSelect'"
               :chips="field.customField?.type === 'multiSelect'"
               :placeholder="$t('import.defaultValue')"
+              autocomplete="off"
             />
             <v-text-field
               v-else
@@ -277,6 +291,7 @@
                 hide-details
                 clearable
                 :placeholder="$t('import.relationMapping')"
+                autocomplete="off"
               />
               <v-select
                 v-model="relationMappingColumns[field.name]"
@@ -288,6 +303,7 @@
                 chips
                 :disabled="!relationMappingModes[field.name]"
                 :placeholder="$t('import.externalKeyColumns')"
+                autocomplete="off"
                 @update:model-value="normalizeRelationMappingColumns(field.name)"
               />
             </div>
@@ -391,6 +407,21 @@
         </div>
 
         <div class="sapling-import__preview-scroll">
+          <v-alert
+            v-if="isPreviewLimited"
+            density="compact"
+            type="info"
+            variant="tonal"
+            class="sapling-import__preview-note"
+          >
+            {{
+              $t('import.previewLimited', {
+                count: IMPORT_PREVIEW_ROW_LIMIT,
+                total: batch?.rows.length ?? 0,
+              })
+            }}
+          </v-alert>
+
           <div v-if="saplingPreviewItems.length > 0" class="sapling-import__sapling-preview">
             <div class="sapling-section-header">
               <div>
@@ -498,6 +529,7 @@
             density="comfortable"
             prepend-inner-icon="mdi-call-split"
             :label="$t('import.valueMappingFallback')"
+            autocomplete="off"
           />
 
           <v-table density="compact" class="sapling-import__table">
@@ -522,6 +554,7 @@
                     clearable
                     :loading="valueMappingDialog.isLoadingReferenceItems"
                     :placeholder="$t('import.targetValue')"
+                    autocomplete="off"
                   />
                   <v-text-field
                     v-else
@@ -565,6 +598,7 @@ import { useGenericStore } from '@/stores/genericStore'
 import ApiGenericService from '@/services/api.generic.service'
 import ApiImportService, {
   type ImportAiSuggestion,
+  type ImportBatchRowSummary,
   type ImportBatchSummary,
   type ImportFieldDefault,
   type ImportFieldMapping,
@@ -582,10 +616,12 @@ import { DEFAULT_ENTITY_ITEMS_COUNT } from '@/constants/project.constants'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import { getEntityValueLabel } from '@/utils/saplingTableUtil'
+import { downloadTextFile } from '@/composables/table/saplingTableAction.utils'
 
 type Option = { title: string; value: string }
 type BatchOption = { title: string; value: number }
 type ValueOption = { title: string; value: unknown }
+type ErrorReportRow = ImportBatchRowSummary & { rawData: Record<string, unknown> }
 type ImportSource = SaplingGenericItem & { handle: string; title?: string; isActive?: boolean }
 type ValueMappingState = {
   targetField: string
@@ -617,6 +653,9 @@ const { loadTranslations } = useTranslationLoader(
   'externalRecordLink',
 )
 
+const IMPORT_PREVIEW_ROW_LIMIT = 100
+const IMPORT_ERROR_REPORT_DELIMITER = ';'
+const IMPORT_ERROR_REPORT_BOM = '\uFEFF'
 const selectedFile = ref<File | File[] | null>(null)
 const selectedEntityHandle = ref<string | null>(null)
 const selectedSourceHandle = ref<string | null>(null)
@@ -742,7 +781,15 @@ const selectedTemplate = computed(
 
 const headerOptions = computed(() => batch.value?.headers ?? [])
 const sampleHeaders = computed(() => batch.value?.headers.slice(0, 8) ?? [])
-const previewRows = computed(() => batch.value?.rows.slice(0, 100) ?? [])
+const previewRows = computed(() => batch.value?.rows.slice(0, IMPORT_PREVIEW_ROW_LIMIT) ?? [])
+const errorReportRows = computed<ErrorReportRow[]>(() =>
+  (batch.value?.rows ?? []).filter(
+    (row): row is ErrorReportRow =>
+      (row.status === 'error' || row.status === 'failed') &&
+      Boolean(row.rawData) &&
+      typeof row.rawData === 'object',
+  ),
+)
 const saplingPreviewItems = computed<SaplingGenericItem[]>(() =>
   (batch.value?.rows ?? [])
     .filter((row) => row.payload && row.status !== 'error' && row.status !== 'failed')
@@ -805,11 +852,20 @@ const canSaveTemplate = computed(
 const canSuggestWithAi = computed(
   () => Boolean(batch.value?.handle && selectedEntityHandle.value) && !isSuggesting.value,
 )
+const hasValidationErrors = computed(() => (batch.value?.errorCount ?? 0) > 0)
+const hasErrorReportRows = computed(() => errorReportRows.value.length > 0)
+const isPreviewLimited = computed(
+  () => (batch.value?.rows.length ?? 0) > IMPORT_PREVIEW_ROW_LIMIT,
+)
+const executeButtonLabel = computed(() =>
+  hasValidationErrors.value ? t('import.executeWithoutInvalidRows') : t('import.execute'),
+)
+const executeButtonColor = computed(() => (hasValidationErrors.value ? 'warning' : 'primary'))
 const canExecute = computed(
   () =>
     Boolean(batch.value?.handle) &&
     (batch.value?.readyCount ?? 0) > 0 &&
-    (batch.value?.errorCount ?? 0) === 0 &&
+    (batch.value?.status === 'validated' || batch.value?.status === 'validatedWithErrors') &&
     !isExecuting.value,
 )
 
@@ -1140,6 +1196,47 @@ async function executeBatch(): Promise<void> {
   } finally {
     isExecuting.value = false
   }
+}
+
+function downloadErrorReport(): void {
+  if (!batch.value || errorReportRows.value.length === 0) {
+    return
+  }
+
+  const rawHeaders = collectErrorReportRawHeaders(errorReportRows.value)
+  const headers = [
+    'rowNumber',
+    'status',
+    'action',
+    'targetReference',
+    'message',
+    'messageKey',
+    'externalKeyHash',
+    ...rawHeaders.map((header) => `raw.${header}`),
+  ]
+  const lines = [
+    headers.map(escapeImportCsvCell).join(IMPORT_ERROR_REPORT_DELIMITER),
+    ...errorReportRows.value.map((row) =>
+      [
+        row.rowNumber,
+        importStatusLabel(row.status),
+        row.action ? importActionLabel(row.action) : '',
+        row.targetReference ?? '',
+        importMessageLabel(row.message),
+        row.message ?? '',
+        row.externalKeyHash ?? '',
+        ...rawHeaders.map((header) => row.rawData[header] ?? ''),
+      ]
+        .map(escapeImportCsvCell)
+        .join(IMPORT_ERROR_REPORT_DELIMITER),
+    ),
+  ]
+
+  downloadTextFile(
+    `${IMPORT_ERROR_REPORT_BOM}${lines.join('\r\n')}\r\n`,
+    createErrorReportFilename(batch.value.filename),
+    'text/csv;charset=utf-8',
+  )
 }
 
 function normalizeExternalKeyColumns(): void {
@@ -1524,6 +1621,34 @@ function normalizeSelectedColumns(columns: string[]): string[] {
 
 function noop(): void {
   // read-only preview table
+}
+
+function collectErrorReportRawHeaders(rows: ErrorReportRow[]): string[] {
+  return Array.from(
+    rows.reduce<Set<string>>((headers, row) => {
+      Object.keys(row.rawData).forEach((header) => headers.add(header))
+      return headers
+    }, new Set<string>()),
+  )
+}
+
+function escapeImportCsvCell(value: unknown): string {
+  const text = String(value ?? '')
+
+  if (/[;"\r\n]/.test(text)) {
+    return `"${text.replace(/"/g, '""')}"`
+  }
+
+  return text
+}
+
+function createErrorReportFilename(filename: string): string {
+  const baseName = filename
+    .replace(/\.[^.]+$/, '')
+    .replace(/[^a-zA-Z0-9._-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+  return `${baseName || 'import'}-fehlerprotokoll.csv`
 }
 
 function fieldLabel(fieldName: string): string {

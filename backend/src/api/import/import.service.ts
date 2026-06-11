@@ -416,6 +416,7 @@ export class ImportService {
     }
 
     if (!handle) {
+      await this.resetSerialSequence('import_template_item', 'handle');
       this.em.persist(template);
     }
 
@@ -1407,15 +1408,16 @@ export class ImportService {
     template: ImportTemplateItem,
     mappings: ImportValueMappingDto[],
   ): Promise<void> {
-    const existingMappings = template.handle
-      ? await this.em.find(ImportTemplateValueMappingItem, {
-          importTemplate: { handle: template.handle },
-        })
-      : [];
-
-    for (const existingMapping of existingMappings) {
-      this.em.remove(existingMapping);
+    if (template.handle) {
+      await this.em.nativeDelete(ImportTemplateValueMappingItem, {
+        importTemplate: { handle: template.handle },
+      });
     }
+
+    await this.resetSerialSequence(
+      'import_template_value_mapping_item',
+      'handle',
+    );
 
     for (const mapping of this.normalizeValueMappings(mappings)) {
       for (const [sourceValue, targetValue] of Object.entries(mapping.values)) {
@@ -1430,6 +1432,19 @@ export class ImportService {
         this.em.persist(valueMapping);
       }
     }
+  }
+
+  private async resetSerialSequence(
+    tableName: 'import_template_item' | 'import_template_value_mapping_item',
+    columnName: 'handle',
+  ): Promise<void> {
+    await this.em.getConnection().execute(`
+      select setval(
+        pg_get_serial_sequence('${tableName}', '${columnName}'),
+        coalesce((select max(${columnName}) from ${tableName}), 1),
+        (select max(${columnName}) from ${tableName}) is not null
+      )
+    `);
   }
 
   private normalizeValueMappings(

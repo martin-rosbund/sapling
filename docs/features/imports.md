@@ -97,7 +97,10 @@ generic target types.
 11. Optionally configure a generic target reference for entities such as
    `information` that use `entity + reference`.
 12. Validate the batch.
-13. Execute the batch.
+13. Download the complete error report when invalid rows need source-file
+    cleanup.
+14. Execute the batch. If valid rows exist, the workspace can run the import
+    without invalid rows; invalid rows remain in the batch for later correction.
 
 Value mappings are stored as `ImportTemplateValueMappingItem` rows for reusable
 templates and are also copied into the batch `mapping` JSON when a batch is
@@ -107,6 +110,8 @@ execution, so users can inspect the Sapling preview before anything is written.
 
 During execution, rows with an existing external record link update the linked
 Sapling record. Rows without a link create a new record and store the link.
+Rows that are not ready are skipped, so a few invalid CSV rows do not block a
+large otherwise valid import.
 
 Relation mappings with mode `externalKey` resolve target references through
 `ExternalRecordLinkItem`. This supports staged imports such as importing
