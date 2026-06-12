@@ -439,8 +439,14 @@ function stringValue(fieldName: string): string {
   return value != null ? String(value) : ''
 }
 
-function numberValue(fieldName: string): number {
-  return Number(props.formValues[fieldName] ?? null)
+function numberValue(fieldName: string): number | null {
+  const value = props.formValues[fieldName]
+  if (value === null || value === undefined || value === '') {
+    return null
+  }
+
+  const numericValue = Number(value)
+  return Number.isFinite(numericValue) ? numericValue : null
 }
 
 function booleanValue(fieldName: string): boolean {

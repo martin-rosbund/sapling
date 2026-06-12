@@ -40,8 +40,16 @@ and one target entity:
 - relation mapping metadata
 - optional generic reference mapping
 
+When the target entity metadata exposes a field default through the generic
+template endpoint, the import workspace pre-fills that value for unmapped
+fields. Explicit CSV mappings and template field-default overrides take
+precedence.
+
 The import workspace filters templates by selected source system and target
-entity, so users only see templates that fit the current import context.
+entity once either scope is selected, so users only see templates that fit the
+current import context. When neither scope is selected yet, users can choose
+from all active templates; selecting one applies its source system and target
+entity before loading its mapping.
 
 `ImportTemplateValueMappingItem` stores user-maintainable value conversions for
 an import template. Each row maps one source value for one target field to the
@@ -75,6 +83,11 @@ This keeps external IDs out of business entities and makes the mechanism work
 for companies, people, tickets, documents, information records, and future
 generic target types.
 
+Generic record action menus can show external record links lazily for a single
+persisted record. The frontend only queries `externalRecordLink` when the user
+opens that action, using the current entity handle and record handle as filter,
+then displays source system, external key parts, import batches, and timestamps.
+
 ## Workflow
 
 1. Upload a CSV file.
@@ -102,6 +115,10 @@ generic target types.
 14. Execute the batch. If valid rows exist, the workspace can run the import
     without invalid rows; invalid rows remain in the batch for later correction.
 
+Validation rejects non-empty invalid date strings before execution. This
+includes source values such as `NULL` in date or datetime fields, so those rows
+are shown as invalid in the preview instead of failing later in PostgreSQL.
+
 Value mappings are stored as `ImportTemplateValueMappingItem` rows for reusable
 templates and are also copied into the batch `mapping` JSON when a batch is
 validated. They are applied while the batch is validated, before the row payload
@@ -113,6 +130,11 @@ Sapling record. Rows without a link create a new record and store the link.
 Rows that are not ready are skipped, so a few invalid CSV rows do not block a
 large otherwise valid import.
 
+Import batches and import batch rows are intentionally deletable through the
+generic entity UI in non-production setup workflows. Deleting a batch cascades
+its row records; external record links keep their business reference and only
+drop the optional first/last batch pointer.
+
 Relation mappings with mode `externalKey` resolve target references through
 `ExternalRecordLinkItem`. This supports staged imports such as importing
 companies first and then importing persons whose company column contains the
@@ -121,6 +143,11 @@ same external company key. The lookup uses:
 ```text
 source system + referenced entity + configured key columns -> Sapling handle
 ```
+
+If the follow-up import uses a different column name for the same single
+external key value, for example `iXISFirma` in a person file pointing to a
+company previously imported with `iXISAdresse`, the resolver first tries the
+canonical hash and then falls back to a unique single-key value match.
 
 Import templates are created through `POST /api/import/templates` and updated
 through `PATCH /api/import/templates/:handle`. Re-saving an existing template

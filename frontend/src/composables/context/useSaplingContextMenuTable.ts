@@ -12,6 +12,7 @@ export type SaplingContextMenuTableAction =
   | 'navigate'
   | 'script'
   | 'show'
+  | 'showExternalRecordLinks'
   | 'showInformation'
   | 'showDocuments'
   | 'timeline'
@@ -64,6 +65,7 @@ export interface SaplingContextMenuTableMenuOptions {
   entityPermission: AccumulatedPermission | null
   canNavigate: boolean
   canTimeline: boolean
+  canShowExternalRecordLinks?: boolean
   scriptButtons?: ScriptButtonItem[]
   mailActions?: SaplingMailMenuAction[]
   mailToLabel?: string
@@ -112,6 +114,13 @@ export function getSaplingContextMenuTableItems(
   }
   if (options.canChangeLog) {
     group2.push({ type: 'changeLog', icon: 'mdi-history', titleKey: 'global.changeLog' })
+  }
+  if (options.canShowExternalRecordLinks === true) {
+    group2.push({
+      type: 'showExternalRecordLinks',
+      icon: 'mdi-link-variant',
+      titleKey: 'global.externalRecordLinks',
+    })
   }
   if (options.canNavigate) {
     group2.push({ type: 'navigate', icon: 'mdi-navigation', titleKey: 'global.navigate' })
@@ -189,6 +198,7 @@ export function useSaplingContextMenuTable(
       entityPermission: props.entityPermission,
       canNavigate: props.canNavigate,
       canTimeline: props.item?.handle != null,
+      canShowExternalRecordLinks: props.item?.handle != null,
       scriptButtons: props.scriptButtons,
       mailActions: props.mailActions,
       showEdit: props.showEdit,

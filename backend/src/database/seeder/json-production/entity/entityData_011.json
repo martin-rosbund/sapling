@@ -2,7 +2,7 @@
   { "handle": "importSource", "canShow": true, "icon": "mdi-database-import-outline", "group": "import", "order": 70, "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "importTemplate", "canShow": true, "icon": "mdi-table-cog", "group": "import", "order": 75, "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "importTemplateValueMapping", "canShow": true, "icon": "mdi-swap-horizontal", "group": "import", "order": 76, "canInsert": true, "canUpdate": true, "canDelete": true },
-  { "handle": "importBatch", "canShow": true, "icon": "mdi-table-arrow-up", "group": "import", "order": 80, "canInsert": false, "canUpdate": false, "canDelete": false },
-  { "handle": "importBatchRow", "canShow": true, "icon": "mdi-table-row", "group": "import", "order": 81, "canInsert": false, "canUpdate": false, "canDelete": false },
+  { "handle": "importBatch", "canShow": true, "icon": "mdi-table-arrow-up", "group": "import", "order": 80, "canInsert": false, "canUpdate": false, "canDelete": true },
+  { "handle": "importBatchRow", "canShow": true, "icon": "mdi-table-row", "group": "import", "order": 81, "canInsert": false, "canUpdate": false, "canDelete": true },
   { "handle": "externalRecordLink", "canShow": true, "icon": "mdi-link-variant", "group": "import", "order": 90, "canInsert": false, "canUpdate": false, "canDelete": false }
 ]

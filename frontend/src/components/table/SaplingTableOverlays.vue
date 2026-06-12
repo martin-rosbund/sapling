@@ -77,6 +77,15 @@
     @close="emit('close-information')"
     @saved="emit('close-information')"
   />
+
+  <SaplingExternalRecordLinksDialog
+    v-if="showExternalRecordLinksDialog"
+    :show="showExternalRecordLinksDialog"
+    :item="externalRecordLinksDialogItem"
+    :entity-handle="entityHandle"
+    @update:show="(value) => !value && emit('close-external-record-links')"
+    @close="emit('close-external-record-links')"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -97,6 +106,7 @@ import SaplingContextMenuTable from '@/components/context/SaplingContextMenuTabl
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
 import SaplingDialogUpdateConflict from '@/components/dialog/SaplingDialogUpdateConflict.vue'
+import SaplingExternalRecordLinksDialog from '@/components/import/SaplingExternalRecordLinksDialog.vue'
 import SaplingTableRowInformation from './SaplingTableRowInformation.vue'
 import SaplingTableRowUpload from './SaplingTableRowUpload.vue'
 
@@ -136,6 +146,8 @@ defineProps<{
   uploadDialogItem: SaplingGenericItem | null
   showInformationDialog: boolean
   informationDialogItem: SaplingGenericItem | null
+  showExternalRecordLinksDialog: boolean
+  externalRecordLinksDialogItem: SaplingGenericItem | null
   contextMenuMailActions?: SaplingMailMenuAction[]
 }>()
 
@@ -165,6 +177,7 @@ const emit = defineEmits<{
   (event: 'update:context-visible', value: boolean): void
   (event: 'close-upload'): void
   (event: 'close-information'): void
+  (event: 'close-external-record-links'): void
 }>()
 
 function handleUpdateConflictVisibility(value: boolean): void {

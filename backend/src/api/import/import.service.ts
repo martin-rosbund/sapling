@@ -299,6 +299,7 @@ export class ImportService {
           entityHandle,
           currentUser,
         );
+        this.validateImportDateValues(template, payload);
         const action = await this.resolvePlannedAction(
           entityHandle,
           payload,
@@ -1253,6 +1254,49 @@ export class ImportService {
       });
   }
 
+  private validateImportDateValues(
+    template: EntityTemplateDto[],
+    payload: Record<string, unknown>,
+  ): void {
+    const invalidDateFields = template
+      .filter((field) => this.isDateField(field))
+      .filter((field) => this.isInvalidImportDateValue(payload[field.name]))
+      .map((field) => field.name);
+
+    if (invalidDateFields.length === 0) {
+      return;
+    }
+
+    throw new Error(
+      `import.invalidDateValues:${Array.from(new Set(invalidDateFields)).join(',')}`,
+    );
+  }
+
+  private isDateField(field: EntityTemplateDto): boolean {
+    return ['date', 'datetime', 'DateType'].includes(field.type);
+  }
+
+  private isInvalidImportDateValue(value: unknown): boolean {
+    if (value == null || value instanceof Date) {
+      return false;
+    }
+
+    if (typeof value !== 'string') {
+      return false;
+    }
+
+    const normalizedValue = value.trim();
+    if (!normalizedValue) {
+      return false;
+    }
+
+    if (normalizedValue.toLowerCase() === 'null') {
+      return true;
+    }
+
+    return Number.isNaN(Date.parse(normalizedValue));
+  }
+
   private async applyRelationMappings(
     template: EntityTemplateDto[],
     payload: Record<string, unknown>,
@@ -1347,11 +1391,63 @@ export class ImportService {
       externalKeyHash: externalKey.hash,
     });
 
-    if (!link) {
+    const resolvedLink =
+      link ??
+      (await this.findExternalReferenceBySingleKeyValue(
+        normalizedSourceHandle,
+        entityHandle,
+        externalKey,
+      ));
+
+    if (!resolvedLink) {
       throw new NotFoundException('import.externalReferenceNotFound');
     }
 
-    return link.reference;
+    return resolvedLink.reference;
+  }
+
+  private async findExternalReferenceBySingleKeyValue(
+    sourceHandle: string,
+    entityHandle: string,
+    externalKey: ExternalKey,
+  ): Promise<ExternalRecordLinkItem | null> {
+    const keyValues = Object.values(externalKey.parts)
+      .map((value) => this.normalizeScalarString(value))
+      .filter((value) => value.length > 0);
+
+    if (keyValues.length !== 1 || Object.keys(externalKey.parts).length !== 1) {
+      return null;
+    }
+
+    const rows = (await this.em.getConnection().execute(
+      `
+        select handle
+        from external_record_link_item
+        where source_handle = ?
+          and entity_handle = ?
+          and (
+            select count(*)
+            from jsonb_object_keys(external_key_parts)
+          ) = 1
+          and exists (
+            select 1
+            from jsonb_each_text(external_key_parts) as key_part(key, value)
+            where key_part.value = ?
+          )
+        limit 2
+      `,
+      [sourceHandle, entityHandle, keyValues[0]],
+    )) as Array<{ handle: number }>;
+
+    if (rows.length > 1) {
+      throw new ConflictException('import.externalReferenceNotUnique');
+    }
+
+    if (rows.length === 0) {
+      return null;
+    }
+
+    return this.em.findOne(ExternalRecordLinkItem, { handle: rows[0].handle });
   }
 
   private async resolveValueReference(

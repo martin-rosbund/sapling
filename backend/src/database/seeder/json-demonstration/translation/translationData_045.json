@@ -1,0 +1,17 @@
+[
+  { "entity": "global", "property": "externalRecordLinks", "de": "Externe Verknüpfungen", "en": "External links" },
+  { "entity": "externalRecordLink", "property": "dialogEyebrow", "de": "Externe Verknüpfungen", "en": "External links" },
+  { "entity": "externalRecordLink", "property": "emptyForRecord", "de": "Für diesen Datensatz wurden keine externen Verknüpfungen gefunden.", "en": "No external links were found for this record." },
+  { "entity": "externalRecordLink", "property": "links", "de": "Verknüpfungen", "en": "Links" },
+  { "entity": "externalRecordLink", "property": "sources", "de": "Fremdsysteme", "en": "Sources" },
+  { "entity": "externalRecordLink", "property": "linkedByImport", "de": "Per Import verknüpft", "en": "Linked by import" },
+  { "entity": "externalRecordLink", "property": "loadFailed", "de": "Externe Verknüpfungen konnten nicht geladen werden.", "en": "External links could not be loaded." },
+  { "entity": "externalRecordLink", "property": "importBatch", "de": "Importstapel", "en": "Import batch" },
+  { "entity": "externalRecordLink", "property": "firstImportBatch", "de": "Erster Importstapel", "en": "First import batch" },
+  { "entity": "externalRecordLink", "property": "lastImportBatch", "de": "Letzter Importstapel", "en": "Last import batch" },
+  { "entity": "externalRecordLink", "property": "timeline", "de": "Zeitpunkte", "en": "Timeline" },
+  { "entity": "externalRecordLink", "property": "sameTimestamp", "de": "Alle Zeitpunkte", "en": "All timestamps" },
+  { "entity": "import", "property": "externalReferenceNotUnique", "de": "Externe Referenz ist nicht eindeutig", "en": "External reference is not unique" },
+  { "entity": "import", "property": "invalidDateValue", "de": "Datum ist ungültig.", "en": "Date is invalid." },
+  { "entity": "import", "property": "invalidDateValues", "de": "Datumswerte sind ungültig: {fields}", "en": "Date values are invalid: {fields}" }
+]

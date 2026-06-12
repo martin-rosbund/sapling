@@ -144,6 +144,8 @@ export function useSaplingTableActions({
   const uploadDialogItem = ref<SaplingGenericItem | null>(null)
   const showInformationDialog = ref(false)
   const informationDialogItem = ref<SaplingGenericItem | null>(null)
+  const showExternalRecordLinksDialog = ref(false)
+  const externalRecordLinksDialogItem = ref<SaplingGenericItem | null>(null)
   const isDownloadingJSON = ref(false)
   const isImportingCSV = ref(false)
   const contextMenu = ref<TableContextMenuState>({
@@ -454,6 +456,20 @@ export function useSaplingTableActions({
     informationDialogItem.value = null
   }
 
+  function openExternalRecordLinksDialog(item: SaplingGenericItem) {
+    if (item.handle == null) {
+      return
+    }
+
+    externalRecordLinksDialogItem.value = item
+    showExternalRecordLinksDialog.value = true
+  }
+
+  function closeExternalRecordLinksDialog() {
+    showExternalRecordLinksDialog.value = false
+    externalRecordLinksDialogItem.value = null
+  }
+
   function navigateToAddress(item: SaplingGenericItem) {
     if (!canNavigate.value) {
       return
@@ -534,6 +550,9 @@ export function useSaplingTableActions({
         break
       case 'showInformation':
         openInformationDialog(item)
+        break
+      case 'showExternalRecordLinks':
+        openExternalRecordLinksDialog(item)
         break
       case 'mail':
         if (mailAction?.email) {
@@ -1067,6 +1086,8 @@ export function useSaplingTableActions({
     uploadDialogItem,
     showInformationDialog,
     informationDialogItem,
+    showExternalRecordLinksDialog,
+    externalRecordLinksDialogItem,
     contextMenu,
     contextMenuMailActions,
     favoriteDialog,
@@ -1092,6 +1113,8 @@ export function useSaplingTableActions({
     navigateToDocuments,
     openInformationDialog,
     closeInformationDialog,
+    openExternalRecordLinksDialog,
+    closeExternalRecordLinksDialog,
     openFavoriteDialog,
     closeFavoriteDialog,
     saveFavorite,

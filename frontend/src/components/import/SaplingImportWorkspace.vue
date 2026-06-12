@@ -108,7 +108,7 @@
             density="comfortable"
             clearable
             :label="$t('import.template')"
-            :disabled="!canUseTemplates"
+            :disabled="!canSelectTemplates"
             :loading="isLoadingTemplates"
             autocomplete="off"
           />
@@ -227,41 +227,13 @@
                 </v-list-item>
               </template>
             </v-select>
-            <v-autocomplete
-              v-if="field.isReference && field.referenceName"
+            <SaplingImportTemplateValueField
               v-model="fieldDefaults[field.name]"
-              :items="referenceOptionsForField(field)"
-              item-title="title"
-              item-value="value"
-              density="compact"
-              hide-details
-              clearable
-              :placeholder="$t('import.defaultValue')"
-              autocomplete="off"
-              @focus="loadReferenceValueItems(field.referenceName)"
-            />
-            <v-select
-              v-else-if="customFieldOptionsForField(field).length > 0"
-              v-model="fieldDefaults[field.name]"
-              :items="customFieldOptionsForField(field)"
-              item-title="label"
-              item-value="value"
-              density="compact"
-              hide-details
-              clearable
-              :multiple="field.customField?.type === 'multiSelect'"
-              :chips="field.customField?.type === 'multiSelect'"
-              :placeholder="$t('import.defaultValue')"
-              autocomplete="off"
-            />
-            <v-text-field
-              v-else
-              v-model="fieldDefaults[field.name]"
-              density="compact"
-              hide-details
-              clearable
-              :placeholder="$t('import.defaultValue')"
-              autocomplete="off"
+              :template="field"
+              :entity-handle="selectedEntityHandle ?? ''"
+              :visible-templates="importableFields"
+              :permissions="currentPermissions"
+              :disabled="!batch"
             />
             <div class="sapling-import__value-mapping-action">
               <v-tooltip :text="$t('import.valueMapping')">
@@ -544,27 +516,12 @@
               <tr v-for="sourceValue in currentValueMappingSourceValues" :key="sourceValue">
                 <td>{{ sourceValue }}</td>
                 <td>
-                  <v-autocomplete
-                    v-if="isCurrentValueMappingReference"
+                  <SaplingImportTemplateValueField
                     v-model="currentValueMapping.values[sourceValue]"
-                    :items="currentValueMappingReferenceOptions"
-                    item-title="title"
-                    item-value="value"
-                    density="compact"
-                    hide-details
-                    clearable
-                    :loading="valueMappingDialog.isLoadingReferenceItems"
-                    :placeholder="$t('import.targetValue')"
-                    autocomplete="off"
-                  />
-                  <v-text-field
-                    v-else
-                    v-model="currentValueMapping.values[sourceValue]"
-                    density="compact"
-                    hide-details
-                    clearable
-                    :placeholder="$t('import.targetValue')"
-                    autocomplete="off"
+                    :template="currentValueMappingField"
+                    :entity-handle="selectedEntityHandle ?? ''"
+                    :visible-templates="importableFields"
+                    :permissions="currentPermissions"
                   />
                 </td>
               </tr>
@@ -594,8 +551,10 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
 import SaplingSurface from '@/components/common/SaplingSurface.vue'
+import SaplingImportTemplateValueField from '@/components/import/SaplingImportTemplateValueField.vue'
 import SaplingTable from '@/components/table/SaplingTable.vue'
 import { useGenericStore } from '@/stores/genericStore'
+import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
 import ApiGenericService from '@/services/api.generic.service'
 import ApiImportService, {
   type ImportAiSuggestion,
@@ -616,12 +575,10 @@ import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure'
 import { DEFAULT_ENTITY_ITEMS_COUNT } from '@/constants/project.constants'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
-import { getEntityValueLabel } from '@/utils/saplingTableUtil'
 import { downloadTextFile } from '@/composables/table/saplingTableAction.utils'
 
 type Option = { title: string; value: string }
 type BatchOption = { title: string; value: number }
-type ValueOption = { title: string; value: unknown }
 type ErrorReportRow = ImportBatchRowSummary & { rawData: Record<string, unknown> }
 type ImportSource = SaplingGenericItem & { handle: string; title?: string; isActive?: boolean }
 type ValueMappingState = {
@@ -641,6 +598,7 @@ type ImportMappingConfiguration =
 
 const { t, te } = useI18n()
 const genericStore = useGenericStore()
+const currentPermissionStore = useCurrentPermissionStore()
 const { pushMessage } = useSaplingMessageCenter()
 const { loadTranslations } = useTranslationLoader(
   'global',
@@ -658,6 +616,7 @@ const IMPORT_PREVIEW_ROW_LIMIT = 100
 const IMPORT_ERROR_REPORT_DELIMITER = ';'
 const IMPORT_ERROR_REPORT_BOM = '\uFEFF'
 const IMPORT_REQUIRED_FIELDS_MISSING_PREFIX = 'import.requiredFieldsMissing:'
+const IMPORT_INVALID_DATE_VALUES_PREFIX = 'import.invalidDateValues:'
 const selectedFile = ref<File | File[] | null>(null)
 const selectedEntityHandle = ref<string | null>(null)
 const selectedSourceHandle = ref<string | null>(null)
@@ -681,6 +640,7 @@ const isSuggesting = ref(false)
 const isLoadingOpenBatches = ref(false)
 const isHydratingBatch = ref(false)
 const isDownloadingErrorReport = ref(false)
+const isApplyingTemplate = ref(false)
 const aiSuggestion = ref<ImportAiSuggestion | null>(null)
 const fieldMappings = reactive<Record<string, string | null>>({})
 const fieldDefaults = reactive<Record<string, unknown>>({})
@@ -690,15 +650,12 @@ const valueMappings = reactive<Record<string, ValueMappingState>>({})
 const aiSuggestionFieldDetails = reactive<
   Record<string, { confidence: number; reason: string | null }>
 >({})
-const referenceValueItems = reactive<Record<string, SaplingGenericItem[]>>({})
 const valueMappingDialog = reactive<{
   visible: boolean
   targetField: string | null
-  isLoadingReferenceItems: boolean
 }>({
   visible: false,
   targetField: null,
-  isLoadingReferenceItems: false,
 })
 
 const selectedEntityTemplates = computed<EntityTemplate[]>(() => {
@@ -721,6 +678,8 @@ const selectedEntityPermission = computed<AccumulatedPermission | null>(() => {
   }
   return genericStore.getState(selectedEntityHandle.value).entityPermission
 })
+
+const currentPermissions = computed(() => currentPermissionStore.accumulatedPermission ?? [])
 
 const importableFields = computed(() =>
   selectedEntityTemplates.value.filter((template) => {
@@ -752,7 +711,7 @@ const sourceOptions = computed<Option[]>(() =>
 
 const templateOptions = computed(() =>
   templates.value.map((template) => ({
-    title: template.title,
+    title: templateOptionTitle(template),
     value: template.handle,
   })),
 )
@@ -817,16 +776,6 @@ const currentValueMapping = computed(() =>
 const currentValueMappingSourceValues = computed(() =>
   currentValueMappingField.value ? sourceValuesForField(currentValueMappingField.value) : [],
 )
-const currentValueMappingReferenceOptions = computed(() =>
-  currentValueMappingField.value
-    ? referenceOptionsForField(currentValueMappingField.value)
-    : ([] as ValueOption[]),
-)
-const isCurrentValueMappingReference = computed(
-  () =>
-    Boolean(currentValueMappingField.value?.isReference) &&
-    Boolean(currentValueMappingField.value?.referenceName),
-)
 const valueMappingFallbackOptions = computed(() => [
   { title: t('import.valueMappingFallback.keep'), value: 'keep' },
   { title: t('import.valueMappingFallback.empty'), value: 'empty' },
@@ -840,6 +789,7 @@ const relationMappingModeOptions = computed(() => [
 const canConfigure = computed(
   () => Boolean(batch.value?.handle && selectedEntityHandle.value) && !isConfiguring.value,
 )
+const canSelectTemplates = computed(() => Boolean(batch.value?.handle))
 const canUseTemplates = computed(() =>
   Boolean(batch.value?.handle && selectedEntityHandle.value && selectedSourceHandle.value),
 )
@@ -878,16 +828,24 @@ const canExecute = computed(
 )
 
 onMounted(async () => {
-  await Promise.all([loadTranslations(), loadEntities(), loadSources(), loadOpenBatches()])
+  await Promise.all([
+    loadTranslations(),
+    loadEntities(),
+    loadSources(),
+    loadOpenBatches(),
+    currentPermissionStore.fetchCurrentPermission(),
+  ])
 })
 
 watch(selectedEntityHandle, async (entityHandle) => {
-  if (isHydratingBatch.value) {
+  if (isHydratingBatch.value || isApplyingTemplate.value) {
     return
   }
 
+  selectedTemplateHandle.value = null
   if (!entityHandle) {
-    templates.value = []
+    initializeMappings()
+    await loadTemplates()
     return
   }
   await genericStore.loadGeneric(entityHandle, 'global', 'import')
@@ -896,7 +854,7 @@ watch(selectedEntityHandle, async (entityHandle) => {
 })
 
 watch(selectedSourceHandle, async () => {
-  if (isHydratingBatch.value) {
+  if (isHydratingBatch.value || isApplyingTemplate.value) {
     return
   }
 
@@ -905,8 +863,8 @@ watch(selectedSourceHandle, async () => {
 })
 
 watch(selectedTemplate, (template) => {
-  if (!isHydratingBatch.value && template) {
-    applyTemplate(template)
+  if (!isHydratingBatch.value && !isApplyingTemplate.value && template) {
+    void applyTemplateSelection(template)
   }
 })
 
@@ -927,7 +885,7 @@ async function loadSources(): Promise<void> {
 }
 
 async function loadTemplates(): Promise<void> {
-  if (!selectedEntityHandle.value || !selectedSourceHandle.value) {
+  if (!batch.value?.handle) {
     templates.value = []
     selectedTemplateHandle.value = null
     return
@@ -939,6 +897,14 @@ async function loadTemplates(): Promise<void> {
       entityHandle: selectedEntityHandle.value,
       sourceHandle: selectedSourceHandle.value,
     })
+    if (
+      selectedTemplateHandle.value != null &&
+      !templates.value.some(
+        (template) => String(template.handle) === String(selectedTemplateHandle.value),
+      )
+    ) {
+      selectedTemplateHandle.value = null
+    }
   } finally {
     isLoadingTemplates.value = false
   }
@@ -964,6 +930,7 @@ async function analyzeSelectedFile(value: File | File[] | null): Promise<void> {
     selectedOpenBatchHandle.value = null
     batch.value = await ApiImportService.analyzeCsv(file)
     initializeMappings()
+    await loadTemplates()
     await loadOpenBatches()
     pushMessage('success', t('import.analysisCompleted'), file.name, 'import')
   } catch {
@@ -1037,24 +1004,28 @@ async function onEntityChange(): Promise<void> {
 }
 
 function initializeMappings(): void {
-  resetAiSuggestion()
-  Object.keys(fieldMappings).forEach((key) => delete fieldMappings[key])
-  Object.keys(fieldDefaults).forEach((key) => delete fieldDefaults[key])
-  Object.keys(relationMappingModes).forEach((key) => delete relationMappingModes[key])
-  Object.keys(relationMappingColumns).forEach((key) => delete relationMappingColumns[key])
-  Object.keys(valueMappings).forEach((key) => delete valueMappings[key])
+  clearMappingState()
 
   for (const field of importableFields.value) {
     const matchedHeader = headerOptions.value.find(
       (header) => normalizeName(header) === normalizeName(field.name),
     )
     fieldMappings[field.name] = matchedHeader ?? null
-    fieldDefaults[field.name] = null
+    fieldDefaults[field.name] = matchedHeader ? null : getTemplateDefaultValue(field)
     if (field.isReference && field.referenceName) {
       relationMappingModes[field.name] = null
       relationMappingColumns[field.name] = []
     }
   }
+}
+
+function clearMappingState(): void {
+  resetAiSuggestion()
+  Object.keys(fieldMappings).forEach((key) => delete fieldMappings[key])
+  Object.keys(fieldDefaults).forEach((key) => delete fieldDefaults[key])
+  Object.keys(relationMappingModes).forEach((key) => delete relationMappingModes[key])
+  Object.keys(relationMappingColumns).forEach((key) => delete relationMappingColumns[key])
+  Object.keys(valueMappings).forEach((key) => delete valueMappings[key])
 }
 
 function applySelectedTemplate(): void {
@@ -1063,8 +1034,36 @@ function applySelectedTemplate(): void {
     return
   }
 
-  applyTemplate(template)
+  void applyTemplateSelection(template)
   pushMessage('success', t('import.templateLoaded'), template.title, 'import')
+}
+
+async function applyTemplateSelection(template: ImportTemplateSummary): Promise<void> {
+  isApplyingTemplate.value = true
+
+  try {
+    const entityChanged = selectedEntityHandle.value !== template.entityHandle
+    const sourceChanged = selectedSourceHandle.value !== template.sourceHandle
+
+    selectedEntityHandle.value = template.entityHandle
+    selectedSourceHandle.value = template.sourceHandle
+
+    if (entityChanged && selectedEntityHandle.value) {
+      await Promise.all([
+        genericStore.loadGeneric(selectedEntityHandle.value, 'global', 'import'),
+        loadTranslations(),
+      ])
+      initializeMappings()
+    }
+
+    if (entityChanged || sourceChanged) {
+      await loadTemplates()
+    }
+
+    applyTemplate(template)
+  } finally {
+    isApplyingTemplate.value = false
+  }
 }
 
 function applyTemplate(template: ImportTemplateSummary): void {
@@ -1078,6 +1077,27 @@ function applyTemplate(template: ImportTemplateSummary): void {
     genericReferenceMapping?.keyColumns ?? [],
   )
   templateTitle.value = template.title
+}
+
+function templateOptionTitle(template: ImportTemplateSummary): string {
+  if (selectedEntityHandle.value && selectedSourceHandle.value) {
+    return template.title
+  }
+
+  return [template.title, sourceLabel(template.sourceHandle), entityLabel(template.entityHandle)]
+    .filter(Boolean)
+    .join(' - ')
+}
+
+function sourceLabel(sourceHandle: string | null | undefined): string {
+  if (!sourceHandle) {
+    return ''
+  }
+
+  return (
+    sources.value.find((source) => String(source.handle) === String(sourceHandle))?.title ??
+    sourceHandle
+  )
 }
 
 async function createAiSuggestion(): Promise<void> {
@@ -1196,14 +1216,38 @@ async function executeBatch(): Promise<void> {
 
   try {
     isExecuting.value = true
-    batch.value = await ApiImportService.executeBatch(batch.value.handle)
+    const executedBatch = await ApiImportService.executeBatch(batch.value.handle)
+    batch.value = executedBatch
     await loadOpenBatches()
-    pushMessage('success', t('import.executionCompleted'), batch.value.filename, 'import')
+    pushMessage('success', t('import.executionCompleted'), executedBatch.filename, 'import')
+
+    if (isCompletedImportBatch(executedBatch)) {
+      resetImportWorkspace()
+    }
   } catch {
     // shared API errors already surface through the message center
   } finally {
     isExecuting.value = false
   }
+}
+
+function isCompletedImportBatch(importBatch: ImportBatchSummary): boolean {
+  return ['completed', 'executed'].includes(importBatch.status) && importBatch.failedCount === 0
+}
+
+function resetImportWorkspace(): void {
+  batch.value = null
+  selectedFile.value = null
+  selectedOpenBatchHandle.value = null
+  selectedEntityHandle.value = null
+  selectedSourceHandle.value = null
+  selectedTemplateHandle.value = null
+  templateTitle.value = ''
+  externalKeyColumns.value = []
+  genericReferenceEntityHandle.value = null
+  genericReferenceKeyColumns.value = []
+  templates.value = []
+  clearMappingState()
 }
 
 async function downloadErrorReport(): Promise<void> {
@@ -1377,7 +1421,7 @@ function applyMappingConfiguration(mappingConfiguration: ImportMappingConfigurat
 
   for (const field of importableFields.value) {
     fieldMappings[field.name] = null
-    fieldDefaults[field.name] = null
+    fieldDefaults[field.name] = getTemplateDefaultValue(field)
     if (field.isReference && field.referenceName) {
       relationMappingModes[field.name] = null
       relationMappingColumns[field.name] = []
@@ -1392,6 +1436,9 @@ function applyMappingConfiguration(mappingConfiguration: ImportMappingConfigurat
     fieldMappings[mapping.targetField] = headerOptions.value.includes(mapping.sourceColumn)
       ? mapping.sourceColumn
       : null
+    if (fieldMappings[mapping.targetField]) {
+      fieldDefaults[mapping.targetField] = null
+    }
   }
 
   for (const fieldDefault of mappingConfiguration?.fieldDefaults ?? []) {
@@ -1484,10 +1531,6 @@ async function openValueMapping(field: EntityTemplate): Promise<void> {
   ensureValueMapping(field.name)
   valueMappingDialog.targetField = field.name
   valueMappingDialog.visible = true
-
-  if (field.isReference && field.referenceName) {
-    await loadReferenceValueItems(field.referenceName)
-  }
 }
 
 function closeValueMapping(): void {
@@ -1583,43 +1626,6 @@ function sourceValuesForField(field: EntityTemplate): string[] {
   return Array.from(new Set(values)).sort((left, right) => left.localeCompare(right))
 }
 
-function referenceOptionsForField(field: EntityTemplate): ValueOption[] {
-  if (!field.referenceName) {
-    return []
-  }
-
-  const referenceTemplates = genericStore.getState(field.referenceName).entityTemplates
-  return (referenceValueItems[field.referenceName] ?? []).map((item) => ({
-    title: getEntityValueLabel(item, referenceTemplates) || String(item.handle ?? ''),
-    value: item.handle,
-  }))
-}
-
-function customFieldOptionsForField(
-  field: EntityTemplate,
-): Array<{ label: string; value: string }> {
-  return field.customField?.options ?? []
-}
-
-async function loadReferenceValueItems(referenceName: string): Promise<void> {
-  if (referenceValueItems[referenceName]) {
-    return
-  }
-
-  try {
-    valueMappingDialog.isLoadingReferenceItems = true
-    await genericStore.loadGeneric(referenceName, 'global', 'import')
-    const response = await ApiGenericService.find<SaplingGenericItem>(referenceName, {
-      limit: DEFAULT_ENTITY_ITEMS_COUNT,
-      orderBy: { handle: 'ASC' },
-      relations: ['m:1'],
-    })
-    referenceValueItems[referenceName] = response.data
-  } finally {
-    valueMappingDialog.isLoadingReferenceItems = false
-  }
-}
-
 function normalizeValueMappingKey(value: unknown): string {
   return String(value ?? '').trim()
 }
@@ -1630,6 +1636,66 @@ function hasFieldDefaultValue(value: unknown): boolean {
   }
 
   return value !== null && typeof value !== 'undefined' && value !== ''
+}
+
+function getTemplateDefaultValue(field: EntityTemplate): unknown {
+  if (field.name === 'handle' || field.isPrimaryKey || field.isAutoIncrement) {
+    return null
+  }
+
+  const defaultValue = hasFieldDefaultValue(field.default) ? field.default : field.defaultRaw
+  if (!hasFieldDefaultValue(defaultValue) || isGeneratedDefaultValue(defaultValue)) {
+    return null
+  }
+
+  return normalizeTemplateDefaultValue(field, cloneTemplateDefaultValue(defaultValue))
+}
+
+function cloneTemplateDefaultValue(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return [...value]
+  }
+
+  if (value && typeof value === 'object') {
+    return { ...(value as Record<string, unknown>) }
+  }
+
+  return value
+}
+
+function normalizeTemplateDefaultValue(field: EntityTemplate, value: unknown): unknown {
+  if (typeof value !== 'string') {
+    return value
+  }
+
+  const fieldType = String(field.type ?? '').toLowerCase()
+  const trimmedValue = value.trim()
+
+  if (fieldType.includes('boolean')) {
+    if (trimmedValue.toLowerCase() === 'true') {
+      return true
+    }
+    if (trimmedValue.toLowerCase() === 'false') {
+      return false
+    }
+  }
+
+  if (/(number|integer|float|double|decimal)/.test(fieldType) && trimmedValue !== '') {
+    const numericValue = Number(trimmedValue)
+    if (Number.isFinite(numericValue)) {
+      return numericValue
+    }
+  }
+
+  return trimmedValue
+}
+
+function isGeneratedDefaultValue(value: unknown): boolean {
+  if (typeof value !== 'string') {
+    return false
+  }
+
+  return /^(now\(\)|current_|gen_random_|uuid_generate_|nextval\()/i.test(value.trim())
 }
 
 function normalizeValueMappingFallback(
@@ -1721,6 +1787,17 @@ function importMessageLabel(message: string | null | undefined): string {
     const fields = fieldNames.map(fieldLabel).join(', ')
 
     return fields ? t('import.requiredFieldsMissing', { fields }) : t('import.requiredFieldMissing')
+  }
+
+  if (message.startsWith(IMPORT_INVALID_DATE_VALUES_PREFIX)) {
+    const fieldNames = message
+      .slice(IMPORT_INVALID_DATE_VALUES_PREFIX.length)
+      .split(',')
+      .map((fieldName) => fieldName.trim())
+      .filter(Boolean)
+    const fields = fieldNames.map(fieldLabel).join(', ')
+
+    return fields ? t('import.invalidDateValues', { fields }) : t('import.invalidDateValue')
   }
 
   return te(message) ? t(message) : message

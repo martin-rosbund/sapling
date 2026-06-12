@@ -167,6 +167,7 @@
         @upload-document="openUploadDialog"
         @show-documents="navigateToDocuments"
         @show-information="openInformationDialog"
+        @show-external-record-links="openExternalRecordLinksDialog"
       />
       <SaplingTableDesktopView
         v-else
@@ -210,6 +211,7 @@
         @upload-document="openUploadDialog"
         @show-documents="navigateToDocuments"
         @show-information="openInformationDialog"
+        @show-external-record-links="openExternalRecordLinksDialog"
         @open-context-menu="openContextMenu"
       />
     </div>
@@ -234,6 +236,8 @@
       :upload-dialog-item="uploadDialogItem"
       :show-information-dialog="showInformationDialog"
       :information-dialog-item="informationDialogItem"
+      :show-external-record-links-dialog="showExternalRecordLinksDialog"
+      :external-record-links-dialog-item="externalRecordLinksDialogItem"
       @update:delete-visible="(value) => (deleteDialog.visible = value)"
       @confirm-delete="confirmDelete"
       @close-delete="closeDeleteDialog"
@@ -254,6 +258,7 @@
       @update:context-visible="(value) => (contextMenu.visible = value)"
       @close-upload="closeUploadDialog"
       @close-information="closeInformationDialog"
+      @close-external-record-links="closeExternalRecordLinksDialog"
     />
 
     <SaplingTableFavoriteDialog
@@ -402,6 +407,8 @@ const {
   uploadDialogItem,
   showInformationDialog,
   informationDialogItem,
+  showExternalRecordLinksDialog,
+  externalRecordLinksDialogItem,
   contextMenu,
   contextMenuMailActions,
   selectedItems,
@@ -449,6 +456,8 @@ const {
   navigateToDocuments,
   openInformationDialog,
   closeInformationDialog,
+  openExternalRecordLinksDialog,
+  closeExternalRecordLinksDialog,
   openFavoriteDialog,
   closeFavoriteDialog,
   saveFavorite,

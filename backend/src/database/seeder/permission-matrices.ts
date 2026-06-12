@@ -269,6 +269,8 @@ export const supportPermissionsInput: PermissionMatrixInput = {
     'information',
     'dashboard',
     'kpi',
+    'importBatch',
+    'importBatchRow',
   ],
   show: [
     'company',
@@ -569,6 +571,8 @@ export const salesPermissionsInput: PermissionMatrixInput = {
     'information',
     'dashboard',
     'kpi',
+    'importBatch',
+    'importBatchRow',
   ],
   show: [
     'company',

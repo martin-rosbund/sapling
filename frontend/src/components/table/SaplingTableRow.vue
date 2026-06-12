@@ -256,6 +256,7 @@ const {
   requestUploadDocument,
   requestShowDocuments,
   requestShowInformation,
+  requestShowExternalRecordLinks,
   requestMail,
   getReferenceTemplates,
   getReferenceEntity,
@@ -304,6 +305,9 @@ function onMenuItemClick(menuItem: SaplingContextMenuTableMenuItem) {
       break
     case 'showInformation':
       requestShowInformation(props.item)
+      break
+    case 'showExternalRecordLinks':
+      requestShowExternalRecordLinks(props.item)
       break
     case 'mail':
       if (menuItem.mailAction) {

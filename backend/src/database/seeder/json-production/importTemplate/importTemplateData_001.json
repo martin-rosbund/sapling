@@ -73,11 +73,11 @@
       "mappings": [
         {
           "targetField": "firstName",
-          "sourceColumn": "Matchcode"
+          "sourceColumn": "Vorname"
         },
         {
           "targetField": "lastName",
-          "sourceColumn": "Matchcode"
+          "sourceColumn": "Nachname"
         },
         {
           "targetField": "phone",
@@ -92,28 +92,24 @@
           "sourceColumn": "EMail"
         },
         {
-          "targetField": "requirePasswordChange",
-          "sourceColumn": "MarketingInaktiv"
+          "targetField": "birthDay",
+          "sourceColumn": "Geburtstag"
         },
         {
           "targetField": "isActive",
-          "sourceColumn": "MarketingInaktiv"
+          "sourceColumn": "Aktiv"
         },
         {
           "targetField": "sendNewsletter",
           "sourceColumn": "MarketingInaktiv"
         },
         {
-          "targetField": "color",
-          "sourceColumn": "MarketingInaktiv"
-        },
-        {
-          "targetField": "company",
-          "sourceColumn": "iXISFirma"
-        },
-        {
           "targetField": "salutation",
           "sourceColumn": "Geschlecht"
+        },
+        {
+          "targetField": "title",
+          "sourceColumn": "Titel"
         },
         {
           "targetField": "jobFunction",
@@ -124,7 +120,33 @@
           "sourceColumn": "Abteilung"
         }
       ],
-      "relationMappings": []
+      "fieldDefaults": [
+        {
+          "value": "false",
+          "targetField": "requirePasswordChange"
+        },
+        {
+          "value": "#4CAF50",
+          "targetField": "color"
+        },
+        {
+          "value": "sapling",
+          "targetField": "type"
+        },
+        {
+          "value": "de",
+          "targetField": "language"
+        }
+      ],
+      "relationMappings": [
+        {
+          "targetField": "company",
+          "mode": "externalKey",
+          "sourceColumn": "iXISFirma",
+          "sourceColumns": ["iXISFirma"],
+          "sourceHandle": "ixis"
+        }
+      ]
     },
     "externalKeyColumns": ["iXISKontakt"],
     "genericReferenceMapping": null

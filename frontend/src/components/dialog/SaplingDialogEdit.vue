@@ -333,6 +333,15 @@
     @saved="closeInformationDialog"
   />
 
+  <SaplingExternalRecordLinksDialog
+    v-if="showExternalRecordLinksDialog"
+    :show="showExternalRecordLinksDialog"
+    :item="item"
+    :entity-handle="entityHandle"
+    @update:show="(value) => !value && closeExternalRecordLinksDialog()"
+    @close="closeExternalRecordLinksDialog"
+  />
+
   <SaplingDialogUnsavedChanges
     :model-value="unsavedChangesDialog"
     :is-saving="isSaving"
@@ -378,6 +387,7 @@ import SaplingDialogEditActions from '@/components/dialog/SaplingDialogEditActio
 import SaplingDialogUnsavedChanges from '@/components/dialog/SaplingDialogUnsavedChanges.vue'
 import SaplingDialogEditFieldRenderer from './SaplingDialogEditFieldRenderer.vue'
 import SaplingDialogEditRelationTab from './SaplingDialogEditRelationTab.vue'
+import SaplingExternalRecordLinksDialog from '@/components/import/SaplingExternalRecordLinksDialog.vue'
 import SaplingTableRowInformation from '@/components/table/SaplingTableRowInformation.vue'
 import SaplingTableRowUpload from '@/components/table/SaplingTableRowUpload.vue'
 import ApiGenericService from '@/services/api.generic.service'
@@ -588,6 +598,7 @@ const canDeleteRecord = computed(
 const recordDeleteDialog = ref(false)
 const showUploadDialog = ref(false)
 const showInformationDialog = ref(false)
+const showExternalRecordLinksDialog = ref(false)
 const loadedScriptButtons = ref<ScriptButtonItem[]>([])
 const runningScriptActionCount = ref(0)
 const formSurfaceRef = ref<HTMLElement | null>(null)
@@ -611,6 +622,7 @@ const recordActionMenuItems = computed<SaplingContextMenuTableMenuEntry[]>(() =>
           entityPermission: entityPermission.value,
           canNavigate: canNavigate.value,
           canTimeline: true,
+          canShowExternalRecordLinks: true,
           scriptButtons: loadedScriptButtons.value,
           mailActions: buildMailMenuActions(props.templates, form.value),
           mailToLabel: t('global.mailTo'),
@@ -789,6 +801,10 @@ function closeInformationDialog(): void {
   showInformationDialog.value = false
 }
 
+function closeExternalRecordLinksDialog(): void {
+  showExternalRecordLinksDialog.value = false
+}
+
 function openRecordDeleteDialog(): void {
   if (!canDeleteRecord.value) {
     return
@@ -876,6 +892,14 @@ function openInformationDialog(): void {
   }
 
   showInformationDialog.value = true
+}
+
+function openExternalRecordLinksDialog(): void {
+  if (!hasPersistedItem.value) {
+    return
+  }
+
+  showExternalRecordLinksDialog.value = true
 }
 
 async function reloadDialogItem(): Promise<void> {
@@ -974,6 +998,9 @@ async function handleRecordAction(menuItem: SaplingContextMenuTableMenuItem): Pr
       break
     case 'showInformation':
       openInformationDialog()
+      break
+    case 'showExternalRecordLinks':
+      openExternalRecordLinksDialog()
       break
     case 'mail':
       if (menuItem.mailAction?.email && entityHandle.value) {

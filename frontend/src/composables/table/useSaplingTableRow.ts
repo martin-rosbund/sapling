@@ -57,6 +57,7 @@ export type UseSaplingTableRowEmit = {
   (event: 'upload-document', value: SaplingGenericItem): void
   (event: 'show-documents', value: SaplingGenericItem): void
   (event: 'show-information', value: SaplingGenericItem): void
+  (event: 'show-external-record-links', value: SaplingGenericItem): void
   (event: 'open-context-menu', value: SaplingTableRowContextMenuOpenPayload): void
 }
 
@@ -128,6 +129,7 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
           entityPermission: props.entityPermission,
           canNavigate: props.canNavigate,
           canTimeline: props.item?.handle != null,
+          canShowExternalRecordLinks: props.item?.handle != null,
           scriptButtons: scriptButtons.value,
           mailActions: buildMailMenuActions(props.entityTemplates, props.item),
           mailToLabel: mailToLabel.value,
@@ -361,6 +363,11 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     emit('show-information', item)
   }
 
+  function requestShowExternalRecordLinks(item: SaplingGenericItem) {
+    closeMenu()
+    emit('show-external-record-links', item)
+  }
+
   function requestMail(item: SaplingGenericItem, email: string) {
     closeMenu()
     if (!email) {
@@ -450,6 +457,7 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     requestUploadDocument,
     requestShowDocuments,
     requestShowInformation,
+    requestShowExternalRecordLinks,
     requestMail,
     getReferenceTemplates,
     getReferenceEntity,
