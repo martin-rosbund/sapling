@@ -977,6 +977,7 @@ async function hydrateBatchState(loadedBatch: ImportBatchSummary): Promise<void>
     }
 
     await loadTemplates()
+    templateTitle.value = selectedTemplate.value?.title ?? ''
     initializeMappings()
     applyMappingConfiguration(loadedBatch.mapping)
     externalKeyColumns.value = filterExistingColumns(loadedBatch.externalKeyColumns ?? [])
@@ -1217,13 +1218,16 @@ async function executeBatch(): Promise<void> {
   try {
     isExecuting.value = true
     const executedBatch = await ApiImportService.executeBatch(batch.value.handle)
-    batch.value = executedBatch
-    await loadOpenBatches()
     pushMessage('success', t('import.executionCompleted'), executedBatch.filename, 'import')
 
     if (isCompletedImportBatch(executedBatch)) {
       resetImportWorkspace()
+      await loadOpenBatches()
+      return
     }
+
+    batch.value = executedBatch
+    await loadOpenBatches()
   } catch {
     // shared API errors already surface through the message center
   } finally {
