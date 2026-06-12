@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "1.70.1170",
+  "version": "1.71.1174",
   "private": true,
   "scripts": {
     "serve": "vite preview",
