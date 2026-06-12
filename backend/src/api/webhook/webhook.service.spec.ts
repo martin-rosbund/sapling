@@ -208,4 +208,91 @@ describe('WebhookService', () => {
     expect(delivery.handle).toBe(99);
     expect(flushPersist).toHaveBeenCalled();
   });
+
+  it('sanitizes unknown circular object fields before persisting delivery payloads', async () => {
+    const companyPayload: Record<string, unknown> = {
+      handle: 7,
+      name: 'Acme GmbH',
+    };
+    companyPayload.persons = { owner: companyPayload };
+
+    const persistedDeliveries: Array<{ payload?: object; handle?: number }> =
+      [];
+    const flushPersist = jest
+      .fn<() => Promise<undefined>>()
+      .mockResolvedValue(undefined);
+    const em = {
+      findOne: jest
+        .fn<(...args: unknown[]) => Promise<unknown>>()
+        .mockResolvedValueOnce({
+          handle: 5,
+          isActive: true,
+          relations: [],
+          type: { handle: 'afterInsert' },
+          entity: { handle: 'company' },
+        })
+        .mockResolvedValueOnce({ handle: 'pending' }),
+      persist: jest.fn((delivery: { handle?: number; payload?: object }) => {
+        delivery.handle = 99;
+        persistedDeliveries.push(delivery);
+        return {
+          flush: flushPersist,
+        };
+      }),
+      populate: jest
+        .fn<(...args: unknown[]) => Promise<undefined>>()
+        .mockResolvedValue(undefined),
+      findOneOrFail: jest.fn<(...args: unknown[]) => Promise<unknown>>(),
+      flush: jest
+        .fn<(...args: unknown[]) => Promise<undefined>>()
+        .mockResolvedValue(undefined),
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn((entityHandle: string) => {
+        if (entityHandle !== 'company') {
+          return [];
+        }
+
+        return [
+          createTemplateField({ name: 'handle', type: 'number' }),
+          createTemplateField({ name: 'name', type: 'string' }),
+        ];
+      }),
+    };
+    const queue = {
+      add: jest
+        .fn<(...args: unknown[]) => Promise<undefined>>()
+        .mockResolvedValue(undefined),
+    };
+    const persistedDelivery = {
+      handle: 99,
+      payload: {
+        handle: 7,
+        name: 'Acme GmbH',
+        persons: { owner: { handle: 7 } },
+      },
+    };
+    const webhookDeliveryExecutor = {
+      execute: jest
+        .fn<(...args: unknown[]) => Promise<undefined>>()
+        .mockResolvedValue(undefined),
+    };
+    em.findOneOrFail.mockResolvedValue(persistedDelivery);
+    const service = new WebhookService(
+      em as never,
+      templateService as never,
+      queue as never,
+      webhookDeliveryExecutor as never,
+    );
+
+    await service.querySubscription(5, companyPayload);
+
+    expect(persistedDeliveries[0]?.payload).toEqual({
+      handle: 7,
+      name: 'Acme GmbH',
+      persons: { owner: { handle: 7 } },
+    });
+    expect(() => JSON.stringify(persistedDeliveries[0]?.payload)).not.toThrow();
+    expect(flushPersist).toHaveBeenCalled();
+  });
 });

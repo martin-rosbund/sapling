@@ -38,6 +38,7 @@
             color="warning"
             variant="tonal"
             prepend-icon="mdi-file-download-outline"
+            :loading="isDownloadingErrorReport"
             @click="downloadErrorReport"
           >
             {{ $t('import.downloadErrorReport') }}
@@ -417,7 +418,7 @@
             {{
               $t('import.previewLimited', {
                 count: IMPORT_PREVIEW_ROW_LIMIT,
-                total: batch?.rows.length ?? 0,
+                total: batch?.rowCount ?? batch?.rows.length ?? 0,
               })
             }}
           </v-alert>
@@ -656,6 +657,7 @@ const { loadTranslations } = useTranslationLoader(
 const IMPORT_PREVIEW_ROW_LIMIT = 100
 const IMPORT_ERROR_REPORT_DELIMITER = ';'
 const IMPORT_ERROR_REPORT_BOM = '\uFEFF'
+const IMPORT_REQUIRED_FIELDS_MISSING_PREFIX = 'import.requiredFieldsMissing:'
 const selectedFile = ref<File | File[] | null>(null)
 const selectedEntityHandle = ref<string | null>(null)
 const selectedSourceHandle = ref<string | null>(null)
@@ -678,6 +680,7 @@ const isSavingTemplate = ref(false)
 const isSuggesting = ref(false)
 const isLoadingOpenBatches = ref(false)
 const isHydratingBatch = ref(false)
+const isDownloadingErrorReport = ref(false)
 const aiSuggestion = ref<ImportAiSuggestion | null>(null)
 const fieldMappings = reactive<Record<string, string | null>>({})
 const fieldDefaults = reactive<Record<string, unknown>>({})
@@ -853,9 +856,14 @@ const canSuggestWithAi = computed(
   () => Boolean(batch.value?.handle && selectedEntityHandle.value) && !isSuggesting.value,
 )
 const hasValidationErrors = computed(() => (batch.value?.errorCount ?? 0) > 0)
-const hasErrorReportRows = computed(() => errorReportRows.value.length > 0)
+const hasErrorReportRows = computed(
+  () =>
+    errorReportRows.value.length > 0 ||
+    (batch.value?.errorCount ?? 0) > 0 ||
+    (batch.value?.failedCount ?? 0) > 0,
+)
 const isPreviewLimited = computed(
-  () => (batch.value?.rows.length ?? 0) > IMPORT_PREVIEW_ROW_LIMIT,
+  () => (batch.value?.rowCount ?? batch.value?.rows.length ?? 0) > IMPORT_PREVIEW_ROW_LIMIT,
 )
 const executeButtonLabel = computed(() =>
   hasValidationErrors.value ? t('import.executeWithoutInvalidRows') : t('import.execute'),
@@ -1198,12 +1206,35 @@ async function executeBatch(): Promise<void> {
   }
 }
 
-function downloadErrorReport(): void {
-  if (!batch.value || errorReportRows.value.length === 0) {
+async function downloadErrorReport(): Promise<void> {
+  if (!batch.value) {
     return
   }
 
-  const rawHeaders = collectErrorReportRawHeaders(errorReportRows.value)
+  try {
+    isDownloadingErrorReport.value = true
+    const rows = batch.value.handle
+      ? await ApiImportService.getBatchErrorRows(batch.value.handle)
+      : errorReportRows.value
+
+    if (rows.length === 0) {
+      return
+    }
+
+    downloadTextFile(
+      buildErrorReportCsv(rows),
+      createErrorReportFilename(batch.value.filename),
+      'text/csv;charset=utf-8',
+    )
+  } catch {
+    // shared API errors already surface through the message center
+  } finally {
+    isDownloadingErrorReport.value = false
+  }
+}
+
+function buildErrorReportCsv(rows: ImportBatchRowSummary[]): string {
+  const rawHeaders = collectErrorReportRawHeaders(rows)
   const headers = [
     'rowNumber',
     'status',
@@ -1216,7 +1247,7 @@ function downloadErrorReport(): void {
   ]
   const lines = [
     headers.map(escapeImportCsvCell).join(IMPORT_ERROR_REPORT_DELIMITER),
-    ...errorReportRows.value.map((row) =>
+    ...rows.map((row) =>
       [
         row.rowNumber,
         importStatusLabel(row.status),
@@ -1232,11 +1263,7 @@ function downloadErrorReport(): void {
     ),
   ]
 
-  downloadTextFile(
-    `${IMPORT_ERROR_REPORT_BOM}${lines.join('\r\n')}\r\n`,
-    createErrorReportFilename(batch.value.filename),
-    'text/csv;charset=utf-8',
-  )
+  return `${IMPORT_ERROR_REPORT_BOM}${lines.join('\r\n')}\r\n`
 }
 
 function normalizeExternalKeyColumns(): void {
@@ -1623,7 +1650,7 @@ function noop(): void {
   // read-only preview table
 }
 
-function collectErrorReportRawHeaders(rows: ErrorReportRow[]): string[] {
+function collectErrorReportRawHeaders(rows: ImportBatchRowSummary[]): string[] {
   return Array.from(
     rows.reduce<Set<string>>((headers, row) => {
       Object.keys(row.rawData).forEach((header) => headers.add(header))
@@ -1652,6 +1679,11 @@ function createErrorReportFilename(filename: string): string {
 }
 
 function fieldLabel(fieldName: string): string {
+  const template = selectedEntityTemplates.value.find((field) => field.name === fieldName)
+  if (template?.formConfig?.label) {
+    return template.formConfig.label
+  }
+
   if (!selectedEntityHandle.value) {
     return humanizeHandle(fieldName)
   }
@@ -1678,6 +1710,17 @@ function importActionLabel(action: string): string {
 function importMessageLabel(message: string | null | undefined): string {
   if (!message) {
     return '-'
+  }
+
+  if (message.startsWith(IMPORT_REQUIRED_FIELDS_MISSING_PREFIX)) {
+    const fieldNames = message
+      .slice(IMPORT_REQUIRED_FIELDS_MISSING_PREFIX.length)
+      .split(',')
+      .map((fieldName) => fieldName.trim())
+      .filter(Boolean)
+    const fields = fieldNames.map(fieldLabel).join(', ')
+
+    return fields ? t('import.requiredFieldsMissing', { fields }) : t('import.requiredFieldMissing')
   }
 
   return te(message) ? t(message) : message

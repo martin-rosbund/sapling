@@ -22,6 +22,7 @@ import type {
   ConfigureImportBatchDto,
   ImportAiSuggestDto,
   ImportAiSuggestionDto,
+  ImportBatchErrorRowsDto,
   ImportBatchSummaryDto,
   ImportTemplateSummaryDto,
   SaveImportTemplateDto,
@@ -64,6 +65,13 @@ export class ImportController {
     @Param('handle') handle: number,
   ): Promise<ImportBatchSummaryDto> {
     return this.importService.getBatch(Number(handle));
+  }
+
+  @Get('batches/:handle/error-rows')
+  async getBatchErrorRows(
+    @Param('handle') handle: number,
+  ): Promise<ImportBatchErrorRowsDto> {
+    return this.importService.getBatchErrorRows(Number(handle));
   }
 
   @Get('templates')

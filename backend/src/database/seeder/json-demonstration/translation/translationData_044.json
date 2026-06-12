@@ -1,0 +1,8 @@
+[
+  {
+    "entity": "import",
+    "property": "requiredFieldsMissing",
+    "de": "Pflichtfelder sind nicht gef\u00fcllt: {fields}",
+    "en": "Required fields are missing: {fields}"
+  }
+]

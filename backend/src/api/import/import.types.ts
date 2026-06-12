@@ -147,3 +147,7 @@ export type ImportBatchSummaryDto = {
   updatedAt?: Date | null;
   rows: ImportBatchRowSummaryDto[];
 };
+
+export type ImportBatchErrorRowsDto = {
+  rows: ImportBatchRowSummaryDto[];
+};

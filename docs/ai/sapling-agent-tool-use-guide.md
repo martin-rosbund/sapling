@@ -39,6 +39,27 @@ docs/security/permissions.md
 9. Respect the selected chat agent's data and tool scope.
 10. For confirm-gated agents, treat create/update/delete tool calls as prepared actions until the user confirms them in Sapling.
 
+## Authenticated Browser Checks
+
+Many Sapling screens depend on session cookies, permissions, seeded data, and
+the user's current browser state. When a task needs visual verification,
+interaction testing, screenshots, or a bug reproduction in the frontend, prefer
+the Codex in-app browser over a freshly spawned anonymous browser.
+
+Recommended workflow:
+
+1. Check whether the Codex browser already has the relevant local Sapling route
+   open.
+2. If the browser is unauthenticated, on the login screen, or missing the needed
+   local route, ask the user to open the route in the Codex browser and sign in.
+3. Never ask the user to share credentials and never type passwords on their
+   behalf unless they explicitly provide a safe test account for that purpose.
+4. After the user signs in, reuse the existing browser tab for UI verification
+   so session cookies and permission context match what the user sees.
+5. If no authenticated browser context is available, still run code-level tests
+   and typechecks, but state clearly that authenticated UI verification was not
+   completed.
+
 ## Available Internal MCP Tools
 
 The internal server currently registers these tools:

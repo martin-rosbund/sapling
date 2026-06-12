@@ -97,4 +97,20 @@ describe('GenericCustomFieldService', () => {
       }),
     ).resolves.toBeUndefined();
   });
+
+  it('returns all missing required custom field names', async () => {
+    const service = createService([
+      createDefinition('segment', 'text', { isRequired: true }),
+      createDefinition('rating', 'number', { isRequired: true }),
+      createDefinition('comment', 'longText', { isRequired: false }),
+    ]);
+
+    await expect(
+      service.getMissingRequiredFieldNames('company', {
+        segment: '',
+        rating: 'not-a-number',
+        comment: '',
+      }),
+    ).resolves.toEqual(['customFields.segment', 'customFields.rating']);
+  });
 });

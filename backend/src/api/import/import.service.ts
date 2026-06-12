@@ -36,6 +36,8 @@ import type {
   ImportAiSuggestedFieldMappingDto,
   ImportAiSuggestedReferenceFieldDto,
   ImportAiSuggestedValueMappingDto,
+  ImportBatchErrorRowsDto,
+  ImportBatchRowSummaryDto,
   ImportBatchSummaryDto,
   ImportFieldDefaultDto,
   ImportGenericReferenceMappingDto,
@@ -83,6 +85,7 @@ const SAMPLE_ROW_LIMIT = 5;
 const RESPONSE_ROW_LIMIT = 200;
 const AI_REFERENCE_CANDIDATE_LIMIT = 50;
 const AI_TEMPLATE_CONTEXT_LIMIT = 5;
+const REQUIRED_FIELDS_MISSING_MESSAGE_PREFIX = 'import.requiredFieldsMissing';
 const OPEN_IMPORT_BATCH_STATUSES = [
   'analyzed',
   'validated',
@@ -154,6 +157,17 @@ export class ImportService {
     );
 
     return this.toBatchSummary(batch, rows);
+  }
+
+  async getBatchErrorRows(handle: number): Promise<ImportBatchErrorRowsDto> {
+    await this.findBatch(handle);
+    const rows = await this.em.find(
+      ImportBatchRowItem,
+      { batch: { handle }, status: { $in: ['error', 'failed'] } },
+      { orderBy: { rowNumber: 'ASC' } },
+    );
+
+    return { rows: rows.map((row) => this.toBatchRowSummary(row)) };
   }
 
   async listOpenBatches(): Promise<ImportBatchSummaryDto[]> {
@@ -292,11 +306,23 @@ export class ImportService {
           externalKey?.hash ?? null,
         );
 
-        this.assertRequiredFields(template, payload, action);
+        const missingRequiredFields = this.getMissingRequiredFieldNames(
+          template,
+          payload,
+          action,
+        );
         if (action !== 'updated') {
-          await this.genericCustomFieldService.assertRequiredFields(
-            entityHandle,
-            this.normalizeRecord(payload.customFields) ?? {},
+          missingRequiredFields.push(
+            ...(await this.genericCustomFieldService.getMissingRequiredFieldNames(
+              entityHandle,
+              this.normalizeRecord(payload.customFields) ?? {},
+            )),
+          );
+        }
+
+        if (missingRequiredFields.length > 0) {
+          throw new Error(
+            this.createRequiredFieldsMissingMessage(missingRequiredFields),
           );
         }
 
@@ -1560,33 +1586,36 @@ export class ImportService {
     );
   }
 
-  private assertRequiredFields(
+  private getMissingRequiredFieldNames(
     template: EntityTemplateDto[],
     payload: Record<string, unknown>,
     action: string | null,
-  ): void {
+  ): string[] {
     if (action === 'updated') {
-      return;
+      return [];
     }
 
-    const missingField = template.find((field) => {
-      if (!field.isRequired || field.name === 'handle') {
-        return false;
-      }
-      if (field.name.startsWith('customFields.') || field.customField) {
-        return false;
-      }
+    return template
+      .filter((field) => {
+        if (!field.isRequired || field.name === 'handle') {
+          return false;
+        }
+        if (field.name.startsWith('customFields.') || field.customField) {
+          return false;
+        }
 
-      const value = payload[field.name];
-      return value == null || this.normalizeScalarString(value).length === 0;
-    });
+        const value = payload[field.name];
+        return value == null || this.normalizeScalarString(value).length === 0;
+      })
+      .map((field) => field.name);
+  }
 
-    if (missingField) {
-      throw new BadRequestException(
-        'import.requiredFieldMissing',
-        missingField.name,
-      );
-    }
+  private createRequiredFieldsMissingMessage(fieldNames: string[]): string {
+    const normalizedFieldNames = Array.from(
+      new Set(fieldNames.map((fieldName) => fieldName.trim()).filter(Boolean)),
+    );
+
+    return `${REQUIRED_FIELDS_MISSING_MESSAGE_PREFIX}:${normalizedFieldNames.join(',')}`;
   }
 
   private async resolvePlannedAction(
@@ -1728,18 +1757,24 @@ export class ImportService {
       executedAt: batch.executedAt ?? null,
       createdAt: batch.createdAt ?? null,
       updatedAt: batch.updatedAt ?? null,
-      rows: rows.map((row) => ({
-        handle: row.handle ?? null,
-        rowNumber: row.rowNumber,
-        status: row.status,
-        action: row.action ?? null,
-        targetReference: row.targetReference ?? null,
-        externalKeyHash: row.externalKeyHash ?? null,
-        externalKeyParts: row.externalKeyParts ?? null,
-        rawData: row.rawData,
-        payload: row.payload ?? null,
-        message: row.message ?? null,
-      })),
+      rows: rows.map((row) => this.toBatchRowSummary(row)),
+    };
+  }
+
+  private toBatchRowSummary(
+    row: ImportBatchRowItem,
+  ): ImportBatchRowSummaryDto {
+    return {
+      handle: row.handle ?? null,
+      rowNumber: row.rowNumber,
+      status: row.status,
+      action: row.action ?? null,
+      targetReference: row.targetReference ?? null,
+      externalKeyHash: row.externalKeyHash ?? null,
+      externalKeyParts: row.externalKeyParts ?? null,
+      rawData: row.rawData,
+      payload: row.payload ?? null,
+      message: row.message ?? null,
     };
   }
 

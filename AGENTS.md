@@ -39,6 +39,9 @@ Sapling is a metadata-driven CRM/service platform.
 - Respect generic permissions and security decorators.
 - Treat `backend/.env` as secret-bearing and `frontend/.env` as browser-exposed.
 - Run focused tests/type checks when code changes; for docs-only changes, a link/placeholders check is usually enough.
+- For authenticated UI verification, prefer the Codex in-app browser. If the page is
+  not already open and signed in, ask the user to open the relevant route there
+  and log in before relying on browser checks; do not ask for or handle passwords.
 
 ## Documentation Index
 
@@ -55,4 +58,3 @@ The current docs cover:
 - operational runbook and testing
 
 If a topic feels unclear, update the matching doc in the same change.
-

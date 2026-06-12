@@ -106,21 +106,34 @@ export class GenericCustomFieldService {
     entityHandle: string,
     customFields: CustomFieldPayload,
   ): Promise<void> {
+    const missingFieldNames = await this.getMissingRequiredFieldNames(
+      entityHandle,
+      customFields,
+    );
+
+    if (missingFieldNames.length > 0) {
+      throw new BadRequestException(
+        'import.requiredFieldMissing',
+        missingFieldNames[0],
+      );
+    }
+  }
+
+  async getMissingRequiredFieldNames(
+    entityHandle: string,
+    customFields: CustomFieldPayload,
+  ): Promise<string[]> {
     const definitions = await this.getActiveDefinitions(entityHandle);
-    const missing = definitions.find(
-      (definition) =>
+    return definitions
+      .filter((definition) =>
         definition.isRequired &&
         !this.hasCustomFieldValue(
           this.normalizeValue(definition, customFields[definition.fieldKey]),
         ),
-    );
-
-    if (missing) {
-      throw new BadRequestException(
-        'import.requiredFieldMissing',
-        `${CUSTOM_FIELD_TEMPLATE_PREFIX}${missing.fieldKey}`,
+      )
+      .map(
+        (definition) => `${CUSTOM_FIELD_TEMPLATE_PREFIX}${definition.fieldKey}`,
       );
-    }
   }
 
   async upsertCustomFieldValues(

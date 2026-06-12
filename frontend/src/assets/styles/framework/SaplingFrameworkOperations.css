@@ -811,6 +811,19 @@
   padding-right: 4px;
 }
 
+.sapling-import__preview-note {
+  flex: 0 0 auto;
+  align-self: stretch;
+  width: 100%;
+  min-height: 44px;
+  overflow: visible;
+}
+
+.sapling-import__preview-note .v-alert__content {
+  overflow: visible;
+  white-space: normal;
+}
+
 .sapling-import__sapling-preview {
   display: flex;
   flex-direction: column;

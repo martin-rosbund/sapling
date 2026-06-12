@@ -173,6 +173,18 @@ class ApiImportService {
     }
   }
 
+  static async getBatchErrorRows(handle: number): Promise<ImportBatchRowSummary[]> {
+    try {
+      const response = await axios.get<{ rows: ImportBatchRowSummary[] }>(
+        `${BACKEND_URL}import/batches/${handle}/error-rows`,
+      )
+      return response.data.rows
+    } catch (error: unknown) {
+      pushApiErrorMessage(error, 'exception.unknownError', 'import')
+      throw error
+    }
+  }
+
   static async listTemplates(params: {
     entityHandle?: string | null
     sourceHandle?: string | null

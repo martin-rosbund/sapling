@@ -255,6 +255,9 @@ frontend/src/composables/**/__tests__/
 - For JSON seed edits, parse the changed JSON files.
 - For schema changes, mention if migrations were not executed locally.
 - If a broad test suite is too expensive, state exactly which subset was run.
+- For authenticated frontend behavior, prefer the already-open Codex in-app
+  browser. If login is required, ask the user to open the target route there and
+  sign in before treating browser verification as complete.
 
 ## Common Mistakes
 

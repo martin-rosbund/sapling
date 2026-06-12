@@ -423,7 +423,78 @@ export class WebhookService {
           continue;
         }
 
-        sanitizedRecord[key] = fieldValue;
+        sanitizedRecord[key] = this.sanitizeJsonValue(
+          fieldValue,
+          visited,
+          active,
+        );
+      }
+    } finally {
+      active.delete(value);
+    }
+
+    return sanitizedRecord as T;
+  }
+
+  private sanitizeJsonValue<T>(
+    value: T,
+    visited: WeakMap<object, unknown>,
+    active: WeakSet<object>,
+  ): T {
+    if (Array.isArray(value)) {
+      if (visited.has(value)) {
+        return (active.has(value) ? [] : visited.get(value)) as T;
+      }
+
+      const sanitizedArray: unknown[] = [];
+      visited.set(value, sanitizedArray);
+      active.add(value);
+      try {
+        value.forEach((item) => {
+          sanitizedArray.push(this.sanitizeJsonValue(item, visited, active));
+        });
+      } finally {
+        active.delete(value);
+      }
+
+      return sanitizedArray as T;
+    }
+
+    if (this.isCollectionLike(value)) {
+      if (!this.isInitializedCollectionLike(value)) {
+        return [] as T;
+      }
+
+      return this.sanitizeJsonValue(value.toArray(), visited, active) as T;
+    }
+
+    if (typeof value !== 'object' || value === null || value instanceof Date) {
+      return value;
+    }
+
+    const cachedValue = visited.get(value);
+
+    if (typeof cachedValue !== 'undefined') {
+      return (
+        active.has(value)
+          ? this.createCircularReferenceFallback(value)
+          : cachedValue
+      ) as T;
+    }
+
+    const sanitizedRecord: Record<string, unknown> = {};
+    visited.set(value, sanitizedRecord);
+    active.add(value);
+
+    try {
+      for (const [key, nestedValue] of Object.entries(
+        value as Record<string, unknown>,
+      )) {
+        sanitizedRecord[key] = this.sanitizeJsonValue(
+          nestedValue,
+          visited,
+          active,
+        );
       }
     } finally {
       active.delete(value);
