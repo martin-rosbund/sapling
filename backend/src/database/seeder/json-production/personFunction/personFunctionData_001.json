@@ -1,8 +1,13 @@
 [
-  { "handle": "management", "title": "Management", "icon": "mdi-account-tie-outline", "color": "#5E35B1", "sortOrder": 10 },
-  { "handle": "it", "title": "IT", "icon": "mdi-laptop", "color": "#1976D2", "sortOrder": 20 },
-  { "handle": "procurement", "title": "Einkauf", "icon": "mdi-cart-outline", "color": "#F9A825", "sortOrder": 30 },
-  { "handle": "finance", "title": "Finanzen", "icon": "mdi-finance", "color": "#00897B", "sortOrder": 40 },
-  { "handle": "operations", "title": "Operations", "icon": "mdi-cog-outline", "color": "#546E7A", "sortOrder": 50 },
-  { "handle": "sales", "title": "Vertrieb", "icon": "mdi-handshake-outline", "color": "#E53935", "sortOrder": 60 }
+  { "handle": "support", "title": "Support", "icon": "mdi-lifebuoy", "color": "#039BE5", "sortOrder": 10 },
+  { "handle": "managing_director", "title": "Geschäftsführer", "icon": "mdi-account-tie", "color": "#5E35B1", "sortOrder": 20 },
+  { "handle": "employee", "title": "Mitarbeiter", "icon": "mdi-account-outline", "color": "#546E7A", "sortOrder": 30 },
+  { "handle": "chairperson", "title": "Vorstandsvorsitzender", "icon": "mdi-account-star-outline", "color": "#6D4C41", "sortOrder": 40 },
+  { "handle": "department_head", "title": "Abteilungsleiter", "icon": "mdi-account-supervisor-outline", "color": "#3949AB", "sortOrder": 50 },
+  { "handle": "account_manager", "title": "Kundenbetreuer", "icon": "mdi-account-heart-outline", "color": "#00897B", "sortOrder": 60 },
+  { "handle": "executive_assistant", "title": "Assistenz der Geschäftsführung", "icon": "mdi-account-clock-outline", "color": "#8E24AA", "sortOrder": 70 },
+  { "handle": "software_developer", "title": "Programmierer / Entwickler", "icon": "mdi-code-tags", "color": "#1976D2", "sortOrder": 80 },
+  { "handle": "trainee", "title": "Auszubildender", "icon": "mdi-school-outline", "color": "#F9A825", "sortOrder": 90 },
+  { "handle": "authorized_signatory", "title": "Prokurist", "icon": "mdi-file-sign", "color": "#757575", "sortOrder": 100 },
+  { "handle": "board_member", "title": "Vorstand", "icon": "mdi-account-supervisor-circle-outline", "color": "#F4511E", "sortOrder": 110 }
 ]

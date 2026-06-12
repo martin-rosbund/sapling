@@ -163,6 +163,39 @@ describe('GenericFilterService', () => {
     ).toThrow(BadRequestException);
   });
 
+  it('allows ilike filters on string-like template fields with explicit and length-backed types', () => {
+    const service = new GenericFilterService();
+    const template = [
+      createTemplateField({ name: 'handle', type: 'StringType' }),
+      createTemplateField({ name: 'name', type: 'string' }),
+      createTemplateField({
+        name: 'dialingCode',
+        type: 'Object',
+        length: 8,
+        nullable: true,
+      }),
+    ];
+
+    const result = service.prepareReadCriteria(
+      {
+        $or: [
+          { handle: { $ilike: '%de%' } },
+          { name: { $ilike: '%de%' } },
+          { dialingCode: { $ilike: '%de%' } },
+        ],
+      },
+      template,
+    );
+
+    expect(result).toEqual({
+      $or: [
+        { handle: { $ilike: '%de%' } },
+        { name: { $ilike: '%de%' } },
+        { dialingCode: { $ilike: '%de%' } },
+      ],
+    });
+  });
+
   it('normalizes date payload values without touching invalid non-date input', () => {
     const service = new GenericFilterService();
     const template = [

@@ -1,5 +1,17 @@
 [
-  { "handle": "dr", "title": "Dr.", "icon": "mdi-school-outline", "color": "#BFDBFE", "sortOrder": 10 },
-  { "handle": "prof", "title": "Prof.", "icon": "mdi-school-outline", "color": "#DDD6FE", "sortOrder": 20 },
-  { "handle": "prof_dr", "title": "Prof. Dr.", "icon": "mdi-school-outline", "color": "#FDE68A", "sortOrder": 30 }
+  { "handle": "graduate_industrial_engineer", "title": "Dipl.-Wirtsch.-Ing.", "icon": "mdi-school-outline", "color": "#1976D2", "sortOrder": 10 },
+  { "handle": "professor_doctor", "title": "Prof. Dr.", "icon": "mdi-account-school-outline", "color": "#5E35B1", "sortOrder": 20 },
+  { "handle": "doctor", "title": "Dr.", "icon": "mdi-school-outline", "color": "#3949AB", "sortOrder": 30 },
+  { "handle": "graduate_engineer", "title": "Dipl.-Ing.", "icon": "mdi-hard-hat", "color": "#F4511E", "sortOrder": 40 },
+  { "handle": "graduate_businesswoman", "title": "Dipl.-Kffrau", "icon": "mdi-briefcase-account-outline", "color": "#8E24AA", "sortOrder": 50 },
+  { "handle": "graduate_business_administrator", "title": "Dipl.-Betriebswirt", "icon": "mdi-chart-box-outline", "color": "#00897B", "sortOrder": 60 },
+  { "handle": "doctor_engineer", "title": "Dr.-Ing.", "icon": "mdi-cog-outline", "color": "#D84315", "sortOrder": 70 },
+  { "handle": "graduate_businessman", "title": "Dipl.-Kaufmann", "icon": "mdi-briefcase-outline", "color": "#546E7A", "sortOrder": 80 },
+  { "handle": "graduate_social_pedagogue", "title": "Dpl. Soz. Päd.", "icon": "mdi-account-heart-outline", "color": "#D81B60", "sortOrder": 90 },
+  { "handle": "graduate_engineer_spaced", "title": "Dipl. Ing.", "icon": "mdi-engine-outline", "color": "#039BE5", "sortOrder": 100 },
+  { "handle": "graduate_economist", "title": "Dipl.- Volksw.", "icon": "mdi-finance", "color": "#2E7D32", "sortOrder": 110 },
+  { "handle": "pastor", "title": "Pfarrerin", "icon": "mdi-church", "color": "#6D4C41", "sortOrder": 120 },
+  { "handle": "graduate_agricultural_engineer", "title": "Dipl.-Ing. agr.", "icon": "mdi-sprout-outline", "color": "#689F38", "sortOrder": 130 },
+  { "handle": "graduate_business_informatics", "title": "Dipl.-Wirt.-Inf.", "icon": "mdi-monitor-dashboard", "color": "#1565C0", "sortOrder": 140 },
+  { "handle": "doctor_medical_science", "title": "Dr. rer. medic.", "icon": "mdi-medical-bag", "color": "#C62828", "sortOrder": 150 }
 ]

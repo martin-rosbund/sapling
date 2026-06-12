@@ -18,10 +18,11 @@
       1
     ],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "cfo",
-    "jobFunction": "procurement",
-    "decisionRole": "procurement"
+    "jobFunction": "department_head",
+    "decisionRole": "procurement",
+    "department": "procurement"
   },
   {
     "firstName": "Lisa",
@@ -43,10 +44,11 @@
       3
     ],
     "salutation": "ms",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "cto",
-    "jobFunction": "finance",
-    "decisionRole": "technical"
+    "jobFunction": "software_developer",
+    "decisionRole": "technical",
+    "department": "finance_accounting"
   },
   {
     "firstName": "Anna",
@@ -65,10 +67,11 @@
       2
     ],
     "salutation": "ms",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "head_of_it",
-    "jobFunction": "operations",
-    "decisionRole": "decider"
+    "jobFunction": "department_head",
+    "decisionRole": "decider",
+    "department": "administration"
   },
   {
     "firstName": "Tom",
@@ -87,10 +90,11 @@
       3
     ],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "procurement_manager",
-    "jobFunction": "sales",
-    "decisionRole": "influencer"
+    "jobFunction": "department_head",
+    "decisionRole": "influencer",
+    "department": "sales"
   },
   {
     "firstName": "Julia",
@@ -109,10 +113,11 @@
       4
     ],
     "salutation": "ms",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "project_manager",
-    "jobFunction": "management",
-    "decisionRole": "user"
+    "jobFunction": "employee",
+    "decisionRole": "user",
+    "department": "executive_management"
   },
   {
     "firstName": "Paul",
@@ -131,10 +136,11 @@
       5
     ],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "ceo",
-    "jobFunction": "it",
-    "decisionRole": "procurement"
+    "jobFunction": "managing_director",
+    "decisionRole": "procurement",
+    "department": "information_technology"
   },
   {
     "firstName": "Sophie",
@@ -153,10 +159,11 @@
       4
     ],
     "salutation": "ms",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "cfo",
-    "jobFunction": "procurement",
-    "decisionRole": "technical"
+    "jobFunction": "department_head",
+    "decisionRole": "technical",
+    "department": "procurement"
   },
   {
     "firstName": "Lukas",
@@ -173,10 +180,11 @@
     "company": 8,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "cto",
-    "jobFunction": "finance",
-    "decisionRole": "decider"
+    "jobFunction": "software_developer",
+    "decisionRole": "decider",
+    "department": "finance_accounting"
   },
   {
     "firstName": "Mia",
@@ -195,10 +203,11 @@
       2
     ],
     "salutation": "ms",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "head_of_it",
-    "jobFunction": "operations",
-    "decisionRole": "influencer"
+    "jobFunction": "department_head",
+    "decisionRole": "influencer",
+    "department": "administration"
   },
   {
     "firstName": "Leon",
@@ -215,10 +224,11 @@
     "company": 10,
     "roles": [],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "procurement_manager",
-    "jobFunction": "sales",
-    "decisionRole": "user"
+    "jobFunction": "department_head",
+    "decisionRole": "user",
+    "department": "sales"
   },
   {
     "firstName": "Emma",
@@ -235,10 +245,11 @@
     "company": 11,
     "roles": [],
     "salutation": "ms",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "project_manager",
-    "jobFunction": "management",
-    "decisionRole": "procurement"
+    "jobFunction": "employee",
+    "decisionRole": "procurement",
+    "department": "executive_management"
   },
   {
     "firstName": "Ben",
@@ -257,10 +268,11 @@
       1
     ],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "ceo",
-    "jobFunction": "it",
-    "decisionRole": "technical"
+    "jobFunction": "managing_director",
+    "decisionRole": "technical",
+    "department": "information_technology"
   },
   {
     "firstName": "Marie",
@@ -279,10 +291,11 @@
       3
     ],
     "salutation": "ms",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "cfo",
-    "jobFunction": "procurement",
-    "decisionRole": "decider"
+    "jobFunction": "department_head",
+    "decisionRole": "decider",
+    "department": "procurement"
   },
   {
     "firstName": "Tim",
@@ -299,10 +312,11 @@
     "company": 14,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "cto",
-    "jobFunction": "finance",
-    "decisionRole": "influencer"
+    "jobFunction": "software_developer",
+    "decisionRole": "influencer",
+    "department": "finance_accounting"
   },
   {
     "firstName": "Laura",
@@ -319,10 +333,11 @@
     "company": 15,
     "roles": [],
     "salutation": "ms",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "head_of_it",
-    "jobFunction": "operations",
-    "decisionRole": "user"
+    "jobFunction": "department_head",
+    "decisionRole": "user",
+    "department": "administration"
   },
   {
     "firstName": "Jan",
@@ -341,10 +356,11 @@
       4
     ],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "procurement_manager",
-    "jobFunction": "sales",
-    "decisionRole": "procurement"
+    "jobFunction": "department_head",
+    "decisionRole": "procurement",
+    "department": "sales"
   },
   {
     "firstName": "Nina",
@@ -361,10 +377,11 @@
     "company": 17,
     "roles": [],
     "salutation": "ms",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "project_manager",
-    "jobFunction": "management",
-    "decisionRole": "technical"
+    "jobFunction": "employee",
+    "decisionRole": "technical",
+    "department": "executive_management"
   },
   {
     "firstName": "Felix",
@@ -383,10 +400,11 @@
       2
     ],
     "salutation": "ms",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "ceo",
-    "jobFunction": "it",
-    "decisionRole": "decider"
+    "jobFunction": "managing_director",
+    "decisionRole": "decider",
+    "department": "information_technology"
   },
   {
     "firstName": "Lena",
@@ -403,10 +421,11 @@
     "company": 19,
     "roles": [],
     "salutation": "ms",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "cfo",
-    "jobFunction": "procurement",
-    "decisionRole": "influencer"
+    "jobFunction": "department_head",
+    "decisionRole": "influencer",
+    "department": "procurement"
   },
   {
     "firstName": "Moritz",
@@ -423,10 +442,11 @@
     "company": 20,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "cto",
-    "jobFunction": "finance",
-    "decisionRole": "user"
+    "jobFunction": "software_developer",
+    "decisionRole": "user",
+    "department": "finance_accounting"
   },
   {
     "firstName": "Sarah",
@@ -445,10 +465,11 @@
       1
     ],
     "salutation": "ms",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "head_of_it",
-    "jobFunction": "operations",
-    "decisionRole": "procurement"
+    "jobFunction": "department_head",
+    "decisionRole": "procurement",
+    "department": "administration"
   },
   {
     "firstName": "Jonas",
@@ -467,10 +488,11 @@
       3
     ],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "procurement_manager",
-    "jobFunction": "sales",
-    "decisionRole": "technical"
+    "jobFunction": "department_head",
+    "decisionRole": "technical",
+    "department": "sales"
   },
   {
     "firstName": "Maja",
@@ -487,10 +509,11 @@
     "company": 23,
     "roles": [],
     "salutation": "ms",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "project_manager",
-    "jobFunction": "management",
-    "decisionRole": "decider"
+    "jobFunction": "employee",
+    "decisionRole": "decider",
+    "department": "executive_management"
   },
   {
     "firstName": "David",
@@ -507,10 +530,11 @@
     "company": 24,
     "roles": [],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "ceo",
-    "jobFunction": "it",
-    "decisionRole": "influencer"
+    "jobFunction": "managing_director",
+    "decisionRole": "influencer",
+    "department": "information_technology"
   },
   {
     "firstName": "Clara",
@@ -529,10 +553,11 @@
       4
     ],
     "salutation": "ms",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "cfo",
-    "jobFunction": "procurement",
-    "decisionRole": "user"
+    "jobFunction": "department_head",
+    "decisionRole": "user",
+    "department": "procurement"
   },
   {
     "firstName": "Erik",
@@ -549,10 +574,11 @@
     "company": 1,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "cto",
-    "jobFunction": "finance",
-    "decisionRole": "procurement"
+    "jobFunction": "software_developer",
+    "decisionRole": "procurement",
+    "department": "finance_accounting"
   },
   {
     "firstName": "Johanna",
@@ -571,10 +597,11 @@
       2
     ],
     "salutation": "ms",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "head_of_it",
-    "jobFunction": "operations",
-    "decisionRole": "technical"
+    "jobFunction": "department_head",
+    "decisionRole": "technical",
+    "department": "administration"
   },
   {
     "firstName": "Matthias",
@@ -591,10 +618,11 @@
     "company": 3,
     "roles": [],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "procurement_manager",
-    "jobFunction": "sales",
-    "decisionRole": "decider"
+    "jobFunction": "department_head",
+    "decisionRole": "decider",
+    "department": "sales"
   },
   {
     "firstName": "Katharina",
@@ -611,10 +639,11 @@
     "company": 4,
     "roles": [],
     "salutation": "ms",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "project_manager",
-    "jobFunction": "management",
-    "decisionRole": "influencer"
+    "jobFunction": "employee",
+    "decisionRole": "influencer",
+    "department": "executive_management"
   },
   {
     "firstName": "Sebastian",
@@ -633,10 +662,11 @@
       1
     ],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "ceo",
-    "jobFunction": "it",
-    "decisionRole": "user"
+    "jobFunction": "managing_director",
+    "decisionRole": "user",
+    "department": "information_technology"
   },
   {
     "firstName": "Claudia",
@@ -655,10 +685,11 @@
       3
     ],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "cfo",
-    "jobFunction": "procurement",
-    "decisionRole": "procurement"
+    "jobFunction": "department_head",
+    "decisionRole": "procurement",
+    "department": "procurement"
   },
   {
     "firstName": "Andreas",
@@ -675,10 +706,11 @@
     "company": 7,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "cto",
-    "jobFunction": "finance",
-    "decisionRole": "technical"
+    "jobFunction": "software_developer",
+    "decisionRole": "technical",
+    "department": "finance_accounting"
   },
   {
     "firstName": "Monika",
@@ -695,10 +727,11 @@
     "company": 8,
     "roles": [],
     "salutation": "ms",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "head_of_it",
-    "jobFunction": "operations",
-    "decisionRole": "decider"
+    "jobFunction": "department_head",
+    "decisionRole": "decider",
+    "department": "administration"
   },
   {
     "firstName": "Stefan",
@@ -717,10 +750,11 @@
       4
     ],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "procurement_manager",
-    "jobFunction": "sales",
-    "decisionRole": "influencer"
+    "jobFunction": "department_head",
+    "decisionRole": "influencer",
+    "department": "sales"
   },
   {
     "firstName": "Heike",
@@ -737,10 +771,11 @@
     "company": 10,
     "roles": [],
     "salutation": "diverse",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "project_manager",
-    "jobFunction": "management",
-    "decisionRole": "user"
+    "jobFunction": "employee",
+    "decisionRole": "user",
+    "department": "executive_management"
   },
   {
     "firstName": "Jens",
@@ -759,10 +794,11 @@
       2
     ],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "ceo",
-    "jobFunction": "it",
-    "decisionRole": "procurement"
+    "jobFunction": "managing_director",
+    "decisionRole": "procurement",
+    "department": "information_technology"
   },
   {
     "firstName": "Petra",
@@ -779,10 +815,11 @@
     "company": 12,
     "roles": [],
     "salutation": "ms",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "cfo",
-    "jobFunction": "procurement",
-    "decisionRole": "technical"
+    "jobFunction": "department_head",
+    "decisionRole": "technical",
+    "department": "procurement"
   },
   {
     "firstName": "Frank",
@@ -799,10 +836,11 @@
     "company": 13,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "cto",
-    "jobFunction": "finance",
-    "decisionRole": "decider"
+    "jobFunction": "software_developer",
+    "decisionRole": "decider",
+    "department": "finance_accounting"
   },
   {
     "firstName": "Ute",
@@ -821,10 +859,11 @@
       1
     ],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "head_of_it",
-    "jobFunction": "operations",
-    "decisionRole": "influencer"
+    "jobFunction": "department_head",
+    "decisionRole": "influencer",
+    "department": "administration"
   },
   {
     "firstName": "Martin",
@@ -843,10 +882,11 @@
       3
     ],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "procurement_manager",
-    "jobFunction": "sales",
-    "decisionRole": "user"
+    "jobFunction": "department_head",
+    "decisionRole": "user",
+    "department": "sales"
   },
   {
     "firstName": "Sabine",
@@ -863,10 +903,11 @@
     "company": 16,
     "roles": [],
     "salutation": "ms",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "project_manager",
-    "jobFunction": "management",
-    "decisionRole": "procurement"
+    "jobFunction": "employee",
+    "decisionRole": "procurement",
+    "department": "executive_management"
   },
   {
     "firstName": "Dennis",
@@ -883,10 +924,11 @@
     "company": 17,
     "roles": [],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "ceo",
-    "jobFunction": "it",
-    "decisionRole": "technical"
+    "jobFunction": "managing_director",
+    "decisionRole": "technical",
+    "department": "information_technology"
   },
   {
     "firstName": "Melanie",
@@ -905,10 +947,11 @@
       4
     ],
     "salutation": "ms",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "cfo",
-    "jobFunction": "procurement",
-    "decisionRole": "decider"
+    "jobFunction": "department_head",
+    "decisionRole": "decider",
+    "department": "procurement"
   },
   {
     "firstName": "Tobias",
@@ -925,10 +968,11 @@
     "company": 19,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "cto",
-    "jobFunction": "finance",
-    "decisionRole": "influencer"
+    "jobFunction": "software_developer",
+    "decisionRole": "influencer",
+    "department": "finance_accounting"
   },
   {
     "firstName": "Carina",
@@ -947,10 +991,11 @@
       2
     ],
     "salutation": "ms",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "head_of_it",
-    "jobFunction": "operations",
-    "decisionRole": "user"
+    "jobFunction": "department_head",
+    "decisionRole": "user",
+    "department": "administration"
   },
   {
     "firstName": "Philipp",
@@ -967,10 +1012,11 @@
     "company": 21,
     "roles": [],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "procurement_manager",
-    "jobFunction": "sales",
-    "decisionRole": "procurement"
+    "jobFunction": "department_head",
+    "decisionRole": "procurement",
+    "department": "sales"
   },
   {
     "firstName": "Vanessa",
@@ -987,10 +1033,11 @@
     "company": 22,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "project_manager",
-    "jobFunction": "management",
-    "decisionRole": "technical"
+    "jobFunction": "employee",
+    "decisionRole": "technical",
+    "department": "executive_management"
   },
   {
     "firstName": "Ralf",
@@ -1009,10 +1056,11 @@
       1
     ],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "ceo",
-    "jobFunction": "it",
-    "decisionRole": "decider"
+    "jobFunction": "managing_director",
+    "decisionRole": "decider",
+    "department": "information_technology"
   },
   {
     "firstName": "Birgit",
@@ -1031,10 +1079,11 @@
       3
     ],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "cfo",
-    "jobFunction": "procurement",
-    "decisionRole": "influencer"
+    "jobFunction": "department_head",
+    "decisionRole": "influencer",
+    "department": "procurement"
   },
   {
     "firstName": "Holger",
@@ -1051,10 +1100,11 @@
     "company": 25,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "cto",
-    "jobFunction": "finance",
-    "decisionRole": "user"
+    "jobFunction": "software_developer",
+    "decisionRole": "user",
+    "department": "finance_accounting"
   },
   {
     "firstName": "Gabriele",
@@ -1071,10 +1121,11 @@
     "company": 1,
     "roles": [],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "head_of_it",
-    "jobFunction": "operations",
-    "decisionRole": "procurement"
+    "jobFunction": "department_head",
+    "decisionRole": "procurement",
+    "department": "administration"
   },
   {
     "firstName": "Dirk",
@@ -1093,10 +1144,11 @@
       4
     ],
     "salutation": "neutral",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "procurement_manager",
-    "jobFunction": "sales",
-    "decisionRole": "technical"
+    "jobFunction": "department_head",
+    "decisionRole": "technical",
+    "department": "sales"
   },
   {
     "firstName": "Simone",
@@ -1113,10 +1165,11 @@
     "company": 3,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "project_manager",
-    "jobFunction": "management",
-    "decisionRole": "decider"
+    "jobFunction": "employee",
+    "decisionRole": "decider",
+    "department": "executive_management"
   },
   {
     "firstName": "Oliver",
@@ -1135,10 +1188,11 @@
       2
     ],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "ceo",
-    "jobFunction": "it",
-    "decisionRole": "influencer"
+    "jobFunction": "managing_director",
+    "decisionRole": "influencer",
+    "department": "information_technology"
   },
   {
     "firstName": "Angelika",
@@ -1155,10 +1209,11 @@
     "company": 5,
     "roles": [],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "cfo",
-    "jobFunction": "procurement",
-    "decisionRole": "user"
+    "jobFunction": "department_head",
+    "decisionRole": "user",
+    "department": "procurement"
   },
   {
     "firstName": "Jörg",
@@ -1175,10 +1230,11 @@
     "company": 6,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "cto",
-    "jobFunction": "finance",
-    "decisionRole": "procurement"
+    "jobFunction": "software_developer",
+    "decisionRole": "procurement",
+    "department": "finance_accounting"
   },
   {
     "firstName": "Heidi",
@@ -1197,10 +1253,11 @@
       1
     ],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "head_of_it",
-    "jobFunction": "operations",
-    "decisionRole": "technical"
+    "jobFunction": "department_head",
+    "decisionRole": "technical",
+    "department": "administration"
   },
   {
     "firstName": "Fabian",
@@ -1219,10 +1276,11 @@
       3
     ],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "procurement_manager",
-    "jobFunction": "sales",
-    "decisionRole": "decider"
+    "jobFunction": "department_head",
+    "decisionRole": "decider",
+    "department": "sales"
   },
   {
     "firstName": "Theresa",
@@ -1239,10 +1297,11 @@
     "company": 9,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "project_manager",
-    "jobFunction": "management",
-    "decisionRole": "influencer"
+    "jobFunction": "employee",
+    "decisionRole": "influencer",
+    "department": "executive_management"
   },
   {
     "firstName": "Moritz",
@@ -1259,10 +1318,11 @@
     "company": 10,
     "roles": [],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "ceo",
-    "jobFunction": "it",
-    "decisionRole": "user"
+    "jobFunction": "managing_director",
+    "decisionRole": "user",
+    "department": "information_technology"
   },
   {
     "firstName": "Helena",
@@ -1281,10 +1341,11 @@
       4
     ],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "cfo",
-    "jobFunction": "procurement",
-    "decisionRole": "procurement"
+    "jobFunction": "department_head",
+    "decisionRole": "procurement",
+    "department": "procurement"
   },
   {
     "firstName": "Lars",
@@ -1301,10 +1362,11 @@
     "company": 12,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "cto",
-    "jobFunction": "finance",
-    "decisionRole": "technical"
+    "jobFunction": "software_developer",
+    "decisionRole": "technical",
+    "department": "finance_accounting"
   },
   {
     "firstName": "Miriam",
@@ -1323,10 +1385,11 @@
       2
     ],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "head_of_it",
-    "jobFunction": "operations",
-    "decisionRole": "decider"
+    "jobFunction": "department_head",
+    "decisionRole": "decider",
+    "department": "administration"
   },
   {
     "firstName": "Steffen",
@@ -1343,10 +1406,11 @@
     "company": 14,
     "roles": [],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "procurement_manager",
-    "jobFunction": "sales",
-    "decisionRole": "influencer"
+    "jobFunction": "department_head",
+    "decisionRole": "influencer",
+    "department": "sales"
   },
   {
     "firstName": "Nadine",
@@ -1363,10 +1427,11 @@
     "company": 15,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "project_manager",
-    "jobFunction": "management",
-    "decisionRole": "user"
+    "jobFunction": "employee",
+    "decisionRole": "user",
+    "department": "executive_management"
   },
   {
     "firstName": "Jörg",
@@ -1385,10 +1450,11 @@
       1
     ],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "ceo",
-    "jobFunction": "it",
-    "decisionRole": "procurement"
+    "jobFunction": "managing_director",
+    "decisionRole": "procurement",
+    "department": "information_technology"
   },
   {
     "firstName": "Carsten",
@@ -1407,10 +1473,11 @@
       3
     ],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "cfo",
-    "jobFunction": "procurement",
-    "decisionRole": "technical"
+    "jobFunction": "department_head",
+    "decisionRole": "technical",
+    "department": "procurement"
   },
   {
     "firstName": "Jana",
@@ -1427,10 +1494,11 @@
     "company": 18,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "cto",
-    "jobFunction": "finance",
-    "decisionRole": "decider"
+    "jobFunction": "software_developer",
+    "decisionRole": "decider",
+    "department": "finance_accounting"
   },
   {
     "firstName": "Rene",
@@ -1447,10 +1515,11 @@
     "company": 19,
     "roles": [],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "head_of_it",
-    "jobFunction": "operations",
-    "decisionRole": "influencer"
+    "jobFunction": "department_head",
+    "decisionRole": "influencer",
+    "department": "administration"
   },
   {
     "firstName": "Sina",
@@ -1469,10 +1538,11 @@
       4
     ],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "procurement_manager",
-    "jobFunction": "sales",
-    "decisionRole": "user"
+    "jobFunction": "department_head",
+    "decisionRole": "user",
+    "department": "sales"
   },
   {
     "firstName": "Pascal",
@@ -1489,10 +1559,11 @@
     "company": 21,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "project_manager",
-    "jobFunction": "management",
-    "decisionRole": "procurement"
+    "jobFunction": "employee",
+    "decisionRole": "procurement",
+    "department": "executive_management"
   },
   {
     "firstName": "Mareike",
@@ -1511,10 +1582,11 @@
       2
     ],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "ceo",
-    "jobFunction": "it",
-    "decisionRole": "technical"
+    "jobFunction": "managing_director",
+    "decisionRole": "technical",
+    "department": "information_technology"
   },
   {
     "firstName": "Torsten",
@@ -1531,10 +1603,11 @@
     "company": 23,
     "roles": [],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "cfo",
-    "jobFunction": "procurement",
-    "decisionRole": "decider"
+    "jobFunction": "department_head",
+    "decisionRole": "decider",
+    "department": "procurement"
   },
   {
     "firstName": "Kerstin",
@@ -1551,10 +1624,11 @@
     "company": 24,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "cto",
-    "jobFunction": "finance",
-    "decisionRole": "influencer"
+    "jobFunction": "software_developer",
+    "decisionRole": "influencer",
+    "department": "finance_accounting"
   },
   {
     "firstName": "Benedikt",
@@ -1573,10 +1647,11 @@
       1
     ],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "head_of_it",
-    "jobFunction": "operations",
-    "decisionRole": "user"
+    "jobFunction": "department_head",
+    "decisionRole": "user",
+    "department": "administration"
   },
   {
     "firstName": "Mona",
@@ -1595,10 +1670,11 @@
       3
     ],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "procurement_manager",
-    "jobFunction": "sales",
-    "decisionRole": "procurement"
+    "jobFunction": "department_head",
+    "decisionRole": "procurement",
+    "department": "sales"
   },
   {
     "firstName": "Gregor",
@@ -1615,10 +1691,11 @@
     "company": 2,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "project_manager",
-    "jobFunction": "management",
-    "decisionRole": "technical"
+    "jobFunction": "employee",
+    "decisionRole": "technical",
+    "department": "executive_management"
   },
   {
     "firstName": "Jasmin",
@@ -1635,10 +1712,11 @@
     "company": 3,
     "roles": [],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "ceo",
-    "jobFunction": "it",
-    "decisionRole": "decider"
+    "jobFunction": "managing_director",
+    "decisionRole": "decider",
+    "department": "information_technology"
   },
   {
     "firstName": "Henrik",
@@ -1657,10 +1735,11 @@
       4
     ],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "cfo",
-    "jobFunction": "procurement",
-    "decisionRole": "influencer"
+    "jobFunction": "department_head",
+    "decisionRole": "influencer",
+    "department": "procurement"
   },
   {
     "firstName": "Svenja",
@@ -1677,10 +1756,11 @@
     "company": 5,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "cto",
-    "jobFunction": "finance",
-    "decisionRole": "user"
+    "jobFunction": "software_developer",
+    "decisionRole": "user",
+    "department": "finance_accounting"
   },
   {
     "firstName": "Rico",
@@ -1699,10 +1779,11 @@
       2
     ],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "head_of_it",
-    "jobFunction": "operations",
-    "decisionRole": "procurement"
+    "jobFunction": "department_head",
+    "decisionRole": "procurement",
+    "department": "administration"
   },
   {
     "firstName": "Mareen",
@@ -1719,10 +1800,11 @@
     "company": 7,
     "roles": [],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "procurement_manager",
-    "jobFunction": "sales",
-    "decisionRole": "technical"
+    "jobFunction": "department_head",
+    "decisionRole": "technical",
+    "department": "sales"
   },
   {
     "firstName": "Jannis",
@@ -1739,10 +1821,11 @@
     "company": 8,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "project_manager",
-    "jobFunction": "management",
-    "decisionRole": "decider"
+    "jobFunction": "employee",
+    "decisionRole": "decider",
+    "department": "executive_management"
   },
   {
     "firstName": "Selina",
@@ -1761,10 +1844,11 @@
       1
     ],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "ceo",
-    "jobFunction": "it",
-    "decisionRole": "influencer"
+    "jobFunction": "managing_director",
+    "decisionRole": "influencer",
+    "department": "information_technology"
   },
   {
     "firstName": "Fabienne",
@@ -1783,10 +1867,11 @@
       3
     ],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "cfo",
-    "jobFunction": "procurement",
-    "decisionRole": "user"
+    "jobFunction": "department_head",
+    "decisionRole": "user",
+    "department": "procurement"
   },
   {
     "firstName": "Marco",
@@ -1803,10 +1888,11 @@
     "company": 11,
     "roles": [],
     "salutation": "ms",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "cto",
-    "jobFunction": "finance",
-    "decisionRole": "procurement"
+    "jobFunction": "software_developer",
+    "decisionRole": "procurement",
+    "department": "finance_accounting"
   },
   {
     "firstName": "Katrin",
@@ -1823,10 +1909,11 @@
     "company": 12,
     "roles": [],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "head_of_it",
-    "jobFunction": "operations",
-    "decisionRole": "technical"
+    "jobFunction": "department_head",
+    "decisionRole": "technical",
+    "department": "administration"
   },
   {
     "firstName": "Bastian",
@@ -1845,10 +1932,11 @@
       4
     ],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "procurement_manager",
-    "jobFunction": "sales",
-    "decisionRole": "decider"
+    "jobFunction": "department_head",
+    "decisionRole": "decider",
+    "department": "sales"
   },
   {
     "firstName": "Mareike",
@@ -1865,10 +1953,11 @@
     "company": 14,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "project_manager",
-    "jobFunction": "management",
-    "decisionRole": "influencer"
+    "jobFunction": "employee",
+    "decisionRole": "influencer",
+    "department": "executive_management"
   },
   {
     "firstName": "Jana",
@@ -1887,10 +1976,11 @@
       2
     ],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "ceo",
-    "jobFunction": "it",
-    "decisionRole": "user"
+    "jobFunction": "managing_director",
+    "decisionRole": "user",
+    "department": "information_technology"
   },
   {
     "firstName": "Rico",
@@ -1907,10 +1997,11 @@
     "company": 16,
     "roles": [],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "cfo",
-    "jobFunction": "procurement",
-    "decisionRole": "procurement"
+    "jobFunction": "department_head",
+    "decisionRole": "procurement",
+    "department": "procurement"
   },
   {
     "firstName": "Selina",
@@ -1927,10 +2018,11 @@
     "company": 17,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "cto",
-    "jobFunction": "finance",
-    "decisionRole": "technical"
+    "jobFunction": "software_developer",
+    "decisionRole": "technical",
+    "department": "finance_accounting"
   },
   {
     "firstName": "Fabienne",
@@ -1949,10 +2041,11 @@
       1
     ],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "head_of_it",
-    "jobFunction": "operations",
-    "decisionRole": "decider"
+    "jobFunction": "department_head",
+    "decisionRole": "decider",
+    "department": "administration"
   },
   {
     "firstName": "Marco",
@@ -1971,10 +2064,11 @@
       3
     ],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "procurement_manager",
-    "jobFunction": "sales",
-    "decisionRole": "influencer"
+    "jobFunction": "department_head",
+    "decisionRole": "influencer",
+    "department": "sales"
   },
   {
     "firstName": "Katrin",
@@ -1991,10 +2085,11 @@
     "company": 20,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "project_manager",
-    "jobFunction": "management",
-    "decisionRole": "user"
+    "jobFunction": "employee",
+    "decisionRole": "user",
+    "department": "executive_management"
   },
   {
     "firstName": "Bastian",
@@ -2011,10 +2106,11 @@
     "company": 21,
     "roles": [],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "ceo",
-    "jobFunction": "it",
-    "decisionRole": "procurement"
+    "jobFunction": "managing_director",
+    "decisionRole": "procurement",
+    "department": "information_technology"
   },
   {
     "firstName": "Mareike",
@@ -2033,10 +2129,11 @@
       4
     ],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "cfo",
-    "jobFunction": "procurement",
-    "decisionRole": "technical"
+    "jobFunction": "department_head",
+    "decisionRole": "technical",
+    "department": "procurement"
   },
   {
     "firstName": "Jana",
@@ -2053,10 +2150,11 @@
     "company": 23,
     "roles": [],
     "salutation": "mr",
-    "title": "prof",
+    "title": "professor_doctor",
     "jobTitle": "cto",
-    "jobFunction": "finance",
-    "decisionRole": "decider"
+    "jobFunction": "software_developer",
+    "decisionRole": "decider",
+    "department": "finance_accounting"
   },
   {
     "firstName": "Rico",
@@ -2075,10 +2173,11 @@
       2
     ],
     "salutation": "mr",
-    "title": "prof_dr",
+    "title": "professor_doctor",
     "jobTitle": "head_of_it",
-    "jobFunction": "operations",
-    "decisionRole": "influencer"
+    "jobFunction": "department_head",
+    "decisionRole": "influencer",
+    "department": "administration"
   },
   {
     "firstName": "Selina",
@@ -2095,9 +2194,10 @@
     "company": 25,
     "roles": [],
     "salutation": "mr",
-    "title": "dr",
+    "title": "doctor",
     "jobTitle": "procurement_manager",
-    "jobFunction": "sales",
-    "decisionRole": "user"
+    "jobFunction": "department_head",
+    "decisionRole": "user",
+    "department": "sales"
   }
 ]

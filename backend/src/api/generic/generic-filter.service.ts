@@ -14,7 +14,7 @@ export class GenericFilterService {
       currentUser,
     );
     const stringFields = template
-      .filter((field) => GenericFilterService.isStringLikeFieldType(field.type))
+      .filter((field) => GenericFilterService.isStringLikeField(field))
       .map((field) => field.name)
       .filter((name): name is string => typeof name === 'string');
 
@@ -245,19 +245,59 @@ export class GenericFilterService {
 
   private static readonly STRING_LIKE_FIELD_TYPES = new Set<string>([
     'string',
+    'stringtype',
     'text',
+    'texttype',
     'character varying',
     'varchar',
     'char',
     'uuid',
+    'uuidtype',
   ]);
 
-  private static isStringLikeFieldType(type: unknown): boolean {
-    if (typeof type !== 'string') {
+  private static readonly NON_STRING_LIKE_FIELD_TYPES = new Set<string>([
+    'boolean',
+    'booleantype',
+    'date',
+    'datetype',
+    'datetime',
+    'time',
+    'number',
+    'integer',
+    'integertype',
+    'float',
+    'double',
+    'decimal',
+    'decimaltype',
+    'json',
+    'jsontype',
+  ]);
+
+  private static isStringLikeField(field: EntityTemplateDto): boolean {
+    if (GenericFilterService.isStringLikeFieldType(field.type)) {
+      return true;
+    }
+
+    if (
+      field.isReference ||
+      GenericFilterService.NON_STRING_LIKE_FIELD_TYPES.has(
+        GenericFilterService.normalizeFieldType(field.type),
+      )
+    ) {
       return false;
     }
 
-    return GenericFilterService.STRING_LIKE_FIELD_TYPES.has(type.toLowerCase());
+    return typeof field.length === 'number' && field.length > 0;
+  }
+
+  private static isStringLikeFieldType(type: unknown): boolean {
+    return GenericFilterService.STRING_LIKE_FIELD_TYPES.has(
+      GenericFilterService.normalizeFieldType(type),
+    );
+  }
+
+  private static normalizeFieldType(type: unknown): string {
+    return typeof type === 'string' ? type.toLowerCase() : '';
   }
 
   private isPlainRecord(value: unknown): value is Record<string, unknown> {

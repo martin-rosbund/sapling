@@ -1,32 +1,86 @@
 [
   {
-    "handle": "development",
-    "description": "Entwicklung",
-    "icon": "mdi-code-tags",
-    "color": "#1565C0"
+    "handle": "information_technology",
+    "description": "IT",
+    "icon": "mdi-laptop",
+    "color": "#1976D2"
   },
   {
-    "handle": "management",
-    "description": "Management",
-    "icon": "mdi-briefcase-account",
-    "color": "#455A64"
+    "handle": "executive_management",
+    "description": "Geschäftsführung",
+    "icon": "mdi-account-tie",
+    "color": "#5E35B1"
+  },
+  {
+    "handle": "board",
+    "description": "Vorstand",
+    "icon": "mdi-account-supervisor-circle-outline",
+    "color": "#6D4C41"
+  },
+  {
+    "handle": "reception",
+    "description": "Empfang",
+    "icon": "mdi-desk",
+    "color": "#26A69A"
   },
   {
     "handle": "sales",
     "description": "Vertrieb",
-    "icon": "mdi-handshake",
-    "color": "#2E7D32"
+    "icon": "mdi-handshake-outline",
+    "color": "#E53935"
+  },
+  {
+    "handle": "back_office",
+    "description": "BackOffice",
+    "icon": "mdi-file-document-multiple-outline",
+    "color": "#546E7A"
+  },
+  {
+    "handle": "human_resources",
+    "description": "Personal",
+    "icon": "mdi-account-group-outline",
+    "color": "#8E24AA"
+  },
+  {
+    "handle": "controlling",
+    "description": "Controlling",
+    "icon": "mdi-chart-timeline-variant",
+    "color": "#3949AB"
+  },
+  {
+    "handle": "finance_accounting",
+    "description": "Finanzen / Rechnungswesen",
+    "icon": "mdi-finance",
+    "color": "#00897B"
+  },
+  {
+    "handle": "customer_service",
+    "description": "Kundenservice",
+    "icon": "mdi-face-agent",
+    "color": "#039BE5"
+  },
+  {
+    "handle": "procurement",
+    "description": "Einkauf",
+    "icon": "mdi-cart-outline",
+    "color": "#F9A825"
+  },
+  {
+    "handle": "administration",
+    "description": "Verwaltung",
+    "icon": "mdi-folder-cog-outline",
+    "color": "#757575"
+  },
+  {
+    "handle": "production",
+    "description": "Produktion",
+    "icon": "mdi-factory",
+    "color": "#F4511E"
   },
   {
     "handle": "marketing",
     "description": "Marketing",
-    "icon": "mdi-bullhorn",
-    "color": "#EF6C00"
-  },
-  {
-    "handle": "support",
-    "description": "Support",
-    "icon": "mdi-lifebuoy",
-    "color": "#00838F"
+    "icon": "mdi-bullhorn-outline",
+    "color": "#D81B60"
   }
 ]

@@ -1176,7 +1176,8 @@ export class ImportService {
       if (!sourceColumn || !targetField) {
         continue;
       }
-      mapped[targetField] = this.applyValueMapping(
+      mapped[targetField] = await this.applyValueMapping(
+        template,
         targetField,
         rawData[sourceColumn] ?? '',
         dto.valueMappings ?? [],
@@ -1482,11 +1483,12 @@ export class ImportService {
     return this.extractResultHandle(matches[0]);
   }
 
-  private applyValueMapping(
+  private async applyValueMapping(
+    template: EntityTemplateDto[],
     targetField: string,
     value: unknown,
     mappings: ImportValueMappingDto[],
-  ): unknown {
+  ): Promise<unknown> {
     const mapping = mappings.find((entry) => entry.targetField === targetField);
 
     if (!mapping) {
@@ -1512,7 +1514,24 @@ export class ImportService {
         );
       case 'keep':
       default:
-        return value;
+        return this.resolveKeptOriginalValue(template, targetField, value);
+    }
+  }
+
+  private async resolveKeptOriginalValue(
+    template: EntityTemplateDto[],
+    targetField: string,
+    value: unknown,
+  ): Promise<unknown> {
+    const field = template.find((entry) => entry.name === targetField);
+    if (!field?.isReference || !field.referenceName || field.kind !== 'm:1') {
+      return value;
+    }
+
+    try {
+      return await this.resolveValueReference(field.referenceName, value);
+    } catch {
+      throw new BadRequestException('import.valueMappingMissing');
     }
   }
 
