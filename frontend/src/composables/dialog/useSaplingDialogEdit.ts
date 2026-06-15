@@ -461,7 +461,7 @@ export function useSaplingDialogEdit(
   }
 
   async function loadActiveRelationTableItems(): Promise<void> {
-    if (props.mode !== 'edit') {
+    if (props.mode === 'create') {
       return
     }
 

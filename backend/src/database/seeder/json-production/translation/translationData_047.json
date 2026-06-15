@@ -1,0 +1,4 @@
+[
+  { "entity": "importBatch", "property": "rows", "de": "Importzeilen", "en": "Import rows" },
+  { "entity": "importBatch", "property": "groupRows", "de": "Importzeilen", "en": "Import rows" }
+]

@@ -48,7 +48,7 @@
                 {{ visibleTemplates.length }}
               </v-chip>
               <v-chip
-                v-if="mode === 'edit'"
+                v-if="mode !== 'create'"
                 size="small"
                 variant="outlined"
                 prepend-icon="mdi-link-variant"
@@ -110,7 +110,7 @@
                 <v-tab class="sapling-record-dialog-tab sapling-dialog-edit-tab">
                   {{ entityLabel }}
                 </v-tab>
-                <template v-if="mode === 'edit'">
+                <template v-if="mode !== 'create'">
                   <v-tab
                     v-for="template in relationTemplates"
                     :key="template.name"
@@ -245,6 +245,7 @@
                 <SaplingDialogEditRelationTab
                   v-if="activeTab === idx + 1"
                   :template="template"
+                  :mode="mode"
                   :entity-handle="entity?.handle ?? ''"
                   :entity-label="entityLabel"
                   :item="item"

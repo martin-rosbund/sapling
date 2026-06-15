@@ -123,6 +123,7 @@ export type ImportBatchRowSummaryDto = {
 export type ImportBatchSummaryDto = {
   handle: number | null;
   status: string;
+  currentOperation?: string | null;
   filename: string;
   mimetype?: string | null;
   fileSize?: number | null;
@@ -130,6 +131,7 @@ export type ImportBatchSummaryDto = {
   entityHandle?: string | null;
   templateHandle?: number | null;
   rowCount: number;
+  processedCount: number;
   readyCount: number;
   errorCount: number;
   createdCount: number;
@@ -142,12 +144,63 @@ export type ImportBatchSummaryDto = {
   mapping?: object | null;
   externalKeyColumns?: string[] | null;
   genericReferenceMapping?: object | null;
+  jobId?: string | null;
+  startedAt?: Date | null;
   executedAt?: Date | null;
+  completedAt?: Date | null;
+  failedAt?: Date | null;
+  lastError?: string | null;
   createdAt?: Date | null;
   updatedAt?: Date | null;
+  resultSummary: ImportBatchResultSummaryDto;
   rows: ImportBatchRowSummaryDto[];
 };
 
 export type ImportBatchErrorRowsDto = {
   rows: ImportBatchRowSummaryDto[];
+};
+
+export type ImportBatchResultSummaryDto = {
+  totalRows: number;
+  processedRows: number;
+  readyRows: number;
+  errorRows: number;
+  createdRows: number;
+  updatedRows: number;
+  skippedRows: number;
+  failedRows: number;
+};
+
+export type ImportMatchRecommendedAction = 'create' | 'update' | 'ambiguous' | 'error';
+
+export type ImportMatchCandidateDto = {
+  reference: string;
+  displayValue: string;
+  confidence: number;
+  reason: string;
+};
+
+export type ImportMatchRowDto = {
+  rowNumber: number;
+  recommendedAction: ImportMatchRecommendedAction;
+  confidence: number;
+  matchedReference: string | null;
+  candidates: ImportMatchCandidateDto[];
+  reason: string;
+  blockingIssues: string[];
+};
+
+export type ImportMatchResponseDto = {
+  batchHandle: number;
+  entityHandle: string;
+  sampledRows: number;
+  rows: ImportMatchRowDto[];
+};
+
+export type ImportMatchRequestDto = {
+  entityHandle: string;
+  sourceColumns?: string[];
+  targetFields?: string[];
+  sampleLimit?: number | null;
+  limitPerValue?: number | null;
 };

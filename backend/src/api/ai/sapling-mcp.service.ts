@@ -16,6 +16,7 @@ import { ImportService } from '../import/import.service';
 import type {
   ConfigureImportBatchDto,
   ImportAiSuggestDto,
+  ImportMatchRequestDto,
 } from '../import/import.types';
 import { PersonItem } from '../../entity/PersonItem';
 import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
@@ -1555,82 +1556,20 @@ export class SaplingMcpService {
     if (targetFields.length === 0) {
       throw new ForbiddenException('ai.importNoSearchableFields');
     }
-    const sampleLimit = Math.min(
-      this.asPositiveNumber(args.sampleLimit) ?? 10,
-      50,
-    );
-    const limitPerValue = Math.min(
-      this.asPositiveNumber(args.limitPerValue) ?? 3,
-      10,
-    );
-    const rows = batch.rows.length > 0 ? batch.rows : [];
-    const sampledRows = rows.slice(0, sampleLimit);
-    const matches: unknown[] = [];
-    let checkedValues = 0;
 
-    for (const row of sampledRows) {
-      for (const sourceColumn of sourceColumns) {
-        const rawValue = row.rawData?.[sourceColumn];
-        const value = this.formatDisplayValuePart(rawValue);
-
-        if (!value || value.length < 2) {
-          continue;
-        }
-
-        checkedValues += 1;
-        const filter = {
-          $or: targetFields.map((targetField) => ({
-            [targetField]: { $ilike: `%${value}%` },
-          })),
-        };
-
-        try {
-          const result = await this.genericService.findAndCount(
-            entityHandle,
-            filter,
-            1,
-            limitPerValue,
-            {},
-            user,
-            [],
-          );
-
-          if (result.data.length > 0) {
-            matches.push({
-              rowNumber: row.rowNumber,
-              sourceColumn,
-              value,
-              total: result.meta.total,
-              records: result.data.map((record) => ({
-                displayValue: this.buildRecordDisplayValue(
-                  entityHandle,
-                  record as Record<string, unknown>,
-                ),
-                record: this.sanitizeEntityRecord(entityHandle, record),
-              })),
-            });
-          }
-        } catch (error) {
-          matches.push({
-            rowNumber: row.rowNumber,
-            sourceColumn,
-            value,
-            error: error instanceof Error ? error.message : String(error),
-          });
-        }
-      }
-    }
-
-    return {
-      batchHandle,
+    const matchRequest: ImportMatchRequestDto = {
       entityHandle,
       sourceColumns,
       targetFields,
-      sampledRows: sampledRows.length,
-      checkedValues,
-      matchCount: matches.length,
-      matches,
+      sampleLimit: this.asPositiveNumber(args.sampleLimit) ?? 10,
+      limitPerValue: this.asPositiveNumber(args.limitPerValue) ?? 3,
     };
+
+    return this.importService.matchBatchExistingRecords(
+      batchHandle,
+      matchRequest,
+      user,
+    );
   }
 
   private normalizeKnowledgeSearchEntityHandles(

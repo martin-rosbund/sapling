@@ -154,6 +154,22 @@ export class ImportBatchItem {
   status: string = 'analyzed';
 
   @ApiPropertyOptional()
+  @Sapling(['isChip'])
+  @SaplingForm({
+    order: 150,
+    group: 'importBatch.groupState',
+    groupOrder: 300,
+    width: 1,
+    visible: true,
+    tableOrder: 150,
+    tableVisible: true,
+    mobileOrder: 150,
+    mobileVisible: true,
+  })
+  @Property({ length: 32, nullable: true })
+  currentOperation?: string | null;
+
+  @ApiPropertyOptional()
   @SaplingForm({
     order: 200,
     group: 'importBatch.groupState',
@@ -167,6 +183,21 @@ export class ImportBatchItem {
   })
   @Property({ nullable: true })
   rowCount?: number;
+
+  @ApiPropertyOptional()
+  @SaplingForm({
+    order: 250,
+    group: 'importBatch.groupState',
+    groupOrder: 300,
+    width: 1,
+    visible: true,
+    tableOrder: 250,
+    tableVisible: true,
+    mobileOrder: 250,
+    mobileVisible: false,
+  })
+  @Property({ default: 0 })
+  processedCount: number = 0;
 
   @ApiPropertyOptional()
   @SaplingForm({
@@ -215,6 +246,25 @@ export class ImportBatchItem {
   failedCount: number = 0;
 
   @ApiPropertyOptional()
+  @Property({ length: 128, nullable: true })
+  jobId?: string | null;
+
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
+  @SaplingForm({
+    order: 450,
+    group: 'importBatch.groupState',
+    groupOrder: 300,
+    width: 1,
+    visible: true,
+    tableOrder: 450,
+    tableVisible: false,
+    mobileOrder: 450,
+    mobileVisible: false,
+  })
+  @Property({ nullable: true, type: 'datetime' })
+  startedAt?: Date | null;
+
+  @ApiPropertyOptional()
   @Property({ length: 8, nullable: true })
   delimiter?: string;
 
@@ -252,6 +302,51 @@ export class ImportBatchItem {
   })
   @Property({ nullable: true, type: 'datetime' })
   executedAt?: Date;
+
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
+  @SaplingForm({
+    order: 600,
+    group: 'importBatch.groupState',
+    groupOrder: 300,
+    width: 1,
+    visible: true,
+    tableOrder: 600,
+    tableVisible: true,
+    mobileOrder: 600,
+    mobileVisible: false,
+  })
+  @Property({ nullable: true, type: 'datetime' })
+  completedAt?: Date | null;
+
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
+  @SaplingForm({
+    order: 700,
+    group: 'importBatch.groupState',
+    groupOrder: 300,
+    width: 1,
+    visible: true,
+    tableOrder: 700,
+    tableVisible: true,
+    mobileOrder: 700,
+    mobileVisible: false,
+  })
+  @Property({ nullable: true, type: 'datetime' })
+  failedAt?: Date | null;
+
+  @ApiPropertyOptional()
+  @SaplingForm({
+    order: 800,
+    group: 'importBatch.groupState',
+    groupOrder: 300,
+    width: 4,
+    visible: true,
+    tableOrder: 800,
+    tableVisible: false,
+    mobileOrder: 800,
+    mobileVisible: false,
+  })
+  @Property({ type: 'text', nullable: true })
+  lastError?: string | null;
 
   @ApiPropertyOptional({ type: () => ImportBatchRowItem, isArray: true })
   @OneToMany(() => ImportBatchRowItem, (row) => row.batch)

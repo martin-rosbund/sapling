@@ -122,6 +122,7 @@ export interface ImportBatchRowSummary {
 export interface ImportBatchSummary {
   handle: number | null
   status: string
+  currentOperation?: string | null
   filename: string
   mimetype?: string | null
   fileSize?: number | null
@@ -129,6 +130,7 @@ export interface ImportBatchSummary {
   entityHandle?: string | null
   templateHandle?: number | null
   rowCount: number
+  processedCount: number
   readyCount: number
   errorCount: number
   createdCount: number
@@ -146,10 +148,51 @@ export interface ImportBatchSummary {
   } | null
   externalKeyColumns?: string[] | null
   genericReferenceMapping?: object | null
+  jobId?: string | null
+  startedAt?: string | Date | null
   executedAt?: string | Date | null
+  completedAt?: string | Date | null
+  failedAt?: string | Date | null
+  lastError?: string | null
   createdAt?: string | Date | null
   updatedAt?: string | Date | null
+  resultSummary: {
+    totalRows: number
+    processedRows: number
+    readyRows: number
+    errorRows: number
+    createdRows: number
+    updatedRows: number
+    skippedRows: number
+    failedRows: number
+  }
   rows: ImportBatchRowSummary[]
+}
+
+export type ImportMatchRecommendedAction = 'create' | 'update' | 'ambiguous' | 'error'
+
+export interface ImportMatchCandidate {
+  reference: string
+  displayValue: string
+  confidence: number
+  reason: string
+}
+
+export interface ImportMatchRow {
+  rowNumber: number
+  recommendedAction: ImportMatchRecommendedAction
+  confidence: number
+  matchedReference: string | null
+  candidates: ImportMatchCandidate[]
+  reason: string
+  blockingIssues: string[]
+}
+
+export interface ImportMatchResponse {
+  batchHandle: number
+  entityHandle: string
+  sampledRows: number
+  rows: ImportMatchRow[]
 }
 
 class ApiImportService {
@@ -287,6 +330,28 @@ class ApiImportService {
     try {
       const response = await axios.post<ImportBatchSummary>(
         `${BACKEND_URL}import/batches/${handle}/execute`,
+      )
+      return response.data
+    } catch (error: unknown) {
+      pushApiErrorMessage(error, 'exception.unknownError', 'import')
+      throw error
+    }
+  }
+
+  static async matchBatchExistingRecords(
+    handle: number,
+    payload: {
+      entityHandle: string
+      sourceColumns?: string[]
+      targetFields?: string[]
+      sampleLimit?: number | null
+      limitPerValue?: number | null
+    },
+  ): Promise<ImportMatchResponse> {
+    try {
+      const response = await axios.post<ImportMatchResponse>(
+        `${BACKEND_URL}import/batches/${handle}/match`,
+        payload,
       )
       return response.data
     } catch (error: unknown) {

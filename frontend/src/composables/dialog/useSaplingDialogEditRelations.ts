@@ -303,7 +303,7 @@ export function useSaplingDialogEditRelations(options: UseSaplingDialogEditRelat
       const columns = relationTableState.value[template.name]?.entityTemplates ?? []
       const columnFilters = relationTableColumnFilters.value[template.name] || {}
 
-      if (options.mode.value === 'edit' && options.item.value && template.referenceName) {
+      if (options.mode.value !== 'create' && options.item.value && template.referenceName) {
         const apiFilter = buildTableFilter({
           search,
           columnFilters,

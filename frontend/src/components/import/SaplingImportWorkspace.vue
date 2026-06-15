@@ -28,7 +28,7 @@
             :color="executeButtonColor"
             prepend-icon="mdi-play"
             :disabled="!canExecute"
-            :loading="isExecuting"
+            :loading="isExecuting || isExecutionRunning"
             @click="executeBatch"
           >
             {{ executeButtonLabel }}
@@ -57,7 +57,7 @@
             prepend-inner-icon="mdi-file-delimited-outline"
             density="comfortable"
             :label="$t('import.selectFile')"
-            :disabled="isAnalyzing"
+            :disabled="isAnalyzing || isImportJobRunning"
             :loading="isAnalyzing"
             @update:model-value="analyzeSelectedFile"
           />
@@ -83,7 +83,7 @@
             prepend-inner-icon="mdi-table"
             density="comfortable"
             :label="$t('import.targetEntity')"
-            :disabled="!batch"
+            :disabled="!batch || isImportJobRunning"
             @update:model-value="onEntityChange"
             autocomplete="off"
           />
@@ -96,7 +96,7 @@
             density="comfortable"
             clearable
             :label="$t('import.source')"
-            :disabled="!batch"
+            :disabled="!batch || isImportJobRunning"
             autocomplete="off"
           />
           <v-autocomplete
@@ -108,7 +108,7 @@
             density="comfortable"
             clearable
             :label="$t('import.template')"
-            :disabled="!canSelectTemplates"
+            :disabled="!canSelectTemplates || isImportJobRunning"
             :loading="isLoadingTemplates"
             autocomplete="off"
           />
@@ -120,7 +120,7 @@
             density="comfortable"
             prepend-inner-icon="mdi-label-outline"
             :label="$t('import.templateTitle')"
-            :disabled="!canUseTemplates"
+            :disabled="!canUseTemplates || isImportJobRunning"
             autocomplete="off"
           />
           <v-select
@@ -132,7 +132,7 @@
             density="comfortable"
             prepend-inner-icon="mdi-key-chain"
             :label="$t('import.externalKeyColumns')"
-            :disabled="!selectedSourceHandle"
+            :disabled="!selectedSourceHandle || isImportJobRunning"
             autocomplete="off"
             counter
             @update:model-value="normalizeExternalKeyColumns"
@@ -157,7 +157,7 @@
               density="comfortable"
               prepend-inner-icon="mdi-key"
               :label="$t('import.externalKeyColumns')"
-              :disabled="!genericReferenceEntityHandle || !selectedSourceHandle"
+              :disabled="!genericReferenceEntityHandle || !selectedSourceHandle || isImportJobRunning"
               autocomplete="off"
               counter
               @update:model-value="normalizeGenericReferenceKeyColumns"
@@ -233,7 +233,7 @@
               :entity-handle="selectedEntityHandle ?? ''"
               :visible-templates="importableFields"
               :permissions="currentPermissions"
-              :disabled="!batch"
+              :disabled="!batch || isImportJobRunning"
             />
             <div class="sapling-import__value-mapping-action">
               <v-tooltip :text="$t('import.valueMapping')">
@@ -244,7 +244,7 @@
                     size="small"
                     variant="tonal"
                     :color="hasValueMapping(field.name) ? 'primary' : undefined"
-                    :disabled="!fieldMappings[field.name]"
+                    :disabled="!fieldMappings[field.name] || isImportJobRunning"
                     :aria-label="$t('import.valueMapping')"
                     @click="openValueMapping(field)"
                   />
@@ -274,7 +274,7 @@
                 clearable
                 multiple
                 chips
-                :disabled="!relationMappingModes[field.name]"
+                :disabled="!relationMappingModes[field.name] || isImportJobRunning"
                 :placeholder="$t('import.externalKeyColumns')"
                 autocomplete="off"
                 @update:model-value="normalizeRelationMappingColumns(field.name)"
@@ -320,6 +320,29 @@
             {{ $t('import.configure') }}
           </v-btn>
         </div>
+
+        <v-alert
+          v-if="isImportJobRunning"
+          type="info"
+          variant="tonal"
+          density="comfortable"
+          class="sapling-import__job-status"
+        >
+          <div class="sapling-stack-sm">
+            <strong>{{ currentImportStatusLabel }}</strong>
+            <v-progress-linear
+              :model-value="importProgressPercent"
+              height="8"
+              rounded
+              color="primary"
+            />
+            <span>
+              {{
+                importProgressLabel
+              }}
+            </span>
+          </div>
+        </v-alert>
 
         <v-alert
           v-if="aiSuggestion"
@@ -547,7 +570,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
 import SaplingSurface from '@/components/common/SaplingSurface.vue'
@@ -574,6 +597,7 @@ import type { EntityItem, SaplingGenericItem } from '@/entity/entity'
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure'
 import { DEFAULT_ENTITY_ITEMS_COUNT } from '@/constants/project.constants'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
+import { useSaplingImportJobs } from '@/composables/import/useSaplingImportJobs'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import { downloadTextFile } from '@/composables/table/saplingTableAction.utils'
 
@@ -600,6 +624,7 @@ const { t, te } = useI18n()
 const genericStore = useGenericStore()
 const currentPermissionStore = useCurrentPermissionStore()
 const { pushMessage } = useSaplingMessageCenter()
+const { trackImportBatch } = useSaplingImportJobs()
 const { loadTranslations } = useTranslationLoader(
   'global',
   'navigation',
@@ -617,6 +642,21 @@ const IMPORT_ERROR_REPORT_DELIMITER = ';'
 const IMPORT_ERROR_REPORT_BOM = '\uFEFF'
 const IMPORT_REQUIRED_FIELDS_MISSING_PREFIX = 'import.requiredFieldsMissing:'
 const IMPORT_INVALID_DATE_VALUES_PREFIX = 'import.invalidDateValues:'
+const IMPORT_POLL_INTERVAL_MS = 2000
+const IMPORT_RUNNING_STATUSES = new Set([
+  'validationQueued',
+  'validating',
+  'executionQueued',
+  'executing',
+])
+const IMPORT_TERMINAL_STATUSES = new Set([
+  'validated',
+  'validatedWithErrors',
+  'validationFailed',
+  'executed',
+  'executedWithErrors',
+  'executionFailed',
+])
 const selectedFile = ref<File | File[] | null>(null)
 const selectedEntityHandle = ref<string | null>(null)
 const selectedSourceHandle = ref<string | null>(null)
@@ -650,6 +690,7 @@ const valueMappings = reactive<Record<string, ValueMappingState>>({})
 const aiSuggestionFieldDetails = reactive<
   Record<string, { confidence: number; reason: string | null }>
 >({})
+let batchPollTimer: number | null = null
 const valueMappingDialog = reactive<{
   visible: boolean
   targetField: string | null
@@ -787,7 +828,10 @@ const relationMappingModeOptions = computed(() => [
   { title: t('import.relationMappingMode.externalKey'), value: 'externalKey' },
 ])
 const canConfigure = computed(
-  () => Boolean(batch.value?.handle && selectedEntityHandle.value) && !isConfiguring.value,
+  () =>
+    Boolean(batch.value?.handle && selectedEntityHandle.value) &&
+    !isConfiguring.value &&
+    !isImportJobRunning.value,
 )
 const canSelectTemplates = computed(() => Boolean(batch.value?.handle))
 const canUseTemplates = computed(() =>
@@ -815,6 +859,29 @@ const hasErrorReportRows = computed(
 const isPreviewLimited = computed(
   () => (batch.value?.rowCount ?? batch.value?.rows.length ?? 0) > IMPORT_PREVIEW_ROW_LIMIT,
 )
+const isImportJobRunning = computed(() =>
+  batch.value ? IMPORT_RUNNING_STATUSES.has(batch.value.status) : false,
+)
+const isExecutionRunning = computed(() =>
+  batch.value ? ['executionQueued', 'executing'].includes(batch.value.status) : false,
+)
+const importProgressPercent = computed(() => {
+  const totalRows = batch.value?.rowCount ?? 0
+  if (totalRows <= 0) {
+    return 0
+  }
+
+  return Math.min(100, Math.round(((batch.value?.processedCount ?? 0) / totalRows) * 100))
+})
+const currentImportStatusLabel = computed(() =>
+  batch.value?.status ? importStatusLabel(batch.value.status) : '-',
+)
+const importProgressLabel = computed(() =>
+  t('import.jobProgress', {
+    processed: batch.value?.processedCount ?? 0,
+    total: batch.value?.rowCount ?? 0,
+  }),
+)
 const executeButtonLabel = computed(() =>
   hasValidationErrors.value ? t('import.executeWithoutInvalidRows') : t('import.execute'),
 )
@@ -824,7 +891,8 @@ const canExecute = computed(
     Boolean(batch.value?.handle) &&
     (batch.value?.readyCount ?? 0) > 0 &&
     (batch.value?.status === 'validated' || batch.value?.status === 'validatedWithErrors') &&
-    !isExecuting.value,
+    !isExecuting.value &&
+    !isImportJobRunning.value,
 )
 
 onMounted(async () => {
@@ -835,6 +903,10 @@ onMounted(async () => {
     loadOpenBatches(),
     currentPermissionStore.fetchCurrentPermission(),
   ])
+})
+
+onUnmounted(() => {
+  stopBatchPolling()
 })
 
 watch(selectedEntityHandle, async (entityHandle) => {
@@ -989,6 +1061,10 @@ async function hydrateBatchState(loadedBatch: ImportBatchSummary): Promise<void>
     genericReferenceKeyColumns.value = filterExistingColumns(
       genericReferenceMapping?.keyColumns ?? [],
     )
+    if (isRunningImportStatus(loadedBatch.status)) {
+      startBatchPolling(loadedBatch.handle)
+      trackImportBatch(loadedBatch.handle)
+    }
   } finally {
     isHydratingBatch.value = false
   }
@@ -1171,8 +1247,10 @@ async function configureBatch(): Promise<void> {
     isConfiguring.value = true
     batch.value = await ApiImportService.configureBatch(batch.value.handle, buildTemplatePayload())
     applyValueMappings(batch.value.mapping)
+    trackImportBatch(batch.value.handle)
+    startBatchPolling(batch.value.handle)
     await loadOpenBatches()
-    pushMessage('success', t('import.validationCompleted'), batch.value.filename, 'import')
+    pushMessage('info', t('import.validationStarted'), batch.value.filename, 'import')
   } catch {
     // shared API errors already surface through the message center
   } finally {
@@ -1218,15 +1296,10 @@ async function executeBatch(): Promise<void> {
   try {
     isExecuting.value = true
     const executedBatch = await ApiImportService.executeBatch(batch.value.handle)
-    pushMessage('success', t('import.executionCompleted'), executedBatch.filename, 'import')
-
-    if (isCompletedImportBatch(executedBatch)) {
-      resetImportWorkspace()
-      await loadOpenBatches()
-      return
-    }
-
     batch.value = executedBatch
+    trackImportBatch(executedBatch.handle)
+    startBatchPolling(executedBatch.handle)
+    pushMessage('info', t('import.executionStarted'), executedBatch.filename, 'import')
     await loadOpenBatches()
   } catch {
     // shared API errors already surface through the message center
@@ -1235,11 +1308,51 @@ async function executeBatch(): Promise<void> {
   }
 }
 
-function isCompletedImportBatch(importBatch: ImportBatchSummary): boolean {
-  return ['completed', 'executed'].includes(importBatch.status) && importBatch.failedCount === 0
+function startBatchPolling(handle: number | null | undefined): void {
+  if (typeof handle !== 'number' || !Number.isFinite(handle)) {
+    return
+  }
+
+  stopBatchPolling()
+  batchPollTimer = window.setInterval(() => {
+    void refreshCurrentBatch(Math.trunc(handle))
+  }, IMPORT_POLL_INTERVAL_MS)
+  void refreshCurrentBatch(Math.trunc(handle))
+}
+
+function stopBatchPolling(): void {
+  if (!batchPollTimer) {
+    return
+  }
+
+  window.clearInterval(batchPollTimer)
+  batchPollTimer = null
+}
+
+async function refreshCurrentBatch(handle: number): Promise<void> {
+  try {
+    const refreshedBatch = await ApiImportService.getBatch(handle)
+    batch.value = refreshedBatch
+
+    if (isTerminalImportStatus(refreshedBatch.status)) {
+      stopBatchPolling()
+      await loadOpenBatches()
+    }
+  } catch {
+    // shared API errors already surface through the message center
+  }
+}
+
+function isRunningImportStatus(status: string): boolean {
+  return IMPORT_RUNNING_STATUSES.has(status)
+}
+
+function isTerminalImportStatus(status: string): boolean {
+  return IMPORT_TERMINAL_STATUSES.has(status)
 }
 
 function resetImportWorkspace(): void {
+  stopBatchPolling()
   batch.value = null
   selectedFile.value = null
   selectedOpenBatchHandle.value = null

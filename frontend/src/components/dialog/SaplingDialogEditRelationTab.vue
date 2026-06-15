@@ -8,6 +8,7 @@
           class="sapling-section-panel sapling-record-relation-content sapling-dialog-edit-relation-content"
         >
           <div
+            v-if="!isReadOnlyRelation"
             class="sapling-toolbar-group sapling-record-relation-actions sapling-dialog-edit-relation-actions"
           >
             <div
@@ -52,10 +53,10 @@
               :entity-templates="entityTemplates"
               :entity="relationEntity"
               :entity-permission="entityPermission"
-              :show-actions="true"
-              :multi-select="true"
+              :show-actions="!isReadOnlyRelation"
+              :multi-select="!isReadOnlyRelation"
               :show-favorite="false"
-              :show-add="true"
+              :show-add="!isReadOnlyRelation"
               :table-key="template.name"
               :selected="selectedItems"
               @update:selected="(val: SaplingGenericItem[]) => emit('update:selected-items', val)"
@@ -76,19 +77,22 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue'
 import SaplingSelectAddField from '@/components/dialog/fields/SaplingFieldSelectAdd.vue'
 import SaplingTable from '@/components/table/SaplingTable.vue'
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity'
 import type {
   AccumulatedPermission,
   ColumnFilterItem,
+  DialogState,
   EntityTemplate,
   SortItem,
   SaplingTableHeaderItem,
 } from '@/entity/structure'
 
-defineProps<{
+const props = defineProps<{
   template: EntityTemplate
+  mode: DialogState
   entityHandle: string
   entityLabel: string
   item: SaplingGenericItem | null
@@ -108,6 +112,10 @@ defineProps<{
   selectedRelations: SaplingGenericItem[]
   selectedItems: SaplingGenericItem[]
 }>()
+
+const isReadOnlyRelation = computed(
+  () => props.mode !== 'edit' || (props.template.options?.includes('isReadOnly') ?? false),
+)
 
 const emit = defineEmits<{
   (event: 'update:selected-relations', value: SaplingGenericItem[]): void

@@ -33,9 +33,10 @@
 </template>
 
 <script lang="ts" setup>
-import { defineAsyncComponent, ref, watch } from 'vue'
+import { defineAsyncComponent, onMounted, onUnmounted, ref, watch } from 'vue'
 import { RouterView } from 'vue-router'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
+import { useSaplingImportJobs } from '@/composables/import/useSaplingImportJobs'
 import SaplingHeader from '@/components/system/SaplingHeader.vue'
 
 // Shell widgets: load them only when actually mounted/opened.
@@ -70,9 +71,11 @@ const SaplingHelpDialog = defineAsyncComponent(
 
 const navigationDrawer = ref(false)
 const navigationDrawerMounted = ref(false)
+const { startImportJobWatcher, stopImportJobWatcher } = useSaplingImportJobs()
 const { isLoading: isShellTranslationLoading } = useTranslationLoader(
   'global',
   'formConfig',
+  'import',
   'login',
   'permission',
 )
@@ -86,4 +89,12 @@ watch(
   },
   { immediate: true },
 )
+
+onMounted(() => {
+  startImportJobWatcher()
+})
+
+onUnmounted(() => {
+  stopImportJobWatcher()
+})
 </script>

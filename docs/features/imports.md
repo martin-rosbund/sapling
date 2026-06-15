@@ -109,11 +109,14 @@ then displays source system, external key parts, import batches, and timestamps.
     by external key links from previous imports.
 11. Optionally configure a generic target reference for entities such as
    `information` that use `entity + reference`.
-12. Validate the batch.
+12. Validate the batch. Validation is queued as a background job, so the
+    workspace can be left while row payloads, required fields, reference
+    mappings, and planned actions are checked.
 13. Download the complete error report when invalid rows need source-file
     cleanup.
-14. Execute the batch. If valid rows exist, the workspace can run the import
-    without invalid rows; invalid rows remain in the batch for later correction.
+14. Execute the batch. Execution is also queued as a background job. If valid
+    rows exist, the workspace can run the import without invalid rows; invalid
+    rows remain in the batch for later correction.
 
 Validation rejects non-empty invalid date strings before execution. This
 includes source values such as `NULL` in date or datetime fields, so those rows
@@ -129,6 +132,22 @@ During execution, rows with an existing external record link update the linked
 Sapling record. Rows without a link create a new record and store the link.
 Rows that are not ready are skipped, so a few invalid CSV rows do not block a
 large otherwise valid import.
+
+Validation and execution use the `imports` BullMQ queue when Redis is enabled.
+When Redis is disabled locally, Sapling starts the same work in-process after
+the API response returns. `ImportBatchItem` stores the current operation,
+processed row count, job id, start/completion/failure timestamps, and latest
+job error. The frontend stores active batch handles in local storage and polls
+`GET /api/import/batches/:handle`; terminal states raise Message Center
+notifications even if the user has left the import page while the app remains
+open.
+
+The optional matching endpoint returns a conservative row-level decision
+proposal. Each sampled row receives `create`, `update`, `ambiguous`, or
+`error`, plus confidence, matched reference, candidates, reason, and blocking
+issues. A unique external record link is the strongest update signal. Fuzzy
+value matches can suggest candidates, but ambiguous candidates do not trigger
+automatic merging.
 
 Import batches and import batch rows are intentionally deletable through the
 generic entity UI in non-production setup workflows. Deleting a batch cascades

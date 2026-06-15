@@ -4,8 +4,11 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { EntityManager, wrap } from '@mikro-orm/core';
+import { InjectQueue } from '@nestjs/bullmq';
+import { EntityManager, RequestContext, wrap } from '@mikro-orm/core';
+import { Queue } from 'bullmq';
 import { createHash } from 'crypto';
+import { REDIS_ENABLED } from '../../constants/project.constants';
 import { EntityItem } from '../../entity/EntityItem';
 import { ExternalRecordLinkItem } from '../../entity/ExternalRecordLinkItem';
 import { ImportBatchItem } from '../../entity/ImportBatchItem';
@@ -37,9 +40,15 @@ import type {
   ImportAiSuggestedReferenceFieldDto,
   ImportAiSuggestedValueMappingDto,
   ImportBatchErrorRowsDto,
+  ImportBatchResultSummaryDto,
   ImportBatchRowSummaryDto,
   ImportBatchSummaryDto,
+  ImportMatchCandidateDto,
+  ImportMatchRequestDto,
+  ImportMatchResponseDto,
+  ImportMatchRowDto,
   ImportFieldDefaultDto,
+  ImportFieldMappingDto,
   ImportGenericReferenceMappingDto,
   ImportTemplateSummaryDto,
   ImportRelationMappingDto,
@@ -88,9 +97,20 @@ const AI_TEMPLATE_CONTEXT_LIMIT = 5;
 const REQUIRED_FIELDS_MISSING_MESSAGE_PREFIX = 'import.requiredFieldsMissing';
 const OPEN_IMPORT_BATCH_STATUSES = [
   'analyzed',
+  'validationQueued',
+  'validating',
+  'validationFailed',
   'validated',
   'validatedWithErrors',
+  'executionQueued',
+  'executing',
+  'executionFailed',
 ] as const;
+const IMPORT_PROGRESS_FLUSH_INTERVAL = 25;
+const IMPORT_JOB_NAMES = {
+  validate: 'validate-import-batch',
+  execute: 'execute-import-batch',
+} as const;
 
 @Injectable()
 export class ImportService {
@@ -101,6 +121,7 @@ export class ImportService {
     private readonly genericQueryService: GenericQueryService,
     private readonly templateService: TemplateService,
     private readonly genericCustomFieldService: GenericCustomFieldService,
+    @InjectQueue('imports') private readonly importQueue: Queue,
   ) {}
 
   async analyzeCsv(
@@ -170,6 +191,118 @@ export class ImportService {
     return { rows: rows.map((row) => this.toBatchRowSummary(row)) };
   }
 
+  async matchBatchExistingRecords(
+    handle: number,
+    dto: ImportMatchRequestDto,
+    currentUser: PersonItem,
+  ): Promise<ImportMatchResponseDto> {
+    const entityHandle = this.normalizeRequiredString(dto.entityHandle);
+    const batch = await this.findBatch(handle);
+    const sourceColumns = this.resolveMatchSourceColumns(batch, dto.sourceColumns);
+    const targetFields = this.resolveMatchTargetFields(
+      entityHandle,
+      dto.targetFields,
+    );
+
+    if (targetFields.length === 0) {
+      throw new BadRequestException('import.matchNoSearchableFields');
+    }
+
+    const sampleLimit = Math.min(
+      Math.max(Math.trunc(dto.sampleLimit ?? 25), 1),
+      100,
+    );
+    const limitPerValue = Math.min(
+      Math.max(Math.trunc(dto.limitPerValue ?? 3), 1),
+      10,
+    );
+    const rows = await this.em.find(
+      ImportBatchRowItem,
+      { batch: { handle: batch.handle } },
+      { orderBy: { rowNumber: 'ASC' }, limit: sampleLimit },
+    );
+    const responseRows: ImportMatchRowDto[] = [];
+
+    for (const row of rows) {
+      const linkedReference = await this.resolveRowExternalLinkReference(
+        batch,
+        row,
+      );
+
+      if (linkedReference) {
+        responseRows.push({
+          rowNumber: row.rowNumber,
+          recommendedAction: 'update' as const,
+          confidence: 1,
+          matchedReference: linkedReference,
+          candidates: [
+            {
+              reference: linkedReference,
+              displayValue: linkedReference,
+              confidence: 1,
+              reason: 'import.matchExternalKey',
+            },
+          ],
+          reason: 'import.matchExternalKey',
+          blockingIssues: [],
+        });
+        continue;
+      }
+
+      const candidates = await this.findMatchCandidatesForRow(
+        entityHandle,
+        row,
+        sourceColumns,
+        targetFields,
+        limitPerValue,
+        currentUser,
+      );
+
+      if (candidates.length === 0) {
+        responseRows.push({
+          rowNumber: row.rowNumber,
+          recommendedAction: 'create' as const,
+          confidence: 0.7,
+          matchedReference: null,
+          candidates: [],
+          reason: 'import.matchNoExistingRecord',
+          blockingIssues: [],
+        });
+        continue;
+      }
+
+      if (candidates.length === 1 && candidates[0].confidence >= 0.85) {
+        responseRows.push({
+          rowNumber: row.rowNumber,
+          recommendedAction: 'update' as const,
+          confidence: candidates[0].confidence,
+          matchedReference: candidates[0].reference,
+          candidates,
+          reason: candidates[0].reason,
+          blockingIssues: [],
+        });
+        continue;
+      }
+
+      responseRows.push({
+        rowNumber: row.rowNumber,
+        recommendedAction: 'ambiguous' as const,
+        confidence: Math.max(...candidates.map((candidate) => candidate.confidence)),
+        matchedReference: null,
+        candidates,
+        reason: 'import.matchAmbiguous',
+        blockingIssues: ['import.matchAmbiguous'],
+      });
+    }
+
+    return {
+      batchHandle: handle,
+      entityHandle,
+      sampledRows: rows.length,
+      rows: responseRows,
+    };
+  }
+
   async listOpenBatches(): Promise<ImportBatchSummaryDto[]> {
     const batches = await this.em.find(
       ImportBatchItem,
@@ -192,8 +325,17 @@ export class ImportService {
     dto: ConfigureImportBatchDto,
     currentUser: PersonItem,
   ): Promise<ImportBatchSummaryDto> {
+    if (currentUser.handle == null) {
+      throw new BadRequestException('global.currentUserRequired');
+    }
+
     const entityHandle = this.normalizeRequiredString(dto.entityHandle);
     const batch = await this.findBatch(handle);
+
+    if (this.isImportBatchBusy(batch.status)) {
+      throw new BadRequestException('import.batchJobAlreadyRunning');
+    }
+
     const targetEntity = await this.em.findOne(EntityItem, {
       handle: entityHandle,
     });
@@ -257,97 +399,28 @@ export class ImportService {
     };
     batch.externalKeyColumns = keyColumns;
     batch.genericReferenceMapping = dto.genericReferenceMapping ?? null;
-    batch.status = 'validating';
-
-    const rows = await this.em.find(
-      ImportBatchRowItem,
-      { batch: { handle: batch.handle } },
-      { orderBy: { rowNumber: 'ASC' } },
-    );
-    const template =
-      await this.genericCustomFieldService.appendCustomFieldTemplates(
-        entityHandle,
-        this.templateService.getEntityTemplate(entityHandle),
-      );
-    const duplicateKeys = new Set<string>();
-    let readyCount = 0;
-    let errorCount = 0;
-
-    for (const row of rows) {
-      try {
-        const externalKey =
-          source && keyColumns.length > 0
-            ? this.buildExternalKey(
-                source.handle,
-                entityHandle,
-                keyColumns,
-                row.rawData,
-              )
-            : null;
-
-        if (externalKey) {
-          if (duplicateKeys.has(externalKey.hash)) {
-            throw new BadRequestException('import.duplicateExternalKeyInBatch');
-          }
-          duplicateKeys.add(externalKey.hash);
-        }
-
-        const payload = await this.buildPayload(
-          template,
-          row.rawData,
-          effectiveDto,
-          entityHandle,
-          currentUser,
-        );
-        this.validateImportDateValues(template, payload);
-        const action = await this.resolvePlannedAction(
-          entityHandle,
-          payload,
-          source?.handle ?? null,
-          externalKey?.hash ?? null,
-        );
-
-        const missingRequiredFields = this.getMissingRequiredFieldNames(
-          template,
-          payload,
-          action,
-        );
-        if (action !== 'updated') {
-          missingRequiredFields.push(
-            ...(await this.genericCustomFieldService.getMissingRequiredFieldNames(
-              entityHandle,
-              this.normalizeRecord(payload.customFields) ?? {},
-            )),
-          );
-        }
-
-        if (missingRequiredFields.length > 0) {
-          throw new Error(
-            this.createRequiredFieldsMissingMessage(missingRequiredFields),
-          );
-        }
-
-        row.payload = payload;
-        row.externalKeyHash = externalKey?.hash ?? null;
-        row.externalKeyParts = externalKey?.parts ?? null;
-        row.action = action;
-        row.status = 'ready';
-        row.message = null;
-        readyCount += 1;
-      } catch (error) {
-        row.payload = null;
-        row.action = null;
-        row.status = 'error';
-        row.message = getImportErrorMessage(error);
-        errorCount += 1;
-      }
-    }
-
-    batch.readyCount = readyCount;
-    batch.errorCount = errorCount;
-    batch.status = errorCount > 0 ? 'validatedWithErrors' : 'validated';
-
+    batch.status = 'validationQueued';
+    batch.currentOperation = 'validation';
+    batch.processedCount = 0;
+    batch.readyCount = 0;
+    batch.errorCount = 0;
+    batch.createdCount = 0;
+    batch.updatedCount = 0;
+    batch.skippedCount = 0;
+    batch.failedCount = 0;
+    batch.jobId = null;
+    batch.startedAt = null;
+    batch.completedAt = null;
+    batch.failedAt = null;
+    batch.executedAt = undefined;
+    batch.lastError = null;
     await this.em.flush();
+
+    await this.enqueueImportJob(
+      IMPORT_JOB_NAMES.validate,
+      handle,
+      currentUser.handle,
+    );
     return this.getBatch(handle);
   }
 
@@ -562,11 +635,19 @@ export class ImportService {
     handle: number,
     currentUser: PersonItem,
   ): Promise<ImportBatchSummaryDto> {
+    if (currentUser.handle == null) {
+      throw new BadRequestException('global.currentUserRequired');
+    }
+
     const batch = await this.findBatch(handle);
     const entityHandle = this.extractHandle(batch.targetEntity);
 
     if (!entityHandle) {
       throw new BadRequestException('import.targetEntityRequired');
+    }
+
+    if (this.isImportBatchBusy(batch.status)) {
+      throw new BadRequestException('import.batchJobAlreadyRunning');
     }
 
     if (
@@ -580,78 +661,297 @@ export class ImportService {
       throw new BadRequestException('import.noReadyRows');
     }
 
-    const rows = await this.em.find(
-      ImportBatchRowItem,
-      { batch: { handle: batch.handle } },
-      { orderBy: { rowNumber: 'ASC' } },
-    );
-
-    batch.status = 'executing';
+    batch.status = 'executionQueued';
+    batch.currentOperation = 'execution';
+    batch.processedCount = 0;
     batch.createdCount = 0;
     batch.updatedCount = 0;
     batch.skippedCount = 0;
     batch.failedCount = 0;
+    batch.jobId = null;
+    batch.startedAt = null;
+    batch.completedAt = null;
+    batch.failedAt = null;
+    batch.lastError = null;
     await this.em.flush();
 
-    for (const row of rows) {
-      if (row.status !== 'ready' || !row.payload) {
-        if (row.status !== 'error') {
-          row.status = 'skipped';
-          row.action = 'skipped';
-          batch.skippedCount += 1;
-        }
-        continue;
+    await this.enqueueImportJob(
+      IMPORT_JOB_NAMES.execute,
+      handle,
+      currentUser.handle,
+    );
+    return this.getBatch(handle);
+  }
+
+  async processQueuedValidation(
+    handle: number,
+    userHandle: number,
+  ): Promise<void> {
+    await this.runInImportContext(async () => {
+      const batch = await this.findBatch(handle);
+
+      if (
+        batch.status !== 'validationQueued' &&
+        batch.status !== 'validating'
+      ) {
+        return;
       }
 
       try {
-        const link = await this.findRowExternalLink(batch, row);
-        const handleToUpdate =
-          link?.reference ?? extractImportHandle(row.payload);
-        const result =
-          handleToUpdate == null
-            ? await this.genericService.create(
-                entityHandle,
-                row.payload,
-                currentUser,
-              )
-            : await this.genericService.update(
-                entityHandle,
-                handleToUpdate,
-                row.payload,
-                currentUser,
-                [],
-                {},
-                { resolution: 'overwrite' },
-              );
-        const targetReference = this.extractResultHandle(result);
-        const action = handleToUpdate == null ? 'created' : 'updated';
-
-        row.status = 'executed';
-        row.action = action;
-        row.targetReference =
-          targetReference == null ? null : String(targetReference);
-        row.message = null;
-
-        if (action === 'created') {
-          batch.createdCount += 1;
-        } else {
-          batch.updatedCount += 1;
+        const currentUser = await this.findImportUser(userHandle);
+        const entityHandle = this.extractHandle(batch.targetEntity);
+        if (!entityHandle) {
+          throw new BadRequestException('import.targetEntityRequired');
         }
 
-        await this.upsertExternalLink(batch, row);
+        const sourceHandle = this.extractHandle(batch.source);
+        const source = sourceHandle
+          ? ({ handle: sourceHandle } as ImportSourceItem)
+          : null;
+        const keyColumns = this.normalizeColumns(
+          batch.externalKeyColumns ?? [],
+        );
+        const effectiveDto = this.createConfigureDtoFromBatch(batch);
+        const rows = await this.em.find(
+          ImportBatchRowItem,
+          { batch: { handle: batch.handle } },
+          { orderBy: { rowNumber: 'ASC' } },
+        );
+        const template =
+          await this.genericCustomFieldService.appendCustomFieldTemplates(
+            entityHandle,
+            this.templateService.getEntityTemplate(entityHandle),
+          );
+        const duplicateKeys = new Set<string>();
+        let readyCount = 0;
+        let errorCount = 0;
+
+        batch.status = 'validating';
+        batch.currentOperation = 'validation';
+        batch.processedCount = 0;
+        batch.readyCount = 0;
+        batch.errorCount = 0;
+        batch.startedAt = new Date();
+        batch.completedAt = null;
+        batch.failedAt = null;
+        batch.lastError = null;
+        await this.em.flush();
+
+        for (const row of rows) {
+          try {
+            const externalKey =
+              source && keyColumns.length > 0
+                ? this.buildExternalKey(
+                    source.handle,
+                    entityHandle,
+                    keyColumns,
+                    row.rawData,
+                  )
+                : null;
+
+            if (externalKey) {
+              if (duplicateKeys.has(externalKey.hash)) {
+                throw new BadRequestException(
+                  'import.duplicateExternalKeyInBatch',
+                );
+              }
+              duplicateKeys.add(externalKey.hash);
+            }
+
+            const payload = await this.buildPayload(
+              template,
+              row.rawData,
+              effectiveDto,
+              entityHandle,
+              currentUser,
+            );
+            this.validateImportDateValues(template, payload);
+            const action = await this.resolvePlannedAction(
+              entityHandle,
+              payload,
+              source?.handle ?? null,
+              externalKey?.hash ?? null,
+            );
+
+            const missingRequiredFields = this.getMissingRequiredFieldNames(
+              template,
+              payload,
+              action,
+            );
+            if (action !== 'updated') {
+              missingRequiredFields.push(
+                ...(await this.genericCustomFieldService.getMissingRequiredFieldNames(
+                  entityHandle,
+                  this.normalizeRecord(payload.customFields) ?? {},
+                )),
+              );
+            }
+
+            if (missingRequiredFields.length > 0) {
+              throw new Error(
+                this.createRequiredFieldsMissingMessage(
+                  missingRequiredFields,
+                ),
+              );
+            }
+
+            row.payload = payload;
+            row.externalKeyHash = externalKey?.hash ?? null;
+            row.externalKeyParts = externalKey?.parts ?? null;
+            row.action = action;
+            row.status = 'ready';
+            row.message = null;
+            readyCount += 1;
+          } catch (error) {
+            row.payload = null;
+            row.externalKeyHash = null;
+            row.externalKeyParts = null;
+            row.action = null;
+            row.status = 'error';
+            row.message = getImportErrorMessage(error);
+            errorCount += 1;
+          }
+
+          batch.processedCount += 1;
+          batch.readyCount = readyCount;
+          batch.errorCount = errorCount;
+          if (batch.processedCount % IMPORT_PROGRESS_FLUSH_INTERVAL === 0) {
+            await this.em.flush();
+          }
+        }
+
+        batch.readyCount = readyCount;
+        batch.errorCount = errorCount;
+        batch.status =
+          errorCount > 0 ? 'validatedWithErrors' : 'validated';
+        batch.currentOperation = null;
+        batch.completedAt = new Date();
+        await this.em.flush();
       } catch (error) {
-        row.status = 'failed';
-        row.action = 'failed';
-        row.message = getImportErrorMessage(error);
-        batch.failedCount += 1;
+        await this.markBatchJobFailed(
+          handle,
+          'validationFailed',
+          'validation',
+          error,
+        );
+        throw error;
       }
-    }
+    });
+  }
 
-    batch.executedAt = new Date();
-    batch.status = batch.failedCount > 0 ? 'executedWithErrors' : 'executed';
-    await this.em.flush();
+  async processQueuedExecution(handle: number, userHandle: number): Promise<void> {
+    await this.runInImportContext(async () => {
+      const batch = await this.findBatch(handle);
 
-    return this.getBatch(handle);
+      if (batch.status !== 'executionQueued' && batch.status !== 'executing') {
+        return;
+      }
+
+      try {
+        const currentUser = await this.findImportUser(userHandle);
+        const entityHandle = this.extractHandle(batch.targetEntity);
+        if (!entityHandle) {
+          throw new BadRequestException('import.targetEntityRequired');
+        }
+
+        const rows = await this.em.find(
+          ImportBatchRowItem,
+          { batch: { handle: batch.handle } },
+          { orderBy: { rowNumber: 'ASC' } },
+        );
+
+        batch.status = 'executing';
+        batch.currentOperation = 'execution';
+        batch.processedCount = 0;
+        batch.createdCount = 0;
+        batch.updatedCount = 0;
+        batch.skippedCount = 0;
+        batch.failedCount = 0;
+        batch.startedAt = new Date();
+        batch.completedAt = null;
+        batch.failedAt = null;
+        batch.lastError = null;
+        await this.em.flush();
+
+        for (const row of rows) {
+          if (row.status !== 'ready' || !row.payload) {
+            if (row.status !== 'error') {
+              row.status = 'skipped';
+              row.action = 'skipped';
+              batch.skippedCount += 1;
+            }
+            batch.processedCount += 1;
+            if (batch.processedCount % IMPORT_PROGRESS_FLUSH_INTERVAL === 0) {
+              await this.em.flush();
+            }
+            continue;
+          }
+
+          try {
+            const link = await this.findRowExternalLink(batch, row);
+            const handleToUpdate =
+              link?.reference ?? extractImportHandle(row.payload);
+            const result =
+              handleToUpdate == null
+                ? await this.genericService.create(
+                    entityHandle,
+                    row.payload,
+                    currentUser,
+                  )
+                : await this.genericService.update(
+                    entityHandle,
+                    handleToUpdate,
+                    row.payload,
+                    currentUser,
+                    [],
+                    {},
+                    { resolution: 'overwrite' },
+                  );
+            const targetReference = this.extractResultHandle(result);
+            const action = handleToUpdate == null ? 'created' : 'updated';
+
+            row.status = 'executed';
+            row.action = action;
+            row.targetReference =
+              targetReference == null ? null : String(targetReference);
+            row.message = null;
+
+            if (action === 'created') {
+              batch.createdCount += 1;
+            } else {
+              batch.updatedCount += 1;
+            }
+
+            await this.upsertExternalLink(batch, row);
+          } catch (error) {
+            row.status = 'failed';
+            row.action = 'failed';
+            row.message = getImportErrorMessage(error);
+            batch.failedCount += 1;
+          }
+
+          batch.processedCount += 1;
+          if (batch.processedCount % IMPORT_PROGRESS_FLUSH_INTERVAL === 0) {
+            await this.em.flush();
+          }
+        }
+
+        batch.executedAt = new Date();
+        batch.status =
+          batch.failedCount > 0 ? 'executedWithErrors' : 'executed';
+        batch.currentOperation = null;
+        batch.completedAt = new Date();
+        await this.em.flush();
+      } catch (error) {
+        await this.markBatchJobFailed(
+          handle,
+          'executionFailed',
+          'execution',
+          error,
+        );
+        throw error;
+      }
+    });
   }
 
   private async generateImportAiSuggestion(
@@ -1159,6 +1459,329 @@ export class ImportService {
     }
 
     return batch;
+  }
+
+  private async enqueueImportJob(
+    jobName: (typeof IMPORT_JOB_NAMES)[keyof typeof IMPORT_JOB_NAMES],
+    batchHandle: number,
+    userHandle: number,
+  ): Promise<void> {
+    const batch = await this.findBatch(batchHandle);
+
+    if (REDIS_ENABLED) {
+      const job = await this.importQueue.add(jobName, {
+        batchHandle,
+        userHandle,
+      });
+      batch.jobId = job?.id == null ? null : String(job.id);
+      await this.em.flush();
+      return;
+    }
+
+    batch.jobId = `local-${jobName}-${Date.now()}`;
+    await this.em.flush();
+
+    setTimeout(() => {
+      const promise =
+        jobName === IMPORT_JOB_NAMES.validate
+          ? this.processQueuedValidation(batchHandle, userHandle)
+          : this.processQueuedExecution(batchHandle, userHandle);
+
+      void promise.catch((error) => {
+        global.log?.error?.(
+          `Import background job failed: ${getImportErrorMessage(error)}`,
+        );
+      });
+    }, 0);
+  }
+
+  private async runInImportContext<T>(callback: () => Promise<T>): Promise<T> {
+    return RequestContext.create(this.em.fork(), callback);
+  }
+
+  private async findImportUser(userHandle: number): Promise<PersonItem> {
+    const currentUser = await this.em.findOne(PersonItem, {
+      handle: userHandle,
+    });
+
+    if (!currentUser) {
+      throw new BadRequestException('global.currentUserRequired');
+    }
+
+    return currentUser;
+  }
+
+  private async markBatchJobFailed(
+    handle: number,
+    status: 'validationFailed' | 'executionFailed',
+    operation: 'validation' | 'execution',
+    error: unknown,
+  ): Promise<void> {
+    const batch = await this.findBatch(handle);
+    batch.status = status;
+    batch.currentOperation = operation;
+    batch.failedAt = new Date();
+    batch.completedAt = null;
+    batch.lastError = getImportErrorMessage(error);
+    await this.em.flush();
+  }
+
+  private isImportBatchBusy(status: string): boolean {
+    return [
+      'validationQueued',
+      'validating',
+      'executionQueued',
+      'executing',
+    ].includes(status);
+  }
+
+  private createConfigureDtoFromBatch(
+    batch: ImportBatchItem,
+  ): ConfigureImportBatchDto {
+    const mapping = this.normalizeRecord(batch.mapping) ?? {};
+
+    return {
+      entityHandle: this.normalizeRequiredString(
+        this.extractHandle(batch.targetEntity),
+      ),
+      sourceHandle: this.extractHandle(batch.source),
+      templateHandle: this.extractNumericHandle(batch.importTemplate),
+      keyColumns: this.normalizeColumns(batch.externalKeyColumns ?? []),
+      mappings: this.asImportRecordArray<ImportFieldMappingDto>(
+        mapping.mappings,
+      ),
+      fieldDefaults: this.asImportRecordArray<ImportFieldDefaultDto>(
+        mapping.fieldDefaults,
+      ),
+      relationMappings: this.asImportRecordArray<ImportRelationMappingDto>(
+        mapping.relationMappings,
+      ),
+      valueMappings: this.asImportRecordArray<ImportValueMappingDto>(
+        mapping.valueMappings,
+      ),
+      genericReferenceMapping:
+        this.normalizeGenericReferenceMapping(batch.genericReferenceMapping) ??
+        null,
+    };
+  }
+
+  private asImportRecordArray<T>(value: unknown): T[] {
+    return Array.isArray(value)
+      ? (value.filter(
+          (entry) => entry && typeof entry === 'object',
+        ) as T[])
+      : [];
+  }
+
+  private normalizeGenericReferenceMapping(
+    value: unknown,
+  ): ImportGenericReferenceMappingDto | null {
+    const record = this.normalizeRecord(value);
+    if (!record) {
+      return null;
+    }
+
+    const entityHandle = this.normalizeOptionalString(record.entityHandle);
+    if (!entityHandle) {
+      return null;
+    }
+
+    return {
+      entityHandle,
+      sourceHandle: this.normalizeOptionalString(record.sourceHandle),
+      keyColumns: this.normalizeColumns(
+        Array.isArray(record.keyColumns) ? record.keyColumns : [],
+      ),
+    };
+  }
+
+  private resolveMatchSourceColumns(
+    batch: ImportBatchItem,
+    requestedColumns: string[] | undefined,
+  ): string[] {
+    const headers = this.normalizeColumns(batch.headers ?? []);
+    const requested = this.normalizeColumns(requestedColumns ?? []);
+
+    if (requested.length > 0) {
+      return requested.filter((column) => headers.includes(column));
+    }
+
+    const mapping = this.normalizeRecord(batch.mapping);
+    const mappedColumns = this.asImportRecordArray<ImportFieldMappingDto>(
+      mapping?.mappings,
+    )
+      .map((entry) => this.normalizeOptionalString(entry.sourceColumn))
+      .filter((entry): entry is string => Boolean(entry));
+
+    return mappedColumns.length > 0
+      ? Array.from(new Set(mappedColumns))
+      : headers;
+  }
+
+  private resolveMatchTargetFields(
+    entityHandle: string,
+    requestedFields: string[] | undefined,
+  ): string[] {
+    const template = this.templateService.getEntityTemplate(entityHandle);
+    const persistentScalarFields = template
+      .filter((field) => {
+        if (!field.name || field.isPersistent === false) {
+          return false;
+        }
+
+        if (['1:m', 'm:n', 'n:m', '1:1'].includes(field.kind ?? '')) {
+          return false;
+        }
+
+        return true;
+      })
+      .map((field) => field.name as string);
+    const requested = this.normalizeColumns(requestedFields ?? []);
+
+    if (requested.length > 0) {
+      return requested.filter((field) => persistentScalarFields.includes(field));
+    }
+
+    const preferredNames = new Set([
+      'handle',
+      'number',
+      'externalNumber',
+      'title',
+      'name',
+      'description',
+      'email',
+      'firstName',
+      'lastName',
+    ]);
+
+    return template
+      .filter(
+        (field) =>
+          field.name &&
+          persistentScalarFields.includes(field.name) &&
+          (field.options?.includes('isValue') || preferredNames.has(field.name)),
+      )
+      .map((field) => field.name as string);
+  }
+
+  private async resolveRowExternalLinkReference(
+    batch: ImportBatchItem,
+    row: ImportBatchRowItem,
+  ): Promise<string | null> {
+    if (!row.externalKeyHash) {
+      return null;
+    }
+
+    const link = await this.findRowExternalLink(batch, row);
+    return link?.reference ?? null;
+  }
+
+  private async findMatchCandidatesForRow(
+    entityHandle: string,
+    row: ImportBatchRowItem,
+    sourceColumns: string[],
+    targetFields: string[],
+    limitPerValue: number,
+    currentUser: PersonItem,
+  ): Promise<ImportMatchCandidateDto[]> {
+    const candidates = new Map<string, ImportMatchCandidateDto>();
+
+    for (const sourceColumn of sourceColumns) {
+      const value = this.normalizeScalarString(row.rawData[sourceColumn]);
+      if (value.length < 2) {
+        continue;
+      }
+
+      const filter = {
+        $or: targetFields.map((targetField) => ({
+          [targetField]: { $ilike: `%${value}%` },
+        })),
+      };
+      const result = await this.genericService.findAndCount(
+        entityHandle,
+        filter,
+        1,
+        limitPerValue,
+        {},
+        currentUser,
+        [],
+      );
+
+      for (const record of result.data) {
+        const reference = this.extractResultHandle(record);
+        if (reference == null) {
+          continue;
+        }
+
+        const key = String(reference);
+        const existing = candidates.get(key);
+        const confidence = this.calculateMatchConfidence(
+          record,
+          targetFields,
+          value,
+          result.meta.total,
+        );
+
+        if (!existing || confidence > existing.confidence) {
+          candidates.set(key, {
+            reference: key,
+            displayValue: this.buildMatchDisplayValue(
+              entityHandle,
+              record,
+            ),
+            confidence,
+            reason:
+              result.meta.total === 1
+                ? 'import.matchSingleValue'
+                : 'import.matchCandidate',
+          });
+        }
+      }
+    }
+
+    return [...candidates.values()]
+      .sort((left, right) => right.confidence - left.confidence)
+      .slice(0, limitPerValue);
+  }
+
+  private calculateMatchConfidence(
+    record: object,
+    targetFields: string[],
+    value: string,
+    totalMatches: number,
+  ): number {
+    const normalizedValue = value.toLocaleLowerCase();
+    const plainRecord = this.toPlainRecord(record);
+    const hasExactValue = targetFields.some((field) => {
+      const fieldValue = this.normalizeScalarString(plainRecord[field]);
+      return fieldValue.toLocaleLowerCase() === normalizedValue;
+    });
+
+    if (hasExactValue && totalMatches === 1) {
+      return 0.95;
+    }
+
+    if (hasExactValue) {
+      return 0.8;
+    }
+
+    return totalMatches === 1 ? 0.75 : 0.45;
+  }
+
+  private buildMatchDisplayValue(entityHandle: string, record: object): string {
+    const template = this.templateService.getEntityTemplate(entityHandle);
+    const plainRecord = this.toPlainRecord(record);
+    const valueField =
+      template.find((field) => field.options?.includes('isValue')) ??
+      template.find((field) => field.name === 'title') ??
+      template.find((field) => field.name === 'name') ??
+      template.find((field) => field.name === 'handle');
+    const value = valueField?.name
+      ? this.normalizeScalarString(plainRecord[valueField.name])
+      : '';
+    const handle = this.extractResultHandle(record);
+
+    return value || (handle == null ? '' : String(handle));
   }
 
   private async buildPayload(
@@ -1847,9 +2470,12 @@ export class ImportService {
     batch: ImportBatchItem,
     rows: ImportBatchRowItem[],
   ): ImportBatchSummaryDto {
+    const resultSummary = this.toBatchResultSummary(batch);
+
     return {
       handle: batch.handle ?? null,
       status: batch.status,
+      currentOperation: batch.currentOperation ?? null,
       filename: batch.filename,
       mimetype: batch.mimetype ?? null,
       fileSize: batch.fileSize ?? null,
@@ -1857,6 +2483,7 @@ export class ImportService {
       entityHandle: this.extractHandle(batch.targetEntity),
       templateHandle: this.extractNumericHandle(batch.importTemplate),
       rowCount: batch.rowCount ?? rows.length,
+      processedCount: batch.processedCount,
       readyCount: batch.readyCount,
       errorCount: batch.errorCount,
       createdCount: batch.createdCount,
@@ -1869,10 +2496,31 @@ export class ImportService {
       mapping: batch.mapping ?? null,
       externalKeyColumns: batch.externalKeyColumns ?? null,
       genericReferenceMapping: batch.genericReferenceMapping ?? null,
+      jobId: batch.jobId ?? null,
+      startedAt: batch.startedAt ?? null,
       executedAt: batch.executedAt ?? null,
+      completedAt: batch.completedAt ?? null,
+      failedAt: batch.failedAt ?? null,
+      lastError: batch.lastError ?? null,
       createdAt: batch.createdAt ?? null,
       updatedAt: batch.updatedAt ?? null,
+      resultSummary,
       rows: rows.map((row) => this.toBatchRowSummary(row)),
+    };
+  }
+
+  private toBatchResultSummary(
+    batch: ImportBatchItem,
+  ): ImportBatchResultSummaryDto {
+    return {
+      totalRows: batch.rowCount ?? 0,
+      processedRows: batch.processedCount ?? 0,
+      readyRows: batch.readyCount ?? 0,
+      errorRows: batch.errorCount ?? 0,
+      createdRows: batch.createdCount ?? 0,
+      updatedRows: batch.updatedCount ?? 0,
+      skippedRows: batch.skippedCount ?? 0,
+      failedRows: batch.failedCount ?? 0,
     };
   }
 

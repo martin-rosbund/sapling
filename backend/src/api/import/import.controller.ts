@@ -24,6 +24,8 @@ import type {
   ImportAiSuggestionDto,
   ImportBatchErrorRowsDto,
   ImportBatchSummaryDto,
+  ImportMatchRequestDto,
+  ImportMatchResponseDto,
   ImportTemplateSummaryDto,
   SaveImportTemplateDto,
 } from './import.types';
@@ -72,6 +74,19 @@ export class ImportController {
     @Param('handle') handle: number,
   ): Promise<ImportBatchErrorRowsDto> {
     return this.importService.getBatchErrorRows(Number(handle));
+  }
+
+  @Post('batches/:handle/match')
+  async matchBatchExistingRecords(
+    @Req() req: Request & { user: PersonItem },
+    @Param('handle') handle: number,
+    @Body() body: ImportMatchRequestDto,
+  ): Promise<ImportMatchResponseDto> {
+    return this.importService.matchBatchExistingRecords(
+      Number(handle),
+      body,
+      req.user,
+    );
   }
 
   @Get('templates')

@@ -88,6 +88,33 @@ describe('useSaplingDialogEditRelations', () => {
     expect(relations.relationTableTotal.value.notes).toBe(1)
   })
 
+  it('loads relation table rows in readonly mode for persisted records', async () => {
+    const relations = createRelations({ mode: 'readonly' })
+    await relations.initializeRelationTables()
+
+    await relations.ensureRelationTableItems('notes')
+
+    expect(apiFindMock).toHaveBeenCalledTimes(1)
+    expect(apiFindMock).toHaveBeenCalledWith(
+      'note',
+      expect.objectContaining({
+        filter: { ticket: 42 },
+        page: 1,
+      }),
+    )
+  })
+
+  it('does not load relation table rows while creating a new record', async () => {
+    const relations = createRelations({ mode: 'create' })
+    await relations.initializeRelationTables()
+
+    await relations.ensureRelationTableItems('notes')
+
+    expect(apiFindMock).not.toHaveBeenCalled()
+    expect(relations.relationTableItems.value.notes).toEqual([])
+    expect(relations.relationTableTotal.value.notes).toBe(0)
+  })
+
   it('ignores stale relation responses after item changes reset the table state', async () => {
     const relations = createRelations()
     const deferred = createDeferred<{ data: SaplingGenericItem[]; meta: { total: number } }>()
@@ -109,10 +136,10 @@ describe('useSaplingDialogEditRelations', () => {
   })
 })
 
-function createRelations() {
+function createRelations(overrides: { mode?: DialogState } = {}) {
   const entity = ref({ handle: 'ticket' } as EntityItem)
   const item = ref({ handle: 42 } as SaplingGenericItem)
-  const mode = ref<DialogState>('edit')
+  const mode = ref<DialogState>(overrides.mode ?? 'edit')
   const permissions = ref<AccumulatedPermission[] | null>([
     { entityHandle: 'note', allowRead: true } as AccumulatedPermission,
     { entityHandle: 'event', allowRead: true } as AccumulatedPermission,
