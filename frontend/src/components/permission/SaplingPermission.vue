@@ -199,8 +199,16 @@
         :selected-role-members="selectedRoleMembers"
         @add-persons="onAddPersons"
         @remove-person="onRemovePerson"
+        @import-provider-users="openProviderImportDialog"
       />
     </section>
+
+    <SaplingPermissionProviderUserImportDialog
+      v-model="providerImportDialogVisible"
+      :roles="roles"
+      :selected-role="selectedRole"
+      @imported="onProviderUsersImported"
+    />
 
     <SaplingDialogDelete
       v-if="deleteDialog.visible"
@@ -219,13 +227,17 @@ import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
 import { useSaplingPermission } from '@/composables/account/useSaplingPermission'
 import SaplingPermissionMembersPanel from '@/components/permission/SaplingPermissionMembersPanel.vue'
 import SaplingPermissionOverview from '@/components/permission/SaplingPermissionOverview.vue'
+import SaplingPermissionProviderUserImportDialog from '@/components/permission/SaplingPermissionProviderUserImportDialog.vue'
 import SaplingPermissionRoleSidebar from '@/components/permission/SaplingPermissionRoleSidebar.vue'
 import SaplingPermissionWorkspace from '@/components/permission/SaplingPermissionWorkspace.vue'
+import { ref } from 'vue'
 import type { EntityItem, PersonItem } from '@/entity/entity'
+import type { ProviderUserImportResponse } from '@/services/api.provider-users.service'
 
 type PermissionColumnKey = 'allowShow' | 'allowRead' | 'allowInsert' | 'allowUpdate' | 'allowDelete'
 
 const {
+  roles,
   roleSearch,
   filteredRoles,
   selectedRole,
@@ -252,6 +264,7 @@ const {
   savePermissionChanges,
   resetPermissionChanges,
   handleAddSelectedPersonsToRole,
+  refreshPermissionMembers,
   openDeleteDialog,
   updateDeleteDialogVisibility,
   cancelRemovePersonFromRole,
@@ -263,6 +276,8 @@ const {
   isPermissionPending,
   getRoleMemberCount,
 } = useSaplingPermission()
+
+const providerImportDialogVisible = ref(false)
 
 function canUsePermission(item: EntityItem, permissionType: PermissionColumnKey) {
   switch (permissionType) {
@@ -317,6 +332,14 @@ function onRemovePerson(person: PersonItem) {
   }
 
   openDeleteDialog(person, selectedRole.value)
+}
+
+function openProviderImportDialog() {
+  providerImportDialogVisible.value = true
+}
+
+async function onProviderUsersImported(_result: ProviderUserImportResponse) {
+  await refreshPermissionMembers()
 }
 
 function getRoleInitial(title: string) {

@@ -171,7 +171,11 @@ export type ImportBatchResultSummaryDto = {
   failedRows: number;
 };
 
-export type ImportMatchRecommendedAction = 'create' | 'update' | 'ambiguous' | 'error';
+export type ImportMatchRecommendedAction =
+  | 'create'
+  | 'update'
+  | 'ambiguous'
+  | 'error';
 
 export type ImportMatchCandidateDto = {
   reference: string;

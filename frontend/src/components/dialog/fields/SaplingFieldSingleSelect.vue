@@ -77,6 +77,7 @@ import { useSaplingSingleSelectField } from '@/composables/fields/useSaplingSing
 import { useSaplingReferenceFilter } from '@/composables/fields/useSaplingReferenceFilter'
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants'
 import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service'
+import { useGenericStore } from '@/stores/genericStore'
 // #endregion
 
 // #region Props and Emits
@@ -128,6 +129,7 @@ const { selectedItem, menuOpen } = useSaplingSingleSelectField(props)
 const { combineFilters, normalizeFilter, areFiltersEqual } = useSaplingReferenceFilter()
 const fieldSearch = ref('')
 const autocompleteItems = ref<SaplingGenericItem[]>([])
+const genericStore = useGenericStore()
 // #endregion
 
 // #region Selection State
@@ -231,6 +233,16 @@ watch(
   { immediate: true, deep: true },
 )
 
+watch(
+  () => [props.entityHandle, selectedItem.value?.handle, props.placeholder] as const,
+  () => {
+    if (selectedItem.value || props.placeholder) {
+      void ensureEntityMetadataLoaded()
+    }
+  },
+  { immediate: true },
+)
+
 watch(menuOpen, async (isOpen) => {
   if (!isOpen) {
     return
@@ -282,5 +294,13 @@ function resolveSaplingItem(item: unknown): SaplingGenericItem | null {
   }
 
   return item as SaplingGenericItem
+}
+
+async function ensureEntityMetadataLoaded() {
+  if (!props.entityHandle || entityTemplates.value.length > 0) {
+    return
+  }
+
+  await genericStore.loadGeneric(props.entityHandle, 'global', 'filter', 'exception')
 }
 </script>

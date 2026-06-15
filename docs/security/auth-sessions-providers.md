@@ -61,6 +61,13 @@ GET /api/auth/google/login
 GET /api/auth/google/callback
 ```
 
+Provider user import for administrators:
+
+```text
+GET /api/auth/provider-users?provider=azure|google&search=&pageToken=
+POST /api/auth/provider-users/import
+```
+
 Logout:
 
 ```text
@@ -123,6 +130,13 @@ Credential IDs and public keys are marked as security fields and are stripped fr
 2. Create person if missing and a matching `PersonTypeItem` exists.
 3. Create or update `PersonSessionItem` with access and refresh tokens.
 4. Return the current-user profile.
+
+Administrator provider import uses the current administrator's own Azure or Google session to read the provider directory. It creates or updates `PersonItem` records without storing provider tokens for imported people. The imported person's `loginName` is the external provider user ID, so a later OAuth login links back to the same Sapling person. Existing people are matched by provider ID first and email second; selected roles are added without removing existing roles. When a company is selected in the import dialog, Sapling assigns it to created people and updates existing imported people to that company.
+
+Provider directory requirements:
+
+- Azure imports call Microsoft Graph `/users` and require directory-read scopes such as `User.ReadBasic.All` or `User.Read.All` in `AZURE_AD_SCOPE`.
+- Google imports call Google Workspace Admin SDK Directory `users.list` with `customer=my_customer` and require a scope such as `https://www.googleapis.com/auth/admin.directory.user.readonly` in `GOOGLE_SCOPE`. The signed-in Google account must have enough Workspace directory permission.
 
 ## Bearer API Tokens
 

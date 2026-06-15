@@ -370,9 +370,11 @@ describe('CurrentController', () => {
     );
   });
 
-  it('returns all entity permissions for the current user', () => {
+  it('returns all entity permissions for the current user', async () => {
     const permissions = [{ entityHandle: 'ticket' }];
+    const hydratedUser = { handle: 7, roles: [] };
     const currentService = {
+      getPerson: jest.fn(async () => hydratedUser),
       getAllEntityPermissions: jest.fn(() => permissions),
     };
     const controller = new CurrentController(
@@ -382,15 +384,20 @@ describe('CurrentController', () => {
     );
     const req = { user: createMockUser() };
 
-    expect(controller.getAllEntityPermissions(req as never)).toBe(permissions);
+    await expect(
+      controller.getAllEntityPermissions(req as never),
+    ).resolves.toBe(permissions);
+    expect(asMock(currentService.getPerson)).toHaveBeenCalledWith(req.user);
     expect(asMock(currentService.getAllEntityPermissions)).toHaveBeenCalledWith(
-      req.user,
+      hydratedUser,
     );
   });
 
-  it('returns permissions for a specific entity', () => {
+  it('returns permissions for a specific entity', async () => {
     const permission = { entityHandle: 'ticket' };
+    const hydratedUser = { handle: 7, roles: [] };
     const currentService = {
+      getPerson: jest.fn(async () => hydratedUser),
       getEntityPermissions: jest.fn(() => permission),
     };
     const controller = new CurrentController(
@@ -400,25 +407,26 @@ describe('CurrentController', () => {
     );
     const req = { user: createMockUser() };
 
-    expect(controller.getEntityPermission(req as never, 'ticket')).toBe(
-      permission,
-    );
+    await expect(
+      controller.getEntityPermission(req as never, 'ticket'),
+    ).resolves.toBe(permission);
+    expect(asMock(currentService.getPerson)).toHaveBeenCalledWith(req.user);
     expect(asMock(currentService.getEntityPermissions)).toHaveBeenCalledWith(
-      req.user,
+      hydratedUser,
       'ticket',
     );
   });
 
-  it('rejects entity permission lookups without an entity handle', () => {
+  it('rejects entity permission lookups without an entity handle', async () => {
     const controller = new CurrentController(
       {} as never,
       {} as never,
       {} as never,
     );
 
-    expect(() =>
+    await expect(
       controller.getEntityPermission({ user: createMockUser() } as never, ''),
-    ).toThrow(new BadRequestException('global.entityHandleRequired'));
+    ).rejects.toThrow(new BadRequestException('global.entityHandleRequired'));
   });
 
   it('returns the configured work week for the current user', async () => {
@@ -439,14 +447,16 @@ describe('CurrentController', () => {
 });
 
 describe('TemplateController', () => {
-  it('returns entity template metadata', () => {
+  it('returns entity template metadata', async () => {
     const template = [{ property: 'name' }];
     const templateService = {
       getEntityTemplate: jest.fn(() => template),
     };
     const controller = new TemplateController(templateService as never);
 
-    expect(controller.getEntityTemplate('ticket')).toBe(template);
+    await expect(controller.getEntityTemplate('ticket')).resolves.toBe(
+      template,
+    );
     expect(asMock(templateService.getEntityTemplate)).toHaveBeenCalledWith(
       'ticket',
     );

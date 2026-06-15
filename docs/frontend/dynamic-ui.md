@@ -117,6 +117,20 @@ Selection examples:
 
 If a new field behavior is generally useful, add a Sapling option and renderer branch rather than special-casing one entity.
 
+### Reference Field Components
+
+Reference fields should use the existing Sapling field components instead of raw Vuetify selects:
+
+| Use case | Component |
+| --- | --- |
+| one related record | `frontend/src/components/dialog/fields/SaplingFieldSingleSelect.vue` |
+| multiple related records | `frontend/src/components/dialog/fields/SaplingFieldSelect.vue` |
+| select and add to a collection | `SaplingFieldSingleSelectAdd.vue` or `SaplingFieldSelectAdd.vue` |
+
+These components open a Sapling table inside the menu and derive display labels from the target entity's `isValue` templates. Do not guess label fields such as `title`, `name`, or `displayName` in custom code. If a selected reference value displays only its handle, the target entity metadata has not been loaded early enough; fix the field/component lifecycle so the metadata loads, then let `getEntityValueLabel()` use the templates.
+
+When a custom workflow needs an initial selected reference, pass the full item when available and ensure the target entity metadata can load before the user opens the menu. The fallback to handles is intentional for unknown metadata and should not be hidden with hard-coded field-name guesses.
+
 Active custom field definitions are appended to the same template metadata as
 generated fields named `customFields.<fieldKey>`. The edit dialog renders the
 supported primitive/select custom field types with the normal field renderer
@@ -167,6 +181,9 @@ Dialog files live under:
 ```text
 frontend/src/components/dialog/
 frontend/src/composables/dialog/
+frontend/src/components/actions/
+frontend/src/components/common/SaplingDialogShell.vue
+frontend/src/components/dialog/SaplingDialogCard.vue
 ```
 
 Dialogs use:
@@ -176,6 +193,29 @@ Dialogs use:
 - generic API for create/update/delete
 - reference metadata for relation selectors
 - Sapling options for specialized fields
+
+Custom dialogs should follow the shared shell pattern:
+
+1. `v-dialog` with one of the size classes such as `sapling-dialog-small`, `sapling-dialog-medium`, or `sapling-dialog-large`.
+2. `SaplingDialogCard` as the card surface.
+3. `SaplingDialogShell` with `#hero`, `#body`, and `#actions` slots.
+4. `SaplingDialogHero` for dialog title/stats/loading states when a hero is needed.
+5. Framework scroll classes for constrained content: `sapling-dialog-fill-body`, `sapling-dialog-fill-content`, and `sapling-scrollable`.
+6. Existing action components from `frontend/src/components/actions/` in the `#actions` slot.
+
+Do not hand-roll dialog footers with ad hoc `<div class="sapling-dialog-actions">` blocks. Use the action components so spacing, mobile behavior, icons, and button ordering stay consistent:
+
+| Dialog action pattern | Component |
+| --- | --- |
+| close only | `SaplingActionClose` |
+| cancel + save | `SaplingActionSave` |
+| account/preferences save | `SaplingActionAccount` |
+| password change | `SaplingActionChangePassword` |
+| delete confirmation | `SaplingActionDelete` |
+| upload | `SaplingActionUpload` |
+| custom action grouping | `SaplingActionBar` with leading/trailing slots |
+
+If none of the existing action components fit, add or extend an action component first and then use it from the dialog. This keeps footer behavior centralized instead of duplicating button layout in each custom dialog.
 
 ## Context Menus And Script Buttons
 

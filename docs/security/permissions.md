@@ -149,6 +149,19 @@ frontend/src/components/permission/
 
 Frontend checks are for UX only. Backend guards remain authoritative.
 
+## Provider User Import
+
+The permission management page can import Azure or Google directory users into Sapling persons.
+
+Backend endpoints:
+
+```text
+GET /api/auth/provider-users?provider=azure|google&search=&pageToken=
+POST /api/auth/provider-users/import
+```
+
+These endpoints require an authenticated administrator. The current administrator must be signed in with the same provider being imported because Sapling uses that user's `PersonSessionItem` access or refresh token to query Microsoft Graph or Google Workspace Admin SDK. Imported people are active by default, receive the selected roles, can optionally be assigned to a selected company, and do not receive provider tokens until they sign in themselves.
+
 ## MCP And Service Accounts
 
 Internal MCP tools run with the authenticated Sapling user.

@@ -14,6 +14,15 @@
           </p>
           <h2 class="sapling-section-title">{{ $t('role.membersTitle') }}</h2>
         </div>
+        <v-btn
+          variant="tonal"
+          color="primary"
+          prepend-icon="mdi-account-multiple-plus-outline"
+          :disabled="!selectedRole || membersArePending"
+          @click="emit('importProviderUsers')"
+        >
+          {{ $t('providerUserImport.open') }}
+        </v-btn>
       </div>
 
       <SaplingFieldSelectAdd
@@ -94,6 +103,7 @@ defineProps<{
 const emit = defineEmits<{
   (event: 'addPersons', persons: PersonItem[]): void
   (event: 'removePerson', person: PersonItem): void
+  (event: 'importProviderUsers'): void
 }>()
 
 const currentPersonStore = useCurrentPersonStore()

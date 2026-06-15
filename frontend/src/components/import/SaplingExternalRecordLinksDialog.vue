@@ -58,7 +58,12 @@
                     <strong>{{ sourceLabel(link) }}</strong>
                   </div>
 
-                  <v-chip size="small" color="primary" variant="tonal" prepend-icon="mdi-link-variant">
+                  <v-chip
+                    size="small"
+                    color="primary"
+                    variant="tonal"
+                    prepend-icon="mdi-link-variant"
+                  >
                     {{ translate('externalRecordLink.linkedByImport', 'Per Import verknüpft') }}
                   </v-chip>
                 </header>
@@ -189,7 +194,9 @@ const recordTitle = computed(() => {
     return label
   }
 
-  return props.entityHandle ? t(`navigation.${props.entityHandle}`) : t('externalRecordLink.dialogEyebrow')
+  return props.entityHandle
+    ? t(`navigation.${props.entityHandle}`)
+    : t('externalRecordLink.dialogEyebrow')
 })
 
 const heroStats = computed(() => [

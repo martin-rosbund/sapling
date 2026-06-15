@@ -157,7 +157,9 @@
               density="comfortable"
               prepend-inner-icon="mdi-key"
               :label="$t('import.externalKeyColumns')"
-              :disabled="!genericReferenceEntityHandle || !selectedSourceHandle || isImportJobRunning"
+              :disabled="
+                !genericReferenceEntityHandle || !selectedSourceHandle || isImportJobRunning
+              "
               autocomplete="off"
               counter
               @update:model-value="normalizeGenericReferenceKeyColumns"
@@ -328,19 +330,18 @@
           density="comfortable"
           class="sapling-import__job-status"
         >
-          <div class="sapling-stack-sm">
-            <strong>{{ currentImportStatusLabel }}</strong>
+          <div class="sapling-import__job-status-content">
+            <div class="sapling-import__job-status-header">
+              <strong>{{ currentImportStatusLabel }}</strong>
+              <span>{{ importProgressLabel }}</span>
+            </div>
             <v-progress-linear
+              class="sapling-import__job-progress"
               :model-value="importProgressPercent"
               height="8"
               rounded
               color="primary"
             />
-            <span>
-              {{
-                importProgressLabel
-              }}
-            </span>
           </div>
         </v-alert>
 
@@ -642,6 +643,7 @@ const IMPORT_ERROR_REPORT_DELIMITER = ';'
 const IMPORT_ERROR_REPORT_BOM = '\uFEFF'
 const IMPORT_REQUIRED_FIELDS_MISSING_PREFIX = 'import.requiredFieldsMissing:'
 const IMPORT_INVALID_DATE_VALUES_PREFIX = 'import.invalidDateValues:'
+const IMPORT_VALUE_MAPPING_MISSING_PREFIX = 'import.valueMappingMissing:'
 const IMPORT_POLL_INTERVAL_MS = 2000
 const IMPORT_RUNNING_STATUSES = new Set([
   'validationQueued',
@@ -1088,7 +1090,7 @@ function initializeMappings(): void {
       (header) => normalizeName(header) === normalizeName(field.name),
     )
     fieldMappings[field.name] = matchedHeader ?? null
-    fieldDefaults[field.name] = matchedHeader ? null : getTemplateDefaultValue(field)
+    fieldDefaults[field.name] = getTemplateDefaultValue(field)
     if (field.isReference && field.referenceName) {
       relationMappingModes[field.name] = null
       relationMappingColumns[field.name] = []
@@ -1553,9 +1555,6 @@ function applyMappingConfiguration(mappingConfiguration: ImportMappingConfigurat
     fieldMappings[mapping.targetField] = headerOptions.value.includes(mapping.sourceColumn)
       ? mapping.sourceColumn
       : null
-    if (fieldMappings[mapping.targetField]) {
-      fieldDefaults[mapping.targetField] = null
-    }
   }
 
   for (const fieldDefault of mappingConfiguration?.fieldDefaults ?? []) {
@@ -1917,7 +1916,27 @@ function importMessageLabel(message: string | null | undefined): string {
     return fields ? t('import.invalidDateValues', { fields }) : t('import.invalidDateValue')
   }
 
+  if (message.startsWith(IMPORT_VALUE_MAPPING_MISSING_PREFIX)) {
+    const [fieldName = '', sourceValue = ''] = message
+      .slice(IMPORT_VALUE_MAPPING_MISSING_PREFIX.length)
+      .split(':')
+      .map(decodeImportMessagePart)
+    const field = fieldName ? fieldLabel(fieldName) : t('import.valueMapping')
+
+    return sourceValue
+      ? t('import.valueMappingMissingWithDetails', { field, value: sourceValue })
+      : t('import.valueMappingMissing')
+  }
+
   return te(message) ? t(message) : message
+}
+
+function decodeImportMessagePart(value: string): string {
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
 }
 
 function aiSuggestionReason(targetField: string): string {
@@ -1949,3 +1968,58 @@ function normalizeName(value: string): string {
     .replace(/[^a-z0-9]/g, '')
 }
 </script>
+
+<style scoped>
+.sapling-import__job-status {
+  min-height: 76px;
+  overflow: visible;
+}
+
+.sapling-import__job-status :deep(.v-alert__content) {
+  min-width: 0;
+  padding-block: 2px;
+  overflow: visible;
+}
+
+.sapling-import__job-status-content {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.sapling-import__job-status-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 16px;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.sapling-import__job-status-header strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.sapling-import__job-status-header span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  opacity: 0.82;
+}
+
+.sapling-import__job-progress {
+  align-self: stretch;
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .sapling-import__job-status {
+    min-height: 88px;
+  }
+
+  .sapling-import__job-status-header {
+    display: grid;
+  }
+}
+</style>

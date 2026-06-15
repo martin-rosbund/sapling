@@ -122,6 +122,14 @@ Key dynamic systems:
 - `frontend/src/components/dialog/SaplingDialogEditFieldRenderer.vue`: chooses field components based on template metadata.
 - `frontend/src/composables/table/useSaplingTable.ts`: table behavior.
 
+Custom workflow dialogs should still use Sapling's shared UI building blocks:
+
+- `SaplingDialogCard`, `SaplingDialogShell`, and `SaplingDialogHero` for dialog structure.
+- `frontend/src/components/actions/*` components for dialog footers such as close/cancel/save.
+- `SaplingFieldSingleSelect` and `SaplingFieldSelect` for reference fields instead of raw Vuetify dropdowns.
+
+Reference labels come from target entity metadata and `isValue` templates. Do not guess display fields in custom frontend code; load the target entity metadata early enough for the shared field components to resolve labels.
+
 ## Adding A New Entity
 
 Typical backend work:

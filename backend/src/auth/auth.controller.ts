@@ -43,6 +43,7 @@ import {
   ApiTokenResponseDto,
   ApiTokenSecretResponseDto,
 } from './dto/api-token-response.dto';
+import { AuthProviderUserImportService } from './auth-provider-user-import.service';
 import {
   BeginPasskeyRegistrationDto,
   LocalLoginPasskeyChallengeResponseDto,
@@ -51,6 +52,12 @@ import {
   VerifyPasskeyAuthenticationDto,
   VerifyPasskeyRegistrationDto,
 } from './dto/passkey.dto';
+import {
+  ImportProviderUsersDto,
+  ListProviderUsersQueryDto,
+  ProviderUserImportResponseDto,
+  ProviderUserListResponseDto,
+} from './dto/provider-user.dto';
 import {
   GenericPermission,
   GenericPermissionEntity,
@@ -101,6 +108,7 @@ type PasskeySessionData = {
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
+    private readonly providerUserImportService: AuthProviderUserImportService,
     private readonly authPasskeyService?: AuthPasskeyService,
   ) {}
 
@@ -582,6 +590,71 @@ export class AuthController {
     }
 
     return this.getPasskeyService().deletePasskey(req.user, passkeyHandle);
+  }
+
+  @Get('provider-users')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'List external provider users',
+    description:
+      'Administrators can list Azure or Google directory users using their own provider session.',
+  })
+  @ApiQuery({ name: 'provider', enum: ['azure', 'google'] })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'pageToken', required: false, type: String })
+  @ApiResponse({
+    status: 200,
+    description: 'Provider directory users',
+    type: ProviderUserListResponseDto,
+  })
+  @UseGuards(SessionOrBearerAuthGuard, AdminPermissionGuard)
+  listProviderUsers(
+    @Req() req: Request & { user: PersonItem },
+    @Query() query: ListProviderUsersQueryDto,
+  ): Promise<ProviderUserListResponseDto> {
+    if (query.provider !== 'azure' && query.provider !== 'google') {
+      throw new BadRequestException('providerUserImport.invalidProvider');
+    }
+
+    return this.providerUserImportService.listProviderUsers(
+      req.user,
+      query.provider,
+      {
+        search: query.search,
+        pageToken: query.pageToken,
+      },
+    );
+  }
+
+  @Post('provider-users/import')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Import external provider users',
+    description:
+      'Administrators can create or update Sapling persons from Azure or Google directory users and assign roles.',
+  })
+  @ApiBody({ type: ImportProviderUsersDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Provider user import result',
+    type: ProviderUserImportResponseDto,
+  })
+  @UseGuards(SessionOrBearerAuthGuard, AdminPermissionGuard)
+  importProviderUsers(
+    @Req() req: Request & { user: PersonItem },
+    @Body() dto: ImportProviderUsersDto,
+  ): Promise<ProviderUserImportResponseDto> {
+    if (dto.provider !== 'azure' && dto.provider !== 'google') {
+      throw new BadRequestException('providerUserImport.invalidProvider');
+    }
+    if (!Array.isArray(dto.userIds) || dto.userIds.length === 0) {
+      throw new BadRequestException('providerUserImport.usersRequired');
+    }
+    if (!Array.isArray(dto.roleHandles) || dto.roleHandles.length === 0) {
+      throw new BadRequestException('providerUserImport.rolesRequired');
+    }
+
+    return this.providerUserImportService.importProviderUsers(req.user, dto);
   }
 
   /**

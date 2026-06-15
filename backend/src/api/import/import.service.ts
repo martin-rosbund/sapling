@@ -198,7 +198,10 @@ export class ImportService {
   ): Promise<ImportMatchResponseDto> {
     const entityHandle = this.normalizeRequiredString(dto.entityHandle);
     const batch = await this.findBatch(handle);
-    const sourceColumns = this.resolveMatchSourceColumns(batch, dto.sourceColumns);
+    const sourceColumns = this.resolveMatchSourceColumns(
+      batch,
+      dto.sourceColumns,
+    );
     const targetFields = this.resolveMatchTargetFields(
       entityHandle,
       dto.targetFields,
@@ -287,7 +290,9 @@ export class ImportService {
       responseRows.push({
         rowNumber: row.rowNumber,
         recommendedAction: 'ambiguous' as const,
-        confidence: Math.max(...candidates.map((candidate) => candidate.confidence)),
+        confidence: Math.max(
+          ...candidates.map((candidate) => candidate.confidence),
+        ),
         matchedReference: null,
         candidates,
         reason: 'import.matchAmbiguous',
@@ -789,9 +794,7 @@ export class ImportService {
 
             if (missingRequiredFields.length > 0) {
               throw new Error(
-                this.createRequiredFieldsMissingMessage(
-                  missingRequiredFields,
-                ),
+                this.createRequiredFieldsMissingMessage(missingRequiredFields),
               );
             }
 
@@ -822,8 +825,7 @@ export class ImportService {
 
         batch.readyCount = readyCount;
         batch.errorCount = errorCount;
-        batch.status =
-          errorCount > 0 ? 'validatedWithErrors' : 'validated';
+        batch.status = errorCount > 0 ? 'validatedWithErrors' : 'validated';
         batch.currentOperation = null;
         batch.completedAt = new Date();
         await this.em.flush();
@@ -839,7 +841,10 @@ export class ImportService {
     });
   }
 
-  async processQueuedExecution(handle: number, userHandle: number): Promise<void> {
+  async processQueuedExecution(
+    handle: number,
+    userHandle: number,
+  ): Promise<void> {
     await this.runInImportContext(async () => {
       const batch = await this.findBatch(handle);
 
@@ -1500,9 +1505,21 @@ export class ImportService {
   }
 
   private async findImportUser(userHandle: number): Promise<PersonItem> {
-    const currentUser = await this.em.findOne(PersonItem, {
-      handle: userHandle,
-    });
+    const currentUser = await this.em.findOne(
+      PersonItem,
+      {
+        handle: userHandle,
+      },
+      {
+        populate: [
+          'company',
+          'roles',
+          'roles.stage',
+          'roles.permissions',
+          'roles.permissions.entity',
+        ],
+      },
+    );
 
     if (!currentUser) {
       throw new BadRequestException('global.currentUserRequired');
@@ -1567,9 +1584,7 @@ export class ImportService {
 
   private asImportRecordArray<T>(value: unknown): T[] {
     return Array.isArray(value)
-      ? (value.filter(
-          (entry) => entry && typeof entry === 'object',
-        ) as T[])
+      ? (value.filter((entry) => entry && typeof entry === 'object') as T[])
       : [];
   }
 
@@ -1639,7 +1654,9 @@ export class ImportService {
     const requested = this.normalizeColumns(requestedFields ?? []);
 
     if (requested.length > 0) {
-      return requested.filter((field) => persistentScalarFields.includes(field));
+      return requested.filter((field) =>
+        persistentScalarFields.includes(field),
+      );
     }
 
     const preferredNames = new Set([
@@ -1659,7 +1676,8 @@ export class ImportService {
         (field) =>
           field.name &&
           persistentScalarFields.includes(field.name) &&
-          (field.options?.includes('isValue') || preferredNames.has(field.name)),
+          (field.options?.includes('isValue') ||
+            preferredNames.has(field.name)),
       )
       .map((field) => field.name as string);
   }
@@ -1725,10 +1743,7 @@ export class ImportService {
         if (!existing || confidence > existing.confidence) {
           candidates.set(key, {
             reference: key,
-            displayValue: this.buildMatchDisplayValue(
-              entityHandle,
-              record,
-            ),
+            displayValue: this.buildMatchDisplayValue(entityHandle, record),
             confidence,
             reason:
               result.meta.total === 1
@@ -1837,10 +1852,8 @@ export class ImportService {
       const targetField = this.normalizeOptionalString(
         fieldDefault.targetField,
       );
-      if (
-        !targetField ||
-        !template.some((field) => field.name === targetField)
-      ) {
+      const field = template.find((field) => field.name === targetField);
+      if (!targetField || !field) {
         continue;
       }
 
@@ -1849,8 +1862,25 @@ export class ImportService {
         continue;
       }
 
-      payload[targetField] = fieldDefault.value;
+      payload[targetField] = this.normalizeFieldDefaultValue(
+        field,
+        fieldDefault.value,
+      );
     }
+  }
+
+  private normalizeFieldDefaultValue(
+    field: EntityTemplateDto,
+    value: unknown,
+  ): unknown {
+    const normalizedValue =
+      field.isReference && value && typeof value === 'object'
+        ? ((value as Record<string, unknown>).handle ?? value)
+        : value;
+
+    return normalizeImportRow([field], {
+      [field.name]: normalizedValue,
+    })[field.name];
   }
 
   private applyCurrentPersonDefaults(
@@ -2132,8 +2162,7 @@ export class ImportService {
         return '';
       case 'error':
         throw new BadRequestException(
-          'import.valueMappingMissing',
-          targetField,
+          this.createValueMappingMissingMessage(targetField, sourceKey),
         );
       case 'keep':
       default:
@@ -2154,8 +2183,22 @@ export class ImportService {
     try {
       return await this.resolveValueReference(field.referenceName, value);
     } catch {
-      throw new BadRequestException('import.valueMappingMissing');
+      throw new BadRequestException(
+        this.createValueMappingMissingMessage(
+          targetField,
+          this.normalizeValueMappingKey(value),
+        ),
+      );
     }
+  }
+
+  private createValueMappingMissingMessage(
+    targetField: string,
+    sourceValue: string,
+  ): string {
+    const encodedTargetField = encodeURIComponent(targetField.trim());
+    const encodedSourceValue = encodeURIComponent(sourceValue.trim());
+    return `import.valueMappingMissing:${encodedTargetField}:${encodedSourceValue}`;
   }
 
   private normalizeValueMappingKey(value: unknown): string {
@@ -2524,9 +2567,7 @@ export class ImportService {
     };
   }
 
-  private toBatchRowSummary(
-    row: ImportBatchRowItem,
-  ): ImportBatchRowSummaryDto {
+  private toBatchRowSummary(row: ImportBatchRowItem): ImportBatchRowSummaryDto {
     return {
       handle: row.handle ?? null,
       rowNumber: row.rowNumber,

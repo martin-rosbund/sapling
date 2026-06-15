@@ -125,11 +125,12 @@ export class GenericCustomFieldService {
   ): Promise<string[]> {
     const definitions = await this.getActiveDefinitions(entityHandle);
     return definitions
-      .filter((definition) =>
-        definition.isRequired &&
-        !this.hasCustomFieldValue(
-          this.normalizeValue(definition, customFields[definition.fieldKey]),
-        ),
+      .filter(
+        (definition) =>
+          definition.isRequired &&
+          !this.hasCustomFieldValue(
+            this.normalizeValue(definition, customFields[definition.fieldKey]),
+          ),
       )
       .map(
         (definition) => `${CUSTOM_FIELD_TEMPLATE_PREFIX}${definition.fieldKey}`,

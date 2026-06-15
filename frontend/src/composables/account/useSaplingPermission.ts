@@ -40,6 +40,7 @@ export function useSaplingPermission() {
     'roleStage',
     'right',
     'person',
+    'providerUserImport',
     'navigationGroup',
   )
 
@@ -269,6 +270,15 @@ export function useSaplingPermission() {
   async function refreshEntities() {
     const response = await ApiGenericService.find<EntityItem>('entity', { relations: ['group'] })
     entities.value = response.data.map((entity) => ({ ...entity }))
+  }
+
+  async function refreshPermissionMembers() {
+    membersArePending.value = true
+    try {
+      await Promise.all([refreshPersons(), refreshRoles()])
+    } finally {
+      membersArePending.value = false
+    }
   }
 
   function selectRole(roleHandle: number | null) {
@@ -770,6 +780,7 @@ export function useSaplingPermission() {
     savePermissionChanges,
     resetPermissionChanges,
     handleAddSelectedPersonsToRole,
+    refreshPermissionMembers,
     openDeleteDialog,
     updateDeleteDialogVisibility,
     cancelRemovePersonFromRole,

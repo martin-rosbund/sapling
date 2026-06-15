@@ -34,10 +34,12 @@ export class CurrentMetadataService {
     const uniqueEntityHandles = [...new Set(entityHandles)]
       .map((entityHandle) => entityHandle.trim())
       .filter((entityHandle) => entityHandle.length > 0);
+    const hydratedPerson =
+      (await this.currentService.getPerson(person)) ?? person;
 
     return Promise.all(
       uniqueEntityHandles.map((entityHandle) =>
-        this.getSingleEntityMetadata(person, entityHandle),
+        this.getSingleEntityMetadata(hydratedPerson, entityHandle),
       ),
     );
   }
