@@ -139,21 +139,22 @@
 
           <v-window-item value="data">
             <div class="sapling-ai-agent-builder__grid">
-              <v-select
-                v-model="draft.allowedEntityHandles"
+              <SaplingFieldSelect
+                v-model="selectedAllowedEntities"
                 class="sapling-ai-agent-builder__wide"
-                chips
-                multiple
-                :items="entityOptions"
+                entity-handle="entity"
                 :label="tr('aiAgentBuilder.fieldEntities', 'Datenbereiche')"
+                density="comfortable"
+                hide-details
               />
-              <v-select
-                v-model="draft.allowedKnowledgeEntityHandles"
+              <SaplingFieldSelect
+                v-model="selectedAllowedKnowledgeEntities"
                 class="sapling-ai-agent-builder__wide"
-                chips
-                multiple
-                :items="knowledgeEntityOptions"
+                entity-handle="entity"
+                :parent-filter="knowledgeEntityFilter"
                 :label="tr('aiAgentBuilder.fieldKnowledge', 'Wissensquellen')"
+                density="comfortable"
+                hide-details
               />
             </div>
           </v-window-item>
@@ -207,15 +208,13 @@
 
           <v-window-item value="release">
             <div class="sapling-ai-agent-builder__grid">
-              <v-select
-                v-model="draft.roles"
+              <SaplingFieldSelect
+                v-model="selectedRoles"
                 class="sapling-ai-agent-builder__wide"
-                chips
-                multiple
-                item-title="title"
-                item-value="handle"
-                :items="roles"
+                entity-handle="role"
                 :label="tr('aiAgentBuilder.fieldRoles', 'Rollenfreigabe')"
+                density="comfortable"
+                hide-details
               />
               <v-switch
                 v-model="draft.isActive"
@@ -467,6 +466,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
 import SaplingSurface from '@/components/common/SaplingSurface.vue'
+import SaplingFieldSelect from '@/components/dialog/fields/SaplingFieldSelect.vue'
 import type {
   AiAgentItem,
   AiAgentEvaluationItem,
@@ -478,9 +478,10 @@ import type {
   AiProviderTypeItem,
   EntityItem,
   RoleItem,
+  SaplingGenericItem,
 } from '@/entity/entity'
 import ApiAiService, { type AiMcpToolDescriptor } from '@/services/api.ai.service'
-import ApiGenericService from '@/services/api.generic.service'
+import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service'
 import TranslationService from '@/services/translation.service'
 
 type AgentDraft = {
@@ -551,12 +552,27 @@ const canSaveAgent = computed(
     !!draft.value.title.trim() &&
     !!draft.value.promptMarkdown.trim(),
 )
-const entityOptions = computed(() => entities.value.map((entity) => entity.handle))
-const knowledgeEntityOptions = computed(() =>
-  entityOptions.value.filter((handle) =>
-    (KNOWLEDGE_ENTITY_HANDLES as readonly string[]).includes(handle),
-  ),
-)
+const knowledgeEntityFilter = computed<FilterQuery>(() => ({
+  handle: { $in: [...KNOWLEDGE_ENTITY_HANDLES] },
+}))
+const selectedAllowedEntities = computed<SaplingGenericItem[]>({
+  get: () => mapHandlesToItems(draft.value.allowedEntityHandles, entities.value),
+  set: (value) => {
+    draft.value.allowedEntityHandles = getStringHandles(value)
+  },
+})
+const selectedAllowedKnowledgeEntities = computed<SaplingGenericItem[]>({
+  get: () => mapHandlesToItems(draft.value.allowedKnowledgeEntityHandles, entities.value),
+  set: (value) => {
+    draft.value.allowedKnowledgeEntityHandles = getStringHandles(value)
+  },
+})
+const selectedRoles = computed<SaplingGenericItem[]>({
+  get: () => mapHandlesToItems(draft.value.roles, roles.value),
+  set: (value) => {
+    draft.value.roles = getNumberHandles(value)
+  },
+})
 const internalToolOptions = computed(() =>
   tools.value.filter((tool) => tool.serverName === 'sapling').map((tool) => tool.toolName),
 )
@@ -858,6 +874,26 @@ function normalizeRoleHandles(value: unknown): number[] {
         )
         .filter((handle): handle is number => typeof handle === 'number')
     : []
+}
+
+function mapHandlesToItems<T extends SaplingGenericItem>(
+  handles: Array<string | number>,
+  items: T[],
+): T[] {
+  const handleSet = new Set(handles)
+  return items.filter((item) => handleSet.has(item.handle))
+}
+
+function getStringHandles(items: SaplingGenericItem[]): string[] {
+  return items
+    .map((item) => item.handle)
+    .filter((handle): handle is string => typeof handle === 'string')
+}
+
+function getNumberHandles(items: SaplingGenericItem[]): number[] {
+  return items
+    .map((item) => item.handle)
+    .filter((handle): handle is number => typeof handle === 'number')
 }
 
 function formatDate(value?: Date | string | null): string {

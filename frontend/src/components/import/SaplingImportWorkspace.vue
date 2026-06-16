@@ -79,124 +79,32 @@
           @normalize-generic-reference-key-columns="normalizeGenericReferenceKeyColumns"
         />
 
-        <div v-if="batch && importableFields.length > 0" class="sapling-import__mapping">
-          <div
-            v-for="field in importableFields"
-            :key="field.name"
-            class="sapling-import__mapping-row"
-          >
-            <div class="sapling-import__mapping-label">
-              <v-icon size="18">{{ field.isReference ? 'mdi-link' : 'mdi-form-textbox' }}</v-icon>
-              <span>{{ fieldLabel(field.name) }}</span>
-              <v-chip v-if="field.isRequired" size="x-small" color="primary" variant="tonal">
-                *
-              </v-chip>
-              <v-tooltip
-                v-if="aiSuggestionFieldDetails[field.name]"
-                :text="aiSuggestionReason(field.name)"
-              >
-                <template #activator="{ props: tooltipProps }">
-                  <v-chip v-bind="tooltipProps" size="x-small" color="info" variant="tonal">
-                    AI {{ confidencePercent(aiSuggestionFieldDetails[field.name].confidence) }}
-                  </v-chip>
-                </template>
-              </v-tooltip>
-            </div>
-            <v-select
-              v-model="fieldMappings[field.name]"
-              :items="headerOptions"
-              density="compact"
-              hide-details
-              clearable
-              :placeholder="field.name"
-              autocomplete="off"
-              @update:model-value="onFieldMappingChange(field.name)"
-            >
-              <template #item="{ props: itemProps, item }">
-                <v-list-item v-bind="itemProps" class="sapling-import__source-option-item">
-                  <template #title>
-                    <div class="sapling-import__source-option">
-                      <span class="sapling-import__source-option-title">
-                        {{ getSourceColumnOptionTitle(item) }}
-                      </span>
-                      <v-chip
-                        v-if="sourceColumnUsageLabels(getSourceColumnOptionValue(item)).length > 0"
-                        size="x-small"
-                        color="primary"
-                        variant="tonal"
-                        prepend-icon="mdi-check-circle-outline"
-                      >
-                        {{ sourceColumnUsageSummary(getSourceColumnOptionValue(item)) }}
-                      </v-chip>
-                    </div>
-                  </template>
-                  <template
-                    v-if="sourceColumnUsageLabels(getSourceColumnOptionValue(item)).length > 0"
-                    #subtitle
-                  >
-                    <span class="sapling-import__source-option-subtitle">
-                      {{ sourceColumnUsageLabels(getSourceColumnOptionValue(item)).join(', ') }}
-                    </span>
-                  </template>
-                </v-list-item>
-              </template>
-            </v-select>
-            <SaplingImportTemplateValueField
-              v-model="fieldDefaults[field.name]"
-              :template="field"
-              :entity-handle="selectedEntityHandle ?? ''"
-              :visible-templates="importableFields"
-              :permissions="currentPermissions"
-              :reference-items="referenceItemsForField(field)"
-              :disabled="!batch || isImportJobRunning"
-            />
-            <div class="sapling-import__value-mapping-action">
-              <v-tooltip :text="$t('import.valueMapping')">
-                <template #activator="{ props: tooltipProps }">
-                  <v-btn
-                    v-bind="tooltipProps"
-                    icon="mdi-swap-horizontal"
-                    size="small"
-                    variant="tonal"
-                    :color="hasValueMapping(field.name) ? 'primary' : undefined"
-                    :disabled="!fieldMappings[field.name] || isImportJobRunning"
-                    :aria-label="$t('import.valueMapping')"
-                    @click="openValueMapping(field)"
-                  />
-                </template>
-              </v-tooltip>
-            </div>
-            <div
-              v-if="field.isReference && field.referenceName"
-              class="sapling-import__relation-mapping-controls"
-            >
-              <v-select
-                v-model="relationMappingModes[field.name]"
-                :items="relationMappingModeOptions"
-                item-title="title"
-                item-value="value"
-                density="compact"
-                hide-details
-                clearable
-                :placeholder="$t('import.relationMapping')"
-                autocomplete="off"
-              />
-              <v-select
-                v-model="relationMappingColumns[field.name]"
-                :items="headerOptions"
-                density="compact"
-                hide-details
-                clearable
-                multiple
-                chips
-                :disabled="!relationMappingModes[field.name] || isImportJobRunning"
-                :placeholder="$t('import.externalKeyColumns')"
-                autocomplete="off"
-                @update:model-value="normalizeRelationMappingColumns(field.name)"
-              />
-            </div>
-          </div>
-        </div>
+        <SaplingImportMappingEditor
+          :has-batch="Boolean(batch)"
+          :fields="importableFields"
+          :field-mappings="fieldMappings"
+          :field-defaults="fieldDefaults"
+          :relation-mapping-modes="relationMappingModes"
+          :relation-mapping-columns="relationMappingColumns"
+          :relation-mapping-mode-options="relationMappingModeOptions"
+          :header-options="headerOptions"
+          :selected-entity-handle="selectedEntityHandle"
+          :permissions="currentPermissions"
+          :ai-suggestion-field-details="aiSuggestionFieldDetails"
+          :is-import-job-running="isImportJobRunning"
+          :field-label="fieldLabel"
+          :ai-suggestion-reason="aiSuggestionReason"
+          :confidence-percent="confidencePercent"
+          :reference-items-for-field="referenceItemsForField"
+          :has-value-mapping="hasValueMapping"
+          :get-source-column-option-value="getSourceColumnOptionValue"
+          :get-source-column-option-title="getSourceColumnOptionTitle"
+          :source-column-usage-labels="sourceColumnUsageLabels"
+          :source-column-usage-summary="sourceColumnUsageSummary"
+          @field-mapping-change="onFieldMappingChange"
+          @open-value-mapping="openValueMapping"
+          @normalize-relation-mapping-columns="normalizeRelationMappingColumns"
+        />
 
         <SaplingImportActionBar
           v-if="batch"
@@ -265,9 +173,9 @@ import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingImportActionBar from '@/components/import/SaplingImportActionBar.vue'
 import SaplingImportAiSuggestionPanel from '@/components/import/SaplingImportAiSuggestionPanel.vue'
 import SaplingImportJobStatus from '@/components/import/SaplingImportJobStatus.vue'
+import SaplingImportMappingEditor from '@/components/import/SaplingImportMappingEditor.vue'
 import SaplingImportPreviewPanel from '@/components/import/SaplingImportPreviewPanel.vue'
 import SaplingImportSetupPanel from '@/components/import/SaplingImportSetupPanel.vue'
-import SaplingImportTemplateValueField from '@/components/import/SaplingImportTemplateValueField.vue'
 import SaplingImportValueMappingDialog from '@/components/import/SaplingImportValueMappingDialog.vue'
 import { useGenericStore } from '@/stores/genericStore'
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
@@ -290,7 +198,15 @@ import type { EntityItem, SaplingGenericItem } from '@/entity/entity'
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure'
 import { DEFAULT_ENTITY_ITEMS_COUNT } from '@/constants/project.constants'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
+import {
+  isRunningImportStatus,
+  useSaplingImportBatchPolling,
+} from '@/composables/import/useSaplingImportBatchPolling'
 import { useSaplingImportJobs } from '@/composables/import/useSaplingImportJobs'
+import {
+  buildImportErrorReportCsv,
+  createImportErrorReportFilename,
+} from '@/composables/import/saplingImportErrorReport'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import { downloadTextFile } from '@/composables/table/saplingTableAction.utils'
 
@@ -331,27 +247,10 @@ const { loadTranslations } = useTranslationLoader(
 )
 
 const IMPORT_PREVIEW_ROW_LIMIT = 100
-const IMPORT_ERROR_REPORT_DELIMITER = ';'
-const IMPORT_ERROR_REPORT_BOM = '\uFEFF'
 const IMPORT_REQUIRED_FIELDS_MISSING_PREFIX = 'import.requiredFieldsMissing:'
 const IMPORT_INVALID_DATE_VALUES_PREFIX = 'import.invalidDateValues:'
 const IMPORT_VALUE_MAPPING_MISSING_PREFIX = 'import.valueMappingMissing:'
-const IMPORT_POLL_INTERVAL_MS = 2000
 const IMPORT_VALUE_MAPPING_SOURCE_VALUE_LIMIT = 100
-const IMPORT_RUNNING_STATUSES = new Set([
-  'validationQueued',
-  'validating',
-  'executionQueued',
-  'executing',
-])
-const IMPORT_TERMINAL_STATUSES = new Set([
-  'validated',
-  'validatedWithErrors',
-  'validationFailed',
-  'executed',
-  'executedWithErrors',
-  'executionFailed',
-])
 const selectedFile = ref<File | File[] | null>(null)
 const selectedEntityHandle = ref<string | null>(null)
 const selectedSourceHandle = ref<string | null>(null)
@@ -389,7 +288,6 @@ const referenceValueItems = reactive<
 const aiSuggestionFieldDetails = reactive<
   Record<string, { confidence: number; reason: string | null }>
 >({})
-let batchPollTimer: number | null = null
 const valueMappingDialog = reactive<{
   visible: boolean
   targetField: string | null
@@ -532,7 +430,7 @@ const currentValueMappingReferenceItems = computed<
 
   return referenceItemsForField(currentValueMappingField.value) ?? {}
 })
-const relationMappingModeOptions = computed(() => [
+const relationMappingModeOptions = computed<Array<{ title: string; value: ImportRelationMappingMode }>>(() => [
   { title: t('import.relationMappingMode.handle'), value: 'handle' },
   { title: t('import.relationMappingMode.value'), value: 'value' },
   { title: t('import.relationMappingMode.externalKey'), value: 'externalKey' },
@@ -570,7 +468,7 @@ const isPreviewLimited = computed(
   () => (batch.value?.rowCount ?? batch.value?.rows.length ?? 0) > IMPORT_PREVIEW_ROW_LIMIT,
 )
 const isImportJobRunning = computed(() =>
-  batch.value ? IMPORT_RUNNING_STATUSES.has(batch.value.status) : false,
+  batch.value ? isRunningImportStatus(batch.value.status) : false,
 )
 const isExecutionRunning = computed(() =>
   batch.value ? ['executionQueued', 'executing'].includes(batch.value.status) : false,
@@ -604,6 +502,15 @@ const canExecute = computed(
     !isExecuting.value &&
     !isImportJobRunning.value,
 )
+
+const { startBatchPolling, stopBatchPolling } = useSaplingImportBatchPolling({
+  onBatch: (refreshedBatch) => {
+    batch.value = refreshedBatch
+  },
+  onTerminal: async () => {
+    await loadOpenBatches()
+  },
+})
 
 onMounted(async () => {
   await Promise.all([
@@ -1021,49 +928,6 @@ async function executeBatch(): Promise<void> {
   }
 }
 
-function startBatchPolling(handle: number | null | undefined): void {
-  if (typeof handle !== 'number' || !Number.isFinite(handle)) {
-    return
-  }
-
-  stopBatchPolling()
-  batchPollTimer = window.setInterval(() => {
-    void refreshCurrentBatch(Math.trunc(handle))
-  }, IMPORT_POLL_INTERVAL_MS)
-  void refreshCurrentBatch(Math.trunc(handle))
-}
-
-function stopBatchPolling(): void {
-  if (!batchPollTimer) {
-    return
-  }
-
-  window.clearInterval(batchPollTimer)
-  batchPollTimer = null
-}
-
-async function refreshCurrentBatch(handle: number): Promise<void> {
-  try {
-    const refreshedBatch = await ApiImportService.getBatch(handle)
-    batch.value = refreshedBatch
-
-    if (isTerminalImportStatus(refreshedBatch.status)) {
-      stopBatchPolling()
-      await loadOpenBatches()
-    }
-  } catch {
-    // shared API errors already surface through the message center
-  }
-}
-
-function isRunningImportStatus(status: string): boolean {
-  return IMPORT_RUNNING_STATUSES.has(status)
-}
-
-function isTerminalImportStatus(status: string): boolean {
-  return IMPORT_TERMINAL_STATUSES.has(status)
-}
-
 function resetImportWorkspace(): void {
   stopBatchPolling()
   batch.value = null
@@ -1096,8 +960,12 @@ async function downloadErrorReport(): Promise<void> {
     }
 
     downloadTextFile(
-      buildErrorReportCsv(rows),
-      createErrorReportFilename(batch.value.filename),
+      buildImportErrorReportCsv(rows, {
+        importStatusLabel,
+        importActionLabel,
+        importMessageLabel,
+      }),
+      createImportErrorReportFilename(batch.value.filename),
       'text/csv;charset=utf-8',
     )
   } catch {
@@ -1105,39 +973,6 @@ async function downloadErrorReport(): Promise<void> {
   } finally {
     isDownloadingErrorReport.value = false
   }
-}
-
-function buildErrorReportCsv(rows: ImportBatchRowSummary[]): string {
-  const rawHeaders = collectErrorReportRawHeaders(rows)
-  const headers = [
-    'rowNumber',
-    'status',
-    'action',
-    'targetReference',
-    'message',
-    'messageKey',
-    'externalKeyHash',
-    ...rawHeaders.map((header) => `raw.${header}`),
-  ]
-  const lines = [
-    headers.map(escapeImportCsvCell).join(IMPORT_ERROR_REPORT_DELIMITER),
-    ...rows.map((row) =>
-      [
-        row.rowNumber,
-        importStatusLabel(row.status),
-        row.action ? importActionLabel(row.action) : '',
-        row.targetReference ?? '',
-        importMessageLabel(row.message),
-        row.message ?? '',
-        row.externalKeyHash ?? '',
-        ...rawHeaders.map((header) => row.rawData[header] ?? ''),
-      ]
-        .map(escapeImportCsvCell)
-        .join(IMPORT_ERROR_REPORT_DELIMITER),
-    ),
-  ]
-
-  return `${IMPORT_ERROR_REPORT_BOM}${lines.join('\r\n')}\r\n`
 }
 
 function normalizeExternalKeyColumns(): void {
@@ -1721,34 +1556,6 @@ function filterExistingColumns(columns: string[]): string[] {
 
 function normalizeSelectedColumns(columns: string[]): string[] {
   return Array.from(new Set(columns.map((column) => column.trim()).filter(Boolean)))
-}
-
-function collectErrorReportRawHeaders(rows: ImportBatchRowSummary[]): string[] {
-  return Array.from(
-    rows.reduce<Set<string>>((headers, row) => {
-      Object.keys(row.rawData).forEach((header) => headers.add(header))
-      return headers
-    }, new Set<string>()),
-  )
-}
-
-function escapeImportCsvCell(value: unknown): string {
-  const text = String(value ?? '')
-
-  if (/[;"\r\n]/.test(text)) {
-    return `"${text.replace(/"/g, '""')}"`
-  }
-
-  return text
-}
-
-function createErrorReportFilename(filename: string): string {
-  const baseName = filename
-    .replace(/\.[^.]+$/, '')
-    .replace(/[^a-zA-Z0-9._-]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-
-  return `${baseName || 'import'}-fehlerprotokoll.csv`
 }
 
 function fieldLabel(fieldName: string): string {

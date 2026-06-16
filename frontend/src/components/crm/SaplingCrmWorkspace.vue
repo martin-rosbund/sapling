@@ -41,54 +41,14 @@
       </template>
     </SaplingPageHero>
 
-    <section class="sapling-crm-workspace__toolbar glass-panel">
-      <v-btn-toggle
-        v-model="activeCockpit"
-        class="sapling-crm-workspace__tabs"
-        color="primary"
-        density="comfortable"
-        divided
-        mandatory
-      >
-        <v-btn value="sales" prepend-icon="mdi-chart-timeline-variant">
-          {{ t('crmWorkspace.salesCockpit') }}
-        </v-btn>
-        <v-btn value="account" prepend-icon="mdi-domain">
-          {{ t('crmWorkspace.accountCockpit') }}
-        </v-btn>
-        <v-btn value="customerSuccess" prepend-icon="mdi-heart-pulse">
-          {{ t('crmWorkspace.customerSuccessCockpit') }}
-        </v-btn>
-      </v-btn-toggle>
-
-      <div class="sapling-crm-workspace__toolbar-fields">
-        <v-text-field
-          v-model="search"
-          density="comfortable"
-          hide-details
-          clearable
-          autocomplete="off"
-          prepend-inner-icon="mdi-magnify"
-          :label="t('global.search')"
-        />
-        <v-autocomplete
-          v-model="selectedResponsibleHandle"
-          density="comfortable"
-          hide-details
-          clearable
-          prepend-inner-icon="mdi-account-tie-outline"
-          :items="responsiblePersonOptions"
-          :label="t('crmWorkspace.responsiblePerson')"
-        />
-        <v-select
-          v-model="contactThresholdDays"
-          density="comfortable"
-          hide-details
-          :items="contactThresholdOptions"
-          :label="t('crmWorkspace.contactThreshold')"
-        />
-      </div>
-    </section>
+    <SaplingCrmWorkspaceToolbar
+      v-model:active-cockpit="activeCockpit"
+      v-model:search="search"
+      v-model:selected-responsible-handle="selectedResponsibleHandle"
+      v-model:contact-threshold-days="contactThresholdDays"
+      :responsible-person-options="responsiblePersonOptions"
+      :contact-threshold-options="contactThresholdOptions"
+    />
 
     <v-progress-linear
       v-if="isLoading && hasLoadedOnce"
@@ -275,11 +235,13 @@ import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
 import SaplingCrmWorkspaceList, {
   type CrmWorkspaceItem,
 } from '@/components/crm/SaplingCrmWorkspaceList.vue'
+import SaplingCrmWorkspaceToolbar, {
+  type CrmCockpitKey,
+} from '@/components/crm/SaplingCrmWorkspaceToolbar.vue'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { useGenericStore } from '@/stores/genericStore'
 import { pushAppRoute } from '@/utils/routerNavigation'
 
-type CockpitKey = 'sales' | 'account' | 'customerSuccess'
 type SignalKey = 'noActivity' | 'contactGaps' | 'risks'
 
 interface RelationHandle {
@@ -402,7 +364,7 @@ const router = useRouter()
 const genericStore = useGenericStore()
 const currentPersonStore = useCurrentPersonStore()
 
-const activeCockpit = ref<CockpitKey>('sales')
+const activeCockpit = ref<CrmCockpitKey>('sales')
 const contactThresholdDays = ref(45)
 const search = ref('')
 const selectedResponsibleHandle = ref<string | null>(null)
