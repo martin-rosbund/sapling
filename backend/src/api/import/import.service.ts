@@ -42,6 +42,7 @@ import type {
   ImportBatchErrorRowsDto,
   ImportBatchResultSummaryDto,
   ImportBatchRowSummaryDto,
+  ImportBatchSourceValuesDto,
   ImportBatchSummaryDto,
   ImportMatchCandidateDto,
   ImportMatchRequestDto,
@@ -189,6 +190,45 @@ export class ImportService {
     );
 
     return { rows: rows.map((row) => this.toBatchRowSummary(row)) };
+  }
+
+  async getBatchSourceValues(
+    handle: number,
+    column: string,
+    requestedLimit?: number,
+  ): Promise<ImportBatchSourceValuesDto> {
+    const batch = await this.findBatch(handle);
+    const normalizedColumn = this.normalizeRequiredString(column);
+    const headers = this.normalizeColumns(batch.headers ?? []);
+
+    if (!headers.includes(normalizedColumn)) {
+      throw new BadRequestException('import.sourceColumnRequired');
+    }
+
+    const requestedLimitValue =
+      typeof requestedLimit === 'number' && Number.isFinite(requestedLimit)
+        ? requestedLimit
+        : 100;
+    const limit = Math.min(Math.max(Math.trunc(requestedLimitValue), 1), 100);
+    const rows = (await this.em.getConnection().execute(
+      `
+        select value
+        from (
+          select distinct nullif(btrim(raw_data ->> ?), '') as value
+          from import_batch_row_item
+          where batch_handle = ?
+        ) source_values
+        where value is not null
+        order by value asc
+        limit ?
+      `,
+      [normalizedColumn, batch.handle, limit + 1],
+    )) as Array<{ value: string }>;
+
+    return {
+      values: rows.slice(0, limit).map((row) => row.value),
+      isTruncated: rows.length > limit,
+    };
   }
 
   async matchBatchExistingRecords(

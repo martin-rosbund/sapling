@@ -195,6 +195,11 @@ export interface ImportMatchResponse {
   rows: ImportMatchRow[]
 }
 
+export interface ImportBatchSourceValues {
+  values: string[]
+  isTruncated: boolean
+}
+
 class ApiImportService {
   static async listOpenBatches(): Promise<ImportBatchSummary[]> {
     try {
@@ -222,6 +227,25 @@ class ApiImportService {
         `${BACKEND_URL}import/batches/${handle}/error-rows`,
       )
       return response.data.rows
+    } catch (error: unknown) {
+      pushApiErrorMessage(error, 'exception.unknownError', 'import')
+      throw error
+    }
+  }
+
+  static async getBatchSourceValues(
+    handle: number,
+    params: {
+      column: string
+      limit?: number | null
+    },
+  ): Promise<ImportBatchSourceValues> {
+    try {
+      const response = await axios.get<ImportBatchSourceValues>(
+        `${BACKEND_URL}import/batches/${handle}/source-values`,
+        { params },
+      )
+      return response.data
     } catch (error: unknown) {
       pushApiErrorMessage(error, 'exception.unknownError', 'import')
       throw error

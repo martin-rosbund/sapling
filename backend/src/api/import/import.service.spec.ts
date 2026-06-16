@@ -67,6 +67,30 @@ describe('ImportService', () => {
     ).rejects.toThrow('import.valueMappingMissing:status:Fremdwert%20A');
   });
 
+  it('loads distinct source values from all import rows with a capped limit', async () => {
+    const execute = jest.fn(async () => [
+      { value: 'Dr.' },
+      { value: 'Prof.' },
+      { value: 'Sir' },
+    ]);
+    const service = createService({
+      findOne: jest.fn(async () => ({ handle: 42, headers: ['Titel'] })),
+      getConnection: jest.fn(() => ({ execute })),
+    });
+
+    const result = await service.getBatchSourceValues(42, 'Titel', 2);
+
+    expect(result).toEqual({
+      values: ['Dr.', 'Prof.'],
+      isTruncated: true,
+    });
+    expect(execute).toHaveBeenCalledWith(expect.stringContaining('distinct'), [
+      'Titel',
+      42,
+      3,
+    ]);
+  });
+
   it('includes the target field and source value when kept reference values cannot be resolved', async () => {
     const service = createService({
       find: jest.fn(async () => []),

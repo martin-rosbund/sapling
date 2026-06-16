@@ -160,6 +160,11 @@ export type ImportBatchErrorRowsDto = {
   rows: ImportBatchRowSummaryDto[];
 };
 
+export type ImportBatchSourceValuesDto = {
+  values: string[];
+  isTruncated: boolean;
+};
+
 export type ImportBatchResultSummaryDto = {
   totalRows: number;
   processedRows: number;

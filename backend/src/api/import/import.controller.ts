@@ -23,6 +23,7 @@ import type {
   ImportAiSuggestDto,
   ImportAiSuggestionDto,
   ImportBatchErrorRowsDto,
+  ImportBatchSourceValuesDto,
   ImportBatchSummaryDto,
   ImportMatchRequestDto,
   ImportMatchResponseDto,
@@ -74,6 +75,19 @@ export class ImportController {
     @Param('handle') handle: number,
   ): Promise<ImportBatchErrorRowsDto> {
     return this.importService.getBatchErrorRows(Number(handle));
+  }
+
+  @Get('batches/:handle/source-values')
+  async getBatchSourceValues(
+    @Param('handle') handle: number,
+    @Query('column') column: string,
+    @Query('limit') limit?: number,
+  ): Promise<ImportBatchSourceValuesDto> {
+    return this.importService.getBatchSourceValues(
+      Number(handle),
+      column,
+      Number(limit),
+    );
   }
 
   @Post('batches/:handle/match')

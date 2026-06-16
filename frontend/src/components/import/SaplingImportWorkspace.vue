@@ -645,6 +645,7 @@ const IMPORT_REQUIRED_FIELDS_MISSING_PREFIX = 'import.requiredFieldsMissing:'
 const IMPORT_INVALID_DATE_VALUES_PREFIX = 'import.invalidDateValues:'
 const IMPORT_VALUE_MAPPING_MISSING_PREFIX = 'import.valueMappingMissing:'
 const IMPORT_POLL_INTERVAL_MS = 2000
+const IMPORT_VALUE_MAPPING_SOURCE_VALUE_LIMIT = 100
 const IMPORT_RUNNING_STATUSES = new Set([
   'validationQueued',
   'validating',
@@ -689,6 +690,7 @@ const fieldDefaults = reactive<Record<string, unknown>>({})
 const relationMappingModes = reactive<Record<string, ImportRelationMappingMode | null>>({})
 const relationMappingColumns = reactive<Record<string, string[]>>({})
 const valueMappings = reactive<Record<string, ValueMappingState>>({})
+const sourceValueOptions = reactive<Record<string, string[]>>({})
 const aiSuggestionFieldDetails = reactive<
   Record<string, { confidence: number; reason: string | null }>
 >({})
@@ -816,9 +818,16 @@ const currentValueMappingField = computed(() =>
 const currentValueMapping = computed(() =>
   valueMappingDialog.targetField ? valueMappings[valueMappingDialog.targetField] : null,
 )
-const currentValueMappingSourceValues = computed(() =>
-  currentValueMappingField.value ? sourceValuesForField(currentValueMappingField.value) : [],
-)
+const currentValueMappingSourceValues = computed(() => {
+  if (!currentValueMappingField.value) {
+    return []
+  }
+
+  return mergeSourceValues(
+    sourceValuesForField(currentValueMappingField.value),
+    Object.keys(currentValueMapping.value?.values ?? {}),
+  )
+})
 const valueMappingFallbackOptions = computed(() => [
   { title: t('import.valueMappingFallback.keep'), value: 'keep' },
   { title: t('import.valueMappingFallback.empty'), value: 'empty' },
@@ -1105,6 +1114,7 @@ function clearMappingState(): void {
   Object.keys(relationMappingModes).forEach((key) => delete relationMappingModes[key])
   Object.keys(relationMappingColumns).forEach((key) => delete relationMappingColumns[key])
   Object.keys(valueMappings).forEach((key) => delete valueMappings[key])
+  Object.keys(sourceValueOptions).forEach((key) => delete sourceValueOptions[key])
 }
 
 function applySelectedTemplate(): void {
@@ -1623,9 +1633,33 @@ function buildGenericReferenceMapping(): ImportGenericReferenceMapping | null {
 
 function onFieldMappingChange(targetField: string): void {
   delete aiSuggestionFieldDetails[targetField]
+  delete sourceValueOptions[targetField]
   const field = importableFields.value.find((entry) => entry.name === targetField)
   const mapping = valueMappings[targetField]
   if (!field || !mapping) {
+    return
+  }
+
+  void pruneValueMappingForField(field, mapping)
+}
+
+async function pruneValueMappingForField(
+  field: EntityTemplate,
+  mapping: ValueMappingState,
+): Promise<void> {
+  const sourceColumn = fieldMappings[field.name]
+  if (!sourceColumn) {
+    delete valueMappings[field.name]
+    return
+  }
+
+  try {
+    await loadSourceValuesForField(field)
+  } catch {
+    return
+  }
+
+  if (fieldMappings[field.name] !== sourceColumn) {
     return
   }
 
@@ -1645,8 +1679,23 @@ async function openValueMapping(field: EntityTemplate): Promise<void> {
   }
 
   ensureValueMapping(field.name)
+  await loadSourceValuesForField(field)
   valueMappingDialog.targetField = field.name
   valueMappingDialog.visible = true
+}
+
+async function loadSourceValuesForField(field: EntityTemplate): Promise<void> {
+  const sourceColumn = fieldMappings[field.name]
+  if (!batch.value?.handle || !sourceColumn) {
+    sourceValueOptions[field.name] = sourceValuesForField(field)
+    return
+  }
+
+  const response = await ApiImportService.getBatchSourceValues(batch.value.handle, {
+    column: sourceColumn,
+    limit: IMPORT_VALUE_MAPPING_SOURCE_VALUE_LIMIT,
+  })
+  sourceValueOptions[field.name] = response.values
 }
 
 function closeValueMapping(): void {
@@ -1726,6 +1775,11 @@ function sourceColumnUsageSummary(sourceColumn: string): string {
 }
 
 function sourceValuesForField(field: EntityTemplate): string[] {
+  const cachedValues = sourceValueOptions[field.name]
+  if (cachedValues) {
+    return cachedValues
+  }
+
   const sourceColumn = fieldMappings[field.name]
   if (!sourceColumn) {
     return []
@@ -1740,6 +1794,12 @@ function sourceValuesForField(field: EntityTemplate): string[] {
     .filter((value) => value.length > 0)
 
   return Array.from(new Set(values)).sort((left, right) => left.localeCompare(right))
+}
+
+function mergeSourceValues(...groups: string[][]): string[] {
+  return Array.from(
+    new Set(groups.flat().map(normalizeValueMappingKey).filter((value) => value.length > 0)),
+  ).sort((left, right) => left.localeCompare(right))
 }
 
 function normalizeValueMappingKey(value: unknown): string {

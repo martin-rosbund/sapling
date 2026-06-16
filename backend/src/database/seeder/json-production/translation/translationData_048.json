@@ -31,5 +31,6 @@
   { "entity": "providerUserImport", "property": "googleTokenNotFound", "de": "Kein Google-Token verfügbar", "en": "No Google token available" },
   { "entity": "providerUserImport", "property": "azureDirectoryUnavailable", "de": "Das Azure-Verzeichnis ist momentan nicht erreichbar. Bitte versuche es gleich erneut.", "en": "The Azure directory is currently unavailable. Please try again shortly." },
   { "entity": "providerUserImport", "property": "googleDirectoryUnavailable", "de": "Das Google-Verzeichnis ist momentan nicht erreichbar. Bitte versuche es gleich erneut.", "en": "The Google directory is currently unavailable. Please try again shortly." },
-  { "entity": "providerUserImport", "property": "companyNotFound", "de": "Die ausgewählte Firma wurde nicht gefunden", "en": "The selected company was not found" }
+  { "entity": "providerUserImport", "property": "companyNotFound", "de": "Die ausgewählte Firma wurde nicht gefunden", "en": "The selected company was not found" },
+  { "entity": "import", "property": "sourceColumnRequired", "de": "Bitte waehle eine gueltige Quellspalte aus.", "en": "Please select a valid source column." }
 ]
