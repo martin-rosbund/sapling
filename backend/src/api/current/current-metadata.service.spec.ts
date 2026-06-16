@@ -21,21 +21,24 @@ describe('CurrentMetadataService', () => {
 
     const service = new CurrentMetadataService(
       {
-        findOne: jest.fn(async () => entity),
+        findOne: jest.fn(() => Promise.resolve(entity)),
       } as never,
       {
         getEntityTemplate: jest.fn(() => baseTemplates),
       } as never,
       {
-        getPerson: jest.fn(async () => hydratedUser),
+        getPerson: jest.fn(() => Promise.resolve(hydratedUser)),
         getEntityPermissions: jest.fn(() => entityPermission),
       } as never,
       {
-        getEffectiveTemplate: jest.fn(async () => effectiveTemplates),
+        getEffectiveTemplate: jest.fn(() =>
+          Promise.resolve(effectiveTemplates),
+        ),
       } as never,
       {
         appendCustomFieldTemplates: jest.fn(
-          async (_entityHandle, templates) => templates,
+          (_entityHandle: string, templates: typeof effectiveTemplates) =>
+            Promise.resolve(templates),
         ),
       } as never,
     );

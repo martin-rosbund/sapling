@@ -213,7 +213,11 @@ import SaplingFieldSingleSelect from '@/components/dialog/fields/SaplingFieldSin
 import SaplingFormConfigFieldList from '@/components/system/form-config/SaplingFormConfigFieldList.vue'
 import SaplingFormConfigPreviewPanel from '@/components/system/form-config/SaplingFormConfigPreviewPanel.vue'
 import SaplingFormConfigSummary from '@/components/system/form-config/SaplingFormConfigSummary.vue'
-import type { FieldDraft, PreviewMode, StaticOption } from '@/components/system/form-config/formConfigAdmin.types'
+import type {
+  FieldDraft,
+  PreviewMode,
+  StaticOption,
+} from '@/components/system/form-config/formConfigAdmin.types'
 import { getDialogTemplateWidth } from '@/utils/saplingDialogLayoutUtil'
 
 type ScopeValue = 'global' | 'role' | 'person'
@@ -692,5 +696,4 @@ function getTemplateDefaultLabel(template: EntityTemplate): string {
   const key = `${selectedEntityHandle.value}.${template.name}`
   return te(key) ? t(key) : ''
 }
-
 </script>

@@ -23,10 +23,7 @@ interface ImportBatchPollingOptions {
   onTerminal?: (batch: ImportBatchSummary) => void | Promise<void>
 }
 
-export function useSaplingImportBatchPolling({
-  onBatch,
-  onTerminal,
-}: ImportBatchPollingOptions) {
+export function useSaplingImportBatchPolling({ onBatch, onTerminal }: ImportBatchPollingOptions) {
   let batchPollTimer: number | null = null
 
   function startBatchPolling(handle: number | null | undefined): void {

@@ -9,7 +9,7 @@
       </v-card-title>
       <v-card-text class="sapling-import__value-mapping-body">
         <v-select
-          v-model="valueMapping.fallback"
+          :model-value="valueMapping.fallback"
           :items="valueMappingFallbackOptions"
           item-title="title"
           item-value="value"
@@ -17,6 +17,7 @@
           prepend-inner-icon="mdi-call-split"
           :label="t('import.valueMappingFallback')"
           autocomplete="off"
+          @update:model-value="updateFallback"
         />
 
         <v-table density="compact" class="sapling-import__table">
@@ -31,12 +32,13 @@
               <td>{{ sourceValue }}</td>
               <td>
                 <SaplingImportTemplateValueField
-                  v-model="valueMapping.values[sourceValue]"
+                  :model-value="valueMapping.values[sourceValue]"
                   :template="field"
                   :entity-handle="selectedEntityHandle ?? ''"
                   :visible-templates="visibleTemplates"
                   :permissions="permissions"
                   :reference-items="referenceItems"
+                  @update:model-value="updateMappedValue(sourceValue, $event)"
                 />
               </td>
             </tr>
@@ -90,6 +92,8 @@ const emit = defineEmits<{
   (event: 'update:visible', value: boolean): void
   (event: 'clear'): void
   (event: 'close'): void
+  (event: 'updateFallback', value: ImportValueMappingFallback): void
+  (event: 'updateMappedValue', sourceValue: string, value: unknown): void
 }>()
 
 const { t } = useI18n()
@@ -109,4 +113,15 @@ const valueMappingFallbackOptions = computed(() => [
   { title: t('import.valueMappingFallback.empty'), value: 'empty' },
   { title: t('import.valueMappingFallback.error'), value: 'error' },
 ])
+
+function updateFallback(value: unknown): void {
+  emit(
+    'updateFallback',
+    value === 'empty' || value === 'error' || value === 'keep' ? value : 'keep',
+  )
+}
+
+function updateMappedValue(sourceValue: string, value: unknown): void {
+  emit('updateMappedValue', sourceValue, value)
+}
 </script>

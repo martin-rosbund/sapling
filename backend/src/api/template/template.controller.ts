@@ -37,10 +37,10 @@ export class TemplateController {
   constructor(
     private readonly templateService: TemplateService,
     private readonly genericCustomFieldService: GenericCustomFieldService = {
-      appendCustomFieldTemplates: async (
+      appendCustomFieldTemplates: (
         _entityHandle: string,
         templates: EntityTemplateDto[],
-      ) => templates,
+      ): Promise<EntityTemplateDto[]> => Promise.resolve(templates),
     } as unknown as GenericCustomFieldService,
   ) {}
 

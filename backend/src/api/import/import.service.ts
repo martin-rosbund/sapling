@@ -1647,7 +1647,11 @@ export class ImportService {
       entityHandle,
       sourceHandle: this.normalizeOptionalString(record.sourceHandle),
       keyColumns: this.normalizeColumns(
-        Array.isArray(record.keyColumns) ? record.keyColumns : [],
+        Array.isArray(record.keyColumns)
+          ? record.keyColumns.filter(
+              (column): column is string => typeof column === 'string',
+            )
+          : [],
       ),
     };
   }
@@ -1692,7 +1696,7 @@ export class ImportService {
 
         return true;
       })
-      .map((field) => field.name as string);
+      .map((field) => field.name);
     const requested = this.normalizeColumns(requestedFields ?? []);
 
     if (requested.length > 0) {
@@ -1721,7 +1725,7 @@ export class ImportService {
           (field.options?.includes('isValue') ||
             preferredNames.has(field.name)),
       )
-      .map((field) => field.name as string);
+      .map((field) => field.name);
   }
 
   private async resolveRowExternalLinkReference(

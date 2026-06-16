@@ -104,6 +104,10 @@
           @field-mapping-change="onFieldMappingChange"
           @open-value-mapping="openValueMapping"
           @normalize-relation-mapping-columns="normalizeRelationMappingColumns"
+          @update-field-mapping="updateFieldMapping"
+          @update-field-default="updateFieldDefault"
+          @update-relation-mapping-mode="updateRelationMappingMode"
+          @update-relation-mapping-columns="updateRelationMappingColumns"
         />
 
         <SaplingImportActionBar
@@ -161,6 +165,8 @@
       :field-label="fieldLabel"
       @clear="clearCurrentValueMapping"
       @close="closeValueMapping"
+      @update-fallback="updateCurrentValueMappingFallback"
+      @update-mapped-value="updateCurrentValueMappingValue"
     />
   </v-container>
 </template>
@@ -430,7 +436,9 @@ const currentValueMappingReferenceItems = computed<
 
   return referenceItemsForField(currentValueMappingField.value) ?? {}
 })
-const relationMappingModeOptions = computed<Array<{ title: string; value: ImportRelationMappingMode }>>(() => [
+const relationMappingModeOptions = computed<
+  Array<{ title: string; value: ImportRelationMappingMode }>
+>(() => [
   { title: t('import.relationMappingMode.handle'), value: 'handle' },
   { title: t('import.relationMappingMode.value'), value: 'value' },
   { title: t('import.relationMappingMode.externalKey'), value: 'externalKey' },
@@ -928,22 +936,6 @@ async function executeBatch(): Promise<void> {
   }
 }
 
-function resetImportWorkspace(): void {
-  stopBatchPolling()
-  batch.value = null
-  selectedFile.value = null
-  selectedOpenBatchHandle.value = null
-  selectedEntityHandle.value = null
-  selectedSourceHandle.value = null
-  selectedTemplateHandle.value = null
-  templateTitle.value = ''
-  externalKeyColumns.value = []
-  genericReferenceEntityHandle.value = null
-  genericReferenceKeyColumns.value = []
-  templates.value = []
-  clearMappingState()
-}
-
 async function downloadErrorReport(): Promise<void> {
   if (!batch.value) {
     return
@@ -987,6 +979,25 @@ function normalizeRelationMappingColumns(targetField: string): void {
   relationMappingColumns[targetField] = normalizeSelectedColumns(
     relationMappingColumns[targetField] ?? [],
   )
+}
+
+function updateFieldMapping(targetField: string, value: string | null): void {
+  fieldMappings[targetField] = value
+}
+
+function updateFieldDefault(targetField: string, value: unknown): void {
+  fieldDefaults[targetField] = value
+}
+
+function updateRelationMappingMode(
+  targetField: string,
+  value: ImportRelationMappingMode | null,
+): void {
+  relationMappingModes[targetField] = value
+}
+
+function updateRelationMappingColumns(targetField: string, value: string[]): void {
+  relationMappingColumns[targetField] = value
 }
 
 function buildTemplatePayload(): SaveImportTemplatePayload {
@@ -1189,16 +1200,13 @@ function normalizeImportValueMappings(mappings: ImportValueMapping[]): ImportVal
       targetField: normalizeValueMappingKey(mapping.targetField),
       values: Object.fromEntries(
         Object.entries(mapping.values ?? {})
-          .map(([sourceValue, targetValue]) => [
-            normalizeValueMappingKey(sourceValue),
-            targetValue,
-          ])
+          .map(([sourceValue, targetValue]) => [normalizeValueMappingKey(sourceValue), targetValue])
           .filter(([sourceValue, targetValue]) =>
             Boolean(
               typeof sourceValue === 'string' &&
-                sourceValue.length > 0 &&
-                targetValue !== null &&
-                targetValue !== '',
+              sourceValue.length > 0 &&
+              targetValue !== null &&
+              targetValue !== '',
             ),
           ),
       ),
@@ -1382,6 +1390,24 @@ function clearCurrentValueMapping(): void {
   closeValueMapping()
 }
 
+function updateCurrentValueMappingFallback(value: ImportValueMappingFallback): void {
+  const mapping = getCurrentValueMapping()
+  if (mapping) {
+    mapping.fallback = value
+  }
+}
+
+function updateCurrentValueMappingValue(sourceValue: string, value: unknown): void {
+  const mapping = getCurrentValueMapping()
+  if (mapping) {
+    mapping.values[sourceValue] = value
+  }
+}
+
+function getCurrentValueMapping(): ValueMappingState | null {
+  return valueMappingDialog.targetField ? valueMappings[valueMappingDialog.targetField] : null
+}
+
 function ensureValueMapping(targetField: string): ValueMappingState {
   if (!valueMappings[targetField]) {
     valueMappings[targetField] = {
@@ -1468,7 +1494,12 @@ function sourceValuesForField(field: EntityTemplate): string[] {
 
 function mergeSourceValues(...groups: string[][]): string[] {
   return Array.from(
-    new Set(groups.flat().map(normalizeValueMappingKey).filter((value) => value.length > 0)),
+    new Set(
+      groups
+        .flat()
+        .map(normalizeValueMappingKey)
+        .filter((value) => value.length > 0),
+    ),
   ).sort((left, right) => left.localeCompare(right))
 }
 

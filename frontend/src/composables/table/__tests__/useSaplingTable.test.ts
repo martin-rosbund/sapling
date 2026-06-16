@@ -4,10 +4,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { ColumnFilterItem, EntityTemplate } from '@/entity/structure'
 
-const { apiFindMock, loadGenericMock, fetchCurrentPermissionMock, routeState } = vi.hoisted(() => ({
+const {
+  apiFindMock,
+  loadGenericMock,
+  fetchCurrentPermissionMock,
+  getEntityTemplateMock,
+  listFormConfigsMock,
+  routeState,
+} = vi.hoisted(() => ({
   apiFindMock: vi.fn(),
   loadGenericMock: vi.fn(),
   fetchCurrentPermissionMock: vi.fn(),
+  getEntityTemplateMock: vi.fn(),
+  listFormConfigsMock: vi.fn(),
   routeState: { query: {} as Record<string, unknown> },
 }))
 
@@ -18,6 +27,18 @@ vi.mock('vue-router', () => ({
 vi.mock('@/services/api.generic.service', () => ({
   default: {
     find: apiFindMock,
+  },
+}))
+
+vi.mock('@/services/api.template.service', () => ({
+  default: {
+    getEntityTemplate: getEntityTemplateMock,
+  },
+}))
+
+vi.mock('@/services/api.form-config.service', () => ({
+  default: {
+    list: listFormConfigsMock,
   },
 }))
 
@@ -161,7 +182,14 @@ describe('useSaplingTable', () => {
     apiFindMock.mockReset()
     loadGenericMock.mockReset()
     fetchCurrentPermissionMock.mockReset()
+    getEntityTemplateMock.mockReset()
+    listFormConfigsMock.mockReset()
     routeState.query = {}
+
+    getEntityTemplateMock.mockImplementation((handle: string) =>
+      Promise.resolve(getMockedEntityState(handle).entityTemplates),
+    )
+    listFormConfigsMock.mockResolvedValue([])
   })
 
   afterEach(() => {

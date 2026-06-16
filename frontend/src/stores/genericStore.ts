@@ -5,18 +5,10 @@ import type { EntityItem } from '@/entity/entity'
 import TranslationService from '@/services/translation.service'
 import { i18n } from '@/i18n'
 import ApiCurrentService from '@/services/api.current.service'
-import type { AccumulatedPermission } from '@/entity/structure'
 
 type GenericLoadRequest = {
   entityHandle: string
   namespaces?: string[] | null
-}
-
-type EntityMetadataResponse = {
-  entityHandle: string
-  entity: EntityItem | null
-  entityPermission: AccumulatedPermission | null
-  entityTemplates: EntityTemplate[]
 }
 
 function getTranslationBatchCacheKey(entityHandles: string[], locale: string) {
@@ -270,9 +262,7 @@ export const useGenericStore = defineStore('genericLoader', () => {
       return
     }
 
-    const response = await ApiCurrentService.getMetadata<EntityItem, EntityTemplate>(
-      normalizedKeys,
-    )
+    const response = await ApiCurrentService.getMetadata<EntityItem, EntityTemplate>(normalizedKeys)
     const metadataByHandle = new Map(response.map((metadata) => [metadata.entityHandle, metadata]))
 
     normalizedKeys.forEach((key) => {

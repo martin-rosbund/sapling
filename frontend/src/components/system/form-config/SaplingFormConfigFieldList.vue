@@ -25,7 +25,10 @@
     </v-btn>
   </div>
 
-  <div class="sapling-scroll-list sapling-config-field-list sapling-form-config__field-list" role="list">
+  <div
+    class="sapling-scroll-list sapling-config-field-list sapling-form-config__field-list"
+    role="list"
+  >
     <SaplingSurface
       as="article"
       v-for="field in filteredFieldRows"

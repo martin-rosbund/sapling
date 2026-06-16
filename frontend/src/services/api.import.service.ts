@@ -234,9 +234,7 @@ class ApiImportService {
 
   static async getBatch(handle: number): Promise<ImportBatchSummary> {
     try {
-      const response = await axios.get<ImportBatchSummary>(
-        buildApiUrl(`import/batches/${handle}`),
-      )
+      const response = await axios.get<ImportBatchSummary>(buildApiUrl(`import/batches/${handle}`))
       return response.data
     } catch (error: unknown) {
       pushApiErrorMessage(error, 'exception.unknownError', 'import')
@@ -436,9 +434,7 @@ function extractHandle(value: unknown): string {
   return typeof handle === 'string' ? handle : ''
 }
 
-function normalizeTemplateValueMappings(
-  record: ImportTemplateRecord,
-): ImportValueMapping[] {
+function normalizeTemplateValueMappings(record: ImportTemplateRecord): ImportValueMapping[] {
   const entityMappings = getTemplateEntityValueMappings(record.valueMappings)
   if (entityMappings.length > 0) {
     return entityMappings
@@ -489,10 +485,10 @@ function normalizeValueMappingFallback(value: unknown): ImportValueMappingFallba
 function isImportValueMapping(value: unknown): value is ImportValueMapping {
   return Boolean(
     value &&
-      typeof value === 'object' &&
-      !Array.isArray(value) &&
-      typeof (value as ImportValueMapping).targetField === 'string' &&
-      typeof (value as ImportValueMapping).values === 'object',
+    typeof value === 'object' &&
+    !Array.isArray(value) &&
+    typeof (value as ImportValueMapping).targetField === 'string' &&
+    typeof (value as ImportValueMapping).values === 'object',
   )
 }
 

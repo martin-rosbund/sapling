@@ -8,6 +8,12 @@ export default defineConfig((configEnv) =>
     defineConfig({
       test: {
         environment: 'jsdom',
+        environmentOptions: {
+          jsdom: {
+            url: 'http://localhost/',
+          },
+        },
+        setupFiles: ['./src/test/setup.ts'],
         exclude: [...configDefaults.exclude, 'e2e/**'],
         root: fileURLToPath(new URL('./', import.meta.url)),
         server: {

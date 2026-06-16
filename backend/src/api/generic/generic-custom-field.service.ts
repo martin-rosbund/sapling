@@ -54,7 +54,7 @@ export class GenericCustomFieldService {
   }
 
   splitPayload<T extends Record<string, unknown>>(payload: T): SplitPayload<T> {
-    const data = { ...payload } as T;
+    const data = { ...payload };
     const customFields = this.normalizePayloadRecord(
       data[CUSTOM_FIELD_PAYLOAD_KEY],
     );
@@ -194,7 +194,7 @@ export class GenericCustomFieldService {
   }
 
   async hydrateRecords<T>(entityHandle: string, input: T): Promise<T> {
-    const records = Array.isArray(input) ? input : [input];
+    const records: unknown[] = Array.isArray(input) ? input : [input];
     const plainRecords = records.filter(
       (record): record is Record<string, unknown> =>
         !!record && typeof record === 'object' && !Array.isArray(record),
@@ -238,7 +238,7 @@ export class GenericCustomFieldService {
     }
 
     plainRecords.forEach((record) => {
-      const reference = String(record.handle ?? '');
+      const reference = this.normalizeRecordReference(record.handle);
       const customFields = valuesByReference.get(reference) ?? {};
       record[CUSTOM_FIELD_PAYLOAD_KEY] = customFields;
 
@@ -270,7 +270,7 @@ export class GenericCustomFieldService {
     for (const [key, value] of Object.entries(criteria)) {
       if ((key === '$and' || key === '$or') && Array.isArray(value)) {
         next[key] = await Promise.all(
-          value.map((entry) =>
+          (value as unknown[]).map((entry) =>
             this.isPlainRecord(entry)
               ? this.resolveCriteria(entityHandle, entry)
               : entry,
@@ -379,11 +379,10 @@ export class GenericCustomFieldService {
       return;
     }
 
-    target.$and = [
-      ...(Array.isArray(target.$and) ? target.$and : []),
-      { handle: target.handle },
-      source,
-    ];
+    const existingConditions = Array.isArray(target.$and)
+      ? (target.$and as unknown[])
+      : [];
+    target.$and = [...existingConditions, { handle: target.handle }, source];
     delete target.handle;
   }
 
@@ -430,7 +429,7 @@ export class GenericCustomFieldService {
           type: fieldType,
           options: definition.selectOptions ?? [],
         },
-      } as never,
+      },
     };
 
     (template as EntityTemplateDto & { customField?: object }).customField = {
@@ -513,7 +512,7 @@ export class GenericCustomFieldService {
       case 'longText':
       case 'text':
       default:
-        return String(value).trim();
+        return this.normalizeText(value);
     }
   }
 
@@ -554,13 +553,35 @@ export class GenericCustomFieldService {
     definition: CustomFieldDefinitionItem,
     value: unknown,
   ): string | null {
-    const normalized = String(value ?? '').trim();
+    const normalized = this.normalizeText(value);
     if (!normalized) {
       return null;
     }
 
     const allowed = this.getAllowedSelectValues(definition);
     return allowed.size === 0 || allowed.has(normalized) ? normalized : null;
+  }
+
+  private normalizeText(value: unknown): string | null {
+    if (typeof value === 'string') {
+      return value.trim();
+    }
+
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      return String(value).trim();
+    }
+
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+
+    return null;
+  }
+
+  private normalizeRecordReference(value: unknown): string {
+    return typeof value === 'string' || typeof value === 'number'
+      ? String(value)
+      : '';
   }
 
   private normalizeMultiSelect(
@@ -718,7 +739,7 @@ export class GenericCustomFieldService {
     }
 
     try {
-      const object = wrap(value as object).toObject();
+      const object = wrap(value).toObject();
       return !!object && typeof object === 'object' && !Array.isArray(object);
     } catch {
       return true;

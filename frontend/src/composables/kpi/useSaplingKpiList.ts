@@ -32,9 +32,7 @@ export function useSaplingKpiList(kpi: MaybeRefOrGetter<KPIItem | null | undefin
 
   const { loading, hasError, isLoaded, loadKpiValue } = useSaplingKpiLoader(kpi, {
     load: async (currentKpi) => {
-      const result = await ApiKpiService.execute<Array<Record<string, unknown>>>(
-        currentKpi.handle,
-      )
+      const result = await ApiKpiService.execute<Array<Record<string, unknown>>>(currentKpi.handle)
       const nextRows = Array.isArray(result?.value) ? result.value.filter(isKpiListRow) : []
 
       rows.value = nextRows

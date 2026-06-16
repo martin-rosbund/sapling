@@ -3,7 +3,9 @@
     as="aside"
     class="sapling-panel-shell sapling-section-panel sapling-config-panel sapling-config-panel--blurred sapling-form-config__panel sapling-form-config__panel--preview"
   >
-    <div class="sapling-row-between-md sapling-config-preview-header sapling-form-config__preview-header">
+    <div
+      class="sapling-row-between-md sapling-config-preview-header sapling-form-config__preview-header"
+    >
       <div>
         <p class="sapling-eyebrow sapling-config-eyebrow sapling-form-config__eyebrow">
           {{ t('formConfig.livePreview') }}

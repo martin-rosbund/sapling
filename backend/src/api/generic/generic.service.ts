@@ -175,17 +175,18 @@ export class GenericService {
     private readonly genericTimelineService: GenericTimelineService,
     private readonly openTaskEventsService: OpenTaskEventsService,
     private readonly genericCustomFieldService: GenericCustomFieldService = {
-      applyCustomFieldFilters: async (
+      applyCustomFieldFilters: (
         _entityHandle: string,
         criteria: object,
-      ) => criteria,
-      hydrateRecords: async <T>(_entityHandle: string, input: T) => input,
+      ): Promise<object> => Promise.resolve(criteria),
+      hydrateRecords: <T>(_entityHandle: string, input: T): Promise<T> =>
+        Promise.resolve(input),
       splitPayload: <T extends Record<string, unknown>>(payload: T) => ({
         data: payload,
         customFields: {},
       }),
-      assertRequiredFields: async () => undefined,
-      upsertCustomFieldValues: async () => undefined,
+      assertRequiredFields: (): Promise<void> => Promise.resolve(),
+      upsertCustomFieldValues: (): Promise<void> => Promise.resolve(),
     } as unknown as GenericCustomFieldService,
   ) {}
   // #endregion
@@ -1533,7 +1534,7 @@ export class GenericService {
 
   private removeCustomFieldOrderBy(orderBy: object): object {
     if (!orderBy || typeof orderBy !== 'object' || Array.isArray(orderBy)) {
-      return orderBy;
+      return {};
     }
 
     return Object.fromEntries(

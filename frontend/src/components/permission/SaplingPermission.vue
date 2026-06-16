@@ -232,7 +232,6 @@ import SaplingPermissionRoleSidebar from '@/components/permission/SaplingPermiss
 import SaplingPermissionWorkspace from '@/components/permission/SaplingPermissionWorkspace.vue'
 import { ref } from 'vue'
 import type { EntityItem, PersonItem } from '@/entity/entity'
-import type { ProviderUserImportResponse } from '@/services/api.provider-users.service'
 
 type PermissionColumnKey = 'allowShow' | 'allowRead' | 'allowInsert' | 'allowUpdate' | 'allowDelete'
 
@@ -338,7 +337,7 @@ function openProviderImportDialog() {
   providerImportDialogVisible.value = true
 }
 
-async function onProviderUsersImported(_result: ProviderUserImportResponse) {
+async function onProviderUsersImported() {
   await refreshPermissionMembers()
 }
 

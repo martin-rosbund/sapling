@@ -310,11 +310,11 @@ export class AuthProviderUserImportService {
     )) as PersonItem | null;
 
     if (!person && email) {
-      person = (await this.em.findOne(
+      person = await this.em.findOne(
         PersonItem,
         { email },
         { populate: ['roles', 'type'] },
-      )) as PersonItem | null;
+      );
     }
 
     const names = this.resolvePersonNames(providerUser);

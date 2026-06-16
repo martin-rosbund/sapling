@@ -8,11 +8,7 @@ import ApiCurrentService, {
   type CurrentSessionDto,
   type TerminateSessionsResult,
 } from '@/services/api.current.service'
-import type {
-  AiProviderModelItem,
-  AiProviderTypeItem,
-  WorkHourWeekItem,
-} from '@/entity/entity'
+import type { AiProviderModelItem, AiProviderTypeItem, WorkHourWeekItem } from '@/entity/entity'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useSaplingPreferences } from '@/composables/system/useSaplingPreferences'
 import ApiAiService from '@/services/api.ai.service'

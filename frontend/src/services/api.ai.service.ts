@@ -421,10 +421,7 @@ class ApiAiService {
 
   static async createSession(payload: CreateAiChatSessionPayload): Promise<AiChatSessionItem> {
     try {
-      const response = await axios.post<AiChatSessionItem>(
-        buildApiUrl('ai/chat/sessions'),
-        payload,
-      )
+      const response = await axios.post<AiChatSessionItem>(buildApiUrl('ai/chat/sessions'), payload)
       return response.data
     } catch (error: unknown) {
       this.handleError(error, 'ai.chat.sessionCreateFailed')

@@ -65,9 +65,10 @@ type PreparedSaplingFormConfigSave = {
   personHandle: number | null;
 };
 
-type SaplingFormConfigValidationResult = SaplingFormConfigValidationResultDto & {
-  normalizedConfig: NormalizedSaplingFormConfig;
-};
+type SaplingFormConfigValidationResult =
+  SaplingFormConfigValidationResultDto & {
+    normalizedConfig: NormalizedSaplingFormConfig;
+  };
 
 @Injectable()
 export class FormConfigService {
@@ -156,7 +157,11 @@ export class FormConfigService {
     payload: SaveSaplingFormConfigDto,
     templates: EntityTemplateDto[],
   ): PreparedSaplingFormConfigSave {
-    const validation = this.validateConfig(entityHandle, payload.config, templates);
+    const validation = this.validateConfig(
+      entityHandle,
+      payload.config,
+      templates,
+    );
     if (!validation.isValid) {
       throw new BadRequestException({
         message: 'formConfig.validationFailed',

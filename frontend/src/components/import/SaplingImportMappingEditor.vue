@@ -4,9 +4,7 @@
       <div class="sapling-import__mapping-label">
         <v-icon size="18">{{ field.isReference ? 'mdi-link' : 'mdi-form-textbox' }}</v-icon>
         <span>{{ fieldLabel(field.name) }}</span>
-        <v-chip v-if="field.isRequired" size="x-small" color="primary" variant="tonal">
-          *
-        </v-chip>
+        <v-chip v-if="field.isRequired" size="x-small" color="primary" variant="tonal"> * </v-chip>
         <v-tooltip
           v-if="aiSuggestionFieldDetails[field.name]"
           :text="aiSuggestionReason(field.name)"
@@ -20,14 +18,14 @@
       </div>
 
       <v-select
-        v-model="fieldMappings[field.name]"
+        :model-value="fieldMappings[field.name]"
         :items="headerOptions"
         density="compact"
         hide-details
         clearable
         :placeholder="field.name"
         autocomplete="off"
-        @update:model-value="emit('fieldMappingChange', field.name)"
+        @update:model-value="updateFieldMapping(field.name, $event)"
       >
         <template #item="{ props: itemProps, item }">
           <v-list-item v-bind="itemProps" class="sapling-import__source-option-item">
@@ -47,7 +45,10 @@
                 </v-chip>
               </div>
             </template>
-            <template v-if="sourceColumnUsageLabels(getSourceColumnOptionValue(item)).length > 0" #subtitle>
+            <template
+              v-if="sourceColumnUsageLabels(getSourceColumnOptionValue(item)).length > 0"
+              #subtitle
+            >
               <span class="sapling-import__source-option-subtitle">
                 {{ sourceColumnUsageLabels(getSourceColumnOptionValue(item)).join(', ') }}
               </span>
@@ -57,13 +58,14 @@
       </v-select>
 
       <SaplingImportTemplateValueField
-        v-model="fieldDefaults[field.name]"
+        :model-value="fieldDefaults[field.name]"
         :template="field"
         :entity-handle="selectedEntityHandle ?? ''"
         :visible-templates="fields"
         :permissions="permissions"
         :reference-items="referenceItemsForField(field)"
         :disabled="!hasBatch || isImportJobRunning"
+        @update:model-value="updateFieldDefault(field.name, $event)"
       />
 
       <div class="sapling-import__value-mapping-action">
@@ -88,7 +90,7 @@
         class="sapling-import__relation-mapping-controls"
       >
         <v-select
-          v-model="relationMappingModes[field.name]"
+          :model-value="relationMappingModes[field.name]"
           :items="relationMappingModeOptions"
           item-title="title"
           item-value="value"
@@ -97,9 +99,10 @@
           clearable
           :placeholder="t('import.relationMapping')"
           autocomplete="off"
+          @update:model-value="updateRelationMappingMode(field.name, $event)"
         />
         <v-select
-          v-model="relationMappingColumns[field.name]"
+          :model-value="relationMappingColumns[field.name]"
           :items="headerOptions"
           density="compact"
           hide-details
@@ -109,7 +112,7 @@
           :disabled="!relationMappingModes[field.name] || isImportJobRunning"
           :placeholder="t('import.externalKeyColumns')"
           autocomplete="off"
-          @update:model-value="emit('normalizeRelationMappingColumns', field.name)"
+          @update:model-value="updateRelationMappingColumns(field.name, $event)"
         />
       </div>
     </div>
@@ -128,7 +131,7 @@ type RelationMappingModeOption = {
   value: ImportRelationMappingMode
 }
 
-defineProps<{
+const props = defineProps<{
   hasBatch: boolean
   fields: EntityTemplate[]
   fieldMappings: Record<string, string | null>
@@ -158,7 +161,46 @@ const emit = defineEmits<{
   (event: 'fieldMappingChange', targetField: string): void
   (event: 'openValueMapping', field: EntityTemplate): void
   (event: 'normalizeRelationMappingColumns', targetField: string): void
+  (event: 'updateFieldMapping', targetField: string, value: string | null): void
+  (event: 'updateFieldDefault', targetField: string, value: unknown): void
+  (
+    event: 'updateRelationMappingMode',
+    targetField: string,
+    value: ImportRelationMappingMode | null,
+  ): void
+  (event: 'updateRelationMappingColumns', targetField: string, value: string[]): void
 }>()
 
 const { t } = useI18n()
+
+function normalizeNullableString(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value : null
+}
+
+function normalizeStringArray(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter((entry): entry is string => typeof entry === 'string')
+    : []
+}
+
+function updateFieldMapping(targetField: string, value: unknown): void {
+  emit('updateFieldMapping', targetField, normalizeNullableString(value))
+  emit('fieldMappingChange', targetField)
+}
+
+function updateFieldDefault(targetField: string, value: unknown): void {
+  emit('updateFieldDefault', targetField, value)
+}
+
+function updateRelationMappingMode(targetField: string, value: unknown): void {
+  const normalizedValue = props.relationMappingModeOptions.some((option) => option.value === value)
+    ? (value as ImportRelationMappingMode)
+    : null
+  emit('updateRelationMappingMode', targetField, normalizedValue)
+}
+
+function updateRelationMappingColumns(targetField: string, value: unknown): void {
+  emit('updateRelationMappingColumns', targetField, normalizeStringArray(value))
+  emit('normalizeRelationMappingColumns', targetField)
+}
 </script>

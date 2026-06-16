@@ -5,6 +5,38 @@ import { PersonItem } from '../entity/PersonItem';
 import { PersonSessionItem } from '../entity/PersonSessionItem';
 import { PersonTypeItem } from '../entity/PersonTypeItem';
 import { RoleItem } from '../entity/RoleItem';
+import type {
+  ProviderUserDto,
+  ProviderUserListResponseDto,
+} from './dto/provider-user.dto';
+
+type EntityLookup = Record<string, unknown>;
+
+type TestableAuthProviderUserImportService = {
+  getAzureUserWithRetry(
+    session: PersonSessionItem,
+    userId: string,
+  ): Promise<ProviderUserDto>;
+  getGoogleUserWithRetry(
+    session: PersonSessionItem,
+    userId: string,
+  ): Promise<ProviderUserDto>;
+  listAzureUsers(
+    accessToken: string,
+    options: { search?: string; pageToken?: string },
+  ): Promise<ProviderUserListResponseDto>;
+  listAzureUsersWithRetry(
+    session: PersonSessionItem,
+    options: { search?: string; pageToken?: string },
+  ): Promise<ProviderUserListResponseDto>;
+  waitForProviderRetry(delayMs: number): Promise<void>;
+};
+
+function asTestableService(
+  service: AuthProviderUserImportService,
+): TestableAuthProviderUserImportService {
+  return service as unknown as TestableAuthProviderUserImportService;
+}
 
 function createRolesCollection(initial: RoleItem[] = []) {
   const items = [...initial];
@@ -121,25 +153,19 @@ describe('AuthProviderUserImportService', () => {
     const roles = createRolesCollection();
     const createdPerson = { roles } as unknown as PersonItem;
 
-    em.findOne.mockImplementation(async (entity, where) => {
-      if (entity === PersonSessionItem) return session;
-      if (entity === PersonTypeItem) return personType;
-      if (entity === PersonItem && 'loginName' in where) return null;
-      if (entity === PersonItem && 'email' in where) return null;
-      return null;
+    em.findOne.mockImplementation((entity: unknown, where: EntityLookup) => {
+      if (entity === PersonSessionItem) return Promise.resolve(session);
+      if (entity === PersonTypeItem) return Promise.resolve(personType);
+      if (entity === PersonItem && 'loginName' in where)
+        return Promise.resolve(null);
+      if (entity === PersonItem && 'email' in where)
+        return Promise.resolve(null);
+      return Promise.resolve(null);
     });
     em.find.mockResolvedValue([role]);
     em.create.mockReturnValue(createdPerson);
     jest
-      .spyOn(
-        service as unknown as {
-          getAzureUserWithRetry: (
-            session: PersonSessionItem,
-            userId: string,
-          ) => Promise<unknown>;
-        },
-        'getAzureUserWithRetry',
-      )
+      .spyOn(asTestableService(service), 'getAzureUserWithRetry')
       .mockResolvedValue({
         provider: 'azure',
         id: 'azure-1',
@@ -187,23 +213,16 @@ describe('AuthProviderUserImportService', () => {
       roles,
     } as unknown as PersonItem;
 
-    em.findOne.mockImplementation(async (entity, where) => {
-      if (entity === PersonSessionItem) return session;
-      if (entity === PersonTypeItem) return personType;
-      if (entity === PersonItem && 'loginName' in where) return existingPerson;
-      return null;
+    em.findOne.mockImplementation((entity: unknown, where: EntityLookup) => {
+      if (entity === PersonSessionItem) return Promise.resolve(session);
+      if (entity === PersonTypeItem) return Promise.resolve(personType);
+      if (entity === PersonItem && 'loginName' in where)
+        return Promise.resolve(existingPerson);
+      return Promise.resolve(null);
     });
     em.find.mockResolvedValue([existingRole, newRole]);
     jest
-      .spyOn(
-        service as unknown as {
-          getGoogleUserWithRetry: (
-            session: PersonSessionItem,
-            userId: string,
-          ) => Promise<unknown>;
-        },
-        'getGoogleUserWithRetry',
-      )
+      .spyOn(asTestableService(service), 'getGoogleUserWithRetry')
       .mockResolvedValue({
         provider: 'google',
         id: 'google-1',
@@ -237,26 +256,21 @@ describe('AuthProviderUserImportService', () => {
     const roles = createRolesCollection();
     const createdPerson = { roles } as unknown as PersonItem;
 
-    em.findOne.mockImplementation(async (entity, where) => {
-      if (entity === PersonSessionItem) return session;
-      if (entity === PersonTypeItem) return personType;
-      if (entity === CompanyItem && where.handle === 12) return company;
-      if (entity === PersonItem && 'loginName' in where) return null;
-      if (entity === PersonItem && 'email' in where) return null;
-      return null;
+    em.findOne.mockImplementation((entity: unknown, where: EntityLookup) => {
+      if (entity === PersonSessionItem) return Promise.resolve(session);
+      if (entity === PersonTypeItem) return Promise.resolve(personType);
+      if (entity === CompanyItem && where.handle === 12)
+        return Promise.resolve(company);
+      if (entity === PersonItem && 'loginName' in where)
+        return Promise.resolve(null);
+      if (entity === PersonItem && 'email' in where)
+        return Promise.resolve(null);
+      return Promise.resolve(null);
     });
     em.find.mockResolvedValue([role]);
     em.create.mockReturnValue(createdPerson);
     jest
-      .spyOn(
-        service as unknown as {
-          getAzureUserWithRetry: (
-            session: PersonSessionItem,
-            userId: string,
-          ) => Promise<unknown>;
-        },
-        'getAzureUserWithRetry',
-      )
+      .spyOn(asTestableService(service), 'getAzureUserWithRetry')
       .mockResolvedValue({
         provider: 'azure',
         id: 'azure-1',
@@ -297,35 +311,19 @@ describe('AuthProviderUserImportService', () => {
 
   it('retries transient Azure directory failures', async () => {
     const { service } = createService();
+    const testService = asTestableService(service);
     const transientError = Object.assign(new Error('fetch failed'), {
       code: 'TypeError',
     });
     const listAzureUsers = jest
-      .spyOn(
-        service as unknown as {
-          listAzureUsers: jest.Mock;
-        },
-        'listAzureUsers',
-      )
+      .spyOn(testService, 'listAzureUsers')
       .mockRejectedValueOnce(transientError)
       .mockResolvedValueOnce({ users: [], nextPageToken: null });
     jest
-      .spyOn(
-        service as unknown as {
-          waitForProviderRetry: jest.Mock;
-        },
-        'waitForProviderRetry',
-      )
+      .spyOn(testService, 'waitForProviderRetry')
       .mockResolvedValue(undefined);
 
-    const result = await (
-      service as unknown as {
-        listAzureUsersWithRetry: (
-          session: PersonSessionItem,
-          options: { search?: string; pageToken?: string },
-        ) => Promise<unknown>;
-      }
-    ).listAzureUsersWithRetry(
+    const result = await testService.listAzureUsersWithRetry(
       { accessToken: 'token' } as PersonSessionItem,
       {},
     );
@@ -336,35 +334,17 @@ describe('AuthProviderUserImportService', () => {
 
   it('returns a translated provider error after repeated Azure directory failures', async () => {
     const { service } = createService();
+    const testService = asTestableService(service);
     const transientError = Object.assign(new Error('fetch failed'), {
       code: 'TypeError',
     });
+    jest.spyOn(testService, 'listAzureUsers').mockRejectedValue(transientError);
     jest
-      .spyOn(
-        service as unknown as {
-          listAzureUsers: jest.Mock;
-        },
-        'listAzureUsers',
-      )
-      .mockRejectedValue(transientError);
-    jest
-      .spyOn(
-        service as unknown as {
-          waitForProviderRetry: jest.Mock;
-        },
-        'waitForProviderRetry',
-      )
+      .spyOn(testService, 'waitForProviderRetry')
       .mockResolvedValue(undefined);
 
     await expect(
-      (
-        service as unknown as {
-          listAzureUsersWithRetry: (
-            session: PersonSessionItem,
-            options: { search?: string; pageToken?: string },
-          ) => Promise<unknown>;
-        }
-      ).listAzureUsersWithRetry(
+      testService.listAzureUsersWithRetry(
         { accessToken: 'token' } as PersonSessionItem,
         {},
       ),
@@ -372,14 +352,7 @@ describe('AuthProviderUserImportService', () => {
       message: 'providerUserImport.azureDirectoryUnavailable',
     });
     await expect(
-      (
-        service as unknown as {
-          listAzureUsersWithRetry: (
-            session: PersonSessionItem,
-            options: { search?: string; pageToken?: string },
-          ) => Promise<unknown>;
-        }
-      ).listAzureUsersWithRetry(
+      testService.listAzureUsersWithRetry(
         { accessToken: 'token' } as PersonSessionItem,
         {},
       ),

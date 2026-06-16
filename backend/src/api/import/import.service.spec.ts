@@ -18,7 +18,7 @@ describe('ImportService', () => {
   it('hydrates the import user permissions for queued validation and execution jobs', async () => {
     const currentUser = { handle: 7, roles: [] };
     const em = {
-      findOne: jest.fn(async () => currentUser),
+      findOne: jest.fn(() => Promise.resolve(currentUser)),
     };
     const service = createService(em);
 
@@ -68,13 +68,13 @@ describe('ImportService', () => {
   });
 
   it('loads distinct source values from all import rows with a capped limit', async () => {
-    const execute = jest.fn(async () => [
-      { value: 'Dr.' },
-      { value: 'Prof.' },
-      { value: 'Sir' },
-    ]);
+    const execute = jest.fn(() =>
+      Promise.resolve([{ value: 'Dr.' }, { value: 'Prof.' }, { value: 'Sir' }]),
+    );
     const service = createService({
-      findOne: jest.fn(async () => ({ handle: 42, headers: ['Titel'] })),
+      findOne: jest.fn(() =>
+        Promise.resolve({ handle: 42, headers: ['Titel'] }),
+      ),
       getConnection: jest.fn(() => ({ execute })),
     });
 
@@ -139,7 +139,7 @@ describe('ImportService', () => {
 
   it('includes the target field and source value when kept reference values cannot be resolved', async () => {
     const service = createService({
-      find: jest.fn(async () => []),
+      find: jest.fn(() => Promise.resolve([])),
     });
 
     await expect(

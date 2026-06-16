@@ -96,11 +96,7 @@
         </tbody>
       </v-table>
 
-      <v-table
-        v-else-if="sampleHeaders.length > 0"
-        density="compact"
-        class="sapling-import__table"
-      >
+      <v-table v-else-if="sampleHeaders.length > 0" density="compact" class="sapling-import__table">
         <thead>
           <tr>
             <th v-for="header in sampleHeaders" :key="header">{{ header }}</th>
