@@ -1,0 +1,26 @@
+[
+  {
+    "entity": "eventStatus",
+    "property": "isOpen",
+    "de": "Offen",
+    "en": "Open"
+  },
+  {
+    "entity": "eventStatus",
+    "property": "groupConfiguration",
+    "de": "Konfiguration",
+    "en": "Configuration"
+  },
+  {
+    "entity": "event",
+    "property": "statusFilter",
+    "de": "Statusfilter",
+    "en": "Status filter"
+  },
+  {
+    "entity": "event",
+    "property": "statusFilterHint",
+    "de": "Standard: offene Status",
+    "en": "Default: open statuses"
+  }
+]

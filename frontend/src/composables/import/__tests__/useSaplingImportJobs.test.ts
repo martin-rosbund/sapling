@@ -21,6 +21,13 @@ vi.mock('@/services/api.import.service', () => ({
   default: {
     getBatch,
   },
+  isImportBatchNotFoundError: (error: unknown) =>
+    Boolean(
+      error &&
+        typeof error === 'object' &&
+        'response' in error &&
+        (error as { response?: { status?: number } }).response?.status === 404,
+    ),
 }))
 
 describe('useSaplingImportJobs', () => {
@@ -58,7 +65,7 @@ describe('useSaplingImportJobs', () => {
     await Promise.resolve()
     await Promise.resolve()
 
-    expect(getBatch).toHaveBeenCalledWith(42)
+    expect(getBatch).toHaveBeenCalledWith(42, { suppressNotFoundError: true })
     expect(pushMessage).toHaveBeenCalledWith(
       'success',
       'import.executionCompleted',
@@ -66,6 +73,24 @@ describe('useSaplingImportJobs', () => {
       'import',
       expect.objectContaining({ processedRows: 2 }),
     )
+    expect(window.localStorage.getItem('sapling.import.activeBatchHandles')).toBe('[]')
+
+    stopImportJobWatcher()
+  })
+
+  it('removes missing import handles from local storage without a notification', async () => {
+    getBatch.mockRejectedValue({ response: { status: 404 } })
+    window.localStorage.setItem('sapling.import.activeBatchHandles', '[42]')
+
+    const { useSaplingImportJobs } = await import('../useSaplingImportJobs')
+    const { startImportJobWatcher, stopImportJobWatcher } = useSaplingImportJobs()
+
+    startImportJobWatcher()
+    await Promise.resolve()
+    await Promise.resolve()
+
+    expect(getBatch).toHaveBeenCalledWith(42, { suppressNotFoundError: true })
+    expect(pushMessage).not.toHaveBeenCalled()
     expect(window.localStorage.getItem('sapling.import.activeBatchHandles')).toBe('[]')
 
     stopImportJobWatcher()

@@ -1,6 +1,9 @@
 import { i18n } from '@/i18n'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
-import ApiImportService, { type ImportBatchSummary } from '@/services/api.import.service'
+import ApiImportService, {
+  isImportBatchNotFoundError,
+  type ImportBatchSummary,
+} from '@/services/api.import.service'
 
 const STORAGE_KEY = 'sapling.import.activeBatchHandles'
 const POLL_INTERVAL_MS = 3000
@@ -67,10 +70,15 @@ export function useSaplingImportJobs() {
     try {
       for (const handle of [...activeBatchHandles]) {
         try {
-          const batch = await ApiImportService.getBatch(handle)
+          const batch = await ApiImportService.getBatch(handle, {
+            suppressNotFoundError: true,
+          })
           handlePolledBatch(batch)
-        } catch {
-          // The shared API error handling already reports failed status loads.
+        } catch (error) {
+          if (isImportBatchNotFoundError(error)) {
+            activeBatchHandles.delete(handle)
+          }
+          // Non-404 polling errors are still reported by the shared API handler.
         }
       }
     } finally {

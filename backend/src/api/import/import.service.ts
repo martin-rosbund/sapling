@@ -53,6 +53,8 @@ import type {
   ImportGenericReferenceMappingDto,
   ImportTemplateSummaryDto,
   ImportRelationMappingDto,
+  ImportUniqueConflictStrategyDto,
+  ImportUniqueConflictStrategyMode,
   ImportValueMappingDto,
   ImportValueMappingFallback,
   SaveImportTemplateDto,
@@ -61,6 +63,11 @@ import type {
 type ExternalKey = {
   hash: string;
   parts: Record<string, unknown>;
+};
+
+type ImportPlannedAction = {
+  action: string;
+  targetReference: string | number | null;
 };
 
 type ImportReferenceCandidate = {
@@ -96,6 +103,7 @@ const RESPONSE_ROW_LIMIT = 200;
 const AI_REFERENCE_CANDIDATE_LIMIT = 50;
 const AI_TEMPLATE_CONTEXT_LIMIT = 5;
 const REQUIRED_FIELDS_MISSING_MESSAGE_PREFIX = 'import.requiredFieldsMissing';
+const INVALID_BOOLEAN_VALUES_MESSAGE_PREFIX = 'import.invalidBooleanValues';
 const OPEN_IMPORT_BATCH_STATUSES = [
   'analyzed',
   'validationQueued',
@@ -443,6 +451,7 @@ export class ImportService {
       fieldDefaults: effectiveDto.fieldDefaults ?? [],
       relationMappings: effectiveDto.relationMappings ?? [],
       valueMappings: effectiveDto.valueMappings ?? [],
+      uniqueConflictStrategies: effectiveDto.uniqueConflictStrategies ?? [],
     };
     batch.externalKeyColumns = keyColumns;
     batch.genericReferenceMapping = dto.genericReferenceMapping ?? null;
@@ -577,6 +586,7 @@ export class ImportService {
       mappings: dto.mappings ?? [],
       fieldDefaults: dto.fieldDefaults ?? [],
       relationMappings: dto.relationMappings ?? [],
+      uniqueConflictStrategies: dto.uniqueConflictStrategies ?? [],
     };
     template.externalKeyColumns = this.normalizeColumns(dto.keyColumns ?? []);
     template.genericReferenceMapping = dto.genericReferenceMapping ?? null;
@@ -735,7 +745,10 @@ export class ImportService {
     userHandle: number,
   ): Promise<void> {
     await this.runInImportContext(async () => {
-      const batch = await this.findBatch(handle);
+      const batch = await this.tryFindBatch(handle);
+      if (!batch) {
+        return;
+      }
 
       if (
         batch.status !== 'validationQueued' &&
@@ -770,6 +783,7 @@ export class ImportService {
             this.templateService.getEntityTemplate(entityHandle),
           );
         const duplicateKeys = new Set<string>();
+        const uniqueValueClaims = new Map<string, number>();
         let readyCount = 0;
         let errorCount = 0;
 
@@ -813,19 +827,30 @@ export class ImportService {
               currentUser,
             );
             this.validateImportDateValues(template, payload);
-            const action = await this.resolvePlannedAction(
+            this.validateImportBooleanValues(template, payload);
+            const plannedAction = await this.resolvePlannedAction(
               entityHandle,
               payload,
               source?.handle ?? null,
               externalKey?.hash ?? null,
             );
+            await this.applyUniqueConflictStrategies(
+              template,
+              payload,
+              effectiveDto,
+              entityHandle,
+              row,
+              plannedAction.targetReference,
+              externalKey,
+              uniqueValueClaims,
+            );
 
             const missingRequiredFields = this.getMissingRequiredFieldNames(
               template,
               payload,
-              action,
+              plannedAction.action,
             );
-            if (action !== 'updated') {
+            if (plannedAction.action !== 'updated') {
               missingRequiredFields.push(
                 ...(await this.genericCustomFieldService.getMissingRequiredFieldNames(
                   entityHandle,
@@ -843,7 +868,7 @@ export class ImportService {
             row.payload = payload;
             row.externalKeyHash = externalKey?.hash ?? null;
             row.externalKeyParts = externalKey?.parts ?? null;
-            row.action = action;
+            row.action = plannedAction.action;
             row.status = 'ready';
             row.message = null;
             readyCount += 1;
@@ -888,7 +913,10 @@ export class ImportService {
     userHandle: number,
   ): Promise<void> {
     await this.runInImportContext(async () => {
-      const batch = await this.findBatch(handle);
+      const batch = await this.tryFindBatch(handle);
+      if (!batch) {
+        return;
+      }
 
       if (batch.status !== 'executionQueued' && batch.status !== 'executing') {
         return;
@@ -1495,17 +1523,21 @@ export class ImportService {
   }
 
   private async findBatch(handle: number): Promise<ImportBatchItem> {
-    const batch = await this.em.findOne(
-      ImportBatchItem,
-      { handle },
-      { populate: ['source', 'targetEntity', 'importTemplate', 'createdBy'] },
-    );
+    const batch = await this.tryFindBatch(handle);
 
     if (!batch) {
       throw new NotFoundException('import.batchNotFound');
     }
 
     return batch;
+  }
+
+  private async tryFindBatch(handle: number): Promise<ImportBatchItem | null> {
+    return this.em.findOne(
+      ImportBatchItem,
+      { handle },
+      { populate: ['source', 'targetEntity', 'importTemplate', 'createdBy'] },
+    );
   }
 
   private async enqueueImportJob(
@@ -1576,7 +1608,11 @@ export class ImportService {
     operation: 'validation' | 'execution',
     error: unknown,
   ): Promise<void> {
-    const batch = await this.findBatch(handle);
+    const batch = await this.tryFindBatch(handle);
+    if (!batch) {
+      return;
+    }
+
     batch.status = status;
     batch.currentOperation = operation;
     batch.failedAt = new Date();
@@ -1618,6 +1654,10 @@ export class ImportService {
       valueMappings: this.asImportRecordArray<ImportValueMappingDto>(
         mapping.valueMappings,
       ),
+      uniqueConflictStrategies:
+        this.asImportRecordArray<ImportUniqueConflictStrategyDto>(
+          mapping.uniqueConflictStrategies,
+        ),
       genericReferenceMapping:
         this.normalizeGenericReferenceMapping(batch.genericReferenceMapping) ??
         null,
@@ -1995,6 +2035,32 @@ export class ImportService {
     }
 
     return Number.isNaN(Date.parse(normalizedValue));
+  }
+
+  private validateImportBooleanValues(
+    template: EntityTemplateDto[],
+    payload: Record<string, unknown>,
+  ): void {
+    const invalidBooleanFields = template
+      .filter((field) => this.isBooleanField(field))
+      .filter((field) => this.isInvalidImportBooleanValue(payload[field.name]))
+      .map((field) => field.name);
+
+    if (invalidBooleanFields.length === 0) {
+      return;
+    }
+
+    throw new Error(
+      `${INVALID_BOOLEAN_VALUES_MESSAGE_PREFIX}:${Array.from(new Set(invalidBooleanFields)).join(',')}`,
+    );
+  }
+
+  private isBooleanField(field: EntityTemplateDto): boolean {
+    return field.type === 'boolean';
+  }
+
+  private isInvalidImportBooleanValue(value: unknown): boolean {
+    return value != null && typeof value !== 'boolean';
   }
 
   private async applyRelationMappings(
@@ -2466,6 +2532,198 @@ export class ImportService {
       .map((field) => field.name);
   }
 
+  private async applyUniqueConflictStrategies(
+    template: EntityTemplateDto[],
+    payload: Record<string, unknown>,
+    dto: ConfigureImportBatchDto,
+    entityHandle: string,
+    row: ImportBatchRowItem,
+    targetReference: string | number | null,
+    externalKey: ExternalKey | null,
+    uniqueValueClaims: Map<string, number>,
+  ): Promise<void> {
+    for (const field of template) {
+      if (!this.isImportUniqueConflictField(field)) {
+        continue;
+      }
+
+      const originalValue = this.normalizeScalarString(payload[field.name]);
+      if (!originalValue) {
+        continue;
+      }
+
+      const strategy = this.getUniqueConflictStrategy(dto, field.name);
+      const originalClaimKey = this.createUniqueValueClaimKey(
+        field.name,
+        originalValue,
+      );
+      const originalBatchConflictRow = uniqueValueClaims.get(originalClaimKey);
+      const originalDatabaseConflict = await this.hasUniqueValueConflict(
+        entityHandle,
+        field.name,
+        originalValue,
+        targetReference,
+      );
+
+      if (!originalBatchConflictRow && !originalDatabaseConflict) {
+        uniqueValueClaims.set(originalClaimKey, row.rowNumber);
+        continue;
+      }
+
+      if (strategy !== 'appendExternalKey') {
+        throw new BadRequestException(
+          originalBatchConflictRow
+            ? this.createUniqueFieldDuplicateInBatchMessage(
+                field.name,
+                originalValue,
+              )
+            : this.createUniqueFieldConflictMessage(field.name, originalValue),
+        );
+      }
+
+      const suffixedValue = this.appendUniqueConflictSuffix(
+        field,
+        originalValue,
+        this.createUniqueConflictSuffix(row, externalKey),
+      );
+      const suffixedClaimKey = this.createUniqueValueClaimKey(
+        field.name,
+        suffixedValue,
+      );
+      const suffixedBatchConflictRow = uniqueValueClaims.get(suffixedClaimKey);
+      const suffixedDatabaseConflict = await this.hasUniqueValueConflict(
+        entityHandle,
+        field.name,
+        suffixedValue,
+        targetReference,
+      );
+
+      if (suffixedBatchConflictRow || suffixedDatabaseConflict) {
+        throw new BadRequestException(
+          suffixedBatchConflictRow
+            ? this.createUniqueFieldDuplicateInBatchMessage(
+                field.name,
+                suffixedValue,
+              )
+            : this.createUniqueFieldConflictMessage(field.name, suffixedValue),
+        );
+      }
+
+      payload[field.name] = suffixedValue;
+      uniqueValueClaims.set(suffixedClaimKey, row.rowNumber);
+    }
+  }
+
+  private isImportUniqueConflictField(field: EntityTemplateDto): boolean {
+    return Boolean(
+      field.name &&
+        field.isUnique &&
+        !field.isPrimaryKey &&
+        !field.isReference &&
+        !field.customField &&
+        !field.name.startsWith('customFields.') &&
+        field.isPersistent !== false &&
+        this.isImportTextField(field),
+    );
+  }
+
+  private isImportTextField(field: EntityTemplateDto): boolean {
+    return ['string', 'text', 'varchar'].includes(field.type);
+  }
+
+  private getUniqueConflictStrategy(
+    dto: ConfigureImportBatchDto,
+    targetField: string,
+  ): ImportUniqueConflictStrategyMode {
+    const strategy = dto.uniqueConflictStrategies?.find(
+      (entry) => entry.targetField === targetField,
+    )?.strategy;
+
+    return strategy === 'appendExternalKey' ? 'appendExternalKey' : 'error';
+  }
+
+  private async hasUniqueValueConflict(
+    entityHandle: string,
+    targetField: string,
+    value: string,
+    currentReference: string | number | null,
+  ): Promise<boolean> {
+    const entityClass = this.genericQueryService.getEntityClass(entityHandle);
+    const matches = await this.em.find(
+      entityClass,
+      { [targetField]: value },
+      { limit: 2 },
+    );
+    const currentReferenceText =
+      currentReference == null ? null : String(currentReference);
+
+    return matches.some((match) => {
+      const handle = this.extractResultHandle(match);
+      return handle == null || String(handle) !== currentReferenceText;
+    });
+  }
+
+  private createUniqueConflictSuffix(
+    row: ImportBatchRowItem,
+    externalKey: ExternalKey | null,
+  ): string {
+    const externalKeySuffix = Object.values(externalKey?.parts ?? {})
+      .map((value) => this.normalizeScalarString(value))
+      .filter(Boolean)
+      .join('-');
+
+    return externalKeySuffix || `row-${row.rowNumber}`;
+  }
+
+  private appendUniqueConflictSuffix(
+    field: EntityTemplateDto,
+    value: string,
+    suffix: string,
+  ): string {
+    const suffixText = ` (${suffix})`;
+    const maxLength =
+      typeof field.length === 'number' && Number.isFinite(field.length)
+        ? Math.trunc(field.length)
+        : null;
+
+    if (!maxLength || value.length + suffixText.length <= maxLength) {
+      return `${value}${suffixText}`;
+    }
+
+    const prefixLength = maxLength - suffixText.length;
+    if (prefixLength > 0) {
+      return `${value.slice(0, prefixLength).trimEnd()}${suffixText}`;
+    }
+
+    return `${value}${suffixText}`.slice(0, maxLength);
+  }
+
+  private createUniqueValueClaimKey(fieldName: string, value: string): string {
+    return `${fieldName}:${value.trim().toLocaleLowerCase()}`;
+  }
+
+  private createUniqueFieldConflictMessage(
+    fieldName: string,
+    value: string,
+  ): string {
+    return [
+      'import.uniqueFieldConflict',
+      encodeURIComponent(fieldName),
+      encodeURIComponent(value),
+    ].join(':');
+  }
+
+  private createUniqueFieldDuplicateInBatchMessage(
+    fieldName: string,
+    value: string,
+  ): string {
+    return [
+      'import.uniqueFieldDuplicateInBatch',
+      encodeURIComponent(fieldName),
+      encodeURIComponent(value),
+    ].join(':');
+  }
+
   private createRequiredFieldsMissingMessage(fieldNames: string[]): string {
     const normalizedFieldNames = Array.from(
       new Set(fieldNames.map((fieldName) => fieldName.trim()).filter(Boolean)),
@@ -2479,7 +2737,7 @@ export class ImportService {
     payload: Record<string, unknown>,
     sourceHandle: string | null,
     externalKeyHash: string | null,
-  ): Promise<string> {
+  ): Promise<ImportPlannedAction> {
     if (sourceHandle && externalKeyHash) {
       const link = await this.em.findOne(ExternalRecordLinkItem, {
         source: { handle: sourceHandle },
@@ -2487,10 +2745,17 @@ export class ImportService {
         externalKeyHash,
       });
 
-      return link ? 'updated' : 'created';
+      return {
+        action: link ? 'updated' : 'created',
+        targetReference: link?.reference ?? null,
+      };
     }
 
-    return extractImportHandle(payload) == null ? 'created' : 'updated';
+    const payloadHandle = extractImportHandle(payload);
+    return {
+      action: payloadHandle == null ? 'created' : 'updated',
+      targetReference: payloadHandle,
+    };
   }
 
   private async findRowExternalLink(

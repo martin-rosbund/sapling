@@ -116,9 +116,13 @@
         <SaplingEventContextPanels
           :is-mobile-filter-layout="isMobileContextLayout"
           :upcoming-events="upcomingEvents"
+          :event-statuses="eventStatuses"
+          :selected-event-statuses="selectedEventStatuses"
+          :selected-event-status-count="selectedEventStatusCount"
           :selected-peoples="selectedPeoples"
           :selected-people-preview="selectedPeoplePreview"
           :selected-people-overflow-count="selectedPeopleOverflowCount"
+          @update-selected-event-statuses="onSelectedEventStatusesUpdate"
           @update-selected-peoples="onSelectedPeoplesUpdate"
           @open-filter="toggleContextDialog"
           @open-event="openEventEditor"
@@ -139,7 +143,10 @@
         class="sapling-event-context-dialog__panel"
         :show-close-action="true"
         :close-action-label="contextDialogCloseLabel"
+        :status-options="eventStatuses"
+        :selected-statuses="selectedEventStatuses"
         @close="mobileContextDialogVisible = false"
+        @update:selected-statuses="onSelectedEventStatusesUpdate"
         @update:selected-peoples="onSelectedPeoplesUpdate"
       />
     </div>
@@ -270,6 +277,7 @@ const {
   eventContextMenuItems,
   eventContextMenuStyle,
   entityEvent,
+  eventStatuses,
   events,
   getEventColor,
   getEvents,
@@ -295,9 +303,12 @@ const {
   onEditDialogSave,
   openUpdateConflictChangeLog,
   openEventEditor,
+  onSelectedEventStatusesUpdate,
   onSelectedPeoplesUpdate,
   reloadUpdateConflictRecord,
   selectedPeoples,
+  selectedEventStatuses,
+  selectedEventStatusCount,
   selectedPeopleOverflowCount,
   selectedPeoplePreview,
   syncExternalCalendar,

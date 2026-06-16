@@ -205,6 +205,7 @@ export class EventItem {
    * @type {EventTypeItem}
    */
   @ApiProperty({ type: () => EventTypeItem })
+  @Sapling(['isChip'])
   @SaplingForm({
     order: 200,
     group: 'event.groupBasics',
@@ -383,6 +384,7 @@ export class EventItem {
    * @type {EventStatusItem}
    */
   @ApiProperty({ type: () => EventStatusItem })
+  @Sapling(['isChip'])
   @SaplingForm({
     order: 300,
     group: 'event.groupBasics',

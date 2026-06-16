@@ -1,4 +1,7 @@
-import ApiImportService, { type ImportBatchSummary } from '@/services/api.import.service'
+import ApiImportService, {
+  isImportBatchNotFoundError,
+  type ImportBatchSummary,
+} from '@/services/api.import.service'
 
 const IMPORT_POLL_INTERVAL_MS = 2000
 
@@ -21,9 +24,14 @@ const IMPORT_TERMINAL_STATUSES = new Set([
 interface ImportBatchPollingOptions {
   onBatch: (batch: ImportBatchSummary) => void
   onTerminal?: (batch: ImportBatchSummary) => void | Promise<void>
+  onNotFound?: (handle: number) => void
 }
 
-export function useSaplingImportBatchPolling({ onBatch, onTerminal }: ImportBatchPollingOptions) {
+export function useSaplingImportBatchPolling({
+  onBatch,
+  onTerminal,
+  onNotFound,
+}: ImportBatchPollingOptions) {
   let batchPollTimer: number | null = null
 
   function startBatchPolling(handle: number | null | undefined): void {
@@ -50,15 +58,21 @@ export function useSaplingImportBatchPolling({ onBatch, onTerminal }: ImportBatc
 
   async function refreshBatchStatus(handle: number): Promise<void> {
     try {
-      const refreshedBatch = await ApiImportService.getBatch(handle)
+      const refreshedBatch = await ApiImportService.getBatch(handle, {
+        suppressNotFoundError: true,
+      })
       onBatch(refreshedBatch)
 
       if (isTerminalImportStatus(refreshedBatch.status)) {
         stopBatchPolling()
         await onTerminal?.(refreshedBatch)
       }
-    } catch {
-      // shared API errors already surface through the message center
+    } catch (error) {
+      if (isImportBatchNotFoundError(error)) {
+        stopBatchPolling()
+        onNotFound?.(handle)
+      }
+      // Non-404 polling errors are still reported by the shared API handler.
     }
   }
 

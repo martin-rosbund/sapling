@@ -13,6 +13,7 @@ import { Sapling, SaplingForm } from './global/entity.decorator';
  * @property        {string}                    handle      Unique handle for the event status (e.g., 'scheduled', 'completed')
  * @property        {string}                    description Description of the status (display name)
  * @property        {string}                    color       Color code (e.g., hex or color name) for UI representation
+ * @property        {boolean}                   isOpen      Indicates whether events with this status are treated as open
  * @property        {Collection<EventItem>}     events      All events that have this status
  * @property        {Date}                      createdAt   Date and time when the event status was created
  * @property        {Date}                      updatedAt   Date and time when the event status was last updated
@@ -67,6 +68,25 @@ export class EventStatusItem {
   })
   @Property({ length: 16, nullable: false })
   color!: string;
+
+  /**
+   * Indicates whether events with this status are treated as open.
+   * @type {boolean}
+   */
+  @ApiPropertyOptional({ default: true })
+  @SaplingForm({
+    order: 100,
+    group: 'eventStatus.groupConfiguration',
+    groupOrder: 300,
+    width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
+  })
+  @Property({ default: true, nullable: false })
+  isOpen?: boolean = true;
   // #endregion
 
   // #region Properties: Relation

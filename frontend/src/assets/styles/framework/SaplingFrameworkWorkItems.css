@@ -358,6 +358,15 @@
   flex: 0 0 auto;
 }
 
+.sapling-event-status-filter__swatch {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--sapling-surface-border) 70%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 8%, transparent);
+}
+
 .sapling-vertical-item.selected,
 .sapling-vertical-item:hover {
   background: var(--sapling-surface-fill);

@@ -32,6 +32,13 @@ export type ImportValueMappingDto = {
   fallback?: ImportValueMappingFallback;
 };
 
+export type ImportUniqueConflictStrategyMode = 'error' | 'appendExternalKey';
+
+export type ImportUniqueConflictStrategyDto = {
+  targetField: string;
+  strategy: ImportUniqueConflictStrategyMode;
+};
+
 export type ImportAiSuggestDto = {
   entityHandle?: string | null;
   sourceHandle?: string | null;
@@ -85,6 +92,7 @@ export type ConfigureImportBatchDto = {
   fieldDefaults?: ImportFieldDefaultDto[];
   relationMappings?: ImportRelationMappingDto[];
   valueMappings?: ImportValueMappingDto[];
+  uniqueConflictStrategies?: ImportUniqueConflictStrategyDto[];
   genericReferenceMapping?: ImportGenericReferenceMappingDto | null;
 };
 

@@ -741,6 +741,11 @@
   min-width: 0;
 }
 
+.sapling-import__unique-conflict-controls {
+  grid-column: 2 / -1;
+  min-width: 0;
+}
+
 .sapling-import__relation-mapping-controls > *:nth-child(2) {
   grid-column: 2 / -1;
 }
@@ -909,6 +914,10 @@
 }
 
 @media (max-width: 560px) {
+  .sapling-import__unique-conflict-controls {
+    grid-column: 1 / -1;
+  }
+
   .sapling-import__relation-mapping-controls {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) var(--sapling-import-mapping-action-width);
   }

@@ -40,7 +40,7 @@ Important fields:
 | `recurrenceRule` | Optional RRULE string for recurring events |
 | `onlineMeetingURL` | Optional meeting link |
 | `type` | Event category; controls default-calendar behavior |
-| `status` | Current event status |
+| `status` | Current event status; `EventStatusItem.isOpen` controls the default open-status calendar filter |
 | `assigneeCompany`, `assigneePerson` | Internal owner |
 | `creatorCompany`, `creatorPerson` | Creator context |
 | `ticket` | Optional ticket relation |
@@ -135,6 +135,10 @@ When Redis is enabled, `CalendarSyncModule` registers a BullMQ `calendar-sync` q
 - Keep non-recurring edits separate from recurring occurrence handling.
 
 `SaplingFieldEventRecurrence.vue` is the editable recurrence field used by generic dialogs. Shared parsing and expansion helpers live in `frontend/src/utils/eventRecurrence.ts`.
+
+The calendar context filter includes an event-status multi-select. On first open,
+it selects all `eventStatus` records where `isOpen` is `true`; users can then
+choose exactly which status handles are visible in the calendar range.
 
 ## Extension Checklist
 

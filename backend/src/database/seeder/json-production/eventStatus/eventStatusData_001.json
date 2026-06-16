@@ -1,6 +1,26 @@
 [
-  { "handle": "canceled", "description": "Abgebrochen", "color": "#f44336" },
-  { "handle": "scheduled", "description": "Geplant", "color": "#ff9800" },
-  { "handle": "confirmed", "description": "Bestätigt", "color": "#2196f3" },
-  { "handle": "completed", "description": "Abgeschlossen", "color": "#4caf50" }
+  {
+    "handle": "canceled",
+    "description": "Abgebrochen",
+    "color": "#f44336",
+    "isOpen": false
+  },
+  {
+    "handle": "scheduled",
+    "description": "Geplant",
+    "color": "#ff9800",
+    "isOpen": true
+  },
+  {
+    "handle": "confirmed",
+    "description": "Bestätigt",
+    "color": "#2196f3",
+    "isOpen": true
+  },
+  {
+    "handle": "completed",
+    "description": "Abgeschlossen",
+    "color": "#4caf50",
+    "isOpen": false
+  }
 ]

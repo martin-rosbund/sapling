@@ -86,6 +86,25 @@
       </div>
 
       <div
+        v-if="isUniqueConflictField(field)"
+        class="sapling-import__unique-conflict-controls"
+      >
+        <v-select
+          :model-value="uniqueConflictStrategies[field.name] ?? 'error'"
+          :items="uniqueConflictStrategyOptions"
+          item-title="title"
+          item-value="value"
+          density="compact"
+          hide-details
+          :label="t('import.uniqueConflictStrategy')"
+          prepend-inner-icon="mdi-key-alert-outline"
+          :disabled="isImportJobRunning"
+          autocomplete="off"
+          @update:model-value="updateUniqueConflictStrategy(field.name, $event)"
+        />
+      </div>
+
+      <div
         v-if="field.isReference && field.referenceName"
         class="sapling-import__relation-mapping-controls"
       >
@@ -122,13 +141,21 @@
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
 import SaplingImportTemplateValueField from '@/components/import/SaplingImportTemplateValueField.vue'
-import type { ImportRelationMappingMode } from '@/services/api.import.service'
+import type {
+  ImportRelationMappingMode,
+  ImportUniqueConflictStrategyMode,
+} from '@/services/api.import.service'
 import type { SaplingGenericItem } from '@/entity/entity'
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure'
 
 type RelationMappingModeOption = {
   title: string
   value: ImportRelationMappingMode
+}
+
+type UniqueConflictStrategyOption = {
+  title: string
+  value: ImportUniqueConflictStrategyMode
 }
 
 const props = defineProps<{
@@ -139,6 +166,8 @@ const props = defineProps<{
   relationMappingModes: Record<string, ImportRelationMappingMode | null>
   relationMappingColumns: Record<string, string[]>
   relationMappingModeOptions: RelationMappingModeOption[]
+  uniqueConflictStrategies: Record<string, ImportUniqueConflictStrategyMode>
+  uniqueConflictStrategyOptions: UniqueConflictStrategyOption[]
   headerOptions: string[]
   selectedEntityHandle: string | null
   permissions: AccumulatedPermission[]
@@ -163,6 +192,11 @@ const emit = defineEmits<{
   (event: 'normalizeRelationMappingColumns', targetField: string): void
   (event: 'updateFieldMapping', targetField: string, value: string | null): void
   (event: 'updateFieldDefault', targetField: string, value: unknown): void
+  (
+    event: 'updateUniqueConflictStrategy',
+    targetField: string,
+    value: ImportUniqueConflictStrategyMode,
+  ): void
   (
     event: 'updateRelationMappingMode',
     targetField: string,
@@ -192,6 +226,15 @@ function updateFieldDefault(targetField: string, value: unknown): void {
   emit('updateFieldDefault', targetField, value)
 }
 
+function updateUniqueConflictStrategy(targetField: string, value: unknown): void {
+  const normalizedValue = props.uniqueConflictStrategyOptions.some(
+    (option) => option.value === value,
+  )
+    ? (value as ImportUniqueConflictStrategyMode)
+    : 'error'
+  emit('updateUniqueConflictStrategy', targetField, normalizedValue)
+}
+
 function updateRelationMappingMode(targetField: string, value: unknown): void {
   const normalizedValue = props.relationMappingModeOptions.some((option) => option.value === value)
     ? (value as ImportRelationMappingMode)
@@ -202,5 +245,14 @@ function updateRelationMappingMode(targetField: string, value: unknown): void {
 function updateRelationMappingColumns(targetField: string, value: unknown): void {
   emit('updateRelationMappingColumns', targetField, normalizeStringArray(value))
   emit('normalizeRelationMappingColumns', targetField)
+}
+
+function isUniqueConflictField(field: EntityTemplate): boolean {
+  return Boolean(
+    field.isUnique &&
+      !field.isPrimaryKey &&
+      !field.isReference &&
+      ['string', 'text', 'varchar'].includes(field.type),
+  )
 }
 </script>

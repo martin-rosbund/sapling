@@ -7,6 +7,7 @@ import ApiGenericService, {
 import type {
   EntityItem,
   EventItem,
+  EventStatusItem,
   HolidayItem,
   PersonItem,
   SaplingGenericItem,
@@ -192,6 +193,8 @@ export function useSaplingEvent() {
 
   const ownPerson = ref<PersonItem | null>(null)
   const events = ref<SaplingCalendarEvent[]>([])
+  const eventStatuses = ref<EventStatusItem[]>([])
+  const selectedEventStatuses = ref<string[]>([])
   const templates = ref<EntityTemplate[]>([])
   const selectedPeoples = ref<number[]>([])
   const calendarMode = ref<CalendarMode>('default')
@@ -398,6 +401,7 @@ export function useSaplingEvent() {
   const selectedPeopleOverflowCount = computed(() =>
     Math.max(selectedPeoples.value.length - selectedPeoplePreview.value.length, 0),
   )
+  const selectedEventStatusCount = computed(() => selectedEventStatuses.value.length)
 
   const upcomingEvents = computed<EventAgendaItem[]>(() => {
     const now = Date.now()
@@ -501,6 +505,7 @@ export function useSaplingEvent() {
       currentPermissionStore.fetchCurrentPermission(),
       loadOwnPerson(),
       loadEventEntity(),
+      loadEventStatuses(),
       loadEventScriptButtons(),
       loadTemplates(),
       loadWorkHours(),
@@ -536,6 +541,14 @@ export function useSaplingEvent() {
   watch(calendarMode, async () => {
     await refreshVisibleEvents()
   })
+
+  watch(
+    selectedEventStatuses,
+    async () => {
+      await refreshVisibleEvents()
+    },
+    { deep: true },
+  )
   //#endregion
 
   //#region Loading
@@ -572,6 +585,27 @@ export function useSaplingEvent() {
           page: 1,
         })
       ).data[0] || null
+  }
+
+  /**
+   * Loads event statuses and initializes the calendar filter to open statuses.
+   */
+  async function loadEventStatuses() {
+    const response = await ApiGenericService.find<EventStatusItem>('eventStatus', {
+      orderBy: buildTableOrderBy([{ key: 'description', order: 'asc' }]),
+      limit: DEFAULT_ENTITY_ITEMS_COUNT,
+    })
+
+    eventStatuses.value = response.data
+
+    const openStatusHandles = response.data
+      .filter((status) => status.isOpen !== false)
+      .map((status) => status.handle)
+
+    selectedEventStatuses.value =
+      openStatusHandles.length > 0
+        ? openStatusHandles
+        : response.data.map((status) => status.handle)
   }
 
   /**
@@ -915,6 +949,10 @@ export function useSaplingEvent() {
     const endDate = parseLocalCalendarDate(nextRange.end.date)
     endDate.setHours(23, 59, 59, 999)
     const holidayGroupHandles = getSelectedHolidayGroupHandles()
+    const eventStatusHandles =
+      selectedEventStatuses.value.length > 0
+        ? selectedEventStatuses.value
+        : ['__sapling_no_event_status__']
 
     const [response, holidayResponse] = await Promise.all([
       ApiGenericService.find<EventItem>('event', {
@@ -922,6 +960,7 @@ export function useSaplingEvent() {
         filter: {
           $and: [
             { participants: selectedPeoples.value },
+            { status: { handle: { $in: eventStatusHandles } } },
             {
               $or: [
                 {
@@ -976,6 +1015,14 @@ export function useSaplingEvent() {
     selectedPeoples.value = values
       .map((value) => Number.parseInt(value, 10))
       .filter((value) => !Number.isNaN(value))
+  }
+
+  /**
+   * Updates the selected event statuses from the calendar status filter.
+   */
+  function onSelectedEventStatusesUpdate(values: string[]) {
+    const validStatusHandles = new Set(eventStatuses.value.map((status) => status.handle))
+    selectedEventStatuses.value = values.filter((value) => validStatusHandles.has(value))
   }
 
   /**
@@ -1889,6 +1936,7 @@ export function useSaplingEvent() {
     eventContextMenuStyle,
     editEvent,
     entityEvent,
+    eventStatuses,
     updateConflictDialog,
     events,
     eventContextMenuMailActions,
@@ -1921,10 +1969,13 @@ export function useSaplingEvent() {
     onEditDialogSave,
     openUpdateConflictChangeLog,
     openEventEditor,
+    onSelectedEventStatusesUpdate,
     onSelectedPeoplesUpdate,
     reloadUpdateConflictRecord,
     scrollToCurrentTime,
     selectedPeoples,
+    selectedEventStatuses,
+    selectedEventStatusCount,
     selectedPeopleOverflowCount,
     selectedPeoplePreview,
     syncExternalCalendar,

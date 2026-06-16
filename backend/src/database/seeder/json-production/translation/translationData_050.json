@@ -1,0 +1,50 @@
+[
+  {
+    "entity": "import",
+    "property": "uniqueConflictStrategy",
+    "de": "Konflikt bei eindeutigem Feld",
+    "en": "Unique field conflict"
+  },
+  {
+    "entity": "import",
+    "property": "uniqueConflictStrategy.error",
+    "de": "Als Fehler markieren",
+    "en": "Mark as error"
+  },
+  {
+    "entity": "import",
+    "property": "uniqueConflictStrategy.appendExternalKey",
+    "de": "ID anhängen",
+    "en": "Append ID"
+  },
+  {
+    "entity": "import",
+    "property": "uniqueField",
+    "de": "Eindeutiges Feld",
+    "en": "Unique field"
+  },
+  {
+    "entity": "import",
+    "property": "uniqueFieldConflictWithDetails",
+    "de": "{field} ist bereits mit dem Wert \"{value}\" vorhanden.",
+    "en": "{field} already exists with value \"{value}\"."
+  },
+  {
+    "entity": "import",
+    "property": "uniqueFieldDuplicateInBatchWithDetails",
+    "de": "{field} kommt im Importstapel mehrfach mit dem Wert \"{value}\" vor.",
+    "en": "{field} occurs more than once in this import batch with value \"{value}\"."
+  },
+  {
+    "entity": "global",
+    "property": "validationError",
+    "de": "Validierungsfehler",
+    "en": "Validation error"
+  },
+  {
+    "entity": "import",
+    "property": "invalidBooleanValues",
+    "de": "Ungültiger Boolean-Wert in: {fields}",
+    "en": "Invalid boolean value in: {fields}"
+  }
+]

@@ -98,29 +98,32 @@ then displays source system, external key parts, import batches, and timestamps.
    from the file becomes status `5` or a referenced Sapling record handle.
 6. Optionally configure defaults for fields that are required in Sapling but
    not present in the file, for example a default country or status.
-7. Optionally ask the AI to suggest a configuration. The backend sends only
+7. For unique target fields, choose whether validation should reject duplicate
+   values or append the selected external key to the imported value.
+8. Optionally ask the AI to suggest a configuration. The backend sends only
    CSV headers, a few sample rows, target entity metadata, reference
    candidates, and matching templates to the configured chat model. The
    returned suggestion is normalized server-side and then applied in the UI as
    an editable proposal.
-8. Optionally choose one or more external key columns.
-9. Save the current mapping as an import template for later batches.
-10. Optionally configure relation mappings by handle, by displayed value, or
+9. Optionally choose one or more external key columns.
+10. Save the current mapping as an import template for later batches.
+11. Optionally configure relation mappings by handle, by displayed value, or
     by external key links from previous imports.
-11. Optionally configure a generic target reference for entities such as
+12. Optionally configure a generic target reference for entities such as
    `information` that use `entity + reference`.
-12. Validate the batch. Validation is queued as a background job, so the
+13. Validate the batch. Validation is queued as a background job, so the
     workspace can be left while row payloads, required fields, reference
     mappings, and planned actions are checked.
-13. Download the complete error report when invalid rows need source-file
+14. Download the complete error report when invalid rows need source-file
     cleanup.
-14. Execute the batch. Execution is also queued as a background job. If valid
+15. Execute the batch. Execution is also queued as a background job. If valid
     rows exist, the workspace can run the import without invalid rows; invalid
     rows remain in the batch for later correction.
 
-Validation rejects non-empty invalid date strings before execution. This
-includes source values such as `NULL` in date or datetime fields, so those rows
-are shown as invalid in the preview instead of failing later in PostgreSQL.
+Validation rejects non-empty invalid date strings and invalid boolean values
+before execution. This includes source values such as `NULL` in date or datetime
+fields and unsupported boolean values such as `-1`, so those rows are shown as
+invalid in the preview instead of failing later in PostgreSQL or MikroORM.
 
 Value mappings are stored as `ImportTemplateValueMappingItem` rows for reusable
 templates and are also copied into the batch `mapping` JSON when a batch is
@@ -132,6 +135,12 @@ During execution, rows with an existing external record link update the linked
 Sapling record. Rows without a link create a new record and store the link.
 Rows that are not ready are skipped, so a few invalid CSV rows do not block a
 large otherwise valid import.
+
+Validation checks single-field unique constraints exposed by entity metadata.
+For a unique field such as `company.name`, the batch can either mark duplicate
+values as row errors or append the selected external key value, for example
+`Leibniz (12345)`. If no external key column is selected, the row number is
+used as a deterministic fallback suffix.
 
 Validation and execution use the `imports` BullMQ queue when Redis is enabled.
 When Redis is disabled locally, Sapling starts the same work in-process after

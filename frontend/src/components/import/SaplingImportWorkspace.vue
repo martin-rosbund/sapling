@@ -90,6 +90,8 @@
           :relation-mapping-modes="relationMappingModes"
           :relation-mapping-columns="relationMappingColumns"
           :relation-mapping-mode-options="relationMappingModeOptions"
+          :unique-conflict-strategies="uniqueConflictStrategies"
+          :unique-conflict-strategy-options="uniqueConflictStrategyOptions"
           :header-options="headerOptions"
           :selected-entity-handle="selectedEntityHandle"
           :permissions="currentPermissions"
@@ -111,6 +113,7 @@
           @update-field-default="updateFieldDefault"
           @update-relation-mapping-mode="updateRelationMappingMode"
           @update-relation-mapping-columns="updateRelationMappingColumns"
+          @update-unique-conflict-strategy="updateUniqueConflictStrategy"
         />
 
         <SaplingImportActionBar
@@ -199,6 +202,8 @@ import ApiImportService, {
   type ImportRelationMapping,
   type ImportRelationMappingMode,
   type ImportTemplateSummary,
+  type ImportUniqueConflictStrategy,
+  type ImportUniqueConflictStrategyMode,
   type ImportValueMapping,
   type ImportValueMappingFallback,
   type SaveImportTemplatePayload,
@@ -233,6 +238,7 @@ type ImportMappingConfiguration =
       fieldDefaults?: ImportFieldDefault[]
       relationMappings?: ImportRelationMapping[]
       valueMappings?: ImportValueMapping[]
+      uniqueConflictStrategies?: ImportUniqueConflictStrategy[]
     }
   | null
   | undefined
@@ -257,7 +263,11 @@ const { loadTranslations } = useTranslationLoader(
 const IMPORT_PREVIEW_ROW_LIMIT = 100
 const IMPORT_REQUIRED_FIELDS_MISSING_PREFIX = 'import.requiredFieldsMissing:'
 const IMPORT_INVALID_DATE_VALUES_PREFIX = 'import.invalidDateValues:'
+const IMPORT_INVALID_BOOLEAN_VALUES_PREFIX = 'import.invalidBooleanValues:'
 const IMPORT_VALUE_MAPPING_MISSING_PREFIX = 'import.valueMappingMissing:'
+const IMPORT_UNIQUE_FIELD_CONFLICT_PREFIX = 'import.uniqueFieldConflict:'
+const IMPORT_UNIQUE_FIELD_DUPLICATE_IN_BATCH_PREFIX =
+  'import.uniqueFieldDuplicateInBatch:'
 const IMPORT_VALUE_MAPPING_SOURCE_VALUE_LIMIT = 100
 const OPEN_IMPORT_BATCH_STATUSES = [
   'analyzed',
@@ -300,6 +310,7 @@ const fieldMappings = reactive<Record<string, string | null>>({})
 const fieldDefaults = reactive<Record<string, unknown>>({})
 const relationMappingModes = reactive<Record<string, ImportRelationMappingMode | null>>({})
 const relationMappingColumns = reactive<Record<string, string[]>>({})
+const uniqueConflictStrategies = reactive<Record<string, ImportUniqueConflictStrategyMode>>({})
 const valueMappings = reactive<Record<string, ValueMappingState>>({})
 const sourceValueOptions = reactive<Record<string, string[]>>({})
 const referenceValueItems = reactive<
@@ -451,6 +462,15 @@ const relationMappingModeOptions = computed<
   { title: t('import.relationMappingMode.value'), value: 'value' },
   { title: t('import.relationMappingMode.externalKey'), value: 'externalKey' },
 ])
+const uniqueConflictStrategyOptions = computed<
+  Array<{ title: string; value: ImportUniqueConflictStrategyMode }>
+>(() => [
+  { title: t('import.uniqueConflictStrategy.error'), value: 'error' },
+  {
+    title: t('import.uniqueConflictStrategy.appendExternalKey'),
+    value: 'appendExternalKey',
+  },
+])
 const canConfigure = computed(
   () =>
     Boolean(batch.value?.handle && selectedEntityHandle.value) &&
@@ -467,7 +487,8 @@ const canSaveTemplate = computed(
     templateTitle.value.trim().length > 0 &&
     (Object.values(fieldMappings).some(Boolean) ||
       Object.values(fieldDefaults).some(hasFieldDefaultValue) ||
-      Object.values(relationMappingModes).some(Boolean)) &&
+      Object.values(relationMappingModes).some(Boolean) ||
+      Object.values(uniqueConflictStrategies).some((strategy) => strategy !== 'error')) &&
     !isSavingTemplate.value,
 )
 const canSuggestWithAi = computed(
@@ -522,6 +543,9 @@ const canExecute = computed(
 const { startBatchPolling, stopBatchPolling } = useSaplingImportBatchPolling({
   onBatch: (refreshedBatch) => {
     batch.value = refreshedBatch
+  },
+  onNotFound: (handle) => {
+    clearMissingBatch(handle)
   },
 })
 
@@ -691,6 +715,25 @@ async function hydrateBatchState(loadedBatch: ImportBatchSummary): Promise<void>
   }
 }
 
+function clearMissingBatch(handle: number): void {
+  if (batch.value?.handle !== handle) {
+    return
+  }
+
+  batch.value = null
+  selectedFile.value = null
+  selectedOpenBatchRecord.value = null
+  selectedTargetEntityRecord.value = null
+  selectedSourceRecord.value = null
+  selectedEntityHandle.value = null
+  selectedSourceHandle.value = null
+  externalKeyColumns.value = []
+  genericReferenceEntityHandle.value = null
+  genericReferenceKeyColumns.value = []
+  clearSelectedTemplate()
+  clearMappingState()
+}
+
 function initializeMappings(): void {
   clearMappingState()
 
@@ -700,6 +743,9 @@ function initializeMappings(): void {
     )
     fieldMappings[field.name] = matchedHeader ?? null
     fieldDefaults[field.name] = getTemplateDefaultValue(field)
+    if (isUniqueConflictField(field)) {
+      uniqueConflictStrategies[field.name] = 'error'
+    }
     if (field.isReference && field.referenceName) {
       relationMappingModes[field.name] = null
       relationMappingColumns[field.name] = []
@@ -713,6 +759,7 @@ function clearMappingState(): void {
   Object.keys(fieldDefaults).forEach((key) => delete fieldDefaults[key])
   Object.keys(relationMappingModes).forEach((key) => delete relationMappingModes[key])
   Object.keys(relationMappingColumns).forEach((key) => delete relationMappingColumns[key])
+  Object.keys(uniqueConflictStrategies).forEach((key) => delete uniqueConflictStrategies[key])
   Object.keys(valueMappings).forEach((key) => delete valueMappings[key])
   Object.keys(sourceValueOptions).forEach((key) => delete sourceValueOptions[key])
 }
@@ -1011,6 +1058,13 @@ function updateRelationMappingColumns(targetField: string, value: string[]): voi
   relationMappingColumns[targetField] = value
 }
 
+function updateUniqueConflictStrategy(
+  targetField: string,
+  value: ImportUniqueConflictStrategyMode,
+): void {
+  uniqueConflictStrategies[targetField] = value
+}
+
 function buildTemplatePayload(): SaveImportTemplatePayload {
   return {
     entityHandle: selectedEntityHandle.value ?? '',
@@ -1021,6 +1075,7 @@ function buildTemplatePayload(): SaveImportTemplatePayload {
     fieldDefaults: buildFieldDefaults(),
     relationMappings: buildRelationMappings(),
     valueMappings: buildValueMappings(),
+    uniqueConflictStrategies: buildUniqueConflictStrategies(),
     genericReferenceMapping: buildGenericReferenceMapping(),
     title: templateTitle.value.trim(),
   }
@@ -1100,6 +1155,21 @@ function buildValueMappings(): ImportValueMapping[] {
     .filter((mapping) => Object.keys(mapping.values).length > 0)
 }
 
+function buildUniqueConflictStrategies(): ImportUniqueConflictStrategy[] {
+  return Object.entries(uniqueConflictStrategies)
+    .filter(([, strategy]) => strategy !== 'error')
+    .map(([targetField, strategy]) => ({ targetField, strategy }))
+}
+
+function isUniqueConflictField(field: EntityTemplate): boolean {
+  return Boolean(
+    field.isUnique &&
+      !field.isPrimaryKey &&
+      !field.isReference &&
+      ['string', 'text', 'varchar'].includes(field.type),
+  )
+}
+
 function applyValueMappings(mappingConfiguration: ImportMappingConfiguration): void {
   Object.keys(valueMappings).forEach((key) => delete valueMappings[key])
 
@@ -1121,11 +1191,15 @@ function applyMappingConfiguration(mappingConfiguration: ImportMappingConfigurat
   Object.keys(fieldDefaults).forEach((key) => delete fieldDefaults[key])
   Object.keys(relationMappingModes).forEach((key) => delete relationMappingModes[key])
   Object.keys(relationMappingColumns).forEach((key) => delete relationMappingColumns[key])
+  Object.keys(uniqueConflictStrategies).forEach((key) => delete uniqueConflictStrategies[key])
   Object.keys(valueMappings).forEach((key) => delete valueMappings[key])
 
   for (const field of importableFields.value) {
     fieldMappings[field.name] = null
     fieldDefaults[field.name] = getTemplateDefaultValue(field)
+    if (isUniqueConflictField(field)) {
+      uniqueConflictStrategies[field.name] = 'error'
+    }
     if (field.isReference && field.referenceName) {
       relationMappingModes[field.name] = null
       relationMappingColumns[field.name] = []
@@ -1167,6 +1241,18 @@ function applyMappingConfiguration(mappingConfiguration: ImportMappingConfigurat
           ? [relationMapping.sourceColumn]
           : [],
     )
+  }
+
+  for (const strategy of mappingConfiguration?.uniqueConflictStrategies ?? []) {
+    if (
+      !strategy.targetField ||
+      !(strategy.targetField in uniqueConflictStrategies) ||
+      !['error', 'appendExternalKey'].includes(strategy.strategy)
+    ) {
+      continue
+    }
+
+    uniqueConflictStrategies[strategy.targetField] = strategy.strategy
   }
 
   applyValueMappings(mappingConfiguration)
@@ -1673,6 +1759,17 @@ function importMessageLabel(message: string | null | undefined): string {
     return fields ? t('import.invalidDateValues', { fields }) : t('import.invalidDateValue')
   }
 
+  if (message.startsWith(IMPORT_INVALID_BOOLEAN_VALUES_PREFIX)) {
+    const fieldNames = message
+      .slice(IMPORT_INVALID_BOOLEAN_VALUES_PREFIX.length)
+      .split(',')
+      .map((fieldName) => fieldName.trim())
+      .filter(Boolean)
+    const fields = fieldNames.map(fieldLabel).join(', ')
+
+    return fields ? t('import.invalidBooleanValues', { fields }) : t('global.validationError')
+  }
+
   if (message.startsWith(IMPORT_VALUE_MAPPING_MISSING_PREFIX)) {
     const [fieldName = '', sourceValue = ''] = message
       .slice(IMPORT_VALUE_MAPPING_MISSING_PREFIX.length)
@@ -1683,6 +1780,27 @@ function importMessageLabel(message: string | null | undefined): string {
     return sourceValue
       ? t('import.valueMappingMissingWithDetails', { field, value: sourceValue })
       : t('import.valueMappingMissing')
+  }
+
+  if (
+    message.startsWith(IMPORT_UNIQUE_FIELD_CONFLICT_PREFIX) ||
+    message.startsWith(IMPORT_UNIQUE_FIELD_DUPLICATE_IN_BATCH_PREFIX)
+  ) {
+    const isBatchDuplicate = message.startsWith(
+      IMPORT_UNIQUE_FIELD_DUPLICATE_IN_BATCH_PREFIX,
+    )
+    const prefix = isBatchDuplicate
+      ? IMPORT_UNIQUE_FIELD_DUPLICATE_IN_BATCH_PREFIX
+      : IMPORT_UNIQUE_FIELD_CONFLICT_PREFIX
+    const [fieldName = '', value = ''] = message
+      .slice(prefix.length)
+      .split(':')
+      .map(decodeImportMessagePart)
+    const field = fieldName ? fieldLabel(fieldName) : t('import.uniqueField')
+
+    return isBatchDuplicate
+      ? t('import.uniqueFieldDuplicateInBatchWithDetails', { field, value })
+      : t('import.uniqueFieldConflictWithDetails', { field, value })
   }
 
   return te(message) ? t(message) : message

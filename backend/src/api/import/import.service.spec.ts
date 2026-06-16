@@ -91,6 +91,34 @@ describe('ImportService', () => {
     ]);
   });
 
+  it('ignores failed background jobs when the import batch was deleted', async () => {
+    const flush = jest.fn();
+    const service = createService({
+      findOne: jest.fn(() => Promise.resolve(null)),
+      flush,
+    });
+
+    await expect(
+      (
+        service as unknown as {
+          markBatchJobFailed(
+            handle: number,
+            status: 'validationFailed',
+            operation: 'validation',
+            error: unknown,
+          ): Promise<void>;
+        }
+      ).markBatchJobFailed(
+        42,
+        'validationFailed',
+        'validation',
+        new Error('boom'),
+      ),
+    ).resolves.toBeUndefined();
+
+    expect(flush).not.toHaveBeenCalled();
+  });
+
   it('merges template value mappings with partial batch overrides', () => {
     const service = createService();
 
@@ -231,5 +259,102 @@ describe('ImportService', () => {
         }
       ).getMissingRequiredFieldNames(template, payload, 'created'),
     ).toEqual([]);
+  });
+
+  it('marks duplicate unique values as validation errors by default', async () => {
+    const service = createService({
+      find: jest.fn(() => Promise.resolve([{ handle: 5 }])),
+    });
+    (service as unknown as { genericQueryService: unknown }).genericQueryService =
+      {
+        getEntityClass: jest.fn(() => class Company {}),
+      };
+
+    await expect(
+      (
+        service as unknown as {
+          applyUniqueConflictStrategies(
+            template: unknown[],
+            payload: Record<string, unknown>,
+            dto: unknown,
+            entityHandle: string,
+            row: unknown,
+            targetReference: string | number | null,
+            externalKey: unknown,
+            uniqueValueClaims: Map<string, number>,
+          ): Promise<void>;
+        }
+      ).applyUniqueConflictStrategies(
+        [{ name: 'name', isUnique: true, type: 'string', length: 128 }],
+        { name: 'Leibniz' },
+        {},
+        'company',
+        { rowNumber: 2 },
+        null,
+        { parts: { id: '123' }, hash: 'hash' },
+        new Map(),
+      ),
+    ).rejects.toThrow('import.uniqueFieldConflict:name:Leibniz');
+  });
+
+  it('can append the external key to duplicate unique values during validation', async () => {
+    const service = createService({
+      find: jest.fn((_, criteria) =>
+        Promise.resolve(criteria.name === 'Leibniz' ? [{ handle: 5 }] : []),
+      ),
+    });
+    (service as unknown as { genericQueryService: unknown }).genericQueryService =
+      {
+        getEntityClass: jest.fn(() => class Company {}),
+      };
+    const payload = { name: 'Leibniz' };
+
+    await (
+      service as unknown as {
+        applyUniqueConflictStrategies(
+          template: unknown[],
+          payload: Record<string, unknown>,
+          dto: unknown,
+          entityHandle: string,
+          row: unknown,
+          targetReference: string | number | null,
+          externalKey: unknown,
+          uniqueValueClaims: Map<string, number>,
+        ): Promise<void>;
+      }
+    ).applyUniqueConflictStrategies(
+      [{ name: 'name', isUnique: true, type: 'string', length: 128 }],
+      payload,
+      {
+        uniqueConflictStrategies: [
+          { targetField: 'name', strategy: 'appendExternalKey' },
+        ],
+      },
+      'company',
+      { rowNumber: 2 },
+      null,
+      { parts: { id: '123' }, hash: 'hash' },
+      new Map(),
+    );
+
+    expect(payload.name).toBe('Leibniz (123)');
+  });
+
+  it('marks invalid boolean import values as validation errors', () => {
+    const service = createService();
+
+    expect(() =>
+      (
+        service as unknown as {
+          validateImportBooleanValues(
+            template: unknown[],
+            payload: Record<string, unknown>,
+          ): void;
+        }
+      ).validateImportBooleanValues(
+        [{ name: 'allowNewsletter', type: 'boolean' }],
+        { allowNewsletter: '-1' },
+      ),
+    ).toThrow('import.invalidBooleanValues:allowNewsletter');
   });
 });

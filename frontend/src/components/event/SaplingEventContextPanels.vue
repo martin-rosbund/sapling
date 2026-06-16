@@ -26,8 +26,14 @@
 
       <div class="sapling-row-xs sapling-row-wrap sapling-event-context__summary">
         <template v-if="activePanel === 'filter'">
-          <span>{{ selectedPeoples.length }} {{ $t('global.selected') }}</span>
-          <span>{{ $t('navigation.person') }} &amp; {{ $t('navigation.company') }}</span>
+          <span
+            >{{ selectedPeoples.length + selectedEventStatusCount }}
+            {{ $t('global.selected') }}</span
+          >
+          <span>
+            {{ $t('navigation.person') }}, {{ $t('navigation.company') }} &amp;
+            {{ $t('event.statusFilter') }}
+          </span>
         </template>
 
         <template v-else>
@@ -40,6 +46,9 @@
     <SaplingWorkFilterPanel
       v-if="activePanel === 'filter' && !isMobileFilterLayout"
       class="sapling-event-context__panel"
+      :status-options="eventStatuses"
+      :selected-statuses="selectedEventStatuses"
+      @update:selected-statuses="emit('updateSelectedEventStatuses', $event)"
       @update:selected-peoples="emit('updateSelectedPeoples', $event)"
     />
 
@@ -68,6 +77,7 @@ import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingEventAgendaPanel from '@/components/event/SaplingEventAgendaPanel.vue'
 import SaplingEventPeoplePanel from '@/components/event/SaplingEventPeoplePanel.vue'
 import SaplingWorkFilterPanel from '@/components/filter/SaplingWorkFilterPanel.vue'
+import type { EventStatusItem } from '@/entity/entity'
 import type {
   EventAgendaItem,
   SelectedPersonPreviewItem,
@@ -76,6 +86,9 @@ import type {
 defineProps<{
   isMobileFilterLayout: boolean
   upcomingEvents: EventAgendaItem[]
+  eventStatuses: EventStatusItem[]
+  selectedEventStatuses: string[]
+  selectedEventStatusCount: number
   selectedPeoples: number[]
   selectedPeoplePreview: SelectedPersonPreviewItem[]
   selectedPeopleOverflowCount: number
@@ -85,6 +98,7 @@ type ContextPanelKey = 'filter' | 'agenda'
 
 const emit = defineEmits<{
   (event: 'updateSelectedPeoples', value: string[]): void
+  (event: 'updateSelectedEventStatuses', value: string[]): void
   (event: 'openFilter'): void
   (event: 'openEvent', value: CalendarEvent): void
 }>()

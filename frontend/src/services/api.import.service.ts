@@ -37,6 +37,13 @@ export interface ImportValueMapping {
   fallback?: ImportValueMappingFallback
 }
 
+export type ImportUniqueConflictStrategyMode = 'error' | 'appendExternalKey'
+
+export interface ImportUniqueConflictStrategy {
+  targetField: string
+  strategy: ImportUniqueConflictStrategyMode
+}
+
 export interface ImportAiSuggestionFieldMapping extends ImportFieldMapping {
   confidence: number
   reason?: string | null
@@ -80,6 +87,7 @@ export interface ConfigureImportBatchPayload {
   fieldDefaults?: ImportFieldDefault[]
   relationMappings?: ImportRelationMapping[]
   valueMappings?: ImportValueMapping[]
+  uniqueConflictStrategies?: ImportUniqueConflictStrategy[]
   genericReferenceMapping?: ImportGenericReferenceMapping | null
 }
 
@@ -95,6 +103,7 @@ export interface ImportTemplateSummary {
     fieldDefaults?: ImportFieldDefault[]
     relationMappings?: ImportRelationMapping[]
     valueMappings?: ImportValueMapping[]
+    uniqueConflictStrategies?: ImportUniqueConflictStrategy[]
   } | null
   externalKeyColumns: string[] | null
   genericReferenceMapping: ImportGenericReferenceMapping | null
@@ -221,12 +230,22 @@ export interface ImportBatchSourceValues {
   isTruncated: boolean
 }
 
+interface GetImportBatchOptions {
+  suppressNotFoundError?: boolean
+}
+
 class ApiImportService {
-  static async getBatch(handle: number): Promise<ImportBatchSummary> {
+  static async getBatch(
+    handle: number,
+    options: GetImportBatchOptions = {},
+  ): Promise<ImportBatchSummary> {
     try {
       const response = await axios.get<ImportBatchSummary>(buildApiUrl(`import/batches/${handle}`))
       return response.data
     } catch (error: unknown) {
+      if (options.suppressNotFoundError && isImportBatchNotFoundError(error)) {
+        throw error
+      }
       pushApiErrorMessage(error, 'exception.unknownError', 'import')
       throw error
     }
@@ -484,3 +503,7 @@ function toImportTemplateSummary(record: ImportTemplateRecord): ImportTemplateSu
 }
 
 export default ApiImportService
+
+export function isImportBatchNotFoundError(error: unknown): boolean {
+  return axios.isAxiosError(error) && error.response?.status === 404
+}

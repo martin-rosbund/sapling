@@ -41,6 +41,38 @@
       <div class="sapling-work-filter-panel__content sapling-scrollable">
         <div class="sapling-accordion-scroll-wrapper">
           <v-expansion-panels v-model="expandedPanels" multiple>
+            <v-expansion-panel v-if="statusOptions.length > 0">
+              <v-expansion-panel-title>
+                <v-list-subheader>{{ $t('event.statusFilter') }}</v-list-subheader>
+              </v-expansion-panel-title>
+              <v-expansion-panel-text>
+                <div class="sapling-event-status-filter">
+                  <div
+                    v-for="status in statusOptions"
+                    :key="status.handle"
+                    class="sapling-vertical-item"
+                    :class="{ selected: isStatusSelected(status.handle) }"
+                    @click="toggleStatus(status.handle)"
+                  >
+                    <span
+                      class="sapling-event-status-filter__swatch"
+                      :style="{ backgroundColor: status.color }"
+                    />
+                    <span class="sapling-person-name">{{ status.description }}</span>
+                    <v-checkbox
+                      :model-value="isStatusSelected(status.handle)"
+                      hide-details
+                      density="comfortable"
+                      class="sapling-filter-checkbox checkbox-no-pointer"
+                      :ripple="false"
+                      @click.stop
+                      @update:model-value="(checked) => toggleStatus(status.handle, checked)"
+                    />
+                  </div>
+                </div>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+
             <v-expansion-panel v-if="ownPerson">
               <v-expansion-panel-title>
                 <v-list-subheader>{{ $t('global.me') }}</v-list-subheader>
@@ -116,17 +148,21 @@
 
 <script setup lang="ts">
 // #region Imports
+import { computed } from 'vue'
 import SaplingFilterMe from '@/components/filter/SaplingFilterMe.vue'
 import SaplingFilterEmployee from '@/components/filter/SaplingFilterEmployee.vue'
 import SaplingFilterPerson from '@/components/filter/SaplingFilterPerson.vue'
 import SaplingFilterCompany from '@/components/filter/SaplingFilterCompany.vue'
 import { useSaplingFilterWork } from '@/composables/filter/useSaplingFilterWork'
+import type { EventStatusItem } from '@/entity/entity'
 // #endregion
 
 // #region Props
 const props = defineProps<{
   showCloseAction?: boolean
   closeActionLabel?: string
+  statusOptions?: EventStatusItem[]
+  selectedStatuses?: string[]
 }>()
 // #endregion
 
@@ -134,6 +170,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: 'update:selectedPeoples', value: string[]): void
   (event: 'update:selectedCompanies', value: string[]): void
+  (event: 'update:selectedStatuses', value: string[]): void
   (event: 'close'): void
 }>()
 // #endregion
@@ -166,4 +203,27 @@ const {
   onSelectedCompaniesChange: (values) => emit('update:selectedCompanies', values.map(String)),
 })
 // #endregion
+
+const statusOptions = computed(() => props.statusOptions ?? [])
+const selectedStatuses = computed(() => props.selectedStatuses ?? [])
+
+function isStatusSelected(handle: string): boolean {
+  return selectedStatuses.value.includes(handle)
+}
+
+function toggleStatus(handle: string, checked?: boolean | null): void {
+  const isSelected = isStatusSelected(handle)
+
+  if (checked === true || (checked == null && !isSelected)) {
+    emit('update:selectedStatuses', [...selectedStatuses.value, handle])
+    return
+  }
+
+  if (checked === false || (checked == null && isSelected)) {
+    emit(
+      'update:selectedStatuses',
+      selectedStatuses.value.filter((statusHandle) => statusHandle !== handle),
+    )
+  }
+}
 </script>

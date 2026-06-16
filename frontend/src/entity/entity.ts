@@ -408,6 +408,8 @@ export interface EventStatusItem extends SaplingGenericItem {
   description: string
   /** Color code (e.g., hex or color name) for UI representation. */
   color: string
+  /** Indicates whether events with this status are treated as open. */
+  isOpen?: boolean
   /** All events that have this status. */
   events?: EventItem[]
   /** Date and time when the status was created. */
