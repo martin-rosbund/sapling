@@ -57,6 +57,12 @@
           "sourceColumn": "Land"
         }
       ],
+      "fieldDefaults": [
+        {
+          "value": "leer",
+          "targetField": "street"
+        }
+      ],
       "relationMappings": []
     },
     "externalKeyColumns": ["iXISAdresse"],
@@ -92,10 +98,6 @@
           "sourceColumn": "EMail"
         },
         {
-          "targetField": "birthDay",
-          "sourceColumn": "Geburtstag"
-        },
-        {
           "targetField": "isActive",
           "sourceColumn": "Aktiv"
         },
@@ -122,8 +124,20 @@
       ],
       "fieldDefaults": [
         {
+          "value": "leer",
+          "targetField": "firstName"
+        },
+        {
           "value": "false",
           "targetField": "requirePasswordChange"
+        },
+        {
+          "value": true,
+          "targetField": "isActive"
+        },
+        {
+          "value": true,
+          "targetField": "sendNewsletter"
         },
         {
           "value": "#4CAF50",
@@ -140,11 +154,11 @@
       ],
       "relationMappings": [
         {
-          "targetField": "company",
           "mode": "externalKey",
+          "targetField": "company",
           "sourceColumn": "iXISFirma",
-          "sourceColumns": ["iXISFirma"],
-          "sourceHandle": "ixis"
+          "sourceHandle": "ixis",
+          "sourceColumns": ["iXISFirma"]
         }
       ]
     },

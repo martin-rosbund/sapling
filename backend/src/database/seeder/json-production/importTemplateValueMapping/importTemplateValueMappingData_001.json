@@ -1,6 +1,6 @@
 [
   {
-    "handle": 1,
+    "handle": 10,
     "importTemplate": 1,
     "targetField": "isActive",
     "sourceValue": "0",
@@ -8,7 +8,7 @@
     "fallback": "keep"
   },
   {
-    "handle": 2,
+    "handle": 11,
     "importTemplate": 1,
     "targetField": "isActive",
     "sourceValue": "1",
@@ -16,7 +16,7 @@
     "fallback": "keep"
   },
   {
-    "handle": 3,
+    "handle": 12,
     "importTemplate": 1,
     "targetField": "allowNewsletter",
     "sourceValue": "0",
@@ -24,7 +24,7 @@
     "fallback": "keep"
   },
   {
-    "handle": 4,
+    "handle": 13,
     "importTemplate": 1,
     "targetField": "dataPrivacyConsentGiven",
     "sourceValue": "0",
@@ -32,43 +32,379 @@
     "fallback": "keep"
   },
   {
-    "handle": 5,
+    "handle": 14,
+    "importTemplate": 2,
+    "targetField": "department",
+    "sourceValue": "IT",
+    "targetValue": "information_technology",
+    "fallback": "empty"
+  },
+  {
+    "handle": 15,
+    "importTemplate": 2,
+    "targetField": "department",
+    "sourceValue": "Einkauf",
+    "targetValue": "procurement",
+    "fallback": "empty"
+  },
+  {
+    "handle": 16,
+    "importTemplate": 2,
+    "targetField": "department",
+    "sourceValue": "Empfang",
+    "targetValue": "reception",
+    "fallback": "empty"
+  },
+  {
+    "handle": 17,
+    "importTemplate": 2,
+    "targetField": "department",
+    "sourceValue": "Personal",
+    "targetValue": "human_resources",
+    "fallback": "empty"
+  },
+  {
+    "handle": 18,
+    "importTemplate": 2,
+    "targetField": "department",
+    "sourceValue": "Vertrieb",
+    "targetValue": "sales",
+    "fallback": "empty"
+  },
+  {
+    "handle": 19,
+    "importTemplate": 2,
+    "targetField": "department",
+    "sourceValue": "Vorstand",
+    "targetValue": "board",
+    "fallback": "empty"
+  },
+  {
+    "handle": 20,
+    "importTemplate": 2,
+    "targetField": "department",
+    "sourceValue": "BackOffice",
+    "targetValue": "back_office",
+    "fallback": "empty"
+  },
+  {
+    "handle": 21,
+    "importTemplate": 2,
+    "targetField": "department",
+    "sourceValue": "Verwaltung",
+    "targetValue": "administration",
+    "fallback": "empty"
+  },
+  {
+    "handle": 22,
+    "importTemplate": 2,
+    "targetField": "department",
+    "sourceValue": "Controlling",
+    "targetValue": "controlling",
+    "fallback": "empty"
+  },
+  {
+    "handle": 23,
+    "importTemplate": 2,
+    "targetField": "department",
+    "sourceValue": "Kundenservice",
+    "targetValue": "customer_service",
+    "fallback": "empty"
+  },
+  {
+    "handle": 24,
+    "importTemplate": 2,
+    "targetField": "department",
+    "sourceValue": "Geschäftsführung",
+    "targetValue": "executive_management",
+    "fallback": "empty"
+  },
+  {
+    "handle": 25,
+    "importTemplate": 2,
+    "targetField": "department",
+    "sourceValue": "Finanzen / Rechnungswesen",
+    "targetValue": "finance_accounting",
+    "fallback": "empty"
+  },
+  {
+    "handle": 26,
+    "importTemplate": 2,
+    "targetField": "department",
+    "sourceValue": "Marketing",
+    "targetValue": "marketing",
+    "fallback": "empty"
+  },
+  {
+    "handle": 27,
+    "importTemplate": 2,
+    "targetField": "department",
+    "sourceValue": "Produktion",
+    "targetValue": "production",
+    "fallback": "empty"
+  },
+  {
+    "handle": 28,
     "importTemplate": 2,
     "targetField": "isActive",
     "sourceValue": "-1",
     "targetValue": "true",
-    "fallback": "keep"
+    "fallback": "empty"
   },
   {
-    "handle": 6,
+    "handle": 29,
+    "importTemplate": 2,
+    "targetField": "jobFunction",
+    "sourceValue": "Support",
+    "targetValue": "support",
+    "fallback": "empty"
+  },
+  {
+    "handle": 30,
+    "importTemplate": 2,
+    "targetField": "jobFunction",
+    "sourceValue": "Mitarbeiter",
+    "targetValue": "employee",
+    "fallback": "empty"
+  },
+  {
+    "handle": 31,
+    "importTemplate": 2,
+    "targetField": "jobFunction",
+    "sourceValue": "Kundenbetreuer",
+    "targetValue": "account_manager",
+    "fallback": "empty"
+  },
+  {
+    "handle": 32,
+    "importTemplate": 2,
+    "targetField": "jobFunction",
+    "sourceValue": "Abteilungsleiter",
+    "targetValue": "department_head",
+    "fallback": "empty"
+  },
+  {
+    "handle": 33,
+    "importTemplate": 2,
+    "targetField": "jobFunction",
+    "sourceValue": "Geschäftsführer",
+    "targetValue": "executive_assistant",
+    "fallback": "empty"
+  },
+  {
+    "handle": 34,
+    "importTemplate": 2,
+    "targetField": "jobFunction",
+    "sourceValue": "Vorstandsvorsitzender",
+    "targetValue": "chairperson",
+    "fallback": "empty"
+  },
+  {
+    "handle": 35,
+    "importTemplate": 2,
+    "targetField": "jobFunction",
+    "sourceValue": "Assistenz der Geschäftsführung",
+    "targetValue": "executive_assistant",
+    "fallback": "empty"
+  },
+  {
+    "handle": 36,
+    "importTemplate": 2,
+    "targetField": "jobFunction",
+    "sourceValue": "Auszubildender",
+    "targetValue": "trainee",
+    "fallback": "empty"
+  },
+  {
+    "handle": 37,
+    "importTemplate": 2,
+    "targetField": "jobFunction",
+    "sourceValue": "Programmierer / Entwickler",
+    "targetValue": "software_developer",
+    "fallback": "empty"
+  },
+  {
+    "handle": 38,
+    "importTemplate": 2,
+    "targetField": "jobFunction",
+    "sourceValue": "Prokurist",
+    "targetValue": "authorized_signatory",
+    "fallback": "empty"
+  },
+  {
+    "handle": 39,
+    "importTemplate": 2,
+    "targetField": "jobFunction",
+    "sourceValue": "Vorstand",
+    "targetValue": "board_member",
+    "fallback": "empty"
+  },
+  {
+    "handle": 40,
     "importTemplate": 2,
     "targetField": "salutation",
     "sourceValue": "Frau",
-    "targetValue": "mr",
-    "fallback": "keep"
+    "targetValue": "ms",
+    "fallback": "empty"
   },
   {
-    "handle": 7,
+    "handle": 41,
     "importTemplate": 2,
     "targetField": "salutation",
     "sourceValue": "Herr",
-    "targetValue": "ms",
-    "fallback": "keep"
+    "targetValue": "mr",
+    "fallback": "empty"
   },
   {
-    "handle": 8,
+    "handle": 42,
     "importTemplate": 2,
     "targetField": "sendNewsletter",
     "sourceValue": "0",
     "targetValue": "true",
-    "fallback": "keep"
+    "fallback": "empty"
   },
   {
-    "handle": 9,
+    "handle": 43,
     "importTemplate": 2,
     "targetField": "sendNewsletter",
     "sourceValue": "-1",
     "targetValue": "false",
-    "fallback": "keep"
+    "fallback": "empty"
+  },
+  {
+    "handle": 44,
+    "importTemplate": 2,
+    "targetField": "title",
+    "sourceValue": "Dr.",
+    "targetValue": "doctor",
+    "fallback": "empty"
+  },
+  {
+    "handle": 45,
+    "importTemplate": 2,
+    "targetField": "title",
+    "sourceValue": "Prof. Dr.",
+    "targetValue": "professor_doctor",
+    "fallback": "empty"
+  },
+  {
+    "handle": 46,
+    "importTemplate": 2,
+    "targetField": "title",
+    "sourceValue": "Dipl.-Ing.",
+    "targetValue": "graduate_engineer",
+    "fallback": "empty"
+  },
+  {
+    "handle": 47,
+    "importTemplate": 2,
+    "targetField": "title",
+    "sourceValue": "Dipl.-Wirtsch.-Ing.",
+    "targetValue": "graduate_industrial_engineer",
+    "fallback": "empty"
+  },
+  {
+    "handle": 48,
+    "importTemplate": 2,
+    "targetField": "title",
+    "sourceValue": "Dipl. Ing.",
+    "targetValue": "graduate_engineer",
+    "fallback": "empty"
+  },
+  {
+    "handle": 49,
+    "importTemplate": 2,
+    "targetField": "title",
+    "sourceValue": "Dipl.- Volksw.",
+    "targetValue": "graduate_economist",
+    "fallback": "empty"
+  },
+  {
+    "handle": 50,
+    "importTemplate": 2,
+    "targetField": "title",
+    "sourceValue": "Dipl.-Betriebswirt",
+    "targetValue": "graduate_business_administrator",
+    "fallback": "empty"
+  },
+  {
+    "handle": 51,
+    "importTemplate": 2,
+    "targetField": "title",
+    "sourceValue": "Dipl.-Betriebswirt (FH)",
+    "targetValue": "graduate_business_administrator",
+    "fallback": "empty"
+  },
+  {
+    "handle": 52,
+    "importTemplate": 2,
+    "targetField": "title",
+    "sourceValue": "Dipl.-Ing. agr.",
+    "targetValue": "graduate_agricultural_engineer",
+    "fallback": "empty"
+  },
+  {
+    "handle": 53,
+    "importTemplate": 2,
+    "targetField": "title",
+    "sourceValue": "Dipl.-Kaufm.",
+    "targetValue": "graduate_businessman",
+    "fallback": "empty"
+  },
+  {
+    "handle": 54,
+    "importTemplate": 2,
+    "targetField": "title",
+    "sourceValue": "Dipl.-Kffr.",
+    "targetValue": "graduate_businesswoman",
+    "fallback": "empty"
+  },
+  {
+    "handle": 55,
+    "importTemplate": 2,
+    "targetField": "title",
+    "sourceValue": "Dipl.-Wirt.-Inf.",
+    "targetValue": "graduate_business_informatics",
+    "fallback": "empty"
+  },
+  {
+    "handle": 56,
+    "importTemplate": 2,
+    "targetField": "title",
+    "sourceValue": "Diplom-Kauffrau (FH)",
+    "targetValue": "graduate_businesswoman",
+    "fallback": "empty"
+  },
+  {
+    "handle": 57,
+    "importTemplate": 2,
+    "targetField": "title",
+    "sourceValue": "Dpl. Soz. Päd.",
+    "targetValue": "graduate_social_pedagogue",
+    "fallback": "empty"
+  },
+  {
+    "handle": 58,
+    "importTemplate": 2,
+    "targetField": "title",
+    "sourceValue": "Dr. rer. medic.",
+    "targetValue": "doctor_medical_science",
+    "fallback": "empty"
+  },
+  {
+    "handle": 59,
+    "importTemplate": 2,
+    "targetField": "title",
+    "sourceValue": "Dr.-Ing.",
+    "targetValue": "doctor_engineer",
+    "fallback": "empty"
+  },
+  {
+    "handle": 60,
+    "importTemplate": 2,
+    "targetField": "title",
+    "sourceValue": "Herr Dr.",
+    "targetValue": "doctor",
+    "fallback": "empty"
   }
 ]
