@@ -36,7 +36,10 @@
         />
       </div>
     </template>
-    <div class="glass-panel sapling-menu-surface sapling-menu-surface--field-table">
+    <div
+      class="glass-panel sapling-menu-surface sapling-menu-surface--field-table"
+      @mousedown.capture="suppressNextActivatorSearchUpdate"
+    >
       <sapling-table
         v-if="menuOpen"
         :entity-handle="entityHandle"
@@ -132,12 +135,13 @@ const { combineFilters, normalizeFilter, areFiltersEqual } = useSaplingReference
 const fieldSearch = ref('')
 const autocompleteItems = ref<SaplingGenericItem[]>([])
 const genericStore = useGenericStore()
+const suppressNextSelectedItemSearch = ref(false)
 // #endregion
 
 // #region Selection State
 function onTableSelect(newSelected: SaplingGenericItem[]) {
-  selectedItems.value = newSelected
-  clearSearch()
+  selectedItems.value = mergeTableSelection(newSelected)
+  suppressNextActivatorSearchUpdate()
 }
 
 function onActivatorModelUpdate(value: readonly SaplingGenericItem[] | null) {
@@ -148,7 +152,19 @@ function onActivatorModelUpdate(value: readonly SaplingGenericItem[] | null) {
 }
 
 function onActivatorSearchUpdate(value: string) {
-  fieldSearch.value = value ?? ''
+  const nextSearch = value ?? ''
+
+  if (suppressNextSelectedItemSearch.value && nextSearch === '') {
+    return
+  }
+
+  if (suppressNextSelectedItemSearch.value && isSelectedItemDisplayText(nextSearch)) {
+    suppressNextSelectedItemSearch.value = false
+    return
+  }
+
+  suppressNextSelectedItemSearch.value = false
+  fieldSearch.value = nextSearch
   openMenu()
 
   if (!isInitialized.value) {
@@ -173,6 +189,10 @@ function closeAutocompleteMenu() {
   // The autocomplete is only used as an input surface. Results are rendered by SaplingTable.
 }
 
+function suppressNextActivatorSearchUpdate() {
+  suppressNextSelectedItemSearch.value = true
+}
+
 function clearSearch() {
   if (fieldSearch.value === '' && search.value === '') {
     return
@@ -190,6 +210,40 @@ function getTableSearchValue() {
 
 function getAutocompleteItemTitle(item: unknown) {
   return getEntityValueLabel(resolveSaplingItem(item), entityTemplates.value)
+}
+
+function mergeTableSelection(tableSelectedItems: SaplingGenericItem[]) {
+  const visibleItemIdentities = new Set(
+    items.value.map((item) => getItemIdentity(item)).filter((identity) => identity.length > 0),
+  )
+  const tableSelectedIdentities = new Set(
+    tableSelectedItems
+      .map((item) => getItemIdentity(item))
+      .filter((identity) => identity.length > 0),
+  )
+  const nextSelectedItems = selectedItems.value.filter((item) => {
+    const identity = getItemIdentity(item)
+    return !visibleItemIdentities.has(identity) || tableSelectedIdentities.has(identity)
+  })
+  const nextSelectedIdentities = new Set(nextSelectedItems.map((item) => getItemIdentity(item)))
+
+  for (const item of tableSelectedItems) {
+    const identity = getItemIdentity(item)
+    if (!nextSelectedIdentities.has(identity)) {
+      nextSelectedItems.push(item)
+      nextSelectedIdentities.add(identity)
+    }
+  }
+
+  return nextSelectedItems
+}
+
+function isSelectedItemDisplayText(value: string) {
+  if (!value || selectedItems.value.length === 0) {
+    return false
+  }
+
+  return selectedItems.value.some((item) => value === getAutocompleteItemTitle(item))
 }
 // #endregion
 
