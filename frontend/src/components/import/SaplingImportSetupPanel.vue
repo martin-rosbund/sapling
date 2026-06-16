@@ -11,56 +11,48 @@
       :loading="isAnalyzing"
       @update:model-value="emit('analyzeSelectedFile', $event)"
     />
-    <v-autocomplete
-      v-model="selectedOpenBatchHandleModel"
-      :items="openBatchOptions"
-      item-title="title"
-      item-value="value"
-      prepend-inner-icon="mdi-tray-arrow-down"
-      density="comfortable"
-      clearable
+    <SaplingFieldSingleSelect
+      v-model="selectedOpenBatchModel"
+      class="sapling-import__open-batch-select"
+      entity-handle="importBatch"
       :label="t('import.openBatch')"
       :disabled="isAnalyzing || isLoadingOpenBatches"
-      :loading="isLoadingOpenBatches"
-      autocomplete="off"
-      @update:model-value="emit('loadSelectedOpenBatch', $event)"
-    />
-    <v-autocomplete
-      v-model="selectedEntityHandleModel"
-      :items="entityOptions"
-      item-title="title"
-      item-value="value"
-      prepend-inner-icon="mdi-table"
+      :parent-filter="openBatchFilter"
       density="comfortable"
+      hide-details
+    />
+    <SaplingFieldSingleSelect
+      v-model="selectedEntityModel"
+      class="sapling-import__entity-select"
+      entity-handle="entity"
       :label="t('import.targetEntity')"
       :disabled="!hasBatch || isImportJobRunning"
-      autocomplete="off"
-      @update:model-value="emit('entityChange')"
-    />
-    <v-autocomplete
-      v-model="selectedSourceHandleModel"
-      :items="sourceOptions"
-      item-title="title"
-      item-value="value"
-      prepend-inner-icon="mdi-database"
+      :parent-filter="entityFilter"
+      :placeholder="selectedEntityPlaceholder ?? undefined"
       density="comfortable"
-      clearable
+      hide-details
+    />
+    <SaplingFieldSingleSelect
+      v-model="selectedSourceModel"
+      class="sapling-import__source-select"
+      entity-handle="importSource"
       :label="t('import.source')"
       :disabled="!hasBatch || isImportJobRunning"
-      autocomplete="off"
-    />
-    <v-autocomplete
-      v-model="selectedTemplateHandleModel"
-      :items="templateOptions"
-      item-title="title"
-      item-value="value"
-      prepend-inner-icon="mdi-table-cog"
+      :parent-filter="sourceFilter"
+      :placeholder="selectedSourcePlaceholder ?? undefined"
       density="comfortable"
-      clearable
+      hide-details
+    />
+    <SaplingFieldSingleSelect
+      v-model="selectedTemplateModel"
+      class="sapling-import__template-select"
+      entity-handle="importTemplate"
       :label="t('import.template')"
       :disabled="!canSelectTemplates || isImportJobRunning"
-      :loading="isLoadingTemplates"
-      autocomplete="off"
+      :parent-filter="templateFilter"
+      :placeholder="selectedTemplatePlaceholder ?? undefined"
+      density="comfortable"
+      hide-details
     />
   </div>
 
@@ -119,25 +111,32 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import SaplingFieldSingleSelect from '@/components/dialog/fields/SaplingFieldSingleSelect.vue'
+import type { SaplingGenericItem } from '@/entity/entity'
+import type { FilterQuery } from '@/services/api.generic.service'
 
 type Option = { title: string; value: string }
-type BatchOption = { title: string; value: number }
-type TemplateOption = { title: string; value: number | null }
 
 const props = defineProps<{
   selectedFile: File | File[] | null
-  selectedOpenBatchHandle: number | null
+  selectedOpenBatch: SaplingGenericItem | null
+  selectedEntity: SaplingGenericItem | null
+  selectedSource: SaplingGenericItem | null
   selectedEntityHandle: string | null
   selectedSourceHandle: string | null
-  selectedTemplateHandle: number | string | null
+  selectedTemplate: SaplingGenericItem | null
+  selectedEntityPlaceholder: string | null
+  selectedSourcePlaceholder: string | null
+  selectedTemplatePlaceholder: string | null
   templateTitle: string
   externalKeyColumns: string[]
   genericReferenceEntityHandle: string | null
   genericReferenceKeyColumns: string[]
-  openBatchOptions: BatchOption[]
   entityOptions: Option[]
-  sourceOptions: Option[]
-  templateOptions: TemplateOption[]
+  openBatchFilter: FilterQuery
+  entityFilter: FilterQuery
+  sourceFilter: FilterQuery
+  templateFilter: FilterQuery
   headerOptions: string[]
   hasBatch: boolean
   hasGenericReference: boolean
@@ -146,22 +145,19 @@ const props = defineProps<{
   isAnalyzing: boolean
   isImportJobRunning: boolean
   isLoadingOpenBatches: boolean
-  isLoadingTemplates: boolean
 }>()
 
 const emit = defineEmits<{
   (event: 'update:selectedFile', value: File | File[] | null): void
-  (event: 'update:selectedOpenBatchHandle', value: number | null): void
-  (event: 'update:selectedEntityHandle', value: string | null): void
-  (event: 'update:selectedSourceHandle', value: string | null): void
-  (event: 'update:selectedTemplateHandle', value: number | string | null): void
+  (event: 'update:selectedOpenBatch', value: SaplingGenericItem | null): void
+  (event: 'update:selectedEntity', value: SaplingGenericItem | null): void
+  (event: 'update:selectedSource', value: SaplingGenericItem | null): void
+  (event: 'update:selectedTemplate', value: SaplingGenericItem | null): void
   (event: 'update:templateTitle', value: string): void
   (event: 'update:externalKeyColumns', value: string[]): void
   (event: 'update:genericReferenceEntityHandle', value: string | null): void
   (event: 'update:genericReferenceKeyColumns', value: string[]): void
   (event: 'analyzeSelectedFile', value: File | File[] | null): void
-  (event: 'loadSelectedOpenBatch', value: number | string | null): void
-  (event: 'entityChange'): void
   (event: 'normalizeExternalKeyColumns'): void
   (event: 'normalizeGenericReferenceKeyColumns'): void
 }>()
@@ -173,24 +169,24 @@ const selectedFileModel = computed({
   set: (value: File | File[] | null) => emit('update:selectedFile', value),
 })
 
-const selectedOpenBatchHandleModel = computed({
-  get: () => props.selectedOpenBatchHandle,
-  set: (value: number | null) => emit('update:selectedOpenBatchHandle', value),
+const selectedOpenBatchModel = computed({
+  get: () => props.selectedOpenBatch,
+  set: (value: SaplingGenericItem | null) => emit('update:selectedOpenBatch', value),
 })
 
-const selectedEntityHandleModel = computed({
-  get: () => props.selectedEntityHandle,
-  set: (value: string | null) => emit('update:selectedEntityHandle', value),
+const selectedEntityModel = computed({
+  get: () => props.selectedEntity,
+  set: (value: SaplingGenericItem | null) => emit('update:selectedEntity', value),
 })
 
-const selectedSourceHandleModel = computed({
-  get: () => props.selectedSourceHandle,
-  set: (value: string | null) => emit('update:selectedSourceHandle', value),
+const selectedSourceModel = computed({
+  get: () => props.selectedSource,
+  set: (value: SaplingGenericItem | null) => emit('update:selectedSource', value),
 })
 
-const selectedTemplateHandleModel = computed({
-  get: () => props.selectedTemplateHandle,
-  set: (value: number | string | null) => emit('update:selectedTemplateHandle', value),
+const selectedTemplateModel = computed({
+  get: () => props.selectedTemplate,
+  set: (value: SaplingGenericItem | null) => emit('update:selectedTemplate', value),
 })
 
 const templateTitleModel = computed({

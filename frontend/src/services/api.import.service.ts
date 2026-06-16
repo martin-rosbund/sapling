@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { pushApiErrorMessage } from '@/services/api.error.service'
 import { buildApiUrl } from '@/services/api.client'
-import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service'
+import ApiGenericService from '@/services/api.generic.service'
 
 export interface ImportFieldMapping {
   sourceColumn: string
@@ -222,16 +222,6 @@ export interface ImportBatchSourceValues {
 }
 
 class ApiImportService {
-  static async listOpenBatches(): Promise<ImportBatchSummary[]> {
-    try {
-      const response = await axios.get<ImportBatchSummary[]>(buildApiUrl('import/batches/open'))
-      return response.data
-    } catch (error: unknown) {
-      pushApiErrorMessage(error, 'exception.unknownError', 'import')
-      throw error
-    }
-  }
-
   static async getBatch(handle: number): Promise<ImportBatchSummary> {
     try {
       const response = await axios.get<ImportBatchSummary>(buildApiUrl(`import/batches/${handle}`))
@@ -273,30 +263,14 @@ class ApiImportService {
     }
   }
 
-  static async listTemplates(params: {
-    entityHandle?: string | null
-    sourceHandle?: string | null
-  }): Promise<ImportTemplateSummary[]> {
+  static async getTemplate(handle: number): Promise<ImportTemplateSummary | null> {
     try {
-      const filter: FilterQuery = { isActive: true }
-      const entityHandle = normalizeOptionalString(params.entityHandle)
-      const sourceHandle = normalizeOptionalString(params.sourceHandle)
-
-      if (entityHandle) {
-        filter.targetEntity = { handle: entityHandle }
-      }
-
-      if (sourceHandle) {
-        filter.source = { handle: sourceHandle }
-      }
-
       const response = await ApiGenericService.find<ImportTemplateRecord>('importTemplate', {
-        filter,
-        orderBy: { title: 'ASC' },
+        filter: { handle },
         relations: ['source', 'targetEntity', 'valueMappings'],
-        limit: 500,
+        limit: 1,
       })
-      return response.data.map(toImportTemplateSummary)
+      return response.data[0] ? toImportTemplateSummary(response.data[0]) : null
     } catch (error: unknown) {
       pushApiErrorMessage(error, 'exception.unknownError', 'import')
       throw error

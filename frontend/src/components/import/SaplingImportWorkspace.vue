@@ -51,18 +51,24 @@
       <SaplingSurface class="sapling-panel-shell sapling-section-panel sapling-import__panel">
         <SaplingImportSetupPanel
           v-model:selected-file="selectedFile"
-          v-model:selected-open-batch-handle="selectedOpenBatchHandle"
-          v-model:selected-entity-handle="selectedEntityHandle"
-          v-model:selected-source-handle="selectedSourceHandle"
-          v-model:selected-template-handle="selectedTemplateHandle"
+          v-model:selected-open-batch="selectedOpenBatchRecord"
+          v-model:selected-entity="selectedTargetEntityRecord"
+          v-model:selected-source="selectedSourceRecord"
+          v-model:selected-template="selectedTemplateRecord"
           v-model:template-title="templateTitle"
           v-model:external-key-columns="externalKeyColumns"
           v-model:generic-reference-entity-handle="genericReferenceEntityHandle"
           v-model:generic-reference-key-columns="genericReferenceKeyColumns"
-          :open-batch-options="openBatchOptions"
           :entity-options="entityOptions"
-          :source-options="sourceOptions"
-          :template-options="templateOptions"
+          :selected-entity-handle="selectedEntityHandle"
+          :selected-source-handle="selectedSourceHandle"
+          :selected-entity-placeholder="selectedEntityPlaceholder"
+          :selected-source-placeholder="selectedSourcePlaceholder"
+          :open-batch-filter="openBatchFilter"
+          :entity-filter="entityFilter"
+          :source-filter="sourceFilter"
+          :selected-template-placeholder="selectedTemplatePlaceholder"
+          :template-filter="templateFilter"
           :header-options="headerOptions"
           :has-batch="Boolean(batch)"
           :has-generic-reference="hasGenericReference"
@@ -71,10 +77,7 @@
           :is-analyzing="isAnalyzing"
           :is-import-job-running="isImportJobRunning"
           :is-loading-open-batches="isLoadingOpenBatches"
-          :is-loading-templates="isLoadingTemplates"
           @analyze-selected-file="analyzeSelectedFile"
-          @load-selected-open-batch="loadSelectedOpenBatch"
-          @entity-change="onEntityChange"
           @normalize-external-key-columns="normalizeExternalKeyColumns"
           @normalize-generic-reference-key-columns="normalizeGenericReferenceKeyColumns"
         />
@@ -213,13 +216,12 @@ import {
   buildImportErrorReportCsv,
   createImportErrorReportFilename,
 } from '@/composables/import/saplingImportErrorReport'
+import type { FilterQuery } from '@/services/api.generic.service'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import { downloadTextFile } from '@/composables/table/saplingTableAction.utils'
 
 type Option = { title: string; value: string }
-type BatchOption = { title: string; value: number }
 type ErrorReportRow = ImportBatchRowSummary & { rawData: Record<string, unknown> }
-type ImportSource = SaplingGenericItem & { handle: string; title?: string; isActive?: boolean }
 type ValueMappingState = {
   targetField: string
   values: Record<string, unknown>
@@ -257,24 +259,36 @@ const IMPORT_REQUIRED_FIELDS_MISSING_PREFIX = 'import.requiredFieldsMissing:'
 const IMPORT_INVALID_DATE_VALUES_PREFIX = 'import.invalidDateValues:'
 const IMPORT_VALUE_MAPPING_MISSING_PREFIX = 'import.valueMappingMissing:'
 const IMPORT_VALUE_MAPPING_SOURCE_VALUE_LIMIT = 100
+const OPEN_IMPORT_BATCH_STATUSES = [
+  'analyzed',
+  'validationQueued',
+  'validating',
+  'validationFailed',
+  'validated',
+  'validatedWithErrors',
+  'executionQueued',
+  'executing',
+  'executionFailed',
+]
 const selectedFile = ref<File | File[] | null>(null)
 const selectedEntityHandle = ref<string | null>(null)
 const selectedSourceHandle = ref<string | null>(null)
 const selectedTemplateHandle = ref<number | string | null>(null)
-const selectedOpenBatchHandle = ref<number | null>(null)
+const selectedOpenBatchRecord = ref<SaplingGenericItem | null>(null)
+const selectedTargetEntityRecord = ref<SaplingGenericItem | null>(null)
+const selectedSourceRecord = ref<SaplingGenericItem | null>(null)
+const selectedTemplateRecord = ref<SaplingGenericItem | null>(null)
+const selectedTemplateSummary = ref<ImportTemplateSummary | null>(null)
 const templateTitle = ref('')
 const externalKeyColumns = ref<string[]>([])
 const genericReferenceEntityHandle = ref<string | null>(null)
 const genericReferenceKeyColumns = ref<string[]>([])
+let selectedTemplateLoadRequestId = 0
 const batch = ref<ImportBatchSummary | null>(null)
-const openBatches = ref<ImportBatchSummary[]>([])
 const entities = ref<EntityItem[]>([])
-const sources = ref<ImportSource[]>([])
-const templates = ref<ImportTemplateSummary[]>([])
 const isAnalyzing = ref(false)
 const isConfiguring = ref(false)
 const isExecuting = ref(false)
-const isLoadingTemplates = ref(false)
 const isSavingTemplate = ref(false)
 const isSuggesting = ref(false)
 const isLoadingOpenBatches = ref(false)
@@ -347,43 +361,37 @@ const entityOptions = computed<Option[]>(() =>
     .sort((left, right) => left.title.localeCompare(right.title)),
 )
 
-const sourceOptions = computed<Option[]>(() =>
-  sources.value
-    .filter((source) => source.isActive !== false)
-    .map((source) => ({ title: source.title || source.handle, value: source.handle })),
+const selectedEntityPlaceholder = computed(() => selectedEntityHandle.value)
+const selectedSourcePlaceholder = computed(() => selectedSourceHandle.value)
+const openBatchFilter = computed<FilterQuery>(() => ({
+  status: { $in: OPEN_IMPORT_BATCH_STATUSES },
+  executedAt: null,
+}))
+const entityFilter = computed<FilterQuery>(() => ({
+  canRead: { $ne: false },
+}))
+const sourceFilter = computed<FilterQuery>(() => ({
+  isActive: true,
+}))
+const selectedTemplate = computed(() => selectedTemplateSummary.value)
+const selectedTemplatePlaceholder = computed(() =>
+  selectedTemplateHandle.value == null || selectedTemplateHandle.value === ''
+    ? null
+    : String(selectedTemplateHandle.value),
 )
+const templateFilter = computed<FilterQuery>(() => {
+  const filter: FilterQuery = { isActive: true }
 
-const templateOptions = computed(() =>
-  templates.value.map((template) => ({
-    title: templateOptionTitle(template),
-    value: template.handle,
-  })),
-)
-const openBatchOptions = computed<BatchOption[]>(() =>
-  openBatches.value
-    .filter((entry) => typeof entry.handle === 'number')
-    .map((entry) => ({
-      title: [
-        `#${entry.handle}`,
-        entry.filename,
-        importStatusLabel(entry.status),
-        entry.entityHandle ? entityLabel(entry.entityHandle) : null,
-      ]
-        .filter(Boolean)
-        .join(' - '),
-      value: entry.handle as number,
-    })),
-)
+  if (selectedEntityHandle.value) {
+    filter.targetEntity = { handle: selectedEntityHandle.value }
+  }
 
-const selectedTemplate = computed(
-  () =>
-    templates.value.find(
-      (template) =>
-        template.handle != null &&
-        selectedTemplateHandle.value != null &&
-        String(template.handle) === String(selectedTemplateHandle.value),
-    ) ?? null,
-)
+  if (selectedSourceHandle.value) {
+    filter.source = { handle: selectedSourceHandle.value }
+  }
+
+  return filter
+})
 
 const headerOptions = computed(() => batch.value?.headers ?? [])
 const sampleHeaders = computed(() => batch.value?.headers.slice(0, 8) ?? [])
@@ -515,17 +523,12 @@ const { startBatchPolling, stopBatchPolling } = useSaplingImportBatchPolling({
   onBatch: (refreshedBatch) => {
     batch.value = refreshedBatch
   },
-  onTerminal: async () => {
-    await loadOpenBatches()
-  },
 })
 
 onMounted(async () => {
   await Promise.all([
     loadTranslations(),
     loadEntities(),
-    loadSources(),
-    loadOpenBatches(),
     currentPermissionStore.fetchCurrentPermission(),
   ])
 })
@@ -534,20 +537,42 @@ onUnmounted(() => {
   stopBatchPolling()
 })
 
+watch(selectedOpenBatchRecord, (selectedBatch) => {
+  if (!selectedBatch) {
+    return
+  }
+
+  void loadSelectedOpenBatch(selectedBatch.handle)
+})
+
+watch(selectedTargetEntityRecord, (selectedEntityRecord) => {
+  if (isHydratingBatch.value || isApplyingTemplate.value) {
+    return
+  }
+
+  selectedEntityHandle.value = normalizeSelectedHandle(selectedEntityRecord?.handle)
+})
+
+watch(selectedSourceRecord, (selectedSource) => {
+  if (isHydratingBatch.value || isApplyingTemplate.value) {
+    return
+  }
+
+  selectedSourceHandle.value = normalizeSelectedHandle(selectedSource?.handle)
+})
+
 watch(selectedEntityHandle, async (entityHandle) => {
   if (isHydratingBatch.value || isApplyingTemplate.value) {
     return
   }
 
-  selectedTemplateHandle.value = null
+  clearSelectedTemplate()
   if (!entityHandle) {
     initializeMappings()
-    await loadTemplates()
     return
   }
   await genericStore.loadGeneric(entityHandle, 'global', 'import')
   initializeMappings()
-  await loadTemplates()
 })
 
 watch(selectedSourceHandle, async () => {
@@ -555,14 +580,20 @@ watch(selectedSourceHandle, async () => {
     return
   }
 
-  selectedTemplateHandle.value = null
-  await loadTemplates()
+  clearSelectedTemplate()
 })
 
-watch(selectedTemplate, (template) => {
-  if (!isHydratingBatch.value && !isApplyingTemplate.value && template) {
-    void applyTemplateSelection(template)
+watch(selectedTemplateRecord, (template) => {
+  if (isHydratingBatch.value || isApplyingTemplate.value) {
+    return
   }
+
+  if (!template) {
+    clearSelectedTemplate()
+    return
+  }
+
+  void selectTemplateRecord(template)
 })
 
 async function loadEntities(): Promise<void> {
@@ -573,49 +604,6 @@ async function loadEntities(): Promise<void> {
   entities.value = response.data
 }
 
-async function loadSources(): Promise<void> {
-  const response = await ApiGenericService.find<ImportSource>('importSource', {
-    limit: DEFAULT_ENTITY_ITEMS_COUNT,
-    orderBy: { title: 'ASC' },
-  })
-  sources.value = response.data
-}
-
-async function loadTemplates(): Promise<void> {
-  if (!batch.value?.handle) {
-    templates.value = []
-    selectedTemplateHandle.value = null
-    return
-  }
-
-  try {
-    isLoadingTemplates.value = true
-    templates.value = await ApiImportService.listTemplates({
-      entityHandle: selectedEntityHandle.value,
-      sourceHandle: selectedSourceHandle.value,
-    })
-    if (
-      selectedTemplateHandle.value != null &&
-      !templates.value.some(
-        (template) => String(template.handle) === String(selectedTemplateHandle.value),
-      )
-    ) {
-      selectedTemplateHandle.value = null
-    }
-  } finally {
-    isLoadingTemplates.value = false
-  }
-}
-
-async function loadOpenBatches(): Promise<void> {
-  try {
-    isLoadingOpenBatches.value = true
-    openBatches.value = await ApiImportService.listOpenBatches()
-  } finally {
-    isLoadingOpenBatches.value = false
-  }
-}
-
 async function analyzeSelectedFile(value: File | File[] | null): Promise<void> {
   const file = Array.isArray(value) ? value[0] : value
   if (!file) {
@@ -624,11 +612,10 @@ async function analyzeSelectedFile(value: File | File[] | null): Promise<void> {
 
   try {
     isAnalyzing.value = true
-    selectedOpenBatchHandle.value = null
+    selectedOpenBatchRecord.value = null
+    clearSelectedTemplate()
     batch.value = await ApiImportService.analyzeCsv(file)
     initializeMappings()
-    await loadTemplates()
-    await loadOpenBatches()
     pushMessage('success', t('import.analysisCompleted'), file.name, 'import')
   } catch {
     // shared API errors already surface through the message center
@@ -663,7 +650,15 @@ async function hydrateBatchState(loadedBatch: ImportBatchSummary): Promise<void>
     selectedFile.value = null
     selectedEntityHandle.value = loadedBatch.entityHandle ?? null
     selectedSourceHandle.value = loadedBatch.sourceHandle ?? null
+    selectedTargetEntityRecord.value = selectedEntityHandle.value
+      ? { handle: selectedEntityHandle.value }
+      : null
+    selectedSourceRecord.value = selectedSourceHandle.value ? { handle: selectedSourceHandle.value } : null
     selectedTemplateHandle.value = loadedBatch.templateHandle ?? null
+    selectedTemplateSummary.value = await loadSelectedTemplateSummary()
+    selectedTemplateRecord.value = selectedTemplateSummary.value
+      ? importTemplateSummaryToGenericItem(selectedTemplateSummary.value)
+      : null
     templateTitle.value = ''
 
     if (selectedEntityHandle.value) {
@@ -673,7 +668,6 @@ async function hydrateBatchState(loadedBatch: ImportBatchSummary): Promise<void>
       ])
     }
 
-    await loadTemplates()
     templateTitle.value = selectedTemplate.value?.title ?? ''
     initializeMappings()
     applyMappingConfiguration(
@@ -695,16 +689,6 @@ async function hydrateBatchState(loadedBatch: ImportBatchSummary): Promise<void>
   } finally {
     isHydratingBatch.value = false
   }
-}
-
-async function onEntityChange(): Promise<void> {
-  if (selectedEntityHandle.value) {
-    await Promise.all([
-      genericStore.loadGeneric(selectedEntityHandle.value, 'global', 'import'),
-      loadTranslations(),
-    ])
-  }
-  initializeMappings()
 }
 
 function initializeMappings(): void {
@@ -743,6 +727,49 @@ function applySelectedTemplate(): void {
   pushMessage('success', t('import.templateLoaded'), template.title, 'import')
 }
 
+function clearSelectedTemplate(): void {
+  selectedTemplateLoadRequestId += 1
+  selectedTemplateHandle.value = null
+  selectedTemplateRecord.value = null
+  selectedTemplateSummary.value = null
+}
+
+async function selectTemplateRecord(record: SaplingGenericItem): Promise<void> {
+  const handle = extractTemplateHandleNumber(record.handle)
+  if (!handle) {
+    clearSelectedTemplate()
+    return
+  }
+
+  const requestId = ++selectedTemplateLoadRequestId
+  const template = await ApiImportService.getTemplate(handle)
+  if (requestId !== selectedTemplateLoadRequestId) {
+    return
+  }
+
+  if (!template) {
+    clearSelectedTemplate()
+    return
+  }
+
+  selectedTemplateHandle.value = template.handle
+  selectedTemplateSummary.value = template
+  await applyTemplateSelection(template)
+}
+
+async function loadSelectedTemplateSummary(): Promise<ImportTemplateSummary | null> {
+  const handle = getSelectedTemplateHandleNumber()
+  return handle ? await ApiImportService.getTemplate(handle) : null
+}
+
+function importTemplateSummaryToGenericItem(template: ImportTemplateSummary): SaplingGenericItem {
+  return {
+    ...template,
+    source: { handle: template.sourceHandle },
+    targetEntity: { handle: template.entityHandle },
+  }
+}
+
 async function applyTemplateSelection(template: ImportTemplateSummary): Promise<void> {
   isApplyingTemplate.value = true
 
@@ -752,6 +779,10 @@ async function applyTemplateSelection(template: ImportTemplateSummary): Promise<
 
     selectedEntityHandle.value = template.entityHandle
     selectedSourceHandle.value = template.sourceHandle
+    selectedTargetEntityRecord.value = selectedEntityHandle.value
+      ? { handle: selectedEntityHandle.value }
+      : null
+    selectedSourceRecord.value = selectedSourceHandle.value ? { handle: selectedSourceHandle.value } : null
 
     if (entityChanged && selectedEntityHandle.value) {
       await Promise.all([
@@ -762,9 +793,11 @@ async function applyTemplateSelection(template: ImportTemplateSummary): Promise<
     }
 
     if (entityChanged || sourceChanged) {
-      await loadTemplates()
+      selectedTemplateRecord.value = importTemplateSummaryToGenericItem(template)
     }
 
+    selectedTemplateHandle.value = template.handle
+    selectedTemplateSummary.value = template
     applyTemplate(template)
   } finally {
     isApplyingTemplate.value = false
@@ -782,27 +815,6 @@ function applyTemplate(template: ImportTemplateSummary): void {
     genericReferenceMapping?.keyColumns ?? [],
   )
   templateTitle.value = template.title
-}
-
-function templateOptionTitle(template: ImportTemplateSummary): string {
-  if (selectedEntityHandle.value && selectedSourceHandle.value) {
-    return template.title
-  }
-
-  return [template.title, sourceLabel(template.sourceHandle), entityLabel(template.entityHandle)]
-    .filter(Boolean)
-    .join(' - ')
-}
-
-function sourceLabel(sourceHandle: string | null | undefined): string {
-  if (!sourceHandle) {
-    return ''
-  }
-
-  return (
-    sources.value.find((source) => String(source.handle) === String(sourceHandle))?.title ??
-    sourceHandle
-  )
 }
 
 async function createAiSuggestion(): Promise<void> {
@@ -877,7 +889,6 @@ async function configureBatch(): Promise<void> {
     applyValueMappings(batch.value.mapping)
     trackImportBatch(batch.value.handle)
     startBatchPolling(batch.value.handle)
-    await loadOpenBatches()
     pushMessage('info', t('import.validationStarted'), batch.value.filename, 'import')
   } catch {
     // shared API errors already surface through the message center
@@ -904,8 +915,9 @@ async function saveTemplate(): Promise<void> {
     const savedTemplate = existingHandle
       ? await ApiImportService.updateTemplate(existingHandle, payload)
       : await ApiImportService.saveTemplate(payload)
-    await loadTemplates()
     selectedTemplateHandle.value = savedTemplate.handle
+    selectedTemplateSummary.value = savedTemplate
+    selectedTemplateRecord.value = importTemplateSummaryToGenericItem(savedTemplate)
     templateTitle.value = savedTemplate.title
     applyValueMappings(savedTemplate.mapping)
     pushMessage('success', t('import.templateSaved'), savedTemplate.title, 'import')
@@ -928,7 +940,6 @@ async function executeBatch(): Promise<void> {
     trackImportBatch(executedBatch.handle)
     startBatchPolling(executedBatch.handle)
     pushMessage('info', t('import.executionStarted'), executedBatch.filename, 'import')
-    await loadOpenBatches()
   } catch {
     // shared API errors already surface through the message center
   } finally {
@@ -1020,8 +1031,25 @@ function getSelectedTemplateHandleNumber(): number | null {
     return null
   }
 
-  const handle = Number(selectedTemplateHandle.value)
+  return extractTemplateHandleNumber(selectedTemplateHandle.value)
+}
+
+function extractTemplateHandleNumber(value: unknown): number | null {
+  if (value === null || value === '') {
+    return null
+  }
+
+  const handle = Number(value)
   return Number.isFinite(handle) ? Math.trunc(handle) : null
+}
+
+function normalizeSelectedHandle(value: unknown): string | null {
+  if (value === null || value === undefined) {
+    return null
+  }
+
+  const normalizedValue = String(value).trim()
+  return normalizedValue.length > 0 ? normalizedValue : null
 }
 
 function buildFieldMappings(): ImportFieldMapping[] {
