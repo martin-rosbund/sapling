@@ -105,8 +105,7 @@ export function useSaplingChipFilters({
         return
       }
 
-      const handles =
-        selectedHandles.length > 0 ? selectedHandles : [EMPTY_CHIP_FILTER_SENTINEL]
+      const handles = selectedHandles.length > 0 ? selectedHandles : [EMPTY_CHIP_FILTER_SENTINEL]
 
       clauses.push({
         [filter.fieldName]: {
@@ -142,10 +141,7 @@ function isChipFilterTemplate(template: EntityTemplate): boolean {
 
 function getChipFilterOrder(template: EntityTemplate): number {
   return (
-    template.formGroupOrder ??
-    template.formOrder ??
-    template.tableOrder ??
-    Number.MAX_SAFE_INTEGER
+    template.formGroupOrder ?? template.formOrder ?? template.tableOrder ?? Number.MAX_SAFE_INTEGER
   )
 }
 

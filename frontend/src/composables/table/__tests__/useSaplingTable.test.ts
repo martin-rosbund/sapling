@@ -94,6 +94,7 @@ const entityStates = reactive<Record<string, ReturnType<typeof createEntityState
       kind: 'm:1',
       referenceName: 'ticketStatus',
       referencedPks: ['handle'],
+      options: ['isChip'],
     }),
     createTemplate({
       name: 'deadlineDate',
@@ -410,6 +411,48 @@ describe('useSaplingTable', () => {
       'partner',
       expect.objectContaining({
         filter: { owner: { $in: [42] } },
+      }),
+    )
+  })
+
+  it('applies default open filters for chip references with isOpen values', async () => {
+    loadGenericMock.mockResolvedValue(undefined)
+    apiFindMock.mockImplementation((entityHandle: string) => {
+      if (entityHandle === 'ticketStatus') {
+        return Promise.resolve({
+          data: [
+            { handle: 'open', description: 'Open', isOpen: true },
+            { handle: 'waiting', description: 'Waiting', isOpen: true },
+            { handle: 'closed', description: 'Closed', isOpen: false },
+          ],
+          meta: { total: 3 },
+        })
+      }
+
+      return Promise.resolve({
+        data: [{ handle: 1, title: 'Open ticket' }],
+        meta: { total: 1 },
+      })
+    })
+
+    const wrapper = mountTestHost(ref('ticket'))
+    await flushPromises()
+
+    expect(wrapper.vm.columnFilters).toEqual({
+      status: {
+        operator: 'eq',
+        value: '',
+        relationItems: [{ handle: 'open' }, { handle: 'waiting' }],
+      },
+    })
+    expect(apiFindMock).toHaveBeenLastCalledWith(
+      'ticket',
+      expect.objectContaining({
+        filter: {
+          status: {
+            handle: { $in: ['open', 'waiting'] },
+          },
+        },
       }),
     )
   })

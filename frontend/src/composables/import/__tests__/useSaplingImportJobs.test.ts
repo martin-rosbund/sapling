@@ -24,9 +24,9 @@ vi.mock('@/services/api.import.service', () => ({
   isImportBatchNotFoundError: (error: unknown) =>
     Boolean(
       error &&
-        typeof error === 'object' &&
-        'response' in error &&
-        (error as { response?: { status?: number } }).response?.status === 404,
+      typeof error === 'object' &&
+      'response' in error &&
+      (error as { response?: { status?: number } }).response?.status === 404,
     ),
 }))
 

@@ -265,10 +265,11 @@ describe('ImportService', () => {
     const service = createService({
       find: jest.fn(() => Promise.resolve([{ handle: 5 }])),
     });
-    (service as unknown as { genericQueryService: unknown }).genericQueryService =
-      {
-        getEntityClass: jest.fn(() => class Company {}),
-      };
+    (
+      service as unknown as { genericQueryService: unknown }
+    ).genericQueryService = {
+      getEntityClass: jest.fn(() => class Company {}),
+    };
 
     await expect(
       (
@@ -303,10 +304,11 @@ describe('ImportService', () => {
         Promise.resolve(criteria.name === 'Leibniz' ? [{ handle: 5 }] : []),
       ),
     });
-    (service as unknown as { genericQueryService: unknown }).genericQueryService =
-      {
-        getEntityClass: jest.fn(() => class Company {}),
-      };
+    (
+      service as unknown as { genericQueryService: unknown }
+    ).genericQueryService = {
+      getEntityClass: jest.fn(() => class Company {}),
+    };
     const payload = { name: 'Leibniz' };
 
     await (

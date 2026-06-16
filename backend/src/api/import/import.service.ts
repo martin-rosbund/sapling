@@ -2617,13 +2617,13 @@ export class ImportService {
   private isImportUniqueConflictField(field: EntityTemplateDto): boolean {
     return Boolean(
       field.name &&
-        field.isUnique &&
-        !field.isPrimaryKey &&
-        !field.isReference &&
-        !field.customField &&
-        !field.name.startsWith('customFields.') &&
-        field.isPersistent !== false &&
-        this.isImportTextField(field),
+      field.isUnique &&
+      !field.isPrimaryKey &&
+      !field.isReference &&
+      !field.customField &&
+      !field.name.startsWith('customFields.') &&
+      field.isPersistent !== false &&
+      this.isImportTextField(field),
     );
   }
 

@@ -14,6 +14,7 @@ import { Sapling, SaplingForm } from './global/entity.decorator';
  * @property        {string}                description   Description of the status (display name)
  * @property        {string}                color         Color code (hex or color name) for UI representation
  * @property        {string}                icon          Icon representing the status (default: mdi-new-box)
+ * @property        {boolean}               isOpen        Indicates whether tickets with this status are treated as open
  * @property        {Collection<TicketItem>} tickets      All tickets that have this status
  * @property        {Date}                  createdAt     Date and time when the ticket status was created
  * @property        {Date}                  updatedAt     Date and time when the ticket status was last updated
@@ -88,6 +89,25 @@ export class TicketStatusItem {
   })
   @Property({ default: 'mdi-new-box', length: 64, nullable: false })
   icon?: string = 'mdi-new-box';
+
+  /**
+   * Indicates whether tickets with this status are treated as open.
+   * @type {boolean}
+   */
+  @ApiPropertyOptional({ default: true })
+  @SaplingForm({
+    order: 100,
+    group: 'ticketStatus.groupConfiguration',
+    groupOrder: 300,
+    width: 1,
+    visible: true,
+    tableOrder: 100,
+    tableVisible: true,
+    mobileOrder: 100,
+    mobileVisible: false,
+  })
+  @Property({ default: true, nullable: false })
+  isOpen?: boolean = true;
   //#endregion
 
   //#region Properties: Relation

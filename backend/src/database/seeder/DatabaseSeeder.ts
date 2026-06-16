@@ -188,7 +188,6 @@ const SEED_ORDER: Array<EntityName<object> | (new () => Seeder)> = [
   EventItem,
   DashboardTemplateItem,
   FavoriteTemplateItem,
-  RoleStarterSeeder,
   ServerLandscapeTypeItem,
   ServerLandscapeTypeUsageItem,
   ServerLandscapeItem,
@@ -240,6 +239,7 @@ const SEED_ORDER: Array<EntityName<object> | (new () => Seeder)> = [
   AiAgentPlaybookItem,
   AiAgentMemoryItem,
   CustomFieldTypeItem,
+  RoleStarterSeeder,
 ];
 
 function isEntityClass(

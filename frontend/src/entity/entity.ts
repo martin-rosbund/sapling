@@ -1020,6 +1020,8 @@ export interface SalesOpportunityItem extends SaplingGenericItem {
   forecast?: SalesOpportunityForecastItem | null
   /** Lead source */
   source?: SalesOpportunitySourceItem | null
+  /** Win/loss result status */
+  resultStatus?: SalesOpportunityResultStatusItem | null
   /** Assigned company */
   assigneeCompany?: CompanyItem | null
   /** Assigned person */
@@ -1084,6 +1086,32 @@ export interface SalesOpportunityForecastItem extends SaplingGenericItem {
   color: string
   /** Opportunities in this forecast */
   salesOpportunities?: SalesOpportunityItem[]
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a sales opportunity win/loss result status.
+ */
+export interface SalesOpportunityResultStatusItem extends SaplingGenericItem {
+  /** Unique identifier for the result status */
+  handle: string
+  /** Display title */
+  title: string
+  /** Whether the result closes the opportunity */
+  isClosed?: boolean | null
+  /** Whether the result counts as a success */
+  isSuccess?: boolean | null
+  /** Whether opportunities with this result status are treated as open */
+  isOpen?: boolean | null
+  /** Optional icon */
+  icon?: string | null
+  /** Accent color */
+  color: string
+  /** Sort order */
+  sortOrder?: number | null
   /** Creation date */
   createdAt?: Date | null
   /** Last update date */
@@ -1402,6 +1430,8 @@ export interface TicketStatusItem extends SaplingGenericItem {
   description: string
   /** Color associated with the status */
   color: string
+  /** Whether tickets with this status are treated as open */
+  isOpen?: boolean | null
   /** List of tickets with this status */
   tickets?: TicketItem[]
   /** Creation date */

@@ -1,0 +1,20 @@
+[
+  {
+    "entity": "ticketStatus",
+    "property": "isOpen",
+    "de": "Offen",
+    "en": "Open"
+  },
+  {
+    "entity": "ticketStatus",
+    "property": "groupConfiguration",
+    "de": "Konfiguration",
+    "en": "Configuration"
+  },
+  {
+    "entity": "salesOpportunityResultStatus",
+    "property": "isOpen",
+    "de": "Offen",
+    "en": "Open"
+  }
+]

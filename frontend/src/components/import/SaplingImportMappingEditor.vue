@@ -85,10 +85,7 @@
         </v-tooltip>
       </div>
 
-      <div
-        v-if="isUniqueConflictField(field)"
-        class="sapling-import__unique-conflict-controls"
-      >
+      <div v-if="isUniqueConflictField(field)" class="sapling-import__unique-conflict-controls">
         <v-select
           :model-value="uniqueConflictStrategies[field.name] ?? 'error'"
           :items="uniqueConflictStrategyOptions"
@@ -250,9 +247,9 @@ function updateRelationMappingColumns(targetField: string, value: unknown): void
 function isUniqueConflictField(field: EntityTemplate): boolean {
   return Boolean(
     field.isUnique &&
-      !field.isPrimaryKey &&
-      !field.isReference &&
-      ['string', 'text', 'varchar'].includes(field.type),
+    !field.isPrimaryKey &&
+    !field.isReference &&
+    ['string', 'text', 'varchar'].includes(field.type),
   )
 }
 </script>

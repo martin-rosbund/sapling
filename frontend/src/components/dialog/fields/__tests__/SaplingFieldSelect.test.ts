@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import SaplingFieldSelect from '../SaplingFieldSelect.vue'
 
 const { loadDataMock, onSearchUpdateMock, tableState } = vi.hoisted(() => {
-  const makeRef = <T,>(value: T) => ({ value })
+  const makeRef = <T>(value: T) => ({ value })
   const state = {
     items: makeRef<Array<Record<string, unknown>>>([]),
     search: makeRef(''),

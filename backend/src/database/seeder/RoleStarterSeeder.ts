@@ -1,13 +1,20 @@
 import { EntityManager, EntityName, Collection } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
+import { existsSync, readFileSync, readdirSync } from 'fs';
+import { join } from 'path';
+import { DB_DATA_SEEDER } from '../../constants/project.constants';
 import { DashboardTemplateItem } from '../../entity/DashboardTemplateItem';
 import { FavoriteTemplateItem } from '../../entity/FavoriteTemplateItem';
 import { RoleItem } from '../../entity/RoleItem';
-import { loadSeedJson } from './utils/load-seed-json';
 
 type RoleStarterTemplateSeed = {
   role: string;
   templates: string[];
+};
+
+type RoleStarterSeedFile = {
+  scriptName: string;
+  seedItems: RoleStarterTemplateSeed[];
 };
 
 type TemplateLike = { name: string };
@@ -37,7 +44,8 @@ export class RoleStarterSeeder extends Seeder {
       em,
       roleByTitle,
       DashboardTemplateItem,
-      'roleStarterDashboard/roleStarterDashboardData_001',
+      'roleStarterDashboard',
+      'roleStarterDashboardData',
       'dashboard template',
       (role) => role.starterDashboardTemplates,
     );
@@ -45,7 +53,8 @@ export class RoleStarterSeeder extends Seeder {
       em,
       roleByTitle,
       FavoriteTemplateItem,
-      'roleStarterFavorite/roleStarterFavoriteData_001',
+      'roleStarterFavorite',
+      'roleStarterFavoriteData',
       'favorite template',
       (role) => role.starterFavoriteTemplates,
     );
@@ -56,29 +65,66 @@ export class RoleStarterSeeder extends Seeder {
     em: EntityManager,
     roleByTitle: Map<string, RoleItem>,
     templateClass: EntityName<T>,
-    fileBase: string,
+    seedFolder: string,
+    filePrefix: string,
     templateType: string,
     getCollection: RoleCollectionAccessor<T>,
   ): Promise<void> {
-    const seedItems = loadSeedJson<RoleStarterTemplateSeed>(fileBase);
+    const seedFiles = this.loadSeedFiles(seedFolder, filePrefix);
     const templateItems = await em.find(templateClass, {});
     const templateByName = new Map(
       templateItems.map((templateItem) => [templateItem.name, templateItem]),
     );
 
-    for (const seedItem of seedItems) {
-      const roleItem = this.requireRole(roleByTitle, seedItem.role);
-      const resolvedTemplates = seedItem.templates.flatMap((templateName) =>
-        this.resolveTemplate(
-          templateByName,
-          templateName,
-          templateType,
-          seedItem.role,
-        ),
+    for (const seedFile of seedFiles) {
+      global.log.info(
+        `Applying ${templateType} role starter assignments from script ${seedFile.scriptName}: ${seedFile.seedItems.length} records.`,
       );
 
-      getCollection(roleItem).set(resolvedTemplates);
+      for (const seedItem of seedFile.seedItems) {
+        const roleItem = this.requireRole(roleByTitle, seedItem.role);
+        const resolvedTemplates = seedItem.templates.flatMap((templateName) =>
+          this.resolveTemplate(
+            templateByName,
+            templateName,
+            templateType,
+            seedItem.role,
+          ),
+        );
+
+        getCollection(roleItem).set(resolvedTemplates);
+      }
     }
+  }
+
+  private loadSeedFiles(
+    seedFolder: string,
+    filePrefix: string,
+  ): RoleStarterSeedFile[] {
+    const scriptsDir = join(__dirname, `json-${DB_DATA_SEEDER}`, seedFolder);
+
+    if (!existsSync(scriptsDir)) {
+      global.log.warn(
+        `No scripts directory found for ${seedFolder}: ${scriptsDir}`,
+      );
+      return [];
+    }
+
+    return readdirSync(scriptsDir)
+      .filter(
+        (fileName) =>
+          fileName.startsWith(`${filePrefix}_`) && fileName.endsWith('.json'),
+      )
+      .sort((left, right) => left.localeCompare(right))
+      .map((scriptName) => {
+        const filePath = join(scriptsDir, scriptName);
+        const fileContent = readFileSync(filePath, 'utf-8');
+
+        return {
+          scriptName,
+          seedItems: JSON.parse(fileContent) as RoleStarterTemplateSeed[],
+        };
+      });
   }
 
   private requireRole(

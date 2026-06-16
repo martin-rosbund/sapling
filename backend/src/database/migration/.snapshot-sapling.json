@@ -24774,6 +24774,23 @@
           "enumItems": [],
           "mappedType": "boolean"
         },
+        "is_open": {
+          "name": "is_open",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "true",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
         "is_success": {
           "name": "is_success",
           "type": "boolean",
@@ -29842,6 +29859,23 @@
           "collation": null,
           "enumItems": [],
           "mappedType": "string"
+        },
+        "is_open": {
+          "name": "is_open",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "true",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "boolean"
         },
         "updated_at": {
           "name": "updated_at",

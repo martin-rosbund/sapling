@@ -14,7 +14,7 @@ import type {
   SortItem,
 } from '@/entity/structure'
 import type { SaplingGenericItem } from '@/entity/entity'
-import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants'
+import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants'
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
 import { useGenericStore } from '@/stores/genericStore'
 import {
@@ -367,6 +367,29 @@ export function useSaplingTable(
       removeRestoredColumnFiltersFromFilterQuery(nextEntityTemplates, urlFilter) ?? {}
   }
 
+  async function applyDefaultOpenChipColumnFilters(nextEntityTemplates: EntityTemplate[]) {
+    const chipReferenceTemplates = nextEntityTemplates.filter(isOpenChipReferenceTemplate)
+
+    if (chipReferenceTemplates.length === 0) {
+      return
+    }
+
+    const defaultFilters = await Promise.all(
+      chipReferenceTemplates.map((template) => buildDefaultOpenChipColumnFilter(template)),
+    )
+
+    defaultFilters.forEach((filter) => {
+      if (!filter || columnFilters.value[filter.key]) {
+        return
+      }
+
+      columnFilters.value = {
+        ...columnFilters.value,
+        [filter.key]: filter.value,
+      }
+    })
+  }
+
   function selectDefaultFormConfig(): void {
     selectedFormConfigHandle.value = getDefaultFormConfigHandle(formConfigs.value)
   }
@@ -439,6 +462,7 @@ export function useSaplingTable(
       generateHeaders(currentEntityHandle)
       initialSort(nextEntityTemplates)
       restoreQueryFilterState(nextEntityTemplates)
+      await applyDefaultOpenChipColumnFilters(nextEntityTemplates)
       await options.beforeInitialLoad?.()
     } finally {
       if (
@@ -667,4 +691,64 @@ function isAbortError(error: unknown): boolean {
     'code' in error &&
     (error as { code?: string }).code === 'ERR_CANCELED'
   )
+}
+
+function isOpenChipReferenceTemplate(template: EntityTemplate): boolean {
+  return (
+    template.kind === 'm:1' &&
+    Boolean(template.referenceName) &&
+    template.options?.includes('isChip') === true
+  )
+}
+
+async function buildDefaultOpenChipColumnFilter(
+  template: EntityTemplate,
+): Promise<{ key: string; value: ColumnFilterItem } | null> {
+  const referenceName = template.referenceName
+  if (!referenceName) {
+    return null
+  }
+
+  let referenceItems: SaplingGenericItem[]
+  try {
+    referenceItems = (
+      await ApiGenericService.find<SaplingGenericItem>(referenceName, {
+        limit: DEFAULT_ENTITY_ITEMS_COUNT,
+      })
+    ).data
+  } catch {
+    return null
+  }
+
+  if (!referenceItems.some((item) => typeof item.isOpen === 'boolean')) {
+    return null
+  }
+
+  const openItems = referenceItems.filter((item) => item.isOpen !== false)
+  if (openItems.length === 0 || openItems.length === referenceItems.length) {
+    return null
+  }
+
+  const identifierKey = template.referencedPks?.[0] ?? 'handle'
+  const relationItems = openItems
+    .map((item) => {
+      const value = item[identifierKey]
+      return typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
+        ? { [identifierKey]: value }
+        : null
+    })
+    .filter((item): item is SaplingGenericItem => item !== null)
+
+  if (relationItems.length === 0) {
+    return null
+  }
+
+  return {
+    key: template.key ?? template.name,
+    value: {
+      operator: 'eq',
+      value: '',
+      relationItems,
+    },
+  }
 }

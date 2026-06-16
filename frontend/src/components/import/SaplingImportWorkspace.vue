@@ -266,8 +266,7 @@ const IMPORT_INVALID_DATE_VALUES_PREFIX = 'import.invalidDateValues:'
 const IMPORT_INVALID_BOOLEAN_VALUES_PREFIX = 'import.invalidBooleanValues:'
 const IMPORT_VALUE_MAPPING_MISSING_PREFIX = 'import.valueMappingMissing:'
 const IMPORT_UNIQUE_FIELD_CONFLICT_PREFIX = 'import.uniqueFieldConflict:'
-const IMPORT_UNIQUE_FIELD_DUPLICATE_IN_BATCH_PREFIX =
-  'import.uniqueFieldDuplicateInBatch:'
+const IMPORT_UNIQUE_FIELD_DUPLICATE_IN_BATCH_PREFIX = 'import.uniqueFieldDuplicateInBatch:'
 const IMPORT_VALUE_MAPPING_SOURCE_VALUE_LIMIT = 100
 const OPEN_IMPORT_BATCH_STATUSES = [
   'analyzed',
@@ -677,7 +676,9 @@ async function hydrateBatchState(loadedBatch: ImportBatchSummary): Promise<void>
     selectedTargetEntityRecord.value = selectedEntityHandle.value
       ? { handle: selectedEntityHandle.value }
       : null
-    selectedSourceRecord.value = selectedSourceHandle.value ? { handle: selectedSourceHandle.value } : null
+    selectedSourceRecord.value = selectedSourceHandle.value
+      ? { handle: selectedSourceHandle.value }
+      : null
     selectedTemplateHandle.value = loadedBatch.templateHandle ?? null
     selectedTemplateSummary.value = await loadSelectedTemplateSummary()
     selectedTemplateRecord.value = selectedTemplateSummary.value
@@ -829,7 +830,9 @@ async function applyTemplateSelection(template: ImportTemplateSummary): Promise<
     selectedTargetEntityRecord.value = selectedEntityHandle.value
       ? { handle: selectedEntityHandle.value }
       : null
-    selectedSourceRecord.value = selectedSourceHandle.value ? { handle: selectedSourceHandle.value } : null
+    selectedSourceRecord.value = selectedSourceHandle.value
+      ? { handle: selectedSourceHandle.value }
+      : null
 
     if (entityChanged && selectedEntityHandle.value) {
       await Promise.all([
@@ -1164,9 +1167,9 @@ function buildUniqueConflictStrategies(): ImportUniqueConflictStrategy[] {
 function isUniqueConflictField(field: EntityTemplate): boolean {
   return Boolean(
     field.isUnique &&
-      !field.isPrimaryKey &&
-      !field.isReference &&
-      ['string', 'text', 'varchar'].includes(field.type),
+    !field.isPrimaryKey &&
+    !field.isReference &&
+    ['string', 'text', 'varchar'].includes(field.type),
   )
 }
 
@@ -1786,9 +1789,7 @@ function importMessageLabel(message: string | null | undefined): string {
     message.startsWith(IMPORT_UNIQUE_FIELD_CONFLICT_PREFIX) ||
     message.startsWith(IMPORT_UNIQUE_FIELD_DUPLICATE_IN_BATCH_PREFIX)
   ) {
-    const isBatchDuplicate = message.startsWith(
-      IMPORT_UNIQUE_FIELD_DUPLICATE_IN_BATCH_PREFIX,
-    )
+    const isBatchDuplicate = message.startsWith(IMPORT_UNIQUE_FIELD_DUPLICATE_IN_BATCH_PREFIX)
     const prefix = isBatchDuplicate
       ? IMPORT_UNIQUE_FIELD_DUPLICATE_IN_BATCH_PREFIX
       : IMPORT_UNIQUE_FIELD_CONFLICT_PREFIX

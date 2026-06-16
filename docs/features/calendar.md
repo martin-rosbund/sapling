@@ -140,7 +140,9 @@ The shared work filter used by calendar and partner views includes one
 multi-select group for each `m:1` or `1:1` reference marked with
 `@Sapling(['isChip'])`. For reference records with an `isOpen` boolean, the
 initial selection uses records where `isOpen` is `true`; other chip filters
-start with all reference records selected.
+start with all reference records selected. Generic tables apply the same
+`isOpen` convention to `m:1` chip references as a visible default column filter;
+references without an `isOpen` field keep the previous all-values behavior.
 
 ## Extension Checklist
 

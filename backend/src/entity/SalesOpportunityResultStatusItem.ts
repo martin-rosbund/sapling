@@ -55,6 +55,21 @@ export class SalesOpportunityResultStatusItem {
   @Property({ default: false, nullable: false })
   isSuccess?: boolean = false;
 
+  @ApiPropertyOptional({ default: true })
+  @SaplingForm({
+    order: 250,
+    group: 'salesOpportunityResultStatus.groupConfiguration',
+    groupOrder: 200,
+    width: 1,
+    visible: true,
+    tableOrder: 250,
+    tableVisible: true,
+    mobileOrder: 250,
+    mobileVisible: false,
+  })
+  @Property({ default: true, nullable: false })
+  isOpen?: boolean = true;
+
   @ApiPropertyOptional({ default: 'mdi-circle-outline' })
   @Sapling(['isIcon'])
   @SaplingForm({
