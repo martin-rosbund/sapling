@@ -1,6 +1,9 @@
 import { computed, ref, watch, type Ref } from 'vue'
 import type { EntityTemplate } from '@/entity/structure'
 import { useSaplingTable } from '@/composables/table/useSaplingTable'
+import { useSaplingChipFilters } from '@/composables/filter/useSaplingChipFilters'
+import type { SaplingChipFilterSelection } from '@/components/filter/saplingWorkFilter.types'
+import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 
 type PartnerHandle = number
 type PartnerFilterClause = Record<string, { $in: PartnerHandle[] }>
@@ -12,6 +15,7 @@ type PartnerFilterClause = Record<string, { $in: PartnerHandle[] }>
  */
 export function useSaplingPartner(entityHandle: Ref<string>) {
   //#region State
+  const currentPersonStore = useCurrentPersonStore()
   const selectedPeopleHandles = ref<PartnerHandle[]>([])
 
   const {
@@ -28,31 +32,60 @@ export function useSaplingPartner(entityHandle: Ref<string>) {
     entity,
     entityPermission,
     parentFilter,
+    isInitialized,
     loadData,
     onSearchUpdate,
     onPageUpdate,
     onItemsPerPageUpdate,
     onColumnFiltersUpdate,
     onSortByUpdate,
-  } = useSaplingTable(entityHandle, undefined, true)
+  } = useSaplingTable(entityHandle, undefined, true, true, () => ({
+    beforeInitialLoad: prepareInitialPartnerFilter,
+  }))
 
   const tableKey = computed(() => `${entityHandle.value}-table`)
   const filterDrawerKey = computed(() => `${entityHandle.value}-filter`)
   const partnerTemplates = computed(() =>
     entityTemplates.value.filter((template) => template.options?.includes('isPartner')),
   )
+  const {
+    chipFilters,
+    selectedChipFilters,
+    selectedChipFilterCount,
+    loadChipFilters,
+    clearChipFilters,
+    onSelectedChipFiltersUpdate: updateSelectedChipFilters,
+    buildChipFilterClauses,
+  } = useSaplingChipFilters({
+    entityHandle,
+    entityTemplates,
+  })
   //#endregion
 
   //#region Lifecycle
   watch(entityHandle, () => {
     selectedPeopleHandles.value = []
-    clearPartnerFilter()
+    clearChipFilters()
+    applyPartnerFilter()
   })
 
   watch(
     entityTemplates,
+    async () => {
+      if (!isInitialized.value) {
+        return
+      }
+
+      await loadChipFilters()
+      applyPartnerFilter()
+    },
+    { deep: true },
+  )
+
+  watch(
+    selectedChipFilters,
     () => {
-      applyPartnerFilter(selectedPeopleHandles.value)
+      applyPartnerFilter()
     },
     { deep: true },
   )
@@ -63,22 +96,37 @@ export function useSaplingPartner(entityHandle: Ref<string>) {
    * Updates the partner selection from the work filter drawer.
    */
   function onSelectedPeoplesUpdate(values: string[]) {
-    applyPartnerFilter(normalizePartnerHandles(values))
+    selectedPeopleHandles.value = normalizePartnerHandles(values)
+    applyPartnerFilter()
   }
 
   /**
-   * Rebuilds the table parent filter so one configured partner field may match.
+   * Updates the selected chip reference filters from the shared work filter drawer.
    */
-  function applyPartnerFilter(values: PartnerHandle[]) {
-    selectedPeopleHandles.value = [...values]
-    parentFilter.value = buildPartnerFilter(selectedPeopleHandles.value, partnerTemplates.value)
+  function onSelectedChipFiltersUpdate(values: SaplingChipFilterSelection) {
+    updateSelectedChipFilters(values)
   }
 
   /**
-   * Clears the partner-specific parent filter.
+   * Prepares the default partner filter before the first table query is sent.
    */
-  function clearPartnerFilter() {
-    parentFilter.value = {}
+  async function prepareInitialPartnerFilter() {
+    await currentPersonStore.fetchCurrentPerson()
+    selectedPeopleHandles.value =
+      currentPersonStore.person?.handle != null ? [currentPersonStore.person.handle] : []
+
+    await loadChipFilters()
+    applyPartnerFilter()
+  }
+
+  /**
+   * Rebuilds the table parent filter so partner fields and configured chips may match.
+   */
+  function applyPartnerFilter() {
+    parentFilter.value = buildCombinedPartnerFilter(
+      buildPartnerFilter(selectedPeopleHandles.value, partnerTemplates.value),
+      buildChipFilterClauses(),
+    )
   }
   //#endregion
 
@@ -99,6 +147,9 @@ export function useSaplingPartner(entityHandle: Ref<string>) {
     parentFilter,
     tableKey,
     filterDrawerKey,
+    chipFilters,
+    selectedChipFilters,
+    selectedChipFilterCount,
     loadData,
     onSearchUpdate,
     onPageUpdate,
@@ -106,6 +157,7 @@ export function useSaplingPartner(entityHandle: Ref<string>) {
     onColumnFiltersUpdate,
     onSortByUpdate,
     onSelectedPeoplesUpdate,
+    onSelectedChipFiltersUpdate,
   }
   //#endregion
 }
@@ -136,4 +188,20 @@ function buildPartnerFilter(
     .filter((filter): filter is PartnerFilterClause => filter !== null)
 
   return orFilters.length > 0 ? { $or: orFilters } : {}
+}
+
+function buildCombinedPartnerFilter(
+  partnerFilter: Record<string, unknown>,
+  chipFilterClauses: Record<string, unknown>[],
+): Record<string, unknown> {
+  const clauses = [
+    ...(Object.keys(partnerFilter).length > 0 ? [partnerFilter] : []),
+    ...chipFilterClauses,
+  ]
+
+  if (clauses.length === 0) {
+    return {}
+  }
+
+  return clauses.length === 1 ? clauses[0] : { $and: clauses }
 }

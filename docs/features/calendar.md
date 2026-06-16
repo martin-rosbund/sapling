@@ -136,10 +136,11 @@ When Redis is enabled, `CalendarSyncModule` registers a BullMQ `calendar-sync` q
 
 `SaplingFieldEventRecurrence.vue` is the editable recurrence field used by generic dialogs. Shared parsing and expansion helpers live in `frontend/src/utils/eventRecurrence.ts`.
 
-The calendar context filter includes one multi-select group for each `m:1` or
-`1:1` event reference marked with `@Sapling(['isChip'])`. For reference records
-with an `isOpen` boolean, the initial selection uses records where `isOpen` is
-`true`; other chip filters start with all reference records selected.
+The shared work filter used by calendar and partner views includes one
+multi-select group for each `m:1` or `1:1` reference marked with
+`@Sapling(['isChip'])`. For reference records with an `isOpen` boolean, the
+initial selection uses records where `isOpen` is `true`; other chip filters
+start with all reference records selected.
 
 ## Extension Checklist
 

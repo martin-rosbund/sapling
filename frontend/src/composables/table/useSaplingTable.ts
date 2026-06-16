@@ -39,6 +39,7 @@ const TABLE_LOAD_DEBOUNCE_MS = 250
 
 type InitializeEntityStateOptions = {
   initialSearch?: string
+  beforeInitialLoad?: () => Promise<void> | void
 }
 
 /**
@@ -50,6 +51,7 @@ export function useSaplingTable(
   itemsPerPageDefaultValue?: number,
   isUseQueryParameter?: boolean,
   autoInitialize = true,
+  getInitializeEntityStateOptions: () => InitializeEntityStateOptions = () => ({}),
 ) {
   // #region State
   const items = ref<SaplingGenericItem[]>([])
@@ -400,7 +402,7 @@ export function useSaplingTable(
     selectedFormConfigHandle.value = handle
   }
 
-  async function initializeEntityState(options?: InitializeEntityStateOptions) {
+  async function initializeEntityState(options: InitializeEntityStateOptions = {}) {
     const currentEntityHandle = entityHandle.value
     const initializationId = ++latestInitializationId
 
@@ -437,6 +439,7 @@ export function useSaplingTable(
       generateHeaders(currentEntityHandle)
       initialSort(nextEntityTemplates)
       restoreQueryFilterState(nextEntityTemplates)
+      await options.beforeInitialLoad?.()
     } finally {
       if (
         initializationId === latestInitializationId &&
@@ -469,7 +472,7 @@ export function useSaplingTable(
       return
     }
 
-    void initializeEntityState()
+    void initializeEntityState(getInitializeEntityStateOptions())
   })
 
   onBeforeUnmount(() => {
@@ -505,7 +508,7 @@ export function useSaplingTable(
       return
     }
 
-    void initializeEntityState()
+    void initializeEntityState(getInitializeEntityStateOptions())
   })
 
   watch(

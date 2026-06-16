@@ -54,7 +54,10 @@
         :key="filterDrawerKey"
         v-show="showDesktopFilterPanel"
         class="sapling-partner-filter-panel"
+        :chip-filters="chipFilters"
+        :selected-chip-filters="selectedChipFilters"
         @update:selected-peoples="onSelectedPeoplesUpdate"
+        @update:selected-chip-filters="onSelectedChipFiltersUpdate"
       />
 
       <v-dialog
@@ -70,8 +73,11 @@
             class="sapling-partner-filter-panel sapling-partner-filter-panel--dialog"
             :show-close-action="true"
             :close-action-label="filterDialogCloseLabel"
+            :chip-filters="chipFilters"
+            :selected-chip-filters="selectedChipFilters"
             @close="mobileFilterDialogVisible = false"
             @update:selected-peoples="onSelectedPeoplesUpdate"
+            @update:selected-chip-filters="onSelectedChipFiltersUpdate"
           />
         </div>
       </v-dialog>
@@ -113,10 +119,11 @@ const isFilterPanelVisible = computed(() =>
 )
 
 const filterPanelLabel = computed(() => {
-  const peopleLabel = t('navigation.person')
-  const companyLabel = t('navigation.company')
+  const labels = [t('navigation.person'), t('navigation.company')]
 
-  return `${peopleLabel} & ${companyLabel}`
+  labels.push(...chipFilters.value.map((filter) => filter.label))
+
+  return labels.join(' & ')
 })
 
 const filterPanelToggleLabel = computed(() =>
@@ -165,7 +172,10 @@ const {
   parentFilter,
   tableKey,
   filterDrawerKey,
+  chipFilters,
+  selectedChipFilters,
   onSelectedPeoplesUpdate,
+  onSelectedChipFiltersUpdate,
 } = useSaplingPartner(entityHandleRef)
 
 // #endregion

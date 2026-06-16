@@ -68,8 +68,8 @@ export class RoleStarterSeeder extends Seeder {
 
     for (const seedItem of seedItems) {
       const roleItem = this.requireRole(roleByTitle, seedItem.role);
-      const resolvedTemplates = seedItem.templates.map((templateName) =>
-        this.requireTemplate(
+      const resolvedTemplates = seedItem.templates.flatMap((templateName) =>
+        this.resolveTemplate(
           templateByName,
           templateName,
           templateType,
@@ -96,20 +96,21 @@ export class RoleStarterSeeder extends Seeder {
     return roleItem;
   }
 
-  private requireTemplate<T>(
+  private resolveTemplate<T>(
     templateByName: Map<string, T>,
     templateName: string,
     templateType: string,
     roleTitle: string,
-  ): T {
+  ): T[] {
     const templateItem = templateByName.get(templateName);
 
     if (!templateItem) {
-      throw new Error(
-        `Role starter seeding failed. Unknown ${templateType} "${templateName}" for role "${roleTitle}"`,
+      global.log.warn(
+        `Skipping unknown ${templateType} "${templateName}" for role "${roleTitle}" during role starter seeding.`,
       );
+      return [];
     }
 
-    return templateItem;
+    return [templateItem];
   }
 }

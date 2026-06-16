@@ -157,6 +157,22 @@ function createManualTestHost(entityHandle: Ref<string>) {
   })
 }
 
+function createBeforeInitialLoadTestHost(
+  entityHandle: Ref<string>,
+  beforeInitialLoad: (table: ReturnType<typeof useSaplingTable>) => Promise<void> | void,
+) {
+  return defineComponent({
+    setup() {
+      const table = useSaplingTable(entityHandle, 25, false, true, () => ({
+        beforeInitialLoad: () => beforeInitialLoad(table),
+      }))
+
+      return table
+    },
+    template: '<div />',
+  })
+}
+
 const mountedWrappers: Array<ReturnType<typeof mount>> = []
 
 function mountTestHost(entityHandle: Ref<string>) {
@@ -173,6 +189,15 @@ function mountQueryEnabledTestHost(entityHandle: Ref<string>) {
 
 function mountManualTestHost(entityHandle: Ref<string>) {
   const wrapper = mount(createManualTestHost(entityHandle))
+  mountedWrappers.push(wrapper)
+  return wrapper
+}
+
+function mountBeforeInitialLoadTestHost(
+  entityHandle: Ref<string>,
+  beforeInitialLoad: (table: ReturnType<typeof useSaplingTable>) => Promise<void> | void,
+) {
+  const wrapper = mount(createBeforeInitialLoadTestHost(entityHandle, beforeInitialLoad))
   mountedWrappers.push(wrapper)
   return wrapper
 }
@@ -360,6 +385,33 @@ describe('useSaplingTable', () => {
       }),
     )
     expect(wrapper.vm.search).toBe('Ada')
+  })
+
+  it('runs the initial load hook before the first request', async () => {
+    loadGenericMock.mockResolvedValue(undefined)
+    apiFindMock.mockResolvedValue({
+      data: [{ handle: 1, name: 'Ada Lovelace' }],
+      meta: { total: 1 },
+    })
+
+    const beforeInitialLoadMock = vi.fn((table: ReturnType<typeof useSaplingTable>) => {
+      table.parentFilter.value = { owner: { $in: [42] } }
+    })
+
+    mountBeforeInitialLoadTestHost(ref('partner'), beforeInitialLoadMock)
+    await flushPromises()
+
+    expect(beforeInitialLoadMock).toHaveBeenCalledTimes(1)
+    expect(beforeInitialLoadMock.mock.invocationCallOrder[0]).toBeLessThan(
+      apiFindMock.mock.invocationCallOrder[0],
+    )
+    expect(apiFindMock).toHaveBeenCalledTimes(1)
+    expect(apiFindMock).toHaveBeenCalledWith(
+      'partner',
+      expect.objectContaining({
+        filter: { owner: { $in: [42] } },
+      }),
+    )
   })
 
   it('applies decoded route query filters when query parameters are enabled', async () => {
