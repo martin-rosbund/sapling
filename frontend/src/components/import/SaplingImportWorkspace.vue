@@ -235,6 +235,7 @@
               :entity-handle="selectedEntityHandle ?? ''"
               :visible-templates="importableFields"
               :permissions="currentPermissions"
+              :reference-items="referenceItemsForField(field)"
               :disabled="!batch || isImportJobRunning"
             />
             <div class="sapling-import__value-mapping-action">
@@ -546,6 +547,7 @@
                     :entity-handle="selectedEntityHandle ?? ''"
                     :visible-templates="importableFields"
                     :permissions="currentPermissions"
+                    :reference-items="referenceItemsForField(currentValueMappingField)"
                   />
                 </td>
               </tr>
@@ -691,6 +693,9 @@ const relationMappingModes = reactive<Record<string, ImportRelationMappingMode |
 const relationMappingColumns = reactive<Record<string, string[]>>({})
 const valueMappings = reactive<Record<string, ValueMappingState>>({})
 const sourceValueOptions = reactive<Record<string, string[]>>({})
+const referenceValueItems = reactive<
+  Record<string, Record<string, SaplingGenericItem | null | undefined>>
+>({})
 const aiSuggestionFieldDetails = reactive<
   Record<string, { confidence: number; reason: string | null }>
 >({})
@@ -1062,7 +1067,9 @@ async function hydrateBatchState(loadedBatch: ImportBatchSummary): Promise<void>
     await loadTemplates()
     templateTitle.value = selectedTemplate.value?.title ?? ''
     initializeMappings()
-    applyMappingConfiguration(loadedBatch.mapping)
+    applyMappingConfiguration(
+      mergeMappingConfiguration(selectedTemplate.value?.mapping, loadedBatch.mapping),
+    )
     externalKeyColumns.value = filterExistingColumns(loadedBatch.externalKeyColumns ?? [])
 
     const genericReferenceMapping = normalizeGenericReferenceMapping(
@@ -1597,6 +1604,80 @@ function applyMappingConfiguration(mappingConfiguration: ImportMappingConfigurat
   applyValueMappings(mappingConfiguration)
 }
 
+function mergeMappingConfiguration(
+  baseConfiguration: ImportMappingConfiguration,
+  overrideConfiguration: ImportMappingConfiguration,
+): ImportMappingConfiguration {
+  if (!baseConfiguration) {
+    return overrideConfiguration
+  }
+  if (!overrideConfiguration) {
+    return baseConfiguration
+  }
+
+  return {
+    ...baseConfiguration,
+    ...overrideConfiguration,
+    valueMappings: mergeValueMappings(
+      baseConfiguration.valueMappings ?? [],
+      overrideConfiguration.valueMappings ?? [],
+    ),
+  }
+}
+
+function mergeValueMappings(
+  baseMappings: ImportValueMapping[],
+  overrideMappings: ImportValueMapping[],
+): ImportValueMapping[] {
+  const merged = new Map<string, ImportValueMapping>()
+
+  for (const mapping of normalizeImportValueMappings(baseMappings)) {
+    merged.set(mapping.targetField, {
+      targetField: mapping.targetField,
+      values: { ...mapping.values },
+      fallback: mapping.fallback,
+    })
+  }
+
+  for (const mapping of normalizeImportValueMappings(overrideMappings)) {
+    const existing = merged.get(mapping.targetField)
+    merged.set(mapping.targetField, {
+      targetField: mapping.targetField,
+      values: {
+        ...(existing?.values ?? {}),
+        ...mapping.values,
+      },
+      fallback: mapping.fallback ?? existing?.fallback,
+    })
+  }
+
+  return [...merged.values()]
+}
+
+function normalizeImportValueMappings(mappings: ImportValueMapping[]): ImportValueMapping[] {
+  return mappings
+    .map((mapping) => ({
+      targetField: normalizeValueMappingKey(mapping.targetField),
+      values: Object.fromEntries(
+        Object.entries(mapping.values ?? {})
+          .map(([sourceValue, targetValue]) => [
+            normalizeValueMappingKey(sourceValue),
+            targetValue,
+          ])
+          .filter(([sourceValue, targetValue]) =>
+            Boolean(
+              typeof sourceValue === 'string' &&
+                sourceValue.length > 0 &&
+                targetValue !== null &&
+                targetValue !== '',
+            ),
+          ),
+      ),
+      fallback: normalizeValueMappingFallback(mapping.fallback),
+    }))
+    .filter((mapping) => mapping.targetField && Object.keys(mapping.values).length > 0)
+}
+
 function normalizeGenericReferenceMapping(value: unknown): ImportGenericReferenceMapping | null {
   if (!value || typeof value !== 'object') {
     return null
@@ -1669,7 +1750,7 @@ async function pruneValueMappingForField(
   )
 
   if (Object.keys(mapping.values).length === 0) {
-    delete valueMappings[targetField]
+    delete valueMappings[field.name]
   }
 }
 
@@ -1680,8 +1761,68 @@ async function openValueMapping(field: EntityTemplate): Promise<void> {
 
   ensureValueMapping(field.name)
   await loadSourceValuesForField(field)
+  await loadReferenceItemsForValueMapping(field)
   valueMappingDialog.targetField = field.name
   valueMappingDialog.visible = true
+}
+
+async function loadReferenceItemsForValueMapping(field: EntityTemplate): Promise<void> {
+  if (!field.isReference || !field.referenceName) {
+    return
+  }
+
+  const mapping = valueMappings[field.name]
+  const handles = Object.values(mapping?.values ?? {})
+    .map(normalizeValueMappingKey)
+    .filter((value) => value.length > 0)
+  const uniqueHandles = Array.from(new Set(handles))
+  if (uniqueHandles.length === 0) {
+    return
+  }
+
+  const cache = getReferenceValueItemCache(field.referenceName)
+  const missingHandles = uniqueHandles.filter((handle) => !(handle in cache))
+  if (missingHandles.length === 0) {
+    return
+  }
+
+  try {
+    const response = await ApiGenericService.find<SaplingGenericItem>(field.referenceName, {
+      filter: { handle: { $in: missingHandles } },
+      limit: missingHandles.length,
+      relations: ['m:1'],
+    })
+    const itemsByHandle = new Map(
+      (response.data ?? [])
+        .map((item) => [normalizeValueMappingKey(item.handle), item] as const)
+        .filter(([handle]) => handle.length > 0),
+    )
+
+    for (const handle of missingHandles) {
+      cache[handle] = itemsByHandle.get(handle) ?? null
+    }
+  } catch {
+    for (const handle of missingHandles) {
+      cache[handle] = null
+    }
+  }
+}
+
+function referenceItemsForField(
+  field: EntityTemplate | null | undefined,
+): Record<string, SaplingGenericItem | null | undefined> | undefined {
+  if (!field?.isReference || !field.referenceName) {
+    return undefined
+  }
+
+  return getReferenceValueItemCache(field.referenceName)
+}
+
+function getReferenceValueItemCache(
+  referenceName: string,
+): Record<string, SaplingGenericItem | null | undefined> {
+  referenceValueItems[referenceName] ??= {}
+  return referenceValueItems[referenceName]
 }
 
 async function loadSourceValuesForField(field: EntityTemplate): Promise<void> {

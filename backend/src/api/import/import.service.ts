@@ -424,10 +424,12 @@ export class ImportService {
       throw new NotFoundException('import.templateNotFound');
     }
 
-    const valueMappings =
-      dto.valueMappings?.length || !importTemplate
-        ? (dto.valueMappings ?? [])
-        : this.getTemplateConfiguredValueMappings(importTemplate);
+    const valueMappings = importTemplate
+      ? this.mergeValueMappings(
+          this.getTemplateConfiguredValueMappings(importTemplate),
+          dto.valueMappings ?? [],
+        )
+      : (dto.valueMappings ?? []);
     const effectiveDto: ConfigureImportBatchDto = {
       ...dto,
       valueMappings,
@@ -2334,6 +2336,35 @@ export class ImportService {
     }
 
     return normalized;
+  }
+
+  private mergeValueMappings(
+    baseMappings: ImportValueMappingDto[],
+    overrideMappings: ImportValueMappingDto[],
+  ): ImportValueMappingDto[] {
+    const merged = new Map<string, ImportValueMappingDto>();
+
+    for (const mapping of this.normalizeValueMappings(baseMappings)) {
+      merged.set(mapping.targetField, {
+        targetField: mapping.targetField,
+        values: { ...mapping.values },
+        fallback: mapping.fallback,
+      });
+    }
+
+    for (const mapping of this.normalizeValueMappings(overrideMappings)) {
+      const existing = merged.get(mapping.targetField);
+      merged.set(mapping.targetField, {
+        targetField: mapping.targetField,
+        values: {
+          ...(existing?.values ?? {}),
+          ...mapping.values,
+        },
+        fallback: mapping.fallback ?? existing?.fallback,
+      });
+    }
+
+    return [...merged.values()];
   }
 
   private getTemplateConfiguredValueMappings(

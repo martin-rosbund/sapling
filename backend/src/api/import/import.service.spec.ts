@@ -91,6 +91,52 @@ describe('ImportService', () => {
     ]);
   });
 
+  it('merges template value mappings with partial batch overrides', () => {
+    const service = createService();
+
+    const result = (
+      service as unknown as {
+        mergeValueMappings(
+          baseMappings: unknown[],
+          overrideMappings: unknown[],
+        ): unknown[];
+      }
+    ).mergeValueMappings(
+      [
+        {
+          targetField: 'department',
+          fallback: 'keep',
+          values: {
+            Marketing: 'marketing',
+            Produktion: 'production',
+            Vertrieb: 'sales',
+          },
+        },
+      ],
+      [
+        {
+          targetField: 'department',
+          fallback: 'error',
+          values: {
+            Vertrieb: 'direct_sales',
+          },
+        },
+      ],
+    );
+
+    expect(result).toEqual([
+      {
+        targetField: 'department',
+        fallback: 'error',
+        values: {
+          Marketing: 'marketing',
+          Produktion: 'production',
+          Vertrieb: 'direct_sales',
+        },
+      },
+    ]);
+  });
+
   it('includes the target field and source value when kept reference values cannot be resolved', async () => {
     const service = createService({
       find: jest.fn(async () => []),

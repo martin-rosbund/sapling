@@ -33,6 +33,7 @@ const props = withDefaults(
     entityHandle: string
     visibleTemplates: EntityTemplate[]
     permissions: AccumulatedPermission[] | null
+    referenceItems?: Record<string, SaplingGenericItem | null | undefined>
     disabled?: boolean
     showLabel?: boolean
   }>(),
@@ -48,9 +49,19 @@ const emit = defineEmits<{
 
 const formValues = reactive<SaplingGenericItem>({})
 const iconNames = ref<Array<{ name: string; unicode?: string }>>([])
+const REFERENCE_BATCH_DELAY_MS = 20
 let iconLoadPromise: Promise<void> | null = null
 let referenceLoadRequestId = 0
 let isSyncingFromModel = false
+
+type ReferenceBatch = {
+  handles: Set<string>
+  resolvers: Map<string, Array<(value: SaplingGenericItem | null) => void>>
+  promise: Promise<void> | null
+}
+
+const referenceItemCache = new Map<string, SaplingGenericItem | null>()
+const pendingReferenceBatches = new Map<string, ReferenceBatch>()
 
 async function ensureIconsLoaded(): Promise<void> {
   if (
@@ -107,17 +118,118 @@ async function resolveReferenceValue(value: unknown): Promise<SaplingGenericItem
   }
 
   const requestId = ++referenceLoadRequestId
-  const response = await ApiGenericService.find<SaplingGenericItem>(props.template.referenceName!, {
-    filter: { handle: value },
-    limit: 1,
-    relations: ['m:1'],
-  })
+  const handle = normalizeReferenceHandle(value)
+  const responseItem =
+    props.referenceItems && Object.prototype.hasOwnProperty.call(props.referenceItems, handle)
+      ? (props.referenceItems[handle] ?? null)
+      : await loadReferenceItem(props.template.referenceName!, handle)
 
   if (requestId !== referenceLoadRequestId) {
     return formValues[props.template.name] as SaplingGenericItem | null
   }
 
-  return response.data[0] ?? null
+  return responseItem
+}
+
+function normalizeReferenceHandle(value: unknown): string {
+  return String(value ?? '').trim()
+}
+
+function getReferenceCacheKey(entityHandle: string, handle: string): string {
+  return `${entityHandle}:${handle}`
+}
+
+async function loadReferenceItem(
+  entityHandle: string,
+  handle: string,
+): Promise<SaplingGenericItem | null> {
+  if (!handle) {
+    return null
+  }
+
+  const cacheKey = getReferenceCacheKey(entityHandle, handle)
+  if (referenceItemCache.has(cacheKey)) {
+    return referenceItemCache.get(cacheKey) ?? null
+  }
+
+  return queueReferenceItemLoad(entityHandle, handle)
+}
+
+function queueReferenceItemLoad(
+  entityHandle: string,
+  handle: string,
+): Promise<SaplingGenericItem | null> {
+  const batch = getReferenceBatch(entityHandle)
+  batch.handles.add(handle)
+
+  const promise = new Promise<SaplingGenericItem | null>((resolve) => {
+    const resolvers = batch.resolvers.get(handle) ?? []
+    resolvers.push(resolve)
+    batch.resolvers.set(handle, resolvers)
+  })
+
+  if (!batch.promise) {
+    batch.promise = new Promise<void>((resolve) => {
+      setTimeout(() => {
+        void flushReferenceBatch(entityHandle, batch).then(resolve)
+      }, REFERENCE_BATCH_DELAY_MS)
+    })
+  }
+
+  return promise
+}
+
+function getReferenceBatch(entityHandle: string): ReferenceBatch {
+  const existingBatch = pendingReferenceBatches.get(entityHandle)
+  if (existingBatch) {
+    return existingBatch
+  }
+
+  const batch: ReferenceBatch = {
+    handles: new Set<string>(),
+    resolvers: new Map<string, Array<(value: SaplingGenericItem | null) => void>>(),
+    promise: null,
+  }
+  pendingReferenceBatches.set(entityHandle, batch)
+  return batch
+}
+
+async function flushReferenceBatch(entityHandle: string, batch: ReferenceBatch): Promise<void> {
+  pendingReferenceBatches.delete(entityHandle)
+  const handles = [...batch.handles]
+
+  try {
+    const response = await ApiGenericService.find<SaplingGenericItem>(entityHandle, {
+      filter: { handle: { $in: handles } },
+      limit: handles.length,
+      relations: ['m:1'],
+    })
+    const itemsByHandle = new Map(
+      (response.data ?? [])
+        .map((item) => [normalizeReferenceHandle(item.handle), item] as const)
+        .filter(([itemHandle]) => itemHandle.length > 0),
+    )
+
+    for (const handle of handles) {
+      const item = itemsByHandle.get(handle) ?? null
+      referenceItemCache.set(getReferenceCacheKey(entityHandle, handle), item)
+      resolveReferenceHandle(batch, handle, item)
+    }
+  } catch {
+    for (const handle of handles) {
+      resolveReferenceHandle(batch, handle, null)
+    }
+  }
+}
+
+function resolveReferenceHandle(
+  batch: ReferenceBatch,
+  handle: string,
+  item: SaplingGenericItem | null,
+): void {
+  for (const resolve of batch.resolvers.get(handle) ?? []) {
+    resolve(item)
+  }
 }
 
 function normalizeInputValue(value: unknown): unknown {
