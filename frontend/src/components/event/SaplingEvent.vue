@@ -116,13 +116,13 @@
         <SaplingEventContextPanels
           :is-mobile-filter-layout="isMobileContextLayout"
           :upcoming-events="upcomingEvents"
-          :event-statuses="eventStatuses"
-          :selected-event-statuses="selectedEventStatuses"
-          :selected-event-status-count="selectedEventStatusCount"
+          :chip-filters="chipFilters"
+          :selected-chip-filters="selectedChipFilters"
+          :selected-chip-filter-count="selectedChipFilterCount"
           :selected-peoples="selectedPeoples"
           :selected-people-preview="selectedPeoplePreview"
           :selected-people-overflow-count="selectedPeopleOverflowCount"
-          @update-selected-event-statuses="onSelectedEventStatusesUpdate"
+          @update-selected-chip-filters="onSelectedChipFiltersUpdate"
           @update-selected-peoples="onSelectedPeoplesUpdate"
           @open-filter="toggleContextDialog"
           @open-event="openEventEditor"
@@ -143,10 +143,10 @@
         class="sapling-event-context-dialog__panel"
         :show-close-action="true"
         :close-action-label="contextDialogCloseLabel"
-        :status-options="eventStatuses"
-        :selected-statuses="selectedEventStatuses"
+        :chip-filters="chipFilters"
+        :selected-chip-filters="selectedChipFilters"
         @close="mobileContextDialogVisible = false"
-        @update:selected-statuses="onSelectedEventStatusesUpdate"
+        @update:selected-chip-filters="onSelectedChipFiltersUpdate"
         @update:selected-peoples="onSelectedPeoplesUpdate"
       />
     </div>
@@ -277,7 +277,7 @@ const {
   eventContextMenuItems,
   eventContextMenuStyle,
   entityEvent,
-  eventStatuses,
+  chipFilters,
   events,
   getEventColor,
   getEvents,
@@ -303,12 +303,12 @@ const {
   onEditDialogSave,
   openUpdateConflictChangeLog,
   openEventEditor,
-  onSelectedEventStatusesUpdate,
+  onSelectedChipFiltersUpdate,
   onSelectedPeoplesUpdate,
   reloadUpdateConflictRecord,
   selectedPeoples,
-  selectedEventStatuses,
-  selectedEventStatusCount,
+  selectedChipFilters,
+  selectedChipFilterCount,
   selectedPeopleOverflowCount,
   selectedPeoplePreview,
   syncExternalCalendar,

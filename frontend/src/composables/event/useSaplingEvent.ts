@@ -2,12 +2,12 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { ComponentPublicInstance, CSSProperties } from 'vue'
 import ApiGenericService, {
   getGenericUpdateConflict,
+  type FilterQuery,
   type GenericUpdateConflictDetails,
 } from '@/services/api.generic.service'
 import type {
   EntityItem,
   EventItem,
-  EventStatusItem,
   HolidayItem,
   PersonItem,
   SaplingGenericItem,
@@ -48,7 +48,12 @@ import { i18n } from '@/i18n'
 import { formatDateFromTo, formatDateValue, formatTimeValue } from '@/utils/saplingFormatUtil'
 import { expandRecurringEvent, isRecurringCalendarEvent } from '@/utils/eventRecurrence'
 import { buildMailMenuActions } from '@/utils/saplingMailMenuUtil'
-import { buildTableOrderBy } from '@/utils/saplingTableUtil'
+import { buildTableOrderBy, getEntityValueLabel } from '@/utils/saplingTableUtil'
+import type {
+  SaplingChipFilterGroup,
+  SaplingChipFilterSelection,
+  SaplingFilterHandle,
+} from '@/components/filter/saplingWorkFilter.types'
 import {
   buildScriptButtonExecutionKey,
   handleScriptResultClient,
@@ -193,8 +198,8 @@ export function useSaplingEvent() {
 
   const ownPerson = ref<PersonItem | null>(null)
   const events = ref<SaplingCalendarEvent[]>([])
-  const eventStatuses = ref<EventStatusItem[]>([])
-  const selectedEventStatuses = ref<string[]>([])
+  const chipFilters = ref<SaplingChipFilterGroup[]>([])
+  const selectedChipFilters = ref<SaplingChipFilterSelection>({})
   const templates = ref<EntityTemplate[]>([])
   const selectedPeoples = ref<number[]>([])
   const calendarMode = ref<CalendarMode>('default')
@@ -401,7 +406,9 @@ export function useSaplingEvent() {
   const selectedPeopleOverflowCount = computed(() =>
     Math.max(selectedPeoples.value.length - selectedPeoplePreview.value.length, 0),
   )
-  const selectedEventStatusCount = computed(() => selectedEventStatuses.value.length)
+  const selectedChipFilterCount = computed(() =>
+    Object.values(selectedChipFilters.value).reduce((count, values) => count + values.length, 0),
+  )
 
   const upcomingEvents = computed<EventAgendaItem[]>(() => {
     const now = Date.now()
@@ -505,11 +512,11 @@ export function useSaplingEvent() {
       currentPermissionStore.fetchCurrentPermission(),
       loadOwnPerson(),
       loadEventEntity(),
-      loadEventStatuses(),
       loadEventScriptButtons(),
       loadTemplates(),
       loadWorkHours(),
     ])
+    await loadChipFilters()
 
     queueScrollToCurrentTime()
   })
@@ -543,7 +550,7 @@ export function useSaplingEvent() {
   })
 
   watch(
-    selectedEventStatuses,
+    selectedChipFilters,
     async () => {
       await refreshVisibleEvents()
     },
@@ -588,24 +595,40 @@ export function useSaplingEvent() {
   }
 
   /**
-   * Loads event statuses and initializes the calendar filter to open statuses.
+   * Loads reference data for each chip-rendered relation and initializes filter selections.
    */
-  async function loadEventStatuses() {
-    const response = await ApiGenericService.find<EventStatusItem>('eventStatus', {
-      orderBy: buildTableOrderBy([{ key: 'description', order: 'asc' }]),
-      limit: DEFAULT_ENTITY_ITEMS_COUNT,
-    })
+  async function loadChipFilters() {
+    const chipTemplates = templates.value
+      .filter(isChipFilterTemplate)
+      .sort((left, right) => getChipFilterOrder(left) - getChipFilterOrder(right))
 
-    eventStatuses.value = response.data
+    const loadedFilters = await Promise.all(
+      chipTemplates.map(async (template) => {
+        const referenceName = template.referenceName ?? ''
+        const referenceTemplates = await ApiTemplateService.getEntityTemplate(referenceName)
+        const response = await ApiGenericService.find<SaplingGenericItem>(referenceName, {
+          orderBy: buildReferenceOrderBy(referenceTemplates),
+          limit: DEFAULT_ENTITY_ITEMS_COUNT,
+        })
+        const identifierKey = template.referencedPks?.[0] ?? 'handle'
 
-    const openStatusHandles = response.data
-      .filter((status) => status.isOpen !== false)
-      .map((status) => status.handle)
+        return {
+          key: template.name,
+          fieldName: template.name,
+          referenceName,
+          identifierKey,
+          label: getTemplateLabel(template),
+          options: response.data
+            .map((item) => buildChipFilterOption(item, identifierKey, referenceTemplates))
+            .filter((option): option is NonNullable<typeof option> => option !== null),
+        }
+      }),
+    )
 
-    selectedEventStatuses.value =
-      openStatusHandles.length > 0
-        ? openStatusHandles
-        : response.data.map((status) => status.handle)
+    chipFilters.value = loadedFilters.filter((filter) => filter.options.length > 0)
+    selectedChipFilters.value = Object.fromEntries(
+      chipFilters.value.map((filter) => [filter.key, getDefaultChipFilterHandles(filter)]),
+    )
   }
 
   /**
@@ -625,6 +648,98 @@ export function useSaplingEvent() {
     }
 
     loadedScriptButtons.value = result.data
+  }
+
+  function isChipFilterTemplate(template: EntityTemplate): boolean {
+    return (
+      template.isReference === true &&
+      template.options?.includes('isChip') === true &&
+      Boolean(template.referenceName) &&
+      ['m:1', '1:1'].includes(template.kind ?? '')
+    )
+  }
+
+  function getChipFilterOrder(template: EntityTemplate): number {
+    return (
+      template.formGroupOrder ??
+      template.formOrder ??
+      template.tableOrder ??
+      Number.MAX_SAFE_INTEGER
+    )
+  }
+
+  function getTemplateLabel(template: EntityTemplate): string {
+    const configuredLabel = template.formConfig?.label?.trim()
+    if (configuredLabel) {
+      return configuredLabel
+    }
+
+    return i18n.global.t(`${entityEvent.value?.handle ?? 'event'}.${template.name}`)
+  }
+
+  function buildReferenceOrderBy(referenceTemplates: EntityTemplate[]): Record<string, string> {
+    const orderedTemplates = referenceTemplates.filter(
+      (template) =>
+        template.options?.includes('isOrderASC') || template.options?.includes('isOrderDESC'),
+    )
+
+    if (orderedTemplates.length > 0) {
+      return Object.fromEntries(
+        orderedTemplates.map((template) => [
+          template.name,
+          template.options?.includes('isOrderDESC') ? 'DESC' : 'ASC',
+        ]),
+      )
+    }
+
+    return Object.fromEntries(
+      referenceTemplates
+        .filter((template) => template.options?.includes('isValue'))
+        .map((template) => [template.name, 'ASC']),
+    )
+  }
+
+  function buildChipFilterOption(
+    item: SaplingGenericItem,
+    identifierKey: string,
+    referenceTemplates: EntityTemplate[],
+  ): SaplingChipFilterGroup['options'][number] | null {
+    const handle = item[identifierKey]
+    if (typeof handle !== 'string' && typeof handle !== 'number') {
+      return null
+    }
+
+    const label = getEntityValueLabel(item, referenceTemplates) || String(handle)
+
+    return {
+      handle,
+      label,
+      color: getChipReferenceOptionValue(item, referenceTemplates, 'isColor'),
+      icon: getChipReferenceOptionValue(item, referenceTemplates, 'isIcon'),
+      isDefaultSelected: typeof item.isOpen === 'boolean' ? item.isOpen !== false : true,
+    }
+  }
+
+  function getChipReferenceOptionValue(
+    item: SaplingGenericItem,
+    referenceTemplates: EntityTemplate[],
+    option: 'isColor' | 'isIcon',
+  ): string | undefined {
+    const fieldName = referenceTemplates.find((template) =>
+      template.options?.includes(option),
+    )?.name
+    const value = fieldName ? item[fieldName] : undefined
+    return typeof value === 'string' && value.trim().length > 0 ? value : undefined
+  }
+
+  function getDefaultChipFilterHandles(filter: SaplingChipFilterGroup): SaplingFilterHandle[] {
+    const defaultHandles = filter.options
+      .filter((option) => option.isDefaultSelected !== false)
+      .map((option) => option.handle)
+
+    return defaultHandles.length > 0
+      ? defaultHandles
+      : filter.options.map((option) => option.handle)
   }
 
   /**
@@ -949,10 +1064,7 @@ export function useSaplingEvent() {
     const endDate = parseLocalCalendarDate(nextRange.end.date)
     endDate.setHours(23, 59, 59, 999)
     const holidayGroupHandles = getSelectedHolidayGroupHandles()
-    const eventStatusHandles =
-      selectedEventStatuses.value.length > 0
-        ? selectedEventStatuses.value
-        : ['__sapling_no_event_status__']
+    const chipFilterClauses = buildChipFilterClauses()
 
     const [response, holidayResponse] = await Promise.all([
       ApiGenericService.find<EventItem>('event', {
@@ -960,7 +1072,7 @@ export function useSaplingEvent() {
         filter: {
           $and: [
             { participants: selectedPeoples.value },
-            { status: { handle: { $in: eventStatusHandles } } },
+            ...chipFilterClauses,
             {
               $or: [
                 {
@@ -1018,11 +1130,31 @@ export function useSaplingEvent() {
   }
 
   /**
-   * Updates the selected event statuses from the calendar status filter.
+   * Updates the selected chip reference filters from the calendar filter panel.
    */
-  function onSelectedEventStatusesUpdate(values: string[]) {
-    const validStatusHandles = new Set(eventStatuses.value.map((status) => status.handle))
-    selectedEventStatuses.value = values.filter((value) => validStatusHandles.has(value))
+  function onSelectedChipFiltersUpdate(values: SaplingChipFilterSelection) {
+    selectedChipFilters.value = Object.fromEntries(
+      chipFilters.value.map((filter) => {
+        const validHandles = new Set(filter.options.map((option) => option.handle))
+        return [filter.key, (values[filter.key] ?? []).filter((value) => validHandles.has(value))]
+      }),
+    )
+  }
+
+  function buildChipFilterClauses(): FilterQuery[] {
+    return chipFilters.value.map((filter) => {
+      const selectedHandles = selectedChipFilters.value[filter.key] ?? []
+      const handles =
+        selectedHandles.length > 0 ? selectedHandles : ['__sapling_empty_chip_filter__']
+
+      return {
+        [filter.fieldName]: {
+          [filter.identifierKey]: {
+            $in: handles,
+          },
+        },
+      }
+    })
   }
 
   /**
@@ -1936,7 +2068,7 @@ export function useSaplingEvent() {
     eventContextMenuStyle,
     editEvent,
     entityEvent,
-    eventStatuses,
+    chipFilters,
     updateConflictDialog,
     events,
     eventContextMenuMailActions,
@@ -1969,13 +2101,13 @@ export function useSaplingEvent() {
     onEditDialogSave,
     openUpdateConflictChangeLog,
     openEventEditor,
-    onSelectedEventStatusesUpdate,
+    onSelectedChipFiltersUpdate,
     onSelectedPeoplesUpdate,
     reloadUpdateConflictRecord,
     scrollToCurrentTime,
     selectedPeoples,
-    selectedEventStatuses,
-    selectedEventStatusCount,
+    selectedChipFilters,
+    selectedChipFilterCount,
     selectedPeopleOverflowCount,
     selectedPeoplePreview,
     syncExternalCalendar,

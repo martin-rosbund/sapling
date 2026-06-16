@@ -27,13 +27,10 @@
       <div class="sapling-row-xs sapling-row-wrap sapling-event-context__summary">
         <template v-if="activePanel === 'filter'">
           <span
-            >{{ selectedPeoples.length + selectedEventStatusCount }}
+            >{{ selectedPeoples.length + selectedChipFilterCount }}
             {{ $t('global.selected') }}</span
           >
-          <span>
-            {{ $t('navigation.person') }}, {{ $t('navigation.company') }} &amp;
-            {{ $t('event.statusFilter') }}
-          </span>
+          <span>{{ filterSummaryLabel }}</span>
         </template>
 
         <template v-else>
@@ -46,9 +43,9 @@
     <SaplingWorkFilterPanel
       v-if="activePanel === 'filter' && !isMobileFilterLayout"
       class="sapling-event-context__panel"
-      :status-options="eventStatuses"
-      :selected-statuses="selectedEventStatuses"
-      @update:selected-statuses="emit('updateSelectedEventStatuses', $event)"
+      :chip-filters="chipFilters"
+      :selected-chip-filters="selectedChipFilters"
+      @update:selected-chip-filters="emit('updateSelectedChipFilters', $event)"
       @update:selected-peoples="emit('updateSelectedPeoples', $event)"
     />
 
@@ -71,24 +68,28 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs'
+import { useI18n } from 'vue-i18n'
 import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingEventAgendaPanel from '@/components/event/SaplingEventAgendaPanel.vue'
 import SaplingEventPeoplePanel from '@/components/event/SaplingEventPeoplePanel.vue'
 import SaplingWorkFilterPanel from '@/components/filter/SaplingWorkFilterPanel.vue'
-import type { EventStatusItem } from '@/entity/entity'
+import type {
+  SaplingChipFilterGroup,
+  SaplingChipFilterSelection,
+} from '@/components/filter/saplingWorkFilter.types'
 import type {
   EventAgendaItem,
   SelectedPersonPreviewItem,
 } from '@/composables/event/useSaplingEvent'
 
-defineProps<{
+const props = defineProps<{
   isMobileFilterLayout: boolean
   upcomingEvents: EventAgendaItem[]
-  eventStatuses: EventStatusItem[]
-  selectedEventStatuses: string[]
-  selectedEventStatusCount: number
+  chipFilters: SaplingChipFilterGroup[]
+  selectedChipFilters: SaplingChipFilterSelection
+  selectedChipFilterCount: number
   selectedPeoples: number[]
   selectedPeoplePreview: SelectedPersonPreviewItem[]
   selectedPeopleOverflowCount: number
@@ -98,10 +99,20 @@ type ContextPanelKey = 'filter' | 'agenda'
 
 const emit = defineEmits<{
   (event: 'updateSelectedPeoples', value: string[]): void
-  (event: 'updateSelectedEventStatuses', value: string[]): void
+  (event: 'updateSelectedChipFilters', value: SaplingChipFilterSelection): void
   (event: 'openFilter'): void
   (event: 'openEvent', value: CalendarEvent): void
 }>()
 
+const { t } = useI18n()
 const activePanel = ref<ContextPanelKey>('agenda')
+const filterSummaryLabel = computed(() =>
+  [
+    t('navigation.person'),
+    t('navigation.company'),
+    ...props.chipFilters.map((filter) => filter.label),
+  ]
+    .filter(Boolean)
+    .join(', '),
+)
 </script>

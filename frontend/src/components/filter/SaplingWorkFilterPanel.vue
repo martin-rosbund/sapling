@@ -41,38 +41,6 @@
       <div class="sapling-work-filter-panel__content sapling-scrollable">
         <div class="sapling-accordion-scroll-wrapper">
           <v-expansion-panels v-model="expandedPanels" multiple>
-            <v-expansion-panel v-if="statusOptions.length > 0">
-              <v-expansion-panel-title>
-                <v-list-subheader>{{ $t('event.statusFilter') }}</v-list-subheader>
-              </v-expansion-panel-title>
-              <v-expansion-panel-text>
-                <div class="sapling-event-status-filter">
-                  <div
-                    v-for="status in statusOptions"
-                    :key="status.handle"
-                    class="sapling-vertical-item"
-                    :class="{ selected: isStatusSelected(status.handle) }"
-                    @click="toggleStatus(status.handle)"
-                  >
-                    <span
-                      class="sapling-event-status-filter__swatch"
-                      :style="{ backgroundColor: status.color }"
-                    />
-                    <span class="sapling-person-name">{{ status.description }}</span>
-                    <v-checkbox
-                      :model-value="isStatusSelected(status.handle)"
-                      hide-details
-                      density="comfortable"
-                      class="sapling-filter-checkbox checkbox-no-pointer"
-                      :ripple="false"
-                      @click.stop
-                      @update:model-value="(checked) => toggleStatus(status.handle, checked)"
-                    />
-                  </div>
-                </div>
-              </v-expansion-panel-text>
-            </v-expansion-panel>
-
             <v-expansion-panel v-if="ownPerson">
               <v-expansion-panel-title>
                 <v-list-subheader>{{ $t('global.me') }}</v-list-subheader>
@@ -139,6 +107,44 @@
                 />
               </v-expansion-panel-text>
             </v-expansion-panel>
+
+            <v-expansion-panel v-for="chipFilter in chipFilters" :key="chipFilter.key">
+              <v-expansion-panel-title>
+                <v-list-subheader>{{ chipFilter.label }}</v-list-subheader>
+              </v-expansion-panel-title>
+              <v-expansion-panel-text>
+                <div class="sapling-chip-filter">
+                  <div
+                    v-for="option in chipFilter.options"
+                    :key="`${chipFilter.key}-${option.handle}`"
+                    class="sapling-vertical-item"
+                    :class="{ selected: isChipFilterOptionSelected(chipFilter.key, option.handle) }"
+                    @click="toggleChipFilterOption(chipFilter.key, option.handle)"
+                  >
+                    <span
+                      v-if="option.color"
+                      class="sapling-chip-filter__swatch"
+                      :style="{ backgroundColor: option.color }"
+                    />
+                    <v-icon v-else-if="option.icon" size="18" class="sapling-chip-filter__icon">
+                      {{ option.icon }}
+                    </v-icon>
+                    <span class="sapling-person-name">{{ option.label }}</span>
+                    <v-checkbox
+                      :model-value="isChipFilterOptionSelected(chipFilter.key, option.handle)"
+                      hide-details
+                      density="comfortable"
+                      class="sapling-filter-checkbox checkbox-no-pointer"
+                      :ripple="false"
+                      @click.stop
+                      @update:model-value="
+                        (checked) => toggleChipFilterOption(chipFilter.key, option.handle, checked)
+                      "
+                    />
+                  </div>
+                </div>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
           </v-expansion-panels>
         </div>
       </div>
@@ -154,15 +160,19 @@ import SaplingFilterEmployee from '@/components/filter/SaplingFilterEmployee.vue
 import SaplingFilterPerson from '@/components/filter/SaplingFilterPerson.vue'
 import SaplingFilterCompany from '@/components/filter/SaplingFilterCompany.vue'
 import { useSaplingFilterWork } from '@/composables/filter/useSaplingFilterWork'
-import type { EventStatusItem } from '@/entity/entity'
+import type {
+  SaplingChipFilterGroup,
+  SaplingChipFilterSelection,
+  SaplingFilterHandle,
+} from '@/components/filter/saplingWorkFilter.types'
 // #endregion
 
 // #region Props
 const props = defineProps<{
   showCloseAction?: boolean
   closeActionLabel?: string
-  statusOptions?: EventStatusItem[]
-  selectedStatuses?: string[]
+  chipFilters?: SaplingChipFilterGroup[]
+  selectedChipFilters?: SaplingChipFilterSelection
 }>()
 // #endregion
 
@@ -170,7 +180,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: 'update:selectedPeoples', value: string[]): void
   (event: 'update:selectedCompanies', value: string[]): void
-  (event: 'update:selectedStatuses', value: string[]): void
+  (event: 'update:selectedChipFilters', value: SaplingChipFilterSelection): void
   (event: 'close'): void
 }>()
 // #endregion
@@ -204,26 +214,34 @@ const {
 })
 // #endregion
 
-const statusOptions = computed(() => props.statusOptions ?? [])
-const selectedStatuses = computed(() => props.selectedStatuses ?? [])
+const chipFilters = computed(() => props.chipFilters ?? [])
+const selectedChipFilters = computed(() => props.selectedChipFilters ?? {})
 
-function isStatusSelected(handle: string): boolean {
-  return selectedStatuses.value.includes(handle)
+function isChipFilterOptionSelected(groupKey: string, handle: SaplingFilterHandle): boolean {
+  return selectedChipFilters.value[groupKey]?.includes(handle) === true
 }
 
-function toggleStatus(handle: string, checked?: boolean | null): void {
-  const isSelected = isStatusSelected(handle)
+function toggleChipFilterOption(
+  groupKey: string,
+  handle: SaplingFilterHandle,
+  checked?: boolean | null,
+): void {
+  const currentSelection = selectedChipFilters.value[groupKey] ?? []
+  const isSelected = currentSelection.includes(handle)
 
   if (checked === true || (checked == null && !isSelected)) {
-    emit('update:selectedStatuses', [...selectedStatuses.value, handle])
+    emit('update:selectedChipFilters', {
+      ...selectedChipFilters.value,
+      [groupKey]: isSelected ? currentSelection : [...currentSelection, handle],
+    })
     return
   }
 
   if (checked === false || (checked == null && isSelected)) {
-    emit(
-      'update:selectedStatuses',
-      selectedStatuses.value.filter((statusHandle) => statusHandle !== handle),
-    )
+    emit('update:selectedChipFilters', {
+      ...selectedChipFilters.value,
+      [groupKey]: currentSelection.filter((selectedHandle) => selectedHandle !== handle),
+    })
   }
 }
 </script>
