@@ -1,11 +1,6 @@
-import ApiService from '@/services/api.service'
+import ApiKpiService from '@/services/api.kpi.service'
 import type { KPIItem } from '@/entity/entity'
-import type {
-  KpiDrilldown,
-  KpiDrilldownEntry,
-  KpiResponse,
-  KpiTrendValue,
-} from '@/entity/structure'
+import type { KpiDrilldown, KpiDrilldownEntry, KpiTrendValue } from '@/entity/structure'
 import { computed, ref, toValue, type MaybeRefOrGetter } from 'vue'
 import { useSaplingKpiLoader } from '@/composables/kpi/useSaplingKpiLoader'
 import { normalizeKpiNumericValue } from '@/utils/saplingKpiValue'
@@ -55,9 +50,7 @@ export function useSaplingKpiTrend(kpi: MaybeRefOrGetter<KPIItem | null | undefi
 
   const { loading, hasError, isLoaded, loadKpiValue } = useSaplingKpiLoader(kpi, {
     load: async (currentKpi) => {
-      const result = await ApiService.findAll<KpiResponse<KpiTrendValue>>(
-        `kpi/execute/${currentKpi.handle}`,
-      )
+      const result = await ApiKpiService.execute<KpiTrendValue>(currentKpi.handle)
       if (isKpiTrendValue(result?.value)) {
         value.value = {
           current: normalizeKpiNumericValue(result.value.current),

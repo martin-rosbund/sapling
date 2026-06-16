@@ -162,313 +162,30 @@
           </div>
         </div>
 
-        <div class="sapling-form-config__summary" aria-live="polite">
-          <v-chip size="small" color="primary" variant="tonal" prepend-icon="mdi-form-select">
-            {{ formVisibleCount }} {{ $t('formConfig.formFields') }}
-          </v-chip>
-          <v-chip size="small" variant="outlined" prepend-icon="mdi-table">
-            {{ tableVisibleCount }} {{ $t('formConfig.tableFields') }}
-          </v-chip>
-          <v-chip size="small" variant="outlined" prepend-icon="mdi-cellphone">
-            {{ mobileVisibleCount }} {{ $t('formConfig.mobileFields') }}
-          </v-chip>
-          <v-chip size="small" variant="outlined" prepend-icon="mdi-eye-off-outline">
-            {{ hiddenFieldCount }} {{ $t('formConfig.hiddenFields') }}
-          </v-chip>
-        </div>
+        <SaplingFormConfigSummary
+          :form-visible-count="formVisibleCount"
+          :table-visible-count="tableVisibleCount"
+          :mobile-visible-count="mobileVisibleCount"
+          :hidden-field-count="hiddenFieldCount"
+        />
 
-        <div class="sapling-config-field-tools sapling-form-config__field-tools">
-          <v-text-field
-            v-model="fieldSearch"
-            density="comfortable"
-            prepend-inner-icon="mdi-magnify"
-            :label="$t('global.search')"
-            hide-details
-          />
-          <v-btn
-            prepend-icon="mdi-eye-check-outline"
-            variant="text"
-            :disabled="fieldRows.length === 0"
-            @click="showAllFields"
-          >
-            {{ $t('formConfig.showAll') }}
-          </v-btn>
-          <v-btn
-            prepend-icon="mdi-restore"
-            variant="text"
-            :disabled="fieldRows.length === 0"
-            @click="resetCurrentConfig"
-          >
-            {{ $t('filter.reset') }}
-          </v-btn>
-        </div>
-
-        <div
-          class="sapling-scroll-list sapling-config-field-list sapling-form-config__field-list"
-          role="list"
-        >
-          <SaplingSurface
-            as="article"
-            v-for="field in filteredFieldRows"
-            :key="field.name"
-            class="sapling-panel-shell sapling-stack-md sapling-config-field sapling-form-config-field"
-            role="listitem"
-          >
-            <div class="sapling-row-md sapling-config-field__main sapling-form-config-field__main">
-              <v-switch
-                v-model="field.visible"
-                color="primary"
-                hide-details
-                density="compact"
-                :label="$t('formConfig.formVisible')"
-                :aria-label="$t('formConfig.formVisible')"
-              />
-              <div>
-                <strong>{{ resolveFieldLabel(field.name) }}</strong>
-                <span>{{ field.name }} - {{ field.type }}</span>
-              </div>
-            </div>
-
-            <div class="sapling-config-field__controls sapling-form-config-field__controls">
-              <v-text-field
-                v-model="field.label"
-                class="sapling-config-field__control sapling-config-field__control--label"
-                density="compact"
-                hide-details
-                :label="$t('formConfig.label')"
-              />
-              <v-text-field
-                v-model="field.placeholder"
-                class="sapling-config-field__control sapling-config-field__control--placeholder"
-                density="compact"
-                hide-details
-                :label="$t('formConfig.placeholder')"
-              />
-              <v-text-field
-                v-model="field.group"
-                class="sapling-config-field__control"
-                density="compact"
-                hide-details
-                :label="$t('formConfig.group')"
-              />
-              <v-number-input
-                v-model="field.order"
-                class="sapling-config-field__control"
-                density="compact"
-                hide-details
-                :label="$t('formConfig.formOrder')"
-              />
-              <v-number-input
-                v-model="field.tableOrder"
-                class="sapling-config-field__control"
-                density="compact"
-                hide-details
-                :label="$t('formConfig.tableOrder')"
-              />
-              <v-number-input
-                v-model="field.mobileOrder"
-                class="sapling-config-field__control"
-                density="compact"
-                hide-details
-                :label="$t('formConfig.mobileOrder')"
-              />
-              <v-select
-                v-model="field.width"
-                class="sapling-config-field__control"
-                density="compact"
-                hide-details
-                :items="widthOptions"
-                item-title="title"
-                item-value="value"
-                :label="$t('formConfig.width')"
-              />
-              <v-select
-                v-model="field.renderer"
-                class="sapling-config-field__control"
-                density="compact"
-                hide-details
-                :items="rendererOptions"
-                item-title="title"
-                item-value="value"
-                :label="$t('formConfig.renderer')"
-              />
-            </div>
-
-            <div
-              class="sapling-row-md sapling-config-field__toggles sapling-form-config-field__toggles"
-            >
-              <v-checkbox
-                v-model="field.required"
-                density="compact"
-                hide-details
-                :label="$t('formConfig.required')"
-              />
-              <v-checkbox
-                v-model="field.tableVisible"
-                density="compact"
-                hide-details
-                :label="$t('formConfig.tableVisible')"
-              />
-              <v-checkbox
-                v-model="field.mobileVisible"
-                density="compact"
-                hide-details
-                :label="$t('formConfig.mobileVisible')"
-              />
-              <v-checkbox
-                v-model="field.readonly"
-                density="compact"
-                hide-details
-                :label="$t('formConfig.readonly')"
-              />
-            </div>
-          </SaplingSurface>
-        </div>
+        <SaplingFormConfigFieldList
+          :fields="fieldRows"
+          :width-options="widthOptions"
+          :renderer-options="rendererOptions"
+          :resolve-field-label="resolveFieldLabel"
+          @show-all="showAllFields"
+          @reset="resetCurrentConfig"
+        />
       </SaplingSurface>
 
-      <SaplingSurface
-        as="aside"
-        class="sapling-panel-shell sapling-section-panel sapling-config-panel sapling-config-panel--blurred sapling-form-config__panel sapling-form-config__panel--preview"
-      >
-        <div
-          class="sapling-row-between-md sapling-config-preview-header sapling-form-config__preview-header"
-        >
-          <div>
-            <p class="sapling-eyebrow sapling-config-eyebrow sapling-form-config__eyebrow">
-              {{ $t('formConfig.livePreview') }}
-            </p>
-            <h2 class="sapling-section-title">{{ previewTitle }}</h2>
-          </div>
-          <div class="sapling-form-config-preview__header-actions">
-            <v-chip size="small" variant="tonal" color="primary">
-              {{ activePreviewCount }}
-            </v-chip>
-            <v-btn
-              icon="mdi-refresh"
-              variant="text"
-              :title="$t('formConfig.reload')"
-              :disabled="!selectedEntityHandle"
-              @click="loadEntityContext"
-            />
-          </div>
-        </div>
-
-        <SaplingSurface
-          class="sapling-panel-shell sapling-stack-lg sapling-config-preview sapling-form-config-preview"
-          aria-live="polite"
-        >
-          <v-btn-toggle
-            v-model="previewMode"
-            class="sapling-form-config-preview__mode-toggle"
-            mandatory
-            density="compact"
-            variant="tonal"
-          >
-            <v-btn
-              v-for="option in previewModeOptions"
-              :key="option.value"
-              :value="option.value"
-              :prepend-icon="option.icon"
-            >
-              {{ option.title }}
-            </v-btn>
-          </v-btn-toggle>
-
-          <div v-if="previewMode === 'form'" class="sapling-form-config-preview__stage">
-            <section
-              v-for="group in previewGroups"
-              :key="group.id"
-              class="sapling-stack-md sapling-config-preview__group sapling-form-config-preview__group"
-            >
-              <h3 v-if="group.label">{{ group.label }}</h3>
-              <div class="sapling-config-preview__grid sapling-form-config-preview__grid">
-                <SaplingSurface
-                  v-for="field in group.templates"
-                  :key="field.name"
-                  class="sapling-panel-shell sapling-config-preview__field sapling-form-config-preview__field"
-                  :class="`sapling-config-preview__field--w${getPreviewWidth(field)}`"
-                >
-                  <span>{{ getPreviewFieldLabel(field) }}</span>
-                  <strong>{{ getPreviewRenderer(field) }}</strong>
-                  <small>{{ getPreviewMeta(field) }}</small>
-                </SaplingSurface>
-              </div>
-            </section>
-            <div v-if="previewGroups.length === 0" class="sapling-form-config-preview__empty">
-              <v-icon icon="mdi-eye-off-outline" />
-              <span>{{ $t('formConfig.noPreviewFields') }}</span>
-            </div>
-          </div>
-
-          <div v-else-if="previewMode === 'table'" class="sapling-form-config-preview__stage">
-            <div v-if="previewTableTemplates.length > 0" class="sapling-form-config-preview-table">
-              <div
-                class="sapling-form-config-preview-table__scroll"
-                :style="previewTableScrollStyle"
-              >
-                <table>
-                  <thead>
-                    <tr>
-                      <th v-for="field in previewTableTemplates" :key="field.name">
-                        {{ getPreviewFieldLabel(field) }}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td v-for="field in previewTableTemplates" :key="field.name">
-                        <span :class="getPreviewValueClasses(field)">
-                          <v-icon
-                            v-if="field.options?.includes('isIcon')"
-                            icon="mdi-shape-outline"
-                            size="small"
-                          />
-                          {{ getPreviewSampleValue(field) }}
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <div v-else class="sapling-form-config-preview__empty">
-              <v-icon icon="mdi-table-off" />
-              <span>{{ $t('formConfig.noPreviewFields') }}</span>
-            </div>
-          </div>
-
-          <div v-else class="sapling-form-config-preview__stage">
-            <div
-              v-if="previewMobileTemplates.length > 0"
-              class="sapling-form-config-preview-mobile"
-            >
-              <div class="sapling-form-config-preview-phone glass-panel">
-                <div class="sapling-form-config-preview-phone__status">
-                  <span>{{ previewTitle }}</span>
-                  <v-icon icon="mdi-dots-horizontal" size="small" />
-                </div>
-                <div class="sapling-form-config-preview-phone__card">
-                  <section
-                    v-for="(field, index) in previewMobileTemplates"
-                    :key="field.name"
-                    class="sapling-form-config-preview-phone__field"
-                    :class="{
-                      'sapling-form-config-preview-phone__field--primary': index === 0,
-                    }"
-                  >
-                    <span>{{ getPreviewFieldLabel(field) }}</span>
-                    <strong>{{ getPreviewSampleValue(field) }}</strong>
-                  </section>
-                </div>
-              </div>
-            </div>
-            <div v-else class="sapling-form-config-preview__empty">
-              <v-icon icon="mdi-cellphone-off" />
-              <span>{{ $t('formConfig.noPreviewFields') }}</span>
-            </div>
-          </div>
-        </SaplingSurface>
-      </SaplingSurface>
+      <SaplingFormConfigPreviewPanel
+        v-model:preview-mode="previewMode"
+        :selected-entity-handle="selectedEntityHandle"
+        :draft-templates="draftTemplates"
+        :reload-disabled="!selectedEntityHandle"
+        @reload="loadEntityContext"
+      />
     </section>
   </v-container>
 </template>
@@ -481,7 +198,7 @@ import ApiFormConfigService, {
   type SaplingFormConfigItem,
 } from '@/services/api.form-config.service'
 import ApiGenericService from '@/services/api.generic.service'
-import ApiService from '@/services/api.service'
+import ApiTemplateService from '@/services/api.template.service'
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity'
 import type {
   EntityTemplate,
@@ -493,36 +210,15 @@ import type {
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
 import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingFieldSingleSelect from '@/components/dialog/fields/SaplingFieldSingleSelect.vue'
-import {
-  getDialogTemplateWidth,
-  groupDialogTemplates,
-  sortDialogTemplates,
-} from '@/utils/saplingDialogLayoutUtil'
-import { getMobileTableHeaders, sortTableHeaders } from '@/utils/saplingTableUtil'
+import SaplingFormConfigFieldList from '@/components/system/form-config/SaplingFormConfigFieldList.vue'
+import SaplingFormConfigPreviewPanel from '@/components/system/form-config/SaplingFormConfigPreviewPanel.vue'
+import SaplingFormConfigSummary from '@/components/system/form-config/SaplingFormConfigSummary.vue'
+import type { FieldDraft, PreviewMode, StaticOption } from '@/components/system/form-config/formConfigAdmin.types'
+import { getDialogTemplateWidth } from '@/utils/saplingDialogLayoutUtil'
 
 type ScopeValue = 'global' | 'role' | 'person'
-type PreviewMode = 'form' | 'table' | 'mobile'
 
-type FieldDraft = {
-  name: string
-  type: string
-  visible: boolean
-  label: string
-  group: string
-  order: number | null
-  width: EntityTemplateFormWidth
-  tableVisible: boolean
-  tableOrder: number | null
-  mobileVisible: boolean
-  mobileOrder: number | null
-  renderer: SaplingFormRenderer
-  placeholder: string
-  required: boolean
-  readonly: boolean
-}
-
-const PREVIEW_UNSUPPORTED_RELATION_KINDS = ['1:m', 'm:n', 'n:m']
-const PREVIEW_UNSUPPORTED_FORM_RELATION_KINDS = [...PREVIEW_UNSUPPORTED_RELATION_KINDS, '1:1']
+const FORM_CONFIG_UNSUPPORTED_RELATION_KINDS = ['1:m', 'm:n', 'n:m', '1:1']
 
 const { t, te } = useI18n()
 const route = useRoute()
@@ -538,7 +234,6 @@ const scopeHandle = ref('')
 const selectedScopeItem = ref<SaplingGenericItem | null>(null)
 const isActive = ref(true)
 const isDefault = ref(false)
-const fieldSearch = ref('')
 const isLoadingEntities = ref(false)
 const isLoadingContext = ref(false)
 const isSaving = ref(false)
@@ -547,14 +242,14 @@ const fileInputRef = ref<HTMLInputElement | null>(null)
 const fieldRows = reactive<FieldDraft[]>([])
 const previewMode = ref<PreviewMode>('form')
 
-const widthOptions = [
+const widthOptions: StaticOption<EntityTemplateFormWidth>[] = [
   { title: '25%', value: 1 },
   { title: '50%', value: 2 },
   { title: '75%', value: 3 },
   { title: '100%', value: 4 },
 ]
 
-const rendererOptions: Array<{ title: string; value: SaplingFormRenderer }> = [
+const rendererOptions: StaticOption<SaplingFormRenderer>[] = [
   { title: 'Auto', value: 'auto' },
   { title: 'Text', value: 'shortText' },
   { title: 'Long text', value: 'longText' },
@@ -576,14 +271,6 @@ const rendererOptions: Array<{ title: string; value: SaplingFormRenderer }> = [
   { title: 'Select', value: 'select' },
   { title: 'Multi select', value: 'multiSelect' },
 ]
-
-const previewModeOptions = computed<Array<{ title: string; value: PreviewMode; icon: string }>>(
-  () => [
-    { title: t('formConfig.previewForm'), value: 'form', icon: 'mdi-form-select' },
-    { title: t('formConfig.previewTable'), value: 'table', icon: 'mdi-table' },
-    { title: t('formConfig.previewMobileTable'), value: 'mobile', icon: 'mdi-cellphone' },
-  ],
-)
 
 const scopeOptions = computed(() => [
   { title: t('formConfig.scopeGlobal'), value: 'global' },
@@ -624,21 +311,6 @@ const canSave = computed(
   () => Boolean(selectedEntityHandle.value && configName.value.trim()) && !isLoadingContext.value,
 )
 
-const filteredFieldRows = computed(() => {
-  const query = fieldSearch.value.trim().toLowerCase()
-  if (!query) {
-    return fieldRows
-  }
-
-  return fieldRows.filter((field) =>
-    [field.name, field.label, field.group, field.type].some((value) =>
-      String(value ?? '')
-        .toLowerCase()
-        .includes(query),
-    ),
-  )
-})
-
 const draftConfig = computed<SaplingFormConfigPayload>(() => ({
   schema: 'sapling.form-config.v1',
   entityHandle: selectedEntityHandle.value,
@@ -668,63 +340,10 @@ const draftTemplates = computed(() =>
   baseTemplates.value.map((template) => applyDraftToTemplate(template)),
 )
 
-const previewTemplates = computed(() =>
-  sortDialogTemplates(
-    draftTemplates.value
-      .filter((template) => template.formVisible === true)
-      .filter((template) => !template.isAutoIncrement)
-      .filter((template) => !PREVIEW_UNSUPPORTED_FORM_RELATION_KINDS.includes(template.kind ?? '')),
-  ),
-)
-
-const previewGroups = computed(() =>
-  groupDialogTemplates(previewTemplates.value, (groupKey) => translateGroup(groupKey)),
-)
-
-const previewTableTemplates = computed(() =>
-  sortTableHeaders(
-    draftTemplates.value
-      .filter(isPreviewSupportedTableTemplate)
-      .filter((template) => template.tableVisible === true),
-  ),
-)
-
-const previewTableScrollStyle = computed(() => ({
-  '--sapling-form-config-preview-table-columns': String(previewTableTemplates.value.length),
-}))
-
-const previewMobileTemplates = computed(() =>
-  getMobileTableHeaders(
-    draftTemplates.value.filter(isPreviewSupportedTableTemplate).map((template) => ({
-      ...template,
-      key: template.name,
-      title: getPreviewFieldLabel(template),
-    })),
-  ),
-)
-
-const activePreviewCount = computed(() => {
-  if (previewMode.value === 'table') {
-    return previewTableTemplates.value.length
-  }
-
-  if (previewMode.value === 'mobile') {
-    return previewMobileTemplates.value.length
-  }
-
-  return previewTemplates.value.length
-})
-
 const formVisibleCount = computed(() => fieldRows.filter((field) => field.visible).length)
 const tableVisibleCount = computed(() => fieldRows.filter((field) => field.tableVisible).length)
 const mobileVisibleCount = computed(() => fieldRows.filter((field) => field.mobileVisible).length)
 const hiddenFieldCount = computed(() => fieldRows.filter((field) => !field.visible).length)
-
-const previewTitle = computed(() =>
-  selectedEntityHandle.value
-    ? translateEntity(selectedEntityHandle.value)
-    : t('formConfig.preview'),
-)
 
 watch(
   () => route.query.entity,
@@ -809,7 +428,7 @@ async function loadEntityContext(): Promise<void> {
 
   try {
     const [templates, nextConfigs] = await Promise.all([
-      ApiService.findAll<EntityTemplate[]>(`template/${selectedEntityHandle.value}`),
+      ApiTemplateService.getEntityTemplate(selectedEntityHandle.value),
       ApiFormConfigService.list(selectedEntityHandle.value),
     ])
     baseTemplates.value = templates
@@ -863,7 +482,7 @@ function buildFieldRows(configFields: SaplingFormConfigPayload['fields']): void 
   fieldRows.splice(0, fieldRows.length)
 
   baseTemplates.value
-    .filter((template) => !PREVIEW_UNSUPPORTED_FORM_RELATION_KINDS.includes(template.kind ?? ''))
+    .filter((template) => !FORM_CONFIG_UNSUPPORTED_RELATION_KINDS.includes(template.kind ?? ''))
     .forEach((template, index) => {
       const fieldConfig = getFieldConfig(configFields?.[template.name])
       const visible = fieldConfig.visible ?? template.formVisible ?? false
@@ -1074,87 +693,4 @@ function getTemplateDefaultLabel(template: EntityTemplate): string {
   return te(key) ? t(key) : ''
 }
 
-function translateGroup(groupKey: string): string {
-  return te(groupKey) ? t(groupKey) : groupKey
-}
-
-function isPreviewSupportedTableTemplate(template: EntityTemplate): boolean {
-  return (
-    !template.options?.includes('isSecurity') &&
-    !PREVIEW_UNSUPPORTED_RELATION_KINDS.includes(template.kind ?? '')
-  )
-}
-
-function getPreviewWidth(template: EntityTemplate): EntityTemplateFormWidth {
-  return getDialogTemplateWidth(template)
-}
-
-function getPreviewFieldLabel(template: EntityTemplate): string {
-  const configuredLabel = template.formConfig?.label?.trim()
-  if (configuredLabel) {
-    return configuredLabel
-  }
-
-  const key = `${selectedEntityHandle.value}.${template.name}`
-  return te(key) ? t(key) : template.name
-}
-
-function getPreviewRenderer(template: EntityTemplate): string {
-  return template.formConfig?.renderer && template.formConfig.renderer !== 'auto'
-    ? template.formConfig.renderer
-    : inferRenderer(template)
-}
-
-function inferRenderer(template: EntityTemplate): string {
-  if (template.options?.includes('isPhone')) return 'phone'
-  if (template.options?.includes('isMail')) return 'mail'
-  if (template.options?.includes('isLink')) return 'link'
-  if (template.options?.includes('isMoney')) return 'money'
-  if (template.options?.includes('isPercent')) return 'percent'
-  if (template.options?.includes('isMarkdown')) return 'markdown'
-  if (template.type === 'boolean') return 'boolean'
-  if (template.type === 'number') return 'number'
-  if (template.type === 'datetime') return 'dateTime'
-  if (template.type === 'DateType') return 'date'
-  if (template.type === 'JsonType') return 'json'
-  return (template.length ?? 0) > 128 ? 'longText' : 'shortText'
-}
-
-function getPreviewSampleValue(template: EntityTemplate): string {
-  if (template.referenceName) {
-    return translateEntity(template.referenceName)
-  }
-
-  if (template.options?.includes('isMail')) return 'kontakt@sapling.local'
-  if (template.options?.includes('isPhone')) return '+49 30 123456'
-  if (template.options?.includes('isLink')) return 'sapling.local'
-  if (template.options?.includes('isMoney')) return '1.240,00 EUR'
-  if (template.options?.includes('isPercent')) return '42 %'
-  if (template.options?.includes('isColor')) return '#3F7F72'
-  if (template.options?.includes('isIcon')) return 'mdi-shape-outline'
-  if (template.type === 'boolean') return 'true'
-  if (template.type === 'datetime') return '30.05.2026 09:30'
-  if (template.type === 'DateType') return '30.05.2026'
-  if (['number', 'integer', 'float', 'double', 'decimal'].includes(template.type.toLowerCase())) {
-    return '42'
-  }
-
-  return getPreviewFieldLabel(template)
-}
-
-function getPreviewValueClasses(template: EntityTemplate): string[] {
-  return [
-    'sapling-form-config-preview-table__value',
-    template.options?.includes('isChip') ? 'sapling-form-config-preview-table__value--chip' : '',
-    template.options?.includes('isColor') ? 'sapling-form-config-preview-table__value--color' : '',
-    template.options?.includes('isIcon') ? 'sapling-form-config-preview-table__value--icon' : '',
-  ].filter(Boolean)
-}
-
-function getPreviewMeta(template: EntityTemplate): string {
-  const parts = []
-  if (template.isRequired) parts.push(t('formConfig.required'))
-  if (template.formConfig?.readonly) parts.push(t('formConfig.readonly'))
-  return parts.join(' - ') || t('formConfig.optional')
-}
 </script>

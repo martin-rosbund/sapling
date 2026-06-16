@@ -13,7 +13,7 @@ import type {
   AiProviderModelItem,
   AiProviderTypeItem,
 } from '@/entity/entity'
-import { BACKEND_URL } from '@/constants/project.constants'
+import { buildApiUrl } from '@/services/api.client'
 import { pushApiErrorMessage } from '@/services/api.error.service'
 
 export interface CreateAiChatSessionPayload {
@@ -198,7 +198,7 @@ export interface AiChatMessageListResponse {
 class ApiAiService {
   static async listProviders(): Promise<AiProviderTypeItem[]> {
     try {
-      const response = await axios.get<AiProviderTypeItem[]>(`${BACKEND_URL}ai/chat/providers`)
+      const response = await axios.get<AiProviderTypeItem[]>(buildApiUrl('ai/chat/providers'))
       return response.data
     } catch (error: unknown) {
       this.handleError(error, 'ai.chat.providerListFailed')
@@ -208,7 +208,7 @@ class ApiAiService {
 
   static async listModels(providerHandle?: string): Promise<AiProviderModelItem[]> {
     try {
-      const response = await axios.get<AiProviderModelItem[]>(`${BACKEND_URL}ai/chat/models`, {
+      const response = await axios.get<AiProviderModelItem[]>(buildApiUrl('ai/chat/models'), {
         params: {
           providerHandle: providerHandle ?? undefined,
         },
@@ -223,7 +223,7 @@ class ApiAiService {
 
   static async listAgents(): Promise<AiAgentItem[]> {
     try {
-      const response = await axios.get<AiAgentItem[]>(`${BACKEND_URL}ai/chat/agents`)
+      const response = await axios.get<AiAgentItem[]>(buildApiUrl('ai/chat/agents'))
       return response.data
     } catch (error: unknown) {
       this.handleError(error, 'ai.chat.agentListFailed')
@@ -233,7 +233,7 @@ class ApiAiService {
 
   static async listMcpTools(): Promise<AiMcpToolDescriptor[]> {
     try {
-      const response = await axios.get<AiMcpToolDescriptor[]>(`${BACKEND_URL}ai/chat/tools`)
+      const response = await axios.get<AiMcpToolDescriptor[]>(buildApiUrl('ai/chat/tools'))
       return response.data
     } catch (error: unknown) {
       this.handleError(error, 'ai.chat.toolListFailed')
@@ -244,7 +244,7 @@ class ApiAiService {
   static async getAgentWorkbench(agentHandle: string): Promise<AiAgentWorkbenchResponse> {
     try {
       const response = await axios.get<AiAgentWorkbenchResponse>(
-        `${BACKEND_URL}ai/agents/${agentHandle}/workbench`,
+        buildApiUrl(`ai/agents/${agentHandle}/workbench`),
       )
       return response.data
     } catch (error: unknown) {
@@ -259,7 +259,7 @@ class ApiAiService {
   ): Promise<AiAgentRunItem> {
     try {
       const response = await axios.post<AiAgentRunItem>(
-        `${BACKEND_URL}ai/agents/${agentHandle}/test-runs`,
+        buildApiUrl(`ai/agents/${agentHandle}/test-runs`),
         payload,
       )
       return response.data
@@ -272,7 +272,7 @@ class ApiAiService {
   static async listAgentRuns(agentHandle: string): Promise<AiAgentRunItem[]> {
     try {
       const response = await axios.get<AiAgentRunItem[]>(
-        `${BACKEND_URL}ai/agents/${agentHandle}/runs`,
+        buildApiUrl(`ai/agents/${agentHandle}/runs`),
       )
       return response.data
     } catch (error: unknown) {
@@ -284,7 +284,7 @@ class ApiAiService {
   static async listAgentEvaluations(agentHandle: string): Promise<AiAgentEvaluationItem[]> {
     try {
       const response = await axios.get<AiAgentEvaluationItem[]>(
-        `${BACKEND_URL}ai/agents/${agentHandle}/evaluations`,
+        buildApiUrl(`ai/agents/${agentHandle}/evaluations`),
       )
       return response.data
     } catch (error: unknown) {
@@ -299,7 +299,7 @@ class ApiAiService {
   ): Promise<AiAgentEvaluationItem> {
     try {
       const response = await axios.post<AiAgentEvaluationItem>(
-        `${BACKEND_URL}ai/agents/${agentHandle}/evaluations`,
+        buildApiUrl(`ai/agents/${agentHandle}/evaluations`),
         payload,
       )
       return response.data
@@ -312,7 +312,7 @@ class ApiAiService {
   static async listTranscriptionProviders(): Promise<AiProviderTypeItem[]> {
     try {
       const response = await axios.get<AiProviderTypeItem[]>(
-        `${BACKEND_URL}ai/transcription/providers`,
+        buildApiUrl('ai/transcription/providers'),
       )
       return response.data
     } catch (error: unknown) {
@@ -324,7 +324,7 @@ class ApiAiService {
   static async listTranscriptionModels(providerHandle?: string): Promise<AiProviderModelItem[]> {
     try {
       const response = await axios.get<AiProviderModelItem[]>(
-        `${BACKEND_URL}ai/transcription/models`,
+        buildApiUrl('ai/transcription/models'),
         {
           params: {
             providerHandle: providerHandle ?? undefined,
@@ -341,7 +341,7 @@ class ApiAiService {
 
   static async listSpeechProviders(): Promise<AiProviderTypeItem[]> {
     try {
-      const response = await axios.get<AiProviderTypeItem[]>(`${BACKEND_URL}ai/speech/providers`)
+      const response = await axios.get<AiProviderTypeItem[]>(buildApiUrl('ai/speech/providers'))
       return response.data
     } catch (error: unknown) {
       this.handleError(error, 'ai.speech.providerListFailed')
@@ -351,7 +351,7 @@ class ApiAiService {
 
   static async listSpeechModels(providerHandle?: string): Promise<AiProviderModelItem[]> {
     try {
-      const response = await axios.get<AiProviderModelItem[]>(`${BACKEND_URL}ai/speech/models`, {
+      const response = await axios.get<AiProviderModelItem[]>(buildApiUrl('ai/speech/models'), {
         params: {
           providerHandle: providerHandle ?? undefined,
         },
@@ -367,7 +367,7 @@ class ApiAiService {
   static async listVectorizationProviders(): Promise<AiProviderTypeItem[]> {
     try {
       const response = await axios.get<AiProviderTypeItem[]>(
-        `${BACKEND_URL}ai/vectorization/providers`,
+        buildApiUrl('ai/vectorization/providers'),
       )
       return response.data
     } catch (error: unknown) {
@@ -379,7 +379,7 @@ class ApiAiService {
   static async listVectorizationModels(providerHandle?: string): Promise<AiProviderModelItem[]> {
     try {
       const response = await axios.get<AiProviderModelItem[]>(
-        `${BACKEND_URL}ai/vectorization/models`,
+        buildApiUrl('ai/vectorization/models'),
         {
           params: {
             providerHandle: providerHandle ?? undefined,
@@ -397,7 +397,7 @@ class ApiAiService {
   static async vectorizeEntity(payload: VectorizeEntityPayload): Promise<VectorizeEntityResponse> {
     try {
       const response = await axios.post<VectorizeEntityResponse>(
-        `${BACKEND_URL}ai/vectorization`,
+        buildApiUrl('ai/vectorization'),
         payload,
       )
       return response.data
@@ -409,7 +409,7 @@ class ApiAiService {
 
   static async listSessions(includeArchived = false): Promise<AiChatSessionItem[]> {
     try {
-      const response = await axios.get<AiChatSessionItem[]>(`${BACKEND_URL}ai/chat/sessions`, {
+      const response = await axios.get<AiChatSessionItem[]>(buildApiUrl('ai/chat/sessions'), {
         params: { includeArchived },
       })
       return response.data
@@ -422,7 +422,7 @@ class ApiAiService {
   static async createSession(payload: CreateAiChatSessionPayload): Promise<AiChatSessionItem> {
     try {
       const response = await axios.post<AiChatSessionItem>(
-        `${BACKEND_URL}ai/chat/sessions`,
+        buildApiUrl('ai/chat/sessions'),
         payload,
       )
       return response.data
@@ -438,7 +438,7 @@ class ApiAiService {
   ): Promise<AiChatSessionItem> {
     try {
       const response = await axios.patch<AiChatSessionItem>(
-        `${BACKEND_URL}ai/chat/sessions/${handle}`,
+        buildApiUrl(`ai/chat/sessions/${handle}`),
         payload,
       )
       return response.data
@@ -454,7 +454,7 @@ class ApiAiService {
   ): Promise<AiChatSessionItem> {
     try {
       const response = await axios.post<AiChatSessionItem>(
-        `${BACKEND_URL}ai/chat/sessions/${handle}/playbook`,
+        buildApiUrl(`ai/chat/sessions/${handle}/playbook`),
         { playbookHandle },
       )
       return response.data
@@ -473,7 +473,7 @@ class ApiAiService {
   ): Promise<AiChatMessageListResponse> {
     try {
       const response = await axios.get<AiChatMessageListResponse>(
-        `${BACKEND_URL}ai/chat/sessions/${sessionHandle}/messages`,
+        buildApiUrl(`ai/chat/sessions/${sessionHandle}/messages`),
         {
           params: {
             limit: options?.limit,
@@ -493,7 +493,7 @@ class ApiAiService {
   ): Promise<{ session: AiChatSessionItem; message: AiChatMessageItem }> {
     try {
       const response = await axios.post<{ session: AiChatSessionItem; message: AiChatMessageItem }>(
-        `${BACKEND_URL}ai/chat/messages`,
+        buildApiUrl('ai/chat/messages'),
         this.withClientTimeContext(payload),
       )
       return response.data
@@ -512,7 +512,7 @@ class ApiAiService {
   ): Promise<AiChatMessageItem> {
     try {
       const response = await axios.post<AiChatMessageItem>(
-        `${BACKEND_URL}ai/chat/messages/${handle}/speech`,
+        buildApiUrl(`ai/chat/messages/${handle}/speech`),
         payload ?? {},
       )
       return response.data
@@ -527,7 +527,7 @@ class ApiAiService {
   static async confirmToolAction(handle: number): Promise<AiChatToolActionItem> {
     try {
       const response = await axios.post<AiChatToolActionItem>(
-        `${BACKEND_URL}ai/chat/tool-actions/${handle}/confirm`,
+        buildApiUrl(`ai/chat/tool-actions/${handle}/confirm`),
       )
       return response.data
     } catch (error: unknown) {
@@ -539,7 +539,7 @@ class ApiAiService {
   static async rejectToolAction(handle: number): Promise<AiChatToolActionItem> {
     try {
       const response = await axios.post<AiChatToolActionItem>(
-        `${BACKEND_URL}ai/chat/tool-actions/${handle}/reject`,
+        buildApiUrl(`ai/chat/tool-actions/${handle}/reject`),
       )
       return response.data
     } catch (error: unknown) {
@@ -555,7 +555,7 @@ class ApiAiService {
     },
   ): Promise<Blob> {
     try {
-      const response = await axios.get<Blob>(`${BACKEND_URL}document/download/${documentHandle}`, {
+      const response = await axios.get<Blob>(buildApiUrl(`document/download/${documentHandle}`), {
         responseType: 'blob',
         withCredentials: true,
       })
@@ -588,7 +588,7 @@ class ApiAiService {
       }
 
       const response = await axios.post<AiChatAttachmentUploadResponse>(
-        `${BACKEND_URL}ai/chat/attachments`,
+        buildApiUrl('ai/chat/attachments'),
         formData,
       )
       return response.data
@@ -618,7 +618,7 @@ class ApiAiService {
       }
 
       const response = await axios.post<AiChatTranscriptionResponse>(
-        `${BACKEND_URL}ai/chat/transcriptions`,
+        buildApiUrl('ai/chat/transcriptions'),
         formData,
       )
       return response.data
@@ -633,7 +633,7 @@ class ApiAiService {
     onEvent: (event: AiChatStreamEvent) => void,
     signal?: AbortSignal,
   ): Promise<void> {
-    const response = await fetch(`${BACKEND_URL}ai/chat/stream`, {
+    const response = await fetch(buildApiUrl('ai/chat/stream'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

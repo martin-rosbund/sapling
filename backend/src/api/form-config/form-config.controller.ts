@@ -152,9 +152,7 @@ export class FormConfigController {
     @Param('entityHandle') entityHandle: string,
     @Body() payload: SaveSaplingFormConfigDto,
   ): Promise<SaplingFormConfigItem> {
-    this.assertCanManageFormConfigs(req.user as PersonItem, 'insert');
-    const templates = this.templateService.getEntityTemplate(entityHandle);
-    return this.formConfigService.saveConfig(entityHandle, payload, templates);
+    return this.saveConfigForRequest(req, entityHandle, payload, 'insert');
   }
 
   @Post(':entityHandle')
@@ -173,9 +171,7 @@ export class FormConfigController {
     @Param('entityHandle') entityHandle: string,
     @Body() payload: SaveSaplingFormConfigDto,
   ): Promise<SaplingFormConfigItem> {
-    this.assertCanManageFormConfigs(req.user as PersonItem, 'insert');
-    const templates = this.templateService.getEntityTemplate(entityHandle);
-    return this.formConfigService.saveConfig(entityHandle, payload, templates);
+    return this.saveConfigForRequest(req, entityHandle, payload, 'insert');
   }
 
   @Patch(':entityHandle/:handle')
@@ -196,13 +192,29 @@ export class FormConfigController {
     @Param('handle') handle: string,
     @Body() payload: SaveSaplingFormConfigDto,
   ): Promise<SaplingFormConfigItem> {
-    this.assertCanManageFormConfigs(req.user as PersonItem, 'update');
+    return this.saveConfigForRequest(
+      req,
+      entityHandle,
+      payload,
+      'update',
+      Number(handle),
+    );
+  }
+
+  private saveConfigForRequest(
+    req: Request,
+    entityHandle: string,
+    payload: SaveSaplingFormConfigDto,
+    action: FormConfigPermissionAction,
+    existingHandle?: number,
+  ): Promise<SaplingFormConfigItem> {
+    this.assertCanManageFormConfigs(req.user as PersonItem, action);
     const templates = this.templateService.getEntityTemplate(entityHandle);
     return this.formConfigService.saveConfig(
       entityHandle,
       payload,
       templates,
-      Number(handle),
+      existingHandle,
     );
   }
 

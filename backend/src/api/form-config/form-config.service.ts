@@ -53,6 +53,22 @@ const CONFIG_SCOPE_ORDER: Record<SaplingFormConfigScope, number> = {
   person: 2,
 };
 
+type PreparedSaplingFormConfigSave = {
+  entityHandle: string;
+  name: string;
+  scope: SaplingFormConfigScope;
+  scopeHandle?: string;
+  isActive: boolean;
+  isDefault: boolean;
+  version: number;
+  config: NormalizedSaplingFormConfig;
+  personHandle: number | null;
+};
+
+type SaplingFormConfigValidationResult = SaplingFormConfigValidationResultDto & {
+  normalizedConfig: NormalizedSaplingFormConfig;
+};
+
 @Injectable()
 export class FormConfigService {
   constructor(private readonly em: EntityManager) {}
@@ -91,11 +107,56 @@ export class FormConfigService {
     templates: EntityTemplateDto[],
     existingHandle?: number,
   ): Promise<SaplingFormConfigItem> {
-    const validation = this.validateConfig(
+    const preparedPayload = this.prepareSavePayload(
       entityHandle,
-      payload.config,
+      payload,
       templates,
     );
+
+    const entity = await this.em.findOne(EntityItem, {
+      handle: preparedPayload.entityHandle,
+    });
+    if (!entity) {
+      throw new NotFoundException('global.entityNotFound');
+    }
+
+    let configItem =
+      typeof existingHandle === 'number'
+        ? await this.getConfig(entityHandle, existingHandle)
+        : null;
+
+    if (!configItem) {
+      configItem = new SaplingFormConfigItem();
+    }
+
+    configItem.name = preparedPayload.name;
+    configItem.entity = entity;
+    configItem.scope = preparedPayload.scope;
+    configItem.scopeHandle = preparedPayload.scopeHandle;
+    configItem.isActive = preparedPayload.isActive;
+    configItem.isDefault = preparedPayload.isDefault;
+    configItem.version = preparedPayload.version;
+    configItem.config = preparedPayload.config;
+
+    configItem.person =
+      preparedPayload.personHandle != null
+        ? ((await this.em.findOne(PersonItem, {
+            handle: preparedPayload.personHandle,
+          })) ?? undefined)
+        : undefined;
+
+    this.em.persist(configItem);
+    await this.em.flush();
+
+    return configItem;
+  }
+
+  prepareSavePayload(
+    entityHandle: string,
+    payload: SaveSaplingFormConfigDto,
+    templates: EntityTemplateDto[],
+  ): PreparedSaplingFormConfigSave {
+    const validation = this.validateConfig(entityHandle, payload.config, templates);
     if (!validation.isValid) {
       throw new BadRequestException({
         message: 'formConfig.validationFailed',
@@ -110,57 +171,38 @@ export class FormConfigService {
       });
     }
 
-    const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
-    if (!entity) {
-      throw new NotFoundException('global.entityNotFound');
-    }
-
     const normalizedScope = this.normalizeScope(payload.scope);
     const normalizedScopeHandle = this.normalizeOptionalString(
       payload.scopeHandle,
     );
     const normalizedName = this.normalizeRequiredString(payload.name, 'name');
-
-    let configItem =
-      typeof existingHandle === 'number'
-        ? await this.getConfig(entityHandle, existingHandle)
-        : null;
-
-    if (!configItem) {
-      configItem = new SaplingFormConfigItem();
-    }
-
-    configItem.name = normalizedName;
-    configItem.entity = entity;
-    configItem.scope = normalizedScope;
-    configItem.scopeHandle =
-      normalizedScope === 'global' ? undefined : normalizedScopeHandle;
-    configItem.isActive = payload.isActive !== false;
-    configItem.isDefault = payload.isDefault === true;
-    configItem.version = 1;
-    configItem.config = validation.normalizedConfig;
-
     const personHandle =
       normalizedScope === 'person' && normalizedScopeHandle
         ? Number(normalizedScopeHandle)
         : null;
-    configItem.person =
-      personHandle != null && Number.isFinite(personHandle)
-        ? ((await this.em.findOne(PersonItem, { handle: personHandle })) ??
-          undefined)
-        : undefined;
 
-    this.em.persist(configItem);
-    await this.em.flush();
-
-    return configItem;
+    return {
+      entityHandle,
+      name: normalizedName,
+      scope: normalizedScope,
+      scopeHandle:
+        normalizedScope === 'global' ? undefined : normalizedScopeHandle,
+      isActive: payload.isActive !== false,
+      isDefault: payload.isDefault === true,
+      version: 1,
+      config: validation.normalizedConfig,
+      personHandle:
+        personHandle != null && Number.isFinite(personHandle)
+          ? personHandle
+          : null,
+    };
   }
 
   validateConfig(
     entityHandle: string,
     config: unknown,
     templates: EntityTemplateDto[],
-  ): SaplingFormConfigValidationResultDto {
+  ): SaplingFormConfigValidationResult {
     const errors: SaplingFormConfigValidationIssueDto[] = [];
     const warnings: SaplingFormConfigValidationIssueDto[] = [];
     const templateNames = new Set(templates.map((template) => template.name));

@@ -1,6 +1,6 @@
-import { BACKEND_URL } from '@/constants/project.constants'
 import type { EntityTemplate } from '@/entity/structure'
 import axios from 'axios'
+import { buildApiUrl } from '@/services/api.client'
 import { pushApiErrorMessage } from '@/services/api.error.service'
 import type { MailSenderListResult } from '@/components/dialog/mail/SaplingDialogMail.types'
 
@@ -44,7 +44,7 @@ export type MailDeliveryResult = {
 class ApiMailService {
   static async getEntityTemplate(entityHandle: string): Promise<EntityTemplate[]> {
     try {
-      const response = await axios.get<EntityTemplate[]>(`${BACKEND_URL}template/${entityHandle}`)
+      const response = await axios.get<EntityTemplate[]>(buildApiUrl(`template/${entityHandle}`))
 
       return response.data
     } catch (error) {
@@ -56,7 +56,7 @@ class ApiMailService {
   static async preview(payload: MailPreviewPayload): Promise<MailPreviewResult> {
     try {
       const response = await axios.post<MailPreviewResult>(
-        `${BACKEND_URL}mail/preview`,
+        buildApiUrl('mail/preview'),
         this.withClientFormattingContext(payload),
       )
 
@@ -69,7 +69,7 @@ class ApiMailService {
 
   static async listSenders(): Promise<MailSenderListResult> {
     try {
-      const response = await axios.get<MailSenderListResult>(`${BACKEND_URL}mail/senders`)
+      const response = await axios.get<MailSenderListResult>(buildApiUrl('mail/senders'))
 
       return response.data
     } catch (error) {
@@ -81,7 +81,7 @@ class ApiMailService {
   static async send(payload: MailPreviewPayload): Promise<MailDeliveryResult> {
     try {
       const response = await axios.post<MailDeliveryResult>(
-        `${BACKEND_URL}mail/send`,
+        buildApiUrl('mail/send'),
         this.withClientFormattingContext(payload),
       )
 

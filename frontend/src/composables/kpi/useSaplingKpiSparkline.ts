@@ -1,11 +1,6 @@
-import ApiService from '@/services/api.service'
+import ApiKpiService from '@/services/api.kpi.service'
 import type { KPIItem } from '@/entity/entity'
-import type {
-  KpiDrilldown,
-  KpiDrilldownEntry,
-  KpiResponse,
-  KpiSparklineValue,
-} from '@/entity/structure'
+import type { KpiDrilldown, KpiDrilldownEntry, KpiSparklineValue } from '@/entity/structure'
 import { computed, ref, toValue, type MaybeRefOrGetter } from 'vue'
 import { useSaplingKpiLoader } from '@/composables/kpi/useSaplingKpiLoader'
 import { normalizeKpiNumericValue } from '@/utils/saplingKpiValue'
@@ -82,9 +77,7 @@ export function useSaplingKpiSparkline(kpi: MaybeRefOrGetter<KPIItem | null | un
 
   const { loading, hasError, isLoaded, loadKpiValue } = useSaplingKpiLoader(kpi, {
     load: async (currentKpi) => {
-      const result = await ApiService.findAll<KpiResponse<KpiSparklineValue[]>>(
-        `kpi/execute/${currentKpi.handle}`,
-      )
+      const result = await ApiKpiService.execute<KpiSparklineValue[]>(currentKpi.handle)
       data.value = Array.isArray(result?.value) ? result.value.filter(isSparklineDataPoint) : []
       drilldown.value = isKpiDrilldown(result?.drilldown) ? result.drilldown : null
     },

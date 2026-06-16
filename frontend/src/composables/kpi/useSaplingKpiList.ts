@@ -1,8 +1,7 @@
 import type { KPIItem } from '@/entity/entity'
 import { buildKpiEntityPath, getKpiTargetEntityHandle } from '@/utils/saplingKpiNavigation'
 import { computed, ref, toValue, type MaybeRefOrGetter } from 'vue'
-import ApiService from '@/services/api.service'
-import type { KpiResponse } from '@/entity/structure'
+import ApiKpiService from '@/services/api.kpi.service'
 import { useSaplingKpiLoader } from '@/composables/kpi/useSaplingKpiLoader'
 import { useRouter } from 'vue-router'
 import { pushAppRoute } from '@/utils/routerNavigation'
@@ -33,8 +32,8 @@ export function useSaplingKpiList(kpi: MaybeRefOrGetter<KPIItem | null | undefin
 
   const { loading, hasError, isLoaded, loadKpiValue } = useSaplingKpiLoader(kpi, {
     load: async (currentKpi) => {
-      const result = await ApiService.findAll<KpiResponse<Array<Record<string, unknown>>>>(
-        `kpi/execute/${currentKpi.handle}`,
+      const result = await ApiKpiService.execute<Array<Record<string, unknown>>>(
+        currentKpi.handle,
       )
       const nextRows = Array.isArray(result?.value) ? result.value.filter(isKpiListRow) : []
 

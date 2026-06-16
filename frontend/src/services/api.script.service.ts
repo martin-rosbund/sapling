@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { BACKEND_URL } from '@/constants/project.constants'
+import { buildApiUrl } from '@/services/api.client'
 import { pushApiErrorMessage } from '@/services/api.error.service'
 import type { EntityItem, PersonItem, SaplingGenericItem } from '@/entity/entity'
 
@@ -19,7 +19,7 @@ class ApiScriptService {
     parameter?: unknown,
   ): Promise<ScriptResultClient> {
     try {
-      const response = await axios.post<ScriptResultClient>(`${BACKEND_URL}script/runClient`, {
+      const response = await axios.post<ScriptResultClient>(buildApiUrl('script/runClient'), {
         items,
         entity,
         user,

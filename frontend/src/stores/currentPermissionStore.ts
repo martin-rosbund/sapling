@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import ApiService from '@/services/api.service'
+import ApiCurrentService from '@/services/api.current.service'
 import type { AccumulatedPermission } from '@/entity/structure'
 
 export const useCurrentPermissionStore = defineStore('currentPermission', () => {
@@ -18,8 +18,7 @@ export const useCurrentPermissionStore = defineStore('currentPermission', () => 
     loading.value = true
     fetchPromise = (async () => {
       try {
-        accumulatedPermission.value =
-          await ApiService.findOne<AccumulatedPermission[]>('current/permission')
+        accumulatedPermission.value = await ApiCurrentService.getPermissions()
         loaded.value = true
       } catch {
         accumulatedPermission.value = null

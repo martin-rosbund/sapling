@@ -20,9 +20,9 @@ vi.mock('vue-i18n', () => ({
   }),
 }))
 
-vi.mock('@/services/api.service', () => ({
+vi.mock('@/services/api.document.service', () => ({
   default: {
-    uploadDocument: uploadDocumentMock,
+    upload: uploadDocumentMock,
   },
 }))
 

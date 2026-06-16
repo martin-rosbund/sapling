@@ -4,7 +4,7 @@ import type { EntityState, EntityTemplate } from '@/entity/structure'
 import type { EntityItem } from '@/entity/entity'
 import TranslationService from '@/services/translation.service'
 import { i18n } from '@/i18n'
-import ApiService from '@/services/api.service'
+import ApiCurrentService from '@/services/api.current.service'
 import type { AccumulatedPermission } from '@/entity/structure'
 
 type GenericLoadRequest = {
@@ -270,9 +270,8 @@ export const useGenericStore = defineStore('genericLoader', () => {
       return
     }
 
-    const query = normalizedKeys.map(encodeURIComponent).join(',')
-    const response = await ApiService.findAll<EntityMetadataResponse[]>(
-      `current/meta?entities=${query}`,
+    const response = await ApiCurrentService.getMetadata<EntityItem, EntityTemplate>(
+      normalizedKeys,
     )
     const metadataByHandle = new Map(response.map((metadata) => [metadata.entityHandle, metadata]))
 

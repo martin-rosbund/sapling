@@ -40,9 +40,9 @@ vi.mock('@/services/api.form-config.service', () => ({
   },
 }))
 
-vi.mock('@/services/api.service', () => ({
+vi.mock('@/services/api.template.service', () => ({
   default: {
-    findAll: findAllMock,
+    getEntityTemplate: findAllMock,
   },
 }))
 

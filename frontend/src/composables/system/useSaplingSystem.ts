@@ -1,5 +1,5 @@
 import { ref, onMounted } from 'vue'
-import ApiService from '@/services/api.service'
+import ApiSystemService from '@/services/api.system.service'
 import { useTranslationLoader } from '../generic/useTranslationLoader'
 import { useVisibilityAwarePolling } from './useVisibilityAwarePolling'
 import type {
@@ -85,7 +85,7 @@ export function useSaplingSystem() {
     error.value = null
 
     try {
-      target.value = await ApiService.findOne<T>(endpoint)
+      target.value = await ApiSystemService.get<T>(endpoint)
     } catch {
       error.value = SYSTEM_ERROR_KEY
     } finally {

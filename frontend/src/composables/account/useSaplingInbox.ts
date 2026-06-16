@@ -8,7 +8,7 @@ import type {
   SalesOpportunityItem,
   TicketItem,
 } from '@/entity/entity'
-import ApiService from '@/services/api.service'
+import ApiCurrentService from '@/services/api.current.service'
 import { formatDate, formatDateFromTo, formatDateTimeValue } from '@/utils/saplingFormatUtil'
 import { useRouter, type RouteLocationRaw } from 'vue-router'
 import {
@@ -357,7 +357,7 @@ export function useSaplingInbox(emit: CloseEmitter) {
       return
     }
 
-    await ApiService.post(`current/inboxNotification/${entry.notificationHandle}/read`)
+    await ApiCurrentService.markInboxNotificationRead(entry.notificationHandle)
     notifications.value = notifications.value.filter(
       (notification) => notification.handle !== entry.notificationHandle,
     )

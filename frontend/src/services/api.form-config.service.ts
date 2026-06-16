@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { BACKEND_URL } from '@/constants/project.constants'
+import { buildApiUrl } from '@/services/api.client'
 import { pushApiErrorMessage } from '@/services/api.error.service'
 import type { EntityTemplate, SaplingFormConfigPayload } from '@/entity/structure'
 
@@ -40,7 +40,7 @@ class ApiFormConfigService {
   static async getEffectiveTemplate(entityHandle: string): Promise<EntityTemplate[]> {
     try {
       const response = await axios.get<{ entityTemplates: EntityTemplate[] }>(
-        `${BACKEND_URL}form-config/${entityHandle}/effective-template`,
+        buildApiUrl(`form-config/${entityHandle}/effective-template`),
       )
       return response.data.entityTemplates
     } catch (error: unknown) {
@@ -52,7 +52,7 @@ class ApiFormConfigService {
   static async list(entityHandle: string): Promise<SaplingFormConfigItem[]> {
     try {
       const response = await axios.get<SaplingFormConfigItem[]>(
-        `${BACKEND_URL}form-config/${entityHandle}`,
+        buildApiUrl(`form-config/${entityHandle}`),
       )
       return response.data
     } catch (error: unknown) {
@@ -67,7 +67,7 @@ class ApiFormConfigService {
   ): Promise<SaplingFormConfigValidationResult> {
     try {
       const response = await axios.post<SaplingFormConfigValidationResult>(
-        `${BACKEND_URL}form-config/${entityHandle}/validate`,
+        buildApiUrl(`form-config/${entityHandle}/validate`),
         config,
       )
       return response.data
@@ -80,7 +80,7 @@ class ApiFormConfigService {
   static async export(entityHandle: string, handle: number): Promise<SaplingFormConfigPayload> {
     try {
       const response = await axios.get<SaplingFormConfigPayload>(
-        `${BACKEND_URL}form-config/${entityHandle}/${handle}/export`,
+        buildApiUrl(`form-config/${entityHandle}/${handle}/export`),
       )
       return response.data
     } catch (error: unknown) {
@@ -95,7 +95,7 @@ class ApiFormConfigService {
   ): Promise<SaplingFormConfigItem> {
     try {
       const response = await axios.post<SaplingFormConfigItem>(
-        `${BACKEND_URL}form-config/${entityHandle}`,
+        buildApiUrl(`form-config/${entityHandle}`),
         payload,
       )
       return response.data
@@ -112,7 +112,7 @@ class ApiFormConfigService {
   ): Promise<SaplingFormConfigItem> {
     try {
       const response = await axios.patch<SaplingFormConfigItem>(
-        `${BACKEND_URL}form-config/${entityHandle}/${handle}`,
+        buildApiUrl(`form-config/${entityHandle}/${handle}`),
         payload,
       )
       return response.data
@@ -128,7 +128,7 @@ class ApiFormConfigService {
   ): Promise<SaplingFormConfigItem> {
     try {
       const response = await axios.post<SaplingFormConfigItem>(
-        `${BACKEND_URL}form-config/${entityHandle}/import`,
+        buildApiUrl(`form-config/${entityHandle}/import`),
         payload,
       )
       return response.data

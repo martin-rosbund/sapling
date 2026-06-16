@@ -5,7 +5,7 @@ import ApiGenericService from '@/services/api.generic.service'
 import ApiFormConfigService, {
   type SaplingFormConfigItem,
 } from '@/services/api.form-config.service'
-import ApiService from '@/services/api.service'
+import ApiTemplateService from '@/services/api.template.service'
 import { i18n } from '@/i18n'
 import type {
   ColumnFilterItem,
@@ -381,7 +381,7 @@ export function useSaplingTable(
 
     try {
       const [templates, configs] = await Promise.all([
-        ApiService.findAll<EntityTemplate[]>(`template/${nextEntityHandle}`),
+        ApiTemplateService.getEntityTemplate(nextEntityHandle),
         ApiFormConfigService.list(nextEntityHandle),
       ])
       systemTemplates.value = templates

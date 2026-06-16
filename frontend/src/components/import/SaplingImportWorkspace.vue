@@ -49,123 +49,35 @@
 
     <section class="sapling-import__workspace">
       <SaplingSurface class="sapling-panel-shell sapling-section-panel sapling-import__panel">
-        <div class="sapling-import__toolbar">
-          <v-file-input
-            v-model="selectedFile"
-            accept=".csv,.txt,.tsv,text/csv,text/plain"
-            prepend-icon=""
-            prepend-inner-icon="mdi-file-delimited-outline"
-            density="comfortable"
-            :label="$t('import.selectFile')"
-            :disabled="isAnalyzing || isImportJobRunning"
-            :loading="isAnalyzing"
-            @update:model-value="analyzeSelectedFile"
-          />
-          <v-autocomplete
-            v-model="selectedOpenBatchHandle"
-            :items="openBatchOptions"
-            item-title="title"
-            item-value="value"
-            prepend-inner-icon="mdi-tray-arrow-down"
-            density="comfortable"
-            clearable
-            :label="$t('import.openBatch')"
-            :disabled="isAnalyzing || isLoadingOpenBatches"
-            :loading="isLoadingOpenBatches"
-            autocomplete="off"
-            @update:model-value="loadSelectedOpenBatch"
-          />
-          <v-autocomplete
-            v-model="selectedEntityHandle"
-            :items="entityOptions"
-            item-title="title"
-            item-value="value"
-            prepend-inner-icon="mdi-table"
-            density="comfortable"
-            :label="$t('import.targetEntity')"
-            :disabled="!batch || isImportJobRunning"
-            @update:model-value="onEntityChange"
-            autocomplete="off"
-          />
-          <v-autocomplete
-            v-model="selectedSourceHandle"
-            :items="sourceOptions"
-            item-title="title"
-            item-value="value"
-            prepend-inner-icon="mdi-database"
-            density="comfortable"
-            clearable
-            :label="$t('import.source')"
-            :disabled="!batch || isImportJobRunning"
-            autocomplete="off"
-          />
-          <v-autocomplete
-            v-model="selectedTemplateHandle"
-            :items="templateOptions"
-            item-title="title"
-            item-value="value"
-            prepend-inner-icon="mdi-table-cog"
-            density="comfortable"
-            clearable
-            :label="$t('import.template')"
-            :disabled="!canSelectTemplates || isImportJobRunning"
-            :loading="isLoadingTemplates"
-            autocomplete="off"
-          />
-        </div>
-
-        <div v-if="batch" class="sapling-import__settings">
-          <v-text-field
-            v-model="templateTitle"
-            density="comfortable"
-            prepend-inner-icon="mdi-label-outline"
-            :label="$t('import.templateTitle')"
-            :disabled="!canUseTemplates || isImportJobRunning"
-            autocomplete="off"
-          />
-          <v-select
-            v-model="externalKeyColumns"
-            :items="headerOptions"
-            chips
-            multiple
-            clearable
-            density="comfortable"
-            prepend-inner-icon="mdi-key-chain"
-            :label="$t('import.externalKeyColumns')"
-            :disabled="!selectedSourceHandle || isImportJobRunning"
-            autocomplete="off"
-            counter
-            @update:model-value="normalizeExternalKeyColumns"
-          />
-          <template v-if="hasGenericReference">
-            <v-autocomplete
-              v-model="genericReferenceEntityHandle"
-              :items="entityOptions"
-              item-title="title"
-              item-value="value"
-              density="comfortable"
-              prepend-inner-icon="mdi-link-variant"
-              :label="$t('import.genericReferenceTarget')"
-              autocomplete="off"
-            />
-            <v-select
-              v-model="genericReferenceKeyColumns"
-              :items="headerOptions"
-              chips
-              multiple
-              clearable
-              density="comfortable"
-              prepend-inner-icon="mdi-key"
-              :label="$t('import.externalKeyColumns')"
-              :disabled="
-                !genericReferenceEntityHandle || !selectedSourceHandle || isImportJobRunning
-              "
-              autocomplete="off"
-              counter
-              @update:model-value="normalizeGenericReferenceKeyColumns"
-            />
-          </template>
-        </div>
+        <SaplingImportSetupPanel
+          v-model:selected-file="selectedFile"
+          v-model:selected-open-batch-handle="selectedOpenBatchHandle"
+          v-model:selected-entity-handle="selectedEntityHandle"
+          v-model:selected-source-handle="selectedSourceHandle"
+          v-model:selected-template-handle="selectedTemplateHandle"
+          v-model:template-title="templateTitle"
+          v-model:external-key-columns="externalKeyColumns"
+          v-model:generic-reference-entity-handle="genericReferenceEntityHandle"
+          v-model:generic-reference-key-columns="genericReferenceKeyColumns"
+          :open-batch-options="openBatchOptions"
+          :entity-options="entityOptions"
+          :source-options="sourceOptions"
+          :template-options="templateOptions"
+          :header-options="headerOptions"
+          :has-batch="Boolean(batch)"
+          :has-generic-reference="hasGenericReference"
+          :can-select-templates="canSelectTemplates"
+          :can-use-templates="canUseTemplates"
+          :is-analyzing="isAnalyzing"
+          :is-import-job-running="isImportJobRunning"
+          :is-loading-open-batches="isLoadingOpenBatches"
+          :is-loading-templates="isLoadingTemplates"
+          @analyze-selected-file="analyzeSelectedFile"
+          @load-selected-open-batch="loadSelectedOpenBatch"
+          @entity-change="onEntityChange"
+          @normalize-external-key-columns="normalizeExternalKeyColumns"
+          @normalize-generic-reference-key-columns="normalizeGenericReferenceKeyColumns"
+        />
 
         <div v-if="batch && importableFields.length > 0" class="sapling-import__mapping">
           <div
@@ -286,289 +198,62 @@
           </div>
         </div>
 
-        <div v-if="batch" class="sapling-import__actions">
-          <v-btn
-            variant="tonal"
-            prepend-icon="mdi-auto-fix"
-            :disabled="!canSuggestWithAi"
-            :loading="isSuggesting"
-            @click="createAiSuggestion"
-          >
-            {{ $t('import.createAiSuggestion') }}
-          </v-btn>
-          <v-btn
-            variant="tonal"
-            prepend-icon="mdi-table-cog"
-            :disabled="!selectedTemplate"
-            @click="applySelectedTemplate"
-          >
-            {{ $t('import.loadTemplate') }}
-          </v-btn>
-          <v-btn
-            variant="tonal"
-            prepend-icon="mdi-content-save-check-outline"
-            :disabled="!canSaveTemplate"
-            :loading="isSavingTemplate"
-            @click="saveTemplate"
-          >
-            {{ $t('import.saveTemplate') }}
-          </v-btn>
-          <v-btn
-            color="primary"
-            prepend-icon="mdi-check-circle-outline"
-            :disabled="!canConfigure"
-            :loading="isConfiguring"
-            @click="configureBatch"
-          >
-            {{ $t('import.configure') }}
-          </v-btn>
-        </div>
+        <SaplingImportActionBar
+          v-if="batch"
+          :can-suggest-with-ai="canSuggestWithAi"
+          :is-suggesting="isSuggesting"
+          :has-selected-template="Boolean(selectedTemplate)"
+          :can-save-template="canSaveTemplate"
+          :is-saving-template="isSavingTemplate"
+          :can-configure="canConfigure"
+          :is-configuring="isConfiguring"
+          @suggest="createAiSuggestion"
+          @apply-template="applySelectedTemplate"
+          @save-template="saveTemplate"
+          @configure="configureBatch"
+        />
 
-        <v-alert
-          v-if="isImportJobRunning"
-          type="info"
-          variant="tonal"
-          density="comfortable"
-          class="sapling-import__job-status"
-        >
-          <div class="sapling-import__job-status-content">
-            <div class="sapling-import__job-status-header">
-              <strong>{{ currentImportStatusLabel }}</strong>
-              <span>{{ importProgressLabel }}</span>
-            </div>
-            <v-progress-linear
-              class="sapling-import__job-progress"
-              :model-value="importProgressPercent"
-              height="8"
-              rounded
-              color="primary"
-            />
-          </div>
-        </v-alert>
+        <SaplingImportJobStatus
+          :is-running="isImportJobRunning"
+          :status-label="currentImportStatusLabel"
+          :progress-label="importProgressLabel"
+          :progress-percent="importProgressPercent"
+        />
 
-        <v-alert
-          v-if="aiSuggestion"
-          type="info"
-          variant="tonal"
-          density="comfortable"
-          class="sapling-import__ai-suggestion"
-        >
-          <div class="sapling-import__ai-suggestion-title">
-            {{ $t('import.aiSuggestionApplied') }}
-          </div>
-          <div class="sapling-import__ai-suggestion-chips">
-            <v-chip size="small" variant="tonal">
-              {{ aiSuggestion.mappings.length }} {{ $t('import.aiSuggestedFields') }}
-            </v-chip>
-            <v-chip v-if="aiSuggestion.externalKey?.columns.length" size="small" variant="tonal">
-              {{ $t('import.externalKeyColumns') }}:
-              {{ aiSuggestion.externalKey.columns.join(', ') }}
-            </v-chip>
-            <v-chip
-              v-for="reference in aiSuggestion.referenceFields"
-              :key="`${reference.targetField}-${reference.sourceColumn ?? ''}`"
-              size="small"
-              variant="tonal"
-            >
-              {{ fieldLabel(reference.targetField) }}
-            </v-chip>
-            <v-chip
-              v-for="mapping in aiSuggestion.valueMappings"
-              :key="mapping.targetField"
-              size="small"
-              color="primary"
-              variant="tonal"
-            >
-              {{ fieldLabel(mapping.targetField) }}: {{ $t('import.valueMapping') }}
-            </v-chip>
-          </div>
-          <div v-if="aiSuggestion.warnings.length" class="sapling-import__ai-warnings">
-            <span v-for="warning in aiSuggestion.warnings" :key="warning">{{ warning }}</span>
-          </div>
-        </v-alert>
+        <SaplingImportAiSuggestionPanel :ai-suggestion="aiSuggestion" :field-label="fieldLabel" />
       </SaplingSurface>
 
-      <SaplingSurface class="sapling-panel-shell sapling-section-panel sapling-import__panel">
-        <div class="sapling-import__summary">
-          <v-chip color="success" variant="tonal" prepend-icon="mdi-check">
-            {{ batch?.readyCount ?? 0 }} {{ $t('import.readyRows') }}
-          </v-chip>
-          <v-chip color="warning" variant="tonal" prepend-icon="mdi-alert">
-            {{ batch?.errorCount ?? 0 }} {{ $t('import.errorRows') }}
-          </v-chip>
-          <v-chip variant="outlined" prepend-icon="mdi-plus-circle-outline">
-            {{ batch?.createdCount ?? 0 }} {{ $t('import.createdRows') }}
-          </v-chip>
-          <v-chip variant="outlined" prepend-icon="mdi-pencil-outline">
-            {{ batch?.updatedCount ?? 0 }} {{ $t('import.updatedRows') }}
-          </v-chip>
-        </div>
-
-        <div class="sapling-import__preview-scroll">
-          <v-alert
-            v-if="isPreviewLimited"
-            density="compact"
-            type="info"
-            variant="tonal"
-            class="sapling-import__preview-note"
-          >
-            {{
-              $t('import.previewLimited', {
-                count: IMPORT_PREVIEW_ROW_LIMIT,
-                total: batch?.rowCount ?? batch?.rows.length ?? 0,
-              })
-            }}
-          </v-alert>
-
-          <div v-if="saplingPreviewItems.length > 0" class="sapling-import__sapling-preview">
-            <div class="sapling-section-header">
-              <div>
-                <p class="sapling-eyebrow">{{ $t('import.saplingPreview') }}</p>
-                <h2 class="sapling-section-title">{{ entityPreviewTitle }}</h2>
-              </div>
-            </div>
-            <SaplingTable
-              :items="saplingPreviewItems"
-              search=""
-              :page="1"
-              :items-per-page="3"
-              :total-items="saplingPreviewItems.length"
-              :is-loading="false"
-              :sort-by="[]"
-              :column-filters="{}"
-              :entity-handle="selectedEntityHandle ?? ''"
-              :entity="selectedEntity"
-              :entity-permission="selectedEntityPermission"
-              :entity-templates="selectedEntityTemplates"
-              :show-actions="false"
-              :show-add="false"
-              :show-favorite="false"
-              :show-import="false"
-              :show-form-config="false"
-              :show-search="false"
-              :show-toolbar="false"
-              :row-interaction="false"
-              :table-key="`import-preview-${selectedEntityHandle ?? 'none'}-${batch?.handle ?? 'new'}`"
-              disable-mobile-view
-              @update:search="noop"
-              @update:page="noop"
-              @update:items-per-page="noop"
-              @update:sort-by="noop"
-              @update:column-filters="noop"
-              @reload="noop"
-              @update:selected="noop"
-            />
-          </div>
-
-          <v-table v-if="previewRows.length > 0" density="compact" class="sapling-import__table">
-            <thead>
-              <tr>
-                <th>{{ $t('importBatchRow.rowNumber') }}</th>
-                <th>{{ $t('importBatchRow.status') }}</th>
-                <th>{{ $t('importBatchRow.action') }}</th>
-                <th>{{ $t('importBatchRow.targetReference') }}</th>
-                <th>{{ $t('importBatchRow.message') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="row in previewRows" :key="row.rowNumber">
-                <td>{{ row.rowNumber }}</td>
-                <td>
-                  <v-chip size="small" :color="row.status === 'error' ? 'warning' : 'primary'">
-                    {{ importStatusLabel(row.status) }}
-                  </v-chip>
-                </td>
-                <td>{{ row.action ? importActionLabel(row.action) : '-' }}</td>
-                <td>{{ row.targetReference ?? '-' }}</td>
-                <td>{{ importMessageLabel(row.message) }}</td>
-              </tr>
-            </tbody>
-          </v-table>
-
-          <v-table
-            v-else-if="sampleHeaders.length > 0"
-            density="compact"
-            class="sapling-import__table"
-          >
-            <thead>
-              <tr>
-                <th v-for="header in sampleHeaders" :key="header">{{ header }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(row, index) in batch?.sampleRows ?? []" :key="index">
-                <td v-for="header in sampleHeaders" :key="header">
-                  {{ row[header] ?? '' }}
-                </td>
-              </tr>
-            </tbody>
-          </v-table>
-        </div>
-      </SaplingSurface>
+      <SaplingImportPreviewPanel
+        :batch="batch"
+        :is-preview-limited="isPreviewLimited"
+        :preview-row-limit="IMPORT_PREVIEW_ROW_LIMIT"
+        :sapling-preview-items="saplingPreviewItems"
+        :entity-preview-title="entityPreviewTitle"
+        :selected-entity-handle="selectedEntityHandle"
+        :selected-entity="selectedEntity"
+        :selected-entity-permission="selectedEntityPermission"
+        :selected-entity-templates="selectedEntityTemplates"
+        :preview-rows="previewRows"
+        :sample-headers="sampleHeaders"
+        :import-status-label="importStatusLabel"
+        :import-action-label="importActionLabel"
+        :import-message-label="importMessageLabel"
+      />
     </section>
 
-    <v-dialog v-model="valueMappingDialog.visible" max-width="900">
-      <v-card
-        v-if="currentValueMapping && currentValueMappingField"
-        class="sapling-import__value-mapping-dialog glass-panel"
-      >
-        <v-card-title class="sapling-section-header">
-          <div>
-            <p class="sapling-eyebrow">{{ $t('import.valueMapping') }}</p>
-            <h2 class="sapling-section-title">{{ fieldLabel(currentValueMappingField.name) }}</h2>
-          </div>
-        </v-card-title>
-        <v-card-text class="sapling-import__value-mapping-body">
-          <v-select
-            v-model="currentValueMapping.fallback"
-            :items="valueMappingFallbackOptions"
-            item-title="title"
-            item-value="value"
-            density="comfortable"
-            prepend-inner-icon="mdi-call-split"
-            :label="$t('import.valueMappingFallback')"
-            autocomplete="off"
-          />
-
-          <v-table density="compact" class="sapling-import__table">
-            <thead>
-              <tr>
-                <th>{{ $t('import.sourceValue') }}</th>
-                <th>{{ $t('import.targetValue') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="sourceValue in currentValueMappingSourceValues" :key="sourceValue">
-                <td>{{ sourceValue }}</td>
-                <td>
-                  <SaplingImportTemplateValueField
-                    v-model="currentValueMapping.values[sourceValue]"
-                    :template="currentValueMappingField"
-                    :entity-handle="selectedEntityHandle ?? ''"
-                    :visible-templates="importableFields"
-                    :permissions="currentPermissions"
-                    :reference-items="referenceItemsForField(currentValueMappingField)"
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </v-table>
-
-          <p v-if="currentValueMappingSourceValues.length === 0" class="sapling-muted-text">
-            {{ $t('import.valueMappingNoValues') }}
-          </p>
-        </v-card-text>
-        <v-card-actions>
-          <v-btn variant="text" prepend-icon="mdi-delete-outline" @click="clearCurrentValueMapping">
-            {{ $t('import.clearValueMapping') }}
-          </v-btn>
-          <v-spacer />
-          <v-btn color="primary" variant="flat" @click="closeValueMapping">
-            {{ $t('global.close') }}
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <SaplingImportValueMappingDialog
+      v-model:visible="valueMappingDialog.visible"
+      :value-mapping="currentValueMapping"
+      :field="currentValueMappingField"
+      :source-values="currentValueMappingSourceValues"
+      :selected-entity-handle="selectedEntityHandle"
+      :visible-templates="importableFields"
+      :permissions="currentPermissions"
+      :reference-items="currentValueMappingReferenceItems"
+      :field-label="fieldLabel"
+      @clear="clearCurrentValueMapping"
+      @close="closeValueMapping"
+    />
   </v-container>
 </template>
 
@@ -577,8 +262,13 @@ import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
 import SaplingSurface from '@/components/common/SaplingSurface.vue'
+import SaplingImportActionBar from '@/components/import/SaplingImportActionBar.vue'
+import SaplingImportAiSuggestionPanel from '@/components/import/SaplingImportAiSuggestionPanel.vue'
+import SaplingImportJobStatus from '@/components/import/SaplingImportJobStatus.vue'
+import SaplingImportPreviewPanel from '@/components/import/SaplingImportPreviewPanel.vue'
+import SaplingImportSetupPanel from '@/components/import/SaplingImportSetupPanel.vue'
 import SaplingImportTemplateValueField from '@/components/import/SaplingImportTemplateValueField.vue'
-import SaplingTable from '@/components/table/SaplingTable.vue'
+import SaplingImportValueMappingDialog from '@/components/import/SaplingImportValueMappingDialog.vue'
 import { useGenericStore } from '@/stores/genericStore'
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
 import ApiGenericService from '@/services/api.generic.service'
@@ -833,11 +523,15 @@ const currentValueMappingSourceValues = computed(() => {
     Object.keys(currentValueMapping.value?.values ?? {}),
   )
 })
-const valueMappingFallbackOptions = computed(() => [
-  { title: t('import.valueMappingFallback.keep'), value: 'keep' },
-  { title: t('import.valueMappingFallback.empty'), value: 'empty' },
-  { title: t('import.valueMappingFallback.error'), value: 'error' },
-])
+const currentValueMappingReferenceItems = computed<
+  Record<string, SaplingGenericItem | null | undefined>
+>(() => {
+  if (!currentValueMappingField.value) {
+    return {}
+  }
+
+  return referenceItemsForField(currentValueMappingField.value) ?? {}
+})
 const relationMappingModeOptions = computed(() => [
   { title: t('import.relationMappingMode.handle'), value: 'handle' },
   { title: t('import.relationMappingMode.value'), value: 'value' },
@@ -2029,10 +1723,6 @@ function normalizeSelectedColumns(columns: string[]): string[] {
   return Array.from(new Set(columns.map((column) => column.trim()).filter(Boolean)))
 }
 
-function noop(): void {
-  // read-only preview table
-}
-
 function collectErrorReportRawHeaders(rows: ImportBatchRowSummary[]): string[] {
   return Array.from(
     rows.reduce<Set<string>>((headers, row) => {
@@ -2169,58 +1859,3 @@ function normalizeName(value: string): string {
     .replace(/[^a-z0-9]/g, '')
 }
 </script>
-
-<style scoped>
-.sapling-import__job-status {
-  min-height: 76px;
-  overflow: visible;
-}
-
-.sapling-import__job-status :deep(.v-alert__content) {
-  min-width: 0;
-  padding-block: 2px;
-  overflow: visible;
-}
-
-.sapling-import__job-status-content {
-  display: grid;
-  gap: 10px;
-  min-width: 0;
-}
-
-.sapling-import__job-status-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 6px 16px;
-  min-width: 0;
-  line-height: 1.25;
-}
-
-.sapling-import__job-status-header strong {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.sapling-import__job-status-header span {
-  min-width: 0;
-  overflow-wrap: anywhere;
-  opacity: 0.82;
-}
-
-.sapling-import__job-progress {
-  align-self: stretch;
-  width: 100%;
-}
-
-@media (max-width: 600px) {
-  .sapling-import__job-status {
-    min-height: 88px;
-  }
-
-  .sapling-import__job-status-header {
-    display: grid;
-  }
-}
-</style>

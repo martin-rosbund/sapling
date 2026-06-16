@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { BACKEND_URL } from '@/constants/project.constants'
+import { buildApiUrl } from '@/services/api.client'
 import { pushApiErrorMessage } from '@/services/api.error.service'
 
 export type ProviderUserProvider = 'azure' | 'google'
@@ -52,7 +52,7 @@ class ApiProviderUsersService {
   }): Promise<ProviderUserListResponse> {
     try {
       const response = await axios.get<ProviderUserListResponse>(
-        `${BACKEND_URL}auth/provider-users`,
+        buildApiUrl('auth/provider-users'),
         {
           params: {
             provider,
@@ -86,7 +86,7 @@ class ApiProviderUsersService {
   }): Promise<ProviderUserImportResponse> {
     try {
       const response = await axios.post<ProviderUserImportResponse>(
-        `${BACKEND_URL}auth/provider-users/import`,
+        buildApiUrl('auth/provider-users/import'),
         {
           provider,
           userIds,

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import ApiService from '@/services/api.service'
+import ApiAuthService from '@/services/api.auth.service'
+import ApiCurrentService from '@/services/api.current.service'
 import type { PersonItem } from '../entity/entity'
 
 export interface ImpersonatorInfo {
@@ -42,7 +43,7 @@ export const useCurrentPersonStore = defineStore('currentPerson', () => {
     loading.value = true
     fetchPromise = (async () => {
       try {
-        person.value = await ApiService.findOne<PersonItem>('current/person')
+        person.value = await ApiCurrentService.getPerson()
         loaded.value = true
       } catch {
         person.value = null
@@ -62,7 +63,7 @@ export const useCurrentPersonStore = defineStore('currentPerson', () => {
    * target user's permissions.
    */
   async function startImpersonation(targetHandle: number): Promise<void> {
-    await ApiService.post<unknown>(`auth/impersonate/${targetHandle}`)
+    await ApiAuthService.startImpersonation(targetHandle)
     window.location.assign('/')
   }
 
@@ -71,7 +72,7 @@ export const useCurrentPersonStore = defineStore('currentPerson', () => {
    * back into the original administrator's context.
    */
   async function stopImpersonation(): Promise<void> {
-    await ApiService.post<unknown>('auth/impersonate/stop')
+    await ApiAuthService.stopImpersonation()
     window.location.assign('/')
   }
 

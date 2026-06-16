@@ -1,6 +1,6 @@
 import axios from 'axios'
 import type { ChangeLogEntry, PaginatedResponse, TimelineResponse } from '../entity/structure'
-import { BACKEND_URL } from '@/constants/project.constants'
+import { buildApiUrl } from '@/services/api.client'
 import { pushApiErrorMessage } from '@/services/api.error.service'
 
 export type FilterQuery = { [key: string]: unknown }
@@ -106,7 +106,7 @@ class ApiGenericService {
     }
 
     try {
-      const response = await axios.get<T[]>(`${BACKEND_URL}generic/${entityHandle}/download`, {
+      const response = await axios.get<T[]>(buildApiUrl(`generic/${entityHandle}/download`), {
         params,
       })
       return response.data
@@ -135,7 +135,7 @@ class ApiGenericService {
 
     try {
       const response = await axios.get<PaginatedResponse<T>>(
-        `${BACKEND_URL}generic/${entityHandle}`,
+        buildApiUrl(`generic/${entityHandle}`),
         { params, signal },
       )
       return response.data
@@ -166,7 +166,7 @@ class ApiGenericService {
 
     try {
       const response = await axios.get<TimelineResponse>(
-        `${BACKEND_URL}generic/${entityHandle}/${handle}/timeline`,
+        buildApiUrl(`generic/${entityHandle}/${handle}/timeline`),
         { params },
       )
       return response.data
@@ -182,7 +182,7 @@ class ApiGenericService {
   ): Promise<ChangeLogEntry[]> {
     try {
       const response = await axios.get<ChangeLogEntry[]>(
-        `${BACKEND_URL}generic/${entityHandle}/${handle}/change-log`,
+        buildApiUrl(`generic/${entityHandle}/${handle}/change-log`),
       )
       return response.data
     } catch (error: unknown) {
@@ -193,7 +193,7 @@ class ApiGenericService {
 
   static async create<T>(entityHandle: string, data: Partial<T>): Promise<T> {
     try {
-      const response = await axios.post<T>(`${BACKEND_URL}generic/${entityHandle}`, data)
+      const response = await axios.post<T>(buildApiUrl(`generic/${entityHandle}`), data)
       return response.data
     } catch (error: unknown) {
       pushApiErrorMessage(error, 'exception.unknownError', entityHandle)
@@ -207,7 +207,7 @@ class ApiGenericService {
   ): Promise<GenericImportResponse> {
     try {
       const response = await axios.post<GenericImportResponse>(
-        `${BACKEND_URL}generic/${entityHandle}/import`,
+        buildApiUrl(`generic/${entityHandle}/import`),
         { rows },
       )
       return response.data
@@ -251,7 +251,7 @@ class ApiGenericService {
         : data
 
     try {
-      const response = await axios.patch<T>(`${BACKEND_URL}generic/${entityHandle}`, payload, {
+      const response = await axios.patch<T>(buildApiUrl(`generic/${entityHandle}`), payload, {
         params,
       })
       return response.data
@@ -269,7 +269,7 @@ class ApiGenericService {
     }
 
     try {
-      await axios.delete(`${BACKEND_URL}generic/${entityHandle}`, { params })
+      await axios.delete(buildApiUrl(`generic/${entityHandle}`), { params })
     } catch (error: unknown) {
       pushApiErrorMessage(error, 'exception.unknownError', entityHandle)
       throw error
@@ -289,7 +289,7 @@ class ApiGenericService {
 
     try {
       const response = await axios.post<T>(
-        `${BACKEND_URL}generic/${entityHandle}/${referenceName}/create`,
+        buildApiUrl(`generic/${entityHandle}/${referenceName}/create`),
         params,
       )
       return response.data
@@ -312,7 +312,7 @@ class ApiGenericService {
 
     try {
       const response = await axios.post<T>(
-        `${BACKEND_URL}generic/${entityHandle}/${referenceName}/delete`,
+        buildApiUrl(`generic/${entityHandle}/${referenceName}/delete`),
         params,
       )
       return response.data

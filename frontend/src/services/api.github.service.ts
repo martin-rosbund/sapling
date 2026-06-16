@@ -1,5 +1,5 @@
-import { BACKEND_URL } from '@/constants/project.constants'
 import axios from 'axios'
+import { buildApiUrl } from '@/services/api.client'
 import { pushApiErrorMessage } from '@/services/api.error.service'
 
 export type GithubIssueStatus = 'open' | 'closed' | 'all'
@@ -38,7 +38,7 @@ export interface CreateGithubIssuePayload {
 class ApiGithubService {
   static async getIssues(status: GithubIssueStatus): Promise<GithubIssue[]> {
     try {
-      const response = await axios.get<GithubIssue[]>(`${BACKEND_URL}github/issues`, {
+      const response = await axios.get<GithubIssue[]>(buildApiUrl('github/issues'), {
         params: { status },
       })
 
@@ -51,7 +51,7 @@ class ApiGithubService {
 
   static async createIssue(payload: CreateGithubIssuePayload): Promise<GithubIssue> {
     try {
-      const response = await axios.post<GithubIssue>(`${BACKEND_URL}github/issues`, payload)
+      const response = await axios.post<GithubIssue>(buildApiUrl('github/issues'), payload)
 
       return response.data
     } catch (error) {

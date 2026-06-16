@@ -1,14 +1,16 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
-import axios from 'axios'
-import { BACKEND_URL } from '@/constants/project.constants'
 import { i18n } from '@/i18n'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
-import ApiService from '@/services/api.service'
+import ApiAuthService from '@/services/api.auth.service'
+import ApiCurrentService, {
+  type CalendarSyncSubscription,
+  type CurrentSessionDto,
+  type TerminateSessionsResult,
+} from '@/services/api.current.service'
 import type {
   AiProviderModelItem,
   AiProviderTypeItem,
-  PersonItem,
   WorkHourWeekItem,
 } from '@/entity/entity'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
@@ -54,21 +56,6 @@ interface WorkHourRow {
 
 type CalendarSyncRange = 'day' | 'week' | 'month'
 
-interface CalendarSyncSubscription {
-  handle?: number
-  isAvailable: boolean
-  isActive: boolean
-  syncRange: CalendarSyncRange
-  intervalMinutes: number
-  lastRunAt?: string | Date | null
-  lastSuccessAt?: string | Date | null
-  lastError?: string | null
-  lastImportedCount: number
-  lastCreatedCount: number
-  lastUpdatedCount: number
-  lastSkippedCount: number
-}
-
 interface CalendarSyncOption<T> {
   title: string
   value: T
@@ -100,20 +87,6 @@ interface ProfileForm {
   phone: string
   mobile: string
   color: string
-}
-
-interface CurrentSessionDto {
-  id: string
-  isCurrent: boolean
-  deviceLabel: string
-  createdAt: string | Date | null
-  lastActivityAt: string | Date | null
-  expiresAt: string | Date
-}
-
-interface TerminateSessionsResult {
-  terminatedCount: number
-  sessions: CurrentSessionDto[]
 }
 
 const WORK_HOUR_DAY_KEYS: WorkHourDayKey[] = [
@@ -379,7 +352,7 @@ export function useSaplingAccount() {
    * Logs the user out by calling the backend logout endpoint and redirecting to the login page.
    */
   async function logout() {
-    await axios.post(BACKEND_URL + 'auth/logout') // Call the backend logout endpoint.
+    await ApiAuthService.logout()
     window.location.href = '/login'
   }
 
@@ -387,7 +360,7 @@ export function useSaplingAccount() {
    * Loads the work hours of the current user from the backend.
    */
   async function loadWorkHours() {
-    workHours.value = await ApiService.findOne<WorkHourWeekItem>('current/workWeek')
+    workHours.value = await ApiCurrentService.getWorkWeek()
   }
 
   function syncProfileForm() {
@@ -410,7 +383,7 @@ export function useSaplingAccount() {
     isProfileSaving.value = true
 
     try {
-      await ApiService.patch<PersonItem>('current/profile', {
+      await ApiCurrentService.updateProfile({
         firstName: profileForm.value.firstName,
         lastName: profileForm.value.lastName,
         phone: profileForm.value.phone,
@@ -429,7 +402,7 @@ export function useSaplingAccount() {
    * Loads the current user's automatic Outlook import settings.
    */
   async function loadCalendarSync() {
-    calendarSync.value = await ApiService.findOne<CalendarSyncSubscription>('current/calendarSync')
+    calendarSync.value = await ApiCurrentService.getCalendarSync()
   }
 
   /**
@@ -443,14 +416,11 @@ export function useSaplingAccount() {
     isCalendarSyncSaving.value = true
 
     try {
-      calendarSync.value = await ApiService.patch<CalendarSyncSubscription>(
-        'current/calendarSync',
-        {
-          isActive: calendarSync.value.isActive,
-          syncRange: calendarSync.value.syncRange,
-          intervalMinutes: calendarSync.value.intervalMinutes,
-        },
-      )
+      calendarSync.value = await ApiCurrentService.updateCalendarSync({
+        isActive: calendarSync.value.isActive,
+        syncRange: calendarSync.value.syncRange,
+        intervalMinutes: calendarSync.value.intervalMinutes,
+      })
       pushMessage('success', 'calendarSyncSubscription.saveSuccess', '', 'calendarSyncSubscription')
     } finally {
       isCalendarSyncSaving.value = false
@@ -472,7 +442,7 @@ export function useSaplingAccount() {
     isSessionsLoading.value = true
 
     try {
-      currentSessions.value = await ApiService.findOne<CurrentSessionDto[]>('current/sessions')
+      currentSessions.value = await ApiCurrentService.getSessions()
     } finally {
       isSessionsLoading.value = false
     }
@@ -482,9 +452,7 @@ export function useSaplingAccount() {
     isSessionsTerminating.value = true
 
     try {
-      const result = await ApiService.post<TerminateSessionsResult>(
-        'current/sessions/terminateOthers',
-      )
+      const result: TerminateSessionsResult = await ApiCurrentService.terminateOtherSessions()
       currentSessions.value = result.sessions
       pushMessage('success', 'account.sessionsTerminated', '', 'account')
     } finally {

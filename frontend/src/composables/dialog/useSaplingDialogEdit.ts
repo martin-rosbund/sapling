@@ -20,7 +20,7 @@ import ApiGenericService from '@/services/api.generic.service'
 import ApiFormConfigService, {
   type SaplingFormConfigItem,
 } from '@/services/api.form-config.service'
-import ApiService from '@/services/api.service'
+import ApiTemplateService from '@/services/api.template.service'
 import { useI18n } from 'vue-i18n'
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity'
 import { getEditDialogHeaders } from '@/utils/saplingTableUtil'
@@ -199,7 +199,7 @@ export function useSaplingDialogEdit(
     }
 
     try {
-      systemTemplates.value = await ApiService.findAll<EntityTemplate[]>(`template/${entityHandle}`)
+      systemTemplates.value = await ApiTemplateService.getEntityTemplate(entityHandle)
     } catch {
       systemTemplates.value = props.templates ?? []
     }

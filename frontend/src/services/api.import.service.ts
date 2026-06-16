@@ -1,6 +1,7 @@
 import axios from 'axios'
-import { BACKEND_URL } from '@/constants/project.constants'
 import { pushApiErrorMessage } from '@/services/api.error.service'
+import { buildApiUrl } from '@/services/api.client'
+import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service'
 
 export interface ImportFieldMapping {
   sourceColumn: string
@@ -97,6 +98,26 @@ export interface ImportTemplateSummary {
   } | null
   externalKeyColumns: string[] | null
   genericReferenceMapping: ImportGenericReferenceMapping | null
+}
+
+interface ImportTemplateRecord {
+  handle?: number | null
+  title?: string | null
+  description?: string | null
+  source?: string | { handle?: string | null } | null
+  targetEntity?: string | { handle?: string | null } | null
+  isActive?: boolean
+  mapping?: ImportTemplateSummary['mapping']
+  externalKeyColumns?: string[] | null
+  genericReferenceMapping?: ImportGenericReferenceMapping | null
+  valueMappings?: ImportTemplateValueMappingRecord[]
+}
+
+interface ImportTemplateValueMappingRecord {
+  targetField?: string | null
+  sourceValue?: string | null
+  targetValue?: string | null
+  fallback?: ImportValueMappingFallback | string | null
 }
 
 export interface SaveImportTemplatePayload extends ConfigureImportBatchPayload {
@@ -203,7 +224,7 @@ export interface ImportBatchSourceValues {
 class ApiImportService {
   static async listOpenBatches(): Promise<ImportBatchSummary[]> {
     try {
-      const response = await axios.get<ImportBatchSummary[]>(`${BACKEND_URL}import/batches/open`)
+      const response = await axios.get<ImportBatchSummary[]>(buildApiUrl('import/batches/open'))
       return response.data
     } catch (error: unknown) {
       pushApiErrorMessage(error, 'exception.unknownError', 'import')
@@ -213,7 +234,9 @@ class ApiImportService {
 
   static async getBatch(handle: number): Promise<ImportBatchSummary> {
     try {
-      const response = await axios.get<ImportBatchSummary>(`${BACKEND_URL}import/batches/${handle}`)
+      const response = await axios.get<ImportBatchSummary>(
+        buildApiUrl(`import/batches/${handle}`),
+      )
       return response.data
     } catch (error: unknown) {
       pushApiErrorMessage(error, 'exception.unknownError', 'import')
@@ -224,7 +247,7 @@ class ApiImportService {
   static async getBatchErrorRows(handle: number): Promise<ImportBatchRowSummary[]> {
     try {
       const response = await axios.get<{ rows: ImportBatchRowSummary[] }>(
-        `${BACKEND_URL}import/batches/${handle}/error-rows`,
+        buildApiUrl(`import/batches/${handle}/error-rows`),
       )
       return response.data.rows
     } catch (error: unknown) {
@@ -242,7 +265,7 @@ class ApiImportService {
   ): Promise<ImportBatchSourceValues> {
     try {
       const response = await axios.get<ImportBatchSourceValues>(
-        `${BACKEND_URL}import/batches/${handle}/source-values`,
+        buildApiUrl(`import/batches/${handle}/source-values`),
         { params },
       )
       return response.data
@@ -257,10 +280,25 @@ class ApiImportService {
     sourceHandle?: string | null
   }): Promise<ImportTemplateSummary[]> {
     try {
-      const response = await axios.get<ImportTemplateSummary[]>(`${BACKEND_URL}import/templates`, {
-        params,
+      const filter: FilterQuery = { isActive: true }
+      const entityHandle = normalizeOptionalString(params.entityHandle)
+      const sourceHandle = normalizeOptionalString(params.sourceHandle)
+
+      if (entityHandle) {
+        filter.targetEntity = { handle: entityHandle }
+      }
+
+      if (sourceHandle) {
+        filter.source = { handle: sourceHandle }
+      }
+
+      const response = await ApiGenericService.find<ImportTemplateRecord>('importTemplate', {
+        filter,
+        orderBy: { title: 'ASC' },
+        relations: ['source', 'targetEntity', 'valueMappings'],
+        limit: 500,
       })
-      return response.data
+      return response.data.map(toImportTemplateSummary)
     } catch (error: unknown) {
       pushApiErrorMessage(error, 'exception.unknownError', 'import')
       throw error
@@ -270,7 +308,7 @@ class ApiImportService {
   static async saveTemplate(payload: SaveImportTemplatePayload): Promise<ImportTemplateSummary> {
     try {
       const response = await axios.post<ImportTemplateSummary>(
-        `${BACKEND_URL}import/templates`,
+        buildApiUrl('import/templates'),
         payload,
       )
       return response.data
@@ -286,7 +324,7 @@ class ApiImportService {
   ): Promise<ImportTemplateSummary> {
     try {
       const response = await axios.patch<ImportTemplateSummary>(
-        `${BACKEND_URL}import/templates/${handle}`,
+        buildApiUrl(`import/templates/${handle}`),
         payload,
       )
       return response.data
@@ -302,7 +340,7 @@ class ApiImportService {
 
     try {
       const response = await axios.post<ImportBatchSummary>(
-        `${BACKEND_URL}import/batches/analyze`,
+        buildApiUrl('import/batches/analyze'),
         formData,
         {
           headers: { 'Content-Type': 'multipart/form-data' },
@@ -321,7 +359,7 @@ class ApiImportService {
   ): Promise<ImportBatchSummary> {
     try {
       const response = await axios.patch<ImportBatchSummary>(
-        `${BACKEND_URL}import/batches/${handle}/configure`,
+        buildApiUrl(`import/batches/${handle}/configure`),
         payload,
       )
       return response.data
@@ -340,7 +378,7 @@ class ApiImportService {
   ): Promise<ImportAiSuggestion> {
     try {
       const response = await axios.post<ImportAiSuggestion>(
-        `${BACKEND_URL}import/batches/${handle}/suggest`,
+        buildApiUrl(`import/batches/${handle}/suggest`),
         payload,
       )
       return response.data
@@ -353,7 +391,7 @@ class ApiImportService {
   static async executeBatch(handle: number): Promise<ImportBatchSummary> {
     try {
       const response = await axios.post<ImportBatchSummary>(
-        `${BACKEND_URL}import/batches/${handle}/execute`,
+        buildApiUrl(`import/batches/${handle}/execute`),
       )
       return response.data
     } catch (error: unknown) {
@@ -374,7 +412,7 @@ class ApiImportService {
   ): Promise<ImportMatchResponse> {
     try {
       const response = await axios.post<ImportMatchResponse>(
-        `${BACKEND_URL}import/batches/${handle}/match`,
+        buildApiUrl(`import/batches/${handle}/match`),
         payload,
       )
       return response.data
@@ -382,6 +420,96 @@ class ApiImportService {
       pushApiErrorMessage(error, 'exception.unknownError', 'import')
       throw error
     }
+  }
+}
+
+function normalizeOptionalString(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value.trim() : null
+}
+
+function extractHandle(value: unknown): string {
+  if (!value || typeof value !== 'object') {
+    return typeof value === 'string' ? value : ''
+  }
+
+  const handle = (value as { handle?: unknown }).handle
+  return typeof handle === 'string' ? handle : ''
+}
+
+function normalizeTemplateValueMappings(
+  record: ImportTemplateRecord,
+): ImportValueMapping[] {
+  const entityMappings = getTemplateEntityValueMappings(record.valueMappings)
+  if (entityMappings.length > 0) {
+    return entityMappings
+  }
+
+  return Array.isArray(record.mapping?.valueMappings)
+    ? record.mapping.valueMappings.filter(isImportValueMapping)
+    : []
+}
+
+function getTemplateEntityValueMappings(
+  valueMappings: ImportTemplateValueMappingRecord[] | undefined,
+): ImportValueMapping[] {
+  if (!Array.isArray(valueMappings)) {
+    return []
+  }
+
+  const groupedMappings = new Map<string, ImportValueMapping>()
+
+  for (const valueMapping of valueMappings) {
+    const targetField = normalizeOptionalString(valueMapping.targetField)
+    const sourceValue = normalizeOptionalString(valueMapping.sourceValue)
+    const targetValue = typeof valueMapping.targetValue === 'string' ? valueMapping.targetValue : ''
+
+    if (!targetField || !sourceValue) {
+      continue
+    }
+
+    const fallback = normalizeValueMappingFallback(valueMapping.fallback)
+    const key = `${targetField}|${fallback}`
+    const existing = groupedMappings.get(key) ?? {
+      targetField,
+      values: {},
+      fallback,
+    }
+
+    existing.values[sourceValue] = targetValue
+    groupedMappings.set(key, existing)
+  }
+
+  return [...groupedMappings.values()]
+}
+
+function normalizeValueMappingFallback(value: unknown): ImportValueMappingFallback {
+  return value === 'empty' || value === 'error' ? value : 'keep'
+}
+
+function isImportValueMapping(value: unknown): value is ImportValueMapping {
+  return Boolean(
+    value &&
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      typeof (value as ImportValueMapping).targetField === 'string' &&
+      typeof (value as ImportValueMapping).values === 'object',
+  )
+}
+
+function toImportTemplateSummary(record: ImportTemplateRecord): ImportTemplateSummary {
+  return {
+    handle: record.handle ?? null,
+    title: record.title ?? '',
+    description: record.description ?? null,
+    sourceHandle: extractHandle(record.source),
+    entityHandle: extractHandle(record.targetEntity),
+    isActive: record.isActive !== false,
+    mapping: {
+      ...(record.mapping ?? {}),
+      valueMappings: normalizeTemplateValueMappings(record),
+    },
+    externalKeyColumns: record.externalKeyColumns ?? null,
+    genericReferenceMapping: record.genericReferenceMapping ?? null,
   }
 }
 

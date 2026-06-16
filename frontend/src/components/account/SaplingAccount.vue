@@ -146,6 +146,7 @@
                           density="comfortable"
                           variant="outlined"
                           hide-details
+                          autocomplete="off"
                           :label="$t('person.firstName')"
                         />
                         <v-text-field
@@ -153,6 +154,7 @@
                           density="comfortable"
                           variant="outlined"
                           hide-details
+                          autocomplete="off"
                           :label="$t('person.lastName')"
                         />
                         <v-text-field
@@ -160,6 +162,7 @@
                           density="comfortable"
                           variant="outlined"
                           hide-details
+                          autocomplete="off"
                           :label="$t('person.phone')"
                         />
                         <v-text-field
@@ -167,6 +170,7 @@
                           density="comfortable"
                           variant="outlined"
                           hide-details
+                          autocomplete="off"
                           :label="$t('person.mobile')"
                         />
                         <v-text-field
@@ -175,6 +179,7 @@
                           variant="outlined"
                           hide-details
                           type="color"
+                          autocomplete="off"
                           :label="$t('person.color')"
                         />
                       </div>
@@ -282,19 +287,13 @@
                           inset
                           :label="$t('calendarSyncSubscription.isActive')"
                         />
-                        <v-select
+                        <SaplingStaticSelect
                           v-model="calendarSync.syncRange"
-                          density="comfortable"
-                          variant="outlined"
-                          hide-details
                           :items="calendarSyncRangeOptions"
                           :label="$t('calendarSyncSubscription.syncRange')"
                         />
-                        <v-select
+                        <SaplingStaticSelect
                           v-model="calendarSync.intervalMinutes"
-                          density="comfortable"
-                          variant="outlined"
-                          hide-details
                           :items="calendarSyncIntervalOptions"
                           :label="$t('calendarSyncSubscription.intervalMinutes')"
                         />
@@ -468,61 +467,43 @@
                       <span>{{ $t('account.songbird') }}</span>
                     </div>
                     <div class="sapling-account-dialog__ai-grid">
-                      <v-select
+                      <SaplingStaticSelect
                         :model-value="aiPreferences.chatProviderHandle"
-                        density="comfortable"
-                        variant="outlined"
-                        hide-details
                         :loading="isAiPreferencesLoading"
                         :items="aiProviderOptions"
                         :label="$t('aiChat.provider')"
                         @update:model-value="updateAiProvider"
                       />
-                      <v-select
+                      <SaplingStaticSelect
                         :model-value="aiPreferences.chatModelHandle"
-                        density="comfortable"
-                        variant="outlined"
-                        hide-details
                         :loading="isAiPreferencesLoading"
                         :items="aiModelOptions"
                         :label="$t('aiChat.model')"
                         @update:model-value="updateAiModel"
                       />
-                      <v-select
+                      <SaplingStaticSelect
                         :model-value="aiPreferences.transcriptionProviderHandle"
-                        density="comfortable"
-                        variant="outlined"
-                        hide-details
                         :loading="isAiPreferencesLoading"
                         :items="transcriptionProviderOptions"
                         :label="$t('aiChat.voiceProvider')"
                         @update:model-value="updateTranscriptionProvider"
                       />
-                      <v-select
+                      <SaplingStaticSelect
                         :model-value="aiPreferences.transcriptionModelHandle"
-                        density="comfortable"
-                        variant="outlined"
-                        hide-details
                         :loading="isAiPreferencesLoading"
                         :items="transcriptionModelOptions"
                         :label="$t('aiChat.voiceModel')"
                         @update:model-value="updateTranscriptionModel"
                       />
-                      <v-select
+                      <SaplingStaticSelect
                         :model-value="aiPreferences.speechProviderHandle"
-                        density="comfortable"
-                        variant="outlined"
-                        hide-details
                         :loading="isAiPreferencesLoading"
                         :items="speechProviderOptions"
                         :label="$t('aiChat.voiceOutputProvider')"
                         @update:model-value="updateSpeechProvider"
                       />
-                      <v-select
+                      <SaplingStaticSelect
                         :model-value="aiPreferences.speechModelHandle"
-                        density="comfortable"
-                        variant="outlined"
-                        hide-details
                         :loading="isAiPreferencesLoading"
                         :items="speechModelOptions"
                         :label="$t('aiChat.voiceOutputModel')"
@@ -579,6 +560,7 @@ import SaplingActionBarSkeleton from '@/components/actions/SaplingActionBarSkele
 import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue'
+import SaplingStaticSelect from '@/components/common/SaplingStaticSelect.vue'
 // #endregion
 
 // #region Composable

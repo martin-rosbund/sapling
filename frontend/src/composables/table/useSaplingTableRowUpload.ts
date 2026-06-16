@@ -1,6 +1,6 @@
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import ApiService from '@/services/api.service'
+import ApiDocumentService from '@/services/api.document.service'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useGenericStore } from '@/stores/genericStore'
 import type { SaplingGenericItem } from '@/entity/entity'
@@ -134,7 +134,7 @@ export function useSaplingTableRowUpload(
         formData.append('description', description.value.trim())
 
         try {
-          await ApiService.uploadDocument(props.entityHandle, referenceHandle.value, formData)
+          await ApiDocumentService.upload(props.entityHandle, referenceHandle.value, formData)
           uploadedCount += 1
         } catch {
           failedFiles.push(file)

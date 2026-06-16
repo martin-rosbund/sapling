@@ -1,6 +1,6 @@
 import { computed, onMounted, ref } from 'vue'
-import ApiService from '@/services/api.service'
 import ApiGenericService from '@/services/api.generic.service'
+import ApiTemplateService from '@/services/api.template.service'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
@@ -111,8 +111,7 @@ export function useSaplingDashboard() {
    * Loads the dashboard form templates used by the shared edit dialog.
    */
   async function loadDashboardEntityTemplates() {
-    dashboardEntityTemplates.value =
-      await ApiService.findAll<EntityTemplate[]>('template/dashboard')
+    dashboardEntityTemplates.value = await ApiTemplateService.getEntityTemplate('dashboard')
   }
 
   /**
@@ -133,9 +132,8 @@ export function useSaplingDashboard() {
    * Loads the dashboard-template form templates used by the shared edit dialog.
    */
   async function loadDashboardTemplateEntityTemplates() {
-    dashboardTemplateEntityTemplates.value = await ApiService.findAll<EntityTemplate[]>(
-      'template/dashboardTemplate',
-    )
+    dashboardTemplateEntityTemplates.value =
+      await ApiTemplateService.getEntityTemplate('dashboardTemplate')
   }
 
   /**

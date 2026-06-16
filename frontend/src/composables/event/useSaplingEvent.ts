@@ -22,8 +22,13 @@ import type {
 } from '@/entity/structure'
 import { DEFAULT_ENTITY_ITEMS_COUNT, NAVIGATION_URL } from '@/constants/project.constants'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
-import ApiService from '@/services/api.service'
+import ApiCalendarService, {
+  type CalendarImportResult,
+  type CalendarSyncProvider,
+} from '@/services/api.calendar.service'
+import ApiCurrentService from '@/services/api.current.service'
 import ApiScriptService from '@/services/api.script.service'
+import ApiTemplateService from '@/services/api.template.service'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
 import { useTimelineDialogStore } from '@/stores/timelineDialogStore'
@@ -120,15 +125,6 @@ interface UpdateConflictDialogState {
   draftItem: SaplingGenericItem | null
   action: DialogSaveAction
   isSaving: boolean
-}
-
-type CalendarSyncProvider = 'azure' | 'google'
-
-interface CalendarImportResult {
-  imported: number
-  created: number
-  updated: number
-  skipped: number
 }
 
 export interface EventAgendaItem {
@@ -561,7 +557,7 @@ export function useSaplingEvent() {
    * Loads the event templates used by the shared edit dialog.
    */
   async function loadTemplates() {
-    templates.value = await ApiService.findAll<EntityTemplate[]>('template/event')
+    templates.value = await ApiTemplateService.getEntityTemplate('event')
   }
 
   /**
@@ -601,7 +597,7 @@ export function useSaplingEvent() {
    * Loads the user's work week to render working-hour background blocks.
    */
   async function loadWorkHours() {
-    workHours.value = await ApiService.findOne<WorkHourWeekItem>('current/workWeek')
+    workHours.value = await ApiCurrentService.getWorkWeek()
   }
 
   /**
@@ -659,7 +655,7 @@ export function useSaplingEvent() {
     endDate.setHours(23, 59, 59, 999)
 
     try {
-      const result = await ApiService.post<CalendarImportResult>(`${provider}/events/import`, {
+      const result: CalendarImportResult = await ApiCalendarService.importEvents(provider, {
         startDateTime: startDate.toISOString(),
         endDateTime: endDate.toISOString(),
       })

@@ -59,7 +59,9 @@ Important files:
 ```text
 frontend/src/services/api.generic.service.ts
 frontend/src/stores/genericStore.ts
-frontend/src/services/api.service.ts
+frontend/src/services/api.current.service.ts
+frontend/src/services/api.template.service.ts
+frontend/src/services/api.document.service.ts
 frontend/src/services/api.error.service.ts
 ```
 
@@ -130,6 +132,14 @@ Reference fields should use the existing Sapling field components instead of raw
 These components open a Sapling table inside the menu and derive display labels from the target entity's `isValue` templates. Do not guess label fields such as `title`, `name`, or `displayName` in custom code. If a selected reference value displays only its handle, the target entity metadata has not been loaded early enough; fix the field/component lifecycle so the metadata loads, then let `getEntityValueLabel()` use the templates.
 
 When a custom workflow needs an initial selected reference, pass the full item when available and ensure the target entity metadata can load before the user opens the menu. The fallback to handles is intentional for unknown metadata and should not be hidden with hard-coded field-name guesses.
+
+Static option lists should use `frontend/src/components/common/SaplingStaticSelect.vue`
+instead of repeating raw `v-select` defaults in each feature component. Keep this
+component for literal option arrays such as modes, intervals, providers already
+loaded by a service, or display preferences. Do not use it for entity
+references; entity relations should continue to use the Sapling reference field
+components so labels, metadata, filtering, and table-menu behavior remain
+consistent.
 
 Active custom field definitions are appended to the same template metadata as
 generated fields named `customFields.<fieldKey>`. The edit dialog renders the
