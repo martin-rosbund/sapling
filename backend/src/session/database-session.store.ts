@@ -77,7 +77,6 @@ export class DatabaseSessionStore extends session.Store {
         return;
       }
 
-      record.payload = JSON.stringify(sessionData);
       record.expiresAt = this.resolveExpiry(sessionData);
       await em.flush();
     });
