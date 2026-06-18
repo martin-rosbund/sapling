@@ -43,7 +43,12 @@
         </span>
       </div>
       <div class="sapling-chat-message__content sapling-ai-chat__message-content">
-        <SaplingMarkdownContent :source="getMessageDisplayContent(message)" />
+        <v-skeleton-loader
+          v-if="isMessageContentLoading(message)"
+          type="paragraph"
+          class="sapling-ai-chat__message-content-skeleton"
+        />
+        <SaplingMarkdownContent v-else :source="getMessageDisplayContent(message)" />
       </div>
       <div
         v-if="getMessageImportAttachments(message).length > 0"
@@ -400,7 +405,7 @@ function isToolAction(value: unknown): value is AiChatToolActionItem {
 
 function getToolActionStatusLabel(action: AiChatToolActionItem) {
   const key = `aiChat.toolActionStatus.${action.status}`
-  return te(key) ? t(key) : action.status
+  return te(key) ? t(key) : ''
 }
 
 function getToolActionTitle(action: AiChatToolActionItem) {
@@ -418,8 +423,7 @@ function getToolActionTitle(action: AiChatToolActionItem) {
     return t(key)
   }
 
-  const fallback = getToolActionTitleFallback(kind, action.status)
-  return fallback ?? (te('aiChat.toolActionTitle') ? t('aiChat.toolActionTitle') : 'Aktion')
+  return te('aiChat.toolActionTitle') ? t('aiChat.toolActionTitle') : ''
 }
 
 function getToolActionEntityResultTitle(kind: string, status: string, entityLabel: string | null) {
@@ -428,60 +432,18 @@ function getToolActionEntityResultTitle(kind: string, status: string, entityLabe
   }
 
   if (kind === 'create') {
-    return `${entityLabel} angelegt`
+    return t('aiChat.toolActionResult.create', { entity: entityLabel })
   }
 
   if (kind === 'update') {
-    return `${entityLabel} bearbeitet`
+    return t('aiChat.toolActionResult.update', { entity: entityLabel })
   }
 
   if (kind === 'delete') {
-    return `${entityLabel} gelöscht`
+    return t('aiChat.toolActionResult.delete', { entity: entityLabel })
   }
 
   return null
-}
-
-function getToolActionTitleFallback(kind: string, status: string) {
-  const titleByKindAndStatus: Record<string, Record<string, string>> = {
-    create: {
-      pending: 'Anlage bestätigen',
-      executed: 'Anlage ausgeführt',
-      failed: 'Anlage fehlgeschlagen',
-      rejected: 'Anlage abgelehnt',
-      expired: 'Anlage abgelaufen',
-    },
-    update: {
-      pending: 'Bearbeitung bestätigen',
-      executed: 'Bearbeitung ausgeführt',
-      failed: 'Bearbeitung fehlgeschlagen',
-      rejected: 'Bearbeitung abgelehnt',
-      expired: 'Bearbeitung abgelaufen',
-    },
-    delete: {
-      pending: 'Löschen bestätigen',
-      executed: 'Löschung ausgeführt',
-      failed: 'Löschung fehlgeschlagen',
-      rejected: 'Löschung abgelehnt',
-      expired: 'Löschung abgelaufen',
-    },
-    importConfigure: {
-      pending: 'Import konfigurieren bestätigen',
-      executed: 'Import konfiguriert',
-      failed: 'Import-Konfiguration fehlgeschlagen',
-      rejected: 'Import-Konfiguration abgelehnt',
-      expired: 'Import-Konfiguration abgelaufen',
-    },
-    importExecute: {
-      pending: 'Import ausführen bestätigen',
-      executed: 'Import ausgeführt',
-      failed: 'Import fehlgeschlagen',
-      rejected: 'Import abgelehnt',
-      expired: 'Import abgelaufen',
-    },
-  }
-
-  return titleByKindAndStatus[kind]?.[status] ?? titleByKindAndStatus.action?.[status] ?? null
 }
 
 function getToolActionKind(action: AiChatToolActionItem) {
@@ -520,7 +482,7 @@ function getToolActionSummary(action: AiChatToolActionItem) {
   }
 
   if (action.toolName === 'import_configure_batch' || action.toolName === 'import_execute_batch') {
-    return 'Import'
+    return t('aiChat.toolActionImportSummary')
   }
 
   return ''
@@ -557,13 +519,11 @@ function hasPayloadContent(value: unknown) {
 }
 
 function getToolActionDetailsButtonLabel() {
-  return te('aiChat.toolActionDetails') ? t('aiChat.toolActionDetails') : 'Details'
+  return te('aiChat.toolActionDetails') ? t('aiChat.toolActionDetails') : ''
 }
 
 function getTechnicalRawDataLabel() {
-  return te('aiChat.toolActionTechnicalRawData')
-    ? t('aiChat.toolActionTechnicalRawData')
-    : 'Technische Rohdaten'
+  return te('aiChat.toolActionTechnicalRawData') ? t('aiChat.toolActionTechnicalRawData') : ''
 }
 
 function openToolActionTechnicalDetails(action: AiChatToolActionItem) {
@@ -591,19 +551,19 @@ function getToolActionTechnicalDetailsIntro(action: AiChatToolActionItem) {
 
   if (action.status === 'executed') {
     return entityLabel
-      ? `${entityLabel}: die ausgeführte Aktion im Überblick.`
-      : 'Die ausgeführte Aktion im Überblick.'
+      ? t('aiChat.toolActionIntro.executedWithEntity', { entity: entityLabel })
+      : t('aiChat.toolActionIntro.executed')
   }
 
   if (action.status === 'failed') {
     return entityLabel
-      ? `${entityLabel}: die Aktion konnte nicht ausgeführt werden.`
-      : 'Die Aktion konnte nicht ausgeführt werden.'
+      ? t('aiChat.toolActionIntro.failedWithEntity', { entity: entityLabel })
+      : t('aiChat.toolActionIntro.failed')
   }
 
   return entityLabel
-    ? `${entityLabel}: prüfen Sie die geplanten Angaben vor der Ausführung.`
-    : 'Prüfen Sie die geplanten Angaben vor der Ausführung.'
+    ? t('aiChat.toolActionIntro.pendingWithEntity', { entity: entityLabel })
+    : t('aiChat.toolActionIntro.pending')
 }
 
 function getToolActionPreviewRows(action: AiChatToolActionItem): ToolActionPreviewRow[] {
@@ -615,7 +575,7 @@ function getToolActionPreviewRows(action: AiChatToolActionItem): ToolActionPrevi
   if (entityHandle) {
     rows.push({
       key: 'entityHandle',
-      label: 'Datensatztyp',
+      label: t('aiChat.toolActionRecordType'),
       value: getNavigationEntityLabel(entityHandle, 1),
     })
   }
@@ -625,7 +585,7 @@ function getToolActionPreviewRows(action: AiChatToolActionItem): ToolActionPrevi
   if (recordHandle != null) {
     rows.push({
       key: 'handle',
-      label: 'Datensatz',
+      label: t('aiChat.toolActionRecord'),
       value: String(recordHandle),
     })
   }
@@ -668,29 +628,29 @@ function getToolActionFieldLabel(entityHandle: string | null, fieldName: string)
     return String(t(fieldKey)).trim()
   }
 
-  return humanizeEntityHandle(fieldName)
+  return ''
 }
 
 function formatToolActionPreviewValue(value: unknown): string {
   if (value == null) {
-    return 'leer'
+    return t('global.empty')
   }
 
   if (typeof value === 'boolean') {
-    return value ? 'Ja' : 'Nein'
+    return value ? t('global.yes') : t('global.no')
   }
 
   if (typeof value === 'string') {
-    return value.trim() || 'leer'
+    return value.trim() || t('global.empty')
   }
 
   if (typeof value === 'number') {
-    return Number.isFinite(value) ? String(value) : 'leer'
+    return Number.isFinite(value) ? String(value) : t('global.empty')
   }
 
   if (Array.isArray(value)) {
     if (value.length === 0) {
-      return 'leer'
+      return t('global.empty')
     }
 
     const preview = value.slice(0, 5).map(formatToolActionPreviewValue).join(', ')
@@ -725,7 +685,7 @@ function formatToolActionPreviewValue(value: unknown): string {
   }
 
   const text = JSON.stringify(value)
-  return text && text.length > 120 ? `${text.slice(0, 117)}...` : (text ?? 'leer')
+  return text && text.length > 120 ? `${text.slice(0, 117)}...` : (text ?? t('global.empty'))
 }
 
 function formatToolActionTechnicalDetails(action: AiChatToolActionItem) {
@@ -741,14 +701,12 @@ function formatToolActionTechnicalDetails(action: AiChatToolActionItem) {
 }
 
 function getCloseButtonLabel() {
-  return te('global.close') ? t('global.close') : 'Schließen'
+  return te('global.close') ? t('global.close') : ''
 }
 
 function getToolActionError(action: AiChatToolActionItem) {
   if (action.status === 'pending' && !action.handle) {
-    return te('aiChat.toolActionMissingHandle')
-      ? t('aiChat.toolActionMissingHandle')
-      : 'Diese vorbereitete Aktion kann nicht bestaetigt werden, weil die technische Bestaetigungsnummer fehlt.'
+    return te('aiChat.toolActionMissingHandle') ? t('aiChat.toolActionMissingHandle') : ''
   }
 
   const payload = action.errorPayload
@@ -766,7 +724,7 @@ function getToolActionError(action: AiChatToolActionItem) {
   }
 
   const key = value.trim()
-  return te(key) ? t(key) : key
+  return te(key) ? t(key) : ''
 }
 
 function getToolActionNavigationLinks(action: AiChatToolActionItem): ChatNavigationLink[] {
@@ -932,11 +890,11 @@ function getMessageDisplayContent(message: AiChatMessageItem) {
     return message.content
   }
 
-  if (message.status === 'streaming') {
-    return '...'
-  }
-
   return message.content ?? ''
+}
+
+function isMessageContentLoading(message: AiChatMessageItem) {
+  return message.status === 'streaming' && !message.content?.trim()
 }
 
 function getMessageStatusLabel(message: AiChatMessageItem) {
@@ -946,7 +904,7 @@ function getMessageStatusLabel(message: AiChatMessageItem) {
 
   const seconds =
     message.handle == null ? 0 : (props.streamingDurationByHandle[message.handle] ?? 0)
-  return `... ${seconds}s`
+  return t('aiChat.streamingDuration', { seconds })
 }
 
 function getFailedMessageContent(message: AiChatMessageItem) {
@@ -1040,11 +998,7 @@ function getNavigationLinkLabel(link: ChatNavigationLink) {
   }
 
   if (link.kind === 'route') {
-    return te('aiChat.openRouteLink') ? t('aiChat.openRouteLink') : t('aiChat.openDataLink')
-  }
-
-  if (link.kind === 'record') {
-    return te('aiChat.openRecordLink') ? t('aiChat.openRecordLink') : t('aiChat.openDataLink')
+    return t('aiChat.openRouteLink')
   }
 
   return t('aiChat.openDataLink')
@@ -1058,16 +1012,20 @@ function buildEntityNavigationLabel(link: ChatNavigationLink) {
   const entityLabel = getNavigationEntityLabel(link.entityHandle, count)
 
   if (count === 1) {
-    return `${entityLabel} öffnen`
+    return entityLabel
+      ? t('aiChat.openRecordEntity', { entity: entityLabel })
+      : t('aiChat.openRecordLink')
   }
 
-  return `${count} ${entityLabel} öffnen`
+  return entityLabel
+    ? t('aiChat.openEntityResults', { count, entity: entityLabel })
+    : t('aiChat.openRecordLink')
 }
 
 function getNavigationEntityLabel(entityHandle: string, count: number) {
   const navigationKey = `navigation.${entityHandle}`
   const translated = te(navigationKey) ? String(t(navigationKey)).trim() : ''
-  const label = translated || humanizeEntityHandle(entityHandle)
+  const label = translated
 
   return count === 1 ? singularizeEntityLabel(label) : label
 }
@@ -1080,11 +1038,6 @@ function singularizeEntityLabel(label: string) {
   }
 
   return trimmedLabel
-}
-
-function humanizeEntityHandle(entityHandle: string) {
-  const spaced = entityHandle.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[-_]+/g, ' ')
-  return spaced.charAt(0).toUpperCase() + spaced.slice(1)
 }
 
 function buildEntityTablePath(entityHandle: string, filter: Record<string, unknown>) {

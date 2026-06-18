@@ -14,7 +14,8 @@
       <div class="sapling-system-gauge">
         <div class="sapling-system-gauge__copy">
           <span>{{ cpuGaugeLabel }}</span>
-          <strong>{{ cpuGaugeValue }}</strong>
+          <v-skeleton-loader v-if="cpuGaugeLoading" type="text" width="72" />
+          <strong v-else>{{ cpuGaugeValue }}</strong>
         </div>
         <v-progress-linear :model-value="cpuGaugeProgress" color="primary" height="16" rounded />
       </div>
@@ -22,7 +23,8 @@
       <div class="sapling-system-gauge">
         <div class="sapling-system-gauge__copy">
           <span>{{ memoryGaugeLabel }}</span>
-          <strong>{{ memoryGaugeValue }}</strong>
+          <v-skeleton-loader v-if="memoryGaugeLoading" type="text" width="72" />
+          <strong v-else>{{ memoryGaugeValue }}</strong>
         </div>
         <v-progress-linear :model-value="memoryGaugeProgress" color="teal" height="16" rounded />
       </div>
@@ -31,7 +33,8 @@
     <div class="sapling-detail-grid">
       <div v-for="item in details" :key="item.label" class="sapling-detail-card">
         <span>{{ item.label }}</span>
-        <strong>{{ item.value }}</strong>
+        <v-skeleton-loader v-if="item.loading" type="text" width="112" />
+        <strong v-else>{{ item.value }}</strong>
       </div>
     </div>
 
@@ -49,13 +52,16 @@ defineProps<{
   manufacturer?: string
   cpuGaugeLabel: string
   cpuGaugeValue: string
+  cpuGaugeLoading?: boolean
   cpuGaugeProgress: number
   memoryGaugeLabel: string
   memoryGaugeValue: string
+  memoryGaugeLoading?: boolean
   memoryGaugeProgress: number
   details: Array<{
     label: string
     value: string
+    loading?: boolean
   }>
   error?: string
 }>()

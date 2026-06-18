@@ -19,7 +19,8 @@
         </div>
 
         <v-chip :color="statusChipColor" size="small" variant="tonal">
-          {{ isLoading ? '...' : issues.length }}
+          <v-skeleton-loader v-if="isLoading" type="text" width="28" />
+          <span v-else>{{ issues.length }}</span>
         </v-chip>
       </SaplingSurface>
 

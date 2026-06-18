@@ -63,7 +63,8 @@
                   @click="refreshDashboard"
                 />
               </div>
-              <strong>{{ timeLoading ? t('global.loading') : formattedServerTime }}</strong>
+              <v-skeleton-loader v-if="timeLoading" type="text" width="160" />
+              <strong v-else>{{ formattedServerTime }}</strong>
               <p class="sapling-muted-copy">
                 {{ $t('system.lastRefresh') }}: {{ lastUpdatedDisplay }}
               </p>
@@ -95,16 +96,20 @@
           icon="mdi-cpu-64-bit"
           icon-class="sapling-system-metric__icon--cpu"
           :label="$t('system.cpuUsage')"
-          :value="cpuSpeedLoading ? t('global.loading') : formatPercentage(cpuLoadPercentage)"
-          :detail="`${$t('system.user')} ${cpuSpeedLoading ? t('global.loading') : formatPercentage(cpuUserLoadPercentage)} · ${$t('system.systemUsage')} ${cpuSpeedLoading ? t('global.loading') : formatPercentage(cpuSystemLoadPercentage)}`"
+          :value="formatPercentage(cpuLoadPercentage)"
+          :detail="`${$t('system.user')} ${formatPercentage(cpuUserLoadPercentage)} · ${$t('system.systemUsage')} ${formatPercentage(cpuSystemLoadPercentage)}`"
+          :value-loading="cpuSpeedLoading"
+          :detail-loading="cpuSpeedLoading"
         />
 
         <SaplingSystemMetricCard
           icon="mdi-memory"
           icon-class="sapling-system-metric__icon--memory"
           :label="$t('system.memory')"
-          :value="memoryLoading ? t('global.loading') : formatGigabytes(memory?.used ?? 0)"
-          :detail="`${memoryLoading ? t('global.loading') : formatPercentage(memoryUsagePercentage)} · ${memoryLoading ? t('global.loading') : formatGigabytes(memory?.total ?? 0)}`"
+          :value="formatGigabytes(memory?.used ?? 0)"
+          :detail="`${formatPercentage(memoryUsagePercentage)} · ${formatGigabytes(memory?.total ?? 0)}`"
+          :value-loading="memoryLoading"
+          :detail-loading="memoryLoading"
         />
 
         <SaplingSystemMetricCard
@@ -113,14 +118,18 @@
           :label="$t('system.filesystem')"
           :value="topFilesystem ? formatPercentage(topFilesystem.use) : t('global.notAvailable')"
           :detail="topFilesystem ? topFilesystem.fs : $t('system.noStorage')"
+          :value-loading="filesystemLoading"
+          :detail-loading="filesystemLoading"
         />
 
         <SaplingSystemMetricCard
           icon="mdi-lan"
           icon-class="sapling-system-metric__icon--network"
           :label="$t('system.network')"
-          :value="networkLoading ? t('global.loading') : String(activeInterfaceCount)"
+          :value="String(activeInterfaceCount)"
           :detail="totalNetworkRateDisplay"
+          :value-loading="networkLoading"
+          :detail-loading="networkLoading"
         />
       </section>
 
@@ -135,14 +144,12 @@
           :title="cpu?.brand || $t('system.cpu')"
           :manufacturer="cpu?.manufacturer"
           :cpu-gauge-label="$t('system.cpuUsage')"
-          :cpu-gauge-value="
-            cpuSpeedLoading ? t('global.loading') : formatPercentage(cpuLoadPercentage)
-          "
+          :cpu-gauge-value="formatPercentage(cpuLoadPercentage)"
+          :cpu-gauge-loading="cpuSpeedLoading"
           :cpu-gauge-progress="cpuLoadPercentage"
           :memory-gauge-label="$t('system.memory')"
-          :memory-gauge-value="
-            memoryLoading ? t('global.loading') : formatPercentage(memoryUsagePercentage)
-          "
+          :memory-gauge-value="formatPercentage(memoryUsagePercentage)"
+          :memory-gauge-loading="memoryLoading"
           :memory-gauge-progress="memoryUsagePercentage"
           :details="performanceDetails"
           :error="performanceError"
@@ -258,7 +265,7 @@ const activeInterfaceCount = computed(() => {
 
 const totalNetworkRateDisplay = computed(() => {
   if (networkLoading.value) {
-    return t('global.loading')
+    return ''
   }
 
   const totalRate = network.value.reduce((sum, iface) => sum + iface.rx_sec + iface.tx_sec, 0)
@@ -295,84 +302,98 @@ const cpuSpeedSummary = computed(() => {
 const overviewDetails = computed(() => [
   {
     label: t('system.os'),
-    value: osLoading.value ? t('global.loading') : displayValue(osSummary.value),
+    value: displayValue(osSummary.value),
+    loading: osLoading.value,
   },
   {
     label: t('system.kernel'),
-    value: osLoading.value ? t('global.loading') : displayValue(os.value?.kernel),
+    value: displayValue(os.value?.kernel),
+    loading: osLoading.value,
   },
   {
     label: t('system.hostname'),
-    value: osLoading.value ? t('global.loading') : displayValue(os.value?.hostname),
+    value: displayValue(os.value?.hostname),
+    loading: osLoading.value,
   },
   {
     label: t('system.arch'),
-    value: osLoading.value ? t('global.loading') : displayValue(os.value?.arch),
+    value: displayValue(os.value?.arch),
+    loading: osLoading.value,
   },
   {
     label: t('system.fqdn'),
-    value: osLoading.value ? t('global.loading') : displayValue(os.value?.fqdn),
+    value: displayValue(os.value?.fqdn),
+    loading: osLoading.value,
   },
   {
     label: t('system.codename'),
-    value: osLoading.value ? t('global.loading') : displayValue(os.value?.codename),
+    value: displayValue(os.value?.codename),
+    loading: osLoading.value,
   },
   {
     label: t('system.serverTime'),
-    value: timeLoading.value ? t('global.loading') : formattedServerTime.value,
+    value: formattedServerTime.value,
+    loading: timeLoading.value,
   },
   {
     label: t('system.timezone'),
-    value: timeLoading.value ? t('global.loading') : timezoneDisplay.value,
+    value: timezoneDisplay.value,
+    loading: timeLoading.value,
   },
   {
     label: t('system.uptime'),
-    value: timeLoading.value ? t('global.loading') : formattedUptime.value,
+    value: formattedUptime.value,
+    loading: timeLoading.value,
   },
   {
     label: t('system.build'),
-    value: versionLoading.value ? t('global.loading') : versionDisplay.value,
+    value: versionDisplay.value,
+    loading: versionLoading.value,
   },
 ])
 
 const performanceDetails = computed(() => [
   {
     label: t('system.socket'),
-    value: cpuLoading.value ? t('global.loading') : displayValue(cpu.value?.socket),
+    value: displayValue(cpu.value?.socket),
+    loading: cpuLoading.value,
   },
   {
     label: t('system.speed'),
-    value: cpuLoading.value ? t('global.loading') : cpuSpeedSummary.value,
+    value: cpuSpeedSummary.value,
+    loading: cpuLoading.value,
   },
   {
     label: t('system.cores'),
-    value: cpuLoading.value ? t('global.loading') : displayValue(cpu.value?.cores),
+    value: displayValue(cpu.value?.cores),
+    loading: cpuLoading.value,
   },
   {
     label: t('system.physicalCores'),
-    value: cpuLoading.value ? t('global.loading') : displayValue(cpu.value?.physicalCores),
+    value: displayValue(cpu.value?.physicalCores),
+    loading: cpuLoading.value,
   },
   {
     label: t('system.processors'),
-    value: cpuLoading.value ? t('global.loading') : displayValue(cpu.value?.processors),
+    value: displayValue(cpu.value?.processors),
+    loading: cpuLoading.value,
   },
   {
     label: t('system.virtualization'),
-    value: cpuLoading.value
-      ? t('global.loading')
-      : cpu.value?.virtualization
-        ? t('system.virtualizationEnabled')
-        : t('system.virtualizationDisabled'),
+    value: cpu.value?.virtualization
+      ? t('system.virtualizationEnabled')
+      : t('system.virtualizationDisabled'),
+    loading: cpuLoading.value,
   },
   {
     label: t('system.total'),
-    value: memoryLoading.value ? t('global.loading') : formatGigabytes(memory.value?.total ?? 0),
+    value: formatGigabytes(memory.value?.total ?? 0),
+    loading: memoryLoading.value,
   },
   {
     label: t('system.available'),
-    value: memoryLoading.value
-      ? t('global.loading')
-      : formatGigabytes(memory.value?.available ?? 0),
+    value: formatGigabytes(memory.value?.available ?? 0),
+    loading: memoryLoading.value,
   },
 ])
 

@@ -58,7 +58,7 @@ const selectedEntityHandle = computed(() => {
 
 function translateFieldLabel(entityHandle: string, fieldName: string): string {
   const translationKey = `${entityHandle}.${fieldName}`
-  return te(translationKey) ? t(translationKey) : fieldName
+  return te(translationKey) ? t(translationKey) : ''
 }
 
 function isRecipientFieldTemplate(template: EntityTemplate): boolean {
@@ -105,10 +105,13 @@ function buildNestedRecipientFields(
       const relatedTemplates = genericStore.getState(relatedEntityHandle).entityTemplates
       const relationLabel = translateFieldLabel(entityHandle, relationTemplate.name)
 
-      return relatedTemplates.filter(isRecipientFieldTemplate).map((template) => ({
-        label: `${relationLabel} -> ${translateFieldLabel(relatedEntityHandle, template.name)}`,
-        value: `${relationTemplate.name}.${template.name}`,
-      }))
+      return relatedTemplates.filter(isRecipientFieldTemplate).map((template) => {
+        const nestedLabel = translateFieldLabel(relatedEntityHandle, template.name)
+        return {
+          label: [relationLabel, nestedLabel].filter(Boolean).join(' / '),
+          value: `${relationTemplate.name}.${template.name}`,
+        }
+      })
     })
 }
 

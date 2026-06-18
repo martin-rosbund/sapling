@@ -13,7 +13,8 @@
     <div class="sapling-detail-grid">
       <div v-for="item in details" :key="item.label" class="sapling-detail-card">
         <span>{{ item.label }}</span>
-        <strong>{{ item.value }}</strong>
+        <v-skeleton-loader v-if="item.loading" type="text" width="112" />
+        <strong v-else>{{ item.value }}</strong>
       </div>
     </div>
 
@@ -31,6 +32,7 @@ defineProps<{
   details: Array<{
     label: string
     value: string
+    loading?: boolean
   }>
   error?: string
 }>()

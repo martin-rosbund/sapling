@@ -6,28 +6,23 @@
     <SaplingPageHero
       class="sapling-config-hero sapling-ai-agent-builder__hero"
       variant="system"
-      :eyebrow="tr('aiAgentBuilder.eyebrow', 'KI Agents')"
-      :title="tr('aiAgentBuilder.title', 'Agent Workbench')"
-      :subtitle="
-        tr(
-          'aiAgentBuilder.subtitle',
-          'Konfiguriere, versioniere und prüfe zugeschnittene Agents für den Sapling Chat.',
-        )
-      "
+      :eyebrow="t('aiAgentBuilder.eyebrow')"
+      :title="t('aiAgentBuilder.title')"
+      :subtitle="t('aiAgentBuilder.subtitle')"
     >
       <template #meta>
         <v-chip size="small" color="primary" variant="tonal" prepend-icon="mdi-creation">
-          {{ agents.length }} {{ tr('aiAgentBuilder.agentCount', 'Agents') }}
+          {{ agents.length }} {{ t('aiAgentBuilder.agentCount') }}
         </v-chip>
         <v-chip size="small" variant="outlined" prepend-icon="mdi-check-circle-outline">
-          {{ activeAgentCount }} {{ tr('aiAgentBuilder.activeAgents', 'aktiv') }}
+          {{ activeAgentCount }} {{ t('aiAgentBuilder.activeAgents') }}
         </v-chip>
       </template>
 
       <template #side>
         <div class="sapling-action-cluster sapling-ai-agent-builder__hero-actions">
           <v-btn color="primary" prepend-icon="mdi-plus" @click="startNewAgent">
-            {{ tr('aiAgentBuilder.newAgent', 'Neuer Agent') }}
+            {{ t('aiAgentBuilder.newAgent') }}
           </v-btn>
         </div>
       </template>
@@ -38,12 +33,12 @@
         class="sapling-panel-shell sapling-section-panel sapling-config-panel sapling-config-panel--blurred sapling-ai-agent-builder__rail"
       >
         <div class="sapling-ai-agent-builder__rail-header">
-          <span>{{ tr('aiAgentBuilder.agentList', 'Agents') }}</span>
+          <span>{{ t('aiAgentBuilder.agentList') }}</span>
           <v-btn
             icon="mdi-plus"
             variant="tonal"
             size="small"
-            :title="tr('aiAgentBuilder.newAgent', 'Neuer Agent')"
+            :title="t('aiAgentBuilder.newAgent')"
             @click="startNewAgent"
           />
         </div>
@@ -71,17 +66,17 @@
           density="comfortable"
           show-arrows
         >
-          <v-tab value="profile">{{ tr('aiAgentBuilder.tabProfile', 'Profil') }}</v-tab>
-          <v-tab value="prompt">{{ tr('aiAgentBuilder.tabPrompt', 'Prompt') }}</v-tab>
-          <v-tab value="data">{{ tr('aiAgentBuilder.tabData', 'Daten') }}</v-tab>
-          <v-tab value="tools">{{ tr('aiAgentBuilder.tabTools', 'Tools') }}</v-tab>
-          <v-tab value="runtime">{{ tr('aiAgentBuilder.tabRuntime', 'Modell') }}</v-tab>
-          <v-tab value="release">{{ tr('aiAgentBuilder.tabRelease', 'Freigabe') }}</v-tab>
-          <v-tab value="versions">{{ tr('aiAgentBuilder.tabVersions', 'Versionen') }}</v-tab>
-          <v-tab value="test">{{ tr('aiAgentBuilder.tabTestRuns', 'Testläufe') }}</v-tab>
-          <v-tab value="memory">{{ tr('aiAgentBuilder.tabMemory', 'Quellen/Memory') }}</v-tab>
-          <v-tab value="quality">{{ tr('aiAgentBuilder.tabQuality', 'Qualität') }}</v-tab>
-          <v-tab value="usage">{{ tr('aiAgentBuilder.tabUsage', 'Nutzung') }}</v-tab>
+          <v-tab value="profile">{{ t('aiAgentBuilder.tabProfile') }}</v-tab>
+          <v-tab value="prompt">{{ t('aiAgentBuilder.tabPrompt') }}</v-tab>
+          <v-tab value="data">{{ t('aiAgentBuilder.tabData') }}</v-tab>
+          <v-tab value="tools">{{ t('aiAgentBuilder.tabTools') }}</v-tab>
+          <v-tab value="runtime">{{ t('aiAgentBuilder.tabRuntime') }}</v-tab>
+          <v-tab value="release">{{ t('aiAgentBuilder.tabRelease') }}</v-tab>
+          <v-tab value="versions">{{ t('aiAgentBuilder.tabVersions') }}</v-tab>
+          <v-tab value="test">{{ t('aiAgentBuilder.tabTestRuns') }}</v-tab>
+          <v-tab value="memory">{{ t('aiAgentBuilder.tabMemory') }}</v-tab>
+          <v-tab value="quality">{{ t('aiAgentBuilder.tabQuality') }}</v-tab>
+          <v-tab value="usage">{{ t('aiAgentBuilder.tabUsage') }}</v-tab>
         </v-tabs>
 
         <v-window v-model="activeTab" class="sapling-ai-agent-builder__window">
@@ -90,23 +85,20 @@
               <v-text-field
                 v-model="draft.handle"
                 :disabled="isEditingExisting"
-                label="Handle"
+                :label="t('aiAgentBuilder.fieldHandle')"
                 required
               />
               <v-text-field
                 v-model="draft.title"
-                :label="tr('aiAgentBuilder.fieldTitle', 'Titel')"
+                :label="t('aiAgentBuilder.fieldTitle')"
                 required
               />
-              <v-text-field v-model="draft.icon" :label="tr('aiAgentBuilder.fieldIcon', 'Icon')" />
-              <v-text-field
-                v-model="draft.color"
-                :label="tr('aiAgentBuilder.fieldColor', 'Farbe')"
-              />
+              <v-text-field v-model="draft.icon" :label="t('aiAgentBuilder.fieldIcon')" />
+              <v-text-field v-model="draft.color" :label="t('aiAgentBuilder.fieldColor')" />
               <v-textarea
                 v-model="draft.description"
                 class="sapling-ai-agent-builder__wide"
-                :label="tr('aiAgentBuilder.fieldDescription', 'Beschreibung')"
+                :label="t('aiAgentBuilder.fieldDescription')"
                 rows="3"
               />
               <v-combobox
@@ -114,7 +106,7 @@
                 class="sapling-ai-agent-builder__wide"
                 chips
                 multiple
-                :label="tr('aiAgentBuilder.fieldStarters', 'Startfragen')"
+                :label="t('aiAgentBuilder.fieldStarters')"
               />
             </div>
           </v-window-item>
@@ -124,14 +116,14 @@
               <v-textarea
                 v-model="draft.promptMarkdown"
                 class="sapling-ai-agent-builder__wide"
-                :label="tr('aiAgentBuilder.fieldPrompt', 'Agent Prompt')"
+                :label="t('aiAgentBuilder.fieldPrompt')"
                 rows="12"
                 required
               />
               <v-textarea
                 v-model="draft.welcomeMessage"
                 class="sapling-ai-agent-builder__wide"
-                :label="tr('aiAgentBuilder.fieldWelcome', 'Begrüßung')"
+                :label="t('aiAgentBuilder.fieldWelcome')"
                 rows="4"
               />
             </div>
@@ -143,7 +135,7 @@
                 v-model="selectedAllowedEntities"
                 class="sapling-ai-agent-builder__wide"
                 entity-handle="entity"
-                :label="tr('aiAgentBuilder.fieldEntities', 'Datenbereiche')"
+                :label="t('aiAgentBuilder.fieldEntities')"
                 density="comfortable"
                 hide-details
               />
@@ -152,7 +144,7 @@
                 class="sapling-ai-agent-builder__wide"
                 entity-handle="entity"
                 :parent-filter="knowledgeEntityFilter"
-                :label="tr('aiAgentBuilder.fieldKnowledge', 'Wissensquellen')"
+                :label="t('aiAgentBuilder.fieldKnowledge')"
                 density="comfortable"
                 hide-details
               />
@@ -167,7 +159,7 @@
                 chips
                 multiple
                 :items="internalToolOptions"
-                :label="tr('aiAgentBuilder.fieldInternalTools', 'Sapling Tools')"
+                :label="t('aiAgentBuilder.fieldInternalTools')"
               />
               <v-select
                 v-model="draft.allowedExternalTools"
@@ -175,7 +167,7 @@
                 chips
                 multiple
                 :items="externalToolOptions"
-                :label="tr('aiAgentBuilder.fieldExternalTools', 'Externe Tools')"
+                :label="t('aiAgentBuilder.fieldExternalTools')"
               />
             </div>
           </v-window-item>
@@ -187,7 +179,7 @@
                 item-title="title"
                 item-value="handle"
                 :items="providers"
-                :label="tr('aiAgentBuilder.fieldProvider', 'Provider')"
+                :label="t('aiAgentBuilder.fieldProvider')"
                 clearable
               />
               <v-select
@@ -195,13 +187,13 @@
                 item-title="title"
                 item-value="handle"
                 :items="filteredModels"
-                :label="tr('aiAgentBuilder.fieldModel', 'Modell')"
+                :label="t('aiAgentBuilder.fieldModel')"
                 clearable
               />
               <v-select
                 v-model="draft.mutationMode"
                 :items="mutationModeOptions"
-                :label="tr('aiAgentBuilder.fieldMutationMode', 'Aktionsmodus')"
+                :label="t('aiAgentBuilder.fieldMutationMode')"
               />
             </div>
           </v-window-item>
@@ -212,22 +204,16 @@
                 v-model="selectedRoles"
                 class="sapling-ai-agent-builder__wide"
                 entity-handle="role"
-                :label="tr('aiAgentBuilder.fieldRoles', 'Rollenfreigabe')"
+                :label="t('aiAgentBuilder.fieldRoles')"
                 density="comfortable"
                 hide-details
               />
-              <v-switch
-                v-model="draft.isActive"
-                :label="tr('aiAgentBuilder.fieldActive', 'Aktiv')"
-              />
-              <v-switch
-                v-model="draft.isDefault"
-                :label="tr('aiAgentBuilder.fieldDefault', 'Standard-Agent')"
-              />
+              <v-switch v-model="draft.isActive" :label="t('aiAgentBuilder.fieldActive')" />
+              <v-switch v-model="draft.isDefault" :label="t('aiAgentBuilder.fieldDefault')" />
               <v-text-field
                 v-model.number="draft.sortOrder"
                 type="number"
-                :label="tr('aiAgentBuilder.fieldSortOrder', 'Sortierung')"
+                :label="t('aiAgentBuilder.fieldSortOrder')"
               />
             </div>
           </v-window-item>
@@ -236,14 +222,9 @@
             <div class="sapling-ai-agent-builder__panel-stack">
               <div class="sapling-row-between-xs">
                 <div>
-                  <strong>{{ tr('aiAgentBuilder.versionsTitle', 'Agent-Versionen') }}</strong>
+                  <strong>{{ t('aiAgentBuilder.versionsTitle') }}</strong>
                   <p>
-                    {{
-                      tr(
-                        'aiAgentBuilder.versionsSubtitle',
-                        'Versionen halten produktive Chats nachvollziehbar.',
-                      )
-                    }}
+                    {{ t('aiAgentBuilder.versionsSubtitle') }}
                   </p>
                 </div>
                 <v-btn
@@ -253,17 +234,17 @@
                   :disabled="!selectedAgent"
                   @click="createVersionFromDraft"
                 >
-                  {{ tr('aiAgentBuilder.createVersion', 'Version aus Entwurf') }}
+                  {{ t('aiAgentBuilder.createVersion') }}
                 </v-btn>
               </div>
               <v-table density="comfortable">
                 <thead>
                   <tr>
-                    <th>Version</th>
-                    <th>Status</th>
-                    <th>{{ tr('aiAgentBuilder.fieldProvider', 'Provider') }}</th>
-                    <th>{{ tr('aiAgentBuilder.fieldModel', 'Modell') }}</th>
-                    <th>{{ tr('aiAgentBuilder.updatedAt', 'Aktualisiert') }}</th>
+                    <th>{{ t('global.version') }}</th>
+                    <th>{{ t('global.status') }}</th>
+                    <th>{{ t('aiAgentBuilder.fieldProvider') }}</th>
+                    <th>{{ t('aiAgentBuilder.fieldModel') }}</th>
+                    <th>{{ t('aiAgentBuilder.updatedAt') }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -272,8 +253,8 @@
                     <td>
                       <v-chip size="small" variant="tonal">{{ version.status }}</v-chip>
                     </td>
-                    <td>{{ getProviderHandle(version.provider) || '-' }}</td>
-                    <td>{{ getModelHandle(version.model) || '-' }}</td>
+                    <td>{{ getProviderHandle(version.provider) || t('global.notAvailable') }}</td>
+                    <td>{{ getModelHandle(version.model) || t('global.notAvailable') }}</td>
                     <td>{{ formatDate(version.updatedAt) }}</td>
                   </tr>
                 </tbody>
@@ -283,11 +264,7 @@
 
           <v-window-item value="test">
             <div class="sapling-ai-agent-builder__panel-stack">
-              <v-textarea
-                v-model="testPrompt"
-                :label="tr('aiAgentBuilder.testPrompt', 'Testprompt')"
-                rows="5"
-              />
+              <v-textarea v-model="testPrompt" :label="t('aiAgentBuilder.testPrompt')" rows="5" />
               <div class="sapling-row-md">
                 <v-select
                   v-model="selectedTestVersionHandle"
@@ -295,7 +272,7 @@
                   item-title="title"
                   item-value="value"
                   clearable
-                  :label="tr('aiAgentBuilder.testVersion', 'Version')"
+                  :label="t('aiAgentBuilder.testVersion')"
                 />
                 <v-select
                   v-model="selectedTestPlaybookHandle"
@@ -303,7 +280,7 @@
                   item-title="title"
                   item-value="value"
                   clearable
-                  :label="tr('aiAgentBuilder.testPlaybook', 'Playbook')"
+                  :label="t('aiAgentBuilder.testPlaybook')"
                 />
                 <v-btn
                   color="primary"
@@ -312,7 +289,7 @@
                   :loading="isRunningTest"
                   @click="runAgentTest"
                 >
-                  {{ tr('aiAgentBuilder.runTest', 'Testlauf starten') }}
+                  {{ t('aiAgentBuilder.runTest') }}
                 </v-btn>
               </div>
               <v-alert v-if="latestTestRun" type="info" variant="tonal">
@@ -323,7 +300,7 @@
 
           <v-window-item value="memory">
             <div class="sapling-ai-agent-builder__panel-stack">
-              <strong>{{ tr('aiAgentBuilder.memoryTitle', 'Quellen und Memory') }}</strong>
+              <strong>{{ t('aiAgentBuilder.memoryTitle') }}</strong>
               <article
                 v-for="playbook in workbenchPlaybooks"
                 :key="playbook.handle"
@@ -336,11 +313,7 @@
                     variant="tonal"
                     :color="playbook.isActive ? 'success' : undefined"
                   >
-                    {{
-                      playbook.isActive
-                        ? tr('global.active', 'Aktiv')
-                        : tr('global.inactive', 'Inaktiv')
-                    }}
+                    {{ playbook.isActive ? t('global.active') : t('global.inactive') }}
                   </v-chip>
                 </div>
                 <p v-if="playbook.description">{{ playbook.description }}</p>
@@ -365,9 +338,7 @@
                 <p v-if="playbook.expectedOutput">{{ playbook.expectedOutput }}</p>
               </article>
               <v-alert v-if="workbenchPlaybooks.length === 0" type="info" variant="tonal">
-                {{
-                  tr('aiAgentBuilder.noPlaybooks', 'Noch kein Playbook für diesen Agent gepflegt.')
-                }}
+                {{ t('aiAgentBuilder.noPlaybooks') }}
               </v-alert>
               <article
                 v-for="memory in workbenchMemories"
@@ -381,7 +352,7 @@
                 <p>{{ memory.contentMarkdown }}</p>
               </article>
               <v-alert v-if="workbenchMemories.length === 0" type="info" variant="tonal">
-                {{ tr('aiAgentBuilder.noMemory', 'Noch kein Memory für diesen Agent gepflegt.') }}
+                {{ t('aiAgentBuilder.noMemory') }}
               </v-alert>
             </div>
           </v-window-item>
@@ -391,7 +362,7 @@
               <div class="sapling-ai-agent-builder__grid">
                 <v-text-field
                   v-model="evaluationDraft.title"
-                  :label="tr('aiAgentBuilder.evaluationTitle', 'Testfall')"
+                  :label="t('aiAgentBuilder.evaluationTitle')"
                 />
                 <v-select
                   v-model="evaluationDraft.agentVersionHandle"
@@ -399,18 +370,18 @@
                   item-title="title"
                   item-value="value"
                   clearable
-                  :label="tr('aiAgentBuilder.testVersion', 'Version')"
+                  :label="t('aiAgentBuilder.testVersion')"
                 />
                 <v-textarea
                   v-model="evaluationDraft.prompt"
                   class="sapling-ai-agent-builder__wide"
-                  :label="tr('aiAgentBuilder.testPrompt', 'Testprompt')"
+                  :label="t('aiAgentBuilder.testPrompt')"
                   rows="4"
                 />
                 <v-textarea
                   v-model="evaluationDraft.expectedCriteria"
                   class="sapling-ai-agent-builder__wide"
-                  :label="tr('aiAgentBuilder.expectedCriteria', 'Erwartete Kriterien')"
+                  :label="t('aiAgentBuilder.expectedCriteria')"
                   rows="3"
                 />
               </div>
@@ -423,14 +394,14 @@
                 "
                 @click="createEvaluation"
               >
-                {{ tr('aiAgentBuilder.createEvaluation', 'Testfall anlegen') }}
+                {{ t('aiAgentBuilder.createEvaluation') }}
               </v-btn>
               <v-table density="comfortable">
                 <thead>
                   <tr>
-                    <th>{{ tr('aiAgentBuilder.evaluationTitle', 'Testfall') }}</th>
-                    <th>Status</th>
-                    <th>{{ tr('aiAgentBuilder.updatedAt', 'Aktualisiert') }}</th>
+                    <th>{{ t('aiAgentBuilder.evaluationTitle') }}</th>
+                    <th>{{ t('global.status') }}</th>
+                    <th>{{ t('aiAgentBuilder.updatedAt') }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -453,13 +424,18 @@
             <div class="sapling-ai-agent-builder__panel-stack">
               <div class="sapling-ai-agent-builder__stats">
                 <v-chip color="primary" variant="tonal"
-                  >{{ workbenchStats.runsTotal ?? 0 }} Runs</v-chip
+                  >{{ workbenchStats.runsTotal ?? 0 }} {{ t('aiAgentBuilder.runs') }}</v-chip
                 >
-                <v-chip variant="tonal">{{ workbenchStats.failedRuns ?? 0 }} Fehler</v-chip>
-                <v-chip variant="tonal">{{ workbenchStats.pendingActions ?? 0 }} Actions</v-chip>
+                <v-chip variant="tonal"
+                  >{{ workbenchStats.failedRuns ?? 0 }} {{ t('aiAgentBuilder.failedRuns') }}</v-chip
+                >
+                <v-chip variant="tonal"
+                  >{{ workbenchStats.pendingActions ?? 0 }}
+                  {{ t('aiAgentBuilder.actions') }}</v-chip
+                >
                 <v-chip variant="tonal">
-                  {{ workbenchStats.evaluationPassRate ?? '-' }}%
-                  {{ tr('aiAgentBuilder.tabQuality', 'Qualität') }}
+                  {{ workbenchStats.evaluationPassRate ?? t('global.notAvailable') }}%
+                  {{ t('aiAgentBuilder.tabQuality') }}
                 </v-chip>
               </div>
               <AiAgentRunTraceList :runs="workbenchRuns" />
@@ -538,7 +514,7 @@ const KNOWLEDGE_ENTITY_HANDLES = [
   'salesOpportunity',
 ] as const
 
-const { t, te } = useI18n()
+const { t } = useI18n()
 const activeTab = ref('profile')
 const agents = ref<AiAgentItem[]>([])
 const selectedAgent = ref<AiAgentItem | null>(null)
@@ -626,25 +602,26 @@ const playbookOptions = computed(() =>
 )
 const mutationModeOptions = computed(() => [
   {
-    title: tr('aiAgentBuilder.mutationConfirm', 'Änderungen bestätigen lassen'),
+    title: t('aiAgentBuilder.mutationConfirm'),
     value: 'confirm',
   },
-  { title: tr('aiAgentBuilder.mutationReadOnly', 'Nur lesen'), value: 'readOnly' },
+  { title: t('aiAgentBuilder.mutationReadOnly'), value: 'readOnly' },
 ])
 
 onMounted(async () => {
   await Promise.all([
-    translationService.prepare('aiAgentBuilder', 'aiAgent', 'aiChatToolAction', 'navigation'),
+    translationService.prepare(
+      'aiAgentBuilder',
+      'aiAgent',
+      'aiChatToolAction',
+      'navigation',
+      'global',
+    ),
     loadAgents(),
     loadReferenceData(),
   ])
   selectAgent(agents.value.find((agent) => agent.isDefault) ?? agents.value[0] ?? null)
 })
-
-function tr(key: string, _fallback: string): string {
-  void _fallback
-  return te(key) ? t(key) : ''
-}
 
 async function loadAgents() {
   agents.value = await ApiAiService.listAgents()
@@ -685,12 +662,12 @@ function startNewAgent() {
 
 function getAgentSubtitle(agent: AiAgentItem): string {
   if (agent.isDefault) {
-    return tr('aiAgentBuilder.defaultAgent', 'Standard')
+    return t('aiAgentBuilder.defaultAgent')
   }
 
   return agent.mutationMode === 'readOnly'
-    ? tr('aiAgentBuilder.mutationReadOnly', 'Nur lesen')
-    : tr('aiAgentBuilder.mutationConfirm', 'Änderungen bestätigen lassen')
+    ? t('aiAgentBuilder.mutationReadOnly')
+    : t('aiAgentBuilder.mutationConfirm')
 }
 
 function resetDraft() {
@@ -922,7 +899,7 @@ function getNumberHandles(items: SaplingGenericItem[]): number[] {
 
 function formatDate(value?: Date | string | null): string {
   if (!value) {
-    return '-'
+    return t('global.notAvailable')
   }
 
   return new Date(value).toLocaleString()

@@ -31,7 +31,8 @@
           <div class="sapling-data-card sapling-work-hero-pulse sapling-issue-hero__pulse">
             <div class="sapling-label">{{ $t('issue.updatedAt') }}</div>
             <div class="sapling-work-hero-pulse__value sapling-issue-hero__pulse-value">
-              {{ lastUpdatedDisplay }}
+              <v-skeleton-loader v-if="isLoading && !lastUpdatedDisplay" type="text" width="160" />
+              <span v-else>{{ lastUpdatedDisplay || $t('global.notAvailable') }}</span>
             </div>
           </div>
         </template>
@@ -167,7 +168,8 @@
           </div>
           <div class="sapling-metric-card__copy">
             <p>{{ $t('issue.openIssues') }}</p>
-            <strong>{{ isLoading ? '...' : openIssues.length }}</strong>
+            <v-skeleton-loader v-if="isLoading" type="text" width="48" />
+            <strong v-else>{{ openIssues.length }}</strong>
           </div>
         </SaplingSurface>
 
@@ -179,7 +181,8 @@
           </div>
           <div class="sapling-metric-card__copy">
             <p>{{ $t('issue.closedIssues') }}</p>
-            <strong>{{ isLoading ? '...' : closedIssues.length }}</strong>
+            <v-skeleton-loader v-if="isLoading" type="text" width="48" />
+            <strong v-else>{{ closedIssues.length }}</strong>
           </div>
         </SaplingSurface>
 
@@ -191,7 +194,8 @@
           </div>
           <div class="sapling-metric-card__copy">
             <p>{{ $t('issue.labels') }}</p>
-            <strong>{{ isLoading ? '...' : labelCount }}</strong>
+            <v-skeleton-loader v-if="isLoading" type="text" width="48" />
+            <strong v-else>{{ labelCount }}</strong>
           </div>
         </SaplingSurface>
 
@@ -203,7 +207,8 @@
           </div>
           <div class="sapling-metric-card__copy">
             <p>{{ $t('issue.assignedTo') }}</p>
-            <strong>{{ isLoading ? '...' : assigneeCount }}</strong>
+            <v-skeleton-loader v-if="isLoading" type="text" width="48" />
+            <strong v-else>{{ assigneeCount }}</strong>
           </div>
         </SaplingSurface>
       </section>
@@ -267,7 +272,7 @@ const lastUpdatedDisplay = computed(() => {
     .filter((value) => !Number.isNaN(value))
 
   if (!timestamps.length) {
-    return '...'
+    return ''
   }
 
   return new Intl.DateTimeFormat(undefined, {

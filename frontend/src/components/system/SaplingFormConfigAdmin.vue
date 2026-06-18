@@ -674,7 +674,7 @@ function exportDraft(): void {
 
 function translateEntity(entityHandle: string): string {
   const key = `navigation.${entityHandle}`
-  return te(key) ? t(key) : entityHandle
+  return te(key) ? t(key) : ''
 }
 
 function resolveFieldLabel(fieldName: string): string {
@@ -684,7 +684,7 @@ function resolveFieldLabel(fieldName: string): string {
   }
 
   const key = `${selectedEntityHandle.value}.${fieldName}`
-  return te(key) ? t(key) : fieldName
+  return te(key) ? t(key) : ''
 }
 
 function getTemplateDefaultLabel(template: EntityTemplate): string {

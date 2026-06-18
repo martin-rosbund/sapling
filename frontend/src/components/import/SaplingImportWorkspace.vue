@@ -1713,31 +1713,31 @@ function fieldLabel(fieldName: string): string {
   }
 
   if (!selectedEntityHandle.value) {
-    return humanizeHandle(fieldName)
+    return ''
   }
 
   const key = `${selectedEntityHandle.value}.${fieldName}`
-  return te(key) ? t(key) : humanizeHandle(fieldName)
+  return te(key) ? t(key) : ''
 }
 
 function entityLabel(entityHandle: string): string {
   const key = `navigation.${entityHandle}`
-  return te(key) ? t(key) : humanizeHandle(entityHandle)
+  return te(key) ? t(key) : ''
 }
 
 function importStatusLabel(status: string): string {
   const key = `import.status.${status}`
-  return te(key) ? t(key) : humanizeHandle(status)
+  return te(key) ? t(key) : ''
 }
 
 function importActionLabel(action: string): string {
   const key = `import.action.${action}`
-  return te(key) ? t(key) : humanizeHandle(action)
+  return te(key) ? t(key) : ''
 }
 
 function importMessageLabel(message: string | null | undefined): string {
   if (!message) {
-    return '-'
+    return t('global.notAvailable')
   }
 
   if (message.startsWith(IMPORT_REQUIRED_FIELDS_MISSING_PREFIX)) {
@@ -1804,7 +1804,7 @@ function importMessageLabel(message: string | null | undefined): string {
       : t('import.uniqueFieldConflictWithDetails', { field, value })
   }
 
-  return te(message) ? t(message) : message
+  return te(message) ? t(message) : ''
 }
 
 function decodeImportMessagePart(value: string): string {
@@ -1826,15 +1826,6 @@ function aiSuggestionReason(targetField: string): string {
 
 function confidencePercent(confidence: number): string {
   return `${Math.round(Math.max(0, Math.min(1, confidence)) * 100)}%`
-}
-
-function humanizeHandle(value: string): string {
-  return value
-    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-    .replace(/[._-]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .replace(/^./, (character) => character.toUpperCase())
 }
 
 function normalizeName(value: string): string {

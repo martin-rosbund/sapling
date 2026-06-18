@@ -49,7 +49,7 @@ export function useSaplingGenericReferenceTarget(options: {
     }
 
     const translationKey = `navigation.${targetEntityHandle.value}`
-    return te(translationKey) ? t(translationKey) : targetEntityHandle.value
+    return te(translationKey) ? t(translationKey) : ''
   })
   const fallbackLabel = computed(() => {
     if (targetHandle.value == null || targetHandle.value === '') {
@@ -58,7 +58,7 @@ export function useSaplingGenericReferenceTarget(options: {
 
     return targetEntityLabel.value
       ? `${targetEntityLabel.value} #${String(targetHandle.value)}`
-      : String(targetHandle.value)
+      : ''
   })
   const displayLabel = computed(() => {
     if (!resolvedItem.value) {

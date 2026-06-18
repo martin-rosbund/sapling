@@ -1,0 +1,1040 @@
+[
+  {
+    "entity": "global",
+    "property": "active",
+    "de": "Aktiv",
+    "en": "Active"
+  },
+  {
+    "entity": "global",
+    "property": "inactive",
+    "de": "Inaktiv",
+    "en": "Inactive"
+  },
+  {
+    "entity": "global",
+    "property": "status",
+    "de": "Status",
+    "en": "Status"
+  },
+  {
+    "entity": "global",
+    "property": "version",
+    "de": "Version",
+    "en": "Version"
+  },
+  {
+    "entity": "global",
+    "property": "yes",
+    "de": "Ja",
+    "en": "Yes"
+  },
+  {
+    "entity": "global",
+    "property": "no",
+    "de": "Nein",
+    "en": "No"
+  },
+  {
+    "entity": "global",
+    "property": "empty",
+    "de": "Leer",
+    "en": "Empty"
+  },
+  {
+    "entity": "login",
+    "property": "instanceBootingTitle",
+    "de": "Instanz wird gestartet",
+    "en": "Instance is starting"
+  },
+  {
+    "entity": "login",
+    "property": "instanceBootingDescription",
+    "de": "Bitte warten Sie, während Ihre Umgebung vorbereitet wird.",
+    "en": "Please wait while your environment is being prepared."
+  },
+  {
+    "entity": "aiAgentBuilder",
+    "property": "fieldHandle",
+    "de": "Handle",
+    "en": "Handle"
+  },
+  {
+    "entity": "aiAgentBuilder",
+    "property": "noPlaybooks",
+    "de": "Noch kein Playbook für diesen Agent gepflegt.",
+    "en": "No playbook has been configured for this agent yet."
+  },
+  {
+    "entity": "aiAgentBuilder",
+    "property": "runs",
+    "de": "Läufe",
+    "en": "runs"
+  },
+  {
+    "entity": "aiAgentBuilder",
+    "property": "failedRuns",
+    "de": "Fehler",
+    "en": "failed"
+  },
+  {
+    "entity": "aiAgentBuilder",
+    "property": "actions",
+    "de": "Aktionen",
+    "en": "actions"
+  },
+  {
+    "entity": "playground",
+    "property": "eyebrow",
+    "de": "Komponenten-Showcase",
+    "en": "Component showcase"
+  },
+  {
+    "entity": "playground",
+    "property": "title",
+    "de": "Sapling Playground",
+    "en": "Sapling Playground"
+  },
+  {
+    "entity": "playground",
+    "property": "subtitle",
+    "de": "Interaktive Showcase-Fläche für Actions, Dialoge, Form-Felder, KPI-Karten und Tabellen. Alles hier ist direkt anklickbar und als Referenz für die übrigen Komponenten gedacht.",
+    "en": "Interactive showcase surface for actions, dialogs, form fields, KPI cards, and tables. Everything here can be clicked directly and serves as a reference for the other components."
+  },
+  {
+    "entity": "playground",
+    "property": "openEditDialog",
+    "de": "Edit-Dialog öffnen",
+    "en": "Open edit dialog"
+  },
+  {
+    "entity": "playground",
+    "property": "startMailDialog",
+    "de": "Mail-Dialog starten",
+    "en": "Start mail dialog"
+  },
+  {
+    "entity": "playground",
+    "property": "actionsEyebrow",
+    "de": "Actions",
+    "en": "Actions"
+  },
+  {
+    "entity": "playground",
+    "property": "actionGalleryTitle",
+    "de": "Action Gallery",
+    "en": "Action gallery"
+  },
+  {
+    "entity": "playground",
+    "property": "actionGalleryDescription",
+    "de": "Alle Footer- und Workflow-Actions direkt im Einsatz. Die Buttons feuern Demo-Handler und zeigen ihre aktuellen Zustände.",
+    "en": "All footer and workflow actions in use. The buttons trigger demo handlers and show their current states."
+  },
+  {
+    "entity": "playground",
+    "property": "dialogsEyebrow",
+    "de": "Dialoge",
+    "en": "Dialogs"
+  },
+  {
+    "entity": "playground",
+    "property": "launchpadTitle",
+    "de": "Launchpad",
+    "en": "Launchpad"
+  },
+  {
+    "entity": "playground",
+    "property": "launchpadDescription",
+    "de": "Jeder Dialog lässt sich über einen eigenen Trigger öffnen. Damit ist der Playground auch eine schnelle QA-Fläche.",
+    "en": "Each dialog can be opened through its own trigger. This also makes the playground a quick QA surface."
+  },
+  {
+    "entity": "playground",
+    "property": "contextInfo",
+    "de": "Edit- und Mail-Demos nutzen aktuell {entity} als Kontext. Verfügbare Templates: {count}.",
+    "en": "Edit and mail demos currently use {entity} as context. Available templates: {count}."
+  },
+  {
+    "entity": "playground",
+    "property": "messageError",
+    "de": "Fehler",
+    "en": "Error"
+  },
+  {
+    "entity": "playground",
+    "property": "messageWarning",
+    "de": "Warnung",
+    "en": "Warning"
+  },
+  {
+    "entity": "playground",
+    "property": "messageSuccess",
+    "de": "Success",
+    "en": "Success"
+  },
+  {
+    "entity": "playground",
+    "property": "messageInfo",
+    "de": "Info",
+    "en": "Info"
+  },
+  {
+    "entity": "playground",
+    "property": "textFields",
+    "de": "Textfelder",
+    "en": "Text fields"
+  },
+  {
+    "entity": "playground",
+    "property": "shortTextField",
+    "de": "Kurzes Textfeld",
+    "en": "Short text field"
+  },
+  {
+    "entity": "playground",
+    "property": "longTextField",
+    "de": "Langes Textfeld",
+    "en": "Long text field"
+  },
+  {
+    "entity": "playground",
+    "property": "markdownField",
+    "de": "Markdown-Feld",
+    "en": "Markdown field"
+  },
+  {
+    "entity": "playground",
+    "property": "contactFields",
+    "de": "Kontaktfelder",
+    "en": "Contact fields"
+  },
+  {
+    "entity": "playground",
+    "property": "phoneField",
+    "de": "Telefonfeld",
+    "en": "Phone field"
+  },
+  {
+    "entity": "playground",
+    "property": "phonePlaceholder",
+    "de": "Telefonnummer eingeben",
+    "en": "Enter phone number"
+  },
+  {
+    "entity": "playground",
+    "property": "mailField",
+    "de": "Mail-Feld",
+    "en": "Mail field"
+  },
+  {
+    "entity": "playground",
+    "property": "mailPlaceholder",
+    "de": "E-Mail-Adresse eingeben",
+    "en": "Enter email address"
+  },
+  {
+    "entity": "playground",
+    "property": "linkField",
+    "de": "Link-Feld",
+    "en": "Link field"
+  },
+  {
+    "entity": "playground",
+    "property": "linkPlaceholder",
+    "de": "URL eingeben",
+    "en": "Enter URL"
+  },
+  {
+    "entity": "playground",
+    "property": "otherFields",
+    "de": "Weitere Felder",
+    "en": "Other fields"
+  },
+  {
+    "entity": "playground",
+    "property": "booleanField",
+    "de": "Boolean-Feld",
+    "en": "Boolean field"
+  },
+  {
+    "entity": "playground",
+    "property": "colorField",
+    "de": "Farbfeld",
+    "en": "Color field"
+  },
+  {
+    "entity": "playground",
+    "property": "numbersAndDates",
+    "de": "Zahlen und Datumswerte",
+    "en": "Numbers and dates"
+  },
+  {
+    "entity": "playground",
+    "property": "numberField",
+    "de": "Zahlenfeld",
+    "en": "Number field"
+  },
+  {
+    "entity": "playground",
+    "property": "dateField",
+    "de": "Datumsfeld",
+    "en": "Date field"
+  },
+  {
+    "entity": "playground",
+    "property": "moneyField",
+    "de": "Geldfeld",
+    "en": "Money field"
+  },
+  {
+    "entity": "playground",
+    "property": "percentField",
+    "de": "Prozentfeld",
+    "en": "Percent field"
+  },
+  {
+    "entity": "playground",
+    "property": "timeField",
+    "de": "Zeitfeld",
+    "en": "Time field"
+  },
+  {
+    "entity": "playground",
+    "property": "dateTimeField",
+    "de": "Datum-Zeit-Feld",
+    "en": "Date-time field"
+  },
+  {
+    "entity": "playground",
+    "property": "iconSelection",
+    "de": "Icon-Auswahl",
+    "en": "Icon selection"
+  },
+  {
+    "entity": "playground",
+    "property": "iconField",
+    "de": "Icon-Feld",
+    "en": "Icon field"
+  },
+  {
+    "entity": "playground",
+    "property": "selectField",
+    "de": "Auswahlfeld",
+    "en": "Select field"
+  },
+  {
+    "entity": "playground",
+    "property": "multiSelectField",
+    "de": "Mehrfachauswahl",
+    "en": "Multi select field"
+  },
+  {
+    "entity": "playground",
+    "property": "singleSelectField",
+    "de": "Einfachauswahl",
+    "en": "Single select field"
+  },
+  {
+    "entity": "playground",
+    "property": "singleSelectTransferField",
+    "de": "Einfachauswahl mit Übernahme",
+    "en": "Single select transfer field"
+  },
+  {
+    "entity": "playground",
+    "property": "multiSelectTransferField",
+    "de": "Mehrfachauswahl mit Übernahme",
+    "en": "Multi select transfer field"
+  },
+  {
+    "entity": "playground",
+    "property": "searchAndTable",
+    "de": "Suche und Tabelle",
+    "en": "Search and table"
+  },
+  {
+    "entity": "playground",
+    "property": "deleteDialogRecordName",
+    "de": "Playground-Datensatz",
+    "en": "Playground record"
+  },
+  {
+    "entity": "playground",
+    "property": "messageCenterErrorTitle",
+    "de": "Playground Fehler",
+    "en": "Playground error"
+  },
+  {
+    "entity": "playground",
+    "property": "messageCenterErrorDescription",
+    "de": "Eine Fehlernachricht wurde im Playground simuliert.",
+    "en": "An error message was simulated in the playground."
+  },
+  {
+    "entity": "playground",
+    "property": "messageCenterWarningTitle",
+    "de": "Playground Warnung",
+    "en": "Playground warning"
+  },
+  {
+    "entity": "playground",
+    "property": "messageCenterWarningDescription",
+    "de": "Eine Warnmeldung wurde im Playground simuliert.",
+    "en": "A warning message was simulated in the playground."
+  },
+  {
+    "entity": "playground",
+    "property": "messageCenterSuccessTitle",
+    "de": "Playground Erfolg",
+    "en": "Playground success"
+  },
+  {
+    "entity": "playground",
+    "property": "messageCenterSuccessDescription",
+    "de": "Eine Erfolgsmeldung wurde im Playground simuliert.",
+    "en": "A success message was simulated in the playground."
+  },
+  {
+    "entity": "playground",
+    "property": "messageCenterInfoTitle",
+    "de": "Playground Info",
+    "en": "Playground info"
+  },
+  {
+    "entity": "playground",
+    "property": "messageCenterInfoDescription",
+    "de": "Eine Info-Nachricht wurde im Playground simuliert.",
+    "en": "An info message was simulated in the playground."
+  },
+  {
+    "entity": "playground",
+    "property": "deleteConfirmedFeedback",
+    "de": "Delete-Dialog bestätigt.",
+    "en": "Delete dialog confirmed."
+  },
+  {
+    "entity": "playground",
+    "property": "deleteClosedFeedback",
+    "de": "Delete-Dialog geschlossen.",
+    "en": "Delete dialog closed."
+  },
+  {
+    "entity": "playground",
+    "property": "kpiLinkedFeedback",
+    "de": "KPI verknüpft: {name}",
+    "en": "KPI linked: {name}"
+  },
+  {
+    "entity": "playground",
+    "property": "editExecutedFeedback",
+    "de": "Edit-Dialog ausgeführt: {action}",
+    "en": "Edit dialog executed: {action}"
+  },
+  {
+    "entity": "playground",
+    "property": "editClosedFeedback",
+    "de": "Edit-Dialog geschlossen.",
+    "en": "Edit dialog closed."
+  },
+  {
+    "entity": "playground",
+    "property": "mailInitialSubject",
+    "de": "Sapling Playground Showcase",
+    "en": "Sapling Playground Showcase"
+  },
+  {
+    "entity": "playground",
+    "property": "actionSaveTitle",
+    "de": "Speichern",
+    "en": "Save"
+  },
+  {
+    "entity": "playground",
+    "property": "actionSaveDescription",
+    "de": "Standard-Speichern-Footer inklusive Speichern-und-Schließen-Aktion.",
+    "en": "Standard save footer including save-and-close action."
+  },
+  {
+    "entity": "playground",
+    "property": "actionSaveCancelFeedback",
+    "de": "Abbrechen aus Save-Action.",
+    "en": "Cancel from save action."
+  },
+  {
+    "entity": "playground",
+    "property": "actionSaveFeedback",
+    "de": "Speichern aus Save-Action.",
+    "en": "Save from save action."
+  },
+  {
+    "entity": "playground",
+    "property": "actionSaveAndCloseFeedback",
+    "de": "Speichern und Schließen aus Save-Action.",
+    "en": "Save and close from save action."
+  },
+  {
+    "entity": "playground",
+    "property": "actionDeleteTitle",
+    "de": "Löschen",
+    "en": "Delete"
+  },
+  {
+    "entity": "playground",
+    "property": "actionDeleteDescription",
+    "de": "Destruktive Bestätigungsaktion für Delete-Dialoge.",
+    "en": "Destructive confirmation action for delete dialogs."
+  },
+  {
+    "entity": "playground",
+    "property": "actionDeleteCancelFeedback",
+    "de": "Löschen abgebrochen.",
+    "en": "Delete cancelled."
+  },
+  {
+    "entity": "playground",
+    "property": "actionDeleteConfirmFeedback",
+    "de": "Löschen bestätigt.",
+    "en": "Delete confirmed."
+  },
+  {
+    "entity": "playground",
+    "property": "actionCloseTitle",
+    "de": "Schließen",
+    "en": "Close"
+  },
+  {
+    "entity": "playground",
+    "property": "actionCloseDescription",
+    "de": "Minimaler Footer für Readonly- oder Preview-Screens.",
+    "en": "Minimal footer for read-only or preview screens."
+  },
+  {
+    "entity": "playground",
+    "property": "actionCloseFeedback",
+    "de": "Schließen-Aktion ausgelöst.",
+    "en": "Close action triggered."
+  },
+  {
+    "entity": "playground",
+    "property": "actionLoginTitle",
+    "de": "Login",
+    "en": "Login"
+  },
+  {
+    "entity": "playground",
+    "property": "actionLoginDescription",
+    "de": "Login-Footer mit optionalen Social-Providern.",
+    "en": "Login footer with optional social providers."
+  },
+  {
+    "entity": "playground",
+    "property": "actionAzureLoginFeedback",
+    "de": "Azure Login gestartet.",
+    "en": "Azure login started."
+  },
+  {
+    "entity": "playground",
+    "property": "actionGoogleLoginFeedback",
+    "de": "Google Login gestartet.",
+    "en": "Google login started."
+  },
+  {
+    "entity": "playground",
+    "property": "actionLocalLoginFeedback",
+    "de": "Lokaler Login gestartet.",
+    "en": "Local login started."
+  },
+  {
+    "entity": "playground",
+    "property": "actionMailTitle",
+    "de": "Mail",
+    "en": "Mail"
+  },
+  {
+    "entity": "playground",
+    "property": "actionMailDescription",
+    "de": "Mail-Workflow mit Preview-Refresh und Versand-Trigger.",
+    "en": "Mail workflow with preview refresh and send trigger."
+  },
+  {
+    "entity": "playground",
+    "property": "actionMailCloseFeedback",
+    "de": "Mail-Dialog geschlossen.",
+    "en": "Mail dialog closed."
+  },
+  {
+    "entity": "playground",
+    "property": "actionMailRefreshFeedback",
+    "de": "Mail-Preview aktualisiert.",
+    "en": "Mail preview refreshed."
+  },
+  {
+    "entity": "playground",
+    "property": "actionMailSendFeedback",
+    "de": "Mail-Versand ausgelöst.",
+    "en": "Mail sending triggered."
+  },
+  {
+    "entity": "playground",
+    "property": "actionUploadTitle",
+    "de": "Upload",
+    "en": "Upload"
+  },
+  {
+    "entity": "playground",
+    "property": "actionUploadDescription",
+    "de": "Upload-Footer für Dateidialoge mit Event-API.",
+    "en": "Upload footer for file dialogs with event API."
+  },
+  {
+    "entity": "playground",
+    "property": "actionUploadCloseFeedback",
+    "de": "Upload geschlossen.",
+    "en": "Upload closed."
+  },
+  {
+    "entity": "playground",
+    "property": "actionUploadStartFeedback",
+    "de": "Upload gestartet.",
+    "en": "Upload started."
+  },
+  {
+    "entity": "playground",
+    "property": "actionAccountTitle",
+    "de": "Account",
+    "en": "Account"
+  },
+  {
+    "entity": "playground",
+    "property": "actionAccountDescription",
+    "de": "Kombinierte Footer-Aktion für Account-Dialoge.",
+    "en": "Combined footer action for account dialogs."
+  },
+  {
+    "entity": "playground",
+    "property": "actionAccountCloseFeedback",
+    "de": "Account-Dialog geschlossen.",
+    "en": "Account dialog closed."
+  },
+  {
+    "entity": "playground",
+    "property": "actionAccountPasswordFeedback",
+    "de": "Passwortwechsel ausgelöst.",
+    "en": "Password change triggered."
+  },
+  {
+    "entity": "playground",
+    "property": "actionAccountLogoutFeedback",
+    "de": "Logout ausgelöst.",
+    "en": "Logout triggered."
+  },
+  {
+    "entity": "playground",
+    "property": "actionChangePasswordTitle",
+    "de": "Passwort ändern",
+    "en": "Change password"
+  },
+  {
+    "entity": "playground",
+    "property": "actionChangePasswordDescription",
+    "de": "Spezialisierte Action für Passwortwechsel-Flächen.",
+    "en": "Specialized action for password change surfaces."
+  },
+  {
+    "entity": "playground",
+    "property": "actionPasswordCloseFeedback",
+    "de": "Passwort-Dialog geschlossen.",
+    "en": "Password dialog closed."
+  },
+  {
+    "entity": "playground",
+    "property": "actionPasswordConfirmFeedback",
+    "de": "Passwortwechsel bestätigt.",
+    "en": "Password change confirmed."
+  },
+  {
+    "entity": "playground",
+    "property": "deleteDialogTitle",
+    "de": "Delete Dialog",
+    "en": "Delete dialog"
+  },
+  {
+    "entity": "playground",
+    "property": "deleteDialogDescription",
+    "de": "Kompakter Danger-Dialog für Lösch-Workflows.",
+    "en": "Compact danger dialog for delete workflows."
+  },
+  {
+    "entity": "playground",
+    "property": "kpiDialogTitle",
+    "de": "KPI Dialog",
+    "en": "KPI dialog"
+  },
+  {
+    "entity": "playground",
+    "property": "kpiDialogDescription",
+    "de": "Verknüpft eine KPI aus den geladenen Beispielkarten.",
+    "en": "Links a KPI from the loaded sample cards."
+  },
+  {
+    "entity": "playground",
+    "property": "editDialogTitle",
+    "de": "Edit Dialog",
+    "en": "Edit dialog"
+  },
+  {
+    "entity": "playground",
+    "property": "editDialogDescription",
+    "de": "Öffnet den großen Shared Edit Dialog mit echten Templates.",
+    "en": "Opens the large shared edit dialog with real templates."
+  },
+  {
+    "entity": "playground",
+    "property": "mailDialogTitle",
+    "de": "Mail Dialog",
+    "en": "Mail dialog"
+  },
+  {
+    "entity": "playground",
+    "property": "mailDialogDescription",
+    "de": "Startet den globalen Mail-Composer mit Playground-Kontext.",
+    "en": "Starts the global mail composer with playground context."
+  },
+  {
+    "entity": "playground",
+    "property": "phoneDialogTitle",
+    "de": "Phone Dialog",
+    "en": "Phone dialog"
+  },
+  {
+    "entity": "playground",
+    "property": "phoneDialogDescription",
+    "de": "Startet den globalen Telefon-Dialog mit Demo-Nummer.",
+    "en": "Starts the global phone dialog with a demo number."
+  },
+  {
+    "entity": "playground",
+    "property": "metricActions",
+    "de": "Actions",
+    "en": "Actions"
+  },
+  {
+    "entity": "playground",
+    "property": "metricDialogs",
+    "de": "Dialoge",
+    "en": "Dialogs"
+  },
+  {
+    "entity": "playground",
+    "property": "metricTemplates",
+    "de": "Templates",
+    "en": "Templates"
+  },
+  {
+    "entity": "playground",
+    "property": "metricKpiCards",
+    "de": "KPI-Karten",
+    "en": "KPI cards"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionDetails",
+    "de": "Details",
+    "en": "Details"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTechnicalRawData",
+    "de": "Technische Rohdaten",
+    "en": "Technical raw data"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionMissingHandle",
+    "de": "Diese vorbereitete Aktion kann nicht bestätigt werden, weil die technische Bestätigungsnummer fehlt.",
+    "en": "This prepared action cannot be confirmed because the technical confirmation number is missing."
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionImportSummary",
+    "de": "Import",
+    "en": "Import"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionRecordType",
+    "de": "Datensatztyp",
+    "en": "Record type"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionRecord",
+    "de": "Datensatz",
+    "en": "Record"
+  },
+  {
+    "entity": "aiChat",
+    "property": "openRouteLink",
+    "de": "Route öffnen",
+    "en": "Open route"
+  },
+  {
+    "entity": "aiChat",
+    "property": "openRecordLink",
+    "de": "Datensatz öffnen",
+    "en": "Open record"
+  },
+  {
+    "entity": "aiChat",
+    "property": "openRecordEntity",
+    "de": "{entity} öffnen",
+    "en": "Open {entity}"
+  },
+  {
+    "entity": "aiChat",
+    "property": "openEntityResults",
+    "de": "{count} {entity} öffnen",
+    "en": "Open {count} {entity}"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionResult.create",
+    "de": "{entity} angelegt",
+    "en": "{entity} created"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionResult.update",
+    "de": "{entity} bearbeitet",
+    "en": "{entity} updated"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionResult.delete",
+    "de": "{entity} gelöscht",
+    "en": "{entity} deleted"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionIntro.executedWithEntity",
+    "de": "{entity}: die ausgeführte Aktion im Überblick.",
+    "en": "{entity}: overview of the executed action."
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionIntro.executed",
+    "de": "Die ausgeführte Aktion im Überblick.",
+    "en": "Overview of the executed action."
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionIntro.failedWithEntity",
+    "de": "{entity}: die Aktion konnte nicht ausgeführt werden.",
+    "en": "{entity}: the action could not be executed."
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionIntro.failed",
+    "de": "Die Aktion konnte nicht ausgeführt werden.",
+    "en": "The action could not be executed."
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionIntro.pendingWithEntity",
+    "de": "{entity}: prüfen Sie die geplanten Angaben vor der Ausführung.",
+    "en": "{entity}: review the planned values before execution."
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionIntro.pending",
+    "de": "Prüfen Sie die geplanten Angaben vor der Ausführung.",
+    "en": "Review the planned values before execution."
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.create.pending",
+    "de": "Anlage bestätigen",
+    "en": "Creation confirm"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.create.executed",
+    "de": "Anlage ausgeführt",
+    "en": "Creation executed"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.create.failed",
+    "de": "Anlage fehlgeschlagen",
+    "en": "Creation failed"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.create.rejected",
+    "de": "Anlage abgelehnt",
+    "en": "Creation rejected"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.create.expired",
+    "de": "Anlage abgelaufen",
+    "en": "Creation expired"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.update.pending",
+    "de": "Bearbeitung bestätigen",
+    "en": "Update confirm"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.update.executed",
+    "de": "Bearbeitung ausgeführt",
+    "en": "Update executed"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.update.failed",
+    "de": "Bearbeitung fehlgeschlagen",
+    "en": "Update failed"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.update.rejected",
+    "de": "Bearbeitung abgelehnt",
+    "en": "Update rejected"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.update.expired",
+    "de": "Bearbeitung abgelaufen",
+    "en": "Update expired"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.delete.pending",
+    "de": "Löschung bestätigen",
+    "en": "Deletion confirm"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.delete.executed",
+    "de": "Löschung ausgeführt",
+    "en": "Deletion executed"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.delete.failed",
+    "de": "Löschung fehlgeschlagen",
+    "en": "Deletion failed"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.delete.rejected",
+    "de": "Löschung abgelehnt",
+    "en": "Deletion rejected"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.delete.expired",
+    "de": "Löschung abgelaufen",
+    "en": "Deletion expired"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.importConfigure.pending",
+    "de": "Import-Konfiguration bestätigen",
+    "en": "Import configuration confirm"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.importConfigure.executed",
+    "de": "Import-Konfiguration ausgeführt",
+    "en": "Import configuration executed"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.importConfigure.failed",
+    "de": "Import-Konfiguration fehlgeschlagen",
+    "en": "Import configuration failed"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.importConfigure.rejected",
+    "de": "Import-Konfiguration abgelehnt",
+    "en": "Import configuration rejected"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.importConfigure.expired",
+    "de": "Import-Konfiguration abgelaufen",
+    "en": "Import configuration expired"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.importExecute.pending",
+    "de": "Import-Ausführung bestätigen",
+    "en": "Import execution confirm"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.importExecute.executed",
+    "de": "Import-Ausführung ausgeführt",
+    "en": "Import execution executed"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.importExecute.failed",
+    "de": "Import-Ausführung fehlgeschlagen",
+    "en": "Import execution failed"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.importExecute.rejected",
+    "de": "Import-Ausführung abgelehnt",
+    "en": "Import execution rejected"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.importExecute.expired",
+    "de": "Import-Ausführung abgelaufen",
+    "en": "Import execution expired"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.action.pending",
+    "de": "Aktion bestätigen",
+    "en": "Action confirm"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.action.executed",
+    "de": "Aktion ausgeführt",
+    "en": "Action executed"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.action.failed",
+    "de": "Aktion fehlgeschlagen",
+    "en": "Action failed"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.action.rejected",
+    "de": "Aktion abgelehnt",
+    "en": "Action rejected"
+  },
+  {
+    "entity": "aiChat",
+    "property": "toolActionTitle.action.expired",
+    "de": "Aktion abgelaufen",
+    "en": "Action expired"
+  },
+  {
+    "entity": "aiChat",
+    "property": "streamingDuration",
+    "de": "streamt {seconds}s",
+    "en": "streaming {seconds}s"
+  }
+]

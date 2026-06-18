@@ -35,8 +35,8 @@ export function useSaplingPlayground() {
   const kpiListLoadling = ref(true)
   const kpiTrendLoadling = ref(true)
   const kpiSparklineLoadling = ref(true)
-  const markdownFieldValue = ref<string>('# Markdown Beispiel\n\n**Fett** und _kursiv_!')
-  const { isLoading } = useTranslationLoader('kpi')
+  const markdownFieldValue = ref<string>('')
+  const { isLoading } = useTranslationLoader('kpi', 'playground', 'global')
   // #endregion
 
   // #region Fields

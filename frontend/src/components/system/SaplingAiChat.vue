@@ -188,6 +188,7 @@ const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoad
   'ai',
   'import',
   'navigation',
+  'global',
 )
 const assistantName = 'Songbird'
 const TITLE_PREVIEW_LIMIT = 30

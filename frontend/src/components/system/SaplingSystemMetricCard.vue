@@ -5,8 +5,10 @@
     </div>
     <div class="sapling-metric-card__copy">
       <p>{{ label }}</p>
-      <strong>{{ value }}</strong>
-      <span>{{ detail }}</span>
+      <v-skeleton-loader v-if="valueLoading" type="text" width="72" />
+      <strong v-else>{{ value }}</strong>
+      <v-skeleton-loader v-if="detailLoading" type="text" width="140" />
+      <span v-else>{{ detail }}</span>
     </div>
   </SaplingSurface>
 </template>
@@ -20,5 +22,7 @@ defineProps<{
   label: string
   value: string
   detail: string
+  valueLoading?: boolean
+  detailLoading?: boolean
 }>()
 </script>

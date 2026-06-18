@@ -570,16 +570,7 @@ export function useSaplingNavigation(props: SaplingNavigationProps, emit: Saplin
       return t(key)
     }
 
-    return fallback ?? humanizeHandle(handle)
-  }
-
-  function humanizeHandle(handle: string) {
-    return handle
-      .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-      .replace(/[._-]+/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .replace(/^./, (character) => character.toUpperCase())
+    return fallback ?? ''
   }
 
   function toggleHandle(currentHandles: string[], handle: string) {

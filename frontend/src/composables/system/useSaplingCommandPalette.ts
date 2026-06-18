@@ -120,13 +120,16 @@ export function useSaplingCommandPalette() {
 
   function getEntityLabel(entity: EntityItem) {
     const key = `navigation.${entity.handle}`
-    return te(key) ? t(key) : entity.handle
+    return te(key) ? t(key) : ''
   }
 
   function getRouteLabel(entity: EntityItem, route: EntityRouteItem) {
     if (route.navigation) {
       const key = `navigation.${route.navigation}`
-      return te(key) ? t(key) : route.navigation
+      const routeLabel = te(key) ? t(key) : ''
+      if (routeLabel) {
+        return routeLabel
+      }
     }
     return getEntityLabel(entity)
   }
@@ -143,7 +146,7 @@ export function useSaplingCommandPalette() {
         return getEntityLabel(match)
       }
       const key = `navigation.${entityValue}`
-      return te(key) ? t(key) : entityValue
+      return te(key) ? t(key) : ''
     }
 
     return ''

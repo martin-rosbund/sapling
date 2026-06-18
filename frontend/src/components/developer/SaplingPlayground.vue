@@ -12,15 +12,13 @@
           <v-card-text class="sapling-showcase__hero-content sapling-playground__hero-content">
             <div class="sapling-showcase__hero-copy sapling-playground__hero-copy">
               <span class="sapling-showcase__eyebrow sapling-playground__eyebrow">
-                Component Showcase
+                {{ t('playground.eyebrow') }}
               </span>
               <h1 class="sapling-showcase__hero-title sapling-playground__hero-title">
-                Sapling Playground
+                {{ t('playground.title') }}
               </h1>
               <p class="sapling-showcase__hero-description sapling-playground__hero-description">
-                Interaktive Showcase-Flaeche für Actions, Dialoge, Form-Felder, KPI-Karten und
-                Tabellen. Alles hier ist direkt anklickbar und als Referenz für die übrigen
-                Komponenten gedacht.
+                {{ t('playground.subtitle') }}
               </p>
 
               <div class="sapling-showcase__hero-actions sapling-playground__hero-actions">
@@ -30,7 +28,7 @@
                   :disabled="!canOpenEditDialog"
                   @click="openEditShowcaseDialog"
                 >
-                  Edit-Dialog oeffnen
+                  {{ t('playground.openEditDialog') }}
                 </v-btn>
                 <v-btn
                   color="primary"
@@ -38,7 +36,7 @@
                   prepend-icon="mdi-email-fast-outline"
                   @click="openMailShowcaseDialog"
                 >
-                  Mail-Dialog starten
+                  {{ t('playground.startMailDialog') }}
                 </v-btn>
               </div>
             </div>
@@ -72,16 +70,17 @@
           <v-card-text class="sapling-showcase__section-body sapling-playground__showcase-body">
             <div class="sapling-showcase__section-header sapling-playground__showcase-header">
               <div>
-                <span class="sapling-showcase__eyebrow sapling-playground__eyebrow"> Actions </span>
+                <span class="sapling-showcase__eyebrow sapling-playground__eyebrow">
+                  {{ t('playground.actionsEyebrow') }}
+                </span>
                 <h2 class="sapling-showcase__section-title sapling-playground__showcase-title">
-                  Action Gallery
+                  {{ t('playground.actionGalleryTitle') }}
                 </h2>
               </div>
               <p
                 class="sapling-showcase__section-description sapling-playground__showcase-description"
               >
-                Alle Footer- und Workflow-Actions direkt im Einsatz. Die Buttons feuern Demo-Handler
-                und zeigen ihre aktuellen Zustaende.
+                {{ t('playground.actionGalleryDescription') }}
               </p>
             </div>
 
@@ -128,16 +127,17 @@
               class="sapling-showcase__section-header sapling-showcase__section-header--stacked sapling-playground__showcase-header sapling-playground__showcase-header--stacked"
             >
               <div>
-                <span class="sapling-showcase__eyebrow sapling-playground__eyebrow"> Dialogs </span>
+                <span class="sapling-showcase__eyebrow sapling-playground__eyebrow">
+                  {{ t('playground.dialogsEyebrow') }}
+                </span>
                 <h2 class="sapling-showcase__section-title sapling-playground__showcase-title">
-                  Launchpad
+                  {{ t('playground.launchpadTitle') }}
                 </h2>
               </div>
               <p
                 class="sapling-showcase__section-description sapling-playground__showcase-description"
               >
-                Jeder Dialog laesst sich ueber einen eigenen Trigger oeffnen. Damit ist der
-                Playground auch eine schnelle QA-Flaeche.
+                {{ t('playground.launchpadDescription') }}
               </p>
             </div>
 
@@ -168,9 +168,12 @@
             </div>
 
             <v-alert class="mt-4" type="info" variant="tonal">
-              Edit- und Mail-Demos nutzen aktuell <strong>{{ showcaseEntityHandle }}</strong> als
-              Kontext. Verfuegbare Templates: <strong>{{ entityTemplates.length }}</strong
-              >.
+              {{
+                t('playground.contextInfo', {
+                  entity: showcaseEntityHandle,
+                  count: entityTemplates.length,
+                })
+              }}
             </v-alert>
 
             <div class="d-flex flex-wrap ga-3 mt-4">
@@ -179,28 +182,28 @@
                 prepend-icon="mdi-alert-circle-outline"
                 @click="simulateMessageCenterMessage('error')"
               >
-                Fehler
+                {{ t('playground.messageError') }}
               </v-btn>
               <v-btn
                 color="warning"
                 prepend-icon="mdi-alert-outline"
                 @click="simulateMessageCenterMessage('warning')"
               >
-                Warnung
+                {{ t('playground.messageWarning') }}
               </v-btn>
               <v-btn
                 color="success"
                 prepend-icon="mdi-check-circle-outline"
                 @click="simulateMessageCenterMessage('success')"
               >
-                Success
+                {{ t('playground.messageSuccess') }}
               </v-btn>
               <v-btn
                 color="info"
                 prepend-icon="mdi-information-outline"
                 @click="simulateMessageCenterMessage('info')"
               >
-                Info
+                {{ t('playground.messageInfo') }}
               </v-btn>
             </div>
           </v-card-text>
@@ -215,12 +218,12 @@
           class="mb-6 glass-panel sapling-showcase__content-card sapling-playground__content-card"
           v-tilt="TILT_SOFT_OPTIONS"
         >
-          <v-card-title class="text-h6">Text Fields</v-card-title>
+          <v-card-title class="text-h6">{{ t('playground.textFields') }}</v-card-title>
           <v-card-text>
             <v-row>
               <v-col cols="12" sm="6">
                 <sapling-short-text-field
-                  label="Short Text Field"
+                  :label="t('playground.shortTextField')"
                   :model-value="shortTextFieldValue"
                   :disabled="false"
                   @update:model-value="setShortTextFieldValue"
@@ -228,7 +231,7 @@
               </v-col>
               <v-col cols="12" sm="6">
                 <sapling-long-text-field
-                  label="Long Text Field"
+                  :label="t('playground.longTextField')"
                   :model-value="longTextFieldValue"
                   :disabled="false"
                   @update:model-value="setLongTextFieldValue"
@@ -243,10 +246,10 @@
           class="mb-6 glass-panel sapling-showcase__content-card sapling-playground__content-card"
           v-tilt="TILT_SOFT_OPTIONS"
         >
-          <v-card-title class="text-h6">Markdown Field</v-card-title>
+          <v-card-title class="text-h6">{{ t('playground.markdownField') }}</v-card-title>
           <v-card-text>
             <sapling-markdown-field
-              label="Markdown Feld"
+              :label="t('playground.markdownField')"
               :model-value="markdownFieldValue"
               :rows="8"
               :show-preview="true"
@@ -260,34 +263,34 @@
           class="mb-6 glass-panel sapling-showcase__content-card sapling-playground__content-card"
           v-tilt="TILT_SOFT_OPTIONS"
         >
-          <v-card-title class="text-h6">Contact Fields</v-card-title>
+          <v-card-title class="text-h6">{{ t('playground.contactFields') }}</v-card-title>
           <v-card-text>
             <v-row>
               <v-col cols="12" sm="4">
                 <sapling-phone-field
-                  label="Phone Field"
+                  :label="t('playground.phoneField')"
                   :model-value="phoneFieldValue"
                   :disabled="false"
                   @update:model-value="setPhoneFieldValue"
-                  placeholder="Enter phone number"
+                  :placeholder="t('playground.phonePlaceholder')"
                 />
               </v-col>
               <v-col cols="12" sm="4">
                 <sapling-mail-field
-                  label="Mail Field"
+                  :label="t('playground.mailField')"
                   :model-value="mailFieldValue"
                   :disabled="false"
                   @update:model-value="setMailFieldValue"
-                  placeholder="Enter email address"
+                  :placeholder="t('playground.mailPlaceholder')"
                 />
               </v-col>
               <v-col cols="12" sm="4">
                 <sapling-link-field
-                  label="Link Field"
+                  :label="t('playground.linkField')"
                   :model-value="linkFieldValue"
                   :disabled="false"
                   @update:model-value="setLinkFieldValue"
-                  placeholder="Enter URL"
+                  :placeholder="t('playground.linkPlaceholder')"
                 />
               </v-col>
             </v-row>
@@ -299,12 +302,12 @@
           class="mb-6 glass-panel sapling-showcase__content-card sapling-playground__content-card"
           v-tilt="TILT_SOFT_OPTIONS"
         >
-          <v-card-title class="text-h6">Other Fields</v-card-title>
+          <v-card-title class="text-h6">{{ t('playground.otherFields') }}</v-card-title>
           <v-card-text>
             <v-row>
               <v-col cols="12" sm="6">
                 <sapling-boolean-field
-                  label="Boolean Field"
+                  :label="t('playground.booleanField')"
                   :model-value="booleanFieldValue"
                   :disabled="false"
                   @update:model-value="setBooleanFieldValue"
@@ -312,7 +315,7 @@
               </v-col>
               <v-col cols="12" sm="6">
                 <sapling-color-field
-                  label="Color Field"
+                  :label="t('playground.colorField')"
                   :model-value="colorFieldValue"
                   :disabled="false"
                   @update:model-value="setColorFieldValue"
@@ -329,12 +332,12 @@
           class="mb-6 glass-panel sapling-showcase__content-card sapling-playground__content-card"
           v-tilt="TILT_SOFT_OPTIONS"
         >
-          <v-card-title class="text-h6">Numbers & Dates</v-card-title>
+          <v-card-title class="text-h6">{{ t('playground.numbersAndDates') }}</v-card-title>
           <v-card-text>
             <v-row>
               <v-col cols="12" sm="6">
                 <sapling-number-field
-                  label="Number Field"
+                  :label="t('playground.numberField')"
                   :model-value="numberFieldValue"
                   :disabled="false"
                   @update:model-value="setNumberFieldValue"
@@ -342,7 +345,7 @@
               </v-col>
               <v-col cols="12" sm="6">
                 <sapling-date-type-field
-                  label="Date Field"
+                  :label="t('playground.dateField')"
                   :model-value="dateTypeFieldValue"
                   :disabled="false"
                   @update:model-value="setDateTypeFieldValue"
@@ -350,7 +353,7 @@
               </v-col>
               <v-col cols="12" sm="6">
                 <SaplingFieldMoney
-                  label="Money Field"
+                  :label="t('playground.moneyField')"
                   :model-value="moneyFieldValue"
                   :disabled="false"
                   @update:model-value="setMoneyFieldValue"
@@ -358,7 +361,7 @@
               </v-col>
               <v-col cols="12" sm="6">
                 <SaplingFieldPercent
-                  label="Percent Field"
+                  :label="t('playground.percentField')"
                   :model-value="percentFieldValue"
                   :disabled="false"
                   @update:model-value="setPercentFieldValue"
@@ -368,7 +371,7 @@
             <v-row>
               <v-col cols="12" sm="6">
                 <sapling-time-field
-                  label="Time Field"
+                  :label="t('playground.timeField')"
                   :model-value="timeFieldValue"
                   :disabled="false"
                   @update:model-value="setTimeFieldValue"
@@ -376,7 +379,7 @@
               </v-col>
               <v-col cols="12" sm="6">
                 <sapling-date-time-field
-                  label="DateTime Field"
+                  :label="t('playground.dateTimeField')"
                   :date-value="dateTimeDateValue"
                   :time-value="dateTimeTimeValue"
                   :disabled="false"
@@ -393,10 +396,10 @@
           class="mb-6 glass-panel sapling-showcase__content-card sapling-playground__content-card"
           v-tilt="TILT_SOFT_OPTIONS"
         >
-          <v-card-title class="text-h6">Icon Selection</v-card-title>
+          <v-card-title class="text-h6">{{ t('playground.iconSelection') }}</v-card-title>
           <v-card-text>
             <sapling-icon-field
-              label="Icon Field"
+              :label="t('playground.iconField')"
               :items="iconFieldItems"
               :model-value="iconFieldValue"
               :disabled="false"
@@ -410,24 +413,30 @@
           class="mb-6 glass-panel sapling-showcase__content-card sapling-playground__content-card"
           v-tilt="TILT_SOFT_OPTIONS"
         >
-          <v-card-title class="text-h6">Select Field</v-card-title>
+          <v-card-title class="text-h6">{{ t('playground.selectField') }}</v-card-title>
           <v-card-text>
             <v-row>
               <v-col cols="12" sm="6">
-                <sapling-select-field label="Multi Select Field" entity-handle="company" />
+                <sapling-select-field
+                  :label="t('playground.multiSelectField')"
+                  entity-handle="company"
+                />
               </v-col>
               <v-col cols="12" sm="6">
-                <sapling-single-select-field label="Single Select Field" entity-handle="company" />
+                <sapling-single-select-field
+                  :label="t('playground.singleSelectField')"
+                  entity-handle="company"
+                />
               </v-col>
               <v-col cols="12" sm="12">
                 <SaplingSingleSelectAddField
-                  :label="'Single Select Transfer Field'"
+                  :label="t('playground.singleSelectTransferField')"
                   :entityHandle="'company'"
                 />
               </v-col>
               <v-col cols="12" sm="12">
                 <SaplingSelectAddField
-                  :label="'Multi Select Transfer Field'"
+                  :label="t('playground.multiSelectTransferField')"
                   :entityHandle="'company'"
                 />
               </v-col>
@@ -483,7 +492,7 @@
           class="mb-6 glass-panel sapling-showcase__content-card sapling-playground__content-card"
           id="playground-data-surfaces"
         >
-          <v-card-title class="text-h6">Search and Table</v-card-title>
+          <v-card-title class="text-h6">{{ t('playground.searchAndTable') }}</v-card-title>
           <v-card-text>
             <sapling-table
               entity-handle="company"
@@ -551,6 +560,7 @@
 
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, markRaw, ref, type Component } from 'vue'
+import { useI18n } from 'vue-i18n'
 import SaplingActionAccount from '@/components/actions/SaplingActionAccount.vue'
 import SaplingActionChangePassword from '@/components/actions/SaplingActionChangePassword.vue'
 import SaplingActionClose from '@/components/actions/SaplingActionClose.vue'
@@ -685,6 +695,7 @@ const {
 const { openMailDialog } = useSaplingMailDialog()
 const { openPhoneDialog } = useSaplingPhoneDialog()
 const { pushMessage } = useSaplingMessageCenter()
+const { t } = useI18n()
 
 const demoFeedbackVisible = ref(false)
 const demoFeedbackMessage = ref('')
@@ -693,7 +704,7 @@ const demoFeedbackColor = ref('primary')
 const deleteDialogModel = ref(false)
 const deleteDialogItem = ref<SaplingGenericItem | null>({
   handle: 101,
-  name: 'Playground Record',
+  name: t('playground.deleteDialogRecordName'),
 })
 
 const kpiDialogModel = ref(false)
@@ -723,20 +734,20 @@ function pushDemoFeedback(message: string, color = 'primary') {
 function simulateMessageCenterMessage(type: Message['type']) {
   const messageConfig: Record<Message['type'], { message: string; description: string }> = {
     error: {
-      message: 'Playground Fehler',
-      description: 'Eine Fehlernachricht wurde im Playground simuliert.',
+      message: t('playground.messageCenterErrorTitle'),
+      description: t('playground.messageCenterErrorDescription'),
     },
     warning: {
-      message: 'Playground Warnung',
-      description: 'Eine Warnmeldung wurde im Playground simuliert.',
+      message: t('playground.messageCenterWarningTitle'),
+      description: t('playground.messageCenterWarningDescription'),
     },
     success: {
-      message: 'Playground Erfolg',
-      description: 'Eine Erfolgsmeldung wurde im Playground simuliert.',
+      message: t('playground.messageCenterSuccessTitle'),
+      description: t('playground.messageCenterSuccessDescription'),
     },
     info: {
-      message: 'Playground Info',
-      description: 'Eine Info-Nachricht wurde im Playground simuliert.',
+      message: t('playground.messageCenterInfoTitle'),
+      description: t('playground.messageCenterInfoDescription'),
     },
   }
 
@@ -750,12 +761,12 @@ function openDeleteShowcaseDialog() {
 
 function handleDeleteConfirm() {
   deleteDialogModel.value = false
-  pushDemoFeedback('Delete-Dialog bestaetigt.', 'warning')
+  pushDemoFeedback(t('playground.deleteConfirmedFeedback'), 'warning')
 }
 
 function handleDeleteCancel() {
   deleteDialogModel.value = false
-  pushDemoFeedback('Delete-Dialog geschlossen.', 'info')
+  pushDemoFeedback(t('playground.deleteClosedFeedback'), 'info')
 }
 
 function openKpiShowcaseDialog() {
@@ -776,7 +787,12 @@ function closeKpiDialog() {
 
 function handleKpiAdd() {
   kpiDialogModel.value = false
-  pushDemoFeedback(`KPI verknuepft: ${selectedKpi.value?.name ?? 'Unbekannt'}`, 'success')
+  pushDemoFeedback(
+    t('playground.kpiLinkedFeedback', {
+      name: selectedKpi.value?.name ?? t('global.notAvailable'),
+    }),
+    'success',
+  )
 }
 
 function openEditShowcaseDialog() {
@@ -794,12 +810,12 @@ function handleEditSave(
   action: DialogSaveAction,
   context?: DialogSaveContext,
 ) {
-  pushDemoFeedback(`Edit-Dialog ausgefuehrt: ${action}`, 'success')
+  pushDemoFeedback(t('playground.editExecutedFeedback', { action }), 'success')
   context?.complete()
 }
 
 function handleEditCancel() {
-  pushDemoFeedback('Edit-Dialog geschlossen.', 'info')
+  pushDemoFeedback(t('playground.editClosedFeedback'), 'info')
 }
 
 function openMailShowcaseDialog() {
@@ -807,7 +823,7 @@ function openMailShowcaseDialog() {
     entityHandle: showcaseEntityHandle.value,
     itemHandle: 1,
     initialTo: [mailFieldValue.value || 'demo@sapling.local'],
-    initialSubject: 'Sapling Playground Showcase',
+    initialSubject: t('playground.mailInitialSubject'),
     draftValues: {
       email: mailFieldValue.value,
       link: linkFieldValue.value,
@@ -826,112 +842,114 @@ function openPhoneShowcaseDialog() {
   })
 }
 
-const actionShowcases: ShowcaseActionCard[] = [
+const actionShowcases = computed<ShowcaseActionCard[]>(() => [
   {
     key: 'save',
-    title: 'Save',
-    description: 'Standard Save-Footer inklusive Save-and-Close-Aktion.',
+    title: t('playground.actionSaveTitle'),
+    description: t('playground.actionSaveDescription'),
     component: markRaw(SaplingActionSave),
     props: {
-      cancel: () => pushDemoFeedback('Cancel aus Save-Action.', 'info'),
-      save: () => pushDemoFeedback('Save aus Save-Action.', 'success'),
-      saveAndClose: () => pushDemoFeedback('Save and Close aus Save-Action.', 'success'),
+      cancel: () => pushDemoFeedback(t('playground.actionSaveCancelFeedback'), 'info'),
+      save: () => pushDemoFeedback(t('playground.actionSaveFeedback'), 'success'),
+      saveAndClose: () => pushDemoFeedback(t('playground.actionSaveAndCloseFeedback'), 'success'),
     },
   },
   {
     key: 'delete',
-    title: 'Delete',
-    description: 'Destruktive Bestaetigungsaktion für Delete-Dialoge.',
+    title: t('playground.actionDeleteTitle'),
+    description: t('playground.actionDeleteDescription'),
     component: markRaw(SaplingActionDelete),
     props: {
-      handleCancel: () => pushDemoFeedback('Delete abgebrochen.', 'info'),
-      handleConfirm: () => pushDemoFeedback('Delete bestaetigt.', 'warning'),
+      handleCancel: () => pushDemoFeedback(t('playground.actionDeleteCancelFeedback'), 'info'),
+      handleConfirm: () => pushDemoFeedback(t('playground.actionDeleteConfirmFeedback'), 'warning'),
     },
   },
   {
     key: 'close',
-    title: 'Close',
-    description: 'Minimaler Footer für Readonly- oder Preview-Screens.',
+    title: t('playground.actionCloseTitle'),
+    description: t('playground.actionCloseDescription'),
     component: markRaw(SaplingActionClose),
     props: {
-      close: () => pushDemoFeedback('Close-Aktion ausgelost.', 'info'),
+      close: () => pushDemoFeedback(t('playground.actionCloseFeedback'), 'info'),
     },
   },
   {
     key: 'login',
-    title: 'Login',
-    description: 'Login-Footer mit optionalen Social-Providern.',
+    title: t('playground.actionLoginTitle'),
+    description: t('playground.actionLoginDescription'),
     component: markRaw(SaplingActionLogin),
     props: {
-      handleAzure: () => pushDemoFeedback('Azure Login gestartet.', 'primary'),
-      handleGoogle: () => pushDemoFeedback('Google Login gestartet.', 'primary'),
-      handleLogin: () => pushDemoFeedback('Lokaler Login gestartet.', 'success'),
+      handleAzure: () => pushDemoFeedback(t('playground.actionAzureLoginFeedback'), 'primary'),
+      handleGoogle: () => pushDemoFeedback(t('playground.actionGoogleLoginFeedback'), 'primary'),
+      handleLogin: () => pushDemoFeedback(t('playground.actionLocalLoginFeedback'), 'success'),
       isLoading: false,
     },
   },
   {
     key: 'mail',
-    title: 'Mail',
-    description: 'Mail-Workflow mit Preview-Refresh und Versand-Trigger.',
+    title: t('playground.actionMailTitle'),
+    description: t('playground.actionMailDescription'),
     component: markRaw(SaplingActionMail),
     props: {
-      close: () => pushDemoFeedback('Mail-Dialog geschlossen.', 'info'),
-      refreshPreview: () => pushDemoFeedback('Mail-Preview aktualisiert.', 'primary'),
-      send: () => pushDemoFeedback('Mail-Versand ausgelost.', 'success'),
+      close: () => pushDemoFeedback(t('playground.actionMailCloseFeedback'), 'info'),
+      refreshPreview: () => pushDemoFeedback(t('playground.actionMailRefreshFeedback'), 'primary'),
+      send: () => pushDemoFeedback(t('playground.actionMailSendFeedback'), 'success'),
       isPreviewLoading: false,
       isSending: false,
     },
   },
   {
     key: 'upload',
-    title: 'Upload',
-    description: 'Upload-Footer für Dateidialoge mit Event-API.',
+    title: t('playground.actionUploadTitle'),
+    description: t('playground.actionUploadDescription'),
     component: markRaw(SaplingActionUpload),
     props: {
       isLoading: false,
     },
     listeners: {
-      close: () => pushDemoFeedback('Upload geschlossen.', 'info'),
-      upload: () => pushDemoFeedback('Upload gestartet.', 'success'),
+      close: () => pushDemoFeedback(t('playground.actionUploadCloseFeedback'), 'info'),
+      upload: () => pushDemoFeedback(t('playground.actionUploadStartFeedback'), 'success'),
     },
   },
   {
     key: 'account',
-    title: 'Account',
-    description: 'Kombinierte Footer-Aktion für Account-Dialoge.',
+    title: t('playground.actionAccountTitle'),
+    description: t('playground.actionAccountDescription'),
     component: markRaw(SaplingActionAccount),
     props: {
-      handleClose: () => pushDemoFeedback('Account-Dialog geschlossen.', 'info'),
-      handleChangePassword: () => pushDemoFeedback('Passwortwechsel ausgelost.', 'primary'),
-      handleLogout: () => pushDemoFeedback('Logout ausgelost.', 'warning'),
+      handleClose: () => pushDemoFeedback(t('playground.actionAccountCloseFeedback'), 'info'),
+      handleChangePassword: () =>
+        pushDemoFeedback(t('playground.actionAccountPasswordFeedback'), 'primary'),
+      handleLogout: () => pushDemoFeedback(t('playground.actionAccountLogoutFeedback'), 'warning'),
     },
   },
   {
     key: 'change-password',
-    title: 'Change Password',
-    description: 'Spezialisierte Action für Passwortwechsel-Flaechen.',
+    title: t('playground.actionChangePasswordTitle'),
+    description: t('playground.actionChangePasswordDescription'),
     component: markRaw(SaplingActionChangePassword),
     props: {
       allowCancel: true,
-      closeDialog: () => pushDemoFeedback('Passwort-Dialog geschlossen.', 'info'),
-      handlePasswordChange: () => pushDemoFeedback('Passwortwechsel bestaetigt.', 'success'),
+      closeDialog: () => pushDemoFeedback(t('playground.actionPasswordCloseFeedback'), 'info'),
+      handlePasswordChange: () =>
+        pushDemoFeedback(t('playground.actionPasswordConfirmFeedback'), 'success'),
     },
   },
-]
+])
 
 const dialogLaunchers = computed<ShowcaseDialogLauncher[]>(() => [
   {
     key: 'delete',
-    title: 'Delete Dialog',
-    description: 'Kompakter Danger-Dialog für Loesch-Workflows.',
+    title: t('playground.deleteDialogTitle'),
+    description: t('playground.deleteDialogDescription'),
     icon: 'mdi-delete-outline',
     color: 'error',
     open: openDeleteShowcaseDialog,
   },
   {
     key: 'kpi',
-    title: 'KPI Dialog',
-    description: 'Verknuepft eine KPI aus den geladenen Beispielkarten.',
+    title: t('playground.kpiDialogTitle'),
+    description: t('playground.kpiDialogDescription'),
     icon: 'mdi-chart-box-outline',
     color: 'primary',
     disabled: !canOpenKpiDialog.value,
@@ -939,8 +957,8 @@ const dialogLaunchers = computed<ShowcaseDialogLauncher[]>(() => [
   },
   {
     key: 'edit',
-    title: 'Edit Dialog',
-    description: 'Oeffnet den grossen Shared Edit Dialog mit echten Templates.',
+    title: t('playground.editDialogTitle'),
+    description: t('playground.editDialogDescription'),
     icon: 'mdi-form-select',
     color: 'primary',
     disabled: !canOpenEditDialog.value,
@@ -948,16 +966,16 @@ const dialogLaunchers = computed<ShowcaseDialogLauncher[]>(() => [
   },
   {
     key: 'mail',
-    title: 'Mail Dialog',
-    description: 'Startet den globalen Mail-Composer mit Playground-Kontext.',
+    title: t('playground.mailDialogTitle'),
+    description: t('playground.mailDialogDescription'),
     icon: 'mdi-email-fast-outline',
     color: 'secondary',
     open: openMailShowcaseDialog,
   },
   {
     key: 'phone',
-    title: 'Phone Dialog',
-    description: 'Startet den globalen Telefon-Dialog mit Demo-Nummer.',
+    title: t('playground.phoneDialogTitle'),
+    description: t('playground.phoneDialogDescription'),
     icon: 'mdi-phone-outline',
     color: 'secondary',
     open: openPhoneShowcaseDialog,
@@ -965,9 +983,9 @@ const dialogLaunchers = computed<ShowcaseDialogLauncher[]>(() => [
 ])
 
 const playgroundMetrics = computed(() => [
-  { label: 'Actions', value: actionShowcases.length },
-  { label: 'Dialogs', value: dialogLaunchers.value.length },
-  { label: 'Templates', value: entityTemplates.value.length },
-  { label: 'KPI Cards', value: 4 },
+  { label: t('playground.metricActions'), value: actionShowcases.value.length },
+  { label: t('playground.metricDialogs'), value: dialogLaunchers.value.length },
+  { label: t('playground.metricTemplates'), value: entityTemplates.value.length },
+  { label: t('playground.metricKpiCards'), value: 4 },
 ])
 </script>
