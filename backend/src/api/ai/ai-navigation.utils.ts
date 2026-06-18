@@ -153,7 +153,6 @@ export function buildNavigationLinksForToolCall(
           entityHandle,
           kind: 'route',
           intent: 'route',
-          label: 'Seite öffnen',
           resultCount: 1,
           toolName: toolCall.toolName,
         },
@@ -196,7 +195,6 @@ export function buildNavigationLinksForToolCall(
           toolCall.toolName === 'generic_update'
             ? 'mutationResult'
             : 'record',
-        label: 'Datensatz öffnen',
         resultCount: 1,
         recordHandles: [recordHandle],
         toolName: toolCall.toolName,
@@ -367,7 +365,7 @@ function buildRecordHandleListLink(
   rawHandles: Array<string | number>,
   options: {
     intent: AiChatNavigationLink['intent'];
-    label: string;
+    label?: string;
     toolName: string;
   },
 ): AiChatNavigationLink[] {
@@ -390,7 +388,7 @@ function buildRecordHandleListLink(
       entityHandle,
       kind: recordHandles.length === 1 ? 'record' : 'list',
       intent: options.intent,
-      label: options.label,
+      ...(options.label ? { label: options.label } : {}),
       resultCount: recordHandles.length,
       recordHandles,
       toolName: options.toolName,
@@ -432,12 +430,9 @@ function deduplicateHandles(
   return [...deduplicated.values()];
 }
 
-function buildListLabel(entityHandle: string, handles: Array<string | number>) {
-  const count = deduplicateHandles(handles).length;
-
-  if (count === 1) {
-    return 'Datensatz öffnen';
-  }
-
-  return `${count} Datensätze öffnen`;
+function buildListLabel(
+  _entityHandle: string,
+  _handles: Array<string | number>,
+): string | undefined {
+  return undefined;
 }

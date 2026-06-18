@@ -28,12 +28,7 @@ export type AiChatNavigationLink = {
   path: string;
   entityHandle: string;
   kind: 'list' | 'record' | 'route';
-  intent?:
-    | 'searchResults'
-    | 'record'
-    | 'route'
-    | 'mutationResult'
-    | 'none';
+  intent?: 'searchResults' | 'record' | 'route' | 'mutationResult' | 'none';
   label?: string;
   resultCount?: number | null;
   recordHandles?: Array<string | number>;

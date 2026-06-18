@@ -1,6 +1,6 @@
 <template>
   <section class="sapling-min-size-0 sapling-chat-conversation sapling-ai-chat__conversation">
-    <div class="sapling-chat-conversation__header sapling-ai-chat__conversation-header">
+    <div class="sapling-chat-conversation__header">
       <SaplingAiChatConversationTitle
         :title="activeConversationTitle"
         :title-preview-limit="titlePreviewLimit"

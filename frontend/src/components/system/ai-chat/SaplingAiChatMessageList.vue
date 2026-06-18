@@ -67,17 +67,24 @@
           v-for="action in getMessageToolActions(message)"
           :key="action.handle ?? `${action.serverName}.${action.toolName}`"
           class="sapling-ai-chat__tool-action"
+          :class="{ 'sapling-ai-chat__tool-action--compact': action.status !== 'pending' }"
         >
           <div class="sapling-row-between-md sapling-ai-chat__tool-action-header">
-            <div class="sapling-stack-xs">
-              <strong>{{ t('aiChat.toolActionTitle') }}</strong>
-              <span>{{ action.serverName }}.{{ action.toolName }}</span>
+            <div class="sapling-ai-chat__tool-action-copy">
+              <strong class="sapling-ai-chat__tool-action-title">{{
+                getToolActionTitle(action)
+              }}</strong>
+              <span
+                v-if="getToolActionSummary(action)"
+                class="sapling-ai-chat__tool-action-summary"
+              >
+                {{ getToolActionSummary(action) }}
+              </span>
             </div>
-            <v-chip size="small" variant="tonal">{{ getToolActionStatusLabel(action) }}</v-chip>
+            <div class="sapling-ai-chat__tool-action-meta">
+              <v-chip size="small" variant="tonal">{{ getToolActionStatusLabel(action) }}</v-chip>
+            </div>
           </div>
-          <pre class="sapling-ai-chat__tool-action-arguments">{{
-            formatToolActionArguments(action)
-          }}</pre>
           <v-alert
             v-if="getToolActionError(action)"
             class="sapling-ai-chat__tool-action-error"
@@ -110,6 +117,42 @@
               @click="emit('reject-tool-action', action)"
             >
               {{ t('aiChat.rejectToolAction') }}
+            </v-btn>
+            <v-btn
+              v-if="hasToolActionTechnicalDetails(action)"
+              size="small"
+              variant="text"
+              prepend-icon="mdi-information-outline"
+              @click="openToolActionTechnicalDetails(action)"
+            >
+              {{ getToolActionDetailsButtonLabel() }}
+            </v-btn>
+          </div>
+          <div
+            v-else-if="
+              hasToolActionTechnicalDetails(action) ||
+              getToolActionNavigationLinks(action).length > 0
+            "
+            class="sapling-row-xs sapling-ai-chat__tool-action-actions"
+          >
+            <v-btn
+              v-for="link in getToolActionNavigationLinks(action)"
+              :key="`${action.handle ?? `${action.serverName}.${action.toolName}`}-${link.path}`"
+              size="small"
+              variant="tonal"
+              prepend-icon="mdi-open-in-app"
+              @click="openNavigationLink(link.path)"
+            >
+              {{ getNavigationLinkLabel(link) }}
+            </v-btn>
+            <v-btn
+              v-if="hasToolActionTechnicalDetails(action)"
+              size="small"
+              variant="text"
+              prepend-icon="mdi-information-outline"
+              @click="openToolActionTechnicalDetails(action)"
+            >
+              {{ getToolActionDetailsButtonLabel() }}
             </v-btn>
           </div>
         </div>
@@ -154,6 +197,68 @@
         </v-btn>
       </div>
     </div>
+    <v-dialog
+      :model-value="!!activeToolActionDetails"
+      max-width="760"
+      class="sapling-dialog-medium sapling-ai-chat__tool-action-details-dialog"
+      @update:model-value="handleToolActionDetailsDialogUpdate"
+    >
+      <SaplingDialogCard class="sapling-ai-chat__tool-action-details-card" :tilt="false">
+        <div class="sapling-dialog-shell sapling-ai-chat__tool-action-details-shell">
+          <SaplingDialogHero
+            :eyebrow="getToolActionDetailsButtonLabel()"
+            :title="getActiveToolActionDetailsTitle()"
+          />
+          <div class="sapling-ai-chat__tool-action-details-body">
+            <p v-if="activeToolActionDetails" class="sapling-ai-chat__tool-action-details-intro">
+              {{ getToolActionTechnicalDetailsIntro(activeToolActionDetails) }}
+            </p>
+            <div
+              v-if="
+                activeToolActionDetails &&
+                getToolActionPreviewRows(activeToolActionDetails).length > 0
+              "
+              class="sapling-ai-chat__tool-action-preview"
+            >
+              <div
+                v-for="row in getToolActionPreviewRows(activeToolActionDetails)"
+                :key="row.key"
+                class="sapling-ai-chat__tool-action-preview-row"
+              >
+                <span class="sapling-ai-chat__tool-action-preview-label">{{ row.label }}</span>
+                <span class="sapling-ai-chat__tool-action-preview-value">{{ row.value }}</span>
+              </div>
+            </div>
+            <v-expansion-panels
+              v-if="activeToolActionDetails"
+              class="sapling-ai-chat__tool-action-technical-panel"
+              variant="accordion"
+            >
+              <v-expansion-panel>
+                <v-expansion-panel-title>{{ getTechnicalRawDataLabel() }}</v-expansion-panel-title>
+                <v-expansion-panel-text>
+                  <pre
+                    class="sapling-ai-chat__tool-action-arguments sapling-ai-chat__tool-action-arguments--dialog"
+                    >{{ formatToolActionTechnicalDetails(activeToolActionDetails) }}</pre
+                  >
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+            </v-expansion-panels>
+          </div>
+          <SaplingActionBar>
+            <template #leading>
+              <v-btn
+                variant="text"
+                prepend-icon="mdi-close"
+                @click="closeToolActionTechnicalDetails"
+              >
+                {{ getCloseButtonLabel() }}
+              </v-btn>
+            </template>
+          </SaplingActionBar>
+        </div>
+      </SaplingDialogCard>
+    </v-dialog>
   </div>
 </template>
 
@@ -161,7 +266,10 @@
 import { nextTick, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import SaplingActionBar from '@/components/actions/SaplingActionBar.vue'
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import SaplingMarkdownContent from '@/components/common/SaplingMarkdownContent.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import type { AiChatMessageItem, AiChatToolActionItem } from '@/entity/entity'
 
 interface ChatNavigationLink {
@@ -185,6 +293,12 @@ interface ChatImportAttachment {
     headers?: unknown[]
     status?: string
   } | null
+}
+
+interface ToolActionPreviewRow {
+  key: string
+  label: string
+  value: string
 }
 
 const props = defineProps<{
@@ -211,6 +325,7 @@ const emit = defineEmits<{
 const { t, te } = useI18n()
 const router = useRouter()
 const messageContainer = ref<HTMLElement | null>(null)
+const activeToolActionDetails = ref<AiChatToolActionItem | null>(null)
 const autoOpenedNavigationKeys = new Set<string>()
 
 function getLastItem<T>(items: readonly T[]): T | undefined {
@@ -288,10 +403,345 @@ function getToolActionStatusLabel(action: AiChatToolActionItem) {
   return te(key) ? t(key) : action.status
 }
 
-function formatToolActionArguments(action: AiChatToolActionItem) {
-  const args = action.arguments ?? {}
-  const text = JSON.stringify(args, null, 2)
-  return text.length > 800 ? `${text.slice(0, 797)}...` : text
+function getToolActionTitle(action: AiChatToolActionItem) {
+  const kind = getToolActionKind(action)
+  const entityLabel = getToolActionEntityLabel(action)
+  const entityResultTitle = getToolActionEntityResultTitle(kind, action.status, entityLabel)
+
+  if (entityResultTitle) {
+    return entityResultTitle
+  }
+
+  const key = `aiChat.toolActionTitle.${kind}.${action.status}`
+
+  if (te(key)) {
+    return t(key)
+  }
+
+  const fallback = getToolActionTitleFallback(kind, action.status)
+  return fallback ?? (te('aiChat.toolActionTitle') ? t('aiChat.toolActionTitle') : 'Aktion')
+}
+
+function getToolActionEntityResultTitle(kind: string, status: string, entityLabel: string | null) {
+  if (!entityLabel || status !== 'executed') {
+    return null
+  }
+
+  if (kind === 'create') {
+    return `${entityLabel} angelegt`
+  }
+
+  if (kind === 'update') {
+    return `${entityLabel} bearbeitet`
+  }
+
+  if (kind === 'delete') {
+    return `${entityLabel} gelöscht`
+  }
+
+  return null
+}
+
+function getToolActionTitleFallback(kind: string, status: string) {
+  const titleByKindAndStatus: Record<string, Record<string, string>> = {
+    create: {
+      pending: 'Anlage bestätigen',
+      executed: 'Anlage ausgeführt',
+      failed: 'Anlage fehlgeschlagen',
+      rejected: 'Anlage abgelehnt',
+      expired: 'Anlage abgelaufen',
+    },
+    update: {
+      pending: 'Bearbeitung bestätigen',
+      executed: 'Bearbeitung ausgeführt',
+      failed: 'Bearbeitung fehlgeschlagen',
+      rejected: 'Bearbeitung abgelehnt',
+      expired: 'Bearbeitung abgelaufen',
+    },
+    delete: {
+      pending: 'Löschen bestätigen',
+      executed: 'Löschung ausgeführt',
+      failed: 'Löschung fehlgeschlagen',
+      rejected: 'Löschung abgelehnt',
+      expired: 'Löschung abgelaufen',
+    },
+    importConfigure: {
+      pending: 'Import konfigurieren bestätigen',
+      executed: 'Import konfiguriert',
+      failed: 'Import-Konfiguration fehlgeschlagen',
+      rejected: 'Import-Konfiguration abgelehnt',
+      expired: 'Import-Konfiguration abgelaufen',
+    },
+    importExecute: {
+      pending: 'Import ausführen bestätigen',
+      executed: 'Import ausgeführt',
+      failed: 'Import fehlgeschlagen',
+      rejected: 'Import abgelehnt',
+      expired: 'Import abgelaufen',
+    },
+  }
+
+  return titleByKindAndStatus[kind]?.[status] ?? titleByKindAndStatus.action?.[status] ?? null
+}
+
+function getToolActionKind(action: AiChatToolActionItem) {
+  if (action.toolName === 'generic_create') {
+    return 'create'
+  }
+
+  if (action.toolName === 'generic_update') {
+    return 'update'
+  }
+
+  if (action.toolName === 'generic_delete') {
+    return 'delete'
+  }
+
+  if (action.toolName === 'import_configure_batch') {
+    return 'importConfigure'
+  }
+
+  if (action.toolName === 'import_execute_batch') {
+    return 'importExecute'
+  }
+
+  return 'action'
+}
+
+function getToolActionSummary(action: AiChatToolActionItem) {
+  const entityLabel = getToolActionEntityLabel(action)
+
+  if (entityLabel && action.status === 'pending') {
+    return entityLabel
+  }
+
+  if (entityLabel && action.status === 'failed') {
+    return entityLabel
+  }
+
+  if (action.toolName === 'import_configure_batch' || action.toolName === 'import_execute_batch') {
+    return 'Import'
+  }
+
+  return ''
+}
+
+function getToolActionEntityLabel(action: AiChatToolActionItem) {
+  const entityHandle =
+    extractEntityHandle(action.arguments) ?? extractEntityHandle(action.resultPayload)
+  return entityHandle ? getNavigationEntityLabel(entityHandle, 1) : null
+}
+
+function hasToolActionTechnicalDetails(action: AiChatToolActionItem) {
+  return (
+    hasPayloadContent(action.arguments) ||
+    hasPayloadContent(action.resultPayload) ||
+    hasPayloadContent(action.errorPayload)
+  )
+}
+
+function hasPayloadContent(value: unknown) {
+  if (value == null) {
+    return false
+  }
+
+  if (Array.isArray(value)) {
+    return value.length > 0
+  }
+
+  if (typeof value === 'object') {
+    return Object.keys(value).length > 0
+  }
+
+  return true
+}
+
+function getToolActionDetailsButtonLabel() {
+  return te('aiChat.toolActionDetails') ? t('aiChat.toolActionDetails') : 'Details'
+}
+
+function getTechnicalRawDataLabel() {
+  return te('aiChat.toolActionTechnicalRawData')
+    ? t('aiChat.toolActionTechnicalRawData')
+    : 'Technische Rohdaten'
+}
+
+function openToolActionTechnicalDetails(action: AiChatToolActionItem) {
+  activeToolActionDetails.value = action
+}
+
+function closeToolActionTechnicalDetails() {
+  activeToolActionDetails.value = null
+}
+
+function handleToolActionDetailsDialogUpdate(isOpen: boolean) {
+  if (!isOpen) {
+    closeToolActionTechnicalDetails()
+  }
+}
+
+function getActiveToolActionDetailsTitle() {
+  return activeToolActionDetails.value
+    ? getToolActionTitle(activeToolActionDetails.value)
+    : getToolActionDetailsButtonLabel()
+}
+
+function getToolActionTechnicalDetailsIntro(action: AiChatToolActionItem) {
+  const entityLabel = getToolActionEntityLabel(action)
+
+  if (action.status === 'executed') {
+    return entityLabel
+      ? `${entityLabel}: die ausgeführte Aktion im Überblick.`
+      : 'Die ausgeführte Aktion im Überblick.'
+  }
+
+  if (action.status === 'failed') {
+    return entityLabel
+      ? `${entityLabel}: die Aktion konnte nicht ausgeführt werden.`
+      : 'Die Aktion konnte nicht ausgeführt werden.'
+  }
+
+  return entityLabel
+    ? `${entityLabel}: prüfen Sie die geplanten Angaben vor der Ausführung.`
+    : 'Prüfen Sie die geplanten Angaben vor der Ausführung.'
+}
+
+function getToolActionPreviewRows(action: AiChatToolActionItem): ToolActionPreviewRow[] {
+  const args = asRecord(action.arguments)
+  const entityHandle =
+    extractEntityHandle(action.arguments) ?? extractEntityHandle(action.resultPayload)
+  const rows: ToolActionPreviewRow[] = []
+
+  if (entityHandle) {
+    rows.push({
+      key: 'entityHandle',
+      label: 'Datensatztyp',
+      value: getNavigationEntityLabel(entityHandle, 1),
+    })
+  }
+
+  const recordHandle = extractHandleValue(args?.handle)
+
+  if (recordHandle != null) {
+    rows.push({
+      key: 'handle',
+      label: 'Datensatz',
+      value: String(recordHandle),
+    })
+  }
+
+  const data = asRecord(args?.data)
+
+  if (data) {
+    for (const [key, value] of Object.entries(data)) {
+      rows.push({
+        key: `data.${key}`,
+        label: getToolActionFieldLabel(entityHandle, key),
+        value: formatToolActionPreviewValue(value),
+      })
+    }
+  }
+
+  if (rows.length <= (entityHandle ? 1 : 0) && args) {
+    const skippedArgumentKeys = new Set(['entityHandle', 'data', 'relations'])
+
+    for (const [key, value] of Object.entries(args)) {
+      if (skippedArgumentKeys.has(key)) {
+        continue
+      }
+
+      rows.push({
+        key: `argument.${key}`,
+        label: getToolActionFieldLabel(entityHandle, key),
+        value: formatToolActionPreviewValue(value),
+      })
+    }
+  }
+
+  return rows.slice(0, 24)
+}
+
+function getToolActionFieldLabel(entityHandle: string | null, fieldName: string) {
+  const fieldKey = entityHandle ? `${entityHandle}.${fieldName}` : ''
+
+  if (fieldKey && te(fieldKey)) {
+    return String(t(fieldKey)).trim()
+  }
+
+  return humanizeEntityHandle(fieldName)
+}
+
+function formatToolActionPreviewValue(value: unknown): string {
+  if (value == null) {
+    return 'leer'
+  }
+
+  if (typeof value === 'boolean') {
+    return value ? 'Ja' : 'Nein'
+  }
+
+  if (typeof value === 'string') {
+    return value.trim() || 'leer'
+  }
+
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? String(value) : 'leer'
+  }
+
+  if (Array.isArray(value)) {
+    if (value.length === 0) {
+      return 'leer'
+    }
+
+    const preview = value.slice(0, 5).map(formatToolActionPreviewValue).join(', ')
+    return value.length > 5 ? `${preview}, ...` : preview
+  }
+
+  const record = asRecord(value)
+
+  if (record) {
+    const displayKeys = [
+      'label',
+      'displayName',
+      'name',
+      'title',
+      'subject',
+      'number',
+      'code',
+      'handle',
+    ]
+
+    for (const displayKey of displayKeys) {
+      const displayValue = record[displayKey]
+
+      if (
+        typeof displayValue === 'string' ||
+        typeof displayValue === 'number' ||
+        typeof displayValue === 'boolean'
+      ) {
+        return formatToolActionPreviewValue(displayValue)
+      }
+    }
+  }
+
+  const text = JSON.stringify(value)
+  return text && text.length > 120 ? `${text.slice(0, 117)}...` : (text ?? 'leer')
+}
+
+function formatToolActionTechnicalDetails(action: AiChatToolActionItem) {
+  const payload = {
+    tool: `${action.serverName}.${action.toolName}`,
+    status: action.status,
+    arguments: action.arguments ?? {},
+    result: action.resultPayload ?? null,
+    error: action.errorPayload ?? null,
+  }
+  const text = JSON.stringify(payload, null, 2)
+  return text.length > 6000 ? `${text.slice(0, 5997)}...` : text
+}
+
+function getCloseButtonLabel() {
+  return te('global.close') ? t('global.close') : 'Schließen'
 }
 
 function getToolActionError(action: AiChatToolActionItem) {
@@ -317,6 +767,39 @@ function getToolActionError(action: AiChatToolActionItem) {
 
   const key = value.trim()
   return te(key) ? t(key) : key
+}
+
+function getToolActionNavigationLinks(action: AiChatToolActionItem): ChatNavigationLink[] {
+  if (action.status !== 'executed') {
+    return []
+  }
+
+  if (action.toolName !== 'generic_create' && action.toolName !== 'generic_update') {
+    return []
+  }
+
+  const entityHandle =
+    extractEntityHandle(action.arguments) ?? extractEntityHandle(action.resultPayload)
+  const recordHandle =
+    extractResultRecordHandle(action.resultPayload) ??
+    extractHandleValue(asRecord(action.arguments)?.handle)
+
+  if (!entityHandle || recordHandle == null) {
+    return []
+  }
+
+  return [
+    {
+      path: buildEntityTablePath(entityHandle, { handle: recordHandle }),
+      entityHandle,
+      kind: 'record',
+      intent: 'mutationResult',
+      resultCount: 1,
+      recordHandles: [recordHandle],
+      toolName: action.toolName,
+      isPrimary: true,
+    },
+  ]
 }
 
 function getTransparencyChips(message: AiChatMessageItem): string[] {
@@ -548,6 +1031,10 @@ function isVisibleNavigationLink(link: ChatNavigationLink) {
 }
 
 function getNavigationLinkLabel(link: ChatNavigationLink) {
+  if (link.kind === 'record' || link.kind === 'list') {
+    return buildEntityNavigationLabel(link)
+  }
+
   if (typeof link.label === 'string' && link.label.trim()) {
     return link.label.trim()
   }
@@ -561,6 +1048,94 @@ function getNavigationLinkLabel(link: ChatNavigationLink) {
   }
 
   return t('aiChat.openDataLink')
+}
+
+function buildEntityNavigationLabel(link: ChatNavigationLink) {
+  const count =
+    typeof link.resultCount === 'number' && Number.isFinite(link.resultCount)
+      ? Math.max(1, Math.trunc(link.resultCount))
+      : Math.max(1, link.recordHandles?.length ?? 1)
+  const entityLabel = getNavigationEntityLabel(link.entityHandle, count)
+
+  if (count === 1) {
+    return `${entityLabel} öffnen`
+  }
+
+  return `${count} ${entityLabel} öffnen`
+}
+
+function getNavigationEntityLabel(entityHandle: string, count: number) {
+  const navigationKey = `navigation.${entityHandle}`
+  const translated = te(navigationKey) ? String(t(navigationKey)).trim() : ''
+  const label = translated || humanizeEntityHandle(entityHandle)
+
+  return count === 1 ? singularizeEntityLabel(label) : label
+}
+
+function singularizeEntityLabel(label: string) {
+  const trimmedLabel = label.trim()
+
+  if (trimmedLabel.length > 3 && trimmedLabel.endsWith('s')) {
+    return trimmedLabel.slice(0, -1)
+  }
+
+  return trimmedLabel
+}
+
+function humanizeEntityHandle(entityHandle: string) {
+  const spaced = entityHandle.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[-_]+/g, ' ')
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1)
+}
+
+function buildEntityTablePath(entityHandle: string, filter: Record<string, unknown>) {
+  return `/table/${entityHandle}?filter=${encodeURIComponent(JSON.stringify(filter))}`
+}
+
+function extractEntityHandle(value: unknown): string | null {
+  const record = asRecord(value)
+  const directValue = record?.entityHandle
+
+  if (typeof directValue === 'string' && directValue.trim()) {
+    return directValue.trim()
+  }
+
+  const args = asRecord(record?.arguments)
+  const argumentValue = args?.entityHandle
+
+  return typeof argumentValue === 'string' && argumentValue.trim() ? argumentValue.trim() : null
+}
+
+function extractResultRecordHandle(value: unknown): string | number | null {
+  const record = asRecord(value)
+
+  if (!record) {
+    return null
+  }
+
+  return (
+    extractHandleValue(record?.handle) ??
+    extractHandleValue(asRecord(record?.record)?.handle) ??
+    extractResultRecordHandle(record?.rawResult) ??
+    extractResultRecordHandle(record?.modelResult)
+  )
+}
+
+function extractHandleValue(value: unknown): string | number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
+  }
+
+  if (typeof value === 'string' && value.trim()) {
+    return value.trim()
+  }
+
+  return null
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null
 }
 
 async function openNavigationLink(path: string) {

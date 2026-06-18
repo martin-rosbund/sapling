@@ -1,8 +1,6 @@
 <template>
   <div class="sapling-chat-conversation__heading sapling-ai-chat__conversation-heading">
-    <div
-      class="sapling-row-xs sapling-chat-conversation__title-row sapling-ai-chat__conversation-title-row"
-    >
+    <div class="sapling-row-xs sapling-chat-conversation__title-row">
       <div
         class="sapling-section-title sapling-chat-conversation__title sapling-ai-chat__conversation-title"
       >

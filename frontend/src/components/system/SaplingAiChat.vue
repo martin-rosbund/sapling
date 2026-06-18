@@ -187,6 +187,7 @@ const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoad
   'aiChat',
   'ai',
   'import',
+  'navigation',
 )
 const assistantName = 'Songbird'
 const TITLE_PREVIEW_LIMIT = 30
