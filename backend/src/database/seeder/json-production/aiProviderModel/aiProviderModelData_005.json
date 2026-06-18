@@ -11,7 +11,7 @@
     "isDefault": true,
     "isActive": false,
     "sortOrder": 10,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   },
   {
     "handle": "ollama-nomic-embed-text",
@@ -26,6 +26,6 @@
     "isDefault": true,
     "isActive": false,
     "sortOrder": 50,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   }
 ]

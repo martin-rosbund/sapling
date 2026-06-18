@@ -7,6 +7,7 @@ import { CurrentModule } from '../current/current.module';
 import { TemplateModule } from '../template/template.module';
 import { AiService } from './ai.service';
 import { AiChatRuntimeService } from './ai-chat-runtime.service';
+import { AiAgentRunLifecycleService } from './ai-agent-run-lifecycle.service';
 import { AiAgentPolicyService } from './ai-agent-policy.service';
 import { AiProviderRegistryService } from './ai-provider-registry.service';
 import { AiVectorService } from './ai-vector.service';
@@ -22,7 +23,9 @@ import { McpServerConfigItem } from '../../entity/McpServerConfigItem';
 import { AiVectorDocumentItem } from '../../entity/AiVectorDocumentItem';
 import { McpService } from './mcp.service';
 import { SaplingMcpService } from './sapling-mcp.service';
+import { SaplingMcpCriteriaService } from './sapling-mcp-criteria.service';
 import { SaplingMcpPermissionService } from './sapling-mcp-permission.service';
+import { SaplingMcpResultFormatterService } from './sapling-mcp-result-formatter.service';
 import { AiAgentEvaluationItem } from '../../entity/AiAgentEvaluationItem';
 import { AiAgentMemoryItem } from '../../entity/AiAgentMemoryItem';
 import { AiAgentPlaybookItem } from '../../entity/AiAgentPlaybookItem';
@@ -69,12 +72,15 @@ import { ImportModule } from '../import/import.module';
   providers: [
     AiService,
     AiChatRuntimeService,
+    AiAgentRunLifecycleService,
     AiAgentPolicyService,
     AiProviderRegistryService,
     AiVectorService,
     McpService,
     SaplingMcpService,
+    SaplingMcpCriteriaService,
     SaplingMcpPermissionService,
+    SaplingMcpResultFormatterService,
   ],
   controllers: [AiController],
   exports: [

@@ -319,7 +319,7 @@ export class AiProviderModelItem {
   @Property({ nullable: false, default: 4000 })
   speechMaxInputLength = 4000;
 
-  @ApiPropertyOptional({ default: 8 })
+  @ApiPropertyOptional({ default: 100 })
   @SaplingForm({
     order: 200,
     group: 'aiProviderModel.groupBasics',
@@ -331,8 +331,8 @@ export class AiProviderModelItem {
     mobileOrder: 200,
     mobileVisible: false,
   })
-  @Property({ nullable: false, default: 8 })
-  maxToolCallIterations = 8;
+  @Property({ nullable: false, default: 100 })
+  maxToolCallIterations = 100;
 
   @ApiPropertyOptional({ default: false })
   @SaplingForm({

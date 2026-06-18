@@ -19,7 +19,7 @@ export function resolveMaxToolCallIterations(
   const value = model.maxToolCallIterations;
 
   if (typeof value !== 'number' || !Number.isFinite(value)) {
-    return 8;
+    return 100;
   }
 
   return Math.max(1, Math.floor(value));

@@ -11,7 +11,7 @@
     "isDefault": false,
     "isActive": false,
     "sortOrder": 10,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   },
   {
     "handle": "openai-gpt-4_1",
@@ -25,7 +25,7 @@
     "isDefault": false,
     "isActive": false,
     "sortOrder": 20,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   },
   {
     "handle": "openai-gpt-4o-mini",
@@ -39,7 +39,7 @@
     "isDefault": false,
     "isActive": false,
     "sortOrder": 30,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   },
   {
     "handle": "openai-gpt-4o",
@@ -53,7 +53,7 @@
     "isDefault": false,
     "isActive": false,
     "sortOrder": 40,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   },
   {
     "handle": "gemini-2_5-flash",
@@ -67,7 +67,7 @@
     "isDefault": false,
     "isActive": false,
     "sortOrder": 10,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   },
   {
     "handle": "gemini-2_5-flash-lite",
@@ -81,7 +81,7 @@
     "isDefault": false,
     "isActive": false,
     "sortOrder": 20,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   },
   {
     "handle": "gemini-2_0-flash",
@@ -95,7 +95,7 @@
     "isDefault": false,
     "isActive": false,
     "sortOrder": 30,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   },
   {
     "handle": "gemini-2_5-pro",
@@ -109,7 +109,7 @@
     "isDefault": false,
     "isActive": false,
     "sortOrder": 40,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   },
   {
     "handle": "openai-text-embedding-3-small",
@@ -123,7 +123,7 @@
     "isDefault": false,
     "isActive": true,
     "sortOrder": 50,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   },
   {
     "handle": "openai-text-embedding-3-large",
@@ -137,7 +137,7 @@
     "isDefault": true,
     "isActive": true,
     "sortOrder": 60,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   },
   {
     "handle": "gemini-embedding-001",
@@ -151,6 +151,6 @@
     "isDefault": true,
     "isActive": true,
     "sortOrder": 50,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   }
 ]

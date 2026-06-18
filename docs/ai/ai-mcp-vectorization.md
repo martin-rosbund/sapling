@@ -277,6 +277,24 @@ Use:
 - `generic_get` when the exact handle is known
 - `generic_timeline` for record history/activity questions
 
+## Chat Navigation And Sources
+
+Songbird stores tool transparency separately from chat navigation.
+
+- `sources` records which tools and entities influenced an answer for audit and
+  review.
+- `navigationLinks` records deliberate UI actions such as opening a route, a
+  specific record, or a filtered table of actual returned records.
+- No navigation link should be emitted for empty results, schema-repair
+  responses, failed tool calls, read-only blocks, or confirm-gated pending
+  actions.
+- Search navigation links should be based on returned record handles, grouped by
+  entity where needed, rather than a broad reconstructed query or only the last
+  result.
+
+This keeps buttons such as "Tabelle öffnen" tied to meaningful data and avoids
+showing table actions for confirmation prompts or purely explanatory answers.
+
 ## Estimate, Opportunity, And Ticket Actions
 
 Phase 4 exposes the existing knowledge search through ScriptButtons on

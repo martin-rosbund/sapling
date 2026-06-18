@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import {
+  BadRequestException,
   ForbiddenException,
   Inject,
   Injectable,
@@ -26,6 +27,9 @@ import { SAPLING_MCP_TOOL_DEFINITIONS } from './sapling-mcp-tool-definitions';
 import { SAPLING_MCP_USAGE_HINTS } from './prompts/sapling-mcp.prompts';
 import { SaplingMcpPermissionService } from './sapling-mcp-permission.service';
 import type { McpToolPolicy } from './mcp-policy.types';
+import { SaplingMcpCriteriaRepairRequest } from './sapling-mcp-criteria.types';
+import { SaplingMcpCriteriaService } from './sapling-mcp-criteria.service';
+import { SaplingMcpResultFormatterService } from './sapling-mcp-result-formatter.service';
 
 type SaplingMcpSession = {
   transport: StreamableHTTPServerTransport;
@@ -51,7 +55,9 @@ export class SaplingMcpService {
     private readonly importService: ImportService,
     @Inject(forwardRef(() => AiService))
     private readonly aiService: AiService,
+    private readonly criteriaService: SaplingMcpCriteriaService,
     private readonly permissionService: SaplingMcpPermissionService,
+    private readonly resultFormatter: SaplingMcpResultFormatterService,
   ) {}
 
   listTools(): Promise<
@@ -150,7 +156,11 @@ export class SaplingMcpService {
       payload = this.createToolErrorPayload(toolName, error);
     }
 
-    const modelResult = this.createModelResult(toolName, payload, args);
+    const modelResult = this.resultFormatter.createModelResult(
+      toolName,
+      payload,
+      args,
+    );
 
     return {
       content: JSON.stringify(modelResult, null, 2),
@@ -278,459 +288,6 @@ export class SaplingMcpService {
     };
   }
 
-  private createModelResult(
-    toolName: string,
-    payload: unknown,
-    args: Record<string, unknown>,
-  ): unknown {
-    if (this.isToolErrorPayload(payload)) {
-      return payload;
-    }
-
-    switch (toolName) {
-      case 'current_person':
-        return this.sanitizeUnknownValue(payload);
-      case 'generic_list':
-      case 'ticket_search':
-        return this.createModelListResult(payload, args);
-      case 'generic_get':
-        return this.createModelGetResult(payload);
-      case 'semantic_search':
-        return this.createModelSemanticSearchResult(payload);
-      case 'knowledge_search':
-        return this.createModelKnowledgeSearchResult(payload);
-      case 'import_get_batch':
-      case 'import_suggest_mapping':
-      case 'import_configure_batch':
-      case 'import_execute_batch':
-        return this.createModelImportBatchResult(payload);
-      case 'import_list_templates':
-        return this.createModelImportTemplateListResult(payload);
-      case 'import_match_existing_records':
-        return this.createModelImportMatchResult(payload);
-      case 'generic_create':
-      case 'generic_update':
-        return this.createModelMutationResult(payload, args);
-      case 'generic_delete':
-        return this.createModelDeleteResult(payload);
-      case 'generic_timeline':
-        return this.sanitizeUnknownValue(payload);
-      default:
-        return payload;
-    }
-  }
-
-  private createModelListResult(
-    payload: unknown,
-    args: Record<string, unknown>,
-  ): unknown {
-    const record = this.asRecord(payload);
-    const entityHandle =
-      this.asStringValue(record.entityHandle) ??
-      this.asStringValue(args.entityHandle);
-
-    if (!entityHandle) {
-      return this.sanitizeUnknownValue(payload);
-    }
-
-    return {
-      ...this.copyModelResultMetadata(record, [
-        'entityHandle',
-        'query',
-        'searchMode',
-        'searchFields',
-        'meta',
-        'usageHints',
-      ]),
-      entityHandle,
-      data: Array.isArray(record.data)
-        ? record.data.map((item) =>
-            this.sanitizeEntityRecord(entityHandle, item),
-          )
-        : [],
-    };
-  }
-
-  private createModelGetResult(payload: unknown): unknown {
-    const record = this.asRecord(payload);
-    const entityHandle = this.asStringValue(record.entityHandle);
-    const sourceRecord = this.asEntityRecord(record.record);
-
-    if (!entityHandle || !sourceRecord) {
-      return this.sanitizeUnknownValue(payload);
-    }
-
-    return {
-      entityHandle,
-      found: record.found === true,
-      displayValue: this.buildRecordDisplayValue(entityHandle, sourceRecord),
-      record: this.sanitizeEntityRecord(entityHandle, sourceRecord),
-      usageHints: [
-        ...SAPLING_MCP_USAGE_HINTS.genericGet,
-        ...SAPLING_MCP_USAGE_HINTS.userFacingValues,
-      ],
-    };
-  }
-
-  private createModelSemanticSearchResult(payload: unknown): unknown {
-    const record = this.asRecord(payload);
-    const entityHandle = this.asStringValue(record.entityHandle);
-
-    if (!entityHandle) {
-      return this.sanitizeUnknownValue(payload);
-    }
-
-    return {
-      ...this.copyModelResultMetadata(record, [
-        'entityHandle',
-        'query',
-        'indexed',
-        'searchableSections',
-        'usageHints',
-      ]),
-      results: this.sanitizeSearchResults(entityHandle, record.results),
-    };
-  }
-
-  private createModelKnowledgeSearchResult(payload: unknown): unknown {
-    const record = this.asRecord(payload);
-    const results = Array.isArray(record.results) ? record.results : [];
-
-    return {
-      ...this.copyModelResultMetadata(record, [
-        'query',
-        'entityHandles',
-        'indexedEntityHandles',
-        'unindexedEntityHandles',
-        'skippedEntityHandles',
-        'errors',
-        'usageHints',
-      ]),
-      results: results
-        .map((item) => {
-          const result = this.asRecord(item);
-          const entityHandle = this.asStringValue(result.entityHandle);
-          const sourceRecord = this.asEntityRecord(result.record);
-
-          if (!entityHandle) {
-            return this.sanitizeUnknownValue(item);
-          }
-
-          return {
-            entityHandle,
-            score: this.asScore(result.score),
-            displayValue: sourceRecord
-              ? this.buildRecordDisplayValue(entityHandle, sourceRecord)
-              : null,
-            record: sourceRecord
-              ? this.sanitizeEntityRecord(entityHandle, sourceRecord)
-              : null,
-            matches: this.sanitizeUnknownValue(result.matches),
-          };
-        })
-        .filter((item) => item != null),
-    };
-  }
-
-  private createModelImportBatchResult(payload: unknown): unknown {
-    const record = this.asRecord(payload);
-
-    return {
-      ...this.copyModelResultMetadata(record, [
-        'handle',
-        'status',
-        'filename',
-        'mimetype',
-        'fileSize',
-        'sourceHandle',
-        'entityHandle',
-        'templateHandle',
-        'rowCount',
-        'readyCount',
-        'errorCount',
-        'createdCount',
-        'updatedCount',
-        'skippedCount',
-        'failedCount',
-        'delimiter',
-        'headers',
-        'sampleRows',
-        'mapping',
-        'externalKeyColumns',
-        'genericReferenceMapping',
-        'executedAt',
-        'warnings',
-        'providerHandle',
-        'modelHandle',
-      ]),
-      rows: Array.isArray(record.rows)
-        ? record.rows.slice(0, 20).map((row) => this.sanitizeUnknownValue(row))
-        : [],
-      usageHints: [...SAPLING_MCP_USAGE_HINTS.importTools],
-    };
-  }
-
-  private createModelImportTemplateListResult(payload: unknown): unknown {
-    const templates = Array.isArray(payload) ? payload : [];
-
-    return {
-      templates: templates.map((template) =>
-        this.sanitizeUnknownValue(template),
-      ),
-      usageHints: [...SAPLING_MCP_USAGE_HINTS.importTools],
-    };
-  }
-
-  private createModelImportMatchResult(payload: unknown): unknown {
-    const record = this.asRecord(payload);
-
-    return {
-      ...this.copyModelResultMetadata(record, [
-        'batchHandle',
-        'entityHandle',
-        'sourceColumns',
-        'targetFields',
-        'sampledRows',
-        'checkedValues',
-        'matchCount',
-      ]),
-      matches: Array.isArray(record.matches)
-        ? record.matches.map((item) => this.sanitizeUnknownValue(item))
-        : [],
-      usageHints: [...SAPLING_MCP_USAGE_HINTS.importTools],
-    };
-  }
-
-  private createModelMutationResult(
-    payload: unknown,
-    args: Record<string, unknown>,
-  ): unknown {
-    const record = this.asRecord(payload);
-    const entityHandle =
-      this.asStringValue(record.entityHandle) ??
-      this.asStringValue(args.entityHandle);
-
-    if (!entityHandle) {
-      return this.sanitizeUnknownValue(payload);
-    }
-
-    return this.sanitizeEntityRecord(entityHandle, record);
-  }
-
-  private createModelDeleteResult(payload: unknown): unknown {
-    const record = this.asRecord(payload);
-
-    return {
-      success: record.success === true,
-      entityHandle: this.asStringValue(record.entityHandle),
-      usageHints: [...SAPLING_MCP_USAGE_HINTS.userFacingValues],
-    };
-  }
-
-  private sanitizeSearchResults(
-    entityHandle: string,
-    value: unknown,
-  ): unknown[] {
-    if (!Array.isArray(value)) {
-      return [];
-    }
-
-    return value
-      .map((item) => {
-        const result = this.asRecord(item);
-        const sourceRecord = this.asEntityRecord(result.record);
-
-        return {
-          score: this.asScore(result.score),
-          displayValue: sourceRecord
-            ? this.buildRecordDisplayValue(entityHandle, sourceRecord)
-            : null,
-          record: sourceRecord
-            ? this.sanitizeEntityRecord(entityHandle, sourceRecord)
-            : null,
-          matches: this.sanitizeUnknownValue(result.matches),
-        };
-      })
-      .filter((item) => item.record != null || item.displayValue != null);
-  }
-
-  private sanitizeEntityRecord(entityHandle: string, value: unknown): unknown {
-    if (Array.isArray(value)) {
-      return value.map((item) => this.sanitizeEntityRecord(entityHandle, item));
-    }
-
-    const record = this.asEntityRecord(value);
-
-    if (!record) {
-      return this.sanitizeUnknownValue(value);
-    }
-
-    const template = this.getEntityTemplate(entityHandle);
-    const fieldsByName = new Map(template.map((field) => [field.name, field]));
-    const sanitizedRecord: Record<string, unknown> = {};
-    const displayValue = this.buildRecordDisplayValue(entityHandle, record);
-
-    if (displayValue) {
-      sanitizedRecord.displayValue = displayValue;
-    }
-
-    for (const [key, rawValue] of Object.entries(record)) {
-      const field = fieldsByName.get(key);
-
-      if (this.isInternalIdentifierKey(key) || field?.isPrimaryKey) {
-        continue;
-      }
-
-      if (field?.options?.includes('isSecurity')) {
-        continue;
-      }
-
-      if (field?.isReference && field.referenceName) {
-        sanitizedRecord[key] = this.sanitizeEntityRecord(
-          field.referenceName,
-          rawValue,
-        );
-        continue;
-      }
-
-      sanitizedRecord[key] = this.sanitizeUnknownValue(rawValue);
-    }
-
-    return sanitizedRecord;
-  }
-
-  private sanitizeUnknownValue(value: unknown): unknown {
-    if (Array.isArray(value)) {
-      return value.map((item) => this.sanitizeUnknownValue(item));
-    }
-
-    if (!value || typeof value !== 'object') {
-      return value;
-    }
-
-    const record = value as Record<string, unknown>;
-    const sanitizedRecord: Record<string, unknown> = {};
-
-    for (const [key, rawValue] of Object.entries(record)) {
-      if (this.isInternalIdentifierKey(key)) {
-        continue;
-      }
-
-      sanitizedRecord[key] = this.sanitizeUnknownValue(rawValue);
-    }
-
-    return sanitizedRecord;
-  }
-
-  private buildRecordDisplayValue(
-    entityHandle: string,
-    record: Record<string, unknown>,
-  ): string | null {
-    const template = this.getEntityTemplate(entityHandle);
-    const valueFieldNames = template
-      .filter((field) => field.options?.includes('isValue'))
-      .map((field) => field.name);
-    const valueParts = valueFieldNames
-      .map((fieldName) => this.formatDisplayValuePart(record[fieldName]))
-      .filter((part): part is string => !!part);
-
-    if (valueParts.length > 0) {
-      return valueParts.join(' ');
-    }
-
-    const fallbackParts = [
-      this.formatDisplayValuePart(record.title),
-      this.formatDisplayValuePart(record.name),
-      this.formatDisplayValuePart(record.number),
-      this.formatDisplayValuePart(record.description),
-      this.formatDisplayValuePart(record.subject),
-      this.formatPersonDisplayValue(record),
-      this.formatDisplayValuePart(record.email),
-    ].filter((part): part is string => !!part);
-
-    return fallbackParts[0] ?? null;
-  }
-
-  private formatPersonDisplayValue(
-    record: Record<string, unknown>,
-  ): string | null {
-    const name = [
-      this.formatDisplayValuePart(record.firstName),
-      this.formatDisplayValuePart(record.lastName),
-    ]
-      .filter((part): part is string => !!part)
-      .join(' ')
-      .trim();
-
-    return name || null;
-  }
-
-  private formatDisplayValuePart(value: unknown): string | null {
-    if (value == null) {
-      return null;
-    }
-
-    if (
-      typeof value === 'string' ||
-      typeof value === 'number' ||
-      typeof value === 'boolean'
-    ) {
-      const normalized = String(value).trim();
-      return normalized || null;
-    }
-
-    if (value instanceof Date) {
-      return value.toISOString();
-    }
-
-    return null;
-  }
-
-  private copyModelResultMetadata(
-    record: Record<string, unknown>,
-    keys: string[],
-  ): Record<string, unknown> {
-    const metadata: Record<string, unknown> = {};
-
-    for (const key of keys) {
-      if (key in record) {
-        metadata[key] = this.sanitizeUnknownValue(record[key]);
-      }
-    }
-
-    const usageHints = metadata.usageHints;
-    if (Array.isArray(usageHints)) {
-      const normalizedUsageHints = usageHints.filter(
-        (hint): hint is unknown => typeof hint !== 'undefined',
-      );
-      metadata.usageHints = [
-        ...normalizedUsageHints,
-        ...SAPLING_MCP_USAGE_HINTS.userFacingValues,
-      ];
-    }
-
-    return metadata;
-  }
-
-  private isToolErrorPayload(payload: unknown): boolean {
-    return !!(
-      payload &&
-      typeof payload === 'object' &&
-      (payload as { ok?: unknown }).ok === false
-    );
-  }
-
-  private isInternalIdentifierKey(key: string): boolean {
-    return (
-      key === 'handle' ||
-      key === 'id' ||
-      key.endsWith('Handle') ||
-      key.endsWith('Id') ||
-      key.endsWith('_handle') ||
-      key.endsWith('_id')
-    );
-  }
-
   private asStringValue(value: unknown): string | null {
     return typeof value === 'string' && value.trim() ? value.trim() : null;
   }
@@ -750,15 +307,30 @@ export class SaplingMcpService {
       entityHandle,
       'allowRead',
     );
-    const filter = this.normalizeEntityCriteria(
-      entityHandle,
-      this.asRecord(args.filter),
-    );
-    const orderBy = this.normalizeEntitySort(
-      entityHandle,
-      this.asRecord(args.orderBy),
-    );
-    const relations = this.normalizeEntityRelations(
+    let filter: Record<string, unknown>;
+    let orderBy: Record<string, unknown>;
+
+    try {
+      filter = this.criteriaService.normalizeEntityCriteria(
+        entityHandle,
+        this.asRecord(args.filter),
+      );
+      orderBy = this.criteriaService.normalizeEntitySort(
+        entityHandle,
+        this.asRecord(args.orderBy),
+      );
+    } catch (error) {
+      if (error instanceof SaplingMcpCriteriaRepairRequest) {
+        return this.criteriaService.createCriteriaRepairResult(
+          entityHandle,
+          error,
+        );
+      }
+
+      throw error;
+    }
+
+    const relations = this.criteriaService.normalizeEntityRelations(
       entityHandle,
       this.asStringArray(args.relations),
     );
@@ -919,20 +491,7 @@ export class SaplingMcpService {
       requiredFieldNames: template
         .filter((field) => field.isRequired)
         .map((field) => field.name),
-      filterOperators: [
-        '$eq',
-        '$ne',
-        '$in',
-        '$nin',
-        '$gt',
-        '$gte',
-        '$lt',
-        '$lte',
-        '$ilike',
-        '$like',
-        '$or',
-        '$and',
-      ],
+      filterOperators: this.criteriaService.getFilterOperators(),
       usageHints: [...SAPLING_MCP_USAGE_HINTS.entitySchema],
     };
   }
@@ -1140,7 +699,7 @@ export class SaplingMcpService {
       'allowRead',
     );
     const handle = this.requireHandleArg(args.handle, 'handle');
-    const relations = this.normalizeEntityRelations(
+    const relations = this.criteriaService.normalizeEntityRelations(
       entityHandle,
       this.asStringArray(args.relations),
     );
@@ -1657,266 +1216,6 @@ export class SaplingMcpService {
     }
   }
 
-  private normalizeEntityCriteria(
-    entityHandle: string,
-    criteria: Record<string, unknown>,
-  ): Record<string, unknown> {
-    return this.normalizeCriteriaValue(
-      entityHandle,
-      criteria,
-      'filter',
-    ) as Record<string, unknown>;
-  }
-
-  private normalizeEntitySort(
-    entityHandle: string,
-    orderBy: Record<string, unknown>,
-  ): Record<string, unknown> {
-    return this.normalizeCriteriaValue(
-      entityHandle,
-      orderBy,
-      'orderBy',
-    ) as Record<string, unknown>;
-  }
-
-  private normalizeEntityRelations(
-    entityHandle: string,
-    relations: string[],
-  ): string[] {
-    if (relations.length === 0) {
-      return [];
-    }
-
-    const relationNames = new Set(
-      this.getEntityTemplate(entityHandle)
-        .filter((field) => field.isReference)
-        .map((field) => field.name),
-    );
-
-    return relations.filter((relation) => relationNames.has(relation));
-  }
-
-  private normalizeCriteriaValue(
-    entityHandle: string,
-    value: unknown,
-    mode: 'filter' | 'orderBy',
-  ): unknown {
-    if (Array.isArray(value)) {
-      return value.map((item) =>
-        this.normalizeCriteriaValue(entityHandle, item, mode),
-      );
-    }
-
-    if (!value || typeof value !== 'object') {
-      return value;
-    }
-
-    const record = value as Record<string, unknown>;
-    const normalizedRecord: Record<string, unknown> = {};
-
-    for (const [rawKey, rawValue] of Object.entries(record)) {
-      const normalizedKey = this.normalizeOperatorKey(rawKey);
-
-      if (normalizedKey === '$or' || normalizedKey === '$and') {
-        normalizedRecord[normalizedKey] = Array.isArray(rawValue)
-          ? rawValue.map((item) =>
-              this.normalizeCriteriaValue(entityHandle, item, mode),
-            )
-          : [];
-        continue;
-      }
-
-      if (this.isOperatorKey(normalizedKey)) {
-        normalizedRecord[normalizedKey] = this.normalizeCriteriaValue(
-          entityHandle,
-          rawValue,
-          mode,
-        );
-        continue;
-      }
-
-      if (normalizedKey.includes('.')) {
-        this.mergeNormalizedRecord(
-          normalizedRecord,
-          this.normalizeDottedCriteria(
-            entityHandle,
-            normalizedKey,
-            rawValue,
-            mode,
-          ),
-        );
-        continue;
-      }
-
-      const field = this.getEntityField(entityHandle, normalizedKey);
-
-      if (!field) {
-        throw new ForbiddenException(
-          `Invalid ${mode} field "${normalizedKey}" for entity "${entityHandle}". Use entity_schema first.`,
-        );
-      }
-
-      if (mode === 'orderBy' && typeof rawValue === 'string') {
-        normalizedRecord[normalizedKey] = rawValue;
-        continue;
-      }
-
-      if (
-        field.isReference &&
-        field.referenceName &&
-        rawValue &&
-        typeof rawValue === 'object' &&
-        !Array.isArray(rawValue)
-      ) {
-        const relationRecord = rawValue as Record<string, unknown>;
-        const relationKeys = Object.keys(relationRecord).map((key) =>
-          this.normalizeOperatorKey(key),
-        );
-        const containsOnlyOperators =
-          relationKeys.length > 0 &&
-          relationKeys.every((key) => this.isOperatorKey(key));
-
-        normalizedRecord[normalizedKey] = containsOnlyOperators
-          ? this.normalizeCriteriaValue(entityHandle, relationRecord, mode)
-          : this.normalizeCriteriaValue(
-              field.referenceName,
-              relationRecord,
-              mode,
-            );
-        continue;
-      }
-
-      normalizedRecord[normalizedKey] = this.normalizeCriteriaValue(
-        entityHandle,
-        rawValue,
-        mode,
-      );
-    }
-
-    return normalizedRecord;
-  }
-
-  private normalizeDottedCriteria(
-    entityHandle: string,
-    dottedKey: string,
-    rawValue: unknown,
-    mode: 'filter' | 'orderBy',
-  ): Record<string, unknown> {
-    const [head, ...rest] = dottedKey
-      .split('.')
-      .map((segment) => segment.trim())
-      .filter(Boolean);
-
-    if (!head || rest.length === 0) {
-      throw new ForbiddenException(
-        `Invalid ${mode} field "${dottedKey}" for entity "${entityHandle}". Use entity_schema first.`,
-      );
-    }
-
-    const field = this.getEntityField(entityHandle, head);
-
-    if (!field || !field.isReference || !field.referenceName) {
-      throw new ForbiddenException(
-        `Invalid ${mode} field "${dottedKey}" for entity "${entityHandle}". Use entity_schema first.`,
-      );
-    }
-
-    return {
-      [head]: this.normalizeCriteriaValue(
-        field.referenceName,
-        { [rest.join('.')]: rawValue },
-        mode,
-      ),
-    };
-  }
-
-  private mergeNormalizedRecord(
-    target: Record<string, unknown>,
-    source: Record<string, unknown>,
-  ): void {
-    for (const [key, value] of Object.entries(source)) {
-      const existingValue = target[key];
-
-      if (
-        existingValue &&
-        typeof existingValue === 'object' &&
-        !Array.isArray(existingValue) &&
-        value &&
-        typeof value === 'object' &&
-        !Array.isArray(value)
-      ) {
-        this.mergeNormalizedRecord(
-          existingValue as Record<string, unknown>,
-          value as Record<string, unknown>,
-        );
-        continue;
-      }
-
-      target[key] = value;
-    }
-  }
-
-  private normalizeOperatorKey(key: string): string {
-    const normalized = key.trim();
-
-    switch (normalized) {
-      case 'eq':
-        return '$eq';
-      case 'ne':
-        return '$ne';
-      case 'gt':
-        return '$gt';
-      case 'gte':
-        return '$gte';
-      case 'lt':
-        return '$lt';
-      case 'lte':
-        return '$lte';
-      case 'in':
-        return '$in';
-      case 'nin':
-        return '$nin';
-      case 'like':
-        return '$like';
-      case 'ilike':
-        return '$ilike';
-      case 'or':
-        return '$or';
-      case 'and':
-        return '$and';
-      default:
-        return normalized;
-    }
-  }
-
-  private isOperatorKey(key: string): boolean {
-    return [
-      '$eq',
-      '$ne',
-      '$gt',
-      '$gte',
-      '$lt',
-      '$lte',
-      '$in',
-      '$nin',
-      '$like',
-      '$ilike',
-      '$or',
-      '$and',
-    ].includes(key);
-  }
-
-  private getEntityField(
-    entityHandle: string,
-    fieldName: string,
-  ): EntityTemplateDto | null {
-    return (
-      this.getEntityTemplate(entityHandle).find(
-        (field) => field.name === fieldName,
-      ) ?? null
-    );
-  }
-
   private getEntityTemplate(entityHandle: string): EntityTemplateDto[] {
     return this.getRawEntityTemplate(entityHandle).filter(
       (field) => !field.options?.includes('isSecurity'),
@@ -1970,6 +1269,95 @@ export class SaplingMcpService {
     );
   }
 
+  private async applyRequiredCurrentReferenceDefaults(
+    entityHandle: string,
+    data: Record<string, unknown>,
+    user: PersonItem,
+  ): Promise<Record<string, unknown>> {
+    const template = this.getEntityTemplate(entityHandle);
+    const fields = template.filter(
+      (field) =>
+        field.isRequired &&
+        field.isReference &&
+        (field.options?.includes('isCurrentCompany') ||
+          field.options?.includes('isCurrentPerson')),
+    );
+
+    if (fields.length === 0) {
+      return data;
+    }
+
+    const defaultedData = { ...data };
+    let currentPersonRecord: Record<string, unknown> | null | undefined;
+
+    for (const field of fields) {
+      if (this.hasReferencePayloadValue(field, defaultedData[field.name])) {
+        continue;
+      }
+
+      if (field.options?.includes('isCurrentPerson')) {
+        const currentPersonHandle =
+          this.asResultHandle(user.handle) ??
+          this.asResultHandle(
+            (currentPersonRecord ??=
+              await this.resolveCurrentPersonRecord(user)).handle,
+          );
+
+        if (currentPersonHandle == null) {
+          throw new BadRequestException('ai.mcpCurrentPersonMissing');
+        }
+
+        defaultedData[field.name] = currentPersonHandle;
+        continue;
+      }
+
+      if (field.options?.includes('isCurrentCompany')) {
+        currentPersonRecord ??= await this.resolveCurrentPersonRecord(user);
+        const companyHandle =
+          this.asResultHandle(currentPersonRecord?.company) ??
+          this.asResultHandle(
+            this.asEntityRecord(currentPersonRecord?.company)?.handle,
+          );
+
+        if (companyHandle == null) {
+          throw new BadRequestException('ai.mcpCurrentCompanyMissing');
+        }
+
+        defaultedData[field.name] = companyHandle;
+      }
+    }
+
+    return defaultedData;
+  }
+
+  private async resolveCurrentPersonRecord(
+    user: PersonItem,
+  ): Promise<Record<string, unknown>> {
+    const currentPerson = (await this.currentService.getPerson(user)) ?? user;
+    return this.asEntityRecord(currentPerson) ?? {};
+  }
+
+  private hasReferencePayloadValue(
+    field: EntityTemplateDto,
+    value: unknown,
+  ): boolean {
+    if (this.asResultHandle(value) != null) {
+      return true;
+    }
+
+    if (Array.isArray(value) || !value || typeof value !== 'object') {
+      return false;
+    }
+
+    const record = value as Record<string, unknown>;
+    const referencedPks =
+      field.referencedPks.length > 0 ? field.referencedPks : ['handle'];
+
+    return referencedPks.every(
+      (referencedPk) => this.asResultHandle(record[referencedPk]) != null,
+    );
+  }
+
   private async executeGenericCreate(
     args: Record<string, unknown>,
     user: PersonItem,
@@ -1989,7 +1377,12 @@ export class SaplingMcpService {
       entityHandle,
       this.asRecord(args.data),
     );
-    return this.genericService.create(entityHandle, data, user);
+    const defaultedData = await this.applyRequiredCurrentReferenceDefaults(
+      entityHandle,
+      data,
+      user,
+    );
+    return this.genericService.create(entityHandle, defaultedData, user);
   }
 
   private async executeGenericUpdate(

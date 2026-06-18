@@ -27,6 +27,7 @@ import {
   parseToolArguments,
   resolveToolRegistryEntry,
 } from './ai-tool-call.utils';
+import { buildAiExecutedToolCallTrace } from './ai-tool-trace.utils';
 import { extractClientTimeContextFromHistory } from './ai-client-time.utils';
 import {
   AI_GEMINI_REPEATED_TOOL_CALL_ABORT_MESSAGE,
@@ -38,8 +39,9 @@ import {
 type AiRuntimeToolExecutor = (
   entry: AiToolRegistryEntry,
   args: Record<string, unknown>,
-) => Promise<
-  Awaited<ReturnType<AiChatRuntimeService['executeAutomaticToolCall']>>
+) => Promise<AiRuntimeToolExecution>;
+type AiRuntimeToolExecution = Awaited<
+  ReturnType<AiChatRuntimeService['executeAutomaticToolCall']>
 >;
 
 @Injectable()
@@ -118,6 +120,7 @@ export class AiChatRuntimeService {
           throw new Error(`ai.toolNotFound:${toolCall.function.name}`);
         }
 
+        const startedAt = Date.now();
         const toolExecution = toolExecutor
           ? await toolExecutor(registryEntry, args)
           : await this.executeAutomaticToolCall(
@@ -127,14 +130,13 @@ export class AiChatRuntimeService {
               user,
             );
 
-        executedToolCalls.push({
-          serverHandle: toolExecution.serverHandle,
-          serverName: toolExecution.serverName,
-          toolName: toolExecution.toolName,
-          arguments: args,
-          modelResult: toolExecution.modelResult,
-          rawResult: toolExecution.rawResult,
-        });
+        executedToolCalls.push(
+          buildAiExecutedToolCallTrace(toolExecution, {
+            arguments: args,
+            iteration: iteration + 1,
+            startedAt,
+          }),
+        );
 
         messages.push({
           role: 'tool',
@@ -330,6 +332,7 @@ export class AiChatRuntimeService {
           throw new Error(`ai.toolNotFound:${functionCall.name}`);
         }
 
+        const startedAt = Date.now();
         const toolExecution = toolExecutor
           ? await toolExecutor(registryEntry, args)
           : await this.executeAutomaticToolCall(
@@ -339,14 +342,13 @@ export class AiChatRuntimeService {
               user,
             );
 
-        executedToolCalls.push({
-          serverHandle: toolExecution.serverHandle,
-          serverName: toolExecution.serverName,
-          toolName: toolExecution.toolName,
-          arguments: args,
-          modelResult: toolExecution.modelResult,
-          rawResult: toolExecution.rawResult,
-        });
+        executedToolCalls.push(
+          buildAiExecutedToolCallTrace(toolExecution, {
+            arguments: args,
+            iteration: iteration + 1,
+            startedAt,
+          }),
+        );
 
         if (isToolErrorPayload(toolExecution.rawResult)) {
           toolErrors.push(toolExecution.rawResult);

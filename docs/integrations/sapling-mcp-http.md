@@ -97,6 +97,24 @@ generic_delete
 
 The exact schema for each tool is returned by `tools/list`. Clients should inspect tool schemas instead of hard-coding payloads.
 
+## Response Contract
+
+Tool responses are JSON text payloads shaped for model consumption. They may
+include technical record handles so a client can make follow-up calls, but
+clients should prefer user-facing fields such as `displayValue`, titles,
+numbers, status labels, and relation display values when presenting answers.
+
+Sapling treats the current tool schemas as the compatibility surface for the
+HTTP MCP endpoint. Additive response fields are allowed. Breaking request
+schema changes, removed fields, or changed authentication/session behavior
+require a documented version change.
+
+Internally, Songbird may derive chat UI navigation links from successful tool
+results. That UI affordance is not part of the external MCP protocol response:
+external clients should build their own navigation from returned entity handles
+and record handles, or use Sapling frontend routes only when they intentionally
+target the Sapling web app.
+
 ## Tool Call Example
 
 After initialization, send tool calls to `POST /api/ai/mcp` with the `mcp-session-id` header.
@@ -173,6 +191,8 @@ Sapling returns MCP JSON-RPC errors. Common cases:
 | User lacks entity permission | Permission denied |
 | Tool name does not exist | Tool not found |
 | Semantic index missing | Successful response with `indexed: false` and usage hints |
+| Invalid generic filter field | Successful response with `queryExecuted: false`, `status: "needs_schema_retry"`, and repair hints |
+| Confirm-gated mutation in Songbird chat | Stored pending action in Sapling chat; external MCP calls execute according to the authenticated user's permissions |
 
 ## Security Notes
 
@@ -181,6 +201,10 @@ Sapling returns MCP JSON-RPC errors. Common cases:
 - Grant only the Sapling roles and entity permissions the external product needs.
 - Do not expose raw session ids or bearer tokens to browsers unless the product is intentionally acting as the authenticated user.
 - Do not assume internal numeric handles are user-facing identifiers. MCP responses may include handles as technical metadata.
+- Log and monitor external tool usage by user, tool name, entity handles, status,
+  duration, and result count in production deployments.
+- Consider gateway or reverse-proxy rate limits for `/api/ai/mcp` when exposing
+  the endpoint beyond a trusted internal network.
 
 ## Related Implementation Files
 

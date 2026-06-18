@@ -96,4 +96,117 @@ describe('AiChatRuntimeService', () => {
     );
     expect(onDelta).toHaveBeenCalledWith('Hallo lokal.');
   });
+
+  it('classifies schema repair tool responses without treating them as tool errors', async () => {
+    const createCompletion = jest
+      .fn<(payload: unknown) => Promise<unknown>>()
+      .mockResolvedValueOnce({
+        choices: [
+          {
+            message: {
+              content: '',
+              tool_calls: [
+                {
+                  id: 'call-1',
+                  type: 'function',
+                  function: {
+                    name: 'sapling__generic_list',
+                    arguments: JSON.stringify({
+                      entityHandle: 'ticketStatus',
+                      filter: { title: 'Offen' },
+                    }),
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      })
+      .mockResolvedValueOnce({
+        choices: [
+          {
+            message: {
+              content: 'Ich pruefe das Schema und versuche es erneut.',
+            },
+          },
+        ],
+      });
+    asMock(createOpenAiClient).mockReturnValue({
+      chat: {
+        completions: {
+          create: createCompletion,
+        },
+      },
+    });
+    const service = new AiChatRuntimeService({} as never);
+    const onDelta = jest
+      .fn<(delta: string) => Promise<void>>()
+      .mockResolvedValue(undefined);
+    const repairPayload = {
+      entityHandle: 'ticketStatus',
+      queryExecuted: false,
+      status: 'needs_schema_retry',
+      invalidFields: [
+        {
+          entityHandle: 'ticketStatus',
+          fieldPath: 'title',
+          suggestedFields: ['description', 'handle'],
+        },
+      ],
+      usageHints: ['Retry with description.'],
+    };
+
+    const result = await service.streamOpenAi(
+      [
+        {
+          role: 'user',
+          status: 'persisted',
+          content: 'Zeig offene Ticket Status',
+          contextPayload: null,
+        },
+      ] as never,
+      { handle: 'openai' } as never,
+      'gpt-5',
+      [
+        {
+          serverHandle: 0,
+          serverName: 'sapling',
+          toolName: 'generic_list',
+          description: 'List records.',
+          inputSchema: {
+            type: 'object',
+            properties: {},
+          },
+        },
+      ] as never,
+      { handle: 1 } as never,
+      3,
+      undefined,
+      onDelta,
+      true,
+      null,
+      async (_entry, args) => ({
+        serverHandle: 0,
+        serverName: 'sapling',
+        toolName: 'generic_list',
+        arguments: args,
+        content: JSON.stringify(repairPayload),
+        modelResult: repairPayload,
+        rawResult: repairPayload,
+      }),
+    );
+
+    expect(result.toolCalls).toHaveLength(1);
+    expect(result.toolCalls[0]).toMatchObject({
+      serverName: 'sapling',
+      toolName: 'generic_list',
+      status: 'repair',
+      resultCount: 0,
+      sourceEntityHandles: ['ticketStatus'],
+      repairHints: ['Retry with description.'],
+    });
+    expect(onDelta).toHaveBeenCalledWith(
+      'Ich pruefe das Schema und versuche es erneut.',
+    );
+  });
 });

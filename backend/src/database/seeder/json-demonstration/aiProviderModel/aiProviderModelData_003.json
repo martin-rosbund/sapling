@@ -18,7 +18,7 @@
     "isDefault": false,
     "isActive": true,
     "sortOrder": 65,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   },
   {
     "handle": "openai-tts-1-hd",
@@ -39,6 +39,6 @@
     "isDefault": false,
     "isActive": true,
     "sortOrder": 66,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   }
 ]

@@ -76,6 +76,10 @@ import { AI_ASSISTANT_SPEECH_INSTRUCTIONS } from './prompts/ai.prompts';
 import { extractClientTimeContext } from './ai-client-time.utils';
 import { resolveMaxToolCallIterations } from './ai-tool-call.utils';
 import {
+  buildAiExecutedToolCallTrace,
+  toAiToolCallRunTrace,
+} from './ai-tool-trace.utils';
+import {
   buildAssistantSpeechDescriptor,
   buildTranscriptionResponse,
   extractMessageSpeechPayload,
@@ -97,6 +101,7 @@ import {
 import { AiProviderRegistryService } from './ai-provider-registry.service';
 import { AiVectorService } from './ai-vector.service';
 import { AiChatRuntimeService } from './ai-chat-runtime.service';
+import { AiAgentRunLifecycleService } from './ai-agent-run-lifecycle.service';
 import { AiAgentPolicyService } from './ai-agent-policy.service';
 import type { McpToolPolicy } from './mcp-policy.types';
 import { ImportService } from '../import/import.service';
@@ -153,6 +158,7 @@ export class AiService {
     private readonly providerRegistry: AiProviderRegistryService,
     private readonly vectorService: AiVectorService,
     private readonly chatRuntime: AiChatRuntimeService,
+    private readonly agentRunLifecycle: AiAgentRunLifecycleService,
     private readonly agentPolicy: AiAgentPolicyService,
     @Inject(forwardRef(() => ImportService))
     private readonly importService: ImportService,
@@ -584,7 +590,7 @@ export class AiService {
     });
     await onEvent({ type: 'mcp.tools', tools: availableTools });
 
-    const run = await this.createAgentRun({
+    const run = await this.agentRunLifecycle.createRun({
       session,
       message: assistantMessage,
       person,
@@ -597,6 +603,7 @@ export class AiService {
       contextRecordHandle: session.contextRecordHandle ?? null,
     });
 
+    const inlineToolStartedAt = Date.now();
     const inlineToolExecution =
       await this.mcpService.tryExecuteInlineToolCommand(
         dto.content,
@@ -605,40 +612,34 @@ export class AiService {
       );
 
     if (inlineToolExecution) {
-      const navigationLinks = buildNavigationLinks([
-        {
-          serverHandle: inlineToolExecution.serverHandle,
-          serverName: inlineToolExecution.serverName,
-          toolName: inlineToolExecution.toolName,
-          arguments: inlineToolExecution.arguments,
-          modelResult: inlineToolExecution.modelResult,
-          rawResult: inlineToolExecution.rawResult,
-        },
-      ]);
+      const inlineToolCall = buildAiExecutedToolCallTrace(inlineToolExecution, {
+        iteration: 1,
+        startedAt: inlineToolStartedAt,
+      });
+      const inlineToolTrace = toAiToolCallRunTrace(inlineToolCall);
+      const navigationLinks = buildNavigationLinks([inlineToolCall]);
+      const sources = this.agentRunLifecycle.buildSources(
+        [inlineToolCall],
+        navigationLinks,
+      );
 
       assistantMessage.content = inlineToolExecution.content;
       assistantMessage.status = 'completed';
-      assistantMessage.toolCalls = [
-        {
-          serverHandle: inlineToolExecution.serverHandle,
-          serverName: inlineToolExecution.serverName,
-          toolName: inlineToolExecution.toolName,
-          arguments: inlineToolExecution.arguments,
-        },
-      ];
+      assistantMessage.toolCalls = [inlineToolTrace];
       assistantMessage.responsePayload = {
         source: 'mcp-inline-tool',
         provider: runtimeTarget.provider.handle,
         model: runtimeTarget.model.providerModel,
         rawResult: inlineToolExecution.rawResult,
         navigationLinks,
+        sources,
         agentRun: sanitizeAgentRun(run),
       };
-      this.completeAgentRun(run, {
+      this.agentRunLifecycle.completeRun(run, {
         status: 'completed',
         responseText: assistantMessage.content,
         toolCalls: assistantMessage.toolCalls as Record<string, unknown>[],
-        sources: navigationLinks,
+        sources,
         pendingActions: [],
       });
       await this.em.flush();
@@ -735,15 +736,16 @@ export class AiService {
         );
       }
 
-      assistantMessage.toolCalls = streamResult.toolCalls.map((toolCall) => ({
-        serverHandle: toolCall.serverHandle,
-        serverName: toolCall.serverName,
-        toolName: toolCall.toolName,
-        arguments: toolCall.arguments,
-      }));
+      assistantMessage.toolCalls = streamResult.toolCalls.map((toolCall) =>
+        toAiToolCallRunTrace(toolCall),
+      );
 
       assistantMessage.status = 'completed';
       const navigationLinks = buildNavigationLinks(streamResult.toolCalls);
+      const sources = this.agentRunLifecycle.buildSources(
+        streamResult.toolCalls,
+        navigationLinks,
+      );
       const pendingToolActions = await this.loadPendingToolActionsForMessage(
         assistantMessage,
         user,
@@ -759,10 +761,7 @@ export class AiService {
         completedAt: new Date().toISOString(),
         navigationLinks,
         toolResults: streamResult.toolCalls.map((toolCall) => ({
-          serverHandle: toolCall.serverHandle,
-          serverName: toolCall.serverName,
-          toolName: toolCall.toolName,
-          arguments: toolCall.arguments,
+          ...toAiToolCallRunTrace(toolCall),
           rawResult: toolCall.rawResult,
         })),
         pendingToolActions: pendingToolActions.map((action) =>
@@ -775,13 +774,13 @@ export class AiService {
         playbook: runtimeContext.playbook
           ? sanitizeAgentPlaybook(runtimeContext.playbook)
           : null,
-        sources: navigationLinks,
+        sources,
       };
-      this.completeAgentRun(run, {
+      this.agentRunLifecycle.completeRun(run, {
         status: 'completed',
         responseText: assistantMessage.content,
         toolCalls: assistantMessage.toolCalls as Record<string, unknown>[],
-        sources: navigationLinks,
+        sources,
         pendingActions: pendingToolActions.map((action) =>
           sanitizeToolAction(action),
         ) as unknown as Record<string, unknown>[],
@@ -806,7 +805,7 @@ export class AiService {
         error: error instanceof Error ? error.message : 'ai.unknownError',
         agentRun: sanitizeAgentRun(run),
       };
-      this.completeAgentRun(run, {
+      this.agentRunLifecycle.completeRun(run, {
         status: 'failed',
         errorPayload: {
           error: error instanceof Error ? error.message : 'ai.unknownError',
@@ -1288,12 +1287,14 @@ export class AiService {
     const action = await this.findOwnedToolAction(handle, user);
 
     if (action.status !== 'pending') {
+      this.syncToolActionIntoMessagePayload(action);
       return sanitizeToolAction(action);
     }
 
     if (action.expiresAt && action.expiresAt.getTime() < Date.now()) {
       action.status = 'expired';
       action.errorPayload = { error: 'ai.toolActionExpired' };
+      this.syncToolActionIntoMessagePayload(action);
       await this.em.flush();
       throw new BadRequestException('ai.toolActionExpired');
     }
@@ -1327,6 +1328,7 @@ export class AiService {
         };
         action.errorPayload = { error: failureMessage };
         action.executedAt = new Date();
+        this.syncToolActionIntoMessagePayload(action);
         await this.em.flush();
         return sanitizeToolAction(action);
       }
@@ -1344,6 +1346,7 @@ export class AiService {
           : {}),
       };
       action.executedAt = new Date();
+      this.syncToolActionIntoMessagePayload(action);
       await this.em.flush();
       return sanitizeToolAction(action);
     } catch (error) {
@@ -1352,6 +1355,7 @@ export class AiService {
         error: error instanceof Error ? error.message : String(error),
       };
       action.executedAt = new Date();
+      this.syncToolActionIntoMessagePayload(action);
       await this.em.flush();
       return sanitizeToolAction(action);
     }
@@ -1369,8 +1373,52 @@ export class AiService {
 
     action.status = 'rejected';
     action.executedAt = new Date();
+    this.syncToolActionIntoMessagePayload(action);
     await this.em.flush();
     return sanitizeToolAction(action);
+  }
+
+  private syncToolActionIntoMessagePayload(action: AiChatToolActionItem): void {
+    const message =
+      action.message && typeof action.message !== 'number'
+        ? action.message
+        : null;
+
+    if (!message) {
+      return;
+    }
+
+    const responsePayload =
+      message.responsePayload && typeof message.responsePayload === 'object'
+        ? { ...(message.responsePayload as Record<string, unknown>) }
+        : {};
+    const existingActions = Array.isArray(responsePayload.pendingToolActions)
+      ? responsePayload.pendingToolActions.filter(
+          (item): item is Record<string, unknown> =>
+            !!item && typeof item === 'object' && !Array.isArray(item),
+        )
+      : [];
+    const sanitizedAction = sanitizeToolAction(action);
+    const actionIndex = existingActions.findIndex(
+      (item) => item.handle === sanitizedAction.handle,
+    );
+
+    if (actionIndex >= 0) {
+      existingActions.splice(
+        actionIndex,
+        1,
+        sanitizedAction as unknown as Record<string, unknown>,
+      );
+    } else {
+      existingActions.push(
+        sanitizedAction as unknown as Record<string, unknown>,
+      );
+    }
+
+    message.responsePayload = {
+      ...responsePayload,
+      pendingToolActions: existingActions,
+    };
   }
 
   private async resolveAgentRuntimeContext(
@@ -1733,66 +1781,6 @@ export class AiService {
         .map((role) => role.handle)
         .filter((handle): handle is number => typeof handle === 'number'),
     );
-  }
-
-  private async createAgentRun(input: {
-    session: AiChatSessionItem;
-    message: AiChatMessageItem;
-    person: PersonItem;
-    agent: AiAgentItem | null;
-    version: AiAgentVersionItem | null;
-    playbook: AiAgentPlaybookItem | null;
-    provider: string;
-    model: string;
-    contextEntityHandle: string | null;
-    contextRecordHandle: string | null;
-  }): Promise<AiAgentRunItem> {
-    const run = this.em.create(AiAgentRunItem, {
-      session: input.session,
-      message: input.message,
-      person: input.person,
-      agent: input.agent,
-      agentVersion: input.version,
-      playbook: input.playbook,
-      status: 'running',
-      provider: input.provider,
-      model: input.model,
-      contextEntityHandle: input.contextEntityHandle,
-      contextRecordHandle: input.contextRecordHandle,
-      startedAt: new Date(),
-    });
-
-    this.em.persist(run);
-    await this.em.flush();
-    return run;
-  }
-
-  private completeAgentRun(
-    run: AiAgentRunItem,
-    patch: {
-      status: string;
-      responseText?: string | null;
-      toolCalls?: Record<string, unknown>[] | null;
-      sources?: Record<string, unknown>[] | null;
-      pendingActions?: Record<string, unknown>[] | null;
-      usagePayload?: Record<string, unknown> | null;
-      errorPayload?: Record<string, unknown> | null;
-    },
-  ): void {
-    const completedAt = new Date();
-    run.status = patch.status;
-    run.completedAt = completedAt;
-    run.durationMs = Math.max(
-      0,
-      completedAt.getTime() -
-        (run.startedAt?.getTime() ?? completedAt.getTime()),
-    );
-    run.responseText = patch.responseText ?? run.responseText ?? null;
-    run.toolCalls = patch.toolCalls ?? run.toolCalls ?? null;
-    run.sources = patch.sources ?? run.sources ?? null;
-    run.pendingActions = patch.pendingActions ?? run.pendingActions ?? null;
-    run.usagePayload = patch.usagePayload ?? run.usagePayload ?? null;
-    run.errorPayload = patch.errorPayload ?? run.errorPayload ?? null;
   }
 
   private buildAgentWorkbenchStats(

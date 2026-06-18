@@ -325,6 +325,51 @@
             <div class="sapling-ai-agent-builder__panel-stack">
               <strong>{{ tr('aiAgentBuilder.memoryTitle', 'Quellen und Memory') }}</strong>
               <article
+                v-for="playbook in workbenchPlaybooks"
+                :key="playbook.handle"
+                class="sapling-section-panel sapling-ai-agent-builder__mini-card"
+              >
+                <div class="sapling-row-between-xs">
+                  <strong>{{ playbook.title }}</strong>
+                  <v-chip
+                    size="small"
+                    variant="tonal"
+                    :color="playbook.isActive ? 'success' : undefined"
+                  >
+                    {{
+                      playbook.isActive
+                        ? tr('global.active', 'Aktiv')
+                        : tr('global.inactive', 'Inaktiv')
+                    }}
+                  </v-chip>
+                </div>
+                <p v-if="playbook.description">{{ playbook.description }}</p>
+                <div v-if="playbook.triggerEntityHandles?.length" class="sapling-row-xs">
+                  <v-chip
+                    v-for="entityHandle in playbook.triggerEntityHandles"
+                    :key="entityHandle"
+                    size="small"
+                    variant="outlined"
+                  >
+                    {{ entityHandle }}
+                  </v-chip>
+                </div>
+                <ol v-if="playbook.steps?.length" class="sapling-stack-xs">
+                  <li
+                    v-for="(step, stepIndex) in playbook.steps"
+                    :key="`${playbook.handle}-${stepIndex}`"
+                  >
+                    {{ step }}
+                  </li>
+                </ol>
+                <p v-if="playbook.expectedOutput">{{ playbook.expectedOutput }}</p>
+              </article>
+              <v-alert v-if="workbenchPlaybooks.length === 0" type="info" variant="tonal">
+                {{
+                  tr('aiAgentBuilder.noPlaybooks', 'Noch kein Playbook für diesen Agent gepflegt.')
+                }}
+              </v-alert>
+              <article
                 v-for="memory in workbenchMemories"
                 :key="memory.handle ?? memory.title"
                 class="sapling-section-panel sapling-ai-agent-builder__mini-card"
@@ -417,29 +462,7 @@
                   {{ tr('aiAgentBuilder.tabQuality', 'Qualität') }}
                 </v-chip>
               </div>
-              <v-table density="comfortable">
-                <thead>
-                  <tr>
-                    <th>Status</th>
-                    <th>{{ tr('aiAgentBuilder.fieldModel', 'Modell') }}</th>
-                    <th>ms</th>
-                    <th>{{ tr('aiAgentBuilder.updatedAt', 'Aktualisiert') }}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    v-for="(run, runIndex) in workbenchRuns"
-                    :key="run.handle ?? `run-${run.startedAt ?? runIndex}`"
-                  >
-                    <td>
-                      <v-chip size="small" variant="tonal">{{ run.status }}</v-chip>
-                    </td>
-                    <td>{{ run.model || '-' }}</td>
-                    <td>{{ run.durationMs ?? '-' }}</td>
-                    <td>{{ formatDate(run.completedAt || run.startedAt) }}</td>
-                  </tr>
-                </tbody>
-              </v-table>
+              <AiAgentRunTraceList :runs="workbenchRuns" />
             </div>
           </v-window-item>
         </v-window>
@@ -467,6 +490,7 @@ import { useI18n } from 'vue-i18n'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
 import SaplingSurface from '@/components/common/SaplingSurface.vue'
 import SaplingFieldSelect from '@/components/dialog/fields/SaplingFieldSelect.vue'
+import AiAgentRunTraceList from '@/components/ai/AiAgentRunTraceList.vue'
 import type {
   AiAgentItem,
   AiAgentEvaluationItem,

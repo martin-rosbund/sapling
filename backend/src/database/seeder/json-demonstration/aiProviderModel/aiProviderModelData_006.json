@@ -11,7 +11,7 @@
     "isDefault": true,
     "isActive": true,
     "sortOrder": 5,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   },
   {
     "handle": "openai-gpt-5_4",
@@ -25,7 +25,7 @@
     "isDefault": false,
     "isActive": true,
     "sortOrder": 6,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   },
   {
     "handle": "openai-gpt-5_4-mini",
@@ -39,7 +39,7 @@
     "isDefault": false,
     "isActive": true,
     "sortOrder": 7,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   },
   {
     "handle": "openai-gpt-5_4-nano",
@@ -53,7 +53,7 @@
     "isDefault": false,
     "isActive": true,
     "sortOrder": 8,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   },
   {
     "handle": "gemini-3_5-flash",
@@ -67,7 +67,7 @@
     "isDefault": true,
     "isActive": true,
     "sortOrder": 5,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   },
   {
     "handle": "gemini-3_1-pro-preview",
@@ -81,7 +81,7 @@
     "isDefault": false,
     "isActive": true,
     "sortOrder": 6,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   },
   {
     "handle": "gemini-3_1-flash-lite",
@@ -95,7 +95,7 @@
     "isDefault": false,
     "isActive": true,
     "sortOrder": 7,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   },
   {
     "handle": "gemini-embedding-2",
@@ -109,6 +109,6 @@
     "isDefault": false,
     "isActive": true,
     "sortOrder": 45,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   }
 ]

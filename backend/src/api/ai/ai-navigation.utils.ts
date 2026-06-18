@@ -6,13 +6,16 @@ export function buildNavigationLinks(
   const deduplicatedLinks = new Map<string, AiChatNavigationLink>();
 
   for (const toolCall of toolCalls) {
-    const link = buildNavigationLink(toolCall);
-
-    if (!link) {
-      continue;
+    for (const link of buildNavigationLinksForToolCall(toolCall)) {
+      const existingLink = deduplicatedLinks.get(link.path);
+      deduplicatedLinks.set(link.path, {
+        ...existingLink,
+        ...link,
+        isPrimary:
+          existingLink?.isPrimary ??
+          (deduplicatedLinks.size === 0 && link.isPrimary !== false),
+      });
     }
-
-    deduplicatedLinks.set(link.path, link);
   }
 
   return [...deduplicatedLinks.values()];
@@ -58,15 +61,27 @@ export function alignAssistantContentWithNavigationLinks(
 export function buildNavigationLink(
   toolCall: AiExecutedToolCall,
 ): AiChatNavigationLink | null {
+  return buildNavigationLinksForToolCall(toolCall)[0] ?? null;
+}
+
+export function buildNavigationLinksForToolCall(
+  toolCall: AiExecutedToolCall,
+): AiChatNavigationLink[] {
   const entityHandle = asNonEmptyString(toolCall.arguments.entityHandle);
   const rawResult = asRecord(toolCall.rawResult);
 
+  if (!isNavigableToolCall(toolCall, rawResult)) {
+    return [];
+  }
+
   if (toolCall.toolName === 'ticket_search') {
-    return {
-      path: buildEntityTablePath('ticket', asRecord(rawResult?.appliedFilter)),
-      entityHandle: 'ticket',
-      kind: 'list',
-    };
+    const resultHandles = extractDataRecordHandles(rawResult);
+
+    return buildRecordHandleListLink('ticket', resultHandles, {
+      intent: 'searchResults',
+      label: buildListLabel('ticket', resultHandles),
+      toolName: toolCall.toolName,
+    });
   }
 
   if (toolCall.toolName === 'semantic_search') {
@@ -74,74 +89,55 @@ export function buildNavigationLink(
       asNonEmptyString(toolCall.arguments.entityHandle) ??
       asNonEmptyString(rawResult?.entityHandle) ??
       'ticket';
-    const resultHandles = Array.isArray(rawResult?.results)
-      ? rawResult.results
-          .map((item) => asRecord(item)?.handle)
-          .filter(
-            (value): value is string | number =>
-              typeof value === 'string' || typeof value === 'number',
-          )
-      : [];
+    const resultHandles = extractResultRecordHandles(rawResult?.results);
 
-    if (resultHandles.length === 0) {
-      return null;
-    }
-
-    return {
-      path: buildEntityTablePath(semanticEntityHandle, {
-        handle: {
-          $in: resultHandles,
-        },
-      }),
-      entityHandle: semanticEntityHandle,
-      kind: 'list',
-    };
+    return buildRecordHandleListLink(semanticEntityHandle, resultHandles, {
+      intent: 'searchResults',
+      label: buildListLabel(semanticEntityHandle, resultHandles),
+      toolName: toolCall.toolName,
+    });
   }
 
   if (toolCall.toolName === 'knowledge_search') {
     const resultItems = Array.isArray(rawResult?.results)
       ? rawResult.results
       : [];
-    const firstEntityHandle = resultItems
-      .map((item) => asNonEmptyString(asRecord(item)?.entityHandle))
-      .find((value): value is string => !!value);
+    const handlesByEntity = new Map<string, Array<string | number>>();
 
-    if (!firstEntityHandle) {
-      return null;
+    for (const item of resultItems) {
+      const itemRecord = asRecord(item);
+      const itemEntityHandle = asNonEmptyString(itemRecord?.entityHandle);
+      const itemHandle = asHandleValue(itemRecord?.handle);
+
+      if (!itemEntityHandle || itemHandle == null) {
+        continue;
+      }
+
+      const handles = handlesByEntity.get(itemEntityHandle) ?? [];
+      handles.push(itemHandle);
+      handlesByEntity.set(itemEntityHandle, handles);
     }
 
-    const resultHandles = resultItems
-      .filter(
-        (item) =>
-          asNonEmptyString(asRecord(item)?.entityHandle) === firstEntityHandle,
-      )
-      .map((item) => asRecord(item)?.handle)
-      .filter(
-        (value): value is string | number =>
-          typeof value === 'string' || typeof value === 'number',
-      );
-
-    if (resultHandles.length === 0) {
-      return null;
-    }
-
-    return {
-      path: buildEntityTablePath(firstEntityHandle, {
-        handle: {
-          $in: resultHandles,
-        },
-      }),
-      entityHandle: firstEntityHandle,
-      kind: 'list',
-    };
+    return [...handlesByEntity.entries()].flatMap(
+      ([resultEntityHandle, resultHandles]) =>
+        buildRecordHandleListLink(resultEntityHandle, resultHandles, {
+          intent: 'searchResults',
+          label: buildListLabel(resultEntityHandle, resultHandles),
+          toolName: toolCall.toolName,
+        }),
+    );
   }
 
   if (!entityHandle) {
-    return null;
+    return [];
   }
 
   if (rawResult?.found === false) {
-    return null;
+    return [];
+  }
+
+  if (rawResult?.queryExecuted === false) {
+    return [];
   }
 
   if (entityHandle === 'entityRoute') {
@@ -151,23 +147,28 @@ export function buildNavigationLink(
     );
 
     if (directRoutePath) {
-      return {
-        path: directRoutePath,
-        entityHandle,
-        kind: 'route',
-      };
+      return [
+        {
+          path: directRoutePath,
+          entityHandle,
+          kind: 'route',
+          intent: 'route',
+          label: 'Seite öffnen',
+          resultCount: 1,
+          toolName: toolCall.toolName,
+        },
+      ];
     }
   }
 
   if (toolCall.toolName === 'generic_list') {
-    return {
-      path: buildEntityTablePath(
-        entityHandle,
-        asRecord(toolCall.arguments.filter),
-      ),
-      entityHandle,
-      kind: 'list',
-    };
+    const resultHandles = extractDataRecordHandles(rawResult);
+
+    return buildRecordHandleListLink(entityHandle, resultHandles, {
+      intent: 'searchResults',
+      label: buildListLabel(entityHandle, resultHandles),
+      toolName: toolCall.toolName,
+    });
   }
 
   if (
@@ -182,17 +183,28 @@ export function buildNavigationLink(
     );
 
     if (recordHandle == null) {
-      return null;
+      return [];
     }
 
-    return {
-      path: buildEntityTablePath(entityHandle, { handle: recordHandle }),
-      entityHandle,
-      kind: 'record',
-    };
+    return [
+      {
+        path: buildEntityTablePath(entityHandle, { handle: recordHandle }),
+        entityHandle,
+        kind: 'record',
+        intent:
+          toolCall.toolName === 'generic_create' ||
+          toolCall.toolName === 'generic_update'
+            ? 'mutationResult'
+            : 'record',
+        label: 'Datensatz öffnen',
+        resultCount: 1,
+        recordHandles: [recordHandle],
+        toolName: toolCall.toolName,
+      },
+    ];
   }
 
-  return null;
+  return [];
 }
 
 export function buildEntityTablePath(
@@ -296,11 +308,10 @@ export function extractRecordHandle(
   rawResult: unknown,
   fallbackHandle?: unknown,
 ): string | number | null {
-  const resultHandle = asHandleValue(
-    rawResult && typeof rawResult === 'object'
-      ? (rawResult as Record<string, unknown>).handle
-      : null,
-  );
+  const resultRecord = asRecord(rawResult);
+  const resultHandle =
+    asHandleValue(resultRecord?.handle) ??
+    asHandleValue(asRecord(resultRecord?.record)?.handle);
 
   return resultHandle ?? asHandleValue(fallbackHandle);
 }
@@ -325,4 +336,108 @@ function asHandleValue(value: unknown): string | number | null {
 
 function asNonEmptyString(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+function isNavigableToolCall(
+  toolCall: AiExecutedToolCall,
+  rawResult: Record<string, unknown> | undefined,
+): boolean {
+  if (
+    toolCall.status === 'blocked' ||
+    toolCall.status === 'repair' ||
+    toolCall.status === 'error'
+  ) {
+    return false;
+  }
+
+  if (
+    rawResult?.ok === false ||
+    rawResult?.pendingToolAction === true ||
+    rawResult?.queryExecuted === false ||
+    rawResult?.status === 'pending'
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+function buildRecordHandleListLink(
+  entityHandle: string,
+  rawHandles: Array<string | number>,
+  options: {
+    intent: AiChatNavigationLink['intent'];
+    label: string;
+    toolName: string;
+  },
+): AiChatNavigationLink[] {
+  const recordHandles = deduplicateHandles(rawHandles);
+
+  if (recordHandles.length === 0) {
+    return [];
+  }
+
+  return [
+    {
+      path: buildEntityTablePath(entityHandle, {
+        handle:
+          recordHandles.length === 1
+            ? recordHandles[0]
+            : {
+                $in: recordHandles,
+              },
+      }),
+      entityHandle,
+      kind: recordHandles.length === 1 ? 'record' : 'list',
+      intent: options.intent,
+      label: options.label,
+      resultCount: recordHandles.length,
+      recordHandles,
+      toolName: options.toolName,
+    },
+  ];
+}
+
+function extractDataRecordHandles(
+  record: Record<string, unknown> | undefined,
+): Array<string | number> {
+  return extractResultRecordHandles(record?.data);
+}
+
+function extractResultRecordHandles(value: unknown): Array<string | number> {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map((item) => {
+      const record = asRecord(item);
+      return (
+        asHandleValue(record?.handle) ??
+        asHandleValue(asRecord(record?.record)?.handle)
+      );
+    })
+    .filter((handle): handle is string | number => handle != null);
+}
+
+function deduplicateHandles(
+  handles: Array<string | number>,
+): Array<string | number> {
+  const deduplicated = new Map<string, string | number>();
+
+  for (const handle of handles) {
+    deduplicated.set(String(handle), handle);
+  }
+
+  return [...deduplicated.values()];
+}
+
+function buildListLabel(entityHandle: string, handles: Array<string | number>) {
+  const count = deduplicateHandles(handles).length;
+
+  if (count === 1) {
+    return 'Datensatz öffnen';
+  }
+
+  return `${count} Datensätze öffnen`;
 }

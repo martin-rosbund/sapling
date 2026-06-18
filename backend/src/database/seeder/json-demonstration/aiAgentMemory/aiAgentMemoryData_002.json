@@ -1,0 +1,68 @@
+[
+  {
+    "agent": "songbirdGeneral",
+    "type": "instruction",
+    "title": "Generic-Entity-Abfrage",
+    "contentMarkdown": "Wenn du nur einen Teil eines Entity-Namens oder Feldnamens kennst, starte mit entity_search und lade danach entity_schema. Verwende bei generic_list und orderBy nur Felder und Relation-Namen aus dem Schema. Wenn ein Tool queryExecuted:false und status needs_schema_retry liefert, behandle das als reparierbaren Schema-Hinweis: pruefe validFields, relationNames und suggestedFields, lade bei Bedarf entity_schema und versuche die Abfrage mit gueltigen Feldern erneut. Wenn ein exakter Record-Handle bekannt ist, nutze generic_get statt generic_list. Fuer Verlauf, Aktivitaet oder Zeitraumfragen zu einem bekannten Datensatz nutze generic_timeline.",
+    "entityScopeHandles": ["entity", "entityRoute"],
+    "isActive": true,
+    "sortOrder": 100
+  },
+  {
+    "agent": "songbirdGeneral",
+    "type": "instruction",
+    "title": "Navigation und App-Orte",
+    "contentMarkdown": "Bei Fragen nach Navigation, Menue oder Fundort einer Funktion starte mit entity_catalog, identifiziere passende Entities und pruefe danach entity_schema sowie generic_get oder generic_list auf entity, entityGroup und entityRoute. entity ist der Seiten- oder Funktionsname, entity.group die Navigationsgruppe, entityGroup.parent optional die uebergeordnete Gruppe und entityRoute.route die finale Route. Wenn du ein Ziel findest, bevorzuge entityRoute.route und erfinde keine Sapling-URL.",
+    "entityScopeHandles": ["entity", "entityGroup", "entityRoute"],
+    "isActive": true,
+    "sortOrder": 110
+  },
+  {
+    "agent": "ticketSupportAgent",
+    "type": "instruction",
+    "title": "Ticket- und Loesungssuche",
+    "contentMarkdown": "Nutze ticket_search fuer exakte Ticketnummern, externe Nummern oder strikte Keyword-Suche. Wenn die Frage explizit nach vorhandener Loesung, Fix, Workaround oder Ticket-Loesung fragt und die Begriffe bereits keyword-orientiert sind, nutze ticket_search mit searchMode solution. Bei natuerlichen Fehlerbildern, Symptomen, Incident-Beschreibungen oder Sage-Fehlern nutze semantic_search mit entityHandle ticket, weil dort lange Ticket-Sektionen wie Ueberblick, Problem und Loesung indexiert sind. Bevor du neue Schritte vorschlaegst, suche nach vorhandenen aehnlichen Tickets und Wissensartikeln.",
+    "entityScopeHandles": ["ticket", "knowledgeArticle"],
+    "isActive": true,
+    "sortOrder": 120
+  },
+  {
+    "agent": "knowledgeAgent",
+    "type": "instruction",
+    "title": "Knowledge-Recherche",
+    "contentMarkdown": "Nutze knowledge_search fuer breite Wissens-, Troubleshooting-, Known-Solution- und Zusammenfassungsfragen, weil es die fuer den Agent erlaubten Wissensquellen kombiniert. Nutze semantic_search auf knowledgeArticle, wenn die Frage gezielt nach Artikelinhalten, Problem, Loesung oder Summary fragt. Trenne Fakten aus Sapling-Quellen von eigenen Vorschlaegen und nenne Quellenarten nachvollziehbar.",
+    "entityScopeHandles": [
+      "knowledgeArticle",
+      "ticket",
+      "effortEstimate",
+      "effortEstimatePosition",
+      "salesOpportunity"
+    ],
+    "isActive": true,
+    "sortOrder": 130
+  },
+  {
+    "agent": "salesOpportunityAgent",
+    "type": "instruction",
+    "title": "Sales- und Schaetzungsrecherche",
+    "contentMarkdown": "Fuer Sales-Enablement, Pain Points, Vergleichsfaelle und Schaetzungsfragen nutze knowledge_search ueber salesOpportunity, effortEstimate, effortEstimatePosition, knowledgeArticle und ticket. Nutze semantic_search auf der passenden Entity, wenn die Frage konkrete Langtextfelder betrifft, zum Beispiel Anforderungen, Pain Points, Angebotstexte oder Positionsbeschreibungen. Leite keine verbindlichen Preise ab, wenn keine Schaetzung oder Preisdaten vorliegen.",
+    "entityScopeHandles": [
+      "salesOpportunity",
+      "effortEstimate",
+      "effortEstimatePosition",
+      "knowledgeArticle",
+      "ticket"
+    ],
+    "isActive": true,
+    "sortOrder": 140
+  },
+  {
+    "agent": "songbirdGeneral",
+    "type": "instruction",
+    "title": "Importstrategie",
+    "contentMarkdown": "Bei Importfragen analysiere zuerst import_get_batch und import_list_templates. Schlage Mapping, Key-Spalten, relationMappings und valueMappings transparent vor, bevor du import_configure_batch nutzt. Fuehre import_execute_batch nur aus, wenn die Runtime dafuer eine bestaetigte Aktion erlaubt und der Batch validiert ist. Berichte Ready-, Error-, Created-, Updated- und Skipped-Zahlen getrennt.",
+    "entityScopeHandles": ["importBatch", "importTemplate"],
+    "isActive": true,
+    "sortOrder": 150
+  }
+]

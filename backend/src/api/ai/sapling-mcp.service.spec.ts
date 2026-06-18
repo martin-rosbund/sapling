@@ -30,6 +30,7 @@ jest.mock('../../entity/global/entity.registry', () => ({
     'person',
     'project',
     'ticket',
+    'ticketStatus',
     'event',
     'salesOpportunity',
     'effortEstimate',
@@ -39,6 +40,8 @@ jest.mock('../../entity/global/entity.registry', () => ({
 }));
 
 import { SaplingMcpService } from './sapling-mcp.service';
+import { SaplingMcpCriteriaService } from './sapling-mcp-criteria.service';
+import { SaplingMcpResultFormatterService } from './sapling-mcp-result-formatter.service';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 
 const createTemplateField = (
@@ -90,7 +93,9 @@ const createService = ({
     templateService as never,
     importService as never,
     aiService as never,
+    new SaplingMcpCriteriaService(templateService as never),
     permissionService as never,
+    new SaplingMcpResultFormatterService(templateService as never),
   );
 
 describe('SaplingMcpService', () => {
@@ -184,6 +189,78 @@ describe('SaplingMcpService', () => {
     );
   });
 
+  it('adds required current reference defaults before generic ticket creates', async () => {
+    const genericService = {
+      create: jest.fn().mockResolvedValue({
+        entityHandle: 'ticket',
+        handle: 42,
+        title: 'Import failure',
+      } as never),
+      update: jest.fn(),
+      delete: jest.fn(),
+      getRecordTimeline: jest.fn(),
+      findAndCount: jest.fn(),
+    };
+    const currentService = {
+      getPerson: jest.fn().mockResolvedValue({
+        handle: 9,
+        company: { handle: 23 },
+      } as never),
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn((entityHandle: string) => {
+        if (entityHandle === 'ticket') {
+          return [
+            createTemplateField({ name: 'title' }),
+            createTemplateField({
+              name: 'creatorCompany',
+              kind: 'm:1',
+              isReference: true,
+              isRequired: true,
+              referenceName: 'company',
+              options: ['isCompany', 'isCurrentCompany'],
+            }),
+            createTemplateField({
+              name: 'creatorPerson',
+              kind: 'm:1',
+              isReference: true,
+              isRequired: true,
+              referenceName: 'person',
+              options: ['isPerson', 'isCurrentPerson'],
+            }),
+          ];
+        }
+
+        return [];
+      }),
+    };
+    const service = createService({
+      genericService,
+      currentService,
+      templateService,
+    });
+    const user = { handle: 9 } as never;
+
+    await service.executeTool(
+      'generic_create',
+      {
+        entityHandle: 'ticket',
+        data: { title: 'Import failure' },
+      },
+      user,
+    );
+
+    expect(genericService.create).toHaveBeenCalledWith(
+      'ticket',
+      {
+        title: 'Import failure',
+        creatorCompany: 23,
+        creatorPerson: 9,
+      },
+      user,
+    );
+  });
+
   it('searches entities by handle and field names', async () => {
     const genericService = {
       create: jest.fn(),
@@ -220,6 +297,252 @@ describe('SaplingMcpService', () => {
     expect(result.rawResult).toMatchObject({
       query: 'email',
       matches: [expect.objectContaining({ entityHandle: 'person' })],
+    });
+  });
+
+  it('returns a schema repair response for invalid generic_list filters', async () => {
+    const genericService = {
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      getRecordTimeline: jest.fn(),
+      findAndCount: jest.fn(),
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn((entityHandle: string) => {
+        if (entityHandle === 'ticketStatus') {
+          return [
+            createTemplateField({ name: 'handle', isPrimaryKey: true }),
+            createTemplateField({
+              name: 'description',
+              options: ['isValue', 'isOrderASC'],
+            }),
+            createTemplateField({ name: 'color' }),
+            createTemplateField({ name: 'icon' }),
+            createTemplateField({ name: 'isOpen', type: 'boolean' }),
+          ];
+        }
+
+        return [];
+      }),
+    };
+    const service = createService({ genericService, templateService });
+
+    const result = await service.executeTool(
+      'generic_list',
+      {
+        entityHandle: 'ticketStatus',
+        filter: { title: { $ilike: '%offen%' } },
+      },
+      { handle: 1 } as never,
+    );
+
+    expect(genericService.findAndCount).not.toHaveBeenCalled();
+    expect(result.rawResult).toMatchObject({
+      entityHandle: 'ticketStatus',
+      queryExecuted: false,
+      status: 'needs_schema_retry',
+      suggestedFields: expect.arrayContaining(['description', 'handle']),
+      validFields: expect.arrayContaining(['handle', 'description']),
+      invalidFields: [
+        expect.objectContaining({
+          entityHandle: 'ticketStatus',
+          fieldPath: 'title',
+          fieldName: 'title',
+          mode: 'filter',
+          suggestedFields: expect.arrayContaining(['description', 'handle']),
+        }),
+      ],
+    });
+    expect(result.modelResult).toMatchObject({
+      entityHandle: 'ticketStatus',
+      queryExecuted: false,
+      status: 'needs_schema_retry',
+    });
+    expect(result.rawResult).not.toMatchObject({ ok: false });
+  });
+
+  it('returns a schema repair response for invalid generic_list orderBy fields', async () => {
+    const genericService = {
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      getRecordTimeline: jest.fn(),
+      findAndCount: jest.fn(),
+    };
+    const templateService = {
+      getEntityTemplate: jest
+        .fn()
+        .mockReturnValue([
+          createTemplateField({ name: 'handle', isPrimaryKey: true }),
+          createTemplateField({ name: 'description', options: ['isValue'] }),
+        ]),
+    };
+    const service = createService({ genericService, templateService });
+
+    const result = await service.executeTool(
+      'generic_list',
+      {
+        entityHandle: 'ticketStatus',
+        orderBy: { title: 'ASC' },
+      },
+      { handle: 1 } as never,
+    );
+
+    expect(genericService.findAndCount).not.toHaveBeenCalled();
+    expect(result.rawResult).toMatchObject({
+      queryExecuted: false,
+      status: 'needs_schema_retry',
+      invalidFields: [
+        expect.objectContaining({
+          fieldPath: 'title',
+          mode: 'orderBy',
+          suggestedFields: expect.arrayContaining(['description', 'handle']),
+        }),
+      ],
+    });
+  });
+
+  it('returns a schema repair response for invalid dotted relation fields', async () => {
+    const genericService = {
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      getRecordTimeline: jest.fn(),
+      findAndCount: jest.fn(),
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn((entityHandle: string) => {
+        if (entityHandle === 'ticket') {
+          return [
+            createTemplateField({ name: 'title', options: ['isValue'] }),
+            createTemplateField({
+              name: 'status',
+              isReference: true,
+              referenceName: 'ticketStatus',
+            }),
+          ];
+        }
+
+        if (entityHandle === 'ticketStatus') {
+          return [
+            createTemplateField({ name: 'handle', isPrimaryKey: true }),
+            createTemplateField({ name: 'description', options: ['isValue'] }),
+          ];
+        }
+
+        return [];
+      }),
+    };
+    const service = createService({ genericService, templateService });
+
+    const result = await service.executeTool(
+      'generic_list',
+      {
+        entityHandle: 'ticket',
+        filter: { 'status.title': { $eq: 'Offen' } },
+      },
+      { handle: 1 } as never,
+    );
+
+    expect(genericService.findAndCount).not.toHaveBeenCalled();
+    expect(result.rawResult).toMatchObject({
+      queryExecuted: false,
+      status: 'needs_schema_retry',
+      invalidFields: [
+        expect.objectContaining({
+          entityHandle: 'ticketStatus',
+          fieldPath: 'status.title',
+          fieldName: 'title',
+          suggestedFields: expect.arrayContaining(['description', 'handle']),
+        }),
+      ],
+    });
+  });
+
+  it('keeps valid generic_list relation filters executable', async () => {
+    const genericService = {
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      getRecordTimeline: jest.fn(),
+      findAndCount: jest.fn().mockResolvedValue({
+        data: [],
+        meta: { total: 0 },
+      } as never),
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn((entityHandle: string) => {
+        if (entityHandle === 'ticket') {
+          return [
+            createTemplateField({ name: 'title', options: ['isValue'] }),
+            createTemplateField({
+              name: 'status',
+              isReference: true,
+              referenceName: 'ticketStatus',
+            }),
+          ];
+        }
+
+        if (entityHandle === 'ticketStatus') {
+          return [
+            createTemplateField({ name: 'handle', isPrimaryKey: true }),
+            createTemplateField({ name: 'description', options: ['isValue'] }),
+          ];
+        }
+
+        return [];
+      }),
+    };
+    const service = createService({ genericService, templateService });
+    const user = { handle: 1 } as never;
+
+    await service.executeTool(
+      'generic_list',
+      {
+        entityHandle: 'ticket',
+        filter: { status: { description: { ilike: '%offen%' } } },
+      },
+      user,
+    );
+
+    expect(genericService.findAndCount).toHaveBeenCalledWith(
+      'ticket',
+      { status: { description: { $ilike: '%offen%' } } },
+      1,
+      50,
+      {},
+      user,
+      [],
+    );
+  });
+
+  it('keeps permission failures as tool errors', async () => {
+    const genericService = {
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      getRecordTimeline: jest.fn(),
+      findAndCount: jest.fn(),
+    };
+    const permissionService = {
+      assertEntityPermission: jest
+        .fn<() => Promise<void>>()
+        .mockRejectedValue(new Error('global.permissionDenied')),
+    };
+    const service = createService({ genericService, permissionService });
+
+    const result = await service.executeTool(
+      'generic_list',
+      { entityHandle: 'ticketStatus', filter: { title: 'Offen' } },
+      { handle: 1 } as never,
+    );
+
+    expect(genericService.findAndCount).not.toHaveBeenCalled();
+    expect(result.rawResult).toMatchObject({
+      ok: false,
+      toolName: 'generic_list',
+      error: 'global.permissionDenied',
     });
   });
 
@@ -283,7 +606,7 @@ describe('SaplingMcpService', () => {
     });
   });
 
-  it('uses isValue fields in model-facing generic_get output and hides raw handles', async () => {
+  it('uses isValue fields in model-facing generic_get output and keeps handles for follow-up tools', async () => {
     const genericService = {
       create: jest.fn(),
       update: jest.fn(),
@@ -382,25 +705,29 @@ describe('SaplingMcpService', () => {
     });
     expect(result.modelResult).toMatchObject({
       entityHandle: 'effortEstimate',
+      handle: 21,
       displayValue: 'Dokumentenablage fuer Angebote',
       record: {
+        handle: 21,
         displayValue: 'Dokumentenablage fuer Angebote',
         title: 'Dokumentenablage fuer Angebote',
         ticket: {
+          handle: 46,
           displayValue: 'Techniker Einsatzplanung',
           title: 'Techniker Einsatzplanung',
         },
         positions: [
           {
+            handle: 61,
             displayValue: 'Dokumenttypen definieren',
             title: 'Dokumenttypen definieren',
           },
         ],
       },
     });
-    expect(JSON.stringify(result.modelResult)).not.toContain('"handle"');
+    expect(JSON.stringify(result.modelResult)).toContain('"handle"');
     expect(result.content).toContain('"displayValue"');
-    expect(result.content).not.toContain('"handle"');
+    expect(result.content).toContain('"handle"');
   });
 
   it('loads a record timeline via generic_timeline', async () => {
@@ -502,9 +829,14 @@ describe('SaplingMcpService', () => {
     });
     expect(result.modelResult).toMatchObject({
       entityHandle: 'ticket',
-      data: [{ displayValue: 'Sage 100 Fehler', title: 'Sage 100 Fehler' }],
+      data: [
+        {
+          handle: 42,
+          displayValue: 'Sage 100 Fehler',
+          title: 'Sage 100 Fehler',
+        },
+      ],
     });
-    expect(JSON.stringify(result.modelResult)).not.toContain('"handle"');
   });
 
   it('forwards semantic_search to AiService with normalized limits', async () => {
@@ -613,7 +945,18 @@ describe('SaplingMcpService', () => {
         },
       ],
     });
-    expect(JSON.stringify(result.modelResult)).not.toContain('"handle"');
+    expect(result.modelResult).toMatchObject({
+      results: [
+        {
+          entityHandle: 'knowledgeArticle',
+          handle: 7,
+        },
+        {
+          entityHandle: 'ticket',
+          handle: 42,
+        },
+      ],
+    });
   });
 
   it('normalizes AI import configure payloads and ignores external keys without a source', async () => {

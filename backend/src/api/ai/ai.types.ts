@@ -7,6 +7,12 @@ export type AiExecutedToolCall = {
   serverName: string;
   toolName: string;
   arguments: Record<string, unknown>;
+  iteration?: number;
+  status?: 'success' | 'repair' | 'blocked' | 'error';
+  durationMs?: number;
+  resultCount?: number | null;
+  sourceEntityHandles?: string[];
+  repairHints?: string[];
   modelResult?: unknown;
   rawResult: unknown;
 };
@@ -22,6 +28,17 @@ export type AiChatNavigationLink = {
   path: string;
   entityHandle: string;
   kind: 'list' | 'record' | 'route';
+  intent?:
+    | 'searchResults'
+    | 'record'
+    | 'route'
+    | 'mutationResult'
+    | 'none';
+  label?: string;
+  resultCount?: number | null;
+  recordHandles?: Array<string | number>;
+  toolName?: string;
+  isPrimary?: boolean;
 };
 
 export type AiStreamResult = {

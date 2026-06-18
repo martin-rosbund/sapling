@@ -4756,7 +4756,7 @@
           "length": null,
           "precision": null,
           "scale": null,
-          "default": "8",
+          "default": "100",
           "comment": null,
           "collation": null,
           "enumItems": [],

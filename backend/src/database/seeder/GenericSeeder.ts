@@ -85,10 +85,17 @@ export class GenericSeeder extends Seeder {
       );
       try {
         for (const item of data) {
-          em.create(
+          const seedItem = await this.prepareSeedItem(entityHandle, item, em);
+          const updatedExisting = await this.updateExistingSeedItemIfSupported(
             entityClass,
-            await this.prepareSeedItem(entityHandle, item, em),
+            entityHandle,
+            seedItem,
+            em,
           );
+
+          if (!updatedExisting) {
+            em.create(entityClass, seedItem);
+          }
         }
         await em.flush();
         const statusItem = new SeedScriptItem();
@@ -166,6 +173,34 @@ export class GenericSeeder extends Seeder {
       ...seedItem,
       entityRoute: entityRoute.handle,
     };
+  }
+
+  private async updateExistingSeedItemIfSupported(
+    entityClass: EntityName<object>,
+    entityHandle: string,
+    item: object,
+    em: EntityManager,
+  ): Promise<boolean> {
+    if (entityHandle !== 'aiProviderModel') {
+      return false;
+    }
+
+    const seedItem = item as { handle?: unknown };
+
+    if (typeof seedItem.handle !== 'string' || !seedItem.handle.trim()) {
+      return false;
+    }
+
+    const existing = await em.findOne(entityClass, {
+      handle: seedItem.handle,
+    } as never);
+
+    if (!existing) {
+      return false;
+    }
+
+    em.assign(existing, item as never);
+    return true;
   }
 
   /**

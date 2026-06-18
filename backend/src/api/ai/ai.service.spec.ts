@@ -94,6 +94,7 @@ import { AiChatRuntimeService } from './ai-chat-runtime.service';
 import {
   alignAssistantContentWithNavigationLinks,
   buildNavigationLink,
+  buildNavigationLinks,
 } from './ai-navigation.utils';
 
 type ExecuteToolResult = {
@@ -113,6 +114,17 @@ type ExecuteToolMock = (
 ) => Promise<ExecuteToolResult>;
 
 const asMock = (value: unknown): jest.Mock => value as jest.Mock;
+const createAgentRunLifecycle = () => ({
+  createRun: jest
+    .fn<() => Promise<Record<string, unknown>>>()
+    .mockResolvedValue({
+      handle: 1,
+      status: 'running',
+      startedAt: new Date('2026-04-20T08:15:30.000Z'),
+    }),
+  completeRun: jest.fn(),
+  buildSources: jest.fn<() => Record<string, unknown>[]>().mockReturnValue([]),
+});
 const createService = (
   em: unknown = {},
   mcpService: unknown = {},
@@ -122,6 +134,7 @@ const createService = (
   chatRuntime: unknown = new AiChatRuntimeService(mcpService as never),
   agentPolicy: unknown = {},
   importService: unknown = {},
+  agentRunLifecycle: unknown = createAgentRunLifecycle(),
 ) =>
   new AiService(
     em as never,
@@ -130,6 +143,7 @@ const createService = (
     providerRegistry as never,
     vectorService as never,
     chatRuntime as never,
+    agentRunLifecycle as never,
     agentPolicy as never,
     importService as never,
   );
@@ -165,7 +179,7 @@ describe('AiService', () => {
       'Interpret relative date expressions such as "today", "yesterday", "this week", and "this month" using the',
     );
     expect(instruction).toContain(
-      'Use available tools automatically when they are needed to answer with current Sapling data.',
+      'Use available tools automatically when current Sapling data is needed.',
     );
   });
 
@@ -316,10 +330,13 @@ describe('AiService', () => {
       },
     });
 
-    expect(link).toEqual({
+    expect(link).toMatchObject({
       path: '/table/project?filter=%7B%22handle%22%3A11%7D',
       entityHandle: 'project',
       kind: 'record',
+      intent: 'record',
+      resultCount: 1,
+      recordHandles: [11],
     });
   });
 
@@ -341,10 +358,12 @@ describe('AiService', () => {
       },
     });
 
-    expect(link).toEqual({
+    expect(link).toMatchObject({
       path: '/dashboard/overview',
       entityHandle: 'entityRoute',
       kind: 'route',
+      intent: 'route',
+      resultCount: 1,
     });
   });
 
@@ -361,17 +380,99 @@ describe('AiService', () => {
         appliedFilter: {
           $or: [{ solutionDescription: { $ilike: '%Sage 100%' } }],
         },
+        data: [
+          { handle: 12, title: 'Sage 100 startet nicht' },
+          { handle: 15, title: 'Sage 100 Update' },
+        ],
       },
     });
 
-    expect(link).toEqual({
-      path: '/table/ticket?filter=%7B%22%24or%22%3A%5B%7B%22solutionDescription%22%3A%7B%22%24ilike%22%3A%22%25Sage%20100%25%22%7D%7D%5D%7D',
+    expect(link).toMatchObject({
+      path: '/table/ticket?filter=%7B%22handle%22%3A%7B%22%24in%22%3A%5B12%2C15%5D%7D%7D',
       entityHandle: 'ticket',
       kind: 'list',
+      intent: 'searchResults',
+      resultCount: 2,
+      recordHandles: [12, 15],
     });
   });
 
-  it('mentions semantic_search and ticket_search guidance for ticket questions in the system instruction', () => {
+  it('does not build navigation links for empty generic_list results', () => {
+    const link = buildNavigationLink({
+      serverHandle: 0,
+      serverName: 'sapling',
+      toolName: 'generic_list',
+      arguments: {
+        entityHandle: 'ticket',
+        filter: { title: { $ilike: '%missing%' } },
+      },
+      rawResult: {
+        entityHandle: 'ticket',
+        data: [],
+        meta: { total: 0 },
+      },
+    });
+
+    expect(link).toBeNull();
+  });
+
+  it('does not build navigation links for pending confirmation actions', () => {
+    const link = buildNavigationLink({
+      serverHandle: 0,
+      serverName: 'sapling',
+      toolName: 'generic_update',
+      arguments: {
+        entityHandle: 'ticket',
+        handle: 12,
+        data: { title: 'Updated' },
+      },
+      status: 'blocked',
+      rawResult: {
+        pendingToolAction: true,
+        actionHandle: 42,
+      },
+    });
+
+    expect(link).toBeNull();
+  });
+
+  it('builds grouped navigation links for mixed knowledge_search results', () => {
+    const links = buildNavigationLinks([
+      {
+        serverHandle: 0,
+        serverName: 'sapling',
+        toolName: 'knowledge_search',
+        arguments: {
+          query: 'Sage startet nicht',
+        },
+        rawResult: {
+          results: [
+            { entityHandle: 'ticket', handle: 12, score: 0.9 },
+            { entityHandle: 'knowledgeArticle', handle: 5, score: 0.8 },
+            { entityHandle: 'ticket', handle: 13, score: 0.7 },
+          ],
+        },
+      },
+    ]);
+
+    expect(links).toHaveLength(2);
+    expect(links[0]).toMatchObject({
+      entityHandle: 'ticket',
+      kind: 'list',
+      resultCount: 2,
+      recordHandles: [12, 13],
+      isPrimary: true,
+    });
+    expect(links[1]).toMatchObject({
+      entityHandle: 'knowledgeArticle',
+      kind: 'record',
+      resultCount: 1,
+      recordHandles: [5],
+      isPrimary: false,
+    });
+  });
+
+  it('keeps hard-coded tool guidance limited to runtime rules', () => {
     const service = createService();
 
     const instruction = (
@@ -383,19 +484,14 @@ describe('AiService', () => {
     ).buildSystemInstruction({ includeToolGuidance: true });
 
     expect(instruction).toContain(
+      'If a tool returns queryExecuted:false with status needs_schema_retry',
+    );
+    expect(instruction).toContain('Do not invent URLs');
+    expect(instruction).not.toContain(
       'use semantic_search with entityHandle ticket first',
     );
-    expect(instruction).toContain(
-      'Semantic search is especially useful for natural-language symptoms',
-    );
-    expect(instruction).toContain(
-      'indexed long-text fields on event, salesOpportunity, effortEstimate, and effortEstimatePosition',
-    );
-    expect(instruction).toContain('use knowledge_search first');
-    expect(instruction).toContain('knowledgeArticle');
-    expect(instruction).toContain('Use ticket_search for exact ticket numbers');
-    expect(instruction).toContain(
-      'Prefer ticket_search with searchMode solution',
+    expect(instruction).not.toContain(
+      'Use ticket_search for exact ticket numbers',
     );
   });
 
@@ -523,7 +619,19 @@ describe('AiService', () => {
       handle: 1,
       status: 'pending',
       session: { handle: 2 },
-      message: { handle: 3 },
+      message: {
+        handle: 3,
+        responsePayload: {
+          pendingToolActions: [
+            {
+              handle: 1,
+              status: 'pending',
+              serverName: 'sapling',
+              toolName: 'import_execute_batch',
+            },
+          ],
+        },
+      },
       person: { handle: 9 },
       agent: 'importStrategyAgent',
       serverName: 'sapling',
@@ -569,6 +677,15 @@ describe('AiService', () => {
     expect(result.status).toBe('failed');
     expect(action.status).toBe('failed');
     expect(action.errorPayload).toEqual({ error: 'import.failed' });
+    expect(action.message.responsePayload).toMatchObject({
+      pendingToolActions: [
+        {
+          handle: 1,
+          status: 'failed',
+          errorPayload: { error: 'import.failed' },
+        },
+      ],
+    });
     expect(em.flush).toHaveBeenCalled();
   });
 

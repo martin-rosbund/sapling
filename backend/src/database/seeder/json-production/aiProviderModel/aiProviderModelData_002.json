@@ -12,6 +12,6 @@
     "isDefault": true,
     "isActive": true,
     "sortOrder": 55,
-    "maxToolCallIterations": 20
+    "maxToolCallIterations": 100
   }
 ]

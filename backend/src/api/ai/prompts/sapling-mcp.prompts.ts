@@ -94,4 +94,9 @@ export const SAPLING_MCP_USAGE_HINTS = {
     'Use only valid field and relation names from the schema response.',
     'Use MikroORM operators with a leading $, for example $eq, $in, or $ilike.',
   ],
+  criteriaRepair: [
+    'The query was not executed because one or more filter or order fields are not part of the entity schema.',
+    'Retry only after replacing invalid fields with one of the suggestedFields or validFields.',
+    'Call entity_schema if the intended field is still unclear.',
+  ],
 } as const;

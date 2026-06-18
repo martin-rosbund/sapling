@@ -88,7 +88,7 @@
             {{ getToolActionError(action) }}
           </v-alert>
           <div
-            v-if="action.status === 'pending'"
+            v-if="action.status === 'pending' && action.handle"
             class="sapling-row-xs sapling-ai-chat__tool-action-actions"
           >
             <v-btn
@@ -150,7 +150,7 @@
           prepend-icon="mdi-open-in-app"
           @click="openNavigationLink(link.path)"
         >
-          {{ t('aiChat.openDataLink') }}
+          {{ getNavigationLinkLabel(link) }}
         </v-btn>
       </div>
     </div>
@@ -168,6 +168,12 @@ interface ChatNavigationLink {
   path: string
   entityHandle: string
   kind: 'list' | 'record' | 'route'
+  intent?: 'searchResults' | 'record' | 'route' | 'mutationResult' | 'none'
+  label?: string
+  resultCount?: number | null
+  recordHandles?: Array<string | number>
+  toolName?: string
+  isPrimary?: boolean
 }
 
 interface ChatImportAttachment {
@@ -289,6 +295,12 @@ function formatToolActionArguments(action: AiChatToolActionItem) {
 }
 
 function getToolActionError(action: AiChatToolActionItem) {
+  if (action.status === 'pending' && !action.handle) {
+    return te('aiChat.toolActionMissingHandle')
+      ? t('aiChat.toolActionMissingHandle')
+      : 'Diese vorbereitete Aktion kann nicht bestaetigt werden, weil die technische Bestaetigungsnummer fehlt.'
+  }
+
   const payload = action.errorPayload
 
   if (!payload || typeof payload !== 'object') {
@@ -398,7 +410,7 @@ watch(
 watch(
   () => {
     const lastMessage = getLastItem(props.messages)
-    const link = lastMessage ? (getLastItem(getMessageNavigationLinks(lastMessage)) ?? null) : null
+    const link = lastMessage ? getPrimaryRouteNavigationLink(lastMessage) : null
 
     return {
       handle: lastMessage?.handle ?? null,
@@ -485,6 +497,10 @@ function getFailedMessageDetail(message: AiChatMessageItem) {
 }
 
 function getMessageNavigationLinks(message: AiChatMessageItem): ChatNavigationLink[] {
+  if (getMessageToolActions(message).some((action) => action.status === 'pending')) {
+    return []
+  }
+
   const responsePayload =
     message.responsePayload && typeof message.responsePayload === 'object'
       ? (message.responsePayload as Record<string, unknown>)
@@ -496,10 +512,15 @@ function getMessageNavigationLinks(message: AiChatMessageItem): ChatNavigationLi
     return []
   }
 
-  const validNavigationLinks = navigationLinks.filter(isChatNavigationLink)
-  const lastNavigationLink = getLastItem(validNavigationLinks)
+  return navigationLinks.filter(isChatNavigationLink).filter(isVisibleNavigationLink).slice(0, 3)
+}
 
-  return lastNavigationLink ? [lastNavigationLink] : []
+function getPrimaryRouteNavigationLink(message: AiChatMessageItem): ChatNavigationLink | null {
+  return (
+    getMessageNavigationLinks(message).find(
+      (link) => link.kind === 'route' && link.isPrimary !== false,
+    ) ?? null
+  )
 }
 
 function isChatNavigationLink(value: unknown): value is ChatNavigationLink {
@@ -512,6 +533,34 @@ function isChatNavigationLink(value: unknown): value is ChatNavigationLink {
       (value as { kind?: unknown }).kind === 'record' ||
       (value as { kind?: unknown }).kind === 'route')
   )
+}
+
+function isVisibleNavigationLink(link: ChatNavigationLink) {
+  if (link.intent === 'none') {
+    return false
+  }
+
+  if ((link.kind === 'list' || link.kind === 'record') && link.resultCount === 0) {
+    return false
+  }
+
+  return !!link.path.trim()
+}
+
+function getNavigationLinkLabel(link: ChatNavigationLink) {
+  if (typeof link.label === 'string' && link.label.trim()) {
+    return link.label.trim()
+  }
+
+  if (link.kind === 'route') {
+    return te('aiChat.openRouteLink') ? t('aiChat.openRouteLink') : t('aiChat.openDataLink')
+  }
+
+  if (link.kind === 'record') {
+    return te('aiChat.openRecordLink') ? t('aiChat.openRecordLink') : t('aiChat.openDataLink')
+  }
+
+  return t('aiChat.openDataLink')
 }
 
 async function openNavigationLink(path: string) {
