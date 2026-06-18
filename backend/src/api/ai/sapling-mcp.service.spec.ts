@@ -189,7 +189,7 @@ describe('SaplingMcpService', () => {
     );
   });
 
-  it('adds required current reference defaults before generic ticket creates', async () => {
+  it('adds current reference defaults before generic ticket creates', async () => {
     const genericService = {
       create: jest.fn().mockResolvedValue({
         entityHandle: 'ticket',
@@ -212,6 +212,22 @@ describe('SaplingMcpService', () => {
         if (entityHandle === 'ticket') {
           return [
             createTemplateField({ name: 'title' }),
+            createTemplateField({
+              name: 'assigneeCompany',
+              kind: 'm:1',
+              isReference: true,
+              isRequired: false,
+              referenceName: 'company',
+              options: ['isCompany', 'isCurrentCompany'],
+            }),
+            createTemplateField({
+              name: 'assigneePerson',
+              kind: 'm:1',
+              isReference: true,
+              isRequired: false,
+              referenceName: 'person',
+              options: ['isPerson', 'isCurrentPerson'],
+            }),
             createTemplateField({
               name: 'creatorCompany',
               kind: 'm:1',
@@ -254,8 +270,105 @@ describe('SaplingMcpService', () => {
       'ticket',
       {
         title: 'Import failure',
+        assigneeCompany: 23,
+        assigneePerson: 9,
         creatorCompany: 23,
         creatorPerson: 9,
+      },
+      user,
+    );
+  });
+
+  it('keeps explicit current reference payload values on generic creates', async () => {
+    const genericService = {
+      create: jest.fn().mockResolvedValue({
+        entityHandle: 'ticket',
+        handle: 43,
+        title: 'Import failure',
+      } as never),
+      update: jest.fn(),
+      delete: jest.fn(),
+      getRecordTimeline: jest.fn(),
+      findAndCount: jest.fn(),
+    };
+    const currentService = {
+      getPerson: jest.fn().mockResolvedValue({
+        handle: 9,
+        company: { handle: 23 },
+      } as never),
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn((entityHandle: string) => {
+        if (entityHandle === 'ticket') {
+          return [
+            createTemplateField({ name: 'title' }),
+            createTemplateField({
+              name: 'assigneeCompany',
+              kind: 'm:1',
+              isReference: true,
+              referenceName: 'company',
+              options: ['isCompany', 'isCurrentCompany'],
+            }),
+            createTemplateField({
+              name: 'assigneePerson',
+              kind: 'm:1',
+              isReference: true,
+              referenceName: 'person',
+              options: ['isPerson', 'isCurrentPerson'],
+            }),
+            createTemplateField({
+              name: 'creatorCompany',
+              kind: 'm:1',
+              isReference: true,
+              isRequired: true,
+              referenceName: 'company',
+              options: ['isCompany', 'isCurrentCompany'],
+            }),
+            createTemplateField({
+              name: 'creatorPerson',
+              kind: 'm:1',
+              isReference: true,
+              isRequired: true,
+              referenceName: 'person',
+              options: ['isPerson', 'isCurrentPerson'],
+            }),
+          ];
+        }
+
+        return [];
+      }),
+    };
+    const service = createService({
+      genericService,
+      currentService,
+      templateService,
+    });
+    const user = { handle: 9 } as never;
+
+    await service.executeTool(
+      'generic_create',
+      {
+        entityHandle: 'ticket',
+        data: {
+          title: 'Import failure',
+          assigneeCompany: 31,
+          assigneePerson: 32,
+          creatorCompany: 41,
+          creatorPerson: 42,
+        },
+      },
+      user,
+    );
+
+    expect(currentService.getPerson).not.toHaveBeenCalled();
+    expect(genericService.create).toHaveBeenCalledWith(
+      'ticket',
+      {
+        title: 'Import failure',
+        assigneeCompany: 31,
+        assigneePerson: 32,
+        creatorCompany: 41,
+        creatorPerson: 42,
       },
       user,
     );

@@ -1269,7 +1269,7 @@ export class SaplingMcpService {
     );
   }
 
-  private async applyRequiredCurrentReferenceDefaults(
+  private async applyCurrentReferenceDefaults(
     entityHandle: string,
     data: Record<string, unknown>,
     user: PersonItem,
@@ -1277,7 +1277,6 @@ export class SaplingMcpService {
     const template = this.getEntityTemplate(entityHandle);
     const fields = template.filter(
       (field) =>
-        field.isRequired &&
         field.isReference &&
         (field.options?.includes('isCurrentCompany') ||
           field.options?.includes('isCurrentPerson')),
@@ -1377,7 +1376,7 @@ export class SaplingMcpService {
       entityHandle,
       this.asRecord(args.data),
     );
-    const defaultedData = await this.applyRequiredCurrentReferenceDefaults(
+    const defaultedData = await this.applyCurrentReferenceDefaults(
       entityHandle,
       data,
       user,
