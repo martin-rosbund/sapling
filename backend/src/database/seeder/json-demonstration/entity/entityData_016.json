@@ -1,0 +1,13 @@
+[
+  { "handle": "entity", "group": "metadata", "order": 10 },
+  { "handle": "entityRoute", "group": "metadata", "order": 20 },
+  { "handle": "entityGroup", "group": "metadata", "order": 30 },
+  { "handle": "saplingFormConfig", "group": "metadata", "order": 40 },
+  { "handle": "dashboard", "group": "workspaceTools", "order": 10 },
+  { "handle": "dashboardTemplate", "group": "workspaceTools", "order": 20 },
+  { "handle": "favorite", "group": "workspaceTools", "order": 30 },
+  { "handle": "favoriteTemplate", "group": "workspaceTools", "order": 40 },
+  { "handle": "changeLog", "group": "auditTrail", "order": 10 },
+  { "handle": "changeLogDetail", "group": "auditTrail", "order": 20 },
+  { "handle": "changeLogAction", "group": "auditTrail", "order": 30 }
+]

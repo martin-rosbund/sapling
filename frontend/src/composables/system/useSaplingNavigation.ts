@@ -50,13 +50,6 @@ interface NavigationTopGroup {
   isActive: boolean
 }
 
-interface NavigationSummary {
-  groupCount: number
-  subgroupCount: number
-  entityCount: number
-  routeCount: number
-}
-
 /**
  * Encapsulates navigation loading, permission filtering, search and route handling.
  */
@@ -173,14 +166,6 @@ export function useSaplingNavigation(props: SaplingNavigationProps, emit: Saplin
         .filter((subgroup) => subgroup.group.isExpanded || subgroup.isActive)
         .map((subgroup) => subgroup.group.handle)
     })
-  })
-  const navigationSummary = computed<NavigationSummary>(() => {
-    return {
-      groupCount: navigationGroups.value.length,
-      subgroupCount: navigationGroups.value.reduce((sum, group) => sum + group.subgroups.length, 0),
-      entityCount: navigationGroups.value.reduce((sum, group) => sum + group.entityCount, 0),
-      routeCount: navigationGroups.value.reduce((sum, group) => sum + group.routeCount, 0),
-    }
   })
   const hasSearchResults = computed(() => filteredGroups.value.length > 0)
   //#endregion
@@ -620,7 +605,6 @@ export function useSaplingNavigation(props: SaplingNavigationProps, emit: Saplin
     expandedGroups,
     expandedSubgroups,
     filteredGroups,
-    navigationSummary,
     hasSearchResults,
     onDrawerUpdate,
     toggleGroup,

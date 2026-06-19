@@ -86,9 +86,8 @@ export class GenericSeeder extends Seeder {
       try {
         for (const item of data) {
           const seedItem = await this.prepareSeedItem(entityHandle, item, em);
-          const updatedExisting = await this.updateExistingSeedItemIfSupported(
+          const updatedExisting = await this.updateExistingSeedItemByHandle(
             entityClass,
-            entityHandle,
             seedItem,
             em,
           );
@@ -175,16 +174,11 @@ export class GenericSeeder extends Seeder {
     };
   }
 
-  private async updateExistingSeedItemIfSupported(
+  private async updateExistingSeedItemByHandle(
     entityClass: EntityName<object>,
-    entityHandle: string,
     item: object,
     em: EntityManager,
   ): Promise<boolean> {
-    if (entityHandle !== 'aiProviderModel') {
-      return false;
-    }
-
     const seedItem = item as { handle?: unknown };
 
     if (typeof seedItem.handle !== 'string' || !seedItem.handle.trim()) {

@@ -1,0 +1,52 @@
+[
+  { "entity": "navigationGroup", "property": "workspace", "de": "Stammdaten", "en": "Master Data" },
+  { "entity": "navigationGroup", "property": "operations", "de": "Support", "en": "Support" },
+  { "entity": "navigationGroup", "property": "salesArea", "de": "Vertrieb", "en": "Sales" },
+  { "entity": "navigationGroup", "property": "communication", "de": "Kommunikation", "en": "Communication" },
+  { "entity": "navigationGroup", "property": "knowledgePool", "de": "Wissenspool", "en": "Knowledge Pool" },
+  { "entity": "navigationGroup", "property": "insights", "de": "Analysen", "en": "Analytics" },
+  { "entity": "navigationGroup", "property": "ai", "de": "AI", "en": "AI" },
+  { "entity": "navigationGroup", "property": "rightsManagement", "de": "Rechteverwaltung", "en": "Rights Management" },
+  { "entity": "navigationGroup", "property": "systemOperations", "de": "System", "en": "System" },
+  { "entity": "navigationGroup", "property": "platform", "de": "Platform", "en": "Platform" },
+
+  { "entity": "navigationGroup", "property": "company", "de": "Organisationen", "en": "Organizations" },
+  { "entity": "navigationGroup", "property": "person", "de": "Kontakte", "en": "Contacts" },
+  { "entity": "navigationGroup", "property": "relationship", "de": "Beziehungen", "en": "Relationships" },
+  { "entity": "navigationGroup", "property": "landscape", "de": "Serverlandschaften", "en": "Server Landscapes" },
+
+  { "entity": "navigationGroup", "property": "ticket", "de": "Tickets", "en": "Tickets" },
+  { "entity": "navigationGroup", "property": "support", "de": "Support", "en": "Support" },
+  { "entity": "navigationGroup", "property": "event", "de": "Kalender", "en": "Calendar" },
+
+  { "entity": "navigationGroup", "property": "sales", "de": "Verkaufschancen", "en": "Sales Opportunities" },
+  { "entity": "navigationGroup", "property": "effortEstimate", "de": "Aufwandsschätzungen", "en": "Effort Estimates" },
+  { "entity": "navigationGroup", "property": "contract", "de": "Verträge", "en": "Contracts" },
+
+  { "entity": "navigationGroup", "property": "teams", "de": "Teams", "en": "Teams" },
+  { "entity": "navigationGroup", "property": "mails", "de": "E-Mails", "en": "E-mails" },
+  { "entity": "navigationGroup", "property": "inbox", "de": "Posteingang", "en": "Inbox" },
+
+  { "entity": "navigationGroup", "property": "knowledge", "de": "Wissensdatenbank", "en": "Knowledge Base" },
+  { "entity": "navigationGroup", "property": "document", "de": "Dokumente", "en": "Documents" },
+  { "entity": "navigationGroup", "property": "note", "de": "Notizen", "en": "Notes" },
+
+  { "entity": "navigationGroup", "property": "kpi", "de": "KPI", "en": "KPI" },
+  { "entity": "navigationGroup", "property": "chat", "de": "Chat", "en": "Chat" },
+  { "entity": "navigationGroup", "property": "mcp", "de": "MCP", "en": "MCP" },
+
+  { "entity": "navigationGroup", "property": "administration", "de": "Rollen & Rechte", "en": "Roles & Permissions" },
+  { "entity": "navigationGroup", "property": "authentication", "de": "Authentifizierung", "en": "Authentication" },
+
+  { "entity": "navigationGroup", "property": "auditTrail", "de": "Änderungshistorie", "en": "Change History" },
+  { "entity": "navigationGroup", "property": "import", "de": "Import", "en": "Import" },
+  { "entity": "navigationGroup", "property": "system", "de": "System", "en": "System" },
+  { "entity": "navigationGroup", "property": "webhook", "de": "Webhooks", "en": "Webhooks" },
+
+  { "entity": "navigationGroup", "property": "metadata", "de": "Metadaten", "en": "Metadata" },
+  { "entity": "navigationGroup", "property": "workspaceTools", "de": "Dashboards & Listen", "en": "Dashboards & Lists" },
+  { "entity": "navigationGroup", "property": "localisation", "de": "Lokalisierung", "en": "Localization" },
+
+  { "entity": "entityGroup", "property": "parent", "de": "Übergeordnet", "en": "Parent" },
+  { "entity": "entityGroup", "property": "sortOrder", "de": "Sortierung", "en": "Sort order" }
+]

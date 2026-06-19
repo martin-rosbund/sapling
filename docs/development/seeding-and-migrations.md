@@ -67,6 +67,14 @@ effortEstimate/effortEstimateData_001.json
 translation/translationData_016.json
 ```
 
+For handle-keyed seed data, new seed files may intentionally update existing
+rows instead of inserting duplicates. `GenericSeeder` does this for every seed
+item with a non-empty string `handle`: it looks up the existing row by `handle`
+and assigns the new values when a row exists; items without a `handle` remain
+additive. Use this for navigation metadata corrections such as group labels,
+icons, order, or parentage, and for other stable reference data. Keep ordinary
+business/demo data additive unless the record has a deliberately stable handle.
+
 ## SeedScript Tracking
 
 Successful seed files are recorded in `SeedScriptItem`.
