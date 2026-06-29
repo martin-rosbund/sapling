@@ -65,6 +65,7 @@ type AzureGraphCalendarEvent = {
   id?: string;
   subject?: string | null;
   bodyPreview?: string | null;
+  sensitivity?: string | null;
   start?: AzureGraphDateTime | null;
   end?: AzureGraphDateTime | null;
   isAllDay?: boolean | null;
@@ -353,7 +354,7 @@ export class AzureCalendarService {
         startDateTime: range.startDateTime.toISOString(),
         endDateTime: range.endDateTime.toISOString(),
         $select:
-          'id,subject,bodyPreview,start,end,isAllDay,isCancelled,attendees,onlineMeeting,onlineMeetingUrl',
+          'id,subject,bodyPreview,sensitivity,start,end,isAllDay,isCancelled,attendees,onlineMeeting,onlineMeetingUrl',
         $top: '100',
       })
       .header('Prefer', 'outlook.timezone="UTC"')
@@ -507,6 +508,7 @@ export class AzureCalendarService {
   ): void {
     event.title = truncate(graphEvent.subject?.trim() || 'Outlook event', 128);
     event.description = graphEvent.bodyPreview?.trim() || undefined;
+    event.isPrivate = graphEvent.sensitivity === 'private';
     event.startDate = values.startDate;
     event.endDate = values.endDate;
     event.isAllDay = graphEvent.isAllDay === true;
@@ -515,8 +517,23 @@ export class AzureCalendarService {
       graphEvent.onlineMeetingUrl ??
       event.onlineMeetingURL;
     event.status = values.status;
-    event.participants.removeAll();
-    event.participants.add(values.participants);
+    this.replaceParticipants(event, values.participants);
+  }
+
+  private replaceParticipants(event: EventItem, participants: PersonItem[]) {
+    const collection = event.participants as {
+      set?: (items: PersonItem[]) => void;
+      removeAll?: () => void;
+      add?: (...items: PersonItem[]) => void;
+    };
+
+    if (typeof collection.set === 'function') {
+      collection.set(participants);
+      return;
+    }
+
+    collection.removeAll?.();
+    collection.add?.(...participants);
   }
 
   private async resolveImportedParticipants(

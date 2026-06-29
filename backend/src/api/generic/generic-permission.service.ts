@@ -72,7 +72,11 @@ export class GenericPermissionService {
 
     let nextWhere = this.setEntityLevelFilter(where, currentUser, entityHandle);
     if (permission.allowReadStage === 'global') {
-      return nextWhere;
+      return this.applyEntityVisibilityFilter(
+        nextWhere,
+        currentUser,
+        entityHandle,
+      );
     }
 
     const template = this.templateService.getEntityTemplate(entityHandle);
@@ -110,7 +114,33 @@ export class GenericPermissionService {
         break;
     }
 
-    return nextWhere;
+    return this.applyEntityVisibilityFilter(
+      nextWhere,
+      currentUser,
+      entityHandle,
+    );
+  }
+
+  applyEntityVisibilityFilter(
+    where: object,
+    currentUser: PersonItem,
+    entityHandle: string,
+  ): object {
+    if (entityHandle !== 'event') {
+      return where;
+    }
+
+    const visibilityConditions: object[] = [{ isPrivate: false }];
+
+    if (currentUser.handle != null) {
+      visibilityConditions.push({ creatorPerson: currentUser.handle });
+    }
+
+    const privacyFilter = {
+      $or: visibilityConditions,
+    };
+
+    return this.combineWhere(where, privacyFilter);
   }
 
   private applyPersonManipulation(
@@ -361,6 +391,20 @@ export class GenericPermissionService {
     }
 
     return { $or: orConditions };
+  }
+
+  private combineWhere(where: object, enforcedFilter: object): object {
+    if (Array.isArray(where)) {
+      return where.map((entry) =>
+        this.combineWhere(entry as object, enforcedFilter),
+      );
+    }
+
+    if (where && Object.keys(where).length > 0) {
+      return { $and: [where, enforcedFilter] };
+    }
+
+    return enforcedFilter;
   }
 
   private getSpecialFields(

@@ -178,7 +178,16 @@ describe('CurrentService', () => {
     );
     expect(find.mock.calls[1]?.[1]).toEqual(
       expect.objectContaining({
-        participants: { handle: 7 },
+        $or: [
+          {
+            isPrivate: false,
+            participants: { handle: 7 },
+          },
+          {
+            isPrivate: true,
+            creatorPerson: { handle: 7 },
+          },
+        ],
         status: { handle: { $nin: ['canceled', 'completed'] } },
       }),
     );

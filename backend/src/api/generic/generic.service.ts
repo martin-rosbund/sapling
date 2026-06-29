@@ -774,7 +774,13 @@ export class GenericService {
       entityHandle,
       handle,
     );
-    const item = await this.em.findOne(entityClass, handleFilter, {
+    const visibleHandleFilter =
+      this.genericPermissionService.applyEntityVisibilityFilter(
+        handleFilter,
+        currentUser,
+        entityHandle,
+      );
+    const item = await this.em.findOne(entityClass, visibleHandleFilter, {
       populate: populate as any[],
     });
 
@@ -935,7 +941,13 @@ export class GenericService {
       entityHandle,
       handle,
     );
-    let item = await this.em.findOne(entityClass, handleFilter);
+    const visibleHandleFilter =
+      this.genericPermissionService.applyEntityVisibilityFilter(
+        handleFilter,
+        currentUser,
+        entityHandle,
+      );
+    let item = await this.em.findOne(entityClass, visibleHandleFilter);
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
 
     if (!item) {
@@ -1384,7 +1396,7 @@ export class GenericService {
       EventItem,
       { handle: normalizedHandle },
       {
-        populate: ['participants', 'status'],
+        populate: ['participants', 'status', 'creatorPerson'],
       },
     );
 
@@ -1395,6 +1407,15 @@ export class GenericService {
     const statusHandle = this.extractOpenTaskReferenceHandle(event.status);
     if (statusHandle === 'canceled' || statusHandle === 'completed') {
       return new Set<number>();
+    }
+
+    if (event.isPrivate === true) {
+      const ownerHandle = this.extractOpenTaskReferenceHandle(
+        event.creatorPerson,
+      );
+      return typeof ownerHandle === 'number'
+        ? new Set<number>([ownerHandle])
+        : new Set<number>();
     }
 
     return new Set<number>(

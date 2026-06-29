@@ -170,12 +170,17 @@ export class GenericRelationService {
     const entityClass = this.genericQueryService.getEntityClass(entityHandle);
     const template = this.templateService.getEntityTemplate(entityHandle);
     const field = template.find((entry) => entry.name === referenceName);
-    const item = await this.em.findOne(
-      entityClass,
+    const entityFilter = this.genericPermissionService.setTopLevelFilter(
       this.genericReferenceService.getHandleFilter(
         entityHandle,
         entityHandleValue,
       ),
+      currentUser,
+      entityHandle,
+    );
+    const item = await this.em.findOne(
+      entityClass,
+      entityFilter,
     );
 
     if (!item || !field) {

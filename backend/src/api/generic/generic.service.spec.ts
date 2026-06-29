@@ -811,6 +811,101 @@ describe('GenericService', () => {
     });
   });
 
+  it('limits direct event updates to records visible under private-event rules', async () => {
+    const item = {
+      handle: 101,
+      title: 'Old title',
+      isPrivate: true,
+      creatorPerson: { handle: 7 },
+    };
+    const findOne = jest
+      .fn<(...args: unknown[]) => Promise<object | null>>()
+      .mockImplementation((_entity, where, options) => {
+        const populate = (options as { populate?: string[] } | undefined)
+          ?.populate;
+
+        if (
+          (where as { handle?: unknown }).handle === 101 &&
+          populate?.includes('participants') &&
+          populate.includes('status') &&
+          populate.includes('creatorPerson')
+        ) {
+          return Promise.resolve(null);
+        }
+
+        if ((where as { handle?: unknown }).handle === 'event') {
+          return Promise.resolve(null);
+        }
+
+        if (
+          JSON.stringify(where) ===
+          JSON.stringify({
+            $and: [
+              { handle: 101 },
+              {
+                $or: [{ isPrivate: false }, { creatorPerson: 7 }],
+              },
+            ],
+          })
+        ) {
+          return Promise.resolve(item);
+        }
+
+        return Promise.resolve(null);
+      });
+    const assign = jest.fn((target: object, data: object) =>
+      Object.assign(target as Record<string, unknown>, data),
+    );
+    const flush = jest.fn<() => Promise<void>>().mockResolvedValue(undefined);
+    const em = {
+      findOne,
+      assign,
+      flush,
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn(() => [
+        createTemplateField({ name: 'handle', type: 'number' }),
+        createTemplateField({ name: 'title' }),
+        createTemplateField({ name: 'isPrivate', type: 'boolean' }),
+      ]),
+    };
+    const currentService = {
+      getEntityPermissions: jest.fn(() => ({
+        allowUpdateStage: 'global',
+      })),
+      getAllEntityPermissions: jest.fn(() => []),
+    };
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+    });
+
+    await service.update(
+      'event',
+      '101',
+      { title: 'Updated title' },
+      { handle: 7 } as never,
+      [],
+    );
+
+    expect(assign).toHaveBeenCalledWith(item, {
+      title: 'Updated title',
+    });
+    expect(findOne).toHaveBeenCalledWith(
+      expect.any(Function),
+      {
+        $and: [
+          { handle: 101 },
+          {
+            $or: [{ isPrivate: false }, { creatorPerson: 7 }],
+          },
+        ],
+      },
+      { populate: [] },
+    );
+  });
+
   it('does not auto-populate all relations during update when none were requested', async () => {
     const item = { handle: 7, phone: '+49 1111111111' };
     const findOne = jest
@@ -2265,6 +2360,89 @@ describe('GenericService', () => {
       expect.any(Function),
       { handle: 9 },
     ]);
+  });
+
+  it('limits direct event deletes to records visible under private-event rules', async () => {
+    const item = {
+      handle: 101,
+      title: 'Private event',
+      isPrivate: true,
+      creatorPerson: { handle: 7 },
+    };
+    const findOne = jest
+      .fn<(...args: unknown[]) => Promise<object | null>>()
+      .mockImplementation((_entity, where, options) => {
+        const populate = (options as { populate?: string[] } | undefined)
+          ?.populate;
+
+        if (
+          (where as { handle?: unknown }).handle === 101 &&
+          populate?.includes('participants') &&
+          populate.includes('status') &&
+          populate.includes('creatorPerson')
+        ) {
+          return Promise.resolve(null);
+        }
+
+        if ((where as { handle?: unknown }).handle === 'event') {
+          return Promise.resolve(null);
+        }
+
+        if (
+          JSON.stringify(where) ===
+          JSON.stringify({
+            $and: [
+              { handle: 101 },
+              {
+                $or: [{ isPrivate: false }, { creatorPerson: 7 }],
+              },
+            ],
+          })
+        ) {
+          return Promise.resolve(item);
+        }
+
+        return Promise.resolve(null);
+      });
+    const nativeDelete = jest
+      .fn<(entity: unknown, where: { handle: number }) => Promise<number>>()
+      .mockResolvedValue(1);
+    const em = {
+      findOne,
+      nativeDelete,
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn(() => [
+        createTemplateField({ name: 'handle', type: 'number' }),
+        createTemplateField({ name: 'title', type: 'string' }),
+        createTemplateField({ name: 'isPrivate', type: 'boolean' }),
+      ]),
+    };
+    const currentService = {
+      getEntityPermissions: jest.fn(() => ({
+        allowDeleteStage: 'global',
+      })),
+      getAllEntityPermissions: jest.fn(() => []),
+    };
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+    });
+
+    await service.delete('event', '101', { handle: 7 } as never);
+
+    expect(findOne).toHaveBeenCalledWith(expect.any(Function), {
+      $and: [
+        { handle: 101 },
+        {
+          $or: [{ isPrivate: false }, { creatorPerson: 7 }],
+        },
+      ],
+    });
+    expect(nativeDelete).toHaveBeenCalledWith(expect.any(Function), {
+      handle: 101,
+    });
   });
 
   it('imports rows through create/update and normalizes simple CSV values', async () => {

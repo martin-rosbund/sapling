@@ -160,12 +160,32 @@ export class EventItem {
   isAllDay!: boolean;
 
   /**
+   * Indicates whether this event should only be visible to its creator.
+   * Outlook imports set this from Microsoft Graph event sensitivity.
+   * @type {boolean}
+   */
+  @ApiPropertyOptional({ default: false })
+  @SaplingForm({
+    order: 350,
+    group: 'event.groupSchedule',
+    groupOrder: 300,
+    width: 1,
+    visible: true,
+    tableOrder: 325,
+    tableVisible: false,
+    mobileOrder: 325,
+    mobileVisible: false,
+  })
+  @Property({ default: false, nullable: false })
+  isPrivate!: boolean;
+
+  /**
    * RFC5545 recurrence rule describing a repeating series (optional).
    * @type {string}
    */
   @ApiPropertyOptional()
   @SaplingForm({
-    order: 350,
+    order: 400,
     group: 'event.groupSchedule',
     groupOrder: 300,
     width: 2,

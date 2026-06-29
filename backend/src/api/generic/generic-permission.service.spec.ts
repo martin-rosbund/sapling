@@ -37,6 +37,7 @@ jest.mock('../../entity/global/entity.decorator', () => ({
 jest.mock('../../entity/global/entity.registry', () => ({
   ENTITY_MAP: {
     document: class DocumentItem {},
+    event: class EventItem {},
     note: class NoteItem {},
   },
 }));
@@ -71,6 +72,78 @@ const createTemplateField = (
 });
 
 describe('GenericPermissionService', () => {
+  it('keeps private events visible only for the event creator even with global read permission', () => {
+    const currentService = {
+      getEntityPermissions: jest.fn(() => ({
+        allowReadStage: 'global',
+      })),
+      getAllEntityPermissions: jest.fn(() => []),
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn(() => [
+        createTemplateField({ name: 'handle', type: 'number' }),
+        createTemplateField({
+          name: 'creatorPerson',
+          type: 'PersonItem',
+          isReference: true,
+          kind: 'm:1',
+        }),
+        createTemplateField({ name: 'isPrivate', type: 'boolean' }),
+      ]),
+    };
+    const service = new GenericPermissionService(
+      currentService as never,
+      templateService as never,
+    );
+
+    const where = service.setTopLevelFilter(
+      { handle: 99 },
+      {
+        handle: 7,
+        company: { handle: 42 },
+      } as never,
+      'event',
+    );
+
+    expect(where).toEqual({
+      $and: [
+        { handle: 99 },
+        {
+          $or: [{ isPrivate: false }, { creatorPerson: 7 }],
+        },
+      ],
+    });
+  });
+
+  it('does not add private event visibility filters to other entities', () => {
+    const currentService = {
+      getEntityPermissions: jest.fn(() => ({
+        allowReadStage: 'global',
+      })),
+      getAllEntityPermissions: jest.fn(() => []),
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn(() => [
+        createTemplateField({ name: 'handle', type: 'number' }),
+      ]),
+    };
+    const service = new GenericPermissionService(
+      currentService as never,
+      templateService as never,
+    );
+
+    const where = service.setTopLevelFilter(
+      { handle: 99 },
+      {
+        handle: 7,
+        company: { handle: 42 },
+      } as never,
+      'note',
+    );
+
+    expect(where).toEqual({ handle: 99 });
+  });
+
   it('limits company-scoped reads by person company when no company field exists', () => {
     const currentService = {
       getEntityPermissions: jest.fn(() => ({

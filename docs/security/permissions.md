@@ -103,6 +103,8 @@ entity
 entityGroup
 ```
 
+Event privacy is enforced after the normal entity permission check. `event` records with `isPrivate = true` are visible only to the record's `creatorPerson`, including users whose role grants global Event read permission. This protects private Outlook imports across generic lists, exports, relation/reference checks, KPIs using generic filters, MCP generic reads, timelines, and direct update/delete operations.
+
 ## Permission Seeder
 
 File:
@@ -172,6 +174,7 @@ Implications:
 - Assign only the roles needed by that product.
 - Generic MCP tools cannot bypass entity permissions.
 - Semantic search filters vector results through generic record loading, so users only receive records they can read.
+- Private Event records remain owner-only when accessed through generic MCP tools because those tools use the same generic read filters.
 
 See:
 

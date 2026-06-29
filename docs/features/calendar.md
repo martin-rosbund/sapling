@@ -37,6 +37,7 @@ Important fields:
 | `description` | Markdown description; also part of AI vectorization |
 | `startDate`, `endDate` | Event time range |
 | `isAllDay` | Marks all-day events |
+| `isPrivate` | Marks owner-only events, including Outlook events imported with private sensitivity |
 | `recurrenceRule` | Optional RRULE string for recurring events |
 | `onlineMeetingURL` | Optional meeting link |
 | `type` | Event category; controls default-calendar behavior |
@@ -108,6 +109,8 @@ The Azure endpoint uses the signed-in user's stored Microsoft session (`PersonSe
 
 Existing Sapling events are updated and unknown provider items are created as internal scheduled events for the current user. Known attendee email addresses are linked as participants when matching `PersonItem` records exist. The current user is always added as a participant so imported events appear in their calendar filter.
 
+Outlook events whose Microsoft Graph `sensitivity` is `private` are imported with `EventItem.isPrivate = true`. Sapling still stores the full event details for the importing owner, but generic Event reads, exports, relation mutations, updates, deletes, KPIs, and timeline anchor loads must only expose private events when `creatorPerson` is the current user. Non-private events keep the normal Event permission behavior.
+
 This import is intentionally user-triggered. It does not require provider webhooks and relies on the existing Microsoft or Google login scopes instead of a separate calendar-only setup.
 
 ## Automatic Outlook Import
@@ -122,6 +125,8 @@ PATCH /api/current/calendarSync
 The subscription stores whether automatic import is active, the import range (`day`, `week`, or `month`), the polling interval in minutes, and the latest run/result metadata. Tokens remain in `PersonSessionItem`; the subscription only references the person.
 
 When Redis is enabled, `CalendarSyncModule` registers a BullMQ `calendar-sync` queue. On startup it adds a repeatable `schedule-calendar-imports` job, which finds due active Outlook subscriptions and enqueues one `import-calendar-for-subscription` job per user. Each import job calls the same `AzureCalendarService.importEvents()` path as the manual Outlook button. When Redis is disabled, automatic import is not scheduled.
+
+Private Outlook events use the same automatic import path as manual imports, so privacy behavior is identical for both flows. Existing imported records are not retroactively reclassified unless a later Outlook import updates the matching event.
 
 ## Frontend Behavior
 

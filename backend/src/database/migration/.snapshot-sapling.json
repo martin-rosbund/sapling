@@ -13690,6 +13690,23 @@
           "enumItems": [],
           "mappedType": "boolean"
         },
+        "is_private": {
+          "name": "is_private",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "false",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
         "online_meeting_url": {
           "name": "online_meeting_url",
           "type": "varchar(512)",

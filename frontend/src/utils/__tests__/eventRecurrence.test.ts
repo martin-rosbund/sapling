@@ -79,6 +79,7 @@ describe('eventRecurrence', () => {
         startDate: new Date('2026-05-04T09:30:00.000Z'),
         endDate: new Date('2026-05-04T10:30:00.000Z'),
         isAllDay: false,
+        isPrivate: false,
         recurrenceRule: 'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,WE;COUNT=5',
         type: { color: '#00897B' } as never,
         status: { color: '#43A047' } as never,

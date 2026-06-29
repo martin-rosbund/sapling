@@ -328,6 +328,8 @@ export interface EventItem extends SaplingGenericItem {
   endDate: Date
   /** Indicates if the event lasts all day */
   isAllDay: boolean
+  /** Indicates whether the event is visible only to its creator */
+  isPrivate: boolean
   /** Optional RFC5545 recurrence rule for repeating events */
   recurrenceRule?: string | null
   /** URL for the online meeting (optional) */

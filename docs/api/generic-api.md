@@ -229,6 +229,7 @@ Generic routes check:
 
 - authentication through `SessionOrBearerAuthGuard`
 - entity/action permission through `GenericPermissionGuard`
+- entity-specific server filters such as private Event visibility
 
 HTTP method to permission mapping:
 
@@ -246,6 +247,8 @@ translation
 entity
 entityGroup
 ```
+
+`event` has an additional row-level privacy rule. Records with `isPrivate = true` are readable only by their `creatorPerson`, even for roles that otherwise have global Event read permission. This rule is applied server-side to generic lists, single-record lookups through read paths, downloads, relation/reference validation, KPIs that use generic permission filters, MCP generic reads, and Event update/delete handle resolution.
 
 ## Sanitization
 

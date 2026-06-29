@@ -420,7 +420,16 @@ export class CurrentService {
 
   private buildOpenEventWhere(user: PersonItem): object {
     return {
-      participants: { handle: user?.handle },
+      $or: [
+        {
+          isPrivate: false,
+          participants: { handle: user?.handle },
+        },
+        {
+          isPrivate: true,
+          creatorPerson: { handle: user?.handle },
+        },
+      ],
       status: { handle: { $nin: ['canceled', 'completed'] } },
     };
   }
