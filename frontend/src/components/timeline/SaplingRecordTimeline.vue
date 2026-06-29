@@ -3,6 +3,7 @@
     <SaplingDialogCard
       class="sapling-inbox-dialog sapling-history-dialog sapling-record-timeline-dialog"
       :tilt="false"
+      :close="closeDialog"
     >
       <SaplingDialogShell
         fill-shell

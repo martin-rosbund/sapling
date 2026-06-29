@@ -67,7 +67,11 @@
         :max-width="SAPLING_DIALOG_MAX_WIDTH.md"
         scrollable
       >
-        <div class="sapling-partner-filter-dialog__surface">
+        <SaplingDialogCard
+          class="sapling-partner-filter-dialog__surface"
+          :tilt="false"
+          :close="() => (mobileFilterDialogVisible = false)"
+        >
           <SaplingWorkFilterPanel
             :key="filterDrawerKey"
             class="sapling-partner-filter-panel sapling-partner-filter-panel--dialog"
@@ -79,7 +83,7 @@
             @update:selected-peoples="onSelectedPeoplesUpdate"
             @update:selected-chip-filters="onSelectedChipFiltersUpdate"
           />
-        </div>
+        </SaplingDialogCard>
       </v-dialog>
     </section>
   </v-container>
@@ -91,6 +95,7 @@ import { computed, defineAsyncComponent, ref, toRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
 import SaplingWorkFilterPanel from '@/components/filter/SaplingWorkFilterPanel.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import { useSaplingPartner } from '@/composables/partner/useSaplingPartner'
 import { SAPLING_DIALOG_MAX_WIDTH } from '@/constants/dialog.constants'
 // #endregion

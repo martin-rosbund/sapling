@@ -10,7 +10,12 @@
     :persistent="persistent"
     @update:model-value="handleDialogUpdate"
   >
-    <SaplingDialogCard :tilt="tilt" :class="cardClass">
+    <SaplingDialogCard
+      :tilt="tilt"
+      :class="cardClass"
+      :close="handleCloseButton"
+      :close-disabled="closeDisabled"
+    >
       <div class="sapling-dialog-shell" @keydown="onShellKeydown" tabindex="-1">
         <template v-if="loading">
           <SaplingDialogHero :variant="variant" loading />
@@ -56,6 +61,7 @@ const props = withDefaults(
     tilt?: boolean
     size?: 'small' | 'medium' | 'large'
     cardClass?: string | string[] | Record<string, boolean>
+    closeDisabled?: boolean
   }>(),
   {
     eyebrow: '',
@@ -67,6 +73,7 @@ const props = withDefaults(
     tilt: true,
     size: 'medium',
     cardClass: '',
+    closeDisabled: false,
   },
 )
 
@@ -84,6 +91,10 @@ const dialogClass = computed(() => `sapling-dialog-${props.size}`)
 // #region Methods
 function handleDialogUpdate(value: boolean): void {
   emit('update:modelValue', value)
+}
+
+function handleCloseButton(): void {
+  emit('escape')
 }
 
 /**

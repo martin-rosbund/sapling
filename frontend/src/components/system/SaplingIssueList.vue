@@ -98,14 +98,6 @@
                 <span>{{ $t('issue.updatedAt') }}</span>
                 <strong>{{ formatDateTime(issue.updated_at) }}</strong>
               </div>
-              <div class="sapling-detail-card">
-                <span>{{ $t('issue.labels') }}</span>
-                <strong>{{ issue.labels.length }}</strong>
-              </div>
-              <div class="sapling-detail-card">
-                <span>{{ $t('issue.assignedTo') }}</span>
-                <strong>{{ issue.assignees.length || $t('global.notAvailable') }}</strong>
-              </div>
             </div>
 
             <div
@@ -157,6 +149,63 @@
               <div class="sapling-label">{{ $t('issue.description') }}</div>
               <div class="sapling-work-card__markdown sapling-issue-card__markdown">
                 <VMarkdown :source="issue.body || $t('issue.noDescription')" />
+              </div>
+            </div>
+
+            <div
+              v-if="issue.comments.length"
+              class="sapling-stack-md sapling-work-card__comments sapling-issue-card__comments"
+            >
+              <div class="sapling-label">{{ $t('issue.comments') }}</div>
+
+              <div class="sapling-stack-md sapling-work-card__comment-list">
+                <article
+                  v-for="comment in issue.comments"
+                  :key="comment.id"
+                  class="sapling-work-card__comment sapling-issue-card__comment"
+                >
+                  <header class="sapling-row-between-md sapling-work-card__comment-header">
+                    <a
+                      v-if="comment.user.html_url"
+                      :href="comment.user.html_url"
+                      target="_blank"
+                      rel="noopener"
+                      class="sapling-work-card__comment-author"
+                    >
+                      <v-avatar size="28">
+                        <img
+                          v-if="comment.user.avatar_url"
+                          :src="comment.user.avatar_url"
+                          :alt="comment.user.login"
+                        />
+                        <v-icon v-else icon="mdi-account-circle-outline" size="22" />
+                      </v-avatar>
+                      <span>{{ comment.user.login || $t('issue.commentUnknownAuthor') }}</span>
+                    </a>
+                    <div v-else class="sapling-work-card__comment-author">
+                      <v-avatar size="28">
+                        <v-icon icon="mdi-account-circle-outline" size="22" />
+                      </v-avatar>
+                      <span>{{ comment.user.login || $t('issue.commentUnknownAuthor') }}</span>
+                    </div>
+
+                    <div class="sapling-row-xs sapling-work-card__comment-meta">
+                      <span>{{ formatDateTime(comment.created_at) }}</span>
+                      <v-btn
+                        :href="comment.html_url"
+                        target="_blank"
+                        rel="noopener"
+                        icon="mdi-open-in-new"
+                        variant="text"
+                        size="x-small"
+                      />
+                    </div>
+                  </header>
+
+                  <div class="sapling-work-card__markdown sapling-work-card__comment-markdown">
+                    <VMarkdown :source="comment.body || $t('issue.noCommentBody')" />
+                  </div>
+                </article>
               </div>
             </div>
           </v-card-text>

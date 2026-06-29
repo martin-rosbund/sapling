@@ -1,11 +1,25 @@
 <template>
   <v-dialog v-model="visibleModel" max-width="900">
-    <v-card v-if="valueMapping && field" class="sapling-import__value-mapping-dialog glass-panel">
+    <SaplingDialogCard
+      v-if="valueMapping && field"
+      class="sapling-import__value-mapping-dialog"
+      :close="() => emit('close')"
+    >
       <v-card-title class="sapling-section-header">
         <div>
           <p class="sapling-eyebrow">{{ t('import.valueMapping') }}</p>
           <h2 class="sapling-section-title">{{ fieldLabel(field.name) }}</h2>
         </div>
+        <v-spacer />
+        <v-btn
+          variant="text"
+          size="small"
+          density="comfortable"
+          icon="mdi-close"
+          :aria-label="t('global.close')"
+          :title="t('global.close')"
+          @click="emit('close')"
+        />
       </v-card-title>
       <v-card-text class="sapling-import__value-mapping-body">
         <v-select
@@ -58,7 +72,7 @@
           {{ t('global.close') }}
         </v-btn>
       </v-card-actions>
-    </v-card>
+    </SaplingDialogCard>
   </v-dialog>
 </template>
 
@@ -66,6 +80,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SaplingImportTemplateValueField from '@/components/import/SaplingImportTemplateValueField.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import type { ImportValueMappingFallback } from '@/services/api.import.service'
 import type { SaplingGenericItem } from '@/entity/entity'
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure'

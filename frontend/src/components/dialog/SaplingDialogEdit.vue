@@ -6,7 +6,7 @@
     :height="SAPLING_DIALOG_HEIGHT.xl"
     persistent
   >
-    <SaplingDialogCard class="sapling-dialog-card--fill" :tilt="false">
+    <SaplingDialogCard class="sapling-dialog-card--fill" :tilt="false" :close="cancel">
       <div
         class="sapling-stack-xl sapling-record-dialog-shell sapling-dialog-edit-shell"
         @keydown="onShellKeydown"
@@ -139,97 +139,101 @@
                       class="sapling-record-dialog-form sapling-dialog-edit-form"
                       @submit.prevent="save"
                     >
-                      <div
-                        class="sapling-stack-lg sapling-record-dialog-form-layout sapling-dialog-edit-form-layout"
-                      >
-                        <section
-                          v-for="group in visibleTemplateGroups"
-                          :key="group.id"
-                          class="sapling-section-panel sapling-record-section sapling-dialog-edit-section"
-                          :class="{
-                            'sapling-dialog-edit-section--collapsed':
-                              group.label && !isGroupExpanded(group.id),
-                            'sapling-record-section--dirty':
-                              mode !== 'readonly' && isGroupDirty(group.templates),
-                            'sapling-dialog-edit-section--dirty':
-                              mode !== 'readonly' && isGroupDirty(group.templates),
-                          }"
+                      <v-defaults-provider :defaults="dialogFieldDefaults">
+                        <div
+                          class="sapling-stack-lg sapling-record-dialog-form-layout sapling-dialog-edit-form-layout"
                         >
-                          <div
-                            v-if="group.label"
-                            class="sapling-section-header sapling-record-section__header sapling-dialog-edit-section__header"
+                          <section
+                            v-for="group in visibleTemplateGroups"
+                            :key="group.id"
+                            class="sapling-section-panel sapling-record-section sapling-dialog-edit-section"
+                            :class="{
+                              'sapling-dialog-edit-section--collapsed':
+                                group.label && !isGroupExpanded(group.id),
+                              'sapling-record-section--dirty':
+                                mode !== 'readonly' && isGroupDirty(group.templates),
+                              'sapling-dialog-edit-section--dirty':
+                                mode !== 'readonly' && isGroupDirty(group.templates),
+                            }"
                           >
-                            <button
-                              type="button"
-                              class="sapling-row-between-md sapling-record-section__toggle sapling-dialog-edit-section__toggle"
-                              :aria-expanded="isGroupExpanded(group.id)"
-                              @click="toggleGroup(group.id)"
-                            >
-                              <h3
-                                class="sapling-section-title sapling-record-section__title sapling-dialog-edit-section__title"
-                              >
-                                {{ $t(group.label) }}
-                              </h3>
-                              <v-icon
-                                :icon="
-                                  isGroupExpanded(group.id) ? 'mdi-chevron-up' : 'mdi-chevron-down'
-                                "
-                                size="20"
-                              />
-                            </button>
-                          </div>
-                          <v-expand-transition>
                             <div
-                              v-show="!group.label || isGroupExpanded(group.id)"
-                              class="sapling-record-section__body sapling-dialog-edit-section__body"
+                              v-if="group.label"
+                              class="sapling-section-header sapling-record-section__header sapling-dialog-edit-section__header"
                             >
-                              <v-row
-                                density="comfortable"
-                                class="sapling-record-form-grid sapling-dialog-edit-grid"
+                              <button
+                                type="button"
+                                class="sapling-row-between-md sapling-record-section__toggle sapling-dialog-edit-section__toggle"
+                                :aria-expanded="isGroupExpanded(group.id)"
+                                @click="toggleGroup(group.id)"
                               >
-                                <v-col
-                                  v-for="template in group.templates"
-                                  :key="template.name"
-                                  v-bind="getTemplateColumnProps(template)"
-                                  class="sapling-record-form-grid__column sapling-dialog-edit-grid__column"
+                                <h3
+                                  class="sapling-section-title sapling-record-section__title sapling-dialog-edit-section__title"
                                 >
-                                  <div
-                                    class="sapling-record-field-shell sapling-dialog-edit-field-shell"
-                                    :class="{
-                                      'sapling-record-field-shell--dirty':
-                                        mode !== 'readonly' && isTemplateDirty(template),
-                                      'sapling-dialog-edit-field-shell--dirty':
-                                        mode !== 'readonly' && isTemplateDirty(template),
-                                    }"
-                                  >
-                                    <SaplingDialogEditFieldRenderer
-                                      :template="template"
-                                      :entity-handle="entity?.handle ?? ''"
-                                      :item-handle="item?.handle ?? undefined"
-                                      :mode="mode"
-                                      :form-values="form"
-                                      :visible-templates="visibleTemplates"
-                                      :permissions="permissions"
-                                      :icon-names="iconNames"
-                                      :is-reference-visible="isReferenceVisible"
-                                      :rules="getRules(template)"
-                                      :field-disabled="isFieldDisabled(template)"
-                                      :reference-field-disabled="isReferenceFieldDisabled(template)"
-                                      :reference-parent-filter="
-                                        template.referenceDependency
-                                          ? getReferenceParentFilter(template)
-                                          : undefined
-                                      "
-                                      @update-field="updateFormField"
-                                      @select-record="onDuplicateSelect"
-                                    />
-                                  </div>
-                                </v-col>
-                              </v-row>
+                                  {{ $t(group.label) }}
+                                </h3>
+                                <v-icon
+                                  :icon="
+                                    isGroupExpanded(group.id)
+                                      ? 'mdi-chevron-up'
+                                      : 'mdi-chevron-down'
+                                  "
+                                  size="20"
+                                />
+                              </button>
                             </div>
-                          </v-expand-transition>
-                        </section>
-                      </div>
+                            <v-expand-transition>
+                              <div
+                                v-show="!group.label || isGroupExpanded(group.id)"
+                                class="sapling-record-section__body sapling-dialog-edit-section__body"
+                              >
+                                <v-row
+                                  density="comfortable"
+                                  class="sapling-record-form-grid sapling-dialog-edit-grid"
+                                >
+                                  <v-col
+                                    v-for="template in group.templates"
+                                    :key="template.name"
+                                    v-bind="getTemplateColumnProps(template)"
+                                    class="sapling-record-form-grid__column sapling-dialog-edit-grid__column"
+                                  >
+                                    <div
+                                      class="sapling-record-field-shell sapling-dialog-edit-field-shell"
+                                      :class="{
+                                        'sapling-record-field-shell--dirty':
+                                          mode !== 'readonly' && isTemplateDirty(template),
+                                        'sapling-dialog-edit-field-shell--dirty':
+                                          mode !== 'readonly' && isTemplateDirty(template),
+                                      }"
+                                    >
+                                      <SaplingDialogEditFieldRenderer
+                                        :template="template"
+                                        :entity-handle="entity?.handle ?? ''"
+                                        :item-handle="item?.handle ?? undefined"
+                                        :mode="mode"
+                                        :form-values="form"
+                                        :visible-templates="visibleTemplates"
+                                        :permissions="permissions"
+                                        :icon-names="iconNames"
+                                        :is-reference-visible="isReferenceVisible"
+                                        :rules="getRules(template)"
+                                        :field-disabled="isFieldDisabled(template)"
+                                        :reference-field-disabled="isReferenceFieldDisabled(template)"
+                                        :reference-parent-filter="
+                                          template.referenceDependency
+                                            ? getReferenceParentFilter(template)
+                                            : undefined
+                                        "
+                                        @update-field="updateFormField"
+                                        @select-record="onDuplicateSelect"
+                                      />
+                                    </div>
+                                  </v-col>
+                                </v-row>
+                              </div>
+                            </v-expand-transition>
+                          </section>
+                        </div>
+                      </v-defaults-provider>
                     </v-form>
                   </div>
                 </div>
@@ -438,6 +442,25 @@ const currentPersonStore = useCurrentPersonStore()
 const timelineDialogStore = useTimelineDialogStore()
 const changeLogDialogStore = useChangeLogDialogStore()
 const { openMailDialog } = useSaplingMailDialog()
+
+const dialogFieldDefaults = {
+  VAutocomplete: {
+    density: 'compact',
+    hideDetails: 'auto',
+  },
+  VSelect: {
+    density: 'compact',
+    hideDetails: 'auto',
+  },
+  VTextarea: {
+    density: 'compact',
+    hideDetails: 'auto',
+  },
+  VTextField: {
+    density: 'compact',
+    hideDetails: 'auto',
+  },
+}
 
 // #region Composable
 const {

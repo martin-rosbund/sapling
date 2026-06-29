@@ -21,7 +21,10 @@
     </button>
 
     <v-dialog v-if="dialog" v-model="dialog" class="sapling-dialog-medium" persistent>
-      <SaplingDialogCard class="sapling-account-dialog sapling-field-event-recurrence__dialog">
+      <SaplingDialogCard
+        class="sapling-account-dialog sapling-field-event-recurrence__dialog"
+        :close="closeDialog"
+      >
         <SaplingDialogShell
           fill-shell
           body-class="sapling-account-dialog__body sapling-field-event-recurrence__body"

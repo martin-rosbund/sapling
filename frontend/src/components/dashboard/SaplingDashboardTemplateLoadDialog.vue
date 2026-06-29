@@ -1,6 +1,10 @@
 <template>
   <v-dialog v-if="dialog" v-model="dialog" :persistent="busy" class="sapling-dialog-medium">
-    <SaplingDialogCard class="sapling-account-dialog sapling-dashboard-template-dialog">
+    <SaplingDialogCard
+      class="sapling-account-dialog sapling-dashboard-template-dialog"
+      :close="handleClose"
+      :close-disabled="busy"
+    >
       <SaplingDialogShell
         fill-shell
         body-class="sapling-account-dialog__body sapling-dashboard-template-dialog__body"

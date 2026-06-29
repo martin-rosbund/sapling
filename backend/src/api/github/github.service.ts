@@ -11,15 +11,27 @@ import {
 } from '../../constants/project.constants';
 import {
   CreateGithubIssueDto,
+  GithubIssueCommentDto,
   GithubIssueDto,
   GithubIssueLabelDto,
+  GithubIssueStatus,
   GithubIssueType,
   GithubReleaseDto,
   GithubRepositoryDto,
 } from './dto/github.dto';
 
-type GithubIssueApiResponse = GithubIssueDto & {
+type GithubIssueApiResponse = Omit<
+  GithubIssueDto,
+  'body' | 'closed_at' | 'comments'
+> & {
+  body?: string | null;
+  closed_at?: string | null;
+  comments?: number;
   pull_request?: object;
+};
+
+type GithubIssueCommentApiResponse = GithubIssueCommentDto & {
+  user: GithubIssueCommentDto['user'] | null;
 };
 
 type GithubLabelConfig = {
@@ -92,6 +104,105 @@ export class GithubService {
     const { owner, name } = this.repositoryParts;
 
     return `${this.apiUrl}/repos/${owner}/${name}${suffix}`;
+  }
+
+  /**
+   * Returns the oldest accepted close date for recently closed issues.
+   * @returns {Date} Cutoff date one calendar month before now
+   */
+  private getRecentlyClosedCutoffDate(): Date {
+    const cutoff = new Date();
+    cutoff.setMonth(cutoff.getMonth() - 1);
+
+    return cutoff;
+  }
+
+  /**
+   * Builds the issue list endpoint query for the requested status.
+   * @param {string} status Issue status requested by the client
+   * @returns {string} Repository-relative issue endpoint suffix
+   */
+  private buildIssuesPath(status: string): string {
+    const params = new URLSearchParams({
+      state: status,
+      per_page: '25',
+    });
+
+    if (status === GithubIssueStatus.CLOSED) {
+      params.set('since', this.getRecentlyClosedCutoffDate().toISOString());
+    }
+
+    return `/issues?${params.toString()}`;
+  }
+
+  /**
+   * Checks whether a closed issue belongs in the recent closed list.
+   * @param {GithubIssueApiResponse} issue GitHub issue API payload
+   * @param {Date} cutoff Oldest accepted close date
+   * @returns {boolean} Whether the issue was closed recently enough
+   */
+  private wasClosedSince(
+    issue: GithubIssueApiResponse,
+    cutoff: Date,
+  ): boolean {
+    if (!issue.closed_at) {
+      return false;
+    }
+
+    const closedAt = new Date(issue.closed_at);
+
+    return !Number.isNaN(closedAt.getTime()) && closedAt >= cutoff;
+  }
+
+  /**
+   * Normalizes a GitHub issue so optional arrays are always present for clients.
+   * @param {GithubIssueApiResponse} issue GitHub issue API payload
+   * @param {GithubIssueCommentDto[]} comments Loaded comments for the issue
+   * @returns {GithubIssueDto} Client-facing issue payload
+   */
+  private normalizeIssue(
+    issue: GithubIssueApiResponse,
+    comments: GithubIssueCommentDto[] = [],
+  ): GithubIssueDto {
+    return {
+      ...issue,
+      labels: issue.labels ?? [],
+      assignees: issue.assignees ?? [],
+      comments,
+      body: issue.body ?? '',
+      closed_at: issue.closed_at ?? null,
+    };
+  }
+
+  /**
+   * Loads user comments for a single GitHub issue.
+   * @param {number} issueNumber GitHub issue number
+   * @returns {Promise<GithubIssueCommentDto[]>} Comment payloads
+   */
+  private async getIssueComments(
+    issueNumber: number,
+  ): Promise<GithubIssueCommentDto[]> {
+    const { data } = await axios.get<GithubIssueCommentApiResponse[]>(
+      this.buildRepositoryUrl(
+        `/issues/${issueNumber}/comments?per_page=100`,
+      ),
+      {
+        headers: this.headers,
+      },
+    );
+
+    return data.map((comment) => ({
+      id: comment.id,
+      html_url: comment.html_url,
+      body: comment.body ?? '',
+      created_at: comment.created_at,
+      updated_at: comment.updated_at,
+      user: comment.user ?? {
+        login: '',
+        avatar_url: '',
+        html_url: '',
+      },
+    }));
   }
 
   /**
@@ -229,14 +340,35 @@ export class GithubService {
    * @returns {Promise<GithubIssueDto[]>} Array of issue objects
    */
   async getIssues(status: string = 'open'): Promise<GithubIssueDto[]> {
+    const recentlyClosedCutoff =
+      status === GithubIssueStatus.CLOSED
+        ? this.getRecentlyClosedCutoffDate()
+        : null;
     const { data } = await axios.get<GithubIssueApiResponse[]>(
-      this.buildRepositoryUrl(`/issues?state=${status}&per_page=25`),
+      this.buildRepositoryUrl(this.buildIssuesPath(status)),
       {
         headers: this.headers,
       },
     );
 
-    return data.filter((issue) => !issue.pull_request);
+    const issues = data
+      .filter((issue) => !issue.pull_request)
+      .filter(
+        (issue) =>
+          !recentlyClosedCutoff ||
+          this.wasClosedSince(issue, recentlyClosedCutoff),
+      );
+
+    return Promise.all(
+      issues.map(async (issue) => {
+        const comments =
+          typeof issue.comments === 'number' && issue.comments > 0
+            ? await this.getIssueComments(issue.number)
+            : [];
+
+        return this.normalizeIssue(issue, comments);
+      }),
+    );
   }
 
   /**
@@ -258,11 +390,7 @@ export class GithubService {
       },
     );
 
-    const createdIssue: GithubIssueDto = {
-      ...data,
-      labels: data.labels ?? [],
-      assignees: data.assignees ?? [],
-    };
+    const createdIssue = this.normalizeIssue(data);
     const labelConfig = this.getTypeLabelConfig(issueDto.type);
 
     try {

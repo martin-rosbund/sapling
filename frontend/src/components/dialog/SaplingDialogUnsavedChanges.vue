@@ -6,6 +6,7 @@
     :eyebrow="$t('global.unsavedChanges')"
     :title="$t('global.unsavedChanges')"
     persistent
+    :close-disabled="isSaving"
     @update:model-value="handleDialogUpdate"
     @enter="handleSaveAndClose"
     @escape="handleKeepEditing"

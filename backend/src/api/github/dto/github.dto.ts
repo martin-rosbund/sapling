@@ -73,6 +73,37 @@ export class GithubIssueLabelDto {
   color!: string;
 }
 
+export class GithubIssueCommentUserDto {
+  @ApiProperty()
+  login!: string;
+
+  @ApiProperty()
+  avatar_url!: string;
+
+  @ApiProperty()
+  html_url!: string;
+}
+
+export class GithubIssueCommentDto {
+  @ApiProperty()
+  id!: number;
+
+  @ApiProperty()
+  html_url!: string;
+
+  @ApiProperty()
+  body!: string;
+
+  @ApiProperty()
+  created_at!: string;
+
+  @ApiProperty()
+  updated_at!: string;
+
+  @ApiProperty({ type: GithubIssueCommentUserDto })
+  user!: GithubIssueCommentUserDto;
+}
+
 export class GithubIssueDto {
   @ApiProperty()
   id!: number;
@@ -95,6 +126,9 @@ export class GithubIssueDto {
   @ApiProperty()
   created_at!: string;
 
+  @ApiPropertyOptional()
+  closed_at!: string | null;
+
   @ApiProperty()
   state!: string;
 
@@ -103,6 +137,9 @@ export class GithubIssueDto {
 
   @ApiProperty({ type: [GithubIssueLabelDto] })
   labels!: GithubIssueLabelDto[];
+
+  @ApiProperty({ type: [GithubIssueCommentDto] })
+  comments!: GithubIssueCommentDto[];
 }
 
 export class GithubRepositoryOwnerDto {

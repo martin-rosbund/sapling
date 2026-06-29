@@ -4,7 +4,7 @@
     :max-width="SAPLING_DIALOG_MAX_WIDTH.lg"
     @update:model-value="handleVisibilityChange"
   >
-    <SaplingDialogCard class="sapling-dialog-compact-card">
+    <SaplingDialogCard class="sapling-dialog-compact-card" :close="closePhoneDialog">
       <div class="sapling-dialog-shell">
         <SaplingDialogHero
           :loading="isTranslationLoading"

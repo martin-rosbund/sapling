@@ -1,7 +1,7 @@
 <template>
   <!-- Dialog container for the account -->
   <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-large">
-    <SaplingDialogCard class="sapling-account-dialog" :tilt="false">
+    <SaplingDialogCard class="sapling-account-dialog" :tilt="false" :close="handleClose">
       <SaplingDialogShell
         fill-shell
         body-class="sapling-account-dialog__body"

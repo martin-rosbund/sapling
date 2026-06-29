@@ -8,6 +8,7 @@
     :eyebrow="$t('updateConflict.eyebrow')"
     :title="$t('updateConflict.title')"
     persistent
+    :close-disabled="isSaving"
     @update:model-value="handleDialogUpdate"
     @enter="merge"
     @escape="cancel"

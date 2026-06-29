@@ -208,7 +208,11 @@
       class="sapling-dialog-medium sapling-ai-chat__tool-action-details-dialog"
       @update:model-value="handleToolActionDetailsDialogUpdate"
     >
-      <SaplingDialogCard class="sapling-ai-chat__tool-action-details-card" :tilt="false">
+      <SaplingDialogCard
+        class="sapling-ai-chat__tool-action-details-card"
+        :tilt="false"
+        :close="closeToolActionTechnicalDetails"
+      >
         <div class="sapling-dialog-shell sapling-ai-chat__tool-action-details-shell">
           <SaplingDialogHero
             :eyebrow="getToolActionDetailsButtonLabel()"

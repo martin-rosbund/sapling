@@ -1,6 +1,10 @@
 <template>
   <v-dialog v-model="dialogModel" persistent class="sapling-dialog-large">
-    <SaplingDialogCard class="sapling-external-record-links-dialog" :tilt="false">
+    <SaplingDialogCard
+      class="sapling-external-record-links-dialog"
+      :tilt="false"
+      :close="closeDialog"
+    >
       <SaplingDialogShell
         fill-shell
         body-class="sapling-dialog-fill-body sapling-external-record-links-dialog__body"

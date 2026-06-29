@@ -4,7 +4,7 @@
     :max-width="SAPLING_DIALOG_MAX_WIDTH.sm"
     @update:model-value="emit('update:modelValue', $event)"
   >
-    <SaplingDialogCard class="sapling-dialog-compact-card">
+    <SaplingDialogCard class="sapling-dialog-compact-card" :close="onCancel">
       <div class="sapling-dialog-shell">
         <SaplingDialogHero
           :eyebrow="$t('global.add')"

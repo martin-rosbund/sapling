@@ -8,6 +8,19 @@
           type="heading, text"
         />
       </slot>
+      <div v-if="dialogClose?.close.value" class="sapling-dialog-edit-hero__actions">
+        <v-btn
+          class="sapling-dialog-hero__close"
+          size="small"
+          variant="text"
+          density="comfortable"
+          icon="mdi-close"
+          :disabled="dialogClose.disabled.value"
+          :aria-label="dialogClose.label.value"
+          :title="dialogClose.label.value"
+          @click.stop="dialogClose.close.value?.()"
+        />
+      </div>
     </template>
     <template v-else>
       <div class="sapling-dialog-edit-hero__copy">
@@ -24,14 +37,32 @@
           <slot name="meta" />
         </div>
       </div>
-      <div v-if="$slots.actions" class="sapling-dialog-edit-hero__actions">
+      <div
+        v-if="$slots.actions || dialogClose?.close.value"
+        class="sapling-dialog-edit-hero__actions"
+      >
         <slot name="actions" />
+        <v-btn
+          class="sapling-dialog-hero__close"
+          v-if="dialogClose?.close.value"
+          size="small"
+          variant="text"
+          density="comfortable"
+          icon="mdi-close"
+          :disabled="dialogClose.disabled.value"
+          :aria-label="dialogClose.label.value"
+          :title="dialogClose.label.value"
+          @click.stop="dialogClose.close.value?.()"
+        />
       </div>
     </template>
   </section>
 </template>
 
 <script setup lang="ts">
+import { inject } from 'vue'
+import { saplingDialogCloseKey } from '@/components/dialog/saplingDialogClose'
+
 defineOptions({
   inheritAttrs: false,
 })
@@ -50,4 +81,6 @@ withDefaults(
     loading: false,
   },
 )
+
+const dialogClose = inject(saplingDialogCloseKey, null)
 </script>

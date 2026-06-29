@@ -150,7 +150,14 @@
 }
 
 .sapling-command-palette__search {
+  display: flex;
+  align-items: center;
+  gap: var(--sapling-gap-xs);
   padding: var(--sapling-space-sm) var(--sapling-space-sm) 0;
+}
+
+.sapling-command-palette__search .v-field {
+  min-width: 0;
 }
 
 .sapling-command-palette__results {

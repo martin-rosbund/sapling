@@ -12,6 +12,7 @@
       :disabled="referenceFieldDisabled"
       :parent-filter="referenceParentFilter"
       :placeholder="defaultRawPlaceholder"
+      density="compact"
       @update:model-value="(val: unknown) => updateField(template.name, val)"
     />
   </template>
@@ -197,7 +198,8 @@
       :items="customFieldOptions"
       item-title="label"
       item-value="value"
-      density="comfortable"
+      density="compact"
+      hide-details="auto"
       clearable
       :disabled="fieldDisabled"
       :rules="rules"
@@ -210,7 +212,8 @@
       :items="customFieldOptions"
       item-title="label"
       item-value="value"
-      density="comfortable"
+      density="compact"
+      hide-details="auto"
       chips
       multiple
       clearable

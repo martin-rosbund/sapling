@@ -4,7 +4,7 @@
     @update:model-value="onDialogModelValueUpdate"
     class="sapling-dialog-medium"
   >
-    <SaplingDialogCard class="sapling-dialog-compact-card">
+    <SaplingDialogCard class="sapling-dialog-compact-card" :close="() => emit('close')">
       <div class="sapling-dialog-shell">
         <template v-if="isLoading">
           <SaplingDialogHero loading :loading-stats-count="2" />

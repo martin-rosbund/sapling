@@ -138,7 +138,11 @@
     :max-width="SAPLING_DIALOG_MAX_WIDTH.md"
     scrollable
   >
-    <div class="sapling-event-context-dialog__surface">
+    <SaplingDialogCard
+      class="sapling-event-context-dialog__surface"
+      :tilt="false"
+      :close="() => (mobileContextDialogVisible = false)"
+    >
       <SaplingWorkFilterPanel
         class="sapling-event-context-dialog__panel"
         :show-close-action="true"
@@ -149,7 +153,7 @@
         @update:selected-chip-filters="onSelectedChipFiltersUpdate"
         @update:selected-peoples="onSelectedPeoplesUpdate"
       />
-    </div>
+    </SaplingDialogCard>
   </v-dialog>
 
   <SaplingDialogEdit
@@ -230,6 +234,7 @@ import SaplingEventCalendarWorkspace from '@/components/event/SaplingEventCalend
 import SaplingEventContextPanels from '@/components/event/SaplingEventContextPanels.vue'
 import SaplingEventToolbar from '@/components/event/SaplingEventToolbar.vue'
 import SaplingWorkFilterPanel from '@/components/filter/SaplingWorkFilterPanel.vue'
+import SaplingDialogCard from '@/components/dialog/SaplingDialogCard.vue'
 import SaplingRecordActionMenuList from '@/components/common/SaplingRecordActionMenuList.vue'
 import SaplingTableRowInformation from '@/components/table/SaplingTableRowInformation.vue'
 import SaplingTableRowUpload from '@/components/table/SaplingTableRowUpload.vue'

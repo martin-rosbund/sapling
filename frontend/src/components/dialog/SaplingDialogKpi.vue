@@ -6,7 +6,7 @@
     :max-width="SAPLING_DIALOG_MAX_WIDTH.sm"
     class="sapling-add-kpi-dialog"
   >
-    <SaplingDialogCard class="sapling-dialog-compact-card">
+    <SaplingDialogCard class="sapling-dialog-compact-card" :close="handleCancel">
       <div class="sapling-dialog-shell">
         <template v-if="isTranslationLoading">
           <SaplingDialogHero loading />

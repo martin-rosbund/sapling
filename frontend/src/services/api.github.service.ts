@@ -16,6 +16,21 @@ export interface GithubIssueLabel {
   color: string
 }
 
+export interface GithubIssueCommentUser {
+  login: string
+  avatar_url: string
+  html_url: string
+}
+
+export interface GithubIssueComment {
+  id: number
+  html_url: string
+  body: string
+  created_at: string
+  updated_at: string
+  user: GithubIssueCommentUser
+}
+
 export interface GithubIssue {
   id: number
   number: number
@@ -24,9 +39,11 @@ export interface GithubIssue {
   body: string
   updated_at: string
   created_at: string
+  closed_at: string | null
   assignees: GithubIssueAssignee[]
   state: string
   labels: GithubIssueLabel[]
+  comments: GithubIssueComment[]
 }
 
 export interface CreateGithubIssuePayload {

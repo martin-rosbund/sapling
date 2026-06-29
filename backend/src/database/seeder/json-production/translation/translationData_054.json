@@ -1,0 +1,5 @@
+[
+  { "entity": "issue", "property": "comments", "de": "Kommentare", "en": "Comments" },
+  { "entity": "issue", "property": "commentUnknownAuthor", "de": "Unbekannter Autor", "en": "Unknown author" },
+  { "entity": "issue", "property": "noCommentBody", "de": "Kein Kommentartext", "en": "No comment text" }
+]

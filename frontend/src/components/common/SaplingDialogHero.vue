@@ -46,11 +46,26 @@
       </template>
       <slot v-else name="stats" />
     </div>
+
+    <div v-if="dialogClose?.close.value" class="sapling-dialog-hero__actions">
+      <v-btn
+        class="sapling-dialog-hero__close"
+        size="small"
+        variant="text"
+        density="comfortable"
+        icon="mdi-close"
+        :disabled="dialogClose.disabled.value"
+        :aria-label="dialogClose.label.value"
+        :title="dialogClose.label.value"
+        @click.stop="dialogClose.close.value?.()"
+      />
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed, useSlots } from 'vue'
+import { computed, inject, useSlots } from 'vue'
+import { saplingDialogCloseKey } from '@/components/dialog/saplingDialogClose'
 
 defineOptions({
   inheritAttrs: false,
@@ -89,6 +104,7 @@ const props = withDefaults(
 )
 
 const slots = useSlots()
+const dialogClose = inject(saplingDialogCloseKey, null)
 
 const hasStats = computed(() => {
   if (props.loading) {

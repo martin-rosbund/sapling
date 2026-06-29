@@ -1,6 +1,11 @@
 <template>
   <v-dialog v-if="dialog" v-model="dialog" :persistent="isBusy" class="sapling-dialog-large">
-    <SaplingDialogCard class="sapling-permission-provider-dialog" :tilt="false">
+    <SaplingDialogCard
+      class="sapling-permission-provider-dialog"
+      :tilt="false"
+      :close="closeDialog"
+      :close-disabled="isBusy"
+    >
       <SaplingDialogShell
         fill-shell
         body-class="sapling-dialog-fill-body sapling-permission-provider-dialog__body"

@@ -6,16 +6,18 @@
     transition="dialog-top-transition"
     content-class="sapling-overlay-content--top"
   >
-    <SaplingDialogCard class="sapling-help-dialog" rounded="lg" :tilt="false">
+    <SaplingDialogCard class="sapling-help-dialog" rounded="lg" :tilt="false" :close="close">
       <v-card-title class="sapling-help-dialog__title">
         <v-icon size="22" class="sapling-help-dialog__title-icon">mdi-help-circle-outline</v-icon>
         <span>{{ t('global.help.title') }}</span>
         <v-spacer />
         <v-btn
           variant="text"
+          size="small"
           density="comfortable"
           icon="mdi-close"
           :aria-label="t('global.close')"
+          :title="t('global.close')"
           @click="close"
         />
       </v-card-title>

@@ -11,7 +11,7 @@
   flex: 1 1 0;
   width: 100%;
   min-height: 0;
-  padding: var(--sapling-space-panel-xl);
+  padding: var(--sapling-space-panel-md);
 }
 
 .sapling-record-dialog-header {
@@ -30,7 +30,7 @@
 }
 
 .sapling-record-dialog-content {
-  gap: var(--sapling-gap-lg);
+  gap: var(--sapling-gap-md);
   overflow: hidden;
   padding: 0;
 }
@@ -68,7 +68,7 @@
 
 .sapling-record-dialog-surface,
 .sapling-record-relation-shell {
-  gap: var(--sapling-gap-lg);
+  gap: var(--sapling-gap-md);
   min-height: 100%;
   padding: 0;
 }
@@ -78,11 +78,12 @@
 }
 
 .sapling-record-dialog-form-layout {
-  gap: var(--sapling-gap-lg);
+  gap: var(--sapling-gap-md);
 }
 
 .sapling-record-section {
-  gap: var(--sapling-gap-md);
+  gap: var(--sapling-gap-sm);
+  padding: var(--sapling-space-lg);
   border: 1px solid var(--sapling-surface-border);
   background: var(--sapling-surface-fill-soft);
 }
@@ -120,8 +121,9 @@
 
 .sapling-record-section__title {
   min-width: 0;
-  font-size: var(--sapling-text-body-size-md);
+  font-size: var(--sapling-text-body-size-sm);
   font-weight: 700;
+  line-height: 1.25;
 }
 
 .sapling-record-section__body {
@@ -130,12 +132,16 @@
 }
 
 .sapling-record-form-grid {
+  --v-gutter-x: var(--sapling-space-md);
+  --v-gutter-y: var(--sapling-space-2xs);
   margin: 0;
-  row-gap: var(--sapling-gap-sm);
+  row-gap: 0;
 }
 
 .sapling-record-form-grid__column {
   display: flex;
+  padding-block: var(--sapling-space-3xs);
+  padding-inline: var(--sapling-space-2xs);
 }
 
 .sapling-record-field-shell {
@@ -144,7 +150,7 @@
   align-items: flex-start;
   width: 100%;
   min-width: 0;
-  padding: var(--sapling-gap-xs);
+  padding: var(--sapling-space-3xs);
   border: 1px solid transparent;
   border-radius: var(--sapling-radius-sm);
   transition:
@@ -170,13 +176,13 @@
 }
 
 .sapling-record-field-shell .v-input__details {
-  min-height: var(--sapling-field-detail-min-height);
-  padding-top: var(--sapling-space-3xs);
+  min-height: var(--sapling-space-md-plus);
+  padding-top: 0;
   padding-inline: var(--sapling-space-3xs);
 }
 
 .sapling-record-field-shell .v-messages {
-  min-height: var(--sapling-field-detail-min-height);
+  min-height: var(--sapling-space-md-plus);
 }
 
 .sapling-record-field-shell .v-messages__message {

@@ -10,6 +10,7 @@
       class="sapling-change-password-dialog"
       :max-width="SAPLING_DIALOG_MAX_WIDTH.sm"
       :elevation="10"
+      :close="props.allowCancel ? closeDialog : undefined"
     >
       <SaplingDialogShell body-class="sapling-change-password-dialog__body">
         <template #hero>

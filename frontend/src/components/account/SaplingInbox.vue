@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-large">
-    <SaplingDialogCard class="sapling-inbox-dialog" :tilt="false">
+    <SaplingDialogCard class="sapling-inbox-dialog" :tilt="false" :close="closeDialog">
       <SaplingDialogShell
         fill-shell
         body-class="sapling-dialog-fill-body sapling-dialog-transparent-loaders sapling-inbox-dialog__body sapling-scrollable"
