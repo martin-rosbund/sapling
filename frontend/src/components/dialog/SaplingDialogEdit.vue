@@ -41,28 +41,6 @@
               >
                 {{ selectedFormConfigChipLabel }}
               </v-chip>
-            </template>
-
-            <template #meta>
-              <v-chip size="small" variant="outlined" prepend-icon="mdi-form-dropdown">
-                {{ visibleTemplates.length }}
-              </v-chip>
-              <v-chip
-                v-if="mode !== 'create'"
-                size="small"
-                variant="outlined"
-                prepend-icon="mdi-link-variant"
-              >
-                {{ relationTemplates.length }}
-              </v-chip>
-              <v-chip
-                v-if="itemHandleLabel"
-                size="small"
-                variant="outlined"
-                prepend-icon="mdi-pound"
-              >
-                {{ itemHandleLabel }}
-              </v-chip>
               <v-chip
                 v-if="isDirty && mode !== 'readonly'"
                 size="small"
@@ -76,15 +54,30 @@
 
             <template #actions>
               <v-btn
-                v-if="canOpenFormConfigEditor"
+                v-if="canOpenFormConfigEditor && $vuetify.display.mdAndUp"
                 size="small"
                 color="primary"
                 variant="tonal"
                 prepend-icon="mdi-table-cog"
+                :aria-label="$t('formConfig.openForEntity')"
                 :title="$t('formConfig.openForEntity')"
                 @click="openFormConfigEditor"
               >
                 {{ $t('formConfig.configure') }}
+              </v-btn>
+              <v-btn
+                v-else-if="canOpenFormConfigEditor"
+                class="sapling-dialog-hero__close"
+                size="small"
+                color="primary"
+                variant="tonal"
+                density="comfortable"
+                icon
+                :aria-label="$t('formConfig.openForEntity')"
+                :title="$t('formConfig.openForEntity')"
+                @click="openFormConfigEditor"
+              >
+                <v-icon icon="mdi-table-cog" />
               </v-btn>
             </template>
           </SaplingDialogEditHero>
@@ -575,10 +568,6 @@ const dialogTitle = computed(() => {
       return entityLabel.value
   }
 })
-
-const itemHandleLabel = computed(() =>
-  props.item?.handle == null ? '' : String(props.item.handle),
-)
 
 const entityHandle = computed(() => props.entity?.handle ?? '')
 
