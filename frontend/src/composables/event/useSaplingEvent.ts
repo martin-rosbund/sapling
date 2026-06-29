@@ -174,7 +174,7 @@ const MONTH_NAMES = [
  */
 export function useSaplingEvent() {
   //#region State
-  const { isLoading, loadTranslations } = useTranslationLoader(
+  const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoader(
     'navigation',
     'calendar',
     'global',
@@ -266,6 +266,7 @@ export function useSaplingEvent() {
   const showInformationDialog = ref(false)
   const informationDialogItem = ref<SaplingGenericItem | null>(null)
   const isSyncingExternalCalendar = ref(false)
+  const isCalendarInitializing = ref(true)
   const loadedScriptButtons = ref<ScriptButtonItem[]>([])
 
   let stopWindowWatcher: (() => void) | null = null
@@ -276,6 +277,7 @@ export function useSaplingEvent() {
   const calendarDisplayType = computed(() =>
     calendarType.value === 'workweek' ? 'week' : calendarType.value,
   )
+  const isLoading = computed(() => isTranslationLoading.value || isCalendarInitializing.value)
   const calendarWeekdays = computed(() =>
     calendarType.value === 'workweek' ? WORKWEEK_DAYS : undefined,
   )
@@ -509,16 +511,22 @@ export function useSaplingEvent() {
   })
 
   onMounted(async () => {
-    await Promise.all([
-      loadTranslations(),
-      currentPermissionStore.fetchCurrentPermission(),
-      loadOwnPerson(),
-      loadEventEntity(),
-      loadEventScriptButtons(),
-      loadTemplates(),
-      loadWorkHours(),
-    ])
-    await loadChipFilters()
+    isCalendarInitializing.value = true
+
+    try {
+      await Promise.all([
+        loadTranslations(),
+        currentPermissionStore.fetchCurrentPermission(),
+        loadOwnPerson(),
+        loadEventEntity(),
+        loadEventScriptButtons(),
+        loadTemplates(),
+        loadWorkHours(),
+      ])
+      await loadChipFilters()
+    } finally {
+      isCalendarInitializing.value = false
+    }
 
     queueScrollToCurrentTime()
   })
